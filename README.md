@@ -1,5 +1,8 @@
 # VOLCANO 
-Previously named -  SmartScan
+(Previously named -  SmartScan)
+
+
+
 This repositoray presents datasets and empirical analysis results that use code clone detection techniques for identifying vulnerabilities and their variations in smart contracts. Our empirical analysis is conducted using Nicad code clone detection tool on an Evaluation Dataset of approximately 50k Ethereum smart contracts.  
 
 This repository contains: 
