@@ -957,7 +957,7 @@ contract AdsInterface {
 ///  Market, Rentals, Ads contracts. Provides authorization and upgradability methods.
 contract MEHAccessControl is Pausable {
 
-    // Allows a module being plugged in to verify it is MEH contract. 
+    // Allows a module being plugged in to verify it is MEH contract.
     bool public isMEH = true;
 
     // Modules
@@ -967,16 +967,16 @@ contract MEHAccessControl is Pausable {
 
     // Emitted when a module is plugged.
     event LogModuleUpgrade(address newAddress, string moduleName);
-    
+
 // GUARDS
-    
-    /// @dev Functions allowed to market module only. 
+
+    /// @dev Functions allowed to market module only.
     modifier onlyMarket() {
         require(msg.sender == address(market));
         _;
     }
 
-    /// @dev Functions allowed to balance operators only (market and rentals contracts are the 
+    /// @dev Functions allowed to balance operators only (market and rentals contracts are the
     ///  only balance operators)
     modifier onlyBalanceOperators() {
         require(msg.sender == address(market) || msg.sender == address(rentals));
@@ -1013,16 +1013,16 @@ contract MEHAccessControl is Pausable {
 
 // File: contracts/MehERC721.sol
 
-// ERC721 
+// ERC721
 
 
 
 /// @title MehERC721: Part of MEH contract responsible for ERC721 token management. Openzeppelin's
-///  ERC721 implementation modified for the Million Ether Homepage. 
+///  ERC721 implementation modified for the Million Ether Homepage.
 contract MehERC721 is ERC721Token("MillionEtherHomePage","MEH"), MEHAccessControl {
 
     /// @dev Checks rights to transfer block ownership. Locks tokens on sale.
-    ///  Overrides OpenZEppelin's isApprovedOrOwner function - so that tokens marked for sale can 
+    ///  Overrides OpenZEppelin's isApprovedOrOwner function - so that tokens marked for sale can
     ///  be transferred by Market contract only.
     function isApprovedOrOwner(
         address _spender,
@@ -1031,7 +1031,7 @@ contract MehERC721 is ERC721Token("MillionEtherHomePage","MEH"), MEHAccessContro
         internal
         view
         returns (bool)
-    {   
+    {
         bool onSale = market.isOnSale(uint16(_tokenId));
 
         address owner = ownerOf(_tokenId);
@@ -1059,11 +1059,11 @@ contract MehERC721 is ERC721Token("MillionEtherHomePage","MEH"), MEHAccessContro
     function approve(address _to, uint256 _tokenId) public whenNotPaused {
         super.approve(_to, _tokenId);
     }
- 
+
     /// @dev overrides setApprovalForAll function to add pause/unpause functionality
     function setApprovalForAll(address _to, bool _approved) public whenNotPaused {
         super.setApprovalForAll(_to, _approved);
-    }    
+    }
 
     /// @dev overrides transferFrom function to add pause/unpause functionality
     ///  affects safeTransferFrom functions as well
@@ -1096,7 +1096,7 @@ contract Accounting is MEHAccessControl {
     event LogContractBalance(address payerOrPayee, int balanceChange);
 
 // ** PAYMENT PROCESSING ** //
-    
+
     /// @dev Withdraws users available balance.
     function withdraw() external whenNotPaused {
         address payee = msg.sender;
@@ -1116,10 +1116,10 @@ contract Accounting is MEHAccessControl {
     ///  MEH contract doesn't transfer funds on its own. Instead Market and Rentals contracts
     ///  are granted operator access.
     function operatorTransferFunds(
-        address _payer, 
-        address _recipient, 
-        uint _amount) 
-    external 
+        address _payer,
+        address _recipient,
+        uint _amount)
+    external
     onlyBalanceOperators
     whenNotPaused
     {
@@ -1149,7 +1149,7 @@ contract Accounting is MEHAccessControl {
     /// @notice Allows admin to withdraw contract balance in emergency. And distribute manualy
     ///  aftrewards.
     /// @dev As the contract is not designed to keep users funds (users can withdraw
-    ///  at anytime) it should be relatively easy to manualy transfer unclaimed funds to 
+    ///  at anytime) it should be relatively easy to manualy transfer unclaimed funds to
     ///  their owners. This is an alternatinve to selfdestruct allowing blocks ledger (ERC721 tokens)
     ///  to be immutable.
     function adminRescueFunds() external onlyOwner whenPaused {
@@ -1184,27 +1184,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 /*
-* A 1000x1000 pixel field is displayed at TheMillionEtherHomepage.com. 
+* A 1000x1000 pixel field is displayed at TheMillionEtherHomepage.com.
 * This smart contract lets anyone buy 10x10 pixel blocks and place ads there.
-* It also allows to sell blocks and rent them out to other advertisers. 
+* It also allows to sell blocks and rent them out to other advertisers.
 *
 * 10x10 pixels blocks are addressed by xy coordinates. So 1000x1000 pixel field is 100 by 100 blocks.
-* Making up 10 000 blocks in total. Each block is an ERC721 (non fungible token) token. 
+* Making up 10 000 blocks in total. Each block is an ERC721 (non fungible token) token.
 *
 * At the initial sale the price for each block is $1 (price is feeded by an oracle). After
 * every 1000 blocks sold (every 10%) the price doubles. Owners can sell and rent out blocks at any
-* price they want. Owners and renters can place and replace ads to their blocks as many times they 
+* price they want. Owners and renters can place and replace ads to their blocks as many times they
 * want.
 *
 * All heavy logic is delegated to external upgradable contracts. There are 4 main modules (contracts):
-*     - MEH: Million Ether Homepage (MEH) contract. Provides user interface and accounting 
-*         functionality. It is immutable and it keeps Non fungible ERC721 tokens (10x10 pixel blocks) 
-*         ledger and eth balances. 
-*     - Market: Plugable. Provides methods for buy-sell functionality, keeps buy-sell ledger, 
-*         querries oracle for a ETH-USD price, 
+*     - MEH: Million Ether Homepage (MEH) contract. Provides user interface and accounting
+*         functionality. It is immutable and it keeps Non fungible ERC721 tokens (10x10 pixel blocks)
+*         ledger and eth balances.
+*     - Market: Plugable. Provides methods for buy-sell functionality, keeps buy-sell ledger,
+*         querries oracle for a ETH-USD price,
 *     - Rentals: Plugable. Provides methods for rentout-rent functionality, keeps rentout-rent ledger.
 *     - Ads: Plugable. Provides methods for image placement functionality.
-* 
+*
 */
 
 /// @title MEH: Million Ether Homepage. Buy, sell, rent out pixels and place ads.
@@ -1254,7 +1254,7 @@ contract MEH is MehERC721, Accounting {
     );
 
     /// @notice emited when an ad is placed to an area
-    event LogAds(uint ID, 
+    event LogAds(uint ID,
         uint8 fromX,
         uint8 fromY,
         uint8 toX,
@@ -1265,16 +1265,16 @@ contract MEH is MehERC721, Accounting {
         address indexed advertiser);
 
 // ** BUY AND SELL BLOCKS ** //
-    
+
     /// @notice lets a message sender to buy blocks within area
-    /// @dev if using a contract to buy an area make sure to implement ERC721 functionality 
+    /// @dev if using a contract to buy an area make sure to implement ERC721 functionality
     ///  as tokens are transfered using "transferFrom" function and not "safeTransferFrom"
     ///  in order to avoid external calls.
-    function buyArea(uint8 fromX, uint8 fromY, uint8 toX, uint8 toY) 
+    function buyArea(uint8 fromX, uint8 fromY, uint8 toX, uint8 toY)
         external
         whenNotPaused
         payable
-    {   
+    {
         // check input parameters and eth deposited
         require(isLegalCoordinates(fromX, fromY, toX, toY));
         require(canPay(areaPrice(fromX, fromY, toX, toY)));
@@ -1289,28 +1289,28 @@ contract MEH is MehERC721, Accounting {
     /// @notice lets a message sender to mark blocks for sale at price set for each block in wei
     /// @dev (priceForEachBlockCents = 0 - not for sale)
     function sellArea(uint8 fromX, uint8 fromY, uint8 toX, uint8 toY, uint priceForEachBlockWei)
-        external 
+        external
         whenNotPaused
-    {   
+    {
         // check input parameters
         require(isLegalCoordinates(fromX, fromY, toX, toY));
 
         // try to mark blocks for sale through market contract
         // will get an id of buy-sell operation if succeeds (if owns all blocks)
         uint id = market.sellBlocks(
-            msg.sender, 
-            priceForEachBlockWei, 
+            msg.sender,
+            priceForEachBlockWei,
             blocksList(fromX, fromY, toX, toY)
         );
         emit LogSells(id, fromX, fromY, toX, toY, priceForEachBlockWei);
     }
 
     /// @notice get area price in wei
-    function areaPrice(uint8 fromX, uint8 fromY, uint8 toX, uint8 toY) 
-        public 
-        view 
-        returns (uint) 
-    {   
+    function areaPrice(uint8 fromX, uint8 fromY, uint8 toX, uint8 toY)
+        public
+        view
+        returns (uint)
+    {
         // check input
         require(isLegalCoordinates(fromX, fromY, toX, toY));
 
@@ -1319,35 +1319,35 @@ contract MEH is MehERC721, Accounting {
     }
 
 // ** RENT OUT AND RENT BLOCKS ** //
-        
-    /// @notice Rent out an area of blocks at coordinates [fromX, fromY, toX, toY] at a price for 
+
+    /// @notice Rent out an area of blocks at coordinates [fromX, fromY, toX, toY] at a price for
     ///  each block in wei
     /// @dev if rentPricePerPeriodWei = 0 then makes area not available for rent
     function rentOutArea(uint8 fromX, uint8 fromY, uint8 toX, uint8 toY, uint rentPricePerPeriodWei)
         external
         whenNotPaused
-    {   
+    {
         // check input
         require(isLegalCoordinates(fromX, fromY, toX, toY));
 
         // try to mark blocks as rented out through rentals contract
         // will get an id of rent-rentout operation if succeeds (if message sender owns blocks)
         uint id = rentals.rentOutBlocks(
-            msg.sender, 
-            rentPricePerPeriodWei, 
+            msg.sender,
+            rentPricePerPeriodWei,
             blocksList(fromX, fromY, toX, toY)
         );
         emit LogRentsOut(id, fromX, fromY, toX, toY, rentPricePerPeriodWei);
     }
-    
-    /// @notice Rent an area of blocks at coordinates [fromX, fromY, toX, toY] for a number of 
+
+    /// @notice Rent an area of blocks at coordinates [fromX, fromY, toX, toY] for a number of
     ///  periods specified
     ///  (period length is specified in rentals contract)
     function rentArea(uint8 fromX, uint8 fromY, uint8 toX, uint8 toY, uint numberOfPeriods)
         external
         payable
         whenNotPaused
-    {   
+    {
         // check input parameters and eth deposited
         // checks number of periods > 0 in rentals contract
         require(isLegalCoordinates(fromX, fromY, toX, toY));
@@ -1357,21 +1357,21 @@ contract MEH is MehERC721, Accounting {
         // try to rent blocks through rentals contract
         // will get an id of rent-rentout operation if succeeds (if all blocks available for rent)
         uint id = rentals.rentBlocks(
-            msg.sender, 
-            numberOfPeriods, 
+            msg.sender,
+            numberOfPeriods,
             blocksList(fromX, fromY, toX, toY)
         );
         emit LogRents(id, fromX, fromY, toX, toY, numberOfPeriods, 0);
     }
 
-    /// @notice get area rent price in wei for number of periods specified 
-    ///  (period length is specified in rentals contract) 
+    /// @notice get area rent price in wei for number of periods specified
+    ///  (period length is specified in rentals contract)
     function areaRentPrice(uint8 fromX, uint8 fromY, uint8 toX, uint8 toY, uint numberOfPeriods)
-        public 
-        view 
-        returns (uint) 
-    {   
-        // check input 
+        public
+        view
+        returns (uint)
+    {
+        // check input
         require(isLegalCoordinates(fromX, fromY, toX, toY));
 
         // querry areaPrice in wei at rentals contract
@@ -1379,51 +1379,51 @@ contract MEH is MehERC721, Accounting {
     }
 
 // ** PLACE ADS ** //
-    
+
     /// @notice places ads (image, caption and link to a website) into desired coordinates
-    /// @dev nothing is stored in any of the contracts except an image id. All other data is 
-    ///  only emitted in event. Basicaly this function just verifies if an event is allowed 
+    /// @dev nothing is stored in any of the contracts except an image id. All other data is
+    ///  only emitted in event. Basicaly this function just verifies if an event is allowed
     ///  to be emitted.
-    function placeAds( 
-        uint8 fromX, 
-        uint8 fromY, 
-        uint8 toX, 
-        uint8 toY, 
-        string imageSource, 
-        string link, 
+    function placeAds(
+        uint8 fromX,
+        uint8 fromY,
+        uint8 toX,
+        uint8 toY,
+        string imageSource,
+        string link,
         string text
-    ) 
+    )
         external
         whenNotPaused
-    {   
+    {
         // check input
         require(isLegalCoordinates(fromX, fromY, toX, toY));
 
         // try to place ads through ads contract
         // will get an image id if succeeds (if advertiser owns or rents all blocks within area)
         uint AdsId = ads.advertiseOnBlocks(
-            msg.sender, 
-            blocksList(fromX, fromY, toX, toY), 
-            imageSource, 
-            link, 
+            msg.sender,
+            blocksList(fromX, fromY, toX, toY),
+            imageSource,
+            link,
             text
         );
         emit LogAds(AdsId, fromX, fromY, toX, toY, imageSource, link, text, msg.sender);
     }
 
-    /// @notice check if an advertiser is allowed to put ads within area (i.e. owns or rents all 
+    /// @notice check if an advertiser is allowed to put ads within area (i.e. owns or rents all
     ///  blocks)
     function canAdvertise(
         address advertiser,
-        uint8 fromX, 
-        uint8 fromY, 
-        uint8 toX, 
+        uint8 fromX,
+        uint8 fromY,
+        uint8 toX,
         uint8 toY
-    ) 
+    )
         external
         view
         returns (bool)
-    {   
+    {
         // check user input
         require(isLegalCoordinates(fromX, fromY, toX, toY));
 
@@ -1440,14 +1440,14 @@ contract MEH is MehERC721, Accounting {
     }
 
 // ** INFO GETTERS ** //
-    
+
     /// @notice get an owner(address) of block at a specified coordinates
     function getBlockOwner(uint8 x, uint8 y) external view returns (address) {
         return ownerOf(blockID(x, y));
     }
 
 // ** UTILS ** //
-    
+
     /// @notice get ERC721 token id corresponding to xy coordinates
     function blockID(uint8 x, uint8 y) public pure returns (uint16) {
         return (uint16(y) - 1) * 100 + uint16(x);
@@ -1455,13 +1455,13 @@ contract MEH is MehERC721, Accounting {
 
     /// @notice get a number of blocks within area
     function countBlocks(
-        uint8 fromX, 
-        uint8 fromY, 
-        uint8 toX, 
+        uint8 fromX,
+        uint8 fromY,
+        uint8 toX,
         uint8 toY
-    ) 
-        internal 
-        pure 
+    )
+        internal
+        pure
         returns (uint16)
     {
         return (toX - fromX + 1) * (toY - fromY + 1);
@@ -1469,14 +1469,14 @@ contract MEH is MehERC721, Accounting {
 
     /// @notice get an array of all block ids (i.e. ERC721 token ids) within area
     function blocksList(
-        uint8 fromX, 
-        uint8 fromY, 
-        uint8 toX, 
+        uint8 fromX,
+        uint8 fromY,
+        uint8 toX,
         uint8 toY
-    ) 
-        internal 
-        pure 
-        returns (uint16[] memory r) 
+    )
+        internal
+        pure
+        returns (uint16[] memory r)
     {
         uint i = 0;
         r = new uint16[](countBlocks(fromX, fromY, toX, toY));
@@ -1487,22 +1487,83 @@ contract MEH is MehERC721, Accounting {
             }
         }
     }
-    
-    /// @notice insures that area coordinates are within 100x100 field and 
+
+    /// @notice insures that area coordinates are within 100x100 field and
     ///  from-coordinates >= to-coordinates
-    /// @dev function is used instead of modifier as modifier 
+    /// @dev function is used instead of modifier as modifier
     ///  required too much stack for placeImage and rentBlocks
     function isLegalCoordinates(
-        uint8 _fromX, 
-        uint8 _fromY, 
-        uint8 _toX, 
+        uint8 _fromX,
+        uint8 _fromY,
+        uint8 _toX,
         uint8 _toY
-    )    
-        private 
-        pure 
-        returns (bool) 
+    )
+        private
+        pure
+        returns (bool)
     {
-        return ((_fromX >= 1) && (_fromY >=1)  && (_toX <= 100) && (_toY <= 100) 
+        return ((_fromX >= 1) && (_fromY >=1)  && (_toX <= 100) && (_toY <= 100)
             && (_fromX <= _toX) && (_fromY <= _toY));
     }
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

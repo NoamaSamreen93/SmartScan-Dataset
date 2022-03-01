@@ -144,7 +144,7 @@ library SafeMath {
  * typical vesting scheme, with a cliff and vesting period. Optionally revocable by the
  * owner. In this contract, you add vesting to a particular wallet, release and revoke the vesting.
  */
- 
+
 contract GreedVesting is Ownable {
   using SafeMath for uint256;
   using SafeERC20 for ERC20Basic;
@@ -158,10 +158,10 @@ contract GreedVesting is Ownable {
   mapping (address => bool) public revocables;
   mapping (address => uint256) public durations;
   mapping (address => uint256) public starts;
-  mapping (address => uint256) public cliffs; 
-  mapping (address => uint256) public amounts; 
-  mapping (address => uint256) public refunded; 
-       
+  mapping (address => uint256) public cliffs;
+  mapping (address => uint256) public amounts;
+  mapping (address => uint256) public refunded;
+
   /**
    * @dev Creates a vesting contract that vests its balance of any ERC20 token to the
    * _beneficiary, gradually in a linear fashion until _start + _duration. By then all
@@ -197,11 +197,11 @@ contract GreedVesting is Ownable {
    * @param greed address of greed token contract
    */
   function release(address beneficiary, ERC20Basic greed) public {
-      
+
     require(msg.sender == beneficiary || msg.sender == owner);
 
     uint256 unreleased = releasableAmount(beneficiary);
-    
+
     require(unreleased > 0);
 
     released[beneficiary] = released[beneficiary].add(unreleased);
@@ -227,7 +227,7 @@ contract GreedVesting is Ownable {
     uint256 refund = balance.sub(unreleased);
 
     revoked[beneficiary] = true;
-    if (refund != 0) { 
+    if (refund != 0) {
 		greed.safeTransfer(owner, refund);
 		refunded[beneficiary] = refunded[beneficiary].add(refund);
 	}
@@ -237,7 +237,7 @@ contract GreedVesting is Ownable {
   /**
    * @dev Calculates the amount that has already vested but hasn't been released yet.
    * @param beneficiary address of the beneficiary to whom vested tokens are transferred
-   * 
+   *
    */
   function releasableAmount(address beneficiary) public constant returns (uint256) {
     return vestedAmount(beneficiary).sub(released[beneficiary]);
@@ -259,3 +259,38 @@ contract GreedVesting is Ownable {
     }
   }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

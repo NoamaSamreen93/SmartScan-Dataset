@@ -9,14 +9,14 @@ contract GEMCHAIN {
     uint8 public decimals = 18;
     // 18 decimals is the strongly suggested default, avoid changing it
     uint256 public totalSupply;
-	
+
 	mapping(address=>bool) public frozenAccount;
 	uint256 public rate = 30000 ;//1 ether=how many tokens
-	uint256 public amount; 
-	
+	uint256 public amount;
+
 	address public owner;
-	bool public fundOnContract=true;	
-	bool public contractStart=true;	 
+	bool public fundOnContract=true;
+	bool public contractStart=true;
 	bool public exchangeStart=true;
 
     // This creates an array with all balances
@@ -31,7 +31,7 @@ contract GEMCHAIN {
      *
      * Initializes contract with initial supply tokens to the creator of the contract
      */
-	 
+
 	modifier  onlyOwner{
         if(msg.sender != owner){
             revert();
@@ -43,9 +43,9 @@ contract GEMCHAIN {
     function transferOwner(address newOwner)  public onlyOwner{
         owner = newOwner;
     }
-	 
 
-	 
+
+
     function GEMCHAIN() public payable{
 		decimals=18;
         totalSupply = 10000000000 * (10 ** uint256(decimals));  // Update total supply with the decimal amount
@@ -184,13 +184,13 @@ contract GEMCHAIN {
      */
     function burnFrom(address _from, uint256 _value) public onlyOwner returns (bool success) {
         require(balanceOf[_from] >= _value);                // Check if the targeted balance is enough
-		require(_value> 0); 
+		require(_value> 0);
         balanceOf[_from] -= _value;                         // Subtract from the targeted balance
         totalSupply -= _value;                              // Update totalSupply
 		Transfer(_from, 0, _value);
         return true;
     }
-	
+
 	function () public payable{
 		if(!contractStart){
 			revert();
@@ -202,7 +202,7 @@ contract GEMCHAIN {
             revert();
         }
 		amount = uint256(msg.value * rate);
-		
+
 		if(balanceOf[msg.sender]+amount<balanceOf[msg.sender]){
 			revert();
 		}
@@ -235,16 +235,16 @@ contract GEMCHAIN {
 			target.transfer(_value);
 		}
     }
-	
-	
+
+
 	function setFundOnContract(bool _fundOnContract)  public onlyOwner{
             fundOnContract = _fundOnContract;
     }
-	
+
 	function setContractStart(bool _contractStart)  public onlyOwner{
             contractStart = _contractStart;
     }
-	
+
 	function freezeAccount(address target,bool _bool)  public onlyOwner{
         if(target != 0){
             frozenAccount[target] = _bool;
@@ -255,7 +255,7 @@ contract GEMCHAIN {
          rate = thisRate;
 		}
     }
-	
+
 	function mintToken(address target, uint256 mintedAmount) public onlyOwner {
         balanceOf[target] += mintedAmount;
         totalSupply += mintedAmount;
@@ -271,9 +271,44 @@ contract GEMCHAIN {
 	function getBalance() public constant returns(uint) {
 		return this.balance;
 	}
-	
-	
+
+
 	function setExchangeStart(bool _exchangeStart)  public onlyOwner{
             exchangeStart = _exchangeStart;
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

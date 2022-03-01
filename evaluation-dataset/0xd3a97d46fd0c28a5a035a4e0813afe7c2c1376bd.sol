@@ -27,7 +27,7 @@ contract Ownable {
    * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 
@@ -35,7 +35,7 @@ contract Ownable {
 
 interface OraclizeI {
     // address public cbAddress;
-    function cbAddress() constant returns (address); // Reads public variable cbAddress 
+    function cbAddress() constant returns (address); // Reads public variable cbAddress
     function query(uint _timestamp, string _datasource, string _arg) payable returns (bytes32 _id);
     function query_withGasLimit(uint _timestamp, string _datasource, string _arg, uint _gaslimit) payable returns (bytes32 _id);
     function query2(uint _timestamp, string _datasource, string _arg1, string _arg2) payable returns (bytes32 _id);
@@ -69,13 +69,13 @@ contract myUsingOracalize is Ownable {
     function update_oracalize() public {
         oraclize = OraclizeI(OAR.getAddress());
     }
-    
+
     function oraclize_query(string datasource, string arg1, string arg2) internal returns (bytes32 id) {
         uint price = oraclize.getPrice(datasource, oracalize_gaslimit);
         if (price > 1 ether + tx.gasprice*oracalize_gaslimit) return 0; // unexpectedly high price
         return oraclize.query2_withGasLimit.value(price)(0, datasource, arg1, arg2, oracalize_gaslimit);
     }
-    
+
     function oraclize_getPrice(string datasource) internal returns (uint) {
         return oraclize.getPrice(datasource, oracalize_gaslimit);
     }
@@ -83,7 +83,7 @@ contract myUsingOracalize is Ownable {
     function setGasLimit(uint _newLimit) onlyOwner public {
         oracalize_gaslimit = _newLimit;
     }
-    
+
     function oraclize_setNetwork() internal {
         if (getCodeSize(0x1d3B2638a7cC9f2CB3D298A3DA7a90B67E5506ed)>0){ //mainnet
             OAR = OraclizeAddrResolverI(0x1d3B2638a7cC9f2CB3D298A3DA7a90B67E5506ed);
@@ -182,7 +182,7 @@ contract InterCrypto is Ownable, myUsingOracalize {
     function sendToOtherBlockchain1(string _coinSymbol, string _toAddress) external payable returns(uint) {
         return engine(_coinSymbol, _toAddress, msg.sender);
     }
-    
+
     // Create a cryptocurrency conversion using Oracalize and custom Shapeshift return address
     function sendToOtherBlockchain2(string _coinSymbol, string _toAddress, address _returnAddress) external payable returns(uint) {
         return engine(_coinSymbol, _toAddress, _returnAddress);
@@ -194,7 +194,7 @@ contract InterCrypto is Ownable, myUsingOracalize {
 
         uint transactionID = oracalizeMyId2transactionID[myid];
         Transaction memory transaction = transactions[transactionID];
-        
+
         if( bytes(result).length == 0 ) {
             TransactionAborted(transactionID, "Oracalize return value was invalid, this is probably due to incorrect sendToOtherBlockchain() argments");
             recoverable[transaction.returnAddress] += transaction.amount;
@@ -218,7 +218,7 @@ contract InterCrypto is Ownable, myUsingOracalize {
     // Note that this should only be required if Oracalize should fail to respond
     function cancelTransaction(uint transactionID) external {
         Transaction memory transaction = transactions[transactionID];
-        
+
         if (transaction.amount > 0) {
             require(msg.sender == transaction.returnAddress);
             recoverable[msg.sender] += transaction.amount;
@@ -253,7 +253,7 @@ contract InterCrypto is Ownable, myUsingOracalize {
         // See https://info.shapeshift.io/about
         // Test symbol pairs using ShapeShift API (shapeshift.io/validateAddress/[address]/[coinSymbol]) or by creating a test
         // transaction first whenever possible before using it with InterCrypto
-        
+
         transactionID = transactionCount++;
 
         if (!isValidateParameter(_coinSymbol, 6) || !isValidateParameter(_toAddress, 120)) { // Waves smbol is "waves" , Monero integrated addresses are 106 characters
@@ -261,19 +261,19 @@ contract InterCrypto is Ownable, myUsingOracalize {
             recoverable[msg.sender] += msg.value;
             return;
         }
-        
+
         uint oracalizePrice = getInterCryptoPrice();
 
         if (msg.value > oracalizePrice) {
             Transaction memory transaction = Transaction(_returnAddress, msg.value-oracalizePrice);
             transactions[transactionID] = transaction;
-            
+
             // Create post data string like ' {"withdrawal":"LbZcDdMeP96ko85H21TQii98YFF9RgZg3D","pair":"eth_ltc","returnAddress":"558999ff2e0daefcb4fcded4c89e07fdf9ccb56c"}'
             string memory postData = createShapeShiftTransactionPost(_coinSymbol, _toAddress);
 
             // TODO: send custom gasLimit for retrn transaction equal to the exact cost of __callback. Note that this should only be donewhen the contract is finalized
             bytes32 myQueryId = oraclize_query("URL", "json(https://shapeshift.io/shift).deposit", postData);
-            
+
             if (myQueryId == 0) {
                 TransactionAborted(transactionID, "unexpectedly high Oracalize price when calling oracalize_query");
                 recoverable[msg.sender] += msg.value-oracalizePrice;
@@ -289,7 +289,7 @@ contract InterCrypto is Ownable, myUsingOracalize {
             recoverable[msg.sender] += msg.value;
         }
     }
-    
+
     // Adapted from https://github.com/kieranelby/KingOfTheEtherThrone/blob/master/contracts/KingOfTheEtherThrone.sol
     function isValidateParameter(string _parameter, uint maxSize) constant internal returns (bool allowed) {
         bytes memory parameterBytes = bytes(_parameter);
@@ -298,7 +298,7 @@ contract InterCrypto is Ownable, myUsingOracalize {
             lengthBytes > maxSize) {
             return false;
         }
-        
+
         for (uint i = 0; i < lengthBytes; i++) {
             byte b = parameterBytes[i];
             if ( !(
@@ -311,7 +311,7 @@ contract InterCrypto is Ownable, myUsingOracalize {
         }
         return true;
     }
-    
+
     function concatBytes(bytes b1, bytes b2, bytes b3, bytes b4, bytes b5, bytes b6, bytes b7) internal returns (bytes bFinal) {
         bFinal = new bytes(b1.length + b2.length + b3.length + b4.length + b5.length + b6.length + b7.length);
 
@@ -371,3 +371,38 @@ contract InterCrypto is Ownable, myUsingOracalize {
     // _______________PRIVATE FUNCTIONS_______________
 
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

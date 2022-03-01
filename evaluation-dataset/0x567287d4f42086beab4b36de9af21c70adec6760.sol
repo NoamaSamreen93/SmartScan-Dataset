@@ -74,7 +74,7 @@ library SafeMath {
 contract Ownable {
 
   address public owner;
-  address public ownerManualMinter; 
+  address public ownerManualMinter;
 
   event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
@@ -85,8 +85,8 @@ contract Ownable {
   function Ownable() {
     /**
     * ownerManualMinter contains the eth address of the party allowed to manually mint outside the crowdsale contract
-    * this is setup at construction time 
-    */ 
+    * this is setup at construction time
+    */
 
     ownerManualMinter = 0x163dE8a97f6B338bb498145536d1178e1A42AF85 ; // To be changed right after contract is deployed
     owner = msg.sender;
@@ -125,22 +125,22 @@ contract Ownable {
 }
 
 contract Restrictable is Ownable {
-    
+
     address public restrictedAddress;
-    
+
     event RestrictedAddressChanged(address indexed restrictedAddress);
-    
+
     function Restrictable() {
         restrictedAddress = address(0);
     }
-    
-    //that function could be called only ONCE!!! After that nothing could be reverted!!! 
+
+    //that function could be called only ONCE!!! After that nothing could be reverted!!!
     function setRestrictedAddress(address _restrictedAddress) onlyOwner public {
       restrictedAddress = _restrictedAddress;
       RestrictedAddressChanged(_restrictedAddress);
       transferOwnership(_restrictedAddress);
     }
-    
+
     modifier notRestricted(address tryTo) {
         if(tryTo == restrictedAddress) {
             revert();
@@ -159,7 +159,7 @@ contract BasicToken is ERC20Basic, Restrictable {
   using SafeMath for uint256;
 
   mapping(address => uint256) balances;
-  uint256 public constant icoEndDatetime = 1530421200 ; 
+  uint256 public constant icoEndDatetime = 1530421200 ;
 
   /**
   * @dev transfer token for a specified address
@@ -169,9 +169,9 @@ contract BasicToken is ERC20Basic, Restrictable {
 
   function transfer(address _to, uint256 _value) notRestricted(_to) public returns (bool) {
     require(_to != address(0));
-    
+
     // We won´t allow to transfer tokens until the ICO finishes
-    require(now > icoEndDatetime ); 
+    require(now > icoEndDatetime );
 
     require(_value <= balances[msg.sender]);
     balances[msg.sender] = balances[msg.sender].sub(_value);
@@ -208,9 +208,9 @@ contract StandardToken is ERC20, BasicToken {
    */
   function transferFrom(address _from, address _to, uint256 _value) notRestricted(_to) public returns (bool) {
     require(_to != address(0));
-    
+
     // We won´t allow to transfer tokens until the ICO finishes
-    require(now > icoEndDatetime) ; 
+    require(now > icoEndDatetime) ;
 
 
     require(_value <= balances[_from]);
@@ -225,7 +225,7 @@ contract StandardToken is ERC20, BasicToken {
     Transfer(_from, _to, _value);
     return true;
   }
-  
+
   function approve(address _spender, uint256 _value) public returns (bool) {
 
     // To change the approve amount you first have to reduce the addresses`
@@ -306,10 +306,45 @@ contract MintableToken is StandardToken {
 
 }
 
-contract LATINOToken is MintableToken 
+contract LATINOToken is MintableToken
 {
   string public constant name = "Latino Token";
   string public constant symbol = "LATINO";
 
- function LATINOToken() { totalSupply = 0 ; } // initializes to 0 the total token supply 
+ function LATINOToken() { totalSupply = 0 ; } // initializes to 0 the total token supply
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

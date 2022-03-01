@@ -44,7 +44,7 @@ contract ERC20Basic {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
     using SafeMath for uint256;
@@ -65,7 +65,7 @@ contract BasicToken is ERC20Basic {
 
     /**
     * @dev Gets the balance of the specified address.
-    * @param _owner The address to query the the balance of. 
+    * @param _owner The address to query the the balance of.
     * @return An uint256 representing the amount owned by the passed address.
     */
     function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -132,7 +132,7 @@ contract Ownable {
 contract StandardMintableToken is ERC20, BasicToken, Ownable {
 
     mapping (address => mapping (address => uint256)) allowed;
-  
+
     event Mint(address indexed to, uint256 amount);
     event MintFinished();
 
@@ -189,7 +189,7 @@ contract StandardMintableToken is ERC20, BasicToken, Ownable {
     function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
-  
+
    /**
    * @dev Function to mint tokens
    * @param _to The address that will receive the minted tokens.
@@ -203,7 +203,7 @@ contract StandardMintableToken is ERC20, BasicToken, Ownable {
         Transfer(0x0, _to, _amount); // so it is displayed properly on EtherScan
         return true;
     }
-    
+
     /**
     * @dev Function to stop minting new tokens.
     * @return True if the operation was successful.
@@ -222,7 +222,7 @@ contract StandardMintableToken is ERC20, BasicToken, Ownable {
  * @dev Issue: * https://github.com/OpenZeppelin/zeppelin-solidity/issues/120
  * Based on code by TokenMarketNet: https://github.com/TokenMarketNet/ico/blob/master/contracts/MintableToken.sol
  */
- 
+
 contract SlotTicket is StandardMintableToken {
 
     string public name = "Slot Ticket";
@@ -235,13 +235,13 @@ contract SlotTicket is StandardMintableToken {
     }
 }
 
-/**  
+/**
  *  @title Slot
  *  @dev every participant has an account index, the winners are picked from here
- *  all winners are picked in order from the single random int 
- *  needs to be cleared after every game 
+ *  all winners are picked in order from the single random int
+ *  needs to be cleared after every game
  */
-     
+
 contract Slot is Ownable {
     using SafeMath for uint256;
 
@@ -253,9 +253,9 @@ contract Slot is Ownable {
     uint256 constant DIV_DIST =       249 finney;
     uint256 constant GAS_REFUND =     2 finney;
 
-    /* 
+    /*
     *  every participant has an account index, the winners are picked from here
-    *  all winners are picked in order from the single random int 
+    *  all winners are picked in order from the single random int
     *  needs to be cleared after every game
     */
     mapping (uint => mapping (uint => address)) public participants; // game number => counter => address
@@ -264,13 +264,13 @@ contract Slot is Ownable {
     uint256 public gameIndex;
     uint256 public gameStartedAtBlock;
     address public fund; // address to send dividends
-    uint256[8] public prizes = [4 ether, 
+    uint256[8] public prizes = [4 ether,
                                 2 ether,
-                                1 ether, 
-                                500 finney, 
-                                500 finney, 
-                                500 finney, 
-                                500 finney, 
+                                1 ether,
+                                500 finney,
+                                500 finney,
+                                500 finney,
+                                500 finney,
                                 500 finney];
     uint256 counter;
 
@@ -315,7 +315,7 @@ contract Slot is Ownable {
 
         for (uint256 i = 0; i < _numberOfTickets; i++) {
             // using gameIndex instead of counter/SIZE since games can be cancelled
-            participants[gameIndex][counter%SIZE] = _participant; 
+            participants[gameIndex][counter%SIZE] = _participant;
             ParticipantAdded(_participant, gameIndex, counter%SIZE);
 
             // msg.sender triggers the drawing of lots
@@ -328,7 +328,7 @@ contract Slot is Ownable {
             // loop continues if there are more tickets
         }
     }
-    
+
     function awardPrizes() private {
         uint256 hashNumber = uint256(keccak256(block.blockhash(block.number-1)));
 
@@ -341,7 +341,7 @@ contract Slot is Ownable {
             distributeJackpot(winnerIndex);
         }
 
-        // loop throught the prizes 
+        // loop throught the prizes
         for (uint8 i = 0; i < prizes.length; i++) {
             // GAS: 21000 Paid for every transaction. (prizes.length)
             participants[gameIndex][winnerIndex%SIZE].transfer(prizes[i]); // msg.sender pays the gas, he's refunded later, % to wrap around
@@ -381,7 +381,7 @@ contract Slot is Ownable {
         require(block.number.sub(gameStartedAtBlock) >= INACTIVITY);
         require(counter%SIZE != 0); // nothing to refund
         // refunds for everybody can be requested after the game has gone (INACTIVITY) blocks without a conclusion
-        
+
         // Checks-Effects-Interactions pattern to avoid re-entrancy
         uint256 _size = counter%SIZE; // not counter.size, but modulus of SIZE
         counter -= _size;
@@ -400,22 +400,151 @@ contract Slot is Ownable {
         ticket.destroy();
         selfdestruct(owner);
     }
-    
+
     function changeTicketOwner(address _newOwner) public onlyOwner {
         require(_newOwner != 0x0);
         // in case of new contract, old token can still be used
         // the token contract owner is the slot contract itself
         ticket.transferOwnership(_newOwner);
     }
-    
+
     function changeFund(address _newFund) public onlyOwner {
         require(_newFund != 0x0);
         // changes the place to send dividends to SLOT investors
         fund = _newFund;
     }
-    
+
     function changeTicket(address _newTicket) public onlyOwner {
         require(_newTicket != 0x0);
         ticket = SlotTicket(_newTicket); // still owner of the ticket needs to changed to work
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

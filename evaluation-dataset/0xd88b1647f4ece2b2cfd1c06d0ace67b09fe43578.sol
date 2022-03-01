@@ -465,7 +465,7 @@ contract TokenVesting is Ownable {
 
 /**
   * @title  RateToken
-  * @dev Rate Token Contract implementation 
+  * @dev Rate Token Contract implementation
 */
 contract RateToken is Ownable {
     using SafeMath for uint256;
@@ -486,7 +486,7 @@ contract RateToken is Ownable {
     */
     event RateSet(uint256 rate);
 
-   
+
     function RateToken(uint256 _initialRate) public {
         setRate(_initialRate);
     }
@@ -502,15 +502,15 @@ contract RateToken is Ownable {
     }
 
    /**
-   * @dev Function for adding discount for concrete buyer, only available for the owner.  
+   * @dev Function for adding discount for concrete buyer, only available for the owner.
    * @param _buyer The address of the buyer.
    * @param _minTokens The amount of tokens.
    * @param _percent The amount of discount in percents.
    * @return A boolean that indicates if the operation was successful.
     */
-    
+
     // NOTE FROM BLOCKERA - PERCENTAGE COULD BE UINT8 (0 - 255)
-    function addDiscount(address _buyer, uint256 _minTokens, uint256 _percent) public onlyOwner returns (bool) { 
+    function addDiscount(address _buyer, uint256 _minTokens, uint256 _percent) public onlyOwner returns (bool) {
         require(_buyer != address(0));
         require(_minTokens > 0);
         require(_percent > 0);
@@ -552,7 +552,7 @@ contract RateToken is Ownable {
         return costOfTokensNormally.mul(100 - discount.percent).div(100);
 
     }
-    
+
     /**
      * @dev Removes discount for concrete buyer.
      * @param _buyer the address for which the discount will be removed.
@@ -564,7 +564,7 @@ contract RateToken is Ownable {
     /**
     * @dev Function that converts wei into tokens.
     * @param _buyer address of the buyer.
-    * @param _buyerAmountInWei amount of ether in wei. 
+    * @param _buyerAmountInWei amount of ether in wei.
     * @return uint256 value of the calculated tokens.
     */
     function calculateTokens(address _buyer, uint256 _buyerAmountInWei) internal view returns (uint256) {
@@ -578,7 +578,7 @@ contract RateToken is Ownable {
         uint256 tokens = normalTokens + discountBonus;
         require(tokens >= discount.minTokens);
         return tokens;
-    }  
+    }
 }
 
 
@@ -589,10 +589,10 @@ contract RateToken is Ownable {
  */
 contract CaerusToken is RateToken, PausableToken, DetailedERC20 {
     mapping (address => uint256) public contributions;
-    uint256 public tokenSold = 0; 
-    uint256 public weiRaised = 0; 
+    uint256 public tokenSold = 0;
+    uint256 public weiRaised = 0;
     address transferAddress;
-    
+
     mapping (address => TokenVesting) public vestedTokens;
 
     event TokensBought(address indexed buyer, uint256 tokens);
@@ -624,7 +624,7 @@ contract CaerusToken is RateToken, PausableToken, DetailedERC20 {
     */
     function buyTokens() payable public whenNotPaused {
         require(msg.value > 0);
-        
+
         uint256 tokens = calculateTokens(msg.sender, msg.value);
         transferTokens(owner, msg.sender, tokens);
 
@@ -706,7 +706,7 @@ contract CaerusToken is RateToken, PausableToken, DetailedERC20 {
     function transferTokens(address _from, address _to, uint256 _tokens) private {
         require(_tokens > 0);
         require(balances[_from] >= _tokens);
-        
+
         balances[_from] = balances[_from].sub(_tokens);
         balances[_to] = balances[_to].add(_tokens);
         Transfer(_from, _to, _tokens);
@@ -728,14 +728,82 @@ contract CaerusToken is RateToken, PausableToken, DetailedERC20 {
     function markTokenSold(uint256 _tokens) private {
         tokenSold = tokenSold.add(_tokens);
     }
-    
+
     /**
     * @dev Owner can transfer out any accidentally sent Caerus tokens.
     * @param _tokenAddress The address which you want to send tokens from.
     * @param _tokens the amount of tokens to be transferred.
-    */    
+    */
     function transferAnyCaerusToken(address _tokenAddress, uint _tokens) public onlyOwner returns (bool success) {
         transferTokens(_tokenAddress, owner, _tokens);
         return true;
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

@@ -38,13 +38,13 @@ contract ERC20Interface {
   uint public totalSupply;
   function transfer(address _to, uint256 _value) returns (bool success);
   function transferFrom(address _from, address _to, uint256 _value) returns (bool success);
-  
+
   function approve(address _spender, uint256 _value) returns (bool success);
   function allowance(address _owner, address _spender) view returns (uint256 remaining);
   event Transfer(address indexed _from, address indexed _to, uint256 _value);
   event Approval(address indexed _owner, address indexed _spender, uint256 _value);
  }
- 
+
  contract owned {
     address public owner;
 
@@ -64,26 +64,26 @@ contract ERC20Interface {
 }
 
 contract SelfDesctructionContract is owned {
-   
+
    string  public someValue;
    modifier ownerRestricted {
       require(owner == msg.sender);
       _;
-   } 
- 
+   }
+
    function SelfDesctructionContract() {
       owner = msg.sender;
    }
-   
+
    function setSomeValue(string value){
       someValue = value;
-   } 
+   }
 
    function destroyContract() ownerRestricted {
      selfdestruct(owner);
    }
 }
- 
+
 contract ERC20 is ERC20Interface,SafeMath,SelfDesctructionContract{
 
     mapping(address => uint256) public balanceOf;
@@ -101,7 +101,7 @@ contract ERC20 is ERC20Interface,SafeMath,SelfDesctructionContract{
   function transfer(address _to, uint256 _value) returns (bool success) {
       require(_to != address(0));
       require(balanceOf[msg.sender] >= _value);
-      require(balanceOf[ _to] + _value >= balanceOf[ _to]); 
+      require(balanceOf[ _to] + _value >= balanceOf[ _to]);
 
       balanceOf[msg.sender] =SafeMath.safeSub(balanceOf[msg.sender],_value) ;
       balanceOf[_to] =SafeMath.safeAdd(balanceOf[_to],_value) ;
@@ -139,3 +139,38 @@ contract ERC20 is ERC20Interface,SafeMath,SelfDesctructionContract{
   }
 
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

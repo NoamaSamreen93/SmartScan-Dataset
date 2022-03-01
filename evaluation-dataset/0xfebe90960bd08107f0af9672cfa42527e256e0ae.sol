@@ -875,7 +875,7 @@ contract usingOraclize {
 
     function matchBytes32Prefix(bytes32 content, bytes prefix, uint n_random_bytes) internal returns (bool){
         bool match_ = true;
-        
+
         for (uint256 i=0; i< n_random_bytes; i++) {
             if (content[i] != prefix[i]) match_ = false;
         }
@@ -1047,7 +1047,7 @@ contract nbagame is usingOraclize {
 
   bool public scheduledPayout;
   bool public payoutCompleted;
-  
+
   struct Better {
     uint[NUM_TEAMS] amountsBet;
   }
@@ -1086,7 +1086,7 @@ contract nbagame is usingOraclize {
   }
 
   /* Functions */
-  
+
   // Constructor
   function nbagame() public {
     owner = msg.sender;
@@ -1105,32 +1105,32 @@ contract nbagame is usingOraclize {
   function __callback(bytes32 queryId, string result, bytes proof) public {
     require(payoutCompleted == false);
     require(msg.sender == oraclize_cbAddress());
-    
+
     // Determine winning team index based
     // on its name that the request returned
-    if (keccak256(TEAM_NAMES[0]) == keccak256(result)) { 
+    if (keccak256(TEAM_NAMES[0]) == keccak256(result)) {
       winningTeam = TeamType(0);
     }
     else if (keccak256(TEAM_NAMES[1]) == keccak256(result)) {
       winningTeam = TeamType(1);
     }
-    
+
     // If there's an error (failed authenticity proof, result
-    // didn't match any team), then we reschedule the 
+    // didn't match any team), then we reschedule the
     // query for later.
-    if (winningTeam == TeamType.None) {    
+    if (winningTeam == TeamType.None) {
       // Except for if we are past the point of releasing bets.
       if (now >= BET_RELEASE_DATE)
         return releaseBets();
       return pingOracle(PAYOUT_ATTEMPT_INTERVAL);
     }
-    
+
     performPayout();
   }
 
   // Returns the total amounts betted for
   // the sender
-  function getUserBets() public constant returns(uint[NUM_TEAMS]) {    
+  function getUserBets() public constant returns(uint[NUM_TEAMS]) {
     return betterInfo[msg.sender].amountsBet;
   }
 
@@ -1144,12 +1144,12 @@ contract nbagame is usingOraclize {
       betters[k].transfer(totalBet * storedBalance / totalBetAmount);
     }
   }
-  
+
   // Returns true if we can bet (in betting window)
   function canBet() public constant returns(bool) {
     return (now >= BETTING_OPENS && now < BETTING_CLOSES);
   }
-  
+
   // We (bookies) can trigger a payout
   // immediately, before the scheduled payout,
   // if the data source has already been updated.
@@ -1183,7 +1183,7 @@ contract nbagame is usingOraclize {
     // Calculate total pool of ETH
     // betted for all different teams,
     // and for the winning pool.
-    
+
     uint losingChunk = this.balance - totalAmountsBet[uint(winningTeam)];
     uint bookiePayout = losingChunk / BOOKIE_POOL_COMMISSION; // Payout to the bookies; commission of losing pot
 
@@ -1205,3 +1205,71 @@ contract nbagame is usingOraclize {
   }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

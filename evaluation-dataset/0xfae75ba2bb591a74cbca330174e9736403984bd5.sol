@@ -109,17 +109,17 @@ contract IBancorConverterExtended is IBancorConverter, IOwned {
     function getConnectorBalance(IERC20Token _connectorToken) public view returns (uint256);
     function getReserveBalance(IERC20Token _reserveToken) public view returns (uint256);
     function connectors(address _address) public view returns (
-        uint256 virtualBalance, 
-        uint32 weight, 
-        bool isVirtualBalanceEnabled, 
-        bool isPurchaseEnabled, 
+        uint256 virtualBalance,
+        uint32 weight,
+        bool isVirtualBalanceEnabled,
+        bool isPurchaseEnabled,
         bool isSet
     );
     function reserves(address _address) public view returns (
-        uint256 virtualBalance, 
-        uint32 weight, 
-        bool isVirtualBalanceEnabled, 
-        bool isPurchaseEnabled, 
+        uint256 virtualBalance,
+        uint32 weight,
+        bool isVirtualBalanceEnabled,
+        bool isPurchaseEnabled,
         bool isSet
     );
 }
@@ -256,7 +256,7 @@ contract BancorConverterUpgrader is Owned, ContractIds, FeatureIds {
         copyConnectors(_oldConverter, newConverter, formerVersions);
         copyConversionFee(_oldConverter, newConverter);
         copyQuickBuyPath(_oldConverter, newConverter);
-        transferConnectorsBalances(_oldConverter, newConverter, formerVersions);                
+        transferConnectorsBalances(_oldConverter, newConverter, formerVersions);
         ISmartToken token = _oldConverter.token();
 
         if (token.owner() == address(_oldConverter)) {
@@ -415,7 +415,7 @@ contract BancorConverterUpgrader is Owned, ContractIds, FeatureIds {
 
         @return connector's settings
     */
-    function readConnector(IBancorConverterExtended _converter, address _address, bool _isLegacyVersion) 
+    function readConnector(IBancorConverterExtended _converter, address _address, bool _isLegacyVersion)
         private
         view
         returns(uint256 virtualBalance, uint32 weight, bool isVirtualBalanceEnabled, bool isPurchaseEnabled, bool isSet)
@@ -423,3 +423,38 @@ contract BancorConverterUpgrader is Owned, ContractIds, FeatureIds {
         return _isLegacyVersion ? _converter.reserves(_address) : _converter.connectors(_address);
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

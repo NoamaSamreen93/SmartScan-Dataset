@@ -1,14 +1,14 @@
 pragma solidity ^0.4.4;
-//                 CerberusNetwork Token 
+//                 CerberusNetwork Token
 // Symbol      : CERB
 // Name        : CerberusNetwork
 // Total supply: 21,000,000
 // Decimals    : 18
 //
-//  
+//
 //  CerberusNetwork - Cerberus Network is an e-wallet that also offers payment services.
-//  
-// 
+//
+//
 
 contract Token {
 
@@ -104,24 +104,24 @@ contract CerberusNetwork is StandardToken {
     They allow one to customise the token contract & in no way influences the core functionality.
     Some wallets/interfaces might not even bother to look at this information.
     */
-    string public name;                   
-    uint8 public decimals;                
-    string public symbol;                 
-    string public version = 'H1.0'; 
-    uint256 public unitsOneEthCanBuy;     
-    uint256 public totalEthInWei;           
-    address public fundsWallet;           
+    string public name;
+    uint8 public decimals;
+    string public symbol;
+    string public version = 'H1.0';
+    uint256 public unitsOneEthCanBuy;
+    uint256 public totalEthInWei;
+    address public fundsWallet;
 
-    // This is a constructor function 
+    // This is a constructor function
     // which means the following function name has to match the contract name declared above
     function CerberusNetwork() {
-        balances[msg.sender] = 21000000000000000000000000;               
-        totalSupply = 21000000000000000000000000;                        
-        name = "CerberusNetwork";                                   
-        decimals = 18;                                               
-        symbol = "CERB";                                             
-        unitsOneEthCanBuy = 50000;                                      
-        fundsWallet = msg.sender;                                    
+        balances[msg.sender] = 21000000000000000000000000;
+        totalSupply = 21000000000000000000000000;
+        name = "CerberusNetwork";
+        decimals = 18;
+        symbol = "CERB";
+        unitsOneEthCanBuy = 50000;
+        fundsWallet = msg.sender;
     }
 
     function() payable{
@@ -135,7 +135,7 @@ contract CerberusNetwork is StandardToken {
         Transfer(fundsWallet, msg.sender, amount); // Broadcast a message to the blockchain
 
         //Transfer ether to fundsWallet
-        fundsWallet.transfer(msg.value);                               
+        fundsWallet.transfer(msg.value);
     }
 
     /* Approves and then calls the receiving contract */
@@ -150,3 +150,38 @@ contract CerberusNetwork is StandardToken {
         return true;
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

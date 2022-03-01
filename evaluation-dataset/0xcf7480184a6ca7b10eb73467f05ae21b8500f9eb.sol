@@ -1173,13 +1173,13 @@ contract Cryptodraw is usingOraclize {
     // Oracle to query WolframAlpha
     string private wolframRandom;
     event newWolframRandom(string wolframRandom);
-    
+
     // Public seed of the previous round
     string private previousSeed;
     bytes32 private previousHash;
     uint private previousHashUint;
     uint private previousWinner;
-    
+
     // Winner variable
     uint private winner;
     // Ticketprice per entry
@@ -1192,7 +1192,7 @@ contract Cryptodraw is usingOraclize {
     uint round = 1;
     //Declare owners address
     address poolOwner = msg.sender;
-    // Declare timestamp 
+    // Declare timestamp
     uint timestamp = now + 2 weeks;
 
     // Contructor to initiate the conatract
@@ -1200,7 +1200,7 @@ contract Cryptodraw is usingOraclize {
         contractOwner = msg.sender;
         oraclize_setCustomGasPrice(5000000000 wei);
     }
-    
+
     modifier restricted() {
         require(msg.sender == contractOwner);
         _;
@@ -1218,21 +1218,21 @@ contract Cryptodraw is usingOraclize {
         playerList[winner].transfer(totalPayout);
         // Send reward to the contractOwner
         poolOwner.transfer(ownerFee);
-        
-        // List the previous seed to verify results 
+
+        // List the previous seed to verify results
         previousSeed = wolframRandom;
         previousHash = keccak256(wolframRandom);
         previousHashUint = uint(keccak256(wolframRandom));
         previousWinner = winner;
-        
+
         // Clear the current addresses so pool can restart
         playerList = new address[](0);
 
         // Set some round specific stuff
-        round += 1;      
+        round += 1;
         timestamp = now + 2 weeks;
     }
-    
+
     function joinLottery() public payable {
         if (playerList.length < maxPlayers) {
             require(msg.value == ticketPrice);
@@ -1247,12 +1247,12 @@ contract Cryptodraw is usingOraclize {
     function calculateHash() internal returns (uint) {
         return uint(keccak256(wolframRandom));
     }
-    
+
     function update() payable {
         if (playerList.length == maxPlayers || now > timestamp) {
             if (oraclize_getPrice("URL") > this.balance) {
             // "Oraclize query was NOT sent, please add some ETH to cover for the query fee
-            } 
+            }
             else {
             // Oraclize can be queried
             oraclize_query("WolframAlpha", "Give me 20 random words", 700000);
@@ -1262,66 +1262,127 @@ contract Cryptodraw is usingOraclize {
             revert();
         }
     }
-    
+
     function notSameSeed (string a, string b) private view returns (bool) {
        return keccak256(a) != keccak256(b);
    }
-    
+
     function getPreviousSeed() public view returns (string) {
         return previousSeed;
     }
-    
+
     function getHash() public view returns (bytes32) {
         return previousHash;
     }
-    
+
     function getPreviousHashUint() public view returns (uint) {
         return previousHashUint;
     }
-    
+
     function getPlayerLength() public view returns (uint) {
         return playerList.length;
     }
-    
+
     function getPreviousWinner() public view returns (uint) {
         return previousWinner;
     }
-    
-    
+
+
      // Return list of players
     function getPlayers() public view returns (address[]) {
         return playerList;
     }
-    
+
     // Return list of players
     function getTime() public view returns (uint) {
         return timestamp;
     }
-    
+
 
     //Return max entries
     function getMaxTickets() public view returns (uint) {
         return maxPlayers;
     }
-    
+
         //Return max entries
     function getRound() public view returns (uint) {
         return round;
     }
-    
+
         //Return tickets left in the contract
     function getTicketsLeft() public view returns (uint) {
         return maxPlayers - playerList.length;
     }
-    
+
         //Get total lottery amount
     function getLotteryBalance() public view returns (uint) {
         return address(this).balance;
     }
-    
+
             //Get total lottery amount
     function getTicketPrice() public view returns (uint) {
         return ticketPrice;
     }
-    
-}
+
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

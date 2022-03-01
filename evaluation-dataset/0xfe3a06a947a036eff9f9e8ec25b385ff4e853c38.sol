@@ -416,7 +416,7 @@ contract JZMLock {
     require(amount > 0);
     token.safeTransfer(beneficiary, amount);
   }
-  
+
   function canRelease() public view returns (bool){
     return block.timestamp >= releaseTime;
   }
@@ -430,7 +430,7 @@ contract JZMLock {
 contract JZMToken is PausableToken {
 
     event TransferWithLock(address indexed from, address indexed to, address indexed locked, uint256 amount, uint256 releaseTime);
-    
+
     mapping (address => address[] ) public balancesLocked;
 
     function transferWithLock(address _to, uint256 _amount, uint256 _releaseTime) public returns (bool) {
@@ -453,7 +453,7 @@ contract JZMToken is PausableToken {
         for (uint i = 0; i < lockTokenAddrs.length; i++) {
             totalLockedBalance = totalLockedBalance.add(balances[lockTokenAddrs[i]]);
         }
-        
+
         return totalLockedBalance;
     }
 
@@ -527,7 +527,7 @@ contract TUToken is JZMToken {
 
     //init supply for foundation = 20%
     uint256 private constant S_FOUNDATION = INITIAL_SUPPLY * 20 / 100;
-    
+
     constructor() public {
         totalSupply_ = INITIAL_SUPPLY;
         balances[owner] = totalSupply_;
@@ -553,12 +553,12 @@ contract TUToken is JZMToken {
         //2018/10/30 0:00:00 UTC +8
         transferWithLock(ADDR_MARKET, S_MARKET_20181030, 1540828800);
         //2019/01/30 0:00:00 UTC +8
-        transferWithLock(ADDR_MARKET, S_MARKET_20190130, 1548777600); 
-        //2019/04/30 0:00:00 UTC +8     
+        transferWithLock(ADDR_MARKET, S_MARKET_20190130, 1548777600);
+        //2019/04/30 0:00:00 UTC +8
         transferWithLock(ADDR_MARKET, S_MARKET_20190430, 1556553600);
         //2019/07/30 0:00:00 UTC +8
         transferWithLock(ADDR_MARKET, S_MARKET_20190730, 1564416000);
-        
+
         //lock for found team
         //2019/10/30 0:00:00 UTC +8
         transferWithLock(ADDR_FOUNDTEAM, S_FOUNDTEAM_20191030, 1572364800);
@@ -566,7 +566,7 @@ contract TUToken is JZMToken {
         transferWithLock(ADDR_FOUNDTEAM, S_FOUNDTEAM_20200430, 1588176000);
         //2020/10/30 0:00:00 UTC +8
         transferWithLock(ADDR_FOUNDTEAM, S_FOUNDTEAM_20201030, 1603987200);
-        
+
         //lock for eco
         //2019/04/01 0:00:00 UTC +8
         transferWithLock(ADDR_ECO, S_ECO_20190401, 1554048000);
@@ -594,3 +594,71 @@ contract TUToken is JZMToken {
         transferWithLock(ADDR_ECO, S_ECO_20241001, 1727712000);
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

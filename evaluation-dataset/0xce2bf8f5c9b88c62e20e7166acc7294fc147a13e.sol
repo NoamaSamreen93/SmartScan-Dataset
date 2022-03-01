@@ -71,7 +71,7 @@ contract LibEIP712 {
         // keccak256(abi.encodePacked(
         //     EIP191_HEADER,
         //     EIP712_DOMAIN_HASH,
-        //     hashStruct    
+        //     hashStruct
         // ));
 
         assembly {
@@ -147,16 +147,16 @@ contract LibOrder is
 
     // solhint-disable max-line-length
     struct Order {
-        address makerAddress;           // Address that created the order.      
-        address takerAddress;           // Address that is allowed to fill the order. If set to 0, any address is allowed to fill the order.          
-        address feeRecipientAddress;    // Address that will recieve fees when order is filled.      
+        address makerAddress;           // Address that created the order.
+        address takerAddress;           // Address that is allowed to fill the order. If set to 0, any address is allowed to fill the order.
+        address feeRecipientAddress;    // Address that will recieve fees when order is filled.
         address senderAddress;          // Address that is allowed to call Exchange contract methods that affect this order. If set to 0, any address is allowed to call these methods.
-        uint256 makerAssetAmount;       // Amount of makerAsset being offered by maker. Must be greater than 0.        
-        uint256 takerAssetAmount;       // Amount of takerAsset being bid on by maker. Must be greater than 0.        
+        uint256 makerAssetAmount;       // Amount of makerAsset being offered by maker. Must be greater than 0.
+        uint256 takerAssetAmount;       // Amount of takerAsset being bid on by maker. Must be greater than 0.
         uint256 makerFee;               // Amount of ZRX paid to feeRecipient by maker when order is filled. If set to 0, no transfer of ZRX from maker to feeRecipient will be attempted.
         uint256 takerFee;               // Amount of ZRX paid to feeRecipient by taker when order is filled. If set to 0, no transfer of ZRX from taker to feeRecipient will be attempted.
-        uint256 expirationTimeSeconds;  // Timestamp in seconds at which order expires.          
-        uint256 salt;                   // Arbitrary number to facilitate uniqueness of the order's hash.     
+        uint256 expirationTimeSeconds;  // Timestamp in seconds at which order expires.
+        uint256 salt;                   // Arbitrary number to facilitate uniqueness of the order's hash.
         bytes makerAssetData;           // Encoded data that can be decoded by a specified proxy contract when transferring makerAsset. The last byte references the id of this proxy.
         bytes takerAssetData;           // Encoded data that can be decoded by a specified proxy contract when transferring takerAsset. The last byte references the id of this proxy.
     }
@@ -219,13 +219,13 @@ contract LibOrder is
             let temp1 := mload(pos1)
             let temp2 := mload(pos2)
             let temp3 := mload(pos3)
-            
+
             // Hash in place
             mstore(pos1, schemaHash)
             mstore(pos2, makerAssetDataHash)
             mstore(pos3, takerAssetDataHash)
             result := keccak256(pos1, 416)
-            
+
             // Restore
             mstore(pos1, temp1)
             mstore(pos2, temp2)
@@ -515,7 +515,7 @@ contract ISignatureValidator {
         bytes signature
     )
         external;
-    
+
     /// @dev Approves/unnapproves a Validator contract to verify signatures on signer's behalf.
     /// @param validatorAddress Address of Validator contract.
     /// @param approval Approval or disapproval of  Validator contract.
@@ -845,7 +845,7 @@ contract LibConstants {
     bytes4 constant internal OWNERSHIP_DATA_ID = bytes4(keccak256("Ownership(address,uint256)"));
     bytes4 constant internal FILLED_TIMES_DATA_ID = bytes4(keccak256("FilledTimes(uint256)"));
     uint256 constant internal MAX_UINT = 2**256 - 1;
- 
+
     // solhint-disable var-name-mixedcase
     IExchange internal EXCHANGE;
     // solhint-enable var-name-mixedcase
@@ -1090,7 +1090,7 @@ contract IRequiredAsset {
 
 contract IRequirementFilterCore {
 
-    /// @dev Executes an Exchange transaction iff the maker and taker meet 
+    /// @dev Executes an Exchange transaction iff the maker and taker meet
     ///      all requirements specified in `takerAssetData`
     ///      Supported Exchange functions:
     ///         - fillOrder
@@ -1104,7 +1104,7 @@ contract IRequirementFilterCore {
         address signerAddress,
         bytes signedExchangeTransaction,
         bytes signature
-    ) 
+    )
         external
         returns (bool success);
 
@@ -1339,7 +1339,7 @@ library LibBytes {
         }
         return memoryAddress;
     }
-    
+
     /// @dev Gets the memory address for the contents of a byte array.
     /// @param input Byte array to lookup.
     /// @return memoryAddress Memory address of the contents of the byte array.
@@ -1422,7 +1422,7 @@ library LibBytes {
                         source := add(source, 32)
                         dest := add(dest, 32)
                     }
-                    
+
                     // Write the last 32 bytes
                     mstore(dEnd, last)
                 }
@@ -1453,7 +1453,7 @@ library LibBytes {
                         sEnd := sub(sEnd, 32)
                         dEnd := sub(dEnd, 32)
                     }
-                    
+
                     // Write the first 32 bytes
                     mstore(dest, first)
                 }
@@ -1483,7 +1483,7 @@ library LibBytes {
             to < b.length,
             "TO_LESS_THAN_LENGTH_REQUIRED"
         );
-        
+
         // Create a new bytes structure and copy contents
         result = new bytes(to - from);
         memCopy(
@@ -1493,7 +1493,7 @@ library LibBytes {
         );
         return result;
     }
-    
+
     /// @dev Returns a slice from a byte array without preserving the input.
     /// @param b The byte array to take a slice from. Will be destroyed in the process.
     /// @param from The starting index for the slice (inclusive).
@@ -1517,7 +1517,7 @@ library LibBytes {
             to < b.length,
             "TO_LESS_THAN_LENGTH_REQUIRED"
         );
-        
+
         // Create a new bytes structure around [from, to) in-place.
         assembly {
             result := add(b, from)
@@ -1660,7 +1660,7 @@ library LibBytes {
                 mload(add(b, index)),
                 0xffffffffffffffffffffffff0000000000000000000000000000000000000000
             )
-            
+
             // Make sure input address is clean.
             // (Solidity does not guarantee this)
             input := and(input, 0xffffffffffffffffffffffffffffffffffffffff)
@@ -1808,7 +1808,7 @@ library LibBytes {
             b.length >= index + nestedBytesLength,
             "GREATER_OR_EQUAL_TO_NESTED_BYTES_LENGTH_REQUIRED"
         );
-        
+
         // Return a pointer to the byte array as it exists inside `b`
         assembly {
             result := add(b, index)
@@ -1877,7 +1877,7 @@ contract MixinRequirementFilterCore is
 {
     using LibBytes for bytes;
 
-    /// @dev Executes an Exchange transaction iff the maker and taker meet 
+    /// @dev Executes an Exchange transaction iff the maker and taker meet
     ///      all requirements specified in `takerAssetData`
     ///      Supported Exchange functions:
     ///         - fillOrder
@@ -1891,7 +1891,7 @@ contract MixinRequirementFilterCore is
         address signerAddress,
         bytes signedExchangeTransaction,
         bytes signature
-    ) 
+    )
         external
         returns (bool success)
     {
@@ -2031,4 +2031,65 @@ contract RequirementFilter is
         public
         LibConstants(exchange)
     {}
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

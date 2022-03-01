@@ -1,8 +1,8 @@
 /**
  * The Xmas Token contract complies with the ERC20 standard (see https://github.com/ethereum/EIPs/issues/20).
- * Santa Claus doesn't kepp any shares and all tokens not being sold during the crowdsale (but the 
+ * Santa Claus doesn't kepp any shares and all tokens not being sold during the crowdsale (but the
  * reserved gift shares) are burned by the elves.
- * 
+ *
  * Author: Christmas Elf
  * Audit: Rudolf the red nose Reindear
  */
@@ -18,7 +18,7 @@ library SafeMath {
 		assert(a == 0 || c / a == b);
 		return c;
 	}
-	
+
 	function div(uint256 a, uint256 b) internal returns(uint256) {
 		uint256 c = a / b;
 		return c;
@@ -40,30 +40,30 @@ library SafeMath {
  * Implementation of Xmas Token contract.
  */
 contract XmasToken {
-    
-    using SafeMath for uint256; 
-	
+
+    using SafeMath for uint256;
+
 	// Xmas token basic data
 	string constant public standard = "ERC20";
 	string constant public symbol = "xmas";
 	string constant public name = "XmasToken";
 	uint8 constant public decimals = 18;
-	
+
 	// Xmas token distribution
 	uint256 constant public initialSupply = 4000000 * 1 ether;
 	uint256 constant public tokensForIco = 3000000 * 1 ether;
 	uint256 constant public tokensForBonus = 1000000 * 1 ether;
-	
-	/** 
+
+	/**
 	 * Starting with this time tokens may be transfered.
 	 */
 	uint256 constant public startAirdropTime = 1514073600;
-	
-	/** 
+
+	/**
 	 * Starting with this time tokens may be transfered.
 	 */
 	uint256 public startTransferTime;
-	
+
 	/**
 	 * Number of tokens sold in crowdsale
 	 */
@@ -76,16 +76,16 @@ contract XmasToken {
 
 	mapping(address => uint256) public balanceOf;
 	mapping(address => mapping(address => uint256)) public allowance;
-	
+
 	// -------------------- Crowdsale parameters --------------------
-	
+
 	/**
-	 * the start date of the crowdsale 
+	 * the start date of the crowdsale
 	 */
 	uint256 constant public start = 1510401600;
-	
+
 	/**
-	 * the end date of the crowdsale 
+	 * the end date of the crowdsale
 	 */
 	uint256 constant public end = 1512863999;
 
@@ -93,37 +93,37 @@ contract XmasToken {
 	 * the exchange rate: 1 eth = 1000 xmas tokens
 	 */
 	uint256 constant public tokenExchangeRate = 1000;
-	
+
 	/**
-	 * how much has been raised by crowdale (in ETH) 
+	 * how much has been raised by crowdale (in ETH)
 	 */
 	uint256 public amountRaised;
 
 	/**
-	 * indicates if the crowdsale has been closed already 
+	 * indicates if the crowdsale has been closed already
 	 */
 	bool public crowdsaleClosed = false;
 
 	/**
-	 * tokens will be transfered from this address 
+	 * tokens will be transfered from this address
 	 */
 	address public xmasFundWallet;
-	
+
 	/**
-	 * the wallet on which the eth funds will be stored 
+	 * the wallet on which the eth funds will be stored
 	 */
 	address ethFundWallet;
-	
+
 	// -------------------- Events --------------------
-	
+
 	// public events on the blockchain that will notify listeners
 	event Transfer(address indexed from, address indexed to, uint256 value);
 	event Approval(address indexed _owner, address indexed spender, uint256 value);
 	event FundTransfer(address backer, uint amount, bool isContribution, uint _amountRaised);
 	event Burn(uint256 amount);
 
-	/** 
-	 * Initializes contract with initial supply tokens to the creator of the contract 
+	/**
+	 * Initializes contract with initial supply tokens to the creator of the contract
 	 */
 	function XmasToken(address _ethFundWallet) {
 		ethFundWallet = _ethFundWallet;
@@ -131,7 +131,7 @@ contract XmasToken {
 		balanceOf[xmasFundWallet] = initialSupply;
 		startTransferTime = end;
 	}
-		
+
 	/**
 	 * Default function called whenever anyone sends funds to this contract.
 	 * Only callable if the crowdsale started and hasn't been closed already and the tokens for icos haven't been sold yet.
@@ -141,13 +141,13 @@ contract XmasToken {
 	 */
 	function() payable {
 		uint256 amount = msg.value;
-		uint256 numTokens = amount.mul(tokenExchangeRate); 
+		uint256 numTokens = amount.mul(tokenExchangeRate);
 		require(numTokens >= 100 * 1 ether);
 		require(!crowdsaleClosed && now >= start && now <= end && tokensSold.add(numTokens) <= tokensForIco);
 
 		ethFundWallet.transfer(amount);
-		
-		balanceOf[xmasFundWallet] = balanceOf[xmasFundWallet].sub(numTokens); 
+
+		balanceOf[xmasFundWallet] = balanceOf[xmasFundWallet].sub(numTokens);
 		balanceOf[msg.sender] = balanceOf[msg.sender].add(numTokens);
 
 		Transfer(xmasFundWallet, msg.sender, numTokens);
@@ -158,25 +158,25 @@ contract XmasToken {
 
 		FundTransfer(msg.sender, amount, true, amountRaised);
 	}
-	
-	/** 
+
+	/**
 	 * Sends the specified amount of tokens from msg.sender to a given address.
 	 * @param _to the address to transfer to.
 	 * @param _value the amount of tokens to be trasferred.
 	 * @return true if the trasnfer is successful, false otherwise.
 	 */
 	function transfer(address _to, uint256 _value) returns(bool success) {
-		require(now >= startTransferTime); 
+		require(now >= startTransferTime);
 
-		balanceOf[msg.sender] = balanceOf[msg.sender].sub(_value); 
-		balanceOf[_to] = balanceOf[_to].add(_value); 
+		balanceOf[msg.sender] = balanceOf[msg.sender].sub(_value);
+		balanceOf[_to] = balanceOf[_to].add(_value);
 
-		Transfer(msg.sender, _to, _value); 
+		Transfer(msg.sender, _to, _value);
 
 		return true;
 	}
 
-	/** 
+	/**
 	 * Allows another contract or person to spend the specified amount of tokens on behalf of msg.sender.
 	 * @param _spender the address which will spend the funds.
 	 * @param _value the amount of tokens to be spent.
@@ -192,41 +192,41 @@ contract XmasToken {
 		return true;
 	}
 
-	/** 
+	/**
 	 * Transfers tokens from one address to another address.
-	 * This is only allowed if the token holder approves. 
+	 * This is only allowed if the token holder approves.
 	 * @param _from the address from which the given _value will be transfer.
 	 * @param _to the address to which the given _value will be transfered.
 	 * @param _value the amount of tokens which will be transfered from one address to another.
-	 * @return true if the transfer was successful, false otherwise. 
+	 * @return true if the transfer was successful, false otherwise.
 	 */
 	function transferFrom(address _from, address _to, uint256 _value) returns(bool success) {
-		if (now < startTransferTime) 
+		if (now < startTransferTime)
 			require(_from == xmasFundWallet);
 		var _allowance = allowance[_from][msg.sender];
 		require(_value <= _allowance);
-		
-		balanceOf[_from] = balanceOf[_from].sub(_value); 
-		balanceOf[_to] = balanceOf[_to].add(_value); 
+
+		balanceOf[_from] = balanceOf[_from].sub(_value);
+		balanceOf[_to] = balanceOf[_to].add(_value);
 		allowance[_from][msg.sender] = _allowance.sub(_value);
 
 		Transfer(_from, _to, _value);
 
 		return true;
 	}
-	
-	/** 
+
+	/**
 	 * Burns the remaining tokens except the gift share.
 	 * To be called when ICO is closed. Anybody may burn the tokens after ICO ended, but only once.
 	 */
 	function burn() internal {
 		require(now > startTransferTime);
 		require(burned == false);
-			
+
 		uint256 difference = balanceOf[xmasFundWallet].sub(tokensForBonus);
 		tokensSold = tokensForIco.sub(difference);
 		balanceOf[xmasFundWallet] = tokensForBonus;
-			
+
 		burned = true;
 
 		Burn(difference);
@@ -239,10 +239,10 @@ contract XmasToken {
 	function markCrowdsaleEnding() {
 		require(now > end);
 
-		burn(); 
+		burn();
 		crowdsaleClosed = true;
 	}
-	
+
 	/**
 	 * Sends the bonus tokens to addresses from Santa's list gift.
 	 * @return true if the airdrop is successful, false otherwise.
@@ -250,16 +250,51 @@ contract XmasToken {
 	function sendGifts(address[] santaGiftList) returns(bool success)  {
 		require(msg.sender == xmasFundWallet);
 		require(now >= startAirdropTime);
-	
+
 		for(uint i = 0; i < santaGiftList.length; i++) {
 		    uint256 tokensHold = balanceOf[santaGiftList[i]];
-			if (tokensHold >= 100 * 1 ether) { 
+			if (tokensHold >= 100 * 1 ether) {
 				uint256 bonus = tokensForBonus.div(1 ether);
 				uint256 giftTokens = ((tokensHold.mul(bonus)).div(tokensSold)) * 1 ether;
 				transferFrom(xmasFundWallet, santaGiftList[i], giftTokens);
 			}
 		}
-		
+
 		return true;
 	}
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

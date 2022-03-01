@@ -194,11 +194,11 @@ contract Ownable {
 }
 
 
-         
+
 
 contract ivtk is SupportsInterfaceWithLookup, ERC721Basic, Ownable {
     mapping (bytes32 => string) public dbCustomer;
-    
+
     struct invoiceInfo {
         bytes32[] aErc20Tx;
         bytes32 custID;
@@ -209,20 +209,20 @@ contract ivtk is SupportsInterfaceWithLookup, ERC721Basic, Ownable {
         uint amtExc2dec;
         uint amtInc2dec;
     }
-    
+
     invoiceInfo[] aInvoices;
     mapping (bytes32 => uint) mTxRelateWithTokenID;
-    
+
 
     string public name;
     string public symbol;
-    
-    
-    
+
+
+
     // Equals to `bytes4(keccak256("onERC721Received(address,address,uint256,bytes)"))`
     // which can be also obtained as `ERC721Receiver(0).onERC721Received.selector`
     bytes4 private constant ERC721_RECEIVED = 0x150b7a02;
-  
+
     // Mapping from token ID to owner
     mapping (uint256 => address) internal tokenOwner;
 
@@ -234,32 +234,32 @@ contract ivtk is SupportsInterfaceWithLookup, ERC721Basic, Ownable {
 
     // Mapping from owner to operator approvals
     mapping (address => mapping (address => bool)) internal operatorApprovals;
-  
-    
+
+
     constructor() public {
         dbCustomer["ET1218"] = "บริษัท กรุงเทพดรักสโตร์ จำกัด";
-        
+
         name = "IV Token";
         symbol = "iv";
-        
+
         // register the supported interfaces to conform to ERC721 via ERC165
         _registerInterface(InterfaceId_ERC721);
         _registerInterface(InterfaceId_ERC721Exists);
     }
-    
+
     function implementsERC721() public pure returns (bool)
     {
         return true;
     }
-    
+
     function getTokenIDRelateWithTx(bytes32 _tx) public view returns (uint) {
         return mTxRelateWithTokenID[_tx];
     }
-    
+
     function totalSupply() public view returns (uint256) {
         return aInvoices.length;
     }
-    
+
     function getItemByTokenID(uint256 _tokenId) public view returns (
         bytes32[] aErc20Tx,
         bytes32 custID,
@@ -270,9 +270,9 @@ contract ivtk is SupportsInterfaceWithLookup, ERC721Basic, Ownable {
         uint amtExc2dec,
         uint amtInc2dec
         ) {
-        
+
         require(_tokenId > 0);
-        
+
         invoiceInfo storage ivInfo = aInvoices[_tokenId - 1];
         return (
             ivInfo.aErc20Tx,
@@ -285,8 +285,8 @@ contract ivtk is SupportsInterfaceWithLookup, ERC721Basic, Ownable {
             ivInfo.amtInc2dec
         );
     }
-    
-    
+
+
     function addData(
         bytes32[] aErc20Tx,
         bytes32 custID,
@@ -296,12 +296,12 @@ contract ivtk is SupportsInterfaceWithLookup, ERC721Basic, Ownable {
         uint salePrice2dec,
         uint amtExc2dec,
         uint amtInc2dec
-        ) 
-        public 
+        )
+        public
         onlyOwner
         {
-        
-        
+
+
         invoiceInfo memory ivInfo = invoiceInfo({
             aErc20Tx: aErc20Tx,
             custID: custID,
@@ -312,19 +312,19 @@ contract ivtk is SupportsInterfaceWithLookup, ERC721Basic, Ownable {
             amtExc2dec: amtExc2dec,
             amtInc2dec: amtInc2dec
         });
-        
+
         uint256 _tokenID = aInvoices.push(ivInfo);
         for(uint256 i=0; i<aErc20Tx.length; i++) {
             mTxRelateWithTokenID[aErc20Tx[i]] = _tokenID;
         }
-        
+
         addTokenTo(msg.sender, _tokenID);
         emit Transfer(address(0), msg.sender, _tokenID);
     }
-    
-    
-    
-    
+
+
+
+
     /**
     * @dev Gets the balance of the specified address
     * @param _owner address to query the balance of
@@ -355,7 +355,7 @@ contract ivtk is SupportsInterfaceWithLookup, ERC721Basic, Ownable {
         address owner = tokenOwner[_tokenId];
         return owner != address(0);
     }
-    
+
     /**
     * @dev Approves another address to transfer the given token ID
     * The zero address indicates there is no approved address.
@@ -372,7 +372,7 @@ contract ivtk is SupportsInterfaceWithLookup, ERC721Basic, Ownable {
         tokenApprovals[_tokenId] = _to;
         emit Approval(owner, _to, _tokenId);
     }
-    
+
     /**
     * @dev Gets the approved address for a token ID, or zero if no address set
     * @param _tokenId uint256 ID of the token to query the approval of
@@ -393,7 +393,7 @@ contract ivtk is SupportsInterfaceWithLookup, ERC721Basic, Ownable {
         operatorApprovals[msg.sender][_to] = _approved;
         emit ApprovalForAll(msg.sender, _to, _approved);
     }
-    
+
     /**
     * @dev Tells whether an operator is approved by a given owner
     * @param _owner owner address which you want to query the approval of
@@ -510,8 +510,8 @@ contract ivtk is SupportsInterfaceWithLookup, ERC721Basic, Ownable {
             isApprovedForAll(owner, _spender)
         );
     }
-    
-    
+
+
     /**
     * @dev Internal function to clear current approval of a given token ID
     * Reverts if the given address is not indeed the owner of the token
@@ -572,8 +572,8 @@ contract ivtk is SupportsInterfaceWithLookup, ERC721Basic, Ownable {
         msg.sender, _from, _tokenId, _data);
         return (retval == ERC721_RECEIVED);
     }
-    
-    
+
+
     /**
     * Returns whether the target address is a contract
     * @dev This function will return false if invoked during the constructor of a contract,
@@ -593,5 +593,40 @@ contract ivtk is SupportsInterfaceWithLookup, ERC721Basic, Ownable {
         assembly { size := extcodesize(addr) }
         return size > 0;
     }
-    
+
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

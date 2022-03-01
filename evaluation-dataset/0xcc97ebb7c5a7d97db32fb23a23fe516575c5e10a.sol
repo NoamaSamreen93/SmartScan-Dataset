@@ -30,7 +30,7 @@ contract owned {
     function owned() payable {
         owner = msg.sender;
     }
-    
+
     modifier onlyOwner {
         require(owner == msg.sender);
         _;
@@ -40,7 +40,7 @@ contract owned {
         require(_owner != 0);
         newOwner = _owner;
     }
-    
+
     function confirmOwner() public {
         require(newOwner == msg.sender);
         owner = newOwner;
@@ -72,7 +72,7 @@ contract ManualMigration is owned, ERC20 {
         require(original == 0);
         _;
     }
-    
+
     struct SpecialTokenHolder {
         uint limit;
         bool isTeam;
@@ -103,7 +103,7 @@ contract ManualMigration is owned, ERC20 {
         holders[original].balance -= balance;
         Transfer(original, _who, balance);
     }
-    
+
     function sealManualMigration(bool force) onlyOwner {
         require(force || holders[original].balance == 0);
         delete original;
@@ -118,7 +118,7 @@ contract ManualMigration is owned, ERC20 {
 }
 
 contract Crowdsale is ManualMigration {
-    
+
     function Crowdsale(address _original) payable ManualMigration(_original) {}
 
     function () payable enabled {
@@ -155,7 +155,7 @@ contract Token is Crowdsale {
 
     function Token(address _original, uint _startTime)
         payable Crowdsale(_original) {
-        startTime = _startTime;    
+        startTime = _startTime;
     }
 
     function availableTokens(address _who) public constant returns (uint _avail) {
@@ -182,7 +182,7 @@ contract Token is Crowdsale {
             _avail -= blocked;
         }
     }
-    
+
     function firstYearPeriods() internal constant returns (uint _periods) {
         _periods = 0;
         if (now < startTime + 1 years) {
@@ -204,7 +204,7 @@ contract Token is Crowdsale {
         holders[_to].balance += _value;
         Transfer(msg.sender, _to, _value);
     }
-    
+
     function transferFrom(address _from, address _to, uint256 _value) public enabled {
         require(availableTokens(_from) >= _value);
         require(holders[_to].balance + _value >= holders[_to].balance); // overflow
@@ -226,7 +226,7 @@ contract Token is Crowdsale {
         returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
-    
+
     function burn(uint256 _value) public enabled {
         require(holders[msg.sender].balance >= _value);
         beforeBalanceChanges(msg.sender);
@@ -241,7 +241,7 @@ contract MigrationAgent {
 }
 
 contract TokenMigration is Token {
-    
+
     address public migrationAgent;
     uint256 public totalMigrated;
 
@@ -275,11 +275,11 @@ contract NeuroDAO is TokenMigration {
 
     function NeuroDAO(address _original, uint _startTime)
         payable TokenMigration(_original, _startTime) {}
-    
+
     function withdraw() public onlyOwner {
         owner.transfer(this.balance);
     }
-    
+
     function freezeTheMoment() public onlyOwner {
         freezedMoment = now;
     }
@@ -294,7 +294,7 @@ contract NeuroDAO is TokenMigration {
             return holders[_who].balanceBeforeUpdate;
         }
     }
-    
+
     function killMe() public onlyOwner {
         require(totalSupply == 0);
         selfdestruct(owner);
@@ -302,27 +302,27 @@ contract NeuroDAO is TokenMigration {
 }
 
 contract Adapter is owned {
-    
+
     address public neuroDAO;
     address public erc20contract;
     address public masterHolder;
-    
+
     mapping (address => bool) public alreadyUsed;
-    
+
     function Adapter(address _neuroDAO, address _erc20contract, address _masterHolder)
         payable owned() {
         neuroDAO = _neuroDAO;
         erc20contract = _erc20contract;
         masterHolder = _masterHolder;
     }
-    
+
     function killMe() public onlyOwner {
         selfdestruct(owner);
     }
- 
+
     /**
      * Move tokens int erc20contract to NDAO tokens holder
-     * 
+     *
      * # Freeze balances in NeuroDAO smartcontract by calling freezeTheMoment() function.
      * # Allow transferFrom masterHolder in ERC20 smartcontract by calling approve() function
      *   from masterHolder address, gives this contract address as spender parameter.
@@ -334,4 +334,98 @@ contract Adapter is owned {
         ERC20(erc20contract).transferFrom(masterHolder, msg.sender, balance);
         alreadyUsed[msg.sender] = true;
     }
-}
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

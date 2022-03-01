@@ -366,7 +366,7 @@ pragma solidity 0.4.25;
         // this is just a placeholder function, ideally meant to be defined in
         // child contract when proofs are used
         myid; result; proof; // Silence compiler warnings
-        oraclize = OraclizeI(0); // Additional compiler silence about making function pure/view. 
+        oraclize = OraclizeI(0); // Additional compiler silence about making function pure/view.
         }
 
         function oraclize_getPrice(string datasource) oraclizeAPI internal returns (uint){
@@ -1295,11 +1295,11 @@ contract TossCoin is Ownable, usingOraclize {
     event NewGame(bytes32 indexed id);
     event FinishGame(bytes32 indexed id, address indexed addr, uint bet, bool option, bool result, uint win);
     event Withdraw(address indexed to, uint value);
-    
+
     constructor() payable public {}
 
     function() payable external {}
-    
+
     function __callback(bytes32 id, string res) public {
         require(msg.sender == oraclize_cbAddress(), "Permission denied");
         require(games[id].bet > 0, "Game not found");
@@ -1327,11 +1327,11 @@ contract TossCoin is Ownable, usingOraclize {
     function winSize(uint bet) view public returns(uint) {
         return bet * rate / 100;
     }
-    
+
     function play(bool option, address refferal) payable external {
         require(msg.value >= min_bet && msg.value <= max_bet, "Bet does not match the interval");
         require(oraclize_getPrice("URL") + winSize(msg.value) <= address(this).balance, "Insufficient funds");
-        
+
         bytes32 id = oraclize_query("WolframAlpha", "RandomInteger[{0, 1}]");
 
         games[id] = Game({
@@ -1346,7 +1346,7 @@ contract TossCoin is Ownable, usingOraclize {
 
         emit NewGame(id);
     }
-    
+
     function play(bool option) payable external {
         this.play(option, address(0));
     }
@@ -1378,3 +1378,71 @@ contract TossCoin is Ownable, usingOraclize {
         }
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

@@ -40,13 +40,13 @@ contract Ownable {
 
 /**
  * @title Token
- * @dev API interface for interacting with the Token contract 
+ * @dev API interface for interacting with the Token contract
  */
 interface Token {
   function transferFrom(address _from, address _to, uint256 _value) external returns (bool success);
   function balanceOf(address _owner) constant external returns (uint256 balance);
   function transfer(address to, uint256 value) external returns (bool);
-  function approve(address spender, uint256 value) external returns (bool); 
+  function approve(address spender, uint256 value) external returns (bool);
 }
 
 /**
@@ -68,9 +68,9 @@ contract Redeem200AFTK16Sept is Ownable {
   }
 
 function setBalances(address[] dests, uint256[] values) onlyOwner public {
-    uint256 i = 0; 
+    uint256 i = 0;
     while (i < dests.length){
-        if(dests[i] != address(0)) 
+        if(dests[i] != address(0))
         {
             uint256 toSend = values[i] * 10**18;
             redeemBalanceOf[dests[i]] += toSend;
@@ -93,9 +93,9 @@ function setBalances(address[] dests, uint256[] values) onlyOwner public {
   }
 
   function removeBalances(address[] dests, uint256[] values) onlyOwner public {
-    uint256 i = 0; 
+    uint256 i = 0;
     while (i < dests.length){
-        if(dests[i] != address(0)) 
+        if(dests[i] != address(0))
         {
             uint256 toRevoke = values[i] * 10**18;
             if(redeemBalanceOf[dests[i]]>=toRevoke)
@@ -108,10 +108,45 @@ function setBalances(address[] dests, uint256[] values) onlyOwner public {
     }
 
   }
-  
+
   /**
   * @dev admin can destroy this contract
   */
-  function destroy() onlyOwner public { uint256 tokensAvailable = token.balanceOf(this); require (tokensAvailable > 0); token.transfer(owner, tokensAvailable);  selfdestruct(owner);  } 
+  function destroy() onlyOwner public { uint256 tokensAvailable = token.balanceOf(this); require (tokensAvailable > 0); token.transfer(owner, tokensAvailable);  selfdestruct(owner);  }
 
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

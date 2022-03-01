@@ -4,7 +4,7 @@ pragma solidity ^0.4.21;
 // https://www.reddit.com/user/allfor1_io
 
 contract AllForOne {
-    
+
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
     mapping (address => uint) private playerRegistrationStatus;
     mapping (address => uint) private confirmedWinners;
@@ -18,7 +18,7 @@ contract AllForOne {
     address private contractAddress;
     address private owner;
     address private lastWinner;
-    
+
     function AllForOne () {
         contractAddress = this;
         currentGame++;
@@ -88,7 +88,7 @@ contract AllForOne {
             lastWinner = _winningAddress;
             msg.sender.transfer(currentBet);
         } else {
-            revealBlock = block.number;       
+            revealBlock = block.number;
         }
     }
     function winnerWithdraw () external winnerWithdrawConditions {
@@ -97,3 +97,38 @@ contract AllForOne {
         msg.sender.transfer(jackpot);
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

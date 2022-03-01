@@ -60,11 +60,11 @@ contract TokenERC20 {
      */
     function _transfer(address _from, address _to, uint _value) internal {
         // Prevent transfer to 0x0 address. Use burn() instead
-        require(_to != 0x0);        
-        require(balanceOf[_from] >= _value);        
-        require(balanceOf[_to] + _value > balanceOf[_to]);        
-        uint previousBalances = balanceOf[_from] + balanceOf[_to];        
-        balanceOf[_from] -= _value;        
+        require(_to != 0x0);
+        require(balanceOf[_from] >= _value);
+        require(balanceOf[_to] + _value > balanceOf[_to]);
+        uint previousBalances = balanceOf[_from] + balanceOf[_to];
+        balanceOf[_from] -= _value;
         balanceOf[_to] += _value;
         Transfer(_from, _to, _value);
         // Asserts are used to use static analysis to find bugs in your code. They should never fail
@@ -73,7 +73,7 @@ contract TokenERC20 {
 
     /**
      * Transfer tokens
-     * Send `_value` tokens to `_to` from your account     
+     * Send `_value` tokens to `_to` from your account
      * @param _to The address of the recipient
      * @param _value the amount to send
      */
@@ -167,26 +167,26 @@ contract utility
         check1(ethers);
         return (ethers);
     }
-    
-    function calculateTokens(uint _amount, uint _rate, uint _decimalValue) constant internal returns(uint tokens, uint excessEthers) 
+
+    function calculateTokens(uint _amount, uint _rate, uint _decimalValue) constant internal returns(uint tokens, uint excessEthers)
     {
         tokens = _amount*10**_decimalValue;
         tokens = tokens/_rate;
         excessEthers = _amount-((tokens*_rate)/10**_decimalValue);
         return (tokens, excessEthers);
-    } 
-    
-   
+    }
+
+
     function decimalAdjustment(uint _amount, uint _decimalPlaces) constant internal returns(uint adjustedValue)
     {
         uint diff = 18-_decimalPlaces;
         uint adjust = 1*10**diff;
-       
+
         adjustedValue = _amount/adjust;
-       
-        return adjustedValue;       
+
+        return adjustedValue;
     }
-   
+
     // function ceil(uint a, uint m) constant returns (uint ) {
     //     return ((a + m - 1) / m) * m;
     // }
@@ -197,9 +197,9 @@ contract utility
 /******************************************/
 
 contract TokenNWTC is owned, TokenERC20, utility {
-    
+
     event check(uint256 val1);
-    
+
     uint256 public sellPrice;
     uint256 public buyPrice;
     address[] frzAcc;
@@ -236,7 +236,7 @@ contract TokenNWTC is owned, TokenERC20, utility {
         balanceOf[_to] += _value;                           // Add the same to the recipient
         Transfer(_from, _to, _value);
         sellTokenAmount += _value;
-        
+
         if (users.length>0){
                 uint count=0;
             for (uint a=0;a<users.length;a++)
@@ -248,13 +248,13 @@ contract TokenNWTC is owned, TokenERC20, utility {
             if (count==0){
                 users.push(_to);
             }
-                 
+
         }
         else{
             users.push(_to);
         }
     }
-    
+
 
     // @notice Create `mintedAmount` tokens and send it to `target`
     // @param target Address to receive the tokens
@@ -267,7 +267,7 @@ contract TokenNWTC is owned, TokenERC20, utility {
         Transfer(0, this, mintedAmount);
         Transfer(this, target, mintedAmount);
         sellTokenAmount += mintedAmount;
-        
+
          if (users.length>0){
                 uint count1=0;
             for (uint a=0;a<users.length;a++)
@@ -279,7 +279,7 @@ contract TokenNWTC is owned, TokenERC20, utility {
             if (count1==0){
                 users.push(target);
             }
-                 
+
         }
         else{
             users.push(target);
@@ -312,7 +312,7 @@ contract TokenNWTC is owned, TokenERC20, utility {
 
     function freezeAllAccountInEmergency(bool freezeAll) onlyOwner public
     {
-        emergencyFreeze = freezeAll;    
+        emergencyFreeze = freezeAll;
     }
 
     /// notice Allow users to buy tokens for `newBuyPrice` eth and sell tokens for `newSellPrice` eth
@@ -320,7 +320,7 @@ contract TokenNWTC is owned, TokenERC20, utility {
     /// @param newBuyPrice Price users can buy from the contract
     function setPrices(uint256 newSellPrice, uint256 newBuyPrice) onlyOwner public {
         require(newSellPrice!=0 || sellPrice!=0);
-        require(newBuyPrice!=0 || buyPrice!=0); 
+        require(newBuyPrice!=0 || buyPrice!=0);
         if(newSellPrice!=0)
         {
             sellPrice = newSellPrice;
@@ -336,14 +336,14 @@ contract TokenNWTC is owned, TokenERC20, utility {
         require(msg.value!=0);
         require(buyPrice!=0);
         uint exceededEthers;
-        uint amount = msg.value;                                // msg.value will be in wei.   
+        uint amount = msg.value;                                // msg.value will be in wei.
         (amount, exceededEthers) = calculateTokens(amount, buyPrice, decimals);
         require(amount!=0);
         _transfer(this, msg.sender, amount);              // makes the transfers.
         msg.sender.transfer(exceededEthers);// sends exceeded ether to the seller.
-        
+
        // addUsers(msg.sender);
-        
+
         if (users.length>0){
                 uint count=0;
             for (uint a=0;a<users.length;a++)
@@ -355,18 +355,18 @@ contract TokenNWTC is owned, TokenERC20, utility {
             if (count==0){
                 users.push(msg.sender);
             }
-                 
+
         }
         else{
             users.push(msg.sender);
         }
-        
-        
+
+
     }
 
     // @notice Sell `amount` tokens to contract
     // @param amount amount of tokens to be sold
-    // amount should be in form of decimal specified in this contract. 
+    // amount should be in form of decimal specified in this contract.
     function sell(uint256 amount) public {
         require(amount!=0);
         require(sellPrice!=0);
@@ -380,17 +380,17 @@ contract TokenNWTC is owned, TokenERC20, utility {
 
 
     function readAllUsers()constant returns(address[]){
-	      
-	      
+
+
 	          for (uint k=0;k<users.length;k++){
 	              if (balanceOf[users[k]]>0){
 	                  users1.push(users[k]);
 	              }
 	          }
-	      
+
        return users1;
    }
-   
+
    function readAllFrzAcc()constant returns(address[]){
        for (uint k=0;k<frzAcc.length;k++){
 	              if (frozenAccount[frzAcc[k]] == true){
@@ -399,23 +399,23 @@ contract TokenNWTC is owned, TokenERC20, utility {
 	          }
        return frzAcc1;
    }
-   
+
    function readSellTokenAmount()constant returns(uint256){
        return sellTokenAmount;
    }
-   
-   
+
+
 //   function addUsers(address add) internal{
 //       uint totalUsers = totalUsers+1;
 //       tokenUsers[totalUsers] = add;
 //   }
-   
+
 //     function transfer1(address _to, uint256 _value){
 
 // 		// if(frozenAccount[msg.sender]) throw;
 // 		                     // Check if sender is frozen
 //         require(!frozenAccount[_to]);                       // Check if recipient is frozen
-//         require(!emergencyFreeze); 
+//         require(!emergencyFreeze);
 // 		require(!frozenAccount[msg.sender]);
 // 		// if(balanceOf[msg.sender] < _value) throw;
 // 		require(balanceOf[msg.sender] >= _value);
@@ -501,13 +501,13 @@ contract TokenNWTC is owned, TokenERC20, utility {
         Burn(_from, _value);
         return true;
     }
-    
+
     //======================================================
     function getTokenName() constant public returns (string)
     {
         return name;
     }
-    
+
     //========================================================
     function getTokenSymbol() constant public returns (string)
     {
@@ -525,5 +525,134 @@ contract TokenNWTC is owned, TokenERC20, utility {
     {
         return totalSupply;
     }
-    
+
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

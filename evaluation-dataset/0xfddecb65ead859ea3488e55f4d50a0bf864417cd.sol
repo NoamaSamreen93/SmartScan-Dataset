@@ -295,7 +295,7 @@ contract MintableToken is StandardToken, Ownable {
 }
 
 contract VEC is Ownable, MintableToken {
-  using SafeMath for uint256;    
+  using SafeMath for uint256;
   string public constant name = "Verified Emission Credit";
   string public constant symbol = "VEC";
   uint32 public constant decimals = 0;
@@ -321,9 +321,9 @@ contract Crowdsale is Ownable {
   //Total number of tokens sold on ICO
   uint256 public allTokenICO;
   //max tokens
-  uint256 public maxTokens; 
+  uint256 public maxTokens;
   //max Ether
-  uint256 public maxEther; 
+  uint256 public maxEther;
   // Address where funds are collected
   address public wallet;
 
@@ -346,7 +346,7 @@ contract Crowdsale is Ownable {
 
 
   function Crowdsale() public {
-    maxTokens = 500000000; 
+    maxTokens = 500000000;
     maxEther = 10000 * 1 ether;
     rate = 12908;
     startICO =1523864288; // 04/16/2018 @ 7:38am (UTC)
@@ -372,7 +372,7 @@ contract Crowdsale is Ownable {
    * @param _beneficiary Address performing the token purchase
    */
   function buyTokens(address _beneficiary) public payable {
-    require(now >= startICO); 
+    require(now >= startICO);
     require(msg.value <= maxEther);
     require(allTokenICO <= maxTokens);
     uint256 weiAmount = msg.value;
@@ -383,7 +383,7 @@ contract Crowdsale is Ownable {
 
     // update state
     weiRaised = weiRaised.add(weiAmount);
-        
+
 
     _processPurchase(_beneficiary, tokens);
     // update state
@@ -447,3 +447,71 @@ contract Crowdsale is Ownable {
     wallet.transfer(msg.value);
   }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

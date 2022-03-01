@@ -1,10 +1,10 @@
 pragma solidity ^0.4.25;
 // expansion on original contract from dav's stronghands contract sac3d
-// the real OG 
+// the real OG
 
-// expansion Slaughter3D Coded by spielley 
+// expansion Slaughter3D Coded by spielley
 
-// now reworked with new refund line model 
+// now reworked with new refund line model
 //  and able to force someone into a match if they hold enough balance
 
 // Thank you for playing Spielleys contract creations.
@@ -50,23 +50,23 @@ contract Slaughter3D is Owned {
         mapping (uint8 => address) slotXplayer;
         mapping (address => bool) players;
         mapping (uint8 => address) setMN;
-        
+
     }
-    
+
     HourglassInterface constant p3dContract = HourglassInterface(0xB3775fB83F7D12A36E0475aBdD1FCA35c091efBe);
     SPASMInterface constant SPASM_ = SPASMInterface(0xfaAe60F2CE6491886C9f7C9356bd92F688cA66a1);//spielley's profit sharing payout
     Slaughter3DInterface constant old = Slaughter3DInterface(0xA76daa02C1A6411c6c368f3A59f4f2257a460006);
     //a small part of every winners share of the sacrificed players offer is used to purchase p3d instead
     uint256 constant private P3D_SHARE = 0.005 ether;
-    
+
     uint8 constant public MAX_PLAYERS_PER_STAGE = 2;
     uint256 constant public OFFER_SIZE = 0.1 ether;
     uint256 public Refundpot;
-    
+
     uint256 private p3dPerStage = P3D_SHARE * (MAX_PLAYERS_PER_STAGE - 1);
-    //not sacrificed players receive their offer back and also a share of the sacrificed players offer 
+    //not sacrificed players receive their offer back and also a share of the sacrificed players offer
     uint256 public winningsPerRound = 0.185 ether;
-    
+
     mapping(address => uint256) public playerVault;
     mapping(uint256 => Stage) public stages;
     mapping(uint256 => address) public RefundWaitingLine;
@@ -74,14 +74,14 @@ contract Slaughter3D is Owned {
     uint256 public  NextInLine;//next person to be refunded
     uint256 public  NextAtLineEnd;//next spot to add loser
     uint256 private numberOfFinalizedStages;
-    
+
     uint256 public numberOfStages;
-    
+
     event SacrificeOffered(address indexed player);
     event SacrificeChosen(address indexed sarifice);
     event EarningsWithdrawn(address indexed player, uint256 indexed amount);
     event StageInvalidated(uint256 indexed stage);
-    
+
     uint256 public NextInLineOld;
     uint256 public lastToPayOld;
     // UI view functions
@@ -136,13 +136,13 @@ contract Slaughter3D is Owned {
         }
         return (check);
     }
-    
+
     function nextonetogetpaid()
         public
         view
         returns(address)
     {
-        
+
         return (RefundWaitingLine[NextInLine]);
     }
    function contractownsthismanyP3D()
@@ -175,7 +175,7 @@ modifier updateAccount(address account) {
   if(owing > balances[account]){balances[account] = owing;}
   if(owing > 0 ) {
     unclaimedDividends = unclaimedDividends.sub(owing);
-    
+
     playerVault[account] = playerVault[account].add(owing);
     balances[account] = balances[account].sub(owing);
     _totalSupply = _totalSupply.sub(owing);
@@ -188,7 +188,7 @@ function fetchdivs(address toUpdate) public updateAccount(toUpdate){}
 
 function disburse() public  payable {
     uint256 amount = msg.value;
-    
+
   totalDividendPoints = totalDividendPoints.add(amount.mul(pointMultiplier).div(_totalSupply));
   //ethtotalSupply = ethtotalSupply.add(amount);
  unclaimedDividends = unclaimedDividends.add(amount);
@@ -197,14 +197,14 @@ function disburse() public  payable {
     //fetch P3D divs
     function DivsToRefundpot ()public
     {
-        //allocate p3d dividends to contract 
+        //allocate p3d dividends to contract
             uint256 dividends = p3dContract.myDividends(true);
             require(dividends > 0);
             uint256 base = dividends.div(100);
             p3dContract.withdraw();
             SPASM_.disburse.value(base.mul(5));// to dev fee sharing contract SPASM
             Refundpot = Refundpot.add(base.mul(95));
-            
+
     }
     //Donate to losers
     function DonateToLosers ()public payable
@@ -228,33 +228,33 @@ function disburse() public  payable {
     // next loser payout distribution
     function Payoutnextrefund ()public
     {
-         
+
         require(Refundpot > 0.00001 ether);
         uint256 amount = Refundpot;
     Refundpot = 0;
     totalDividendPoints = totalDividendPoints.add(amount.mul(pointMultiplier).div(_totalSupply));
     unclaimedDividends = unclaimedDividends.add(amount);
     }
-    
+
     // Sac dep
     modifier isValidOffer()
     {
         require(msg.value == OFFER_SIZE);
         _;
     }
-    
+
     modifier canPayFromVault()
     {
         require(playerVault[msg.sender] >= OFFER_SIZE);
         _;
     }
-    
+
     modifier hasEarnings()
     {
         require(playerVault[msg.sender] > 0);
         _;
     }
-    
+
     modifier prepareStage()
     {
         //create a new stage if current has reached max amount of players
@@ -264,13 +264,13 @@ function disburse() public  payable {
         }
         _;
     }
-    
+
     modifier isNewToStage()
     {
         require(stages[numberOfStages - 1].players[msg.sender] == false);
         _;
     }
-    
+
     constructor()
         public
     {
@@ -279,9 +279,9 @@ function disburse() public  payable {
         NextInLineOld = old.NextInLine();
         lastToPayOld = 525;
     }
-    
+
     //function() external payable {}
-    
+
     function offerAsSacrifice(address MN)
         external
         payable
@@ -290,11 +290,11 @@ function disburse() public  payable {
         isNewToStage
     {
         acceptOffer(MN);
-        
+
         //try to choose a sacrifice in an already full stage (finalize a stage)
         tryFinalizeStage();
     }
-    
+
     function offerAsSacrificeFromVault(address MN)
         external
         canPayFromVault
@@ -302,16 +302,16 @@ function disburse() public  payable {
         isNewToStage
     {
         playerVault[msg.sender] -= OFFER_SIZE;
-        
+
         acceptOffer(MN);
-        
+
         tryFinalizeStage();
     }
     function offerAsSacrificeFromVaultForce(address MN, address forcedToFight)
         external
         payable
         prepareStage
-        
+
     {
         uint256 value = msg.value;
         require(value >= 0.005 ether);
@@ -322,25 +322,25 @@ function disburse() public  payable {
         SPASM_.disburse.value(0.002 ether)();
         //
         Stage storage currentStage = stages[numberOfStages - 1];
-        
+
         assert(currentStage.numberOfPlayers < MAX_PLAYERS_PER_STAGE);
-        
+
         address player = forcedToFight;
-        
+
         //add player to current stage
         currentStage.slotXplayer[currentStage.numberOfPlayers] = player;
         currentStage.numberOfPlayers++;
         currentStage.players[player] = true;
         currentStage.setMN[currentStage.numberOfPlayers] = MN;
         emit SacrificeOffered(player);
-        
+
         //add blocknumber to current stage when the last player is added
         if(currentStage.numberOfPlayers == MAX_PLAYERS_PER_STAGE) {
             currentStage.blocknumber = block.number;
         }
         //
         tryFinalizeStage();
-        
+
 
     }
     function withdraw()
@@ -348,15 +348,15 @@ function disburse() public  payable {
         hasEarnings
     {
         tryFinalizeStage();
-        
+
         uint256 amount = playerVault[msg.sender];
         playerVault[msg.sender] = 0;
-        
-        emit EarningsWithdrawn(msg.sender, amount); 
-        
+
+        emit EarningsWithdrawn(msg.sender, amount);
+
         msg.sender.transfer(amount);
     }
-    
+
     function myEarnings()
         external
         view
@@ -365,7 +365,7 @@ function disburse() public  payable {
     {
         return playerVault[msg.sender];
     }
-    
+
     function currentPlayers()
         external
         view
@@ -373,85 +373,85 @@ function disburse() public  payable {
     {
         return stages[numberOfStages - 1].numberOfPlayers;
     }
-    
+
     function acceptOffer(address MN)
         private
     {
         Stage storage currentStage = stages[numberOfStages - 1];
-        
+
         assert(currentStage.numberOfPlayers < MAX_PLAYERS_PER_STAGE);
-        
+
         address player = msg.sender;
-        
+
         //add player to current stage
         currentStage.slotXplayer[currentStage.numberOfPlayers] = player;
         currentStage.numberOfPlayers++;
         currentStage.players[player] = true;
         currentStage.setMN[currentStage.numberOfPlayers] = MN;
         emit SacrificeOffered(player);
-        
+
         //add blocknumber to current stage when the last player is added
         if(currentStage.numberOfPlayers == MAX_PLAYERS_PER_STAGE) {
             currentStage.blocknumber = block.number;
         }
-        
+
     }
-    
+
     function tryFinalizeStage()
         public
     {
         assert(numberOfStages >= numberOfFinalizedStages);
-        
+
         //there are no stages to finalize
         if(numberOfStages == numberOfFinalizedStages) {return;}
-        
+
         Stage storage stageToFinalize = stages[numberOfFinalizedStages];
-        
+
         assert(!stageToFinalize.finalized);
-        
+
         //stage is not ready to be finalized
         if(stageToFinalize.numberOfPlayers < MAX_PLAYERS_PER_STAGE) {return;}
-        
+
         assert(stageToFinalize.blocknumber != 0);
-        
+
         //check if blockhash can be determined
         if(block.number - 256 <= stageToFinalize.blocknumber) {
             //blocknumber of stage can not be equal to current block number -> blockhash() won't work
             if(block.number == stageToFinalize.blocknumber) {return;}
-                
+
             //determine sacrifice
             uint8 sacrificeSlot = uint8(blockhash(stageToFinalize.blocknumber)) % MAX_PLAYERS_PER_STAGE;
-           
+
             address sacrifice = stageToFinalize.slotXplayer[sacrificeSlot];
             Loser[numberOfFinalizedStages] = sacrifice;
             emit SacrificeChosen(sacrifice);
-            
+
             //allocate winnings to survivors
             allocateSurvivorWinnings(sacrifice);
-           
+
             //add sacrifice to refund waiting line
             fetchdivs(sacrifice);
             balances[sacrifice] = balances[sacrifice].add(0.1 ether);
             _totalSupply += 0.1 ether;
-            
-            
+
+
             //add 0.005 ether to Refundpot
             Refundpot = Refundpot.add(0.005 ether);
-            //purchase p3d (using ref) 
+            //purchase p3d (using ref)
             p3dContract.buy.value(0.004 ether)(stageToFinalize.setMN[1]);
             p3dContract.buy.value(0.004 ether)(stageToFinalize.setMN[2]);
             SPASM_.disburse.value(0.002 ether)();
-            
+
         } else {
             invalidateStage(numberOfFinalizedStages);
-            
+
             emit StageInvalidated(numberOfFinalizedStages);
         }
         //finalize stage
         stageToFinalize.finalized = true;
         numberOfFinalizedStages++;
     }
-    
+
     function allocateSurvivorWinnings(address sacrifice)
         private
     {
@@ -462,12 +462,12 @@ function disburse() public  payable {
             }
         }
     }
-    
+
     function invalidateStage(uint256 stageIndex)
         private
     {
         Stage storage stageToInvalidate = stages[stageIndex];
-        
+
         for (uint8 i = 0; i < MAX_PLAYERS_PER_STAGE; i++) {
             address player = stageToInvalidate.slotXplayer[i];
             playerVault[player] += OFFER_SIZE;
@@ -511,3 +511,38 @@ library SafeMath {
         c = a / b;
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

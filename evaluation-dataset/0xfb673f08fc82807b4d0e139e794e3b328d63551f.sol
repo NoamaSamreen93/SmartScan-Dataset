@@ -2,13 +2,13 @@ pragma solidity ^0.4.20;
 
 contract AccessAdmin {
     bool public isPaused = false;
-    address public addrAdmin;  
+    address public addrAdmin;
 
     event AdminTransferred(address indexed preAdmin, address indexed newAdmin);
 
     function AccessAdmin() public {
         addrAdmin = msg.sender;
-    }  
+    }
 
 
     modifier onlyAdmin() {
@@ -68,8 +68,8 @@ contract AccessService is AccessAdmin {
         addrFinance = _newFinance;
     }
 
-    function withdraw(address _target, uint256 _amount) 
-        external 
+    function withdraw(address _target, uint256 _amount)
+        external
     {
         require(msg.sender == addrFinance || msg.sender == addrAdmin);
         require(_amount > 0);
@@ -79,11 +79,11 @@ contract AccessService is AccessAdmin {
             receiver.transfer(_amount);
         } else {
             receiver.transfer(this.balance);
-        }      
+        }
     }
 }
 
-interface tokenRecipient { 
+interface tokenRecipient {
     function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) external;
 }
 
@@ -98,7 +98,7 @@ contract TokenTycoonIGO is AccessService {
     mapping (address => mapping(address => uint256)) allowed;
     mapping (address => string) addressToAccount;
     mapping (bytes32 => address) accHashToAddress;
-    
+
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
@@ -138,7 +138,7 @@ contract TokenTycoonIGO is AccessService {
     }
 
     function transfer(address _to, uint256 _value) external returns (bool) {
-        return _transfer(msg.sender, _to, _value);     
+        return _transfer(msg.sender, _to, _value);
     }
 
     function approveAndCall(address _spender, uint256 _value, bytes _extraData)
@@ -168,7 +168,7 @@ contract TokenTycoonIGO is AccessService {
         return true;
     }
 
-    function buy(string _account) external payable whenNotPaused {  
+    function buy(string _account) external payable whenNotPaused {
         uint256 val = msg.value;
         uint256 tthVal;
         if (val == 1 ether) {
@@ -229,3 +229,38 @@ contract TokenTycoonIGO is AccessService {
         return addressToAccount[_addr];
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

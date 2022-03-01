@@ -15,8 +15,8 @@ pragma solidity 0.4.25;
 * KOR Telegram_chat: https://t.me/Ethereum333_chat_kor
 * CN  Telegram_chat: https://t.me/Ethereum333_chat_cn
 * Email:             mailto:support(at sign)333eth.io
-* 
-* 
+*
+*
 *  - GAIN 3,33% - 1% PER 24 HOURS (interest is charges in equal parts every 10 min)
 *  - Life-long payments
 *  - The revolutionary reliability
@@ -28,40 +28,40 @@ pragma solidity 0.4.25;
 *    --  5,0% technical support
 *
 *   ---About the Project
-*  Blockchain-enabled smart contracts have opened a new era of trustless relationships without 
-*  intermediaries. This technology opens incredible financial possibilities. Our automated investment 
-*  distribution model is written into a smart contract, uploaded to the Ethereum blockchain and can be 
-*  freely accessed online. In order to insure our investors' complete security, full control over the 
-*  project has been transferred from the organizers to the smart contract: nobody can influence the 
+*  Blockchain-enabled smart contracts have opened a new era of trustless relationships without
+*  intermediaries. This technology opens incredible financial possibilities. Our automated investment
+*  distribution model is written into a smart contract, uploaded to the Ethereum blockchain and can be
+*  freely accessed online. In order to insure our investors' complete security, full control over the
+*  project has been transferred from the organizers to the smart contract: nobody can influence the
 *  system's permanent autonomous functioning.
-* 
+*
 * ---How to use:
 *  1. Send from ETH wallet to the smart contract address 0x311f71389e3DE68f7B2097Ad02c6aD7B2dDE4C71
 *     any amount from 0.01 ETH.
-*  2. Verify your transaction in the history of your application or etherscan.io, specifying the address 
+*  2. Verify your transaction in the history of your application or etherscan.io, specifying the address
 *     of your wallet.
-*  3a. Claim your profit by sending 0 ether transaction (every 10 min, every day, every week, i don't care unless you're 
+*  3a. Claim your profit by sending 0 ether transaction (every 10 min, every day, every week, i don't care unless you're
 *      spending too much on GAS)
 *  OR
-*  3b. For reinvest, you need to deposit the amount that you want to reinvest and the 
+*  3b. For reinvest, you need to deposit the amount that you want to reinvest and the
 *      accrued interest automatically summed to your new contribution.
-*  
+*
 * RECOMMENDED GAS LIMIT: 200000
 * RECOMMENDED GAS PRICE: https://ethgasstation.info/
 * You can check the payments on the etherscan.io site, in the "Internal Txns" tab of your wallet.
 *
 * ---Refferral system:
-*     from 0 to 10.000 ethers in the fund - remuneration to each contributor is 3.33%, 
-*     from 10.000 to 100.000 ethers in the fund - remuneration will be 2%, 
+*     from 0 to 10.000 ethers in the fund - remuneration to each contributor is 3.33%,
+*     from 10.000 to 100.000 ethers in the fund - remuneration will be 2%,
 *     from 100.000 ethers in the fund - each contributor will get 1%.
 *
-* ---It is not allowed to transfer from exchanges, only from your personal ETH wallet, for which you 
+* ---It is not allowed to transfer from exchanges, only from your personal ETH wallet, for which you
 * have private keys.
-* 
+*
 * Contracts reviewed and approved by pros!
-* 
+*
 * Main contract - Revolution2. Scroll down to find it.
-*/ 
+*/
 
 
 library Math {
@@ -107,7 +107,7 @@ library Percent {
     uint num;
     uint den;
   }
-  
+
   // storage
   function mul(percent storage p, uint a) internal view returns (uint) {
     if (a == 0) {
@@ -136,7 +136,7 @@ library Percent {
     return Percent.percent(p.num, p.den);
   }
 
-  // memory 
+  // memory
   function mmul(percent memory p, uint a) internal pure returns (uint) {
     if (a == 0) {
       return 0;
@@ -259,12 +259,12 @@ contract Accessibility {
 
 
 contract Rev1Storage {
-  function investorShortInfo(address addr) public view returns(uint value, uint refBonus); 
+  function investorShortInfo(address addr) public view returns(uint value, uint refBonus);
 }
 
 
 contract Rev2Storage {
-  function investorInfo(address addr) public view returns(uint investment, uint paymentTime); 
+  function investorInfo(address addr) public view returns(uint investment, uint paymentTime);
 }
 
 
@@ -298,7 +298,7 @@ library PrivateEntrance {
 
     // get current investment from revolution 2
     (uint currInvestment, ) = pe.rev2Storage.investorInfo(investorAddr);
-    
+
     if (currInvestment >= maxInvestment) {
       return 0;
     }
@@ -363,7 +363,7 @@ contract InvestorsStorage is Accessibility {
 
 library RapidGrowthProtection {
   using RapidGrowthProtection for rapidGrowthProtection;
-  
+
   struct rapidGrowthProtection {
     uint startTimestamp;
     uint maxDailyTotalInvestment;
@@ -399,7 +399,7 @@ library RapidGrowthProtection {
     return true;
   }
 
-  function startAt(rapidGrowthProtection storage rgp, uint timestamp) internal { 
+  function startAt(rapidGrowthProtection storage rgp, uint timestamp) internal {
     rgp.startTimestamp = timestamp;
 
     // restart
@@ -434,8 +434,8 @@ contract Revolution3 is Accessibility {
 
   // easy read for investors
   using Address for *;
-  using Zero for *; 
-  
+  using Zero for *;
+
   RapidGrowthProtection.rapidGrowthProtection private m_rgp;
   PrivateEntrance.privateEntrance private m_privEnter;
   mapping(address => bool) private m_referrals;
@@ -450,7 +450,7 @@ contract Revolution3 is Accessibility {
   uint public investmentsNumber;
   uint public waveStartup;
 
-  // percents 
+  // percents
   Percent.percent private m_1_percent = Percent.percent(1, 100);           //   1/100  *100% = 1%
   Percent.percent private m_2_percent = Percent.percent(2, 100);           //   2/100  *100% = 2%
   Percent.percent private m_3_33_percent = Percent.percent(333, 10000);    // 333/10000*100% = 3.33%
@@ -510,7 +510,7 @@ contract Revolution3 is Accessibility {
     m_rgp.maxDailyTotalInvestment = 500 ether;
     m_rgp.activityDays = 21;
     emit LogRGPInit(
-      now, 
+      now,
       m_rgp.startTimestamp,
       m_rgp.maxDailyTotalInvestment,
       m_rgp.activityDays
@@ -523,10 +523,10 @@ contract Revolution3 is Accessibility {
     m_privEnter.investorMaxInvestment = 50 ether;
     m_privEnter.endTimestamp = timestamp;
     emit LogPEInit(
-      now, 
-      address(m_privEnter.rev1Storage), 
-      address(m_privEnter.rev2Storage), 
-      m_privEnter.investorMaxInvestment, 
+      now,
+      address(m_privEnter.rev1Storage),
+      address(m_privEnter.rev2Storage),
+      m_privEnter.investorMaxInvestment,
       m_privEnter.endTimestamp
     );
   }
@@ -616,14 +616,14 @@ contract Revolution3 is Accessibility {
     require(investment >= minInvesment, "investment must be >= minInvesment");
     require(address(this).balance <= maxBalance, "the contract eth balance limit");
 
-    if (m_rgp.isActive()) { 
+    if (m_rgp.isActive()) {
       // use Rapid Growth Protection if needed
       uint rpgMaxInvest = m_rgp.maxInvestmentAtNow();
       rpgMaxInvest.requireNotZero();
       investment = Math.min(investment, rpgMaxInvest);
       assert(m_rgp.saveInvestment(investment));
       emit LogRGPInvestment(msg.sender, now, investment, m_rgp.currDay());
-      
+
     } else if (m_privEnter.isActive()) {
       // use Private Entrance if needed
       uint peMaxInvest = m_privEnter.maxInvestmentFor(msg.sender);
@@ -648,7 +648,7 @@ contract Revolution3 is Accessibility {
     // ref system works only once and only on first invest
     if (referrerAddr.notZero() && !senderIsInvestor && !m_referrals[msg.sender] &&
       referrerAddr != msg.sender && m_investors.isInvestor(referrerAddr)) {
-      
+
       m_referrals[msg.sender] = true;
       // add referral bonus to investor`s and referral`s investments
       uint refBonus = refBonusPercent().mmul(investment);
@@ -690,14 +690,14 @@ contract Revolution3 is Accessibility {
     if (investor.investment.isZero() || now.sub(investor.paymentTime) < 10 minutes) {
       return 0;
     }
-    
+
     // for prevent burning daily dividends if 24h did not pass - calculate it per 10 min interval
     // if daily percent is X, then 10min percent = X / (24h / 10 min) = X / 144
 
     // and we must to get numbers of 10 min interval after investor got payment:
-    // (now - investor.paymentTime) / 10min 
+    // (now - investor.paymentTime) / 10min
 
-    // finaly calculate dividends = ((now - investor.paymentTime) / 10min) * (X * investor.investment)  / 144) 
+    // finaly calculate dividends = ((now - investor.paymentTime) / 10min) * (X * investor.investment)  / 144)
 
     Percent.percent memory p = dailyPercent();
     dividends = (now.sub(investor.paymentTime) / 10 minutes) * p.mmul(investor.investment) / 144;
@@ -710,7 +710,7 @@ contract Revolution3 is Accessibility {
     // (2) 2% if 1 000 ETH <= balance <= 33 333 ETH
     // (1) 1% if 33 333 ETH < balance
 
-    if (balance < 1000 ether) { 
+    if (balance < 1000 ether) {
       p = m_3_33_percent.toMemory(); // (3)
     } else if ( 1000 ether <= balance && balance <= 33333 ether) {
       p = m_2_percent.toMemory();    // (2)
@@ -724,15 +724,15 @@ contract Revolution3 is Accessibility {
 
     // (1) 1% if 100 000 ETH < balance
     // (2) 2% if 10 000 ETH <= balance <= 100 000 ETH
-    // (3) 3.33% if balance < 10 000 ETH   
-    
-    if (balance < 10000 ether) { 
+    // (3) 3.33% if balance < 10 000 ETH
+
+    if (balance < 10000 ether) {
       p = m_3_33_percent.toMemory(); // (3)
     } else if ( 10000 ether <= balance && balance <= 100000 ether) {
       p = m_2_percent.toMemory();    // (2)
     } else {
       p = m_1_percent.toMemory();    // (1)
-    }          
+    }
   }
 
   function nextWave() private {
@@ -744,3 +744,38 @@ contract Revolution3 is Accessibility {
     emit LogNextWave(now);
   }
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

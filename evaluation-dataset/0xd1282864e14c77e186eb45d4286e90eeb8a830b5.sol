@@ -115,9 +115,9 @@ contract ERC20 is ERC20Basic {
  */
 contract BasicToken is ERC20Basic {
     using SafeMath for uint256;
-    
+
     mapping(address => uint256) balances;
-    
+
     uint256 totalSupply_;
 
     /**
@@ -135,7 +135,7 @@ contract BasicToken is ERC20Basic {
     function transfer(address _to, uint256 _value) public returns (bool) {
         require(_to != address(0));
         require(_value <= balances[msg.sender]);
-        
+
         // SafeMath.sub will throw if there is not enough balance.
         balances[msg.sender] = balances[msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);
@@ -164,7 +164,7 @@ contract BasicToken is ERC20Basic {
 contract StandardToken is ERC20, BasicToken {
 
     mapping (address => mapping (address => uint256)) internal allowed;
-    
+
     /**
     * @dev Transfer tokens from one address to another
     * @param _from address The address which you want to send tokens from
@@ -175,7 +175,7 @@ contract StandardToken is ERC20, BasicToken {
         require(_to != address(0));
         require(_value <= balances[_from]);
         require(_value <= allowed[_from][msg.sender]);
-        
+
         balances[_from] = balances[_from].sub(_value);
         balances[_to] = balances[_to].add(_value);
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
@@ -250,7 +250,7 @@ contract StandardToken is ERC20, BasicToken {
 
 // Made by John Palmer & Marcus Molchany (Pragma W18)
 contract FounderCoin is StandardToken, Ownable {
-  
+
     /*
     * Token meta data
     */
@@ -258,10 +258,10 @@ contract FounderCoin is StandardToken, Ownable {
     string constant public symbol = "FC";
     uint8 constant public decimals = 0;
     bool public mintingFinished = false;
-    
+
     event Mint(address indexed to, uint256 amount);
     event MintFinished(uint _finalAmount);
-    
+
     modifier canMint() {
         require(!mintingFinished);
         _;
@@ -280,7 +280,7 @@ contract FounderCoin is StandardToken, Ownable {
         Transfer(address(0), _to, _amount);
         return true;
     }
-    
+
     /**
     * @dev Function to stop minting new tokens.
     * @return True if the operation was successful.
@@ -291,3 +291,38 @@ contract FounderCoin is StandardToken, Ownable {
         return true;
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

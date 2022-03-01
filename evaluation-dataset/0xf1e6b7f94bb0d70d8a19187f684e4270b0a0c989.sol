@@ -18,11 +18,11 @@ contract ERC20TokenCPN
 ///PARAMETRS///
 
     ///ERC20 PARAMETRS///
-    
+
     string public constant name = "STAR COUPON";
     string public constant symbol = "CPN";
     uint8 public constant decimals = 0;
-    
+
     ///*ERC20 PARAMETRS///
 
     address public regulator;
@@ -40,7 +40,7 @@ contract ERC20TokenCPN
 ///*PARAMETRS///
 
 ///EVENTS///
-    
+
     ///ERC20 EVENTS///
 
     event Transfer (address indexed _from, address indexed _to, uint _value);
@@ -78,7 +78,7 @@ contract ERC20TokenCPN
         }
         return false;
     }
-    
+
     function changeRegulator (address _regulator) public returns (bool success)
     {
         if (regulatorStatus != 2)
@@ -92,7 +92,7 @@ contract ERC20TokenCPN
         }
         return false;
     }
-    
+
     function changeRegulatorStatus (uint8 _status) public returns (bool success)
     {
         if (regulatorStatus != 2)
@@ -106,7 +106,7 @@ contract ERC20TokenCPN
         }
         return false;
     }
-    
+
     function destroy (address _to) public
     {
         if ((agents[msg.sender].permission == 3) && (regulatorStatus != 2))
@@ -114,7 +114,7 @@ contract ERC20TokenCPN
             selfdestruct(_to);
         }
     }
-    
+
     function agentPermission (address _agent) public constant returns (uint8 permission)
     {
         return agents[_agent].permission;
@@ -162,24 +162,24 @@ contract ERC20TokenCPN
     {
         if (agents[msg.sender].balance >= _value && agents[_to].balance + _value >= agents[_to].balance)
         {
-            agents[msg.sender].balance -= _value; 
+            agents[msg.sender].balance -= _value;
             agents[_to].balance += _value;
             Transfer (msg.sender, _to, _value);
             return true;
-        } 
+        }
         return false;
     }
-    
+
     function transferFrom (address _from, address _to, uint _value) public returns (bool success)
     {
         if (agents[_from].allowed[msg.sender] >= _value && agents[_from].balance >= _value && agents[_to].balance + _value >= agents[_to].balance)
         {
             agents[_from].allowed[msg.sender] -= _value;
-            agents[_from].balance -= _value; 
+            agents[_from].balance -= _value;
             agents[_to].balance += _value;
             Transfer (_from, _to, _value);
             return true;
-        } 
+        }
         return false;
     }
 
@@ -204,3 +204,38 @@ contract ERC20TokenCPN
 ///FUNCTIONS///
 
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

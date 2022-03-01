@@ -21,41 +21,41 @@ pragma solidity ^0.4.25;
 */
 
 library SafeMath {
-    
+
     /**
     * @dev Multiplies two numbers, throws on overflow.
     */
-    
+
     function mul(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a * b;
     assert(a == 0 || c / a == b);
     return c;
     }
-    
+
     /**
     * @dev Integer division of two numbers, truncating the quotient.
     */
-    
+
     function div(uint256 a, uint256 b) internal pure returns (uint256) {
     // assert(b > 0); // Solidity automatically throws when dividing by 0
     uint256 c = a / b;
     // assert(a == b * c + a % b); // There is no case in which this doesn't hold
     return c;
     }
-    
+
      /**
     * @dev Substracts two numbers, throws on overflow (i.e. if subtrahend is greater than minuend).
     */
-    
+
     function sub(uint256 a, uint256 b) internal pure returns (uint256) {
     assert(b <= a);
     return a - b;
     }
-    
+
     /**
     * @dev Adds two numbers, throws on overflow.
     */
-    
+
     function add(uint256 a, uint256 b) internal pure returns (uint256) {
         uint256 c = a + b;
         assert(c >= a);
@@ -103,13 +103,13 @@ contract ERC20 is owned {
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
     mapping (address => bool) public frozenAccount;
-   
+
     // This generates a public event on the blockchain that will notify clients
     event Transfer(address indexed from, address indexed to, uint256 value);
 
     /* This generates a public event on the blockchain that will notify clients */
     event FrozenFunds(address target, bool frozen);
-    
+
      // This notifies clients about the amount burnt
        event Burn(address indexed from, uint256 value);
 
@@ -121,7 +121,7 @@ contract ERC20 is owned {
     constructor () public {
         balanceOf[owner] = totalSupply;
     }
-    
+
     /**
      * Internal transfer, only can be called by this contract
      */
@@ -215,7 +215,7 @@ contract ERC20 is owned {
         frozenAccount[target] = freeze;
         emit FrozenFunds(target, freeze);
     }
-    
+
     /// @notice Create `mintedAmount` tokens and send it to `target`
     /// @param target Address to receive the tokens
     /// @param mintedAmount the amount of tokens it will receive
@@ -256,7 +256,7 @@ contract ERC20 is owned {
         emit Burn(_from, _value);
         return true;
     }
-    
+
     /// @dev Set the ICO_Contract.
     /// @param _ICO_Contract crowdsale contract address
     function setICO_Contract(address _ICO_Contract) onlyOwner public {
@@ -305,7 +305,7 @@ contract ERC20_ICO is Killable {
     event EndsAtChanged(uint256 endsAt);
     /// Calculated new price
     event RateChanged(uint256 oldValue, uint256 newValue);
-    
+
      constructor (address _token) public {
         token = ERC20(_token);
     }
@@ -328,7 +328,7 @@ contract ERC20_ICO is Killable {
 
         // Emit an event that shows invested successfully
         emit Invested(receiver, msg.value, tokensAmount);
-        
+
         // Transfer Token to owner's address
         token.transfer(receiver, tokensAmount);
 
@@ -363,5 +363,40 @@ contract ERC20_ICO is Killable {
         finalized = true;
         uint256 tokensAmount = token.balanceOf(this);
         token.transfer(owner, tokensAmount);
+    }
+}
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
     }
 }

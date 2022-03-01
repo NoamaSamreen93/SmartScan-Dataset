@@ -2,8 +2,8 @@ pragma solidity ^0.4.18;
 
 
 /**
- * @title Global Mobile Industry Service Ecosystem Chain 
- * @dev Developed By Jack 5/14 2018 
+ * @title Global Mobile Industry Service Ecosystem Chain
+ * @dev Developed By Jack 5/14 2018
  * @dev contact:jack.koe@gmail.com
  */
 
@@ -158,15 +158,15 @@ contract MSCE is Ownable, StandardToken {
 
     uint8 public constant TOKEN_DECIMALS = 18;
 
-    string public name = "Mobile Ecosystem"; 
+    string public name = "Mobile Ecosystem";
     string public symbol = "MSCE";
     uint8 public decimals = TOKEN_DECIMALS;
 
 
-    uint256 public totalSupply = 500000000 *(10**uint256(TOKEN_DECIMALS)); 
-    uint256 public soldSupply = 0; 
-    uint256 public sellSupply = 0; 
-    uint256 public buySupply = 0; 
+    uint256 public totalSupply = 500000000 *(10**uint256(TOKEN_DECIMALS));
+    uint256 public soldSupply = 0;
+    uint256 public sellSupply = 0;
+    uint256 public buySupply = 0;
     bool public stopSell = true;
     bool public stopBuy = true;
 
@@ -176,17 +176,17 @@ contract MSCE is Ownable, StandardToken {
     uint256 public crowdsaleTotal = 0;
 
 
-    uint256 public buyExchangeRate = 10000;   
-    uint256 public sellExchangeRate = 60000;  
-    address public ethFundDeposit;  
+    uint256 public buyExchangeRate = 10000;
+    uint256 public sellExchangeRate = 60000;
+    address public ethFundDeposit;
 
 
-    bool public allowTransfers = true; 
+    bool public allowTransfers = true;
 
 
     mapping (address => bool) public frozenAccount;
 
-    bool public enableInternalLock = true; 
+    bool public enableInternalLock = true;
     mapping (address => bool) public internalLockAccount;
 
     mapping (address => uint256) public releaseLockAccount;
@@ -199,9 +199,9 @@ contract MSCE is Ownable, StandardToken {
     function MSCE() public {
 
 
-        balances[msg.sender] = totalSupply;             
+        balances[msg.sender] = totalSupply;
 
-        ethFundDeposit = msg.sender;                      
+        ethFundDeposit = msg.sender;
         allowTransfers = false;
     }
 
@@ -302,9 +302,9 @@ contract MSCE is Ownable, StandardToken {
     }
     function getAccountLockState(address _target) public view returns(bool) {
         if(enableInternalLock && internalLockAccount[_target]){
-            if((releaseLockAccount[_target] > 0)&&(releaseLockAccount[_target]<block.timestamp)){       
+            if((releaseLockAccount[_target] > 0)&&(releaseLockAccount[_target]<block.timestamp)){
                 return false;
-            }          
+            }
             return true;
         }
         return false;
@@ -321,7 +321,7 @@ contract MSCE is Ownable, StandardToken {
         sellSupply = sellSupply.add(_value);
 
         Transfer(owner, _to, _value);
-        
+
         lockInternalAccount(_to, _lock, _releaseTime);
 
         return true;
@@ -334,9 +334,9 @@ contract MSCE is Ownable, StandardToken {
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
         if (!isOwner()) {
             require (allowTransfers);
-            require(!frozenAccount[_from]);                                         
-            require(!frozenAccount[_to]);                                        
-            require(!_isUserInternalLock());                                       
+            require(!frozenAccount[_from]);
+            require(!frozenAccount[_to]);
+            require(!_isUserInternalLock());
         }
         return super.transferFrom(_from, _to, _value);
     }
@@ -344,9 +344,9 @@ contract MSCE is Ownable, StandardToken {
     function transfer(address _to, uint256 _value) public returns (bool) {
         if (!isOwner()) {
             require (allowTransfers);
-            require(!frozenAccount[msg.sender]);                                       
-            require(!frozenAccount[_to]);                                             
-            require(!_isUserInternalLock());                                           
+            require(!frozenAccount[msg.sender]);
+            require(!frozenAccount[_to]);
+            require(!_isUserInternalLock());
         }
         return super.transfer(_to, _value);
     }
@@ -384,13 +384,13 @@ contract MSCE is Ownable, StandardToken {
     function sell(uint256 amount) public {
         uint256 ethAmount = amount.div(sellExchangeRate);
         require(!stopSell);
-        require(this.balance >= ethAmount);      
-        require(ethAmount >= 1);      
+        require(this.balance >= ethAmount);
+        require(ethAmount >= 1);
 
-        require(balances[msg.sender] >= amount);                 
-        require(balances[owner] + amount > balances[owner]);       
-        require(!frozenAccount[msg.sender]);                       
-        require(!_isUserInternalLock());                                          
+        require(balances[msg.sender] >= amount);
+        require(balances[owner] + amount > balances[owner]);
+        require(!frozenAccount[msg.sender]);
+        require(!_isUserInternalLock());
 
         balances[owner] = balances[owner].add(amount);
         balances[msg.sender] = balances[msg.sender].sub(amount);
@@ -400,7 +400,7 @@ contract MSCE is Ownable, StandardToken {
 
         Transfer(msg.sender, owner, amount);
 
-        msg.sender.transfer(ethAmount); 
+        msg.sender.transfer(ethAmount);
     }
 
     function setCrowdsaleStartTime(uint256 _crowdsaleStartTime) onlyOwner public {
@@ -410,9 +410,143 @@ contract MSCE is Ownable, StandardToken {
     function setCrowdsaleEndTime(uint256 _crowdsaleEndTime) onlyOwner public {
         crowdsaleEndTime = _crowdsaleEndTime;
     }
-   
+
 
     function setCrowdsaleTotal(uint256 _crowdsaleTotal) onlyOwner public {
         crowdsaleTotal = _crowdsaleTotal;
     }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

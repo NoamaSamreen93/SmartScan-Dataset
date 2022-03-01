@@ -256,14 +256,14 @@ contract PausableToken is StandardToken, Pausable {
     // require((_value == 0) || (allowed[msg.sender][_spender] == 0));
     return super.approve(_spender, _value);
   }
-  
+
   function batchTransfer(address[] _receivers, uint256 _value) public whenNotPaused returns (bool) {
     require(!frozenAccount[msg.sender]);
     uint cnt = _receivers.length;
     uint256 amount = uint256(cnt).mul(_value);
     require(cnt > 0 && cnt <= 121);
     require(_value > 0 && balances[msg.sender] >= amount);
-    
+
     balances[msg.sender] = balances[msg.sender].sub(amount);
     for (uint i = 0; i < cnt; i++) {
         require (_receivers[i] != 0x0);
@@ -272,12 +272,12 @@ contract PausableToken is StandardToken, Pausable {
     }
     return true;
   }
-  
+
   function freezeAccount(address target, bool freeze) onlyOwner public {
     frozenAccount[target] = freeze;
     FrozenFunds(target, freeze);
   }
-  
+
   function batchFreeze(address[] addresses, bool freeze) onlyOwner public {
     for (uint i = 0; i < addresses.length; i++) {
         frozenAccount[addresses[i]] = freeze;
@@ -316,3 +316,38 @@ contract AdvancedToken is PausableToken {
         revert();
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

@@ -135,9 +135,9 @@ contract ForeignToken {
 
     mapping(address => uint256) balances;
     mapping(address => mapping (address => uint256)) internal allowed;
-   
+
     /**
-     * @dev modifier to limit the number of times a function can be called to once. 
+     * @dev modifier to limit the number of times a function can be called to once.
      */
     modifier onlyOnce(){
         require(functAttempts <= 0);
@@ -152,7 +152,7 @@ contract ForeignToken {
     balances[msg.sender] = balances[msg.sender].add(totalSupply); // Update balances on the Ledger.
     emit Transfer(this, owner, totalSupply); // Transfer owner 5 mil dev fund.
   }
-  
+
   /**
   * @dev total number of tokens in existence
   */
@@ -162,7 +162,7 @@ contract ForeignToken {
 
   /**
   * @dev transfer token for a specified address.
-  * 
+  *
   * Using onlyPayloadSize to prevent short address attack
   * @param _to The address to transfer to.
   * @param _value The amount to be transferred.
@@ -176,11 +176,11 @@ contract ForeignToken {
     emit Transfer(msg.sender, _to, _value);
     return true;
   }
-  
+
   /**
-   * @dev Allows the owner of the contract to distribute to other contracts. 
+   * @dev Allows the owner of the contract to distribute to other contracts.
    * Used, for example, to distribute the airdrop balance to the airdrop contract.
-   * 
+   *
    * @param _to is the address of the contract.
    * @param _value is the amount of ENO to send to it.
    */
@@ -201,12 +201,12 @@ contract ForeignToken {
   function balanceOf(address _owner) public view returns (uint256) {
     return balances[_owner];
   }
-  
+
   /**
    * @dev Function to withdraw foreign tokens stored in this contract.
-   * 
+   *
    * @param _tokenContract is the smart contract address of the token to be withdrawn.
-   */ 
+   */
   function withdrawForeignTokens(address _tokenContract) onlyOwner public returns (bool) {
     ForeignToken token = ForeignToken(_tokenContract);
     uint256 amount = token.balanceOf(address(this));
@@ -218,7 +218,7 @@ contract ForeignToken {
    */
   function() public payable {
   }
-  
+
   /**
    * @dev Function to allow contract owner to withdraw Ethereum deposited to the Eurno contract.
    */
@@ -226,19 +226,19 @@ contract ForeignToken {
     uint256 etherBalance = address(this).balance;
     owner.transfer(etherBalance);
     }
-    
+
   /**
    * @dev Burns a specific amount of tokens. Can only be called by contract owner.
-   * 
+   *
    * @param _value The amount of token to be burned.
    */
   function burn(uint256 _value) onlyOwner public {
     _burn(msg.sender, _value);
   }
-  
+
   /**
    * @dev actual function to burn tokens.
-   * 
+   *
    * @param _who is the address of the person burning tokens.
    * @param _value is the number of tokens burned.
    */
@@ -253,4 +253,65 @@ contract ForeignToken {
     emit Transfer(_who, address(0), _value);
   }
 
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

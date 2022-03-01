@@ -116,15 +116,15 @@ library SafeMath {
 
 }
 
-contract Ownable 
+contract Ownable
 
 {
 
   address public owner;
 
- 
 
-  constructor(address _owner) public 
+
+  constructor(address _owner) public
 
   {
 
@@ -132,9 +132,9 @@ contract Ownable
 
   }
 
- 
 
-  modifier onlyOwner() 
+
+  modifier onlyOwner()
 
   {
 
@@ -144,13 +144,13 @@ contract Ownable
 
   }
 
- 
 
-  function transferOwnership(address newOwner) onlyOwner 
+
+  function transferOwnership(address newOwner) onlyOwner
 
   {
 
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
 
     owner = newOwner;
 
@@ -174,11 +174,11 @@ contract BiLinkLoan is Ownable {
 
 	uint256 public commissionRatio;//percentage
 
-	
+
 
 	mapping (address => mapping ( bytes32 => uint256)) public account2Order2TradeAmount;
 
-	
+
 
 	mapping (address => mapping (address => uint16)) public tokenPledgeRatio;//pledge 2 borrow percentage
 
@@ -200,7 +200,7 @@ contract BiLinkLoan is Ownable {
 
 	event OnLossCompensatedByAssurance(address tokenPledge, address tokenBorrow, address borrower, address lender, uint256 amountLoss, uint256 amountCompensated, uint256 timestamp);
 
-		
+
 
 	constructor(address _owner, address _accountCost, address _contractLoanLogic, address _contractMarketData, uint256 _commissionRatio) public Ownable(_owner) {
 
@@ -216,7 +216,7 @@ contract BiLinkLoan is Ownable {
 
 	}
 
-	
+
 
 	function setTokenPledgeRatio(address[] _pledgeTokens, address[] _borrowTokens, uint16[] _ratioPledges) public onlyOwner {
 
@@ -278,15 +278,15 @@ contract BiLinkLoan is Ownable {
 
 
 
-		IBalance(contractBalance).modifyBalance(_arr1[3], _arr1[1], _arr2[4], false); 
+		IBalance(contractBalance).modifyBalance(_arr1[3], _arr1[1], _arr2[4], false);
 
-		IBalance(contractBalance).modifyBalance(_arr1[2], _arr1[1], _arr2[4], true); 
+		IBalance(contractBalance).modifyBalance(_arr1[2], _arr1[1], _arr2[4], true);
 
 
 
 		require(ILoanLogic(contractLoanLogic).updateDataAfterTrade(_arr1[0], _arr1[1], _arr1[2], _arr1[3], _arr2[4], amountPledge, amountInterest, _arr2[2]));
 
-		
+
 
 		emit OnTrade(_guid, _arr1[0], _arr1[1], _arr1[2], _arr1[3], amountPledge, amountInterest, _arr2[4], now);
 
@@ -310,7 +310,7 @@ contract BiLinkLoan is Ownable {
 
 		require(ecrecover(_hash, _vMaker, _arr3[0], _arr3[1]) == (_borrowOrLend? _arr1[3] : _arr1[2]));
 
-		
+
 
 		if(_borrowOrLend) {
 
@@ -348,7 +348,7 @@ contract BiLinkLoan is Ownable {
 
 		require(_borrower!= address(0));
 
-		 
+
 
 		uint256 _available= IBalance(contractBalance).getAvailableBalance(_tokenBorrow, _borrower);
 
@@ -406,11 +406,11 @@ contract BiLinkLoan is Ownable {
 
 				_actualCompensatedAmountByAssurance= _available;
 
-			IBalance(contractBalance).modifyBalance(_accountAssurance, _tokenBorrow, _actualCompensatedAmountByAssurance, false); 
+			IBalance(contractBalance).modifyBalance(_accountAssurance, _tokenBorrow, _actualCompensatedAmountByAssurance, false);
 
-			IBalance(contractBalance).modifyBalance(_borrower, _tokenBorrow, _actualCompensatedAmountByAssurance, true); 
+			IBalance(contractBalance).modifyBalance(_borrower, _tokenBorrow, _actualCompensatedAmountByAssurance, true);
 
-			
+
 
 			emit OnLossCompensatedByAssurance(_tokenPledge, _tokenBorrow, _borrower, _lender, _amountUnRepaiedAmount, _actualCompensatedAmountByAssurance, now);
 
@@ -436,7 +436,7 @@ contract BiLinkLoan is Ownable {
 
 		require(msg.sender == _borrower);
 
-		 
+
 
 		doRepay(_id, true);
 
@@ -464,11 +464,11 @@ contract BiLinkLoan is Ownable {
 
 		uint256 _amountProfit= (_amountActualInterest.mul(commissionRatio))/ 100;
 
-		IBalance(contractBalance).modifyBalance(_borrower, _tokenPledge, _amountRepaiedPeldgeToken.add(_amountActualInterest), false); 
+		IBalance(contractBalance).modifyBalance(_borrower, _tokenPledge, _amountRepaiedPeldgeToken.add(_amountActualInterest), false);
 
 		IBalance(contractBalance).modifyBalance(_lender, _tokenPledge, _amountActualInterest.sub(_amountProfit), true);
 
-		 		 
+
 
 		if(_amountRepaiedBorrowToken> 0) {
 
@@ -484,9 +484,9 @@ contract BiLinkLoan is Ownable {
 
 			if(IBalance(contractBalance).getAvailableBalance(_tokenPledge, accountCost)/ 10> _amountLoss) {
 
-				IBalance(contractBalance).modifyBalance(accountCost, _tokenPledge, _amountLoss, false); 
+				IBalance(contractBalance).modifyBalance(accountCost, _tokenPledge, _amountLoss, false);
 
-				IBalance(contractBalance).modifyBalance(_lender, _tokenPledge, _amountLoss, true); 
+				IBalance(contractBalance).modifyBalance(_lender, _tokenPledge, _amountLoss, true);
 
 				emit OnLossCompensated(_tokenPledge, _tokenBorrow, _borrower, _lender, _amountLoss, _amountLoss, now);
 
@@ -496,9 +496,9 @@ contract BiLinkLoan is Ownable {
 
 				uint256 uActualPaiedLoss= IBalance(contractBalance).getAvailableBalance(_tokenPledge, accountCost)/ 10;
 
-				IBalance(contractBalance).modifyBalance(accountCost, _tokenPledge, uActualPaiedLoss, false); 
+				IBalance(contractBalance).modifyBalance(accountCost, _tokenPledge, uActualPaiedLoss, false);
 
-				IBalance(contractBalance).modifyBalance(_lender, _tokenPledge, uActualPaiedLoss, true); 
+				IBalance(contractBalance).modifyBalance(_lender, _tokenPledge, uActualPaiedLoss, true);
 
 				emit OnLossCompensated(_tokenPledge, _tokenBorrow, _borrower, _lender, _amountLoss, uActualPaiedLoss, now);
 
@@ -528,7 +528,7 @@ contract BiLinkLoan is Ownable {
 
 }
 
-contract ILoanLogic {  
+contract ILoanLogic {
 
 	function setTokenExchangeRatio(address[] tokenPledge, address[] tokenBorrow, uint256[] amountDenom, uint256[] amountNum) public returns (bool);
 
@@ -565,3 +565,71 @@ contract IBalance {
 	function getTokenAssuranceAccount(address _token) public constant returns (address);
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

@@ -40,7 +40,7 @@ library SafeMath {
 */
 contract Membership {
     using SafeMath for uint256;
-    
+
     /*Variables*/
     address public owner;
     //Memebership fees
@@ -48,13 +48,13 @@ contract Membership {
 
     /*Structs*/
     /**
-    *@dev Keeps member information 
+    *@dev Keeps member information
     */
     struct Member {
         uint memberId;
         uint membershipType;
     }
-    
+
     /*Mappings*/
     //Members information
     mapping(address => Member) public members;
@@ -71,7 +71,7 @@ contract Membership {
         require(msg.sender == owner);
         _;
     }
-    
+
     /*Functions*/
     /**
     *@dev Constructor - Sets owner
@@ -88,7 +88,7 @@ contract Membership {
         //define fee structure for the three membership types
         memberFee = _memberFee;
     }
-    
+
     /**
     *@notice Allows a user to become DDA members if they pay the fee. However, they still have to complete
     *complete KYC/AML verification off line
@@ -102,9 +102,9 @@ contract Membership {
         sender.membershipType = 1;
         emit NewMember(msg.sender, sender.memberId, sender.membershipType);
     }
-    
+
     /**
-    *@dev This updates/transfers the member address 
+    *@dev This updates/transfers the member address
     *@param _from is the current member address
     *@param _to is the address the member would like to update their current address with
     */
@@ -157,9 +157,9 @@ contract Membership {
         lastAcctIndex = membersAccts.length.sub(1);
         lastAdd = membersAccts[lastAcctIndex];
         membersAccts[indexToDelete]=lastAdd;
-        membersAcctsIndex[lastAdd] = indexToDelete;   
+        membersAcctsIndex[lastAdd] = indexToDelete;
         membersAccts.length--;
-        membersAcctsIndex[_memberAddress]=0; 
+        membersAcctsIndex[_memberAddress]=0;
     }
 
 
@@ -170,7 +170,7 @@ contract Membership {
     function addMemberAcct(address _memberAddress) public onlyOwner{
         require(_memberAddress != address(0));
         Member storage memberAddress = members[_memberAddress];
-        membersAcctsIndex[_memberAddress] = membersAccts.length; 
+        membersAcctsIndex[_memberAddress] = membersAccts.length;
         membersAccts.push(_memberAddress);
         memberAddress.memberId = membersAccts.length;
         memberAddress.membershipType = 1;
@@ -183,7 +183,7 @@ contract Membership {
     function getMembers() view public returns (address[]){
         return membersAccts;
     }
-    
+
     /**
     *@dev Get member information
     *@param _memberAddress address to pull the memberId, membershipType and membership
@@ -206,13 +206,13 @@ contract Membership {
     function getMembershipType(address _memberAddress) public constant returns(uint){
         return members[_memberAddress].membershipType;
     }
-    
+
     /**
     *@dev Allows the owner to set a new owner address
     *@param _new_owner the new owner address
     */
-    function setOwner(address _new_owner) public onlyOwner() { 
-        owner = _new_owner; 
+    function setOwner(address _new_owner) public onlyOwner() {
+        owner = _new_owner;
     }
 
     /**
@@ -235,5 +235,40 @@ contract Membership {
     */
     function withdraw(address _to, uint _amount) public onlyOwner {
         _to.transfer(_amount);
-    }    
+    }
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

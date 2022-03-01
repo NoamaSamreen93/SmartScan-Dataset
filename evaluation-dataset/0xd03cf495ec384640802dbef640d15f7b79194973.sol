@@ -248,18 +248,18 @@ contract Crowdsale is Ownable {
   uint256 public preEndTime;
   uint256 public ICOstartTime;
   uint256 public ICOEndTime;
-  
+
   // Bonuses will be calculated here of ICO and Pre-ICO (both inclusive)
   uint256 private preICOBonus;
   uint256 private firstWeekBonus;
   uint256 private secondWeekBonus;
   uint256 private thirdWeekBonus;
   uint256 private forthWeekBonus;
-  
-  
+
+
   // wallet address where funds will be saved
   address internal wallet;
-  
+
   // base-rate of a particular Benebit token
   uint256 public rate;
   // amount of raised money in wei
@@ -269,32 +269,32 @@ contract Crowdsale is Ownable {
   uint256 weekTwo;
   uint256 weekThree;
   uint256 weekForth;
-  
-  // total supply of token 
+
+  // total supply of token
   uint256 private totalSupply = 300000000 * (10**18);
-  // public supply of token 
+  // public supply of token
   uint256 private publicSupply = SafeMath.mul(SafeMath.div(totalSupply,100),75);
-  // rewards supply of token 
+  // rewards supply of token
   uint256 private rewardsSupply = SafeMath.mul(SafeMath.div(totalSupply,100),15);
-  // team supply of token 
+  // team supply of token
   uint256 private teamSupply = SafeMath.mul(SafeMath.div(totalSupply,100),5);
-  // advisor supply of token 
+  // advisor supply of token
   uint256 private advisorSupply = SafeMath.mul(SafeMath.div(totalSupply,100),3);
-  // bounty supply of token 
+  // bounty supply of token
   uint256 private bountySupply = SafeMath.mul(SafeMath.div(totalSupply,100),2);
-  // preICO supply of token 
+  // preICO supply of token
   uint256 private preicoSupply = SafeMath.mul(SafeMath.div(publicSupply,100),15);
-  // ICO supply of token 
+  // ICO supply of token
   uint256 private icoSupply = SafeMath.mul(SafeMath.div(publicSupply,100),85);
-  // Remaining Public Supply of token 
+  // Remaining Public Supply of token
   uint256 private remainingPublicSupply = publicSupply;
-  // Remaining Reward Supply of token 
+  // Remaining Reward Supply of token
   uint256 private remainingRewardsSupply = rewardsSupply;
-  // Remaining Bounty Supply of token 
+  // Remaining Bounty Supply of token
   uint256 private remainingBountySupply = bountySupply;
-  // Remaining Advisor Supply of token 
+  // Remaining Advisor Supply of token
   uint256 private remainingAdvisorSupply = advisorSupply;
-  // Remaining Team Supply of token 
+  // Remaining Team Supply of token
   uint256 private remainingTeamSupply = teamSupply;
   // Time lock or vested period of token for team allocated token
   uint256 private teamTimeLock;
@@ -304,7 +304,7 @@ contract Crowdsale is Ownable {
    *  @bool checkBurnTokens
    *  @bool upgradeICOSupply
    *  @bool grantTeamSupply
-   *  @bool grantAdvisorSupply     
+   *  @bool grantAdvisorSupply
   */
   bool private checkBurnTokens;
   bool private upgradeICOSupply;
@@ -324,7 +324,7 @@ contract Crowdsale is Ownable {
     require(_endTime >= _startTime);
     require(_rate > 0);
     require(_wallet != 0x0);
-    // Benebit token creation 
+    // Benebit token creation
     token = createTokenContract();
     // Pre-ICO start Time
     preStartTime = _startTime;
@@ -352,7 +352,7 @@ contract Crowdsale is Ownable {
     /** Vested Period calculations for team and advisors*/
     teamTimeLock = SafeMath.add(ICOEndTime, 31536000);
     advisorTimeLock = SafeMath.add(ICOEndTime, 5356800);
-    
+
     checkBurnTokens = false;
     upgradeICOSupply = false;
     grantAdvisorSupply = false;
@@ -363,11 +363,11 @@ contract Crowdsale is Ownable {
   function createTokenContract() internal returns (MintableToken) {
     return new MintableToken();
   }
-  
+
   // fallback function can be used to buy tokens
   function () payable {
     buyTokens(msg.sender);
-    
+
   }
   // High level token purchase function
   function buyTokens(address beneficiary) public payable {
@@ -376,7 +376,7 @@ contract Crowdsale is Ownable {
     uint256 weiAmount = msg.value;
     // minimum investment should be 0.05 ETH
     require(weiAmount >= (0.05 * 1 ether));
-    
+
     uint256 accessTime = now;
     uint256 tokens = 0;
   // calculating the ICO and Pre-ICO bonuses on the basis of timing
@@ -384,10 +384,10 @@ contract Crowdsale is Ownable {
         require(preicoSupply > 0);
         tokens = SafeMath.add(tokens, weiAmount.mul(preICOBonus));
         tokens = SafeMath.add(tokens, weiAmount.mul(rate));
-        
+
         require(preicoSupply >= tokens);
-        
-        preicoSupply = preicoSupply.sub(tokens);        
+
+        preicoSupply = preicoSupply.sub(tokens);
         remainingPublicSupply = remainingPublicSupply.sub(tokens);
     } else if ((accessTime >= ICOstartTime) && (accessTime <= ICOEndTime)) {
         if (!upgradeICOSupply) {
@@ -403,9 +403,9 @@ contract Crowdsale is Ownable {
         } else if ( accessTime < weekForth ) {
           tokens = SafeMath.add(tokens, weiAmount.mul(forthWeekBonus));
         }
-        
+
         tokens = SafeMath.add(tokens, weiAmount.mul(rate));
-        icoSupply = icoSupply.sub(tokens);        
+        icoSupply = icoSupply.sub(tokens);
         remainingPublicSupply = remainingPublicSupply.sub(tokens);
     } else if ((accessTime > preEndTime) && (accessTime < ICOstartTime)){
       revert();
@@ -443,30 +443,30 @@ contract Crowdsale is Ownable {
     checkBurnTokens = true;
     return true;
   }
-  /** 
+  /**
      * @return true if bountyFunds function has ended
      * @param beneficiary address where owner wants to transfer tokens
      * @param valueToken value of token
   */
-  function bountyFunds(address beneficiary, uint256 valueToken) onlyOwner public { 
+  function bountyFunds(address beneficiary, uint256 valueToken) onlyOwner public {
     valueToken = SafeMath.mul(valueToken, 1 ether);
     require(remainingBountySupply >= valueToken);
     remainingBountySupply = SafeMath.sub(remainingBountySupply,valueToken);
     token.mint(beneficiary, valueToken);
   }
-  /** 
+  /**
      * @return true if rewardsFunds function has ended
      * @param beneficiary address where owner wants to transfer tokens
      * @param valueToken value of token
   */
-  function rewardsFunds(address beneficiary, uint256 valueToken) onlyOwner public { 
+  function rewardsFunds(address beneficiary, uint256 valueToken) onlyOwner public {
     valueToken = SafeMath.mul(valueToken, 1 ether);
     require(remainingRewardsSupply >= valueToken);
     remainingRewardsSupply = SafeMath.sub(remainingRewardsSupply,valueToken);
     token.mint(beneficiary, valueToken);
-  } 
+  }
   /**
-      @return true if grantAdvisorToken function has ended  
+      @return true if grantAdvisorToken function has ended
   */
   function grantAdvisorToken() onlyOwner public {
     require(!grantAdvisorSupply);
@@ -480,7 +480,7 @@ contract Crowdsale is Ownable {
     remainingAdvisorSupply = 0;
   }
   /**
-      @return true if grantTeamToken function has ended  
+      @return true if grantTeamToken function has ended
   */
     function grantTeamToken() onlyOwner public {
     require(!grantTeamSupply);
@@ -494,9 +494,9 @@ contract Crowdsale is Ownable {
     token.mint(0x42e045f4D119212AC1CF5820488E69AA9164DC70, valueToken);
     token.mint(0x2f53678a33C0fEE8f30fc5cfaC4E5E140397b40D, valueToken);
     remainingTeamSupply = 0;
-    
+
   }
-/** 
+/**
    * Function transferToken works to transfer tokens to the specified address on the
      call of owner within the crowdsale timestamp.
    * @param beneficiary address where owner wants to transfer tokens
@@ -656,7 +656,7 @@ contract RefundableCrowdsale is FinalizableCrowdsale {
       return true;
     } else if (_goalReached) {
       return true;
-    } 
+    }
     else {
       return false;
     }
@@ -677,7 +677,7 @@ contract BenebitToken is MintableToken {
   string public constant symbol = "BNE";
   uint256 public constant decimals = 18;
   uint256 public constant _totalSupply = 300000000 * 1 ether;
-  
+
 /** Constructor BenebitToken */
   function BenebitToken() {
     totalSupply = _totalSupply;
@@ -685,22 +685,57 @@ contract BenebitToken is MintableToken {
 }
 contract BenebitICO is Crowdsale, CappedCrowdsale, RefundableCrowdsale {
     uint256 _startTime = 1516626000;
-    uint256 _endTime = 1525093200; 
+    uint256 _endTime = 1525093200;
     uint256 _rate = 3000;
     uint256 _goal = 5000 * 1 ether;
     uint256 _cap = 40000 * 1 ether;
-    address _wallet  = 0x88BfBd2B464C15b245A9f7a563D207bd8A161054;   
+    address _wallet  = 0x88BfBd2B464C15b245A9f7a563D207bd8A161054;
     /** Constructor BenebitICO */
-    function BenebitICO() 
+    function BenebitICO()
     CappedCrowdsale(_cap)
     FinalizableCrowdsale()
     RefundableCrowdsale(_goal)
-    Crowdsale(_startTime,_endTime,_rate,_wallet) 
+    Crowdsale(_startTime,_endTime,_rate,_wallet)
     {
-        
+
     }
     /** BenebitToken Contract is generating from here */
     function createTokenContract() internal returns (MintableToken) {
         return new BenebitToken();
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

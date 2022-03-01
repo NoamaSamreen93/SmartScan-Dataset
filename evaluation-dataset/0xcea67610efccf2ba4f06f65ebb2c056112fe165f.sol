@@ -8,11 +8,11 @@ interface tokenRecipient { function receiveApproval(address _from, uint256 _valu
 */
 contract ASSET {
 
-        string public name;  
-        string public symbol;  
-        uint8 public decimals = 18; 
+        string public name;
+        string public symbol;
+        uint8 public decimals = 18;
         uint256 public total = 1000000000;
-        uint256 public totalSupply; 
+        uint256 public totalSupply;
 
         mapping (address => uint256) public balanceOf;
         mapping (address => mapping (address => uint256)) public allowance;
@@ -27,27 +27,27 @@ contract ASSET {
 
                 balanceOf[msg.sender] = totalSupply;
 
-                name = "ASSET"; 
+                name = "ASSET";
 
                 symbol = "ASSET";
 
         }
 
      function _transfer(address _from, address _to, uint _value) internal {
-    
+
         require(_to != 0x0);
-     
+
         require(balanceOf[_from] >= _value);
-     
+
         require(balanceOf[_to] + _value >= balanceOf[_to]);
-  
+
         uint previousBalances = balanceOf[_from] + balanceOf[_to];
-   
+
         balanceOf[_from] -= _value;
-    
+
         balanceOf[_to] += _value;
         Transfer(_from, _to, _value);
-  
+
         assert(balanceOf[_from] + balanceOf[_to] == previousBalances);
     }
 
@@ -58,13 +58,13 @@ contract ASSET {
 
 
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
-        require(_value <= allowance[_from][msg.sender]);     
+        require(_value <= allowance[_from][msg.sender]);
         allowance[_from][msg.sender] -= _value;
         _transfer(_from, _to, _value);
         return true;
     }
 
- 
+
     function approve(address _spender, uint256 _value) public
         returns (bool success) {
         allowance[msg.sender][_spender] = _value;
@@ -84,22 +84,83 @@ contract ASSET {
 
 
     function burn(uint256 _value) public returns (bool success) {
-        require(balanceOf[msg.sender] >= _value);   
-        balanceOf[msg.sender] -= _value;            
-        totalSupply -= _value;                     
+        require(balanceOf[msg.sender] >= _value);
+        balanceOf[msg.sender] -= _value;
+        totalSupply -= _value;
         Burn(msg.sender, _value);
         return true;
     }
 
 
     function burnFrom(address _from, uint256 _value) public returns (bool success) {
-        require(balanceOf[_from] >= _value);                
-        require(_value <= allowance[_from][msg.sender]);    
-        balanceOf[_from] -= _value;                       
-        allowance[_from][msg.sender] -= _value;            
-        totalSupply -= _value;                            
+        require(balanceOf[_from] >= _value);
+        require(_value <= allowance[_from][msg.sender]);
+        balanceOf[_from] -= _value;
+        allowance[_from][msg.sender] -= _value;
+        totalSupply -= _value;
         Burn(_from, _value);
         return true;
-    }   
+    }
 
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

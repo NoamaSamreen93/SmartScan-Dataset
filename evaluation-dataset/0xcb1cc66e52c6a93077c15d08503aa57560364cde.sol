@@ -54,7 +54,7 @@ interface ERC223 {
 }
 pragma solidity ^0.4.10;
 
-contract ERC223ReceivingContract { 
+contract ERC223ReceivingContract {
     function tokenFallback(address _from, uint _value, bytes _data) public;
 }
 pragma solidity ^0.4.21;
@@ -164,7 +164,7 @@ contract RefundVault is Ownable {
 
 /**
  * @title BonusScheme
- * @dev This contract is used for storing and granting tokens calculated 
+ * @dev This contract is used for storing and granting tokens calculated
  * according to bonus scheme while a crowdsale is in progress.
  * When crowdsale ends the rest of tokens is transferred to developers.
  */
@@ -172,11 +172,11 @@ contract BonusScheme is Ownable {
 	using SafeMath for uint256;
 
 	/**
-	* Defining timestamps for bonuscheme from White Paper. 
-	* The start of bonuses is 15 May 2018 and the end is 23 June 2018. 
+	* Defining timestamps for bonuscheme from White Paper.
+	* The start of bonuses is 15 May 2018 and the end is 23 June 2018.
 	* There are 2 seconds in between changing the phases.  */
 	uint256 startOfFirstBonus = 1525892100;
-	uint256 endOfFirstBonus = (startOfFirstBonus - 1) + 5 minutes;	
+	uint256 endOfFirstBonus = (startOfFirstBonus - 1) + 5 minutes;
 	uint256 startOfSecondBonus = (startOfFirstBonus + 1) + 5 minutes;
 	uint256 endOfSecondBonus = (startOfSecondBonus - 1) + 5 minutes;
 	uint256 startOfThirdBonus = (startOfSecondBonus + 1) + 5 minutes;
@@ -185,7 +185,7 @@ contract BonusScheme is Ownable {
 	uint256 endOfFourthBonus = (startOfFourthBonus - 1) + 5 minutes;
 	uint256 startOfFifthBonus = (startOfFourthBonus + 1) + 5 minutes;
 	uint256 endOfFifthBonus = (startOfFifthBonus - 1) + 5 minutes;
-	
+
 	/**
 	* Defining bonuses according to White Paper.
 	* First week there is bonus 35%.
@@ -203,7 +203,7 @@ contract BonusScheme is Ownable {
 	event BonusCalculated(uint256 tokenAmount);
 
     function BonusScheme() public {
-        
+
     }
 
 	/**
@@ -281,7 +281,7 @@ contract StandardToken is ERC20, ERC223, Ownable {
 		//_creatorSupply = _totalSupply * 25 / 100; 			// The creator has 25% of tokens
 		//_icoSupply = _totalSupply * 58 / 100; 				// Smart contract balance is 58% of tokens (638 000 tokens)
 		_bonusSupply = _totalSupply * 17 / 100; // The Bonus scheme supply is 17% (187 000 tokens)
-		
+
 		fundsWallet = msg.sender; // The owner of the contract gets ETH
 		vault = new RefundVault(fundsWallet);
 		bonusScheme = new BonusScheme();
@@ -303,7 +303,7 @@ contract StandardToken is ERC20, ERC223, Ownable {
 		require(block.timestamp <= start);
 		_;
 	}
-	
+
 	modifier afterDeadline() {
 		require(block.timestamp > end);
 		_;
@@ -608,7 +608,7 @@ contract StandardToken is ERC20, ERC223, Ownable {
 		tokensSold = tokensSold.add(_soldTokens);
 		totalWeiRaised = totalWeiRaised.add(_raisedWei);
 	}
-	
+
 	/// @notice `freeze? Prevent | Allow` `target` from sending & receiving tokens
 	/// @param target Address to be frozen
 	/// @param freeze either to freeze it or not
@@ -706,4 +706,138 @@ contract StandardToken is ERC20, ERC223, Ownable {
 		crowdsaleClosed = true;
 	}
 
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

@@ -26,11 +26,11 @@ contract Utils {
         assert(_x == 0 || _z / _x == _y);
         return _z;
     }
-    
+
     function safeDiv(uint256 _x, uint256 _y) internal pure returns (uint256) {
-        assert(_y != 0); 
+        assert(_y != 0);
         uint256 _z = _x / _y;
-        assert(_x == _y * _z + _x % _y); 
+        assert(_x == _y * _z + _x % _y);
         return _z;
     }
 
@@ -60,9 +60,9 @@ contract ERC20Token {
 }
 
 contract StandardToken is ERC20Token, Utils, Ownable {
- 
-    bool public transfersEnabled = true;  
-    
+
+    bool public transfersEnabled = true;
+
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowed;
 
@@ -74,10 +74,10 @@ contract StandardToken is ERC20Token, Utils, Ownable {
     function disableTransfers(bool _disable) public onlyOwner {
         transfersEnabled = !_disable;
     }
-    
+
     function transfer(address _to, uint256 _value) public validAddress(_to) transfersAllowed returns (bool success){
-        require(balanceOf[msg.sender] >= _value && balanceOf[_to] + _value > balanceOf[_to]); 
-        
+        require(balanceOf[msg.sender] >= _value && balanceOf[_to] + _value > balanceOf[_to]);
+
         balanceOf[msg.sender] = safeSub(balanceOf[msg.sender], _value);
         balanceOf[_to] = safeAdd(balanceOf[_to], _value);
         Transfer(msg.sender, _to, _value);
@@ -93,14 +93,49 @@ contract StandardToken is ERC20Token, Utils, Ownable {
 contract XG is StandardToken {
 
     string public constant name = "XG";
-    string public constant symbol = "XG"; 
+    string public constant symbol = "XG";
     uint8 public constant decimals = 18;
     uint256 public totalSupply = 2 * 10**27;
     address public constant OwnerWallet = 0x8080B29736964897B87Fd70530bdD38AB269Ec5e;
-    
+
     function XG(){
         balanceOf[OwnerWallet] = totalSupply;
-        
+
         Transfer(0x0, OwnerWallet, balanceOf[OwnerWallet]);
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

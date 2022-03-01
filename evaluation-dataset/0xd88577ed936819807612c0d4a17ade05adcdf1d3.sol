@@ -72,11 +72,11 @@ contract ZTRTokenSale
     uint public ZTR_ETH_initial_price;
     uint public ZTR_ETH_extra_price;
     uint public remaining;
-    
+
     modifier admin { if (msg.sender == owner) _; }
     modifier afterUnlock { if(now>unlockTime) _;}
     modifier afterDeadline { if(now>deadline) _;}
-    
+
     function ZTRTokenSale()
     {
         owner = msg.sender;
@@ -113,7 +113,7 @@ contract ZTRTokenSale
             remaining.sub(purchase);
         }
     }
-    
+
     function withdrawBeneficiary() public admin afterDeadline//withdrawl for the ZTrust Foundation
     {
         ZTRToken t = ZTRToken(ZTRTokenContract);
@@ -121,7 +121,7 @@ contract ZTRTokenSale
         require(amountRaised >= fundingGoal);//allow admin withdrawl if funding goal is reached and the sale is over
         owner.transfer(amountRaised);
     }
-    
+
     function withdraw() afterDeadline//ETH/ZTR withdrawl for sale participants
     {
         if(amountRaised < fundingGoal)//funding goal was not met, withdraw ETH deposit
@@ -138,19 +138,87 @@ contract ZTRTokenSale
             t.transfer(msg.sender, tokenVal);
         }
     }
-    
+
     function setDeadline(uint ti) public admin//setter
     {
         deadline = ti;
     }
-    
+
     function setStart(uint ti) public admin//setter
     {
         start = ti;
     }
-    
+
     function suicide() public afterUnlock //contract can be destroyed 4 months after the sale ends to save state
     {
         selfdestruct(owner);
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

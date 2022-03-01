@@ -4,7 +4,7 @@ contract Addresses {
 
     //2%
     address public bounty;
-    
+
     //5%
     address public successFee;
 
@@ -27,7 +27,7 @@ contract Addresses {
       bounty = 0x0064952457905eBFB9c0292200A74B1d7414F081;
                  //TEST
    //   bounty = 0x1626079328312cdb1e731a934a547c6d81b3ee2c;
-      
+
       //5%       //ORIGINAL
       successFee = 0xdA39e0Ce2adf93129D04F53176c7Bfaaae8B051a;
                  //TEST
@@ -44,7 +44,7 @@ contract Addresses {
 
       //93%       //ORIGINAL
       addr4 = 0x4E3B219684b9570D0d81Cc13E5c0aAcafe2323B1;
-      
+
 
      /* //93%       //TEST
       addr1 = 0x1626079328312cdb1e731a934a547c6d81b3ee2c;
@@ -60,7 +60,7 @@ contract Addresses {
   }
 
 }
- 
+
 contract ERC20Basic {
   uint256 public totalSupply;
   function balanceOf(address who) constant returns (uint256);
@@ -78,9 +78,9 @@ contract ERC20 is ERC20Basic {
 
 
 contract Ownable {
-    
+
   address public owner;
- 
+
   function Ownable() {
     owner = msg.sender;
   }
@@ -91,30 +91,30 @@ contract Ownable {
   }
 
   function transferOwnership(address newOwner) onlyOwner {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
- 
+
 }
 
 library SafeMath {
-    
+
   function mul(uint256 a, uint256 b) internal constant returns (uint256) {
     uint256 c = a * b;
     assert(a == 0 || c / a == b);
     return c;
   }
- 
+
   function div(uint256 a, uint256 b) internal constant returns (uint256) {
     uint256 c = a / b;
     return c;
   }
- 
+
   function sub(uint256 a, uint256 b) internal constant returns (uint256) {
     assert(b <= a);
     return a - b;
   }
- 
+
   function add(uint256 a, uint256 b) internal constant returns (uint256) {
     uint256 c = a + b;
     assert(c >= a);
@@ -125,13 +125,13 @@ library SafeMath {
     uint256 c = a % b;
     return c;
   }
-  
+
 }
 
 contract BasicToken is ERC20Basic {
-    
+
   using SafeMath for uint256;
- 
+
   mapping(address => uint256) balances;
 
   //18.10.2017 23:59 UTC
@@ -150,11 +150,11 @@ contract BasicToken is ERC20Basic {
     Transfer(msg.sender, _to, _value);
     return true;
   }
- 
+
   function balanceOf(address _owner) constant returns (uint256 balance) {
     return balances[_owner];
   }
- 
+
 }
 
 contract Migrations {
@@ -180,7 +180,7 @@ contract Migrations {
 }
 
 contract StandardToken is ERC20, BasicToken {
- 
+
   mapping (address => mapping (address => uint256)) allowed;
 
   //14.10.2017 23:59 UTC
@@ -192,10 +192,10 @@ contract StandardToken is ERC20, BasicToken {
     }
     _;
   }
- 
+
   function transferFrom(address _from, address _to, uint256 _value) isFreeze returns (bool) {
     var _allowance = allowed[_from][msg.sender];
- 
+
     balances[_to] = balances[_to].add(_value);
     balances[_from] = balances[_from].sub(_value);
     allowed[_from][msg.sender] = _allowance.sub(_value);
@@ -204,25 +204,25 @@ contract StandardToken is ERC20, BasicToken {
   }
 
   function approve(address _spender, uint256 _value) returns (bool) {
- 
+
     require((_value == 0) || (allowed[msg.sender][_spender] == 0));
- 
+
     allowed[msg.sender][_spender] = _value;
     Approval(msg.sender, _spender, _value);
     return true;
   }
 
   function approve(address _owner, address _spender, uint256 _value) returns (bool) {
- 
+
     allowed[_owner][_spender] = _value;
     Approval(_owner, _spender, _value);
     return true;
   }
- 
+
   function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
     return allowed[_owner][_spender];
   }
- 
+
 }
 
 contract MintableToken is StandardToken, Ownable {
@@ -243,7 +243,7 @@ contract MintableToken is StandardToken, Ownable {
   function getTotalTokenCount() public constant returns(uint256) {
     return totalSupply;
   }
-  
+
   function mint(address _address, uint256 _tokens) public {
 
     Mint(_address, _tokens);
@@ -259,18 +259,18 @@ contract MintableToken is StandardToken, Ownable {
 }
 
 contract SingleTokenCoin is MintableToken {
-    
+
     string public constant name = "Start mining";
-    
+
     string public constant symbol = "STM";
-    
+
     uint32 public constant decimals = 2;
-    
+
 }
 
 // ---------ALERT---------
-// Before deploy to Main Net uncomment all *ADDRESSES FOR PRODUCTION* comment 
-// Before deploy to Main Net change rinkeby.etherscan.io to etherscan.io 
+// Before deploy to Main Net uncomment all *ADDRESSES FOR PRODUCTION* comment
+// Before deploy to Main Net change rinkeby.etherscan.io to etherscan.io
 // Before deploy to Main Net check all ICO dates in all .sol files
 // Before deploy to Main Net check all Comment in .sol and .js files
 // Before deploy to Main Net check all code area with '* 100' & '/ 100' for .js files
@@ -343,7 +343,7 @@ contract Crowdsale is Ownable {
     uint256 private totalAmount;
 
     bool private initialize = false;
-    
+
     bool public mintingFinished = false;
 
     //Storage for ICO Buyers ETH
@@ -395,7 +395,7 @@ contract Crowdsale is Ownable {
 
       // 500 000 STM with 2 decimals
       mincup = 50000000;
-      
+
       mintingFinished = false;
 
       setTotalSupply();
@@ -503,7 +503,7 @@ contract Crowdsale is Ownable {
     function sendToAddress(address _address, uint256 _tokens) canMint public {
 
       if (grantedWallets(msg.sender) == false) {
-        revert();      
+        revert();
       }
 
       ShowInfo(_tokens);
@@ -512,11 +512,11 @@ contract Crowdsale is Ownable {
 
       uint256 timeBonus = calculateBonusForHours(currentTokens);
 
-      uint256 allTokens = currentTokens.add(timeBonus);   
+      uint256 allTokens = currentTokens.add(timeBonus);
 
-      token.approve(_address, this, allTokens);      
+      token.approve(_address, this, allTokens);
 
-      saveInfoAboutInvestors(_address, 0, allTokens, true);         
+      saveInfoAboutInvestors(_address, 0, allTokens, true);
 
       token.mint(_address, allTokens);
 
@@ -636,7 +636,7 @@ contract Crowdsale is Ownable {
 
         // Store Token of Investor
         ico_buyers_token[_address] = ico_buyers_token[_address].add(_tokens);
-      
+
       } else {
         if(manualAddresses[_address] == 0) {
           manualAddressesCount.push(_address);
@@ -666,15 +666,15 @@ contract Crowdsale is Ownable {
       ShowInfoBool(mintingFinished);
       mintingFinished = true;
       ShowInfoBool(mintingFinished);
-      
+
       if (soldTokens < mincup) {
         if(investors.length != 0) {
           for (uint256 i=0; i < investors.length; i++) {
-            address addr = investors[i];          
+            address addr = investors[i];
             token.burnTokens(addr);
           }
         }
-        
+
         if(manualAddressesCount.length != 0) {
           for (uint256 j=0; j < manualAddressesCount.length; j++) {
             address manualAddr = manualAddressesCount[j];
@@ -700,7 +700,7 @@ contract Crowdsale is Ownable {
       } else {
         revert();
       }
-      
+
     }
 
     function refund(uint256 _amount) private {
@@ -758,16 +758,16 @@ contract Crowdsale is Ownable {
         firstWithdrowPhase = true;
       } else {
         if (!secondWithdrowPhase) {
-          addresses.addr2().transfer(nineThreePercent);   
-          secondWithdrowPhase = true;       
+          addresses.addr2().transfer(nineThreePercent);
+          secondWithdrowPhase = true;
         } else {
           if (!thirdWithdrowPhase) {
             addresses.addr3().transfer(nineThreePercent);
-            thirdWithdrowPhase = true;                
+            thirdWithdrowPhase = true;
           } else {
             if (!fourWithdrowPhase) {
               addresses.addr4().transfer(nineThreePercent);
-              fourWithdrowPhase = true;                      
+              fourWithdrowPhase = true;
             }
           }
         }
@@ -776,10 +776,10 @@ contract Crowdsale is Ownable {
 
       //Five Percent
       addresses.successFee().transfer(fivePercent);
-      
+
       //Two Percent
       addresses.bounty().transfer(twoPercent);
-      
+
     }
 
     function getBalanceContract() public constant returns(uint256) {
@@ -832,7 +832,7 @@ contract Crowdsale is Ownable {
     }
 
     function getCurrentPrice() public constant returns(uint256) {
-      
+
       uint256 secondDiscount = calculateBonusForHours(rate);
 
       uint256 investorDiscount = rate.sub(secondDiscount);
@@ -852,7 +852,7 @@ contract Crowdsale is Ownable {
         if (msg.value != 0) {
             wrapper.transfer(msg.value);
         }
-      
+
       wrapper.update("URL", "json(https://api.kraken.com/0/public/Ticker?pair=ETHUSD).result.XETHZUSD.c.0");
     }
 
@@ -868,3 +868,38 @@ contract Crowdsale is Ownable {
       return wrapper.getWrapperData();
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

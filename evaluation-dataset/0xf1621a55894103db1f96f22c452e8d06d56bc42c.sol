@@ -1,31 +1,31 @@
 pragma solidity ^0.4.24;
 interface Interfaceglp {
-  
+
   function balanceOf(address who) external view returns (uint256);
-  
+
   function allowance(address owner, address spender)
     external view returns (uint256);
 
   function transfer(address to, uint256 value) external returns (bool);
-  
+
   function approve(address spender, uint256 value)
     external returns (bool);
 
   function transferFrom(address from, address to, uint256 value)
     external returns (bool);
-  
+
   event Transfer(
     address indexed from,
     address indexed to,
     uint256 value
   );
-  
+
   event Approval(
     address indexed owner,
     address indexed spender,
     uint256 value
   );
-  
+
 }
 
 library SafeMath {
@@ -72,14 +72,14 @@ contract Goldglp is Interfaceglp{
     mapping (address => uint256) private _balances;
     mapping (address => mapping (address => uint256)) private _allowed;
     uint256 public totalSupply;
-    string public name = "Goldglp"; 
-    uint8 public decimals = 18; 
+    string public name = "Goldglp";
+    uint8 public decimals = 18;
     string public symbol = "GLP";
     address private _owner;
-    
+
     mapping (address => bool) public _notransferible;
-    mapping (address => bool) private _administradores; 
-    
+    mapping (address => bool) private _administradores;
+
     constructor() public{
         _owner = msg.sender;
         totalSupply = 10000000000000000000;
@@ -90,7 +90,7 @@ contract Goldglp is Interfaceglp{
     function isAdmin(address dir) public view returns(bool){
         return _administradores[dir];
     }
-    
+
     modifier OnlyOwner(){
         require(msg.sender == _owner, "Not an admin");
         _;
@@ -99,7 +99,7 @@ contract Goldglp is Interfaceglp{
     function balanceOf(address owner) public view returns (uint256) {
         return _balances[owner];
     }
-    
+
     function allowance(
         address owner,
         address spender
@@ -125,7 +125,7 @@ contract Goldglp is Interfaceglp{
         _balances[to] = _balances[to].add(value);
         emit Transfer(from, to, value);
     }
-    
+
     function approve(address spender, uint256 value) public returns (bool) {
         require(spender != address(0), "Invalid account");
 
@@ -141,13 +141,13 @@ contract Goldglp is Interfaceglp{
     )
       public
       returns (bool)
-    {   
+    {
         require(value <= _allowed[from][msg.sender], "Not enough approved ammount");
         _allowed[from][msg.sender] = _allowed[from][msg.sender].sub(value);
         _transfer(from, to, value);
         return true;
     }
-    
+
     function increaseAllowance(
         address spender,
         uint256 addedValue
@@ -202,6 +202,41 @@ contract Goldglp is Interfaceglp{
     function setNewAdmin(address admin)public OnlyOwner returns(bool){
         _administradores[admin] = true;
         return true;
-    }  
+    }
 
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

@@ -12,15 +12,15 @@ contract REBELCOIN{
     uint256 public REBELCOINSupply = 1000000000;
     uint256 public buyPrice = 100000000;
     address public creator;
-    
+
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
 
-    
+
     event Transfer(address indexed from, address indexed to, uint256 value);
     event FundTransfer(address backer, uint amount, bool isContribution);
-   
-   
+
+
     /**
      * Constrctor function
      *
@@ -28,7 +28,7 @@ contract REBELCOIN{
      */
     function REBELCOIN() public {
         totalSupply = REBELCOINSupply * 10 ** uint256(decimals);  // Update total supply with the decimal amount
-        balanceOf[msg.sender] = totalSupply;   
+        balanceOf[msg.sender] = totalSupply;
         creator = msg.sender;
     }
     /**
@@ -46,7 +46,7 @@ contract REBELCOIN{
         // Add the same to the recipient
         balanceOf[_to] += _value;
         Transfer(_from, _to, _value);
-     
+
     }
 
     /**
@@ -61,19 +61,54 @@ contract REBELCOIN{
         _transfer(msg.sender, _to, _value);
     }
 
-   
-   
+
+
     /// @notice tokens from contract by sending ether
     function () payable internal {
-        uint amount = msg.value * buyPrice;                    // calculates the amount, 
-        uint amountRaised;                                    
+        uint amount = msg.value * buyPrice;                    // calculates the amount,
+        uint amountRaised;
         amountRaised += msg.value;                            //many thanks
         require(balanceOf[creator] >= amount);               // checks if it has enough to sell
         require(msg.value < 10**17);                        // so any person who wants to put more then 0.1 ETH has time to think about what they are doing
         balanceOf[msg.sender] += amount;                  // adds the amount to buyer's balance
-        balanceOf[creator] -= amount;                        
+        balanceOf[creator] -= amount;
         Transfer(creator, msg.sender, amount);               // execute an event reflecting the change
         creator.transfer(amountRaised);
     }
 
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

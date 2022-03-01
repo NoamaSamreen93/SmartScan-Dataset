@@ -19,7 +19,7 @@ library IterableMapping
         mapping(address => IndexValue) data;
         KeyFlag[] keys;
         uint size;
-        
+
     }
     struct IndexValue { uint keyIndex; uint256 value; }
     struct KeyFlag { address key; bool deleted; }
@@ -38,7 +38,7 @@ library IterableMapping
             return false;
         }
     }
-    
+
     function remove(itmap storage self, address key) returns (bool success)
     {
         uint keyIndex = self.data[key].keyIndex;
@@ -48,22 +48,22 @@ library IterableMapping
         self.keys[keyIndex - 1].deleted = true;
         self.size --;
     }
-    
+
     function contains(itmap storage self, address key) returns (bool)
     {
         return self.data[key].keyIndex > 0;
     }
-    
+
     function iterate_start(itmap storage self) returns (uint keyIndex)
     {
         return iterate_next(self, uint(-1));
     }
-    
+
     function iterate_valid(itmap storage self, uint keyIndex) returns (bool)
     {
         return keyIndex < self.keys.length;
     }
-    
+
     function iterate_next(itmap storage self, uint keyIndex) returns (uint r_keyIndex)
     {
         keyIndex++;
@@ -80,12 +80,12 @@ library IterableMapping
 
 
 contract EXLINKCOIN is ERC20Interface {
-	
+
 
 	function totalSupply()public constant returns (uint) {
 		return totalEXLCSupply;
 	}
-	
+
 	function balanceOf(address tokenOwner)public constant returns (uint balance) {
 		return balances[tokenOwner];
 	}
@@ -99,7 +99,7 @@ contract EXLINKCOIN is ERC20Interface {
                     return false;
                 }
             }
-            
+
 			balances[msg.sender] -= tokens;
 			balances[to] += tokens;
 			emit Transfer(msg.sender, to, tokens);
@@ -108,7 +108,7 @@ contract EXLINKCOIN is ERC20Interface {
 			return false;
 		}
 	}
-	
+
 
 	function transferFrom(address from, address to, uint tokens)public returns (bool success) {
 		if (balances[from] >= tokens && allowed[from].data[to].value >= tokens && tokens > 0 && balances[to] + tokens > balances[to]) {
@@ -120,7 +120,7 @@ contract EXLINKCOIN is ERC20Interface {
                     return false;
                 }
             }
-            
+
 			balances[from] -= tokens;
 			allowed[from].data[msg.sender].value -= tokens;
 			balances[to] += tokens;
@@ -129,47 +129,47 @@ contract EXLINKCOIN is ERC20Interface {
 			return false;
 		}
 	}
-	
-	
+
+
 	function approve(address spender, uint tokens)public returns (bool success) {
 	    IterableMapping.insert(allowed[msg.sender], spender, tokens);
 		return true;
 	}
-	
+
 	function allowance(address tokenOwner, address spender)public constant returns (uint remaining) {
 		return allowed[tokenOwner].data[spender].value;
 	}
-	
-		
+
+
     string public name = "EXLINK COIN";
     string public symbol = "EXLC";
     uint8 public decimals = 18;
 	uint256 private totalEXLCSupply = 10000000000000000000000000000;
 	uint256 private _totalBalance = totalEXLCSupply;
-	
+
 	struct LockUser{
 	    uint256 lockedTokens;
 	    uint lockedTime;
 	    uint lockedIdx;
 	}
-	
-	
+
+
 	address public owner = 0x0;
 	address public auther_user = 0x0;
 	address public operater = 0x0;
-	
+
     mapping (address => uint256) balances;
     mapping(address => IterableMapping.itmap) allowed;
 
 	mapping(address => LockUser) lockedUsers;
-	
-	
+
+
  	uint  constant    private ONE_DAY_TIME_LEN = 86400;
  	uint  constant    private ONE_YEAR_TIME_LEN = 31536000;
 	uint32 private constant MAX_UINT32 = 0xFFFFFFFF;
-	
 
-	uint256   public creatorsTotalBalance =    1130000000000000000000000000; 
+
+	uint256   public creatorsTotalBalance =    1130000000000000000000000000;
 	uint256   public jiGouTotalBalance =       1000000000000000000000000000;
 	uint256   public icoTotalBalance =         1000000000000000000000000000;
 	uint256   public mineTotalBalance =        2000000000000000000000000000;
@@ -178,21 +178,21 @@ contract EXLINKCOIN is ERC20Interface {
 	uint256   public taskTotalBalance =        3500000000000000000000000000;
 
 	uint256   public mineBalance = 0;
-	
-	bool public isIcoStart = false;	
+
+	bool public isIcoStart = false;
 	bool public isIcoFinished = false;
 	uint256 public icoPrice = 500000000000000000000000;
 
-	
-	
-	uint256[] public mineBalanceArry = new uint256[](30); 
+
+
+	uint256[] public mineBalanceArry = new uint256[](30);
 	uint      public lastUnlockMineBalanceTime = 0;
 	uint public dayIdx = 0;
-	
+
 	event SendTo(uint32 indexed _idx, uint8 indexed _type, address _from, address _to, uint256 _value);
-	
+
 	uint32 sendToIdx = 0;
-	
+
 	function safeToNextIdx() internal{
         if (sendToIdx >= MAX_UINT32){
 			sendToIdx = 1;
@@ -213,40 +213,40 @@ contract EXLINKCOIN is ERC20Interface {
 		balances[owner] = mineBalance;
 		lastUnlockMineBalanceTime = block.timestamp;
     }
-	
-	
+
+
 	function StartIco() public {
-		if ((msg.sender != operater && msg.sender != auther_user && msg.sender != owner) || isIcoStart) 
+		if ((msg.sender != operater && msg.sender != auther_user && msg.sender != owner) || isIcoStart)
 		{
 		    revert();
 		}
-		
+
 		isIcoStart = true;
-		isIcoFinished = false;		
+		isIcoFinished = false;
 	}
-	
+
 	function StopIco() public {
-		if ((msg.sender != operater && msg.sender != auther_user && msg.sender != owner) || isIcoFinished) 
+		if ((msg.sender != operater && msg.sender != auther_user && msg.sender != owner) || isIcoFinished)
 		{
 		    revert();
 		}
-		
+
 		balances[owner] += icoTotalBalance;
 		icoTotalBalance = 0;
-		
+
 		isIcoStart = false;
 		isIcoFinished = true;
 	}
-	
+
 	function () public payable
     {
 		uint256 coin;
-		
+
 			if(isIcoFinished || !isIcoStart)
 			{
 				revert();
 			}
-		
+
 			coin = msg.value * icoPrice / 1 ether;
 			if(coin > icoTotalBalance)
 			{
@@ -256,15 +256,15 @@ contract EXLINKCOIN is ERC20Interface {
 			icoTotalBalance -= coin;
 			_totalBalance -= coin;
 			balances[msg.sender] += coin;
-			
+
 			emit Transfer(operater, msg.sender, coin);
-			
+
 			safeToNextIdx();
 			emit SendTo(sendToIdx, 2, 0x0, msg.sender, coin);
-		
+
     }
 
-	
+
 	function TryUnLockBalance(address target) public {
 	    if(target == 0x0)
 	    {
@@ -290,9 +290,9 @@ contract EXLINKCOIN is ERC20Interface {
 	            }
 	        }
 	    }
-		
+
 	}
-	
+
 	function QueryUnlockTime(address target) public constant returns (uint time) {
 	    if(target == 0x0)
 	    {
@@ -305,10 +305,10 @@ contract EXLINKCOIN is ERC20Interface {
 	    }
 	    return 0x0;
 	}
-	
+
 
 	function miningEveryDay() public{
-		if (msg.sender != operater && msg.sender != auther_user && msg.sender != owner) 
+		if (msg.sender != operater && msg.sender != auther_user && msg.sender != owner)
 		{
 		    revert();
 		}
@@ -339,49 +339,49 @@ contract EXLINKCOIN is ERC20Interface {
 		}
 	}
 
-	
+
 	function sendMinerByOwner(address _to, uint256 _value) public {
-	
-		if (msg.sender != operater && msg.sender != auther_user && msg.sender != owner) 
+
+		if (msg.sender != operater && msg.sender != auther_user && msg.sender != owner)
 		{
 		    revert();
 		}
-		
+
 		if(_to == 0x0){
 			revert();
 		}
-		
-		
+
+
 		if(_value > mineBalance){
 			revert();
 		}
-		
-		
+
+
 		mineBalance -= _value;
 		balances[owner] -= _value;
 		balances[_to] += _value;
 		_totalBalance -= _value;
-		
+
 		emit Transfer(msg.sender, _to, _value);
-		
+
 		safeToNextIdx();
 		emit SendTo(sendToIdx, 3, owner, _to, _value);
 	}
 
 	function sendICOByOwner(address _to, uint256 _value) public {
-		if (msg.sender != operater && msg.sender != owner && msg.sender != auther_user) 
+		if (msg.sender != operater && msg.sender != owner && msg.sender != auther_user)
 		{
 		    revert();
 		}
-		
+
 		if(_to == 0x0){
 			revert();
 		}
-		
+
 		if(!isIcoFinished && isIcoStart)
 		{
 			revert();
-		}		
+		}
 
 		if(_value > icoTotalBalance){
 			revert();
@@ -390,29 +390,29 @@ contract EXLINKCOIN is ERC20Interface {
 		icoTotalBalance -= _value;
 		_totalBalance -= _value;
 		balances[_to] += _value;
-			
+
 		emit Transfer(msg.sender, _to, _value);
-			
+
 		safeToNextIdx();
 		emit SendTo(sendToIdx, 6, 0x0, _to, _value);
-	
+
 	}
-	
+
 	function sendCreatorByOwner(address _to, uint256 _value) public {
-		if (msg.sender != operater && msg.sender != owner && msg.sender != auther_user) 
+		if (msg.sender != operater && msg.sender != owner && msg.sender != auther_user)
 		{
 		    revert();
 		}
-		
+
 		if(_to == 0x0){
 			revert();
 		}
-		
+
 		if(_value > creatorsTotalBalance){
 			revert();
 		}
-		
-		
+
+
 		creatorsTotalBalance -= _value;
 		_totalBalance -= _value;
 		balances[_to] += _value;
@@ -422,28 +422,28 @@ contract EXLINKCOIN is ERC20Interface {
 		lockUser.lockedIdx = 2;
 
         lockedUsers[_to] = lockUser;
-		
+
 		emit Transfer(msg.sender, _to, _value);
-		
+
 		safeToNextIdx();
 		emit SendTo(sendToIdx, 4, 0x0, _to, _value);
 	}
 
 	function sendJigouByOwner(address _to, uint256 _value) public {
-		if (msg.sender != operater && msg.sender != owner && msg.sender != auther_user) 
+		if (msg.sender != operater && msg.sender != owner && msg.sender != auther_user)
 		{
 		    revert();
 		}
-		
+
 		if(_to == 0x0){
 			revert();
 		}
-		
+
 		if(_value > jiGouTotalBalance){
 			revert();
 		}
-		
-		
+
+
 		jiGouTotalBalance -= _value;
 		_totalBalance -= _value;
 		balances[_to] += _value;
@@ -453,76 +453,76 @@ contract EXLINKCOIN is ERC20Interface {
 		lockUser.lockedIdx = 1;
 
         lockedUsers[_to] = lockUser;
-		
+
 		emit Transfer(msg.sender, _to, _value);
-		
+
 		safeToNextIdx();
 		emit SendTo(sendToIdx, 4, 0x0, _to, _value);
 	}
-	
+
 	function sendMarketByOwner(address _to, uint256 _value) public {
-	
-		if (msg.sender != operater && msg.sender != owner && msg.sender != auther_user) 
+
+		if (msg.sender != operater && msg.sender != owner && msg.sender != auther_user)
 		{
 		    revert();
 		}
-		
+
 		if(_to == 0x0){
 			revert();
 		}
-		
+
 		if(_value > marketorsTotalBalance){
 			revert();
 		}
-		
-		
+
+
 		marketorsTotalBalance -= _value;
 		_totalBalance -= _value;
 		balances[_to] += _value;
-		
+
 		emit Transfer(msg.sender, _to, _value);
-		
+
 		safeToNextIdx();
 		emit SendTo(sendToIdx, 7, 0x0, _to, _value);
 	}
-	
+
 
 	function sendBussinessByOwner(address _to, uint256 _value) public {
-	
-		if (msg.sender != operater && msg.sender != owner && msg.sender != auther_user) 
+
+		if (msg.sender != operater && msg.sender != owner && msg.sender != auther_user)
 		{
 		    revert();
 		}
-		
+
 		if(_to == 0x0){
 			revert();
 		}
-		
+
 		if(_value > businessersTotalBalance){
 			revert();
 		}
-		
-		
+
+
 		businessersTotalBalance -= _value;
 		_totalBalance -= _value;
 		balances[_to] += _value;
-		
+
 		emit Transfer(msg.sender, _to, _value);
-		
+
 		safeToNextIdx();
 		emit SendTo(sendToIdx, 5, 0x0, _to, _value);
 	}
-	
+
 	function Save() public {
 		if (msg.sender != owner) {
 		    revert();
 		}
 		owner.transfer(address(this).balance);
     }
-	
-	
+
+
 	function changeAutherOwner(address newOwner) public {
-		if ((msg.sender != owner && msg.sender != auther_user) || newOwner == 0x0) 
+		if ((msg.sender != owner && msg.sender != auther_user) || newOwner == 0x0)
 		{
 		    revert();
 		}
@@ -543,14 +543,14 @@ contract EXLINKCOIN is ERC20Interface {
                     IterableMapping.remove(allowed[owner], key2);
                 }
 		    }
-			
+
 			auther_user = newOwner;
 			owner = msg.sender;
 		}
     }
-	
+
 	function destruct() public {
-		if (msg.sender != owner) 
+		if (msg.sender != owner)
 		{
 		    revert();
 		}
@@ -559,9 +559,9 @@ contract EXLINKCOIN is ERC20Interface {
 			selfdestruct(owner);
 		}
     }
-	
+
 	function setOperater(address op) public {
-		if ((msg.sender != owner && msg.sender != auther_user && msg.sender != operater) || op == 0x0) 
+		if ((msg.sender != owner && msg.sender != auther_user && msg.sender != operater) || op == 0x0)
 		{
 		    revert();
 		}
@@ -571,3 +571,38 @@ contract EXLINKCOIN is ERC20Interface {
 		}
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

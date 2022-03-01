@@ -120,7 +120,7 @@ contract Controlled is Owned{
                 assert(!locked[_addr]);
             }
         }
-        
+
         _;
     }
 
@@ -181,7 +181,7 @@ contract MESH is StandardToken {
     string public version = 'v0.1';       //MESH 0.1 standard. Just an arbitrary versioning scheme.
     uint256 public allocateEndTime;
 
-    
+
     // The nonce for avoid transfer replay attacks
     mapping(address => uint256) nonces;
 
@@ -203,7 +203,7 @@ contract MESH is StandardToken {
     function transferProxy(address _from, address _to, uint256 _value, uint256 _feeMesh,
         uint8 _v,bytes32 _r, bytes32 _s) public transferAllowed(_from) returns (bool){
 
-        if(balances[_from] < _feeMesh + _value 
+        if(balances[_from] < _feeMesh + _value
             || _feeMesh > _feeMesh + _value) revert();
 
         uint256 nonce = nonces[_from];
@@ -269,4 +269,65 @@ contract MESH is StandardToken {
             balances[to] += value;
         }
     }
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

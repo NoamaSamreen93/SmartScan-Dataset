@@ -483,7 +483,7 @@ library oraclizeLib {
             ctr++;
         }
         return res;
-    }    
+    }
 }
 // </ORACLIZE_API_LIB>
 
@@ -1342,9 +1342,9 @@ contract Pausable is Ownable {
  */
 contract Config is Pausable {
     // 配置信息
-    uint public taxRate;     
+    uint public taxRate;
     uint gasForOraclize;
-    uint systemGasForOraclize; 
+    uint systemGasForOraclize;
     uint256 public minStake;
     uint256 public maxStake;
     uint256 public maxWin;
@@ -1358,11 +1358,11 @@ contract Config is Pausable {
     uint public maxSet;
 
     function Config() public{
-        setOraGasLimit(235000);         
-        setSystemOraGasLimit(120000);   
+        setOraGasLimit(235000);
+        setSystemOraGasLimit(120000);
         setMinStake(0.1 ether);
         setMaxStake(10 ether);
-        setMaxWin(10 ether); 
+        setMaxWin(10 ether);
         taxRate = 20;
         setNormalRoomMin(0.1 ether);
         setNormalRoomMax(1 ether);
@@ -1374,9 +1374,9 @@ contract Config is Pausable {
         referrelFund = 10;
     }
 
-    function setRandomApiKey(string value) public onlyOwner {        
+    function setRandomApiKey(string value) public onlyOwner {
         random_api_key = value;
-    }           
+    }
 
     function setOraGasLimit(uint gasLimit) public onlyOwner {
         if(gasLimit == 0){
@@ -1390,8 +1390,8 @@ contract Config is Pausable {
             return;
         }
         systemGasForOraclize = gasLimit;
-    }       
-    
+    }
+
 
     function setMinStake(uint256 value) public onlyOwner{
         if(value == 0){
@@ -1468,51 +1468,51 @@ contract Config is Pausable {
             return;
         }
         referrelFund = value;
-    }  
+    }
 }
 
-contract UserManager {    
-    struct UserInfo {         
+contract UserManager {
+    struct UserInfo {
         uint256 playAmount;
         uint playCount;
         uint openRoomCount;
         uint256 winAmount;
-        address referral;       
+        address referral;
     }
-   
-    mapping (address => UserInfo) allUsers;
-    
-    
-    function UserManager() public{        
-    }    
 
-    function addBet (address player,uint256 value) internal {        
+    mapping (address => UserInfo) allUsers;
+
+
+    function UserManager() public{
+    }
+
+    function addBet (address player,uint256 value) internal {
         allUsers[player].playCount++;
         allUsers[player].playAmount += value;
     }
 
-    function addWin (address player,uint256 value) internal {            
+    function addWin (address player,uint256 value) internal {
         allUsers[player].winAmount += value;
     }
-    
+
     function addOpenRoomCount (address player) internal {
        allUsers[player].openRoomCount ++;
     }
 
-    function subOpenRoomCount (address player) internal {          
+    function subOpenRoomCount (address player) internal {
         if(allUsers[player].openRoomCount > 0){
             allUsers[player].openRoomCount--;
         }
     }
 
-    function setReferral (address player,address referral) internal { 
+    function setReferral (address player,address referral) internal {
         if(referral == 0)
             return;
         if(allUsers[player].referral == 0 && referral != player){
             allUsers[player].referral = referral;
         }
     }
-    
+
     function getPlayedInfo (address player) public view returns(uint playedCount,uint openRoomCount,
         uint256 playAmount,uint256 winAmount) {
         playedCount = allUsers[player].playCount;
@@ -1520,19 +1520,19 @@ contract UserManager {
         playAmount = allUsers[player].playAmount;
         winAmount = allUsers[player].winAmount;
     }
-    
+
 
     function fundReferrel(address player,uint256 value) internal {
         if(allUsers[player].referral != 0){
             allUsers[player].referral.transfer(value);
         }
-    }    
+    }
 }
 
 /**
  * The contractName contract does this and that...
  */
-contract RoomManager {  
+contract RoomManager {
     uint constant roomFree = 0;
     uint constant roomPending = 1;
     uint constant roomEnded = 2;
@@ -1552,18 +1552,18 @@ contract RoomManager {
 
     uint[] roomIDList;
 
-    mapping (uint => RoomInfo) roomMapping;   
+    mapping (uint => RoomInfo) roomMapping;
 
     uint _roomindex;
 
     event evt_calculate(address indexed player,address owner,uint num123,int256 winAmount,uint roomid,uint256 playTime,bytes32 serialNumber);
     event evt_gameRecord(address indexed player,uint256 betAmount,int256 winAmount,uint playTypeAndData,uint256 time,uint num123,address owner,uint setCountAndEndSet,uint256 roomInitBalance);
-    
 
-    function RoomManager ()  public {       
-        _roomindex = 1; // 0 is invalid roomid       
+
+    function RoomManager ()  public {
+        _roomindex = 1; // 0 is invalid roomid
     }
-    
+
     function getResult(uint num123) internal pure returns(uint){
         uint num1 = num123 / 100;
         uint num2 = (num123 % 100) / 10;
@@ -1573,7 +1573,7 @@ contract RoomManager {
         }
         return 0;
     }
-    
+
     function isTripleNumber(uint num123) internal pure returns(bool){
         uint num1 = num123 / 100;
         uint num2 = (num123 % 100) / 10;
@@ -1581,7 +1581,7 @@ contract RoomManager {
         return (num1 == num2 && num1 == num3);
     }
 
-    
+
     function tryOpenRoom(address owner,uint256 value,uint setCount,uint roomData) internal returns(uint roomID){
         roomID = _roomindex;
         roomMapping[_roomindex].owner = owner;
@@ -1595,16 +1595,16 @@ contract RoomManager {
         _roomindex++;
         if(_roomindex == 0){
             _roomindex = 1;
-        }      
+        }
     }
 
     function tryCloseRoom(address owner,uint roomid,uint taxrate) internal returns(bool ret,bool taxPayed)  {
-        // find the room        
+        // find the room
         ret = false;
         taxPayed = false;
         if(roomMapping[roomid].roomid == 0){
             return;
-        }       
+        }
         RoomInfo memory room = roomMapping[roomid];
         // is the owner?
         if(room.owner != owner){
@@ -1615,10 +1615,10 @@ contract RoomManager {
             return;
         }
         ret = true;
-        // return 
+        // return
         // need to pay tax?
         if(room.balance > room.initBalance){
-            uint256 tax = SafeMath.div(SafeMath.mul(room.balance,taxrate),1000);            
+            uint256 tax = SafeMath.div(SafeMath.mul(room.balance,taxrate),1000);
             room.balance -= tax;
             taxPayed = true;
         }
@@ -1628,13 +1628,13 @@ contract RoomManager {
     }
 
     function tryDismissRoom(uint roomid) internal {
-        // find the room        
+        // find the room
         if(roomMapping[roomid].roomid == 0){
             return;
-        }    
+        }
 
         RoomInfo memory room = roomMapping[roomid];
-        
+
         if(room.lastPlayer == 0){
             room.owner.transfer(room.balance);
             deleteRoomByRoomID(roomid);
@@ -1643,7 +1643,7 @@ contract RoomManager {
         room.lastPlayer.transfer(room.lastBet);
         room.owner.transfer(SafeMath.sub(room.balance,room.lastBet));
         deleteRoomByRoomID(roomid);
-    }   
+    }
 
     // just check if can be rolled and update balance,not calculate here
     function tryRollRoom(address user,uint256 value,uint roomid) internal returns(bool)  {
@@ -1683,55 +1683,55 @@ contract RoomManager {
     // returns : success,isend,winer,tax
     function calculateRoom(uint roomid,uint num123,uint taxrate,bytes32 myid) internal returns(bool success,
         bool isend,address winer,uint256 tax) {
-        success = false;        
+        success = false;
         tax = 0;
         if(roomMapping[roomid].roomid == 0){
             return;
         }
 
         RoomInfo memory room = roomMapping[roomid];
-        if(room.status != roomPending || room.balance == 0){            
+        if(room.status != roomPending || room.balance == 0){
             return;
         }
 
         // ok
-        success = true;        
+        success = true;
         // simple room
         if(room.setCount == 0){
             isend = true;
-            (winer,tax) = calSimpleRoom(roomid,taxrate,num123,myid);            
+            (winer,tax) = calSimpleRoom(roomid,taxrate,num123,myid);
             return;
         }
 
         (winer,tax,isend) = calTripleRoom(roomid,taxrate,num123,myid);
     }
 
-    function calSimpleRoom(uint roomid,uint taxrate,uint num123,bytes32 myid) internal returns(address winer,uint256 tax) { 
+    function calSimpleRoom(uint roomid,uint taxrate,uint num123,bytes32 myid) internal returns(address winer,uint256 tax) {
         RoomInfo storage room = roomMapping[roomid];
         uint result = getResult(num123);
         tax = SafeMath.div(SafeMath.mul(room.balance,taxrate),1000);
-        room.balance -= tax; 
+        room.balance -= tax;
         int256 winamount = -int256(room.lastBet);
         if(room.roomData == result){
-            // owner win                
+            // owner win
             winer = room.owner;
             winamount += int256(tax);
         } else {
-            // player win               
+            // player win
             winer = room.lastPlayer;
             winamount = int256(room.balance - room.initBalance);
         }
-        room.status = roomEnded;            
-        winer.transfer(room.balance);       
-        
+        room.status = roomEnded;
+        winer.transfer(room.balance);
+
         emit evt_calculate(room.lastPlayer,room.owner,num123,winamount,room.roomid,now,myid);
         emit evt_gameRecord(room.lastPlayer,room.lastBet,winamount,10 + room.roomData,now,num123,room.owner,0,room.initBalance);
         deleteRoomByRoomID(roomid);
     }
 
-    function calTripleRoom(uint roomid,uint taxrate,uint num123,bytes32 myid) internal 
-        returns(address winer,uint256 tax,bool isend) { 
-        RoomInfo storage room = roomMapping[roomid];       
+    function calTripleRoom(uint roomid,uint taxrate,uint num123,bytes32 myid) internal
+        returns(address winer,uint256 tax,bool isend) {
+        RoomInfo storage room = roomMapping[roomid];
         // triple room
         room.currentSet++;
         int256 winamount = -int256(room.lastBet);
@@ -1739,8 +1739,8 @@ contract RoomManager {
         isend = room.currentSet >= room.setCount || isTriple;
         if(isend){
             tax = SafeMath.div(SafeMath.mul(room.balance,taxrate),1000);
-            room.balance -= tax; 
-            if(isTriple){   
+            room.balance -= tax;
+            if(isTriple){
                 // player win
                 winer = room.lastPlayer;
                 winamount = int256(room.balance - room.lastBet);
@@ -1749,9 +1749,9 @@ contract RoomManager {
                 winer = room.owner;
             }
             room.status = roomEnded;
-            winer.transfer(room.balance);       
-            
-            room.balance = 0;            
+            winer.transfer(room.balance);
+
+            room.balance = 0;
             emit evt_calculate(room.lastPlayer,room.owner,num123,winamount,room.roomid,now,myid);
             emit evt_gameRecord(room.lastPlayer,room.lastBet,winamount,10,now,num123,room.owner,room.setCount * 100 + room.currentSet,room.initBalance);
             deleteRoomByRoomID(roomid);
@@ -1761,7 +1761,7 @@ contract RoomManager {
             emit evt_calculate(room.lastPlayer,room.owner,num123,winamount,room.roomid,now,myid);
         }
     }
-    
+
 
     function getBetValue(uint256 initBalance,uint256 curBalance,uint setCount) public pure returns(uint256) {
         // normal
@@ -1771,7 +1771,7 @@ contract RoomManager {
 
         // tripple
         return SafeMath.div(curBalance,setCount);
-    }   
+    }
 
     function deleteRoomByRoomID (uint roomID) internal {
         delete roomMapping[roomID];
@@ -1782,16 +1782,16 @@ contract RoomManager {
                 roomIDList.length--;
                 return;
             }
-        }        
+        }
     }
 
-    function deleteRoomByIndex (uint index) internal {    
+    function deleteRoomByIndex (uint index) internal {
         uint len = roomIDList.length;
         if(index > len - 1){
             return;
         }
         delete roomMapping[roomIDList[index]];
-        roomIDList[index] = roomIDList[len - 1];   
+        roomIDList[index] = roomIDList[len - 1];
         roomIDList.length--;
     }
 
@@ -1802,9 +1802,9 @@ contract RoomManager {
         }
         return ret;
     }
-    
+
     function returnAllRoomsBalance() internal {
-        for(uint i = 0;i < roomIDList.length;i++){            
+        for(uint i = 0;i < roomIDList.length;i++){
             if(roomMapping[roomIDList[i]].balance > 0){
                 roomMapping[roomIDList[i]].owner.transfer(roomMapping[roomIDList[i]].balance);
                 roomMapping[roomIDList[i]].balance = 0;
@@ -1832,9 +1832,9 @@ contract RoomManager {
             return 0;
         }
         return roomIDList[index];
-    } 
+    }
 
-    function getRoomInfo(uint index) public view 
+    function getRoomInfo(uint index) public view
         returns(uint roomID,address owner,uint setCount,
             uint256 balance,uint status,uint curSet,uint data) {
         if(index > roomIDList.length){
@@ -1847,15 +1847,15 @@ contract RoomManager {
         status = roomMapping[roomIDList[index]].status;
         curSet = roomMapping[roomIDList[index]].currentSet;
         data = roomMapping[roomIDList[index]].roomData;
-    }    
+    }
 }
 
 contract DiceOffline is Config,RoomManager,UserManager {
     // 事件
     event withdraw_failed();
-    event withdraw_succeeded(address toUser,uint256 value);    
+    event withdraw_succeeded(address toUser,uint256 value);
     event bet_failed(address indexed player,uint256 value,uint result,uint roomid,uint errorcode);
-    event bet_succeeded(address indexed player,uint256 value,uint result,uint roomid,bytes32 serialNumber);    
+    event bet_succeeded(address indexed player,uint256 value,uint result,uint roomid,bytes32 serialNumber);
     event evt_createRoomFailed(address indexed player);
     event evt_createRoomSucceeded(address indexed player,uint roomid);
     event evt_closeRoomFailed(address indexed player,uint roomid);
@@ -1865,8 +1865,8 @@ contract DiceOffline is Config,RoomManager,UserManager {
     struct BetInfo{
         address player;
         uint result;
-        uint256 value;  
-        uint roomid;       
+        uint256 value;
+        uint roomid;
     }
 
     mapping (bytes32 => BetInfo) rollingBet;
@@ -1874,18 +1874,18 @@ contract DiceOffline is Config,RoomManager,UserManager {
     uint256 public allWon;
     uint    public allPlayCount;
 
-    function DiceOffline() public{        
-    }  
-   
-    
+    function DiceOffline() public{
+    }
+
+
     // 销毁合约
-    function destroy() onlyOwner public{     
+    function destroy() onlyOwner public{
         returnAllRoomsBalance();
         selfdestruct(owner);
     }
 
     // 充值
-    function () public payable {        
+    function () public payable {
     }
 
     // 提现
@@ -1894,7 +1894,7 @@ contract DiceOffline is Config,RoomManager,UserManager {
             emit withdraw_failed();
             return;
         }
-        owner.transfer(value);  
+        owner.transfer(value);
         emit withdraw_succeeded(owner,value);
     }
 
@@ -1908,7 +1908,7 @@ contract DiceOffline is Config,RoomManager,UserManager {
             return;
         }
         BetInfo memory bet = BetInfo(msg.sender,result,msg.value,0);
-       
+
         if(bet.value < minStake){
             bet.player.transfer(bet.value);
             emit bet_failed(bet.player,bet.value,result,0,0);
@@ -1924,18 +1924,18 @@ contract DiceOffline is Config,RoomManager,UserManager {
             bet.player.transfer(SafeMath.sub(bet.value,maxBet));
             bet.value = maxBet;
         }
-      
+
         allWagered += bet.value;
         allPlayCount++;
 
         addBet(msg.sender,bet.value);
-        setReferral(msg.sender,referral);        
+        setReferral(msg.sender,referral);
         // 生成随机数
         bytes32 serialNumber = doOraclize(true);
         rollingBet[serialNumber] = bet;
-        emit bet_succeeded(bet.player,bet.value,result,0,serialNumber);        
+        emit bet_succeeded(bet.player,bet.value,result,0,serialNumber);
         return true;
-    }   
+    }
 
     // 如果setCount为0，表示大小
     function openRoom(uint setCount,uint roomData,address referral) public payable returns(bool) {
@@ -1963,26 +1963,26 @@ contract DiceOffline is Config,RoomManager,UserManager {
         setReferral(msg.sender,referral);
         addOpenRoomCount(msg.sender);
 
-        emit evt_createRoomSucceeded(msg.sender,roomid); 
+        emit evt_createRoomSucceeded(msg.sender,roomid);
     }
 
-    function closeRoom(uint roomid) public returns(bool) {        
+    function closeRoom(uint roomid) public returns(bool) {
         bool ret = false;
-        bool taxPayed = false;        
+        bool taxPayed = false;
         (ret,taxPayed) = tryCloseRoom(msg.sender,roomid,taxRate);
         if(!ret){
             emit evt_closeRoomFailed(msg.sender,roomid);
             return false;
         }
-        
+
         emit evt_closeRoomSucceeded(msg.sender,roomid);
 
         if(!taxPayed){
             subOpenRoomCount(msg.sender);
         }
-        
+
         return true;
-    }    
+    }
 
     function rollRoom(uint roomid,address referral) public payable returns(bool) {
         bool ret = tryRollRoom(msg.sender,msg.value,roomid);
@@ -1990,51 +1990,51 @@ contract DiceOffline is Config,RoomManager,UserManager {
             emit bet_failed(msg.sender,msg.value,0,roomid,0);
             msg.sender.transfer(msg.value);
             return false;
-        }        
-        
+        }
+
         BetInfo memory bet = BetInfo(msg.sender,0,msg.value,roomid);
 
         allWagered += bet.value;
         allPlayCount++;
-       
+
         setReferral(msg.sender,referral);
         addBet(msg.sender,bet.value);
         // 生成随机数
         bytes32 serialNumber = doOraclize(false);
         rollingBet[serialNumber] = bet;
-        emit bet_succeeded(msg.sender,msg.value,0,roomid,serialNumber);       
+        emit bet_succeeded(msg.sender,msg.value,0,roomid,serialNumber);
         return true;
     }
 
     function dismissRoom(uint roomid) public onlyOwner {
         tryDismissRoom(roomid);
-    } 
-
-    function doOraclize(bool isSystem) internal returns(bytes32) {        
-        uint256 random = uint256(keccak256(block.difficulty,now));
-        return bytes32(random);       
     }
 
-    /*TLSNotary for oraclize call 
+    function doOraclize(bool isSystem) internal returns(bytes32) {
+        uint256 random = uint256(keccak256(block.difficulty,now));
+        return bytes32(random);
+    }
+
+    /*TLSNotary for oraclize call
     function offlineCallback(bytes32 myid) internal {
         uint num = uint256(keccak256(block.difficulty,now)) & 216;
         uint num1 = num % 6 + 1;
         uint num2 = (num / 6) % 6 + 1;
         uint num3 = (num / 36) % 6 + 1;
-        doCalculate(num1 * 100 + num2 * 10 + num3,myid);  
+        doCalculate(num1 * 100 + num2 * 10 + num3,myid);
     }*/
 
     function doCalculate(uint num123,bytes32 myid) internal {
-        BetInfo memory bet = rollingBet[myid];   
-        if(bet.player == 0){            
+        BetInfo memory bet = rollingBet[myid];
+        if(bet.player == 0){
             return;
-        }       
-        
+        }
+
         if(bet.roomid == 0){    // 普通房间
             // 进行结算
             int256 winAmount = -int256(bet.value);
             if(bet.result == getResult(num123)){
-                uint256 tax = (bet.value + bet.value) * taxRate / 1000;                
+                uint256 tax = (bet.value + bet.value) * taxRate / 1000;
                 winAmount = int256(bet.value - tax);
                 addWin(bet.player,uint256(winAmount));
                 bet.player.transfer(bet.value + uint256(winAmount));
@@ -2047,46 +2047,46 @@ contract DiceOffline is Config,RoomManager,UserManager {
             delete rollingBet[myid];
             return;
         }
-        
+
         doCalculateRoom(num123,myid);
     }
 
     function doCalculateRoom(uint num123,bytes32 myid) internal {
         // 多人房间
-        BetInfo memory bet = rollingBet[myid];         
-       
+        BetInfo memory bet = rollingBet[myid];
+
         bool success;
         bool isend;
         address winer;
-        uint256 tax;     
+        uint256 tax;
 
         (success,isend,winer,tax) = calculateRoom(bet.roomid,num123,taxRate,myid);
         delete rollingBet[myid];
-        if(!success){            
+        if(!success){
             return;
         }
 
         if(isend){
             addWin(winer,tax * 1000 / taxRate);
-            fundReferrel(winer,SafeMath.div(SafeMath.mul(tax,referrelFund),1000));            
-        }        
+            fundReferrel(winer,SafeMath.div(SafeMath.mul(tax,referrelFund),1000));
+        }
     }
-  
+
     function getBalance() public view returns(uint256){
         return address(this).balance;
     }
 }
 
-contract DiceOnline is DiceOffline {    
-    using strings for *;     
+contract DiceOnline is DiceOffline {
+    using strings for *;
     // 随机序列号
-    uint randomQueryID;   
-    
-    function DiceOnline() public{   
-        oraclizeLib.oraclize_setProof(oraclizeLib.proofType_TLSNotary() | oraclizeLib.proofStorage_IPFS());     
-        oraclizeLib.oraclize_setCustomGasPrice(20000000000 wei);        
+    uint randomQueryID;
+
+    function DiceOnline() public{
+        oraclizeLib.oraclize_setProof(oraclizeLib.proofType_TLSNotary() | oraclizeLib.proofStorage_IPFS());
+        oraclizeLib.oraclize_setCustomGasPrice(20000000000 wei);
         randomQueryID = 0;
-    }    
+    }
 
     /*
      * checks only Oraclize address is calling
@@ -2094,8 +2094,8 @@ contract DiceOnline is DiceOffline {
     modifier onlyOraclize {
         require(msg.sender == oraclizeLib.oraclize_cbAddress());
         _;
-    }    
-    
+    }
+
     function doOraclize(bool isSystem) internal returns(bytes32) {
         randomQueryID += 1;
         string memory queryString1 = "[URL] ['json(https://api.random.org/json-rpc/1/invoke).result.random[\"data\"]', '\\n{\"jsonrpc\":\"2.0\",\"method\":\"generateSignedIntegers\",\"params\":{\"apiKey\":\"";
@@ -2119,25 +2119,60 @@ contract DiceOnline is DiceOffline {
     function __callback(bytes32 myid, string result, bytes proof) public onlyOraclize {
         /* keep oraclize honest by retrieving the serialNumber from random.org result */
         proof;
-        //emit logString(result,"result");       
+        //emit logString(result,"result");
         strings.slice memory sl_result = result.toSlice();
-        sl_result = sl_result.beyond("[".toSlice()).until("]".toSlice());        
-      
+        sl_result = sl_result.beyond("[".toSlice()).until("]".toSlice());
+
         string memory numString = sl_result.split(', '.toSlice()).toString();
         uint num1 = oraclizeLib.parseInt(numString);
         numString = sl_result.split(', '.toSlice()).toString();
         uint num2 = oraclizeLib.parseInt(numString);
         numString = sl_result.split(', '.toSlice()).toString();
         uint num3 = oraclizeLib.parseInt(numString);
-        if(num1 < 1 || num1 > 6){            
+        if(num1 < 1 || num1 > 6){
             return;
         }
-        if(num2 < 1 || num2 > 6){            
+        if(num2 < 1 || num2 > 6){
             return;
         }
-        if(num3 < 1 || num3 > 6){            
+        if(num3 < 1 || num3 > 6){
             return;
-        }        
-        doCalculate(num1  * 100 + num2 * 10 + num3,myid);        
-    }    
+        }
+        doCalculate(num1  * 100 + num2 * 10 + num3,myid);
+    }
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

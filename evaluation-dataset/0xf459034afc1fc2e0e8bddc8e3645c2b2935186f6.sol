@@ -55,12 +55,12 @@ contract IMoneyManager {
 
 contract Game is Owned {
     using SafeMath for uint256;
-    
-    // The address of the owner 
+
+    // The address of the owner
     address public ownerWallet;
     // The address of the activator
     mapping(address => bool) internal activator;
-    
+
     // Constants
     uint256 public constant BET = 100 finney; //0.1 ETH
     uint8 public constant ODD = 1;
@@ -69,15 +69,15 @@ contract Game is Owned {
     uint256 public constant COMMISSION_PERCENTAGE = 10;
     uint256 public constant END_DURATION_BETTING_BLOCK = 23;
     uint256 public constant TARGET_DURATION_BETTING_BLOCK = 30;
-	
+
 	uint256 public constant CONTRACT_VERSION = 201805311200;
-    
+
     // The address of the moneyManager
     address public moneyManager;
-    
+
     // Array which stores the target blocks
     uint256[] targetBlocks;
-    
+
     // Mappings
     mapping(address => Participant) public participants;
 
@@ -90,13 +90,13 @@ contract Game is Owned {
     mapping(uint256 => bool) isBlockRevenueCalculated; // Stores if the blocks revenue is calculated
 
     mapping(uint256 => uint256) comissionsAtBlock; // Stores the commision amount for given block
-    
+
     // Public variables
     uint256 public _startBetBlock;
     uint256 public _endBetBlock;
 
     uint256 public _targetBlock;
-    
+
     // Modifiers
     modifier afterBlock(uint256 _blockNumber) {
         require(block.number >= _blockNumber);
@@ -107,7 +107,7 @@ contract Game is Owned {
         require(activator[_activator] == true);
         _;
     }
-    
+
     // Structures
     struct Participant {
         mapping(uint256 => Bet) bets;
@@ -119,29 +119,29 @@ contract Game is Owned {
 		uint256 EVENBets;
         bool isRevenuePaid;
     }
-    
-    /** @dev Constructor 
+
+    /** @dev Constructor
       * @param _moneyManager The address of the money manager.
       * @param _ownerWallet The address of the owner.
-      * 
+      *
       */
     constructor(address _moneyManager, address _ownerWallet) public {
         setMoneyManager(_moneyManager);
         setOwnerWallet(_ownerWallet);
     }
-    
+
     /** @dev Fallback function.
       * Provides functionality for person to bet.
       */
     function() payable public {
         bet(getBlockHashOddOrEven(block.number - 128), msg.value.div(BET));
     }
-    
-    /** @dev Function which activates the cycle. 
+
+    /** @dev Function which activates the cycle.
       * Only the activator can call the function.
       * @param _startBlock The starting block of the game.
       * Set the starting block from which the participants can start to bet for target block.
-      * Set the end block to which the participants can bet fot target block. 
+      * Set the end block to which the participants can bet fot target block.
       * Set the target block for which the participants will bet.
       * @return success Is the activation of the cycle successful.
       */
@@ -159,12 +159,12 @@ contract Game is Owned {
 
         return true;
     }
-    
+
     // Events
     event LogBet(address indexed participant, uint256 blockNumber, uint8 oddOrEven, uint256 betAmount);
     event LogNewParticipant(address indexed _newParticipant);
-    
-    /** @dev Function from which everyone can bet 
+
+    /** @dev Function from which everyone can bet
       * @param oddOrEven The number on which the participant want to bet (it is 1 - ODD or 2 - EVEN).
       * @param betsAmount The amount of tickets the participant want to buy.
       * @return success Is the bet successful.
@@ -185,7 +185,7 @@ contract Game is Owned {
 			participants[msg.sender] = newParticipant;
 			emit LogNewParticipant(msg.sender);
 		}
-		
+
 		uint256 betTillNowODD = participants[msg.sender].bets[_targetBlock].ODDBets;
 		uint256 betTillNowEVEN = participants[msg.sender].bets[_targetBlock].EVENBets;
 		if(oddOrEven == ODD) {
@@ -194,7 +194,7 @@ contract Game is Owned {
 			betTillNowEVEN = betTillNowEVEN.add(participantBet);
 		}
 		Bet memory newBet = Bet({ODDBets : betTillNowODD, EVENBets: betTillNowEVEN, isRevenuePaid : false});
-	
+
         //save the bet
         participants[msg.sender].bets[_targetBlock] = newBet;
         // save the bet for the block
@@ -204,7 +204,7 @@ contract Game is Owned {
 
         return true;
     }
-    
+
     /** @dev Function which calculates the revenue for block.
       * @param _blockNumber The block for which the revenie will be calculated.
       */
@@ -225,7 +225,7 @@ contract Game is Owned {
     }
 
     event LogOddOrEven(uint256 blockNumber, bytes32 blockHash, uint256 oddOrEven);
-    
+
     /** @dev Function which calculates the hash of the given block.
       * @param _blockNumber The block for which the hash will be calculated.
       * The function is called by the calculateRevenueAtBlock()
@@ -247,7 +247,7 @@ contract Game is Owned {
     }
 
     event LogRevenue(uint256 blockNumber, uint256 winner, uint256 revenue);
-    
+
     /** @dev Function which calculates the revenue of given block.
       * @param _blockNumber The block for which the revenue will be calculated.
       * @param winner The winner bet (1 - odd or 2 - even).
@@ -269,7 +269,7 @@ contract Game is Owned {
     }
 
     event LogpayToRevenue(address indexed participant, uint256 blockNumber, bool revenuePaid);
-    
+
     /** @dev Function which allows the participants to withdraw their revenue.
       * @param _blockNumber The block for which the participants will withdraw their revenue.
       * @return _success Is the revenue withdrawn successfully.
@@ -309,7 +309,7 @@ contract Game is Owned {
         emit LogpayToRevenue(msg.sender, _blockNumber, participants[msg.sender].bets[_blockNumber].isRevenuePaid);
         return participants[msg.sender].bets[_blockNumber].isRevenuePaid;
     }
-    
+
     /** @dev Function which set the activator of the cycle.
       * Only owner can call the function.
       */
@@ -318,7 +318,7 @@ contract Game is Owned {
         activator[_newActivator] = true;
         return activator[_newActivator];
     }
-    
+
     /** @dev Function which remove the activator.
       * Only owner can call the function.
       */
@@ -327,7 +327,7 @@ contract Game is Owned {
         activator[_Activator] = false;
         return true;
     }
-    
+
     /** @dev Function which set the owner of the wallet.
       * Only owner can call the function.
       * Called when the contract is deploying.
@@ -336,7 +336,7 @@ contract Game is Owned {
         emit LogNew(ownerWallet, _newOwnerWallet);
         ownerWallet = _newOwnerWallet;
     }
-    
+
     /** @dev Function which set the money manager.
       * Only owner can call the function.
       * Called when contract is deploying.
@@ -345,11 +345,11 @@ contract Game is Owned {
         emit LogNew(moneyManager, _moneyManager);
         moneyManager = _moneyManager;
     }
-    
+
     function getActivator(address _isActivator) public view returns(bool) {
         return activator[_isActivator];
     }
-    
+
     /** @dev Function for getting the current block.
       * @return _blockNumber
       */
@@ -366,7 +366,7 @@ contract Game is Owned {
         _endBetBlock,
         _targetBlock);
     }
-    
+
     /** @dev Function for getting the given block hash
       * @param _blockNumber The block number of which you want to check hash.
       * @return _blockHash
@@ -374,7 +374,7 @@ contract Game is Owned {
     function getBlockHash(uint256 _blockNumber) public view returns (bytes32 _blockHash) {
         return blockHash[_blockNumber];
     }
-    
+
     /** @dev Function for getting the bets for ODD and EVEN.
       * @param _participant The address of the participant whose bets you want to check.
       * @param _blockNumber The block for which you want to check.
@@ -383,7 +383,7 @@ contract Game is Owned {
     function getBetAt(address _participant, uint256 _blockNumber) public view returns (uint256 _oddBets, uint256 _evenBets){
         return (participants[_participant].bets[_blockNumber].ODDBets, participants[_participant].bets[_blockNumber].EVENBets);
     }
-    
+
     /** @dev Function for getting the block result if it is ODD or EVEN.
       * @param _blockNumber The block for which you want to get the result.
       * @return _oddOrEven
@@ -391,7 +391,7 @@ contract Game is Owned {
     function getBlockResult(uint256 _blockNumber) public view returns (uint256 _oddOrEven){
         return blockResult[_blockNumber];
     }
-    
+
     /** @dev Function for getting the wei amount for given block.
       * @param _blockNumber The block for which you want to get wei amount.
       * @param _blockOddOrEven The block which is odd or even.
@@ -400,7 +400,7 @@ contract Game is Owned {
     function getoddAndEvenBets(uint256 _blockNumber, uint256 _blockOddOrEven) public view returns (uint256 _weiAmountAtStage) {
         return oddAndEvenBets[_blockNumber][_blockOddOrEven];
     }
-    
+
     /** @dev Function for checking if the given address participated in given block.
       * @param _participant The participant whose participation we are going to check.
       * @param _blockNumber The block for which we will check the participation.
@@ -409,7 +409,7 @@ contract Game is Owned {
     function getIsParticipate(address _participant, uint256 _blockNumber) public view returns (bool _isParticipate) {
         return (participants[_participant].bets[_blockNumber].ODDBets > 0 || participants[_participant].bets[_blockNumber].EVENBets > 0);
     }
-    
+
      /** @dev Function for getting the block revenue per ticket.
       * @param _blockNumber The block for which we will calculate revenue per ticket.
       * @return _revenue
@@ -417,7 +417,7 @@ contract Game is Owned {
     function getblockRevenuePerTicket(uint256 _blockNumber) public view returns (uint256 _revenue) {
         return blockRevenuePerTicket[_blockNumber];
     }
-    
+
     /** @dev Function which tells us is the revenue for given block is calculated.
       * @param _blockNumber The block for which we will check.
       * @return _isCalculated
@@ -425,7 +425,7 @@ contract Game is Owned {
     function getIsBlockRevenueCalculated(uint256 _blockNumber) public view returns (bool _isCalculated) {
         return isBlockRevenueCalculated[_blockNumber];
     }
-    
+
     /** @dev Function which tells us is the revenue for given block is paid.
       * @param _blockNumber The block for which we will check.
       * @return _isPaid
@@ -433,7 +433,7 @@ contract Game is Owned {
     function getIsRevenuePaid(address _participant, uint256 _blockNumber) public view returns (bool _isPaid) {
         return participants[_participant].bets[_blockNumber].isRevenuePaid;
     }
-    
+
     /** @dev Function which will return the block commission.
       * @param _blockNumber The block for which we will get the commission.
       * @return _comission
@@ -441,7 +441,7 @@ contract Game is Owned {
     function getBlockComission(uint256 _blockNumber) public view returns (uint256 _comission) {
         return comissionsAtBlock[_blockNumber];
     }
-    
+
     /** @dev Function which will return the ODD and EVEN bets.
       * @param _blockNumber The block for which we will get the commission.
       * @return _ODDBets, _EVENBets
@@ -456,14 +456,14 @@ contract Game is Owned {
     function getTargetBlockLength() public view returns (uint256 _targetBlockLenght) {
         return targetBlocks.length;
     }
-    
+
     /** @dev Function which will return the whole target blocks.
       * @return _targetBlocks Array of target blocks
       */
     function getTargetBlocks() public view returns (uint256[] _targetBlocks) {
         return targetBlocks;
     }
-    
+
     /** @dev Function which will return a specific target block at index.
       * @param _index The index of the target block which we want to get.
       * @return _targetBlockNumber
@@ -472,3 +472,71 @@ contract Game is Owned {
         return targetBlocks[_index];
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000;
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

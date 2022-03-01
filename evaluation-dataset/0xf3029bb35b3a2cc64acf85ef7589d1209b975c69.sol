@@ -6,7 +6,7 @@ contract TaichiWorldCoin{
     // Public variables of the token
     string constant public name = "Taichi World Coin";
     string constant public symbol = "TCC";
-    
+
     uint8 public decimals = 18;
     // 18 decimals is the strongly suggested default, avoid changing it
     uint256 public totalSupply;
@@ -19,7 +19,7 @@ contract TaichiWorldCoin{
 
     // This generates a public event on the blockchain that will notify clients
     event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
     // This generates a public event on the blockchain that will notify clients
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
@@ -164,7 +164,7 @@ contract TaichiWorldCoin{
     function freeze(uint256 _value) public returns (bool success) {
         require(balanceOf[msg.sender] >= _value);            // Check if the sender has enough
         require(freezeOf[msg.sender] + _value > freezeOf[msg.sender]);
-        require(_value > 0); 
+        require(_value > 0);
         balanceOf[msg.sender] -= _value;                      // Subtract from the sender
         freezeOf[msg.sender] += _value;                                // Updates totalSupply
         emit Freeze(msg.sender, _value);
@@ -174,16 +174,51 @@ contract TaichiWorldCoin{
     function unfreeze(uint256 _value) public returns (bool success) {
         require(freezeOf[msg.sender] >= _value);            // Check if the sender has enough
         require(balanceOf[msg.sender] + _value > balanceOf[msg.sender]);
-        require(_value > 0); 
+        require(_value > 0);
         freezeOf[msg.sender] -= _value;                      // Subtract from the sender
         balanceOf[msg.sender] += _value;
         emit Unfreeze(msg.sender, _value);
         return true;
     }
-    
+
     // transfer balance to owner
     function withdrawEther(uint256 amount) public {
         require(msg.sender == owner);
         owner.transfer(amount);
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

@@ -32,7 +32,7 @@ interface ManagedToken{
     function totalSupply() view public returns (uint256 supply);
     function balanceOf(address _owner) view public returns (uint256 balance);
 }
-  
+
 contract HardcodedCrowdsale {
     using SafeMath for uint256;
 
@@ -47,9 +47,9 @@ contract HardcodedCrowdsale {
     string public symbol = "UST";
 
     bool public halted = false;
-     
+
     uint256 public minWeiToBuy = 200000000000000000;          //  minimum 0.2 ETH to buy
-    
+
     uint256 public preICOcontributors = 0;
 
     uint256 public preICOstart;
@@ -59,12 +59,12 @@ contract HardcodedCrowdsale {
     uint256 public preICOcap = 10000 ether;
     uint256 public preICOtokensSold = 0;
     ICOStateEnum public preICOstate = ICOStateEnum.NotStarted;
-    
+
     uint8 public decimals = 18;
     uint256 public DECIMAL_MULTIPLIER = 10**uint256(decimals);
 
     uint8 public saleIndex = 0;
- 
+
     uint256 public preICOprice = uint256(0.25 ether).div(1000);
     uint256[3] public preICOcoinsLeft = [40000000*DECIMAL_MULTIPLIER, 0*DECIMAL_MULTIPLIER, 0*DECIMAL_MULTIPLIER];
 
@@ -100,7 +100,7 @@ contract HardcodedCrowdsale {
                     preICOstate = ICOStateEnum.Refunded;
                 }
             }
-        } 
+        }
     }
 
     modifier stateTransition() {
@@ -124,7 +124,7 @@ contract HardcodedCrowdsale {
     }
 
     function transferOwnership(address newOwner) public onlyOwner {
-        require(newOwner != address(0));      
+        require(newOwner != address(0));
         OwnershipTransferred(owner, newOwner);
         owner = newOwner;
     }
@@ -172,7 +172,7 @@ contract HardcodedCrowdsale {
         assert(preICOBuy());
     }
 
-    
+
     function finalize() stateTransition public returns (bool success) {
         require(preICOstate == ICOStateEnum.Successful);
         owner.transfer(preICOcollected);
@@ -255,4 +255,65 @@ contract HardcodedCrowdsale {
         selfdestruct(owner);
     }
 
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

@@ -196,7 +196,7 @@ library SyscoinMessageLibrary {
                  + uint64(data[pos + 7]) * 2 ** 56;
         }
     }
-    
+
 
     // @dev - Parses a syscoin tx
     //
@@ -209,7 +209,7 @@ library SyscoinMessageLibrary {
     function parseTransaction(bytes memory txBytes) internal pure
              returns (uint, uint, address, uint32)
     {
-        
+
         uint output_value;
         uint32 assetGUID;
         address destinationAddress;
@@ -220,20 +220,20 @@ library SyscoinMessageLibrary {
             return (ERR_PARSE_TX_SYS, output_value, destinationAddress, assetGUID);
         }
         pos = skipInputs(txBytes, 4);
-            
+
         (output_value, destinationAddress, assetGUID) = scanBurns(txBytes, version, pos);
         return (0, output_value, destinationAddress, assetGUID);
     }
 
 
-  
+
     // skips witnesses and saves first script position/script length to extract pubkey of first witness scriptSig
     function skipWitnesses(bytes memory txBytes, uint pos, uint n_inputs) private pure
              returns (uint)
     {
         uint n_stack;
         (n_stack, pos) = parseVarInt(txBytes, pos);
-        
+
         uint script_len;
         for (uint i = 0; i < n_inputs; i++) {
             for (uint j = 0; j < n_stack; j++) {
@@ -243,7 +243,7 @@ library SyscoinMessageLibrary {
         }
 
         return n_stack;
-    }    
+    }
 
     function skipInputs(bytes memory txBytes, uint pos) private pure
              returns (uint)
@@ -268,7 +268,7 @@ library SyscoinMessageLibrary {
 
         return pos;
     }
-             
+
     // scan the burn outputs and return the value and script data of first burned output.
     function scanBurns(bytes memory txBytes, uint32 version, uint pos) private pure
              returns (uint, address, uint32)
@@ -299,8 +299,8 @@ library SyscoinMessageLibrary {
             if(version == SYSCOIN_TX_VERSION_ASSET_ALLOCATION_BURN){
                 (output_value, destinationAddress, assetGUID) = scanAssetDetails(txBytes, pos);
             }
-            else if(version == SYSCOIN_TX_VERSION_BURN){                
-                destinationAddress = scanSyscoinDetails(txBytes, pos);   
+            else if(version == SYSCOIN_TX_VERSION_BURN){
+                destinationAddress = scanSyscoinDetails(txBytes, pos);
             }
             // only one opreturn data allowed per transaction
             break;
@@ -362,7 +362,7 @@ library SyscoinMessageLibrary {
         }
 
         return (sibling_values, pos);
-    }   
+    }
     // Slice 20 contiguous bytes from bytes `data`, starting at `start`
     function sliceBytes20(bytes memory data, uint start) private pure returns (bytes20) {
         uint160 slice = 0;
@@ -402,29 +402,29 @@ library SyscoinMessageLibrary {
         }
         return result;
     }
-    
-    
+
+
     // Returns true if the tx output is an OP_RETURN output
     function isOpReturn(bytes memory txBytes, uint pos) private pure
              returns (bool) {
         // scriptPub format is
         // 0x6a OP_RETURN
-        return 
+        return
             txBytes[pos] == byte(0x6a);
     }
     // Returns syscoin data parsed from the op_return data output from syscoin burn transaction
     function scanSyscoinDetails(bytes memory txBytes, uint pos) private pure
-             returns (address) {      
+             returns (address) {
         uint8 op;
         (op, pos) = getOpcode(txBytes, pos);
         // ethereum addresses are 20 bytes (without the 0x)
         require(op == 0x14);
         return readEthereumAddress(txBytes, pos);
-    }    
+    }
     // Returns asset data parsed from the op_return data output from syscoin asset burn transaction
     function scanAssetDetails(bytes memory txBytes, uint pos) private pure
              returns (uint, address, uint32) {
-                 
+
         uint32 assetGUID;
         address destinationAddress;
         uint output_value;
@@ -444,9 +444,9 @@ library SyscoinMessageLibrary {
         (op, pos) = getOpcode(txBytes, pos);
         // ethereum contracts are 20 bytes (without the 0x)
         require(op == 0x14);
-        destinationAddress = readEthereumAddress(txBytes, pos);       
+        destinationAddress = readEthereumAddress(txBytes, pos);
         return (output_value, destinationAddress, assetGUID);
-    }         
+    }
     // Read the ethereum address embedded in the tx output
     function readEthereumAddress(bytes memory txBytes, uint pos) private pure
              returns (address) {
@@ -712,7 +712,7 @@ library SyscoinMessageLibrary {
         uint32 result;
         assembly {
             result := mload(add(add(data, 0x20), offset))
-            
+
         }
         return result;
     }
@@ -737,7 +737,7 @@ library SyscoinMessageLibrary {
     function targetToDiff(uint target) internal pure returns (uint) {
         return SYSCOIN_DIFFICULTY_ONE / target;
     }
-    
+
 
     // 0x00 version
     // 0x04 prev block hash
@@ -812,7 +812,7 @@ library SyscoinMessageLibrary {
     }
      function bytesToUint32(bytes memory input, uint pos) internal pure returns (uint32 result) {
         result = uint32(input[pos+3]) + uint32(input[pos + 2])*(2**8) + uint32(input[pos + 1])*(2**16) + uint32(input[pos])*(2**24);
-    }  
+    }
     // @dev - checks version to determine if a block has merge mining information
     function isMergeMined(bytes memory _rawBytes, uint pos) internal pure returns (bool) {
         return bytesToUint32Flipped(_rawBytes, pos) & VERSION_AUXPOW != 0;
@@ -851,18 +851,18 @@ library SyscoinMessageLibrary {
     }
 
     // For verifying Syscoin difficulty
-    int64 constant TARGET_TIMESPAN =  int64(21600); 
+    int64 constant TARGET_TIMESPAN =  int64(21600);
     int64 constant TARGET_TIMESPAN_DIV_4 = TARGET_TIMESPAN / int64(4);
     int64 constant TARGET_TIMESPAN_MUL_4 = TARGET_TIMESPAN * int64(4);
     int64 constant TARGET_TIMESPAN_ADJUSTMENT =  int64(360);  // 6 hour
-    uint constant INITIAL_CHAIN_WORK =  0x100001; 
+    uint constant INITIAL_CHAIN_WORK =  0x100001;
     uint constant POW_LIMIT = 0x00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
 
     // @dev - Calculate difficulty from compact representation (bits) found in block
     function diffFromBits(uint32 bits) external pure returns (uint) {
         return targetToDiff(targetFromBits(bits))*INITIAL_CHAIN_WORK;
     }
-    
+
     function difficultyAdjustmentInterval() external pure returns (int64) {
         return TARGET_TIMESPAN_ADJUSTMENT;
     }
@@ -1082,7 +1082,7 @@ contract SyscoinSuperblocks is SyscoinErrorCodes {
     // @param _lastHash Hash of the last block in the superblock
     // @param _lastBits Difficulty bits of the last block in the superblock
     // @param _parentId Id of the parent superblock
-    // @param _blockHeight Block height of last block in superblock   
+    // @param _blockHeight Block height of last block in superblock
     // @return Error code and superblockHash
     function initialize(
         bytes32 _blocksMerkleRoot,
@@ -1185,7 +1185,7 @@ contract SyscoinSuperblocks is SyscoinErrorCodes {
             indexNextSuperblock++;
             emit NewSuperblock(superblockHash, submitter);
         }
-        
+
 
         return (ERR_SUPERBLOCK_OK, superblockHash);
     }
@@ -1243,7 +1243,7 @@ contract SyscoinSuperblocks is SyscoinErrorCodes {
         }
         if(superblock.submitter == _challenger){
             emit ErrorSuperblock(_superblockHash, ERR_SUPERBLOCK_OWN_CHALLENGE);
-            return (ERR_SUPERBLOCK_OWN_CHALLENGE, 0);        
+            return (ERR_SUPERBLOCK_OWN_CHALLENGE, 0);
         }
         superblock.status = Status.InBattle;
         emit ChallengeSuperblock(_superblockHash, _challenger);
@@ -1346,7 +1346,7 @@ contract SyscoinSuperblocks is SyscoinErrorCodes {
             return verifyTxHelper(txHash);
         }
         emit RelayTransaction(bytes32(0), ERR_RELAY_VERIFY);
-        return(ERR_RELAY_VERIFY);        
+        return(ERR_RELAY_VERIFY);
     }
     function parseTxHelper(bytes memory _txBytes, uint txHash, SyscoinTransactionProcessor _untrustedTargetContract) private returns (uint) {
         uint value;
@@ -1363,11 +1363,11 @@ contract SyscoinSuperblocks is SyscoinErrorCodes {
         params.destinationAddress = destinationAddress;
         params.assetGUID = _assetGUID;
         params.untrustedTargetContract = _untrustedTargetContract;
-        txParams[txHash] = params;        
+        txParams[txHash] = params;
         return 0;
     }
     function verifyTxHelper(uint txHash) private returns (uint) {
-        ProcessTransactionParams memory params = txParams[txHash];        
+        ProcessTransactionParams memory params = txParams[txHash];
         uint returnCode = params.untrustedTargetContract.processTransaction(txHash, params.value, params.destinationAddress, params.assetGUID, params.superblockSubmitterAddress);
         emit RelayTransaction(bytes32(txHash), returnCode);
         return (returnCode);
@@ -1453,7 +1453,7 @@ contract SyscoinSuperblocks is SyscoinErrorCodes {
     // @param _lastHash Hash of the last block in the superblock
     // @param _lastBits Difficulty bits of the last block in the superblock
     // @param _parentId Id of the parent superblock
-    // @param _blockHeight Block height of last block in superblock   
+    // @param _blockHeight Block height of last block in superblock
     // @return Superblock id
     function calcSuperblockHash(
         bytes32 _blocksMerkleRoot,
@@ -1698,4 +1698,65 @@ contract SyscoinSuperblocks is SyscoinErrorCodes {
         if (height == 0) return false;
         return (getSuperblockAt(height) == _superblockHash);
     }
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

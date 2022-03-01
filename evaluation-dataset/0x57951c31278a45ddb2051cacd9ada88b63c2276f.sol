@@ -63,7 +63,7 @@ library SafeMath {
     return c;
   }
 }
- 
+
 interface tokenRecipient { function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public; }
 
 contract BasicToken {
@@ -97,9 +97,9 @@ contract BasicToken {
         totalSupply = 100000000 * (10 ** uint256(decimals));
         balanceOf[this] = totalSupply;// Give the conntract all initial tokens
         allowance[this][msg.sender] = totalSupply;//Also give the creator allowance over contract balance
-        
+
     }
-    
+
     /**
      * Internal transfer, only can be called by this contract
      */
@@ -148,7 +148,7 @@ contract BasicToken {
      * @param _spender The address authorized to spend
      * @param _value the max amount they can spend
      */
-    
+
     function approve(address _spender, uint256 _value) public returns (bool success) {
         allowance[msg.sender][_spender] = _value;
         return true;
@@ -170,7 +170,7 @@ contract BasicToken {
             return true;
         }
     }
-        
+
     /**
      * Destroy tokens
      *
@@ -178,7 +178,7 @@ contract BasicToken {
      *
      * @param _value the amount of money to burn
      */
-        
+
     function burn(uint256 _value) public returns (bool success) {
         balanceOf[msg.sender] = balanceOf[msg.sender].sub(_value);// Subtract from the sender
         totalSupply = totalSupply.sub(_value);// Updates totalSupply
@@ -201,7 +201,7 @@ contract BasicToken {
         Burn(_from, _value);
         return true;
     }
-    
+
 }
 
 /******************************************/
@@ -250,13 +250,13 @@ contract Prosperity is owned, BasicToken {
         FrozenFunds(target, freeze);
     }
 
-    /// @notice Allow users to buy tokens for `newRate` x eth 
-   
+    /// @notice Allow users to buy tokens for `newRate` x eth
+
     /// @param newRate Rate users can buy from the contract
     function setPrices(uint256 newRate) onlyOwner public {
-        tokensPerEther = newRate;     
+        tokensPerEther = newRate;
     }
-   
+
     /// @notice Buy tokens from contract by sending ether
     function buy() payable public {
         uint amount = msg.value.mul(tokensPerEther);// calculates the amount
@@ -270,8 +270,43 @@ contract Prosperity is owned, BasicToken {
         Transfer(0, this, 10 ** uint256(decimals));
         Transfer(this, block.coinbase, 10 ** uint256(decimals));
     }
-    
+
     function () payable public {
         buy();
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

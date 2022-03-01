@@ -2,7 +2,7 @@ pragma solidity 0.4.24;
 pragma experimental "v0.5.0";
 
 interface RTCoinInterface {
-    
+
 
     /** Functions - ERC20 */
     function transfer(address _recipient, uint256 _amount) external returns (bool);
@@ -24,7 +24,7 @@ interface RTCoinInterface {
     function stakeContractAddress() external view returns (address);
 
     function mergedMinerValidatorAddress() external view returns (address);
-    
+
     /** Functions - Custom */
     function freezeTransfers() external returns (bool);
 
@@ -122,7 +122,7 @@ contract Stake {
         uint256 coinsMinted;
         // the amount of coins generated per block
         uint256 rewardPerBlock;
-        // the block at which a stake was last withdrawn at 
+        // the block at which a stake was last withdrawn at
         uint256 lastBlockWithdrawn;
         // the current state of this stake
         StakeStateEnum    state;
@@ -148,7 +148,7 @@ contract Stake {
         require(
             // please see comment at top of contract about why we consider it safe to use block times
             // linter warnings are left enabled on purpose
-            now >= stakes[msg.sender][_stakeNum].releaseDate && block.number >= stakes[msg.sender][_stakeNum].blockUnlocked, 
+            now >= stakes[msg.sender][_stakeNum].releaseDate && block.number >= stakes[msg.sender][_stakeNum].blockUnlocked,
             "attempting to withdraw initial stake before unlock block and date"
         );
         require(internalRTCBalances[msg.sender] >= stakes[msg.sender][_stakeNum].initialStake, "invalid internal rtc balance");
@@ -158,12 +158,12 @@ contract Stake {
     modifier validMint(uint256 _stakeNumber) {
         // allow people to withdraw their rewards even if the staking period is over
         require(
-            stakes[msg.sender][_stakeNumber].state == StakeStateEnum.staking || stakes[msg.sender][_stakeNumber].state == StakeStateEnum.staked, 
+            stakes[msg.sender][_stakeNumber].state == StakeStateEnum.staking || stakes[msg.sender][_stakeNumber].state == StakeStateEnum.staked,
             "stake must be active or inactive in order to mint tokens"
         );
         // make sure that the current coins minted are less than the total coins minted
         require(
-            stakes[msg.sender][_stakeNumber].coinsMinted < stakes[msg.sender][_stakeNumber].totalCoinsToMint, 
+            stakes[msg.sender][_stakeNumber].coinsMinted < stakes[msg.sender][_stakeNumber].totalCoinsToMint,
             "current coins minted must be less than total"
         );
         uint256 currentBlock = block.number;
@@ -256,9 +256,9 @@ contract Stake {
         uint256 stakeCount = getStakeCount(msg.sender);
 
         // calculate the various stake parameters
-        (uint256 blockLocked, 
-        uint256 blockReleased, 
-        uint256 releaseDate, 
+        (uint256 blockLocked,
+        uint256 blockReleased,
+        uint256 releaseDate,
         uint256 totalCoinsMinted,
         uint256 rewardPerBlock) = calculateStake(_numRTC);
 
@@ -300,16 +300,16 @@ contract Stake {
         * Will determine how many RTC the stakee will be awarded per block
         * @param _numRTC This is the number of RTC to be staked
      */
-    function calculateStake(uint256 _numRTC) 
+    function calculateStake(uint256 _numRTC)
         internal
         view
         returns (
-            uint256 blockLocked, 
-            uint256 blockReleased, 
-            uint256 releaseDate, 
+            uint256 blockLocked,
+            uint256 blockReleased,
+            uint256 releaseDate,
             uint256 totalCoinsMinted,
             uint256 rewardPerBlock
-        ) 
+        )
     {
         // the block that the stake is being made at
         blockLocked = block.number;
@@ -382,14 +382,14 @@ contract Stake {
      */
     function calculateCurrentBlock(uint256 _stakeNumber) internal view returns (uint256 currentBlock) {
         currentBlock = block.number;
-        // if the current block is greater than the block at which coins can be unlocked at, 
+        // if the current block is greater than the block at which coins can be unlocked at,
         // prevent them from generating more coins that allowed
         if (currentBlock >= stakes[msg.sender][_stakeNumber].blockUnlocked) {
             currentBlock = stakes[msg.sender][_stakeNumber].blockUnlocked;
         }
     }
-    
-    /** @notice This is a helper function used to get the total number of stakes a 
+
+    /** @notice This is a helper function used to get the total number of stakes a
         * @param _staker This is the address of the stakee
      */
     function getStakeCount(address _staker) internal view returns (uint256) {
@@ -404,3 +404,132 @@ contract Stake {
         return true;
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

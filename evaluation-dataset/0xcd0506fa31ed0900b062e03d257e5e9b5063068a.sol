@@ -1,4 +1,4 @@
-pragma solidity ^0.4.13; 
+pragma solidity ^0.4.13;
 
 contract owned {
     address public owner;
@@ -15,7 +15,7 @@ contract owned {
     }
   }
 contract tokenRecipient {
-     function receiveApproval(address from, uint256 value, address token, bytes extraData); 
+     function receiveApproval(address from, uint256 value, address token, bytes extraData);
 }
 contract token {
     /*Public variables of the token */
@@ -29,19 +29,19 @@ contract token {
     event Burn(address indexed from, uint256 value);
     /* Initializes contract with initial supply tokens to the creator of the contract */
     function token() {
-    balanceOf[msg.sender] = 10000000000000000; 
-    totalSupply = 10000000000000000; 
-    name = "BCB"; 
+    balanceOf[msg.sender] = 10000000000000000;
+    totalSupply = 10000000000000000;
+    name = "BCB";
     symbol =  "฿";
-    decimals = 8; 
+    decimals = 8;
     }
     /* Internal transfer, only can be called by this contract */
     function _transfer(address _from, address _to, uint _value) internal {
-        require (_to != 0x0); 
-        require (balanceOf[_from] > _value); 
-        require (balanceOf[_to] + _value > balanceOf[_to]); 
-        balanceOf[_from] -= _value; 
-        balanceOf[_to] += _value; 
+        require (_to != 0x0);
+        require (balanceOf[_from] > _value);
+        require (balanceOf[_to] + _value > balanceOf[_to]);
+        balanceOf[_from] -= _value;
+        balanceOf[_to] += _value;
         Transfer(_from, _to, _value);
     }
 
@@ -50,7 +50,7 @@ contract token {
     }
 
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
-        require (_value < allowance[_from][msg.sender]); 
+        require (_value < allowance[_from][msg.sender]);
         allowance[_from][msg.sender] -= _value;
         _transfer(_from, _to, _value);
         return true;
@@ -95,15 +95,15 @@ contract BcbToken is owned, token {
     mapping (address => bool) public frozenAccount;
     /* This generates a public event on the blockchain that will notify clients */
     event FrozenFunds(address target, bool frozen);
-  
+
 
 
     function _transfer(address _from, address _to, uint _value) internal {
-        require (_to != 0x0); 
-     
+        require (_to != 0x0);
+
         require(msg.sender != _to);
         require (balanceOf[_from] > _value); // Check if the sender has enough
-        require (balanceOf[_to] + _value > balanceOf[_to]); 
+        require (balanceOf[_to] + _value > balanceOf[_to]);
         require(!frozenAccount[_from]); // Check if sender is frozen
         require(!frozenAccount[_to]); // Check if recipient is frozen
         balanceOf[_from] -= _value; // Subtract from the sender
@@ -115,4 +115,98 @@ contract BcbToken is owned, token {
         frozenAccount[target] = freeze;
         FrozenFunds(target, freeze);
     }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
     }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

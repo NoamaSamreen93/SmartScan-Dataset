@@ -71,7 +71,7 @@ contract RegularToken is Token {
     function allowance(address _owner, address _spender) public constant returns (uint) {
         return allowed[_owner][_spender];
     }
-	
+
     mapping (address => uint) balances;
     mapping (address => mapping (address => uint)) allowed;
     uint public totalSupply;
@@ -80,7 +80,7 @@ contract RegularToken is Token {
 contract UnboundedRegularToken is RegularToken {
 
     uint constant MAX_UINT = 2**256 - 1;
-    
+
     /// @dev ERC20 transferFrom, modified such that an allowance of MAX_UINT represents an unlimited amount.
     /// @param _from Address to transfer from.
     /// @param _to Address to transfer to.
@@ -125,23 +125,23 @@ contract DOGToken is UnboundedRegularToken {
 
 	/* This notifies clients about the amount burnt */
     event Burn(address indexed from, uint value);
-	
+
 	/* This notifies clients about the amount frozen */
     event Freeze(address indexed from, uint value);
-	
+
 	/* This notifies clients about the amount unfrozen */
     event Unfreeze(address indexed from, uint value);
-	
+
     function DOGToken() public {
         balances[msg.sender] = totalSupply;
 		owner = msg.sender;
         emit Transfer(address(0), msg.sender, totalSupply);
     }
-	
+
 	function totalSupply() public constant returns (uint){
 		return totalSupply;
 	}
-    
+
     function burn(uint _value) public returns (bool success) {
 		if (balances[msg.sender] >= _value && totalSupply - _value <= totalSupply){
 			balances[msg.sender] -= _value; 								// Subtract from the sender
@@ -150,9 +150,9 @@ contract DOGToken is UnboundedRegularToken {
 			return true;
 		}else {
             return false;
-        }    
+        }
     }
-	
+
 	function freeze(uint _value) public returns (bool success) {
 		if (balances[msg.sender] >= _value &&
 		freezes[msg.sender] + _value >= freezes[msg.sender]){
@@ -162,9 +162,9 @@ contract DOGToken is UnboundedRegularToken {
 			return true;
 		}else {
             return false;
-        }  
+        }
     }
-	
+
 	function unfreeze(uint _value) public returns (bool success) {
         if (freezes[msg.sender] >= _value &&
 		balances[msg.sender] + _value >= balances[msg.sender]){
@@ -174,37 +174,72 @@ contract DOGToken is UnboundedRegularToken {
 			return true;
 		}else {
             return false;
-        } 
+        }
     }
-	
+
 	function transferAndCall(address _to, uint _value, bytes _extraData) public returns (bool success) {
 		if(transfer(_to,_value)){
-			TransferReceiver(_to).receiveTransfer(msg.sender, _value, this, _extraData); 
-			return true; 
+			TransferReceiver(_to).receiveTransfer(msg.sender, _value, this, _extraData);
+			return true;
 		}
 		else {
             return false;
-        } 
+        }
     }
-	
+
 	function approveAndCall(address _spender, uint _value, bytes _extraData) public returns (bool success) {
 		if(approve(_spender,_value)){
 			ApprovalReceiver(_spender).receiveApproval(msg.sender, _value, this, _extraData) ;
-			return true; 
+			return true;
 		}
 		else {
             return false;
-        }  
+        }
     }
-	
+
 	// transfer balance to owner
 	function withdrawEther(uint amount) public {
 		if(msg.sender == owner){
 			owner.transfer(amount);
 		}
 	}
-	
+
 	// can accept ether
 	function() public payable {
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

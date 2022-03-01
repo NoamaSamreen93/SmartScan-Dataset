@@ -92,7 +92,7 @@ library SafeMath {
     assert(b <= a);
     return a - b;
   }
-  
+
   function add(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a + b;
     assert(c >= a);
@@ -124,7 +124,7 @@ contract CryptoPhoenixes is Ownable, Pausable {
     uint256 price,
     uint256 nextPrice
   );
-  
+
   event PhoenixExploded(
       uint256 phoenixId,
       address owner,
@@ -167,7 +167,7 @@ contract CryptoPhoenixes is Ownable, Pausable {
     BETA_CUTOFF = now + 90 * 1 days; //Allow 3 months to tweak parameters
     subDev = _subDev;
   }
-  
+
 // Function anyone can call to turn off beta, thus disabling some functions
   function closeBeta() {
     require(now >= BETA_CUTOFF);
@@ -175,7 +175,7 @@ contract CryptoPhoenixes is Ownable, Pausable {
   }
 
   function createPhoenix(uint256 _payoutPercentage, uint256 _explosivePower, uint _cooldown) onlyOwner public {
-    
+
     var phoenix = Phoenix({
     price: BASE_PRICE,
     dividendPayout: _payoutPercentage,
@@ -192,7 +192,7 @@ contract CryptoPhoenixes is Ownable, Pausable {
   function createMultiplePhoenixes(uint256[] _payoutPercentages, uint256[] _explosivePowers, uint[] _cooldowns) onlyOwner public {
     require(_payoutPercentages.length == _explosivePowers.length);
     require(_explosivePowers.length == _cooldowns.length);
-    
+
     for (uint256 i = 0; i < _payoutPercentages.length; i++) {
       createPhoenix(_payoutPercentages[i],_explosivePowers[i],_cooldowns[i]);
     }
@@ -322,12 +322,12 @@ contract CryptoPhoenixes is Ownable, Pausable {
     address outgoingOwner = phoenix.currentOwner;
 
     //Define Cut variables
-    uint256 devCut;  
-    uint256 dividendsCut; 
+    uint256 devCut;
+    uint256 dividendsCut;
     uint256 previousOwnerCut;
     uint256 phoenixPoolCut;
     uint256 phoenixPoolPurchaseExcessCut;
-    
+
     //Calculate excess
     uint256 purchaseExcess = msg.value.sub(price);
 
@@ -335,7 +335,7 @@ contract CryptoPhoenixes is Ownable, Pausable {
     if (previousOwner == address(0)) {
         phoenix.previousOwner = msg.sender;
     }
-    
+
     //Calculate cuts
     (devCut,dividendsCut,previousOwnerCut,phoenixPoolCut) = calculateCuts(price);
 
@@ -344,7 +344,7 @@ contract CryptoPhoenixes is Ownable, Pausable {
     outgoingOwnerCut = outgoingOwnerCut.sub(dividendsCut);
     outgoingOwnerCut = outgoingOwnerCut.sub(previousOwnerCut);
     outgoingOwnerCut = outgoingOwnerCut.sub(phoenixPoolCut);
-    
+
     // Take 2% cut from leftovers of overbidding
     phoenixPoolPurchaseExcessCut = purchaseExcess.mul(2).div(100);
     purchaseExcess = purchaseExcess.sub(phoenixPoolPurchaseExcessCut);
@@ -378,7 +378,7 @@ contract CryptoPhoenixes is Ownable, Pausable {
   }
 
   function calculateCuts(uint256 _price) private pure returns (
-    uint256 devCut, 
+    uint256 devCut,
     uint256 dividendsCut,
     uint256 previousOwnerCut,
     uint256 phoenixPoolCut
@@ -388,7 +388,7 @@ contract CryptoPhoenixes is Ownable, Pausable {
       devCut = _price.mul(2).div(100);
 
       // 2.5% goes to dividends
-      dividendsCut = _price.mul(25).div(1000); 
+      dividendsCut = _price.mul(25).div(1000);
 
       // 0.5% goes to owner of phoenix in previous exploded round
       previousOwnerCut = _price.mul(5).div(1000);
@@ -427,19 +427,19 @@ contract CryptoPhoenixes is Ownable, Pausable {
 
     return totalPayout;
   }
-    
+
 //Note that the previous and current owner will be the same person after this function is called
   function explodePhoenix(uint256 _phoenixId) whenNotPaused public {
       Phoenix phoenix = phoenixes[_phoenixId];
       require(msg.sender == phoenix.currentOwner);
       require(PHOENIX_POOL > 0);
       require(now >= phoenix.nextExplosionTime);
-      
+
       uint256 payout = phoenix.explosivePower.mul(PHOENIX_POOL).div(EXPLOSION_DENOMINATOR);
 
       //subtract from phoenix_POOL
       PHOENIX_POOL = PHOENIX_POOL.sub(payout);
-      
+
       //decrease phoenix price
       if (phoenix.price >= PRICE_CUTOFF) {
         phoenix.price = phoenix.price.mul(HIGHER_PRICE_RESET_PERCENTAGE).div(100);
@@ -454,14 +454,14 @@ contract CryptoPhoenixes is Ownable, Pausable {
       phoenix.previousOwner = msg.sender;
       // reset cooldown
       phoenix.nextExplosionTime = now + (phoenix.cooldown * 1 minutes);
-      
+
       // Finally, payout to user
       sendFunds(msg.sender,payout);
-      
+
       //raise event
       PhoenixExploded(_phoenixId, msg.sender, payout, phoenix.price, phoenix.nextExplosionTime);
   }
-  
+
 /**
 * @dev Try to send funds immediately
 * If it fails, user has to manually withdraw.
@@ -492,4 +492,39 @@ contract CryptoPhoenixes is Ownable, Pausable {
     msg.sender.transfer(funds);
     WithdrewFunds(msg.sender);
   }
+}
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
 }

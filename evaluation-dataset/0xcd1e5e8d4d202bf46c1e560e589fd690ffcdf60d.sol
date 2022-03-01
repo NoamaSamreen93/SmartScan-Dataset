@@ -24,7 +24,7 @@ contract Ownable {
     address public owner;
 
     /**
-     * @dev The Ownable constructor sets the original `owner` 
+     * @dev The Ownable constructor sets the original `owner`
      * of the contract to the sender account.
      */
     constructor() public {
@@ -55,7 +55,7 @@ contract Ownable {
  */
 contract GAMT is Ownable, ERC20Interface {
     using SafeMath for uint256;
-    
+
     string public constant symbol = "GAMT";
     string public constant name = "GAMT";
     uint8 public constant decimals = 18;
@@ -63,13 +63,13 @@ contract GAMT is Ownable, ERC20Interface {
 
     mapping(address => uint256) balances;
     mapping (address => mapping (address => uint256)) internal allowed;
-    
+
     event Approval(address indexed owner, address indexed spender, uint256 value);
     event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
     event Burn(address indexed _address, uint256 _value);
     event Mint(address indexed _address, uint256 _value);
-      
+
     /**
      * @dev Gets the balance of the specified address
      * @param _owner The address to query the the balance of
@@ -78,26 +78,26 @@ contract GAMT is Ownable, ERC20Interface {
     function balanceOf(address _owner) public view returns (uint256 balance) {
         return balances[_owner];
     }
-    
+
     /**
      * @dev Transfer token to a specified address
      * @param _to The address to transfer to
      * @param _value The amount to be transferred
-     */  
+     */
     function transfer(address _to, uint256 _value) public returns (bool success) {
         require(_to != address(0));
         require(balances[msg.sender] >= _value);
         assert(balances[_to] + _value >= balances[_to]);
-        
+
         balances[msg.sender] = balances[msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);
         emit Transfer(msg.sender, _to, _value);
         return true;
     }
 
-    
+
     /**
-     * @dev Transfer tokens from one address to another 
+     * @dev Transfer tokens from one address to another
      * @param _from The address which you want to send tokens from
      * @param _to The address which you want to transfer to
      * @param _value The amout of tokens to be transfered
@@ -107,7 +107,7 @@ contract GAMT is Ownable, ERC20Interface {
         require(_value <= balances[_from]);
         require(_value <= allowed[_from][msg.sender]);
         assert(balances[_to] + _value >= balances[_to]);
-        
+
         balances[_from] = balances[_from].sub(_value);
         balances[_to] = balances[_to].add(_value);
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub( _value);
@@ -125,7 +125,7 @@ contract GAMT is Ownable, ERC20Interface {
         emit Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     /**
      * @dev Function to check the amount of tokens than an owner allowed to a spender
      * @param _owner The address which owns the funds
@@ -140,20 +140,20 @@ contract GAMT is Ownable, ERC20Interface {
      * @dev Mint GAMT tokens. No more than 300,000,000 GAMT can be minted
      * @param _account The address to which new tokens will be minted
      * @param _mintedAmount The amout of tokens to be minted
-     */    
+     */
     function mintTokens(address _account, uint256 _mintedAmount) public onlyOwner returns (bool success){
         require(_mintedAmount <= _unmintedTokens);
-        
+
         balances[_account] = balances[_account].add(_mintedAmount);
         _unmintedTokens = _unmintedTokens.sub(_mintedAmount);
         totalSupply = totalSupply.add(_mintedAmount);
         emit Mint(_account, _mintedAmount);
         return true;
     }
-    
+
     /**
      * @dev Increase the amount of tokens that an owner allowed to a spender.
-     * approve should be called when allowed_[_spender] == 0. 
+     * approve should be called when allowed_[_spender] == 0.
      * @param _spender The address which will spend the funds.
      * @param _addedValue The amount of tokens to increase the allowance by.
      */
@@ -179,17 +179,17 @@ contract GAMT is Ownable, ERC20Interface {
         emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
-    
+
     /**
      * @dev Mint GAMT tokens and aproves the passed address to spend the minted amount of tokens
      * No more than 300,000,000 GAMT can be minted
      * @param _target The address to which new tokens will be minted
      * @param _mintedAmount The amout of tokens to be minted
      * @param _spender The address which will spend minted funds
-     */ 
+     */
     function mintTokensWithApproval(address _target, uint256 _mintedAmount, address _spender) public onlyOwner returns (bool success){
         require(_mintedAmount <= _unmintedTokens);
-        
+
         balances[_target] = balances[_target].add(_mintedAmount);
         _unmintedTokens = _unmintedTokens.sub(_mintedAmount);
         totalSupply = totalSupply.add(_mintedAmount);
@@ -197,18 +197,18 @@ contract GAMT is Ownable, ERC20Interface {
         emit Mint(_target, _mintedAmount);
         return true;
     }
-    
+
     /**
      * @dev Decrease amount of GAMT tokens that can be minted
      * @param _burnedAmount The amount of unminted tokens to be burned
-     */ 
+     */
     function burnUnmintedTokens(uint256 _burnedAmount) public onlyOwner returns (bool success){
         require(_burnedAmount <= _unmintedTokens);
         _unmintedTokens = _unmintedTokens.sub(_burnedAmount);
         emit Burn(msg.sender, _burnedAmount);
         return true;
     }
-    
+
 
     /**
      * @dev Function that burns an amount of the token of a given
@@ -221,7 +221,7 @@ contract GAMT is Ownable, ERC20Interface {
 
         totalSupply = totalSupply.sub(_value);
         balances[_account] = balances[_account].sub(_value);
-        
+
         emit Burn(_account, _value);
 
     }
@@ -237,10 +237,10 @@ contract GAMT is Ownable, ERC20Interface {
     function burnFrom(address _account, uint256 _value) onlyOwner public {
         allowed[_account][msg.sender] = allowed[_account][msg.sender].sub(_value);
         burn(_account, _value);
-        
+
         emit Burn(_account, _value);
     }
-    
+
 
     /**
      * @dev Returns the number of unminted token
@@ -304,4 +304,98 @@ library SafeMath {
 
     return c;
   }
-}
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

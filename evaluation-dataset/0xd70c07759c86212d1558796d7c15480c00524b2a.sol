@@ -72,7 +72,7 @@ contract UsingAdmin is
         require(msg.sender == getAdmin());
         _;
     }
-    
+
     function getAdmin()
         public
         constant
@@ -103,7 +103,7 @@ contract UsingMonarchyFactory is
         public
     {}
 
-    modifier fromMonarchyFactory(){ 
+    modifier fromMonarchyFactory(){
         require(msg.sender == address(getMonarchyFactory()));
         _;
     }
@@ -143,7 +143,7 @@ contract UsingTreasury is
         require(msg.sender == address(getTreasury()));
         _;
     }
-    
+
     function getTreasury()
         public
         view
@@ -227,7 +227,7 @@ contract HasDailyLimit {
 
 /**
     This is a simple class that maintains a doubly linked list of
-    address => uint amounts. Address balances can be added to 
+    address => uint amounts. Address balances can be added to
     or removed from via add() and subtract(). All balances can
     be obtain by calling balances(). If an address has a 0 amount,
     it is removed from the Ledger.
@@ -298,7 +298,7 @@ contract Ledger {
 
         uint _maxAmt = entry.balance;
         if (_maxAmt == 0) return;
-        
+
         if (_amt >= _maxAmt) {
             // Subtract the max amount, and delete entry.
             total -= _maxAmt;
@@ -376,7 +376,7 @@ contract Ledger {
      - .addresses()
 */
 contract AddressSet {
-    
+
     struct Entry {  // Doubly linked list
         bool exists;
         address next;
@@ -517,8 +517,8 @@ contract AddressSet {
 */
 contract Bankrollable is
     UsingTreasury
-{   
-    // How much profits have been sent. 
+{
+    // How much profits have been sent.
     uint public profitsSent;
     // Ledger keeps track of who has bankrolled us, and for how much
     Ledger public ledger;
@@ -550,7 +550,7 @@ contract Bankrollable is
 
     /*****************************************************/
     /************** WHITELIST MGMT ***********************/
-    /*****************************************************/    
+    /*****************************************************/
 
     function addToWhitelist(address _addr)
         fromWhitelistOwner
@@ -578,7 +578,7 @@ contract Bankrollable is
     // Increase funding by whatever value is sent
     function addBankroll()
         public
-        payable 
+        payable
     {
         require(whitelist.size()==0 || whitelist.has(msg.sender));
         ledger.add(msg.sender, msg.value);
@@ -766,7 +766,7 @@ contract MonarchyController is
     event FeesCollected(uint time, uint amount);
 
 
-    constructor(address _registry) 
+    constructor(address _registry)
         HasDailyLimit(10 ether)
         Bankrollable(_registry)
         UsingAdmin(_registry)
@@ -957,7 +957,7 @@ contract MonarchyController is
                 // paying the winner can error if the winner uses too much gas
                 // in that case, they can call .sendPrize() themselves later.
                 if (!_game.isPaid()) _game.sendPrize(2300);
-                
+
                 // update stats
                 totalPrizes += _game.prize();
                 totalOverthrows += _game.numOverthrows();
@@ -1094,3 +1094,132 @@ contract MonarchyController is
     }
     /******** Shorthand access to definedGames **************************/
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

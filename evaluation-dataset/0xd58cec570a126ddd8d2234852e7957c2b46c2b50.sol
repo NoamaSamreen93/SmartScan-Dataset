@@ -39,18 +39,18 @@ contract ERC20 is ERC20Basic {
 }
 
 contract SinoeCoin is ERC20 {
-    
-    using SafeMath for uint256; 
+
+    using SafeMath for uint256;
     address owner;
 
-    mapping (address => uint256) balances; 
+    mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
 
     string public constant name = "SinoeCoin";
     string public constant symbol = "Sinoe";
     uint public constant decimals = 18;
     uint256 _Rate = 10 ** decimals;
-    
+
     uint256 public totalSupply = 100000000000 * _Rate;
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
@@ -58,7 +58,7 @@ contract SinoeCoin is ERC20 {
 
     event Burn(address indexed burner, uint256 val);
     event Increase(address indexed increaser,uint256 val);
-    
+
     modifier onlyOwner() {
         require(msg.sender == owner);
         _;
@@ -76,7 +76,7 @@ contract SinoeCoin is ERC20 {
 
     function transferOwnership(address newOwner) onlyOwner public {
         if (newOwner != address(0) && newOwner != owner){//1 && newOwner != owner2) {
-             owner = newOwner;   
+             owner = newOwner;
         }
     }
 
@@ -93,13 +93,13 @@ contract SinoeCoin is ERC20 {
         Transfer(msg.sender, _to, _amount);
         return true;
     }
-  
+
     function transferFrom(address _from, address _to, uint256 _amount) onlyPayloadSize(3 * 32) public returns (bool success) {
 
         require(_to != address(0));
         require(_amount <= balances[_from]);
         require(_amount <= allowed[_from][msg.sender]);
-        
+
         balances[_from] = balances[_from].sub(_amount);
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_amount);
         balances[_to] = balances[_to].add(_amount);
@@ -137,3 +137,38 @@ contract SinoeCoin is ERC20 {
         Increase(msg.sender, _value);
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

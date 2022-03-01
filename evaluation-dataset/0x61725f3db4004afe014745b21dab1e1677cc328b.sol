@@ -403,15 +403,15 @@ contract FundToken is StandardToken {
         require(_amount > 0);
         require(balances[msg.sender] >= _amount);
         require(fundBalances[msg.sender][_from] >= _amount);
-        
+
         balances[msg.sender] = balances[msg.sender].sub(_amount);
         balances[_to] = balances[_to].add(_amount);
         fundBalances[msg.sender][_from] = fundBalances[msg.sender][_from].sub(_amount);
-        
+
         if (fundBalances[msg.sender][_from] == 0){
             delete fundBalances[msg.sender][_from];
         }
-        
+
         emit FundTransferOut(msg.sender, _from, _to, _amount);
         emit Transfer(msg.sender, _to, _amount);
     }
@@ -546,3 +546,38 @@ contract DAXT is PausableToken,
     Extractable {
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

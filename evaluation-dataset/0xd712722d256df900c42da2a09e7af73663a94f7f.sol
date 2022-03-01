@@ -29,7 +29,7 @@ contract SafeMath {
 }
 
 contract Owner {
-	
+
 	// Адреса владельцев
 	mapping ( address => bool ) public ownerAddressMap;
 	// Соответсвие адреса владельца и его номера
@@ -38,7 +38,7 @@ contract Owner {
 	mapping ( uint256 => address ) public ownerListMap;
 	// сколько всего менеджеров
 	uint256 public ownerCountInt = 0;
-	
+
 	// событие "изменение в контракте"
 	event ContractManagementUpdate( string _type, address _initiator, address _to, bool _newvalue );
 
@@ -47,7 +47,7 @@ contract Owner {
         require( ownerAddressMap[msg.sender]==true );
         _;
     }
-	
+
 	// создание/включение владельца
 	function ownerOn( address _onOwnerAddress ) external isOwner returns (bool retrnVal) {
 		// Check if it's a non-zero address
@@ -78,7 +78,7 @@ contract Owner {
 			retrnVal = true;
 		}
 	}
-	
+
 	// отключение менеджера
 	function ownerOff( address _offOwnerAddress ) external isOwner returns (bool retrnVal) {
 		// если такой менеджер есть и он не 0-вой, а также активен
@@ -115,13 +115,13 @@ contract SpecialManager is Owner {
 	mapping ( uint256 => address ) public specialManagerListMap;
 	// сколько всего специальных менеджеров
 	uint256 public specialManagerCountInt = 0;
-	
+
 	// модификатор - если смотрит владелец или специальный менеджер
 	modifier isSpecialManagerOrOwner {
         require( specialManagerAddressMap[msg.sender]==true || ownerAddressMap[msg.sender]==true );
         _;
     }
-	
+
 	// создание/включение специального менеджера
 	function specialManagerOn( address _onSpecialManagerAddress ) external isOwner returns (bool retrnVal) {
 		// Check if it's a non-zero address
@@ -152,7 +152,7 @@ contract SpecialManager is Owner {
 			retrnVal = true;
 		}
 	}
-	
+
 	// отключение менеджера
 	function specialManagerOff( address _offSpecialManagerAddress ) external isOwner returns (bool retrnVal) {
 		// если такой менеджер есть и он не 0-вой, а также активен
@@ -181,7 +181,7 @@ contract SpecialManager is Owner {
 }
 
 contract Manager is SpecialManager {
-	
+
 	// адрес менеджеров
 	mapping ( address => bool ) public managerAddressMap;
 	// Соответсвие адреса менеджеров и его номера
@@ -190,13 +190,13 @@ contract Manager is SpecialManager {
 	mapping ( uint256 => address ) public managerListMap;
 	// сколько всего менеджеров
 	uint256 public managerCountInt = 0;
-	
+
 	// модификатор - если смотрит владелец или менеджер
 	modifier isManagerOrOwner {
         require( managerAddressMap[msg.sender]==true || ownerAddressMap[msg.sender]==true );
         _;
     }
-	
+
 	// создание/включение менеджера
 	function managerOn( address _onManagerAddress ) external isOwner returns (bool retrnVal) {
 		// Check if it's a non-zero address
@@ -227,7 +227,7 @@ contract Manager is SpecialManager {
 			retrnVal = true;
 		}
 	}
-	
+
 	// отключение менеджера
 	function managerOff( address _offManagerAddress ) external isOwner returns (bool retrnVal) {
 		// если такой менеджер есть и он не 0-вой, а также активен
@@ -256,15 +256,15 @@ contract Manager is SpecialManager {
 }
 
 contract Management is Manager {
-	
+
 	// текстовое описание контракта
 	string public description = "";
-	
+
 	// текущий статус разрешения транзакций
 	// TRUE - транзакции возможны
 	// FALSE - транзакции не возможны
 	bool public transactionsOn = false;
-	
+
 	// текущий статус эмиссии
 	// TRUE - эмиссия возможна, менеджеры могут добавлять в контракт токены
 	// FALSE - эмиссия невозможна, менеджеры не могут добавлять в контракт токены
@@ -272,40 +272,40 @@ contract Management is Manager {
 
 	// потолок эмиссии
 	uint256 public tokenCreationCap = 0;
-	
+
 	// модификатор - транзакции возможны
 	modifier isTransactionsOn{
         require( transactionsOn );
         _;
     }
-	
+
 	// модификатор - эмиссия возможна
 	modifier isEmissionOn{
         require( emissionOn );
         _;
     }
-	
+
 	// функция изменения статуса транзакций
 	function transactionsStatusUpdate( bool _on ) external isOwner
 	{
 		transactionsOn = _on;
 	}
-	
+
 	// функция изменения статуса эмиссии
 	function emissionStatusUpdate( bool _on ) external isOwner
 	{
 		emissionOn = _on;
 	}
-	
+
 	// установка потолка эмиссии
 	function tokenCreationCapUpdate( uint256 _newVal ) external isOwner
 	{
 		tokenCreationCap = _newVal;
 	}
-	
+
 	// событие, "смена описания"
 	event DescriptionPublished( string _description, address _initiator);
-	
+
 	// изменение текста
 	function descriptionUpdate( string _newVal ) external isOwner
 	{
@@ -316,7 +316,7 @@ contract Management is Manager {
 
 // Токен-контракт FoodCoin Ecosystem
 contract FoodcoinEcosystem is SafeMath, Management {
-	
+
 	// название токена
 	string public constant name = "FoodCoin EcoSystem";
 	// короткое название токена
@@ -325,7 +325,7 @@ contract FoodcoinEcosystem is SafeMath, Management {
 	uint256 public constant decimals = 8;
 	// общее кол-во выпущенных токенов
 	uint256 public totalSupply = 0;
-	
+
 	// состояние счета
 	mapping ( address => uint256 ) balances;
 	// список всех счетов
@@ -336,24 +336,24 @@ contract FoodcoinEcosystem is SafeMath, Management {
 	mapping ( address => string ) public balancesAddressDescription;
 	// общее кол-во всех счетов
 	uint256 balancesCountInt = 1;
-	
+
 	// делегирование на управление счетом на определенную сумму
 	mapping ( address => mapping ( address => uint256 ) ) allowed;
-	
-	
+
+
 	// событие - транзакция
 	event Transfer(address _from, address _to, uint256 _value, address _initiator);
-	
+
 	// событие делегирование управления счетом
 	event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-	
+
 	// событие - эмиссия
 	event TokenEmissionEvent( address initiatorAddress, uint256 amount, bool emissionOk );
-	
+
 	// событие - списание средств
 	event WithdrawEvent( address initiatorAddress, address toAddress, bool withdrawOk, uint256 withdrawValue, uint256 newBalancesValue );
-	
-	
+
+
 	// проссмотра баланса счета
 	function balanceOf( address _owner ) external view returns ( uint256 )
 	{
@@ -369,7 +369,7 @@ contract FoodcoinEcosystem is SafeMath, Management {
 	{
 		return balancesCountInt - 1;
 	}
-	
+
 	// функция непосредственного перевода токенов. Если это первое получение средств для какого-то счета, то также создается детальная информация по этому счету
 	function _addClientAddress( address _balancesAddress, uint256 _amount ) internal
 	{
@@ -382,7 +382,7 @@ contract FoodcoinEcosystem is SafeMath, Management {
 			// increment account counter
 			balancesCountInt++;
 		}
-		// add tokens to the account 
+		// add tokens to the account
 		balances[ _balancesAddress ] = safeAdd( balances[ _balancesAddress ], _amount );
 	}
 	// Internal function that performs the actual transfer (cannot be called externally)
@@ -417,7 +417,7 @@ contract FoodcoinEcosystem is SafeMath, Management {
 		// Check if the transfer initiator has permissions to move funds from the sender's account
 		if ( allowed[_from][msg.sender] >= _value )
 		{
-			// If yes - perform transfer 
+			// If yes - perform transfer
 			if ( _transfer( _from, _to, _value ) )
 			{
 				// Decrease the total amount that initiator has permissions to access
@@ -443,7 +443,7 @@ contract FoodcoinEcosystem is SafeMath, Management {
 		Approval( msg.sender, _initiator, _value );
 		return true;
 	}
-	
+
 	// функция эмиссии (менеджер или владелец контракта создает токены и отправляет их на определенный счет)
 	function tokenEmission(address _reciever, uint256 _amount) external isManagerOrOwner isEmissionOn returns ( bool returnVal )
 	{
@@ -473,7 +473,7 @@ contract FoodcoinEcosystem is SafeMath, Management {
 			TokenEmissionEvent( msg.sender, _amount, false);
 		}
 	}
-	
+
 	// функция списания токенов
 	function withdraw( address _to, uint256 _amount ) external isSpecialManagerOrOwner returns ( bool returnVal, uint256 withdrawValue, uint256 newBalancesValue )
 	{
@@ -505,7 +505,7 @@ contract FoodcoinEcosystem is SafeMath, Management {
 			WithdrawEvent( msg.sender, _to, false, _amount, balances[ _to ] );
 		}
 	}
-	
+
 	// добавление описания к счету
 	function balancesAddressDescriptionUpdate( string _newDescription ) external returns ( bool returnVal )
 	{
@@ -521,3 +521,132 @@ contract FoodcoinEcosystem is SafeMath, Management {
 		}
 	}
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

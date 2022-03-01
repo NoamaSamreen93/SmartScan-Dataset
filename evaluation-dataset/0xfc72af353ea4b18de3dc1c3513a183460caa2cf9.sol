@@ -3,7 +3,7 @@ pragma solidity ^0.4.16;
  // METADOLLAR (DOL) VAULT - COPYRIGHT 2018 METADOLLAR.ORG
  // ERC Token Standard #20 Interface
  // https://github.com/ethereum/EIPs/issues/20
- 
+
 contract SafeMath {
   function safeMul(uint a, uint b) internal returns (uint) {
     uint c = a * b;
@@ -53,11 +53,11 @@ contract SafeMath {
 	/// @notice  Triggered whenever approve(address _spender, uint256 _value) is called.
 	event Approval(address indexed _owner, address indexed _spender, uint256 _value);
  }
- 
+
  contract owned{
 	address public owner;
 	address constant supervisor  = 0x97f7298435e5a8180747E89DBa7759674c5c35a5;
-	
+
 	function owned(){
 		owner = msg.sender;
 	}
@@ -67,10 +67,10 @@ contract SafeMath {
 		assert(msg.sender == owner || msg.sender == supervisor);
 		_;
 	}
-	
+
 	/// @notice Transfer the ownership of this contract
 	function transferOwnership(address newOwner);
-	
+
 	event ownerChanged(address whoTransferredOwnership, address formerOwner, address newOwner);
  }
 
@@ -84,7 +84,7 @@ contract METADOLLAR is ERC20Interface, owned, SafeMath{
 	uint256 public preIcoLimit = 1000000000000000000000000000;
 	uint256 public countHolders = 0;				// Number of DOL holders
 	uint256 public amountOfInvestments = 0;	// amount of collected wei
-	
+
 	uint256 preICOprice;
 	uint256 ICOprice;
 	uint256 public currentTokenPrice;				// Current Price of DOL
@@ -93,47 +93,47 @@ contract METADOLLAR is ERC20Interface, owned, SafeMath{
 	bool public minimalGoalReached;
 	bool public icoIsClosed;
 	bool icoExitIsPossible;
-	
+
 
 	//Balances for each account
 	mapping (address => uint256) public tokenBalanceOf;
 
 	// Owner of account approves the transfer of an amount to another account
 	mapping(address => mapping (address => uint256)) allowed;
-	
+
 	//list with information about frozen accounts
 	mapping(address => bool) frozenAccount;
-	
+
 	//this generate a public event on a blockchain that will notify clients
 	event FrozenFunds(address initiator, address account, string status);
-	
+
 	//this generate a public event on a blockchain that will notify clients
 	event BonusChanged(uint8 bonusOld, uint8 bonusNew);
-	
+
 	//this generate a public event on a blockchain that will notify clients
 	event minGoalReached(uint256 minIcoAmount, string notice);
-	
+
 	//this generate a public event on a blockchain that will notify clients
 	event preIcoEnded(uint256 preIcoAmount, string notice);
-	
+
 	//this generate a public event on a blockchain that will notify clients
 	event priceUpdated(uint256 oldPrice, uint256 newPrice, string notice);
-	
+
 	//this generate a public event on a blockchain that will notify clients
 	event withdrawed(address _to, uint256 summe, string notice);
-	
+
 	//this generate a public event on a blockchain that will notify clients
 	event deposited(address _from, uint256 summe, string notice);
-	
+
 	//this generate a public event on a blockchain that will notify clients
 	event orderToTransfer(address initiator, address _from, address _to, uint256 summe, string notice);
-	
+
 	//this generate a public event on a blockchain that will notify clients
 	event tokenCreated(address _creator, uint256 summe, string notice);
-	
+
 	//this generate a public event on a blockchain that will notify clients
 	event tokenDestroyed(address _destroyer, uint256 summe, string notice);
-	
+
 	//this generate a public event on a blockchain that will notify clients
 	event icoStatusUpdated(address _initiator, string status);
 
@@ -174,7 +174,7 @@ contract METADOLLAR is ERC20Interface, owned, SafeMath{
 	function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
 		return allowed[_owner][_spender];
 	}
-	
+
 	/// @notice Calculates amount of ETH needed to buy DOL
 	/// @param howManyTokenToBuy - Amount of tokens to calculate
 	function calculateTheEndPrice(uint256 howManyTokenToBuy) constant returns (uint256 summarizedPriceInWeis) {
@@ -184,7 +184,7 @@ contract METADOLLAR is ERC20Interface, owned, SafeMath{
 			summarizedPriceInWeis = 0;
 		}
 	}
-	
+
 	/// @notice Shows if account is frozen
 	/// @param account - Accountaddress to check
 	function checkFrozenAccounts(address account) constant returns (bool accountIsFrozen) {
@@ -210,8 +210,8 @@ contract METADOLLAR is ERC20Interface, owned, SafeMath{
 		require(this.balance >= revenue);
 		msg.sender.transfer(revenue - detractSell);  // sends ether to the seller: it's important to do this last to prevent recursion attacks
 	}
-	
-	
+
+
 	/// @notice Transfer amount of tokens from own wallet to someone else
 	function transfer(address _to, uint256 _value) returns (bool success) {
 		assert(msg.sender != address(0));
@@ -286,7 +286,7 @@ contract METADOLLAR is ERC20Interface, owned, SafeMath{
 		require(tokenBalanceOf[this] >= amount);              		// checks if contract has enough to sell
 		amountOfInvestments = amountOfInvestments + (value - moneyBack);
 		updatePrices();
-		
+
 		_transfer(this, sender, amount - detract);
 		if(!minimalGoalReached) {
 			checkMinimalGoal();
@@ -329,7 +329,7 @@ contract METADOLLAR is ERC20Interface, owned, SafeMath{
 		}else{
 			currentTokenPrice = ICOprice;
 		}
-		
+
 		if(oldPrice != currentTokenPrice) {
 			priceUpdated(oldPrice, currentTokenPrice, "Token price updated!");
 		}
@@ -363,7 +363,7 @@ contract METADOLLAR is ERC20Interface, owned, SafeMath{
 		ICOprice = priceForIcoInWei;
 		updatePrices();
 	}
-	
+
 	/// @notice Set current Commission Rate
 	/// @param newCommRate - is the amount in wei for one token
 	function commRate(uint256 newCommRate) isOwner {
@@ -465,3 +465,38 @@ contract METADOLLAR is ERC20Interface, owned, SafeMath{
 	}
 
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

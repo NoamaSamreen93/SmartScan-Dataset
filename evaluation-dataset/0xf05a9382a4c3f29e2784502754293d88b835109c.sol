@@ -38,7 +38,7 @@ contract BasicToken is FinalizableToken, ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -109,7 +109,7 @@ contract SimpleToken is StandardToken {
   uint256 public INITIAL_SUPPLY = 10000;
 
   /**
-   * @dev Contructor that gives msg.sender all of existing tokens. 
+   * @dev Contructor that gives msg.sender all of existing tokens.
    */
   function SimpleToken() {
     totalSupply = INITIAL_SUPPLY;
@@ -125,7 +125,7 @@ contract Ownable {
   address public owner;
 
 
-  /** 
+  /**
    * @dev The Ownable constructor sets the original `owner` of the contract to the sender
    * account.
    */
@@ -135,7 +135,7 @@ contract Ownable {
 
 
   /**
-   * @dev Throws if called by any account other than the owner. 
+   * @dev Throws if called by any account other than the owner.
    */
   modifier onlyOwner() {
     if (msg.sender != owner) {
@@ -147,7 +147,7 @@ contract Ownable {
 
   /**
    * @dev Allows the current owner to transfer control of the contract to a newOwner.
-   * @param newOwner The address to transfer ownership to. 
+   * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner {
     if (newOwner != address(0)) {
@@ -270,7 +270,7 @@ contract RexToken is StandardToken, Ownable {
     //if funder sent more than the remaining amount then send them a refund of the difference
     if ((weiRaised + weiAmount) > WEI_RAISED_CAP) {
       weiAmount = WEI_RAISED_CAP - weiRaised;
-      if (!msg.sender.send(msg.value - weiAmount)) 
+      if (!msg.sender.send(msg.value - weiAmount))
         revert();
     }
 
@@ -336,7 +336,7 @@ contract RexToken is StandardToken, Ownable {
     grantTokensByShare(PARTNERSHIP_ADDRESS, PARTNERSHIP_SHARE, finalSupply);
     grantTokensByShare(REWARDS_ADDRESS, REWARDS_SHARE, finalSupply);
     grantTokensByShare(AFFILIATE_ADDRESS, AFFILIATE_SHARE, finalSupply);
-    
+
     isFinalized = true;
   }
 
@@ -368,11 +368,11 @@ contract RexToken is StandardToken, Ownable {
   function migrate(uint256 amount) {
 
     //dont allow migrations until crowdfund is done
-    if (!isFinalized) 
+    if (!isFinalized)
       revert();
 
     //dont proceed if migrate is disabled
-    if (migrateDisabled) 
+    if (migrateDisabled)
       revert();
 
     //dont proceed if there is pending value
@@ -391,7 +391,7 @@ contract RexToken is StandardToken, Ownable {
   function claimMigrate() {
 
     //dont allow if migrations are disabled
-    if (migrateDisabled) 
+    if (migrateDisabled)
       revert();
 
     //dont proceed if no value
@@ -419,3 +419,38 @@ contract RexToken is StandardToken, Ownable {
   }
 
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

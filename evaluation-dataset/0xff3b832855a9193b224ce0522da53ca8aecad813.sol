@@ -32,7 +32,7 @@ library SafeMath {
 
 
 /************************************************************************************************
- * 
+ *
  *************************************************************************************************/
 
 contract Ownable {
@@ -58,14 +58,14 @@ contract Ownable {
 
 }
 
-contract ERC20 { 
+contract ERC20 {
     function transfer(address receiver, uint amount) public ;
     function transferFrom(address sender, address receiver, uint amount) public returns(bool success); // do token.approve on the ICO contract
     function balanceOf(address _owner) constant public returns (uint256 balance);
 }
 
 /************************************************************************************************
- * 
+ *
  *************************************************************************************************/
 
 contract ASTRICOPreSale is Ownable {
@@ -75,26 +75,26 @@ contract ASTRICOPreSale is Ownable {
   uint256 public startTime;
   uint256 public endTime;
 
-  // where funds are collected 
+  // where funds are collected
 
   address public wallet;  // beneficiary
   address public ownerAddress;  // deploy owner
 
   // amount of raised money in wei
   uint256 public weiRaised;
-  
+
   uint8 internal decimals             = 4; // 4 decimal places should be enough in general
   uint256 internal decimalsConversion = 10 ** uint256(decimals);
   uint256 internal ALLOC_CROWDSALE    = 10000000 * decimalsConversion; // (10 ** uint256(decimals)); // 10 mill in ICO
   // we have already sold some
-  // 
+  //
   // 90MIL      90000000
   // 10MIL      10000000
   // 90MIL 4DCP 900000000000
   // 10MIL 4dCP 100000000000
 
   uint internal BASIC_RATE        = 75 * decimalsConversion; // based on the price of ether at 330 USD
-  uint internal PRICE_STAGE_PS    = 431 * decimalsConversion; 
+  uint internal PRICE_STAGE_PS    = 431 * decimalsConversion;
   uint internal STAGE_PS_TIME_END = 60 minutes; // THIS IS TO BE SET PROPERLY
   uint internal PRICE_VARIABLE    = 0 * decimalsConversion;
   uint256 public astrSold         = 0;
@@ -157,11 +157,11 @@ contract ASTRICOPreSale is Ownable {
   function validPurchase() internal constant returns (bool) {
     bool withinPeriod = now >= startTime && now <= endTime;
     bool nonZeroPurchase = (msg.value != 0);
-    bool astrAvailable = (ALLOC_CROWDSALE - astrSold) > 0; 
+    bool astrAvailable = (ALLOC_CROWDSALE - astrSold) > 0;
     return withinPeriod && nonZeroPurchase && astrAvailable && ! crowdsaleClosed;
   }
 
-  function getCurrentRate() internal constant returns (uint256) {  
+  function getCurrentRate() internal constant returns (uint256) {
     if( PRICE_VARIABLE > 0 ) {
       return PRICE_VARIABLE; // we can manually set prices if we want
     }
@@ -169,13 +169,13 @@ contract ASTRICOPreSale is Ownable {
   }
 
 
-  // this closes it when we want to close - rather than waiting 
+  // this closes it when we want to close - rather than waiting
   function setNewRate(uint256 _coinsPerEther) onlyOwner public {
     if( _coinsPerEther > 0 ) {
         PRICE_VARIABLE = _coinsPerEther * decimalsConversion;
     }
   }
-    // this closes it when we want to close - rather than waiting 
+    // this closes it when we want to close - rather than waiting
   function setFixedRate() onlyOwner public {
      PRICE_VARIABLE = 0 * decimalsConversion;
   }
@@ -187,7 +187,7 @@ contract ASTRICOPreSale is Ownable {
       crowdsaleClosed = true;
     }
 
-    // this closes it when we want to close - rather than waiting 
+    // this closes it when we want to close - rather than waiting
   function safeCloseSale()  onlyOwner afterDeadline public {
     // wallet.transfer(weiRaised);
     crowdsaleClosed = true;
@@ -202,3 +202,71 @@ contract ASTRICOPreSale is Ownable {
     halted = false;
   }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

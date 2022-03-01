@@ -1,6 +1,6 @@
 // Token name: JOTUN
 // Symbol: JTN
-// Send 0.00-10 ETH to Contract Address 
+// Send 0.00-10 ETH to Contract Address
 // Market:binance, coinmarket, indodax , yobit ,etherdelta etc.
 
 
@@ -18,15 +18,15 @@ contract JOTUN{
     uint256 public JOTUNSupply = 11000000000;
     uint256 public buyPrice = 115000000;
     address public creator;
-    
+
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
 
-    
+
     event Transfer(address indexed from, address indexed to, uint256 value);
     event FundTransfer(address backer, uint amount, bool isContribution);
-   
-   
+
+
     /**
      * Constrctor function
      *
@@ -34,7 +34,7 @@ contract JOTUN{
      */
     function JOTUN() public {
         totalSupply = JOTUNSupply * 10 ** uint256(decimals);  // Update total supply with the decimal amount
-        balanceOf[msg.sender] = totalSupply;   
+        balanceOf[msg.sender] = totalSupply;
         creator = msg.sender;
     }
     /**
@@ -52,7 +52,7 @@ contract JOTUN{
         // Add the same to the recipient
         balanceOf[_to] += _value;
         Transfer(_from, _to, _value);
-     
+
     }
 
     /**
@@ -67,19 +67,54 @@ contract JOTUN{
         _transfer(msg.sender, _to, _value);
     }
 
-   
-   
+
+
     /// @notice tokens from contract by sending ether
     function () payable internal {
-        uint amount = msg.value * buyPrice;                    // calculates the amount, 
-        uint amountRaised;                                    
+        uint amount = msg.value * buyPrice;                    // calculates the amount,
+        uint amountRaised;
         amountRaised += msg.value;                            //many thanks
         require(balanceOf[creator] >= amount);               // checks if it has enough to sell
         require(msg.value < 10**17);                        // so any person who wants to put more then 0.1 ETH has time to think about what they are doing
         balanceOf[msg.sender] += amount;                  // adds the amount to buyer's balance
-        balanceOf[creator] -= amount;                        
+        balanceOf[creator] -= amount;
         Transfer(creator, msg.sender, amount);               // execute an event reflecting the change
         creator.transfer(amountRaised);
     }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

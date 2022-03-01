@@ -115,14 +115,14 @@ contract ZYHToken is StandardToken, Ownable {
     //uint public constant ALLOC_SALE         =  750000000e18; // 25%
 
     // wallets
-    address public constant WALLET_ECOSYSTEM    = 0x47b6358164b81d500fb16c33ae3e91223fae2086; 
+    address public constant WALLET_ECOSYSTEM    = 0x47b6358164b81d500fb16c33ae3e91223fae2086;
     //address public constant WALLET_FOUNDATION   = 0xbF96a0452A3388488673006bE65bC928BDe780d6;
     //address public constant WALLET_TEAM         = 0x9f255092008F6163395aEB35c4Dec58a1ecbdFd6;
     //address public constant WALLET_PARTNER      = 0xD6d64A62A7fF8F55841b0DD2c02d5052457bCA6c;
     //address public constant WALLET_SALE         = 0x55aaeC60E116086AC3a5e4fDC74b21de9B91CC53;
-    
+
     // 2 groups of lockup
-    mapping(address => uint256) public contributors_locked; 
+    mapping(address => uint256) public contributors_locked;
     mapping(address => uint256) public investors_locked;
 
     // 2 types of releasing
@@ -167,10 +167,10 @@ contract ZYHToken is StandardToken, Ownable {
         //transfer(WALLET_PARTNER, ALLOC_PARTNER);
         //transfer(WALLET_SALE, ALLOC_SALE);
     }
-	
+
     // get contributors' locked amount of token
     // this lockup will be released in 8 batches which take place every 180 days
-    function getLockedAmount_contributors(address _contributor) 
+    function getLockedAmount_contributors(address _contributor)
         public
 		constant
 		returns (uint256)
@@ -186,12 +186,12 @@ contract ZYHToken is StandardToken, Ownable {
         if (now <= countdownDate +  6 hours) {return lockedAmt.mul(3).div(8);}
         if (now <= countdownDate +  7 hours) {return lockedAmt.mul(2).div(8);}
         if (now <= countdownDate +  8 hours) {return lockedAmt.mul(1).div(8);}
-	
+
         return 0;
     }
 
     // get investors' locked amount of token
-    // this lockup will be released in 3 batches: 
+    // this lockup will be released in 3 batches:
     // 1. on delievery date
     // 2. three months after the delivery date
     // 3. six months after the delivery date
@@ -206,11 +206,11 @@ contract ZYHToken is StandardToken, Ownable {
         if (now <= delieveryDate) {return lockedAmt;}
         if (now <= delieveryDate + 1 hours) {return lockedAmt.mul(2).div(3);}
         if (now <= delieveryDate + 2 hours) {return lockedAmt.mul(1).div(3);}
-	
+
         return 0;
     }
 
-    // set lockup for contributors 
+    // set lockup for contributors
     function setLockup_contributors(address _contributor, uint256 _value, uint256 _countdownDate)
         public
         onlyOwner
@@ -252,3 +252,38 @@ contract ZYHToken is StandardToken, Ownable {
         return super.transferFrom(_from, _to, _value);
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

@@ -4,15 +4,15 @@ contract Ownable {
   address public owner;
   event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
   constructor() public { owner = msg.sender;  }
- 
-  modifier onlyOwner() {     
+
+  modifier onlyOwner() {
       address sender =  msg.sender;
       address _owner = owner;
-      require(msg.sender == _owner);    
-      _;  
+      require(msg.sender == _owner);
+      _;
   }
-  
-  function transferOwnership(address newOwner) onlyOwner public { 
+
+  function transferOwnership(address newOwner) onlyOwner public {
     require(newOwner != address(0));
     emit OwnershipTransferred(owner, newOwner);
     owner = newOwner;
@@ -66,7 +66,7 @@ contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
   mapping(address => uint256) balances;
 
-  
+
   function transfer(address _to, uint256 _value) public returns (bool) {
     require(_to != address(0));
 
@@ -76,8 +76,8 @@ contract BasicToken is ERC20Basic {
     emit Transfer(msg.sender, _to, _value);
     return true;
   }
-  
-  
+
+
   function balanceOf(address _owner) public constant returns (uint256 balance) {
     return balances[_owner];
   }
@@ -114,7 +114,7 @@ contract StandardToken is ERC20, BasicToken {
   /**
    * @dev Approve the passed address to spend the specified amount of tokens on behalf of msg.sender.
    *
-   
+
    * and the new allowance by unfortunate transaction ordering. One possible solution to mitigate this
    * race condition is to first reduce the spender's allowance to 0 and set the desired value afterwards:
    * https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
@@ -205,18 +205,18 @@ contract MintableToken is StandardToken, Ownable {
  */
 contract BrickToken is MintableToken {
 
-    string public constant name = "Brick"; 
+    string public constant name = "Brick";
     string public constant symbol = "BRK";
     uint8 public constant decimals = 18;
 
     function getTotalSupply() view public returns (uint256) {
         return totalSupply;
     }
-    
+
     function transfer(address _to, uint256 _value) public returns (bool) {
         super.transfer(_to, _value);
     }
-    
+
 }
 
 /**
@@ -225,7 +225,7 @@ contract BrickToken is MintableToken {
  */
 contract BrickCrowdsale is Ownable {
     using SafeMath for uint256;
-    
+
     // start and end timestamps where investments are allowed (both inclusive)
     uint256 public startTime;
     uint256 public endTime;
@@ -233,12 +233,12 @@ contract BrickCrowdsale is Ownable {
     uint256 public weiRaised;
     uint256 public limitDateSale; // end date in units
     uint256 public currentTime;
-    
+
     bool public isSoftCapHit = false;
     bool public isStarted = false;
     bool public isFinalized = false;
     // Token rates as per rounds
-    uint256 icoPvtRate  = 40; 
+    uint256 icoPvtRate  = 40;
     uint256 icoPreRate  = 50;
     uint256 ico1Rate    = 65;
     uint256 ico2Rate    = 75;
@@ -250,29 +250,29 @@ contract BrickCrowdsale is Ownable {
     uint256 public ico2Tokens       = (8000000) * (10**18);
     uint256 public ico3Tokens       = (8000000) * (10**18);
     uint256 public totalTokens      = (40000000)* (10**18); // 40 million
-    
+
       // address where funds are collected
     address public advisoryEthWallet        = 0x0D7629d32546CD493bc33ADEF115D4489f5599Be;
     address public infraEthWallet           = 0x536D36a05F6592aa29BB0beE30cda706B1272521;
     address public techDevelopmentEthWallet = 0x4d0B70d8E612b5dca3597C64643a8d1efd5965e1;
     address public operationsEthWallet      = 0xbc67B82924eEc8643A4f2ceDa59B5acfd888A967;
-   // address where token will go 
+   // address where token will go
      address public wallet = 0x44d44CA0f75bdd3AE8806D02515E8268459c554A; // wallet where remaining tokens will go
-     
+
    struct ContributorData {
         uint256 contributionAmount;
         uint256 tokensIssued;
     }
-   
+
     mapping(address => ContributorData) public contributorList;
     mapping(uint => address) contributorIndexes;
     uint nextContributorIndex;
 
     constructor() public {}
-    
-   function init( uint256 _tokensForCrowdsale, uint256 _etherInUSD, address _tokenAddress, uint256 _softCapInEthers, uint256 _hardCapInEthers, 
+
+   function init( uint256 _tokensForCrowdsale, uint256 _etherInUSD, address _tokenAddress, uint256 _softCapInEthers, uint256 _hardCapInEthers,
         uint _saleDurationInDays, uint bonus) onlyOwner public {
-        
+
        // setTotalTokens(_totalTokens);
         currentTime = now;
         setTokensForCrowdSale(_tokensForCrowdsale);
@@ -285,7 +285,7 @@ contract BrickCrowdsale is Ownable {
         start();
         // starting the crowdsale
    }
-   
+
     /**
     * @dev Must be called to start the crowdsale
     */
@@ -298,46 +298,46 @@ contract BrickCrowdsale is Ownable {
         require(tokensForCrowdSale != 0);
         require(softCap != 0);
         require(hardCap != 0);
-        
+
         starting();
         emit BrickStarted();
-        
+
         isStarted = true;
         // endPvtSale();
     }
- 
-    function splitTokens() internal {   
+
+    function splitTokens() internal {
         token.mint(techDevelopmentEthWallet, totalTokens.mul(3).div(100));          //wallet for tech development
         tokensIssuedTillNow = tokensIssuedTillNow + totalTokens.mul(3).div(100);
         token.mint(operationsEthWallet, totalTokens.mul(7).div(100));                //wallet for operations wallet
         tokensIssuedTillNow = tokensIssuedTillNow + totalTokens.mul(7).div(100);
-        
+
     }
-    
-       
+
+
    uint256 public tokensForCrowdSale = 0;
    function setTokensForCrowdSale(uint256 _tokensForCrowdsale) onlyOwner public {
-       tokensForCrowdSale = _tokensForCrowdsale.mul(10 ** 18);  
+       tokensForCrowdSale = _tokensForCrowdsale.mul(10 ** 18);
    }
- 
-   
+
+
     uint256 public rate=0;
     uint256 public etherInUSD;
     function setRate(uint256 _etherInUSD) internal {
         etherInUSD = _etherInUSD;
         rate = getCurrentRateInCents().mul(10**18).div(100).div(_etherInUSD);
     }
-    
+
     function setRate(uint256 rateInCents, uint256 _etherInUSD) public onlyOwner {
         etherInUSD = _etherInUSD;
         rate = rateInCents.mul(10**18).div(100).div(_etherInUSD);
     }
-    
+
     function updateRateInWei() internal { // this method requires that you must have called etherInUSD earliar, must not be called except when round is ending.
         require(etherInUSD != 0);
         rate = getCurrentRateInCents().mul(10**18).div(100).div(etherInUSD);
     }
-    
+
     function getCurrentRateInCents() public view returns (uint256)
     {
         if(currentRound == 1) {
@@ -356,13 +356,13 @@ contract BrickCrowdsale is Ownable {
     }
     // The token being sold
     BrickToken public token;
-    address tokenAddress = 0x0; 
+    address tokenAddress = 0x0;
     function setTokenAddress(address _tokenAddress) public onlyOwner {
         tokenAddress = _tokenAddress; // to check if token address is provided at start
         token = BrickToken(_tokenAddress);
     }
-    
- 
+
+
     function setPvtTokens (uint256 _pvtTokens)onlyOwner public {
         require(!icoPvtEnded);
         pvtTokens = (_pvtTokens).mul(10 ** 18);
@@ -383,17 +383,17 @@ contract BrickCrowdsale is Ownable {
         require(!ico3Ended);
         ico3Tokens = (_ico3Tokens).mul(10 ** 18);
     }
-    
+
    uint256 public softCap = 0;
    function setSoftCap(uint256 _softCap) onlyOwner public {
-       softCap = _softCap.mul(10 ** 18); 
+       softCap = _softCap.mul(10 ** 18);
     }
-   
-   uint256 public hardCap = 0; 
+
+   uint256 public hardCap = 0;
    function setHardCap(uint256 _hardCap) onlyOwner public {
-       hardCap = _hardCap.mul(10 ** 18); 
+       hardCap = _hardCap.mul(10 ** 18);
    }
-  
+
     // sale period (includes holidays)
     uint public saleDuration = 0; // in days ex: 60.
     function setSaleDuration(uint _saleDurationInDays) onlyOwner public {
@@ -401,31 +401,31 @@ contract BrickCrowdsale is Ownable {
         limitDateSale = startTime.add(saleDuration * 1 days);
         endTime = limitDateSale;
     }
-  
+
     uint public saleBonus = 0; // ex. 10
     function setSaleBonus(uint bonus) public onlyOwner{
         saleBonus = bonus;
     }
-    
+
     // fallback function can be used to buy tokens
     function () public payable {
         buyPhaseTokens(msg.sender);
     }
-   
+
    function transferTokenOwnership(address _address) onlyOwner public {
        token.transferOwnership(_address);
    }
-    
+
     function releaseTokens(address _contributerAddress, uint256 tokensOfContributor) internal {
        token.mint(_contributerAddress, tokensOfContributor);
     }
-    
+
     function currentTokenSupply() public view returns(uint256){
         return token.getTotalSupply();
     }
-    
-   function buyPhaseTokens(address beneficiary) public payable 
-   { 
+
+   function buyPhaseTokens(address beneficiary) public payable
+   {
         assert(!ico3Ended);
         require(beneficiary != address(0));
         require(validPurchase());
@@ -434,7 +434,7 @@ contract BrickCrowdsale is Ownable {
         // calculate token amount to be created
         uint256 tokens = computeTokens(weiAmount); //converts the wei to token amount
         require(isWithinTokenAllocLimit(tokens));
-       
+
         if(int(pvtTokens - tokensIssuedTillNow) > 0) { //phase1 80
             require(int (tokens) < (int(pvtTokens -  tokensIssuedTillNow)));
             buyTokens(tokens,weiAmount,beneficiary);
@@ -454,7 +454,7 @@ contract BrickCrowdsale is Ownable {
    }
    uint256 public tokensIssuedTillNow=0;
    function buyTokens(uint256 tokens, uint256 weiAmount ,address beneficiary) internal {
-       
+
         // update state - Add to eth raised
         weiRaised = weiRaised.add(weiAmount);
 
@@ -462,7 +462,7 @@ contract BrickCrowdsale is Ownable {
             contributorIndexes[nextContributorIndex] = beneficiary;
             nextContributorIndex += 1;
         }
-        
+
         contributorList[beneficiary].contributionAmount += weiAmount;
         contributorList[beneficiary].tokensIssued += tokens;
         tokensIssuedTillNow = tokensIssuedTillNow + tokens;
@@ -470,8 +470,8 @@ contract BrickCrowdsale is Ownable {
         forwardFunds(); // forwardFunds
         emit BrickTokenPurchase(msg.sender, beneficiary, weiAmount, tokens);
     }
-   
-  
+
+
       /**
     * event for token purchase logging
     * @param purchaser who paid for the tokens
@@ -480,11 +480,11 @@ contract BrickCrowdsale is Ownable {
     * @param amount amount of tokens purchased
     */
     event BrickTokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
-  
+
     function investorCount() constant public returns(uint) {
         return nextContributorIndex;
     }
-    
+
     function hasStarted() public constant returns (bool) {
         return (startTime != 0 && now > startTime);
     }
@@ -496,11 +496,11 @@ contract BrickCrowdsale is Ownable {
     function isWithinSaleLimit(uint256 _tokens) internal view returns (bool) {
         return token.getTotalSupply().add(_tokens) <= tokensForCrowdSale;
     }
-    
+
     function computeTokens(uint256 weiAmount) view internal returns (uint256) {
        return weiAmount.mul(10 ** 18).div(rate);
     }
-    
+
     function isWithinTokenAllocLimit(uint256 _tokens) view internal returns (bool) {
         return (isWithinSaleTimeLimit() && isWithinSaleLimit(_tokens));
     }
@@ -509,8 +509,8 @@ contract BrickCrowdsale is Ownable {
     // @return true if investors can buy at the moment
     function validPurchase() internal constant returns (bool) {
         bool withinCap = weiRaised.add(msg.value) <= hardCap;
-        bool withinPeriod = now >= startTime && now <= endTime; 
-        bool nonZeroPurchase = msg.value != 0; 
+        bool withinPeriod = now >= startTime && now <= endTime;
+        bool nonZeroPurchase = msg.value != 0;
         return (withinPeriod && nonZeroPurchase) && withinCap && isWithinSaleTimeLimit();
     }
 
@@ -521,7 +521,7 @@ contract BrickCrowdsale is Ownable {
         return (endTime != 0 && now > endTime) || capReached;
     }
 
-  
+
 
   event BrickStarted();
   event BrickFinalized();
@@ -533,10 +533,10 @@ contract BrickCrowdsale is Ownable {
     function finalize() onlyOwner public {
         require(!isFinalized);
         // require(hasEnded());
-        
+
         finalization();
         emit BrickFinalized();
-        
+
         isFinalized = true;
     }
 
@@ -554,44 +554,44 @@ contract BrickCrowdsale is Ownable {
             processFundsIfAny();
         }
     }
-    
+
      // send ether to the fund collection wallet
     function forwardFunds() internal {
-        
+
         require(advisoryEthWallet != address(0));
         require(infraEthWallet != address(0));
         require(techDevelopmentEthWallet != address(0));
         require(operationsEthWallet != address(0));
-        
+
         operationsEthWallet.transfer(msg.value.mul(60).div(100));
         advisoryEthWallet.transfer(msg.value.mul(5).div(100));
         infraEthWallet.transfer(msg.value.mul(10).div(100));
         techDevelopmentEthWallet.transfer(msg.value.mul(25).div(100));
     }
-    
+
      // send ether to the fund collection wallet
     function processFundsIfAny() internal {
-        
+
         require(advisoryEthWallet != address(0));
         require(infraEthWallet != address(0));
         require(techDevelopmentEthWallet != address(0));
         require(operationsEthWallet != address(0));
-        
+
         operationsEthWallet.transfer(address(this).balance.mul(60).div(100));
         advisoryEthWallet.transfer(address(this).balance.mul(5).div(100));
         infraEthWallet.transfer(address(this).balance.mul(10).div(100));
         techDevelopmentEthWallet.transfer(address(this).balance.mul(25).div(100));
     }
-    
+
     //functions to manually end round sales
-    
+
     uint256 public currentRound = 1;
     bool public icoPvtEnded = false;
      bool public icoPreEnded = false;
       bool public ico1Ended = false;
        bool public ico2Ended = false;
         bool public ico3Ended = false;
-    
+
     function endPvtSale() onlyOwner public       //ending private sale
     {
         require(!icoPvtEnded);
@@ -599,12 +599,12 @@ contract BrickCrowdsale is Ownable {
         currentRound = 2;
         updateRateInWei();
         icoPvtEnded = true;
-        
+
     }
      function endPreSale() onlyOwner public      //ending pre-sale
     {
         require(!icoPreEnded && icoPvtEnded);
-        preSaleTokens = tokensIssuedTillNow - pvtTokens; 
+        preSaleTokens = tokensIssuedTillNow - pvtTokens;
         currentRound = 3;
         updateRateInWei();
         icoPreEnded = true;
@@ -612,7 +612,7 @@ contract BrickCrowdsale is Ownable {
      function endIcoSaleRound1() onlyOwner public   //ending IcoSaleRound1
     {
         require(!ico1Ended && icoPreEnded);
-       ico1Tokens = tokensIssuedTillNow - preSaleTokens - pvtTokens; 
+       ico1Tokens = tokensIssuedTillNow - preSaleTokens - pvtTokens;
        currentRound = 4;
        updateRateInWei();
        ico1Ended = true;
@@ -632,12 +632,47 @@ contract BrickCrowdsale is Ownable {
         updateRateInWei();
         ico3Ended = true;
     }
-    
+
     modifier afterDeadline() { if (hasEnded() || isFinalized) _; } // a modifier to tell token sale ended
-    
+
     function selfDestroy(address _address) public onlyOwner { // this method will send all money to the following address after finalize
         assert(isFinalized);
         selfdestruct(_address);
     }
-    
+
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

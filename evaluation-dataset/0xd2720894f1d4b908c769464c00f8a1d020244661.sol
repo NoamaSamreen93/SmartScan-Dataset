@@ -54,12 +54,12 @@ contract BlockWar {
     uint currentRound = 0;
     uint leftBlockNumber = 0;
     uint rightBlockNumber = 0;
-    uint maxBlockNumber = 500;  
+    uint maxBlockNumber = 500;
     uint buildFee = 100 finney;
     uint gameStartTimestamp;  // if gameEnded and currentRound==0 wait gameStartTimestamp
     uint gameIntervalTimestamp = 600;  // how many seconds game start after game end
     uint gamePrizePool = 0;  // game prize pool
-    uint public gameLength = 10800;  
+    uint public gameLength = 10800;
     uint public doCallNumber;
     /* Modifiers */
     modifier onlyOwner() {
@@ -272,4 +272,25 @@ contract BlockWar {
         result[7] = rightUserBlockNumber[currentRound][msg.sender];
         return result;
     }
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

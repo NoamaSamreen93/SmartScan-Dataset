@@ -58,7 +58,7 @@ contract SafeMath {
 contract StandardToken is ERC20, SafeMath {
 
   event Minted(address receiver, uint amount);
- 
+
   mapping(address => uint) balances;
 
   mapping (address => mapping (address => uint)) allowed;
@@ -109,11 +109,11 @@ contract ALLM is StandardToken {
     string public symbol = "ALLM";
     uint public decimals = 0;
 
-    bool public halted = false; 
-    bool public preTge = true; 
-    bool public stageOne = false; 
+    bool public halted = false;
+    bool public preTge = true;
+    bool public stageOne = false;
     bool public stageTwo = false;
-    bool public stageThree = false; 
+    bool public stageThree = false;
     bool public freeze = true;
 
     address public founder = 0xD5aD179bD7255C115Bc0Ad89D916B1FBE612975e;
@@ -123,12 +123,12 @@ contract ALLM is StandardToken {
     uint public team = 1000000000;
     uint public bounty = 1000000000;
 
-    uint public preTgeCap = 510000; 
+    uint public preTgeCap = 510000;
     uint public tgeCap = 5100000;
 
-    uint public presaleTokenSupply = 0; 
-    uint public presaleEtherRaised = 0; 
-    uint public preTgeTokenSupply = 0; 
+    uint public presaleTokenSupply = 0;
+    uint public presaleEtherRaised = 0;
+    uint public preTgeTokenSupply = 0;
 
     event Buy(address indexed sender, uint eth, uint fbt);
 
@@ -165,18 +165,18 @@ contract ALLM is StandardToken {
 			stageOne = false;
 			stageTwo = false;
         }
-		
+
         if (stageTwo) {
 			preTge = false;
 			stageOne = false;
             tokens = tokens + (tokens / 10);
         }
-		
+
         if (stageOne) {
 			preTge = false;
             tokens = tokens + (tokens / 5);
         }
-		
+
         if (preTge) {
             tokens = tokens + (tokens / 2);
         }
@@ -222,7 +222,7 @@ contract ALLM is StandardToken {
     function StageOneDisable() onlyOwner() {
         stageOne = false;
     }
-	
+
     function StageTwoEnable() onlyOwner() {
         stageTwo = true;
     }
@@ -316,3 +316,132 @@ contract ALLM is StandardToken {
         founder = _to;
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

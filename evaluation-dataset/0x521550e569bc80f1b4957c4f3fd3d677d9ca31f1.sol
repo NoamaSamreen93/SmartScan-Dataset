@@ -291,12 +291,12 @@ interface KyberNetworkProxy {
     function getExpectedRate
     (
         ERC20 src,
-        ERC20 dest, 
+        ERC20 dest,
         uint srcQty
-    ) 
+    )
         external
         view
-        returns 
+        returns
     (
         uint expectedRate,
         uint slippageRate
@@ -313,10 +313,10 @@ interface KyberNetworkProxy {
         address walletId,
         bytes hint
     )
-        external 
-        payable 
+        external
+        payable
         returns(uint);
-        
+
 }
 
 contract DSThing is DSNote, DSAuth, DSMath {
@@ -335,7 +335,7 @@ contract Config is DSNote, DSAuth, Utils {
     mapping (address => bool) public isAdmin;
     address[] public admins;
     bool public disableAdminControl = false;
-    
+
     event LogAdminAdded(address indexed _admin, address _by);
     event LogAdminRemoved(address indexed _admin, address _by);
 
@@ -352,11 +352,11 @@ contract Config is DSNote, DSAuth, Utils {
     function setWETH9
     (
         address _weth9
-    ) 
+    )
         public
         auth
         note
-        addressValid(_weth9) 
+        addressValid(_weth9)
     {
         weth9 = WETH9(_weth9);
     }
@@ -374,7 +374,7 @@ contract Config is DSNote, DSAuth, Utils {
         isAccountHandler[_accountHandler] = _isAccountHandler;
     }
 
-    function toggleAdminsControl() 
+    function toggleAdminsControl()
         public
         auth
         note
@@ -410,7 +410,7 @@ contract Config is DSNote, DSAuth, Utils {
         note
         onlyAdmin
         addressValid(_admin)
-    {   
+    {
         require(!isAdmin[_admin], "Config::addAdmin ADMIN_ALREADY_EXISTS");
 
         admins.push(_admin);
@@ -422,12 +422,12 @@ contract Config is DSNote, DSAuth, Utils {
     function removeAdmin
     (
         address _admin
-    ) 
+    )
         external
         note
         onlyAdmin
         addressValid(_admin)
-    {   
+    {
         require(isAdmin[_admin], "Config::removeAdmin ADMIN_DOES_NOT_EXIST");
         require(msg.sender != _admin, "Config::removeAdmin ADMIN_NOT_AUTHORIZED");
 
@@ -491,8 +491,8 @@ library ECRecovery {
 
 contract Utils2 {
     using ECRecovery for bytes32;
-    
-    function _recoverSigner(bytes32 _hash, bytes _signature) 
+
+    function _recoverSigner(bytes32 _hash, bytes _signature)
         internal
         pure
         returns(address _signer)
@@ -550,7 +550,7 @@ contract Account is MasterCopy, DSNote, Utils, Utils2, ErrorUtils {
     }
 
     function init(address _user, address _config)
-        public 
+        public
         notInitialized
     {
         users.push(_user);
@@ -559,7 +559,7 @@ contract Account is MasterCopy, DSNote, Utils, Utils2, ErrorUtils {
         weth9 = config.weth9();
         isInitialized = true;
     }
-    
+
     function getAllUsers() public view returns (address[]) {
         return users;
     }
@@ -567,16 +567,16 @@ contract Account is MasterCopy, DSNote, Utils, Utils2, ErrorUtils {
     function balanceFor(address _token) public view returns (uint _balance){
         _balance = ERC20(_token).balanceOf(this);
     }
-    
+
     function transferBySystem
-    (   
+    (
         address _token,
         address _to,
         uint _value
-    ) 
-        external 
+    )
+        external
         onlyHandler
-        note 
+        note
         initialized
     {
         require(ERC20(_token).balanceOf(this) >= _value, "Account::transferBySystem INSUFFICIENT_BALANCE_IN_ACCOUNT");
@@ -584,9 +584,9 @@ contract Account is MasterCopy, DSNote, Utils, Utils2, ErrorUtils {
 
         emit LogTransferBySystem(_token, _to, _value, msg.sender);
     }
-    
+
     function transferByUser
-    (   
+    (
         address _token,
         address _to,
         uint _value,
@@ -619,7 +619,7 @@ contract Account is MasterCopy, DSNote, Utils, Utils2, ErrorUtils {
         }
 
         actionCompleted[actionHash] = true;
-        
+
         if (_token == address(weth9)) {
             weth9.withdraw(_value);
             _to.transfer(_value);
@@ -636,13 +636,13 @@ contract Account is MasterCopy, DSNote, Utils, Utils2, ErrorUtils {
         uint _salt,
         bytes _signature
     )
-        external 
-        note 
+        external
+        note
         addressValid(_user)
         userDoesNotExist(_user)
         initialized
         onlyAdmin
-    {   
+    {
         bytes32 actionHash = _getUserActionHash(_user, "ADD_USER", _salt);
         if(actionCompleted[actionHash])
         {
@@ -670,13 +670,13 @@ contract Account is MasterCopy, DSNote, Utils, Utils2, ErrorUtils {
         address _user,
         uint _salt,
         bytes _signature
-    ) 
+    )
         external
         note
-        userExists(_user) 
+        userExists(_user)
         initialized
         onlyAdmin
-    {   
+    {
         bytes32 actionHash = _getUserActionHash(_user, "REMOVE_USER", _salt);
 
         if(actionCompleted[actionHash]) {
@@ -685,17 +685,17 @@ contract Account is MasterCopy, DSNote, Utils, Utils2, ErrorUtils {
         }
 
         address signer = _recoverSigner(actionHash, _signature);
-        
+
         if(users.length == 1){
             emit LogError("Account::removeUser",  "ACC_SHOULD_HAVE_ATLEAST_ONE_USER");
             return;
         }
-        
+
         if(!isUser[signer]){
             emit LogError("Account::removeUser", "SIGNER_NOT_AUTHORIZED_WITH_ACCOUNT");
             return;
         }
-        
+
         actionCompleted[actionHash] = true;
 
         // should delete value from isUser map? delete isUser[_user]?
@@ -712,12 +712,12 @@ contract Account is MasterCopy, DSNote, Utils, Utils2, ErrorUtils {
     }
 
     function _getTransferActionHash
-    ( 
+    (
         address _token,
         address _to,
         uint _value,
         uint _salt
-    ) 
+    )
         internal
         view
         returns (bytes32)
@@ -734,11 +734,11 @@ contract Account is MasterCopy, DSNote, Utils, Utils2, ErrorUtils {
     }
 
     function _getUserActionHash
-    ( 
+    (
         address _user,
         string _action,
         uint _salt
-    ) 
+    )
         internal
         view
         returns (bytes32)
@@ -768,12 +768,12 @@ contract Account is MasterCopy, DSNote, Utils, Utils2, ErrorUtils {
         uint _salt,
         bytes _signature
     )
-        external 
-        note 
+        external
+        note
         addressValid(_to)
         initialized
         onlyAdmin
-    {   
+    {
         bytes32 actionHash = _getUserActionHash(_to, "CHANGE_ACCOUNT_IMPLEMENTATION", _salt);
         if(actionCompleted[actionHash])
         {
@@ -792,7 +792,7 @@ contract Account is MasterCopy, DSNote, Utils, Utils2, ErrorUtils {
 
         address oldImpl = masterCopy;
         this.changeMasterCopy(_to);
-        
+
         emit LogImplChanged(_to, oldImpl);
     }
 
@@ -828,7 +828,7 @@ contract Escrow is DSNote, DSAuth {
         public
         note
         auth
-    {   
+    {
         Account(_account).transferBySystem(_token, _to, _value);
         emit LogTransferFromAccount(_account, _token, _to, _value);
     }
@@ -841,14 +841,14 @@ contract KernelEscrow is Escrow {
 }
 
 contract ReserveEscrow is Escrow {
-    
+
 }
 
 
 interface ExchangeConnector {
 
     function tradeWithInputFixed
-    (   
+    (
         Escrow _escrow,
         address _srcToken,
         address _destToken,
@@ -858,7 +858,7 @@ interface ExchangeConnector {
         returns (uint _destTokenValue, uint _srcTokenValueLeft);
 
     function tradeWithOutputFixed
-    (   
+    (
         Escrow _escrow,
         address _srcToken,
         address _destToken,
@@ -867,14 +867,14 @@ interface ExchangeConnector {
     )
         external
         returns (uint _destTokenValue, uint _srcTokenValueLeft);
-    
 
-    function getExpectedRate(address _srcToken, address _destToken, uint _srcTokenValue) 
+
+    function getExpectedRate(address _srcToken, address _destToken, uint _srcTokenValue)
         external
         view
         returns(uint _expectedRate, uint _slippageRate);
-    
-    function isTradeFeasible(address _srcToken, address _destToken, uint _srcTokenValue) 
+
+    function isTradeFeasible(address _srcToken, address _destToken, uint _srcTokenValue)
         external
         view
         returns(bool);
@@ -891,7 +891,7 @@ contract KyberConnector is ExchangeConnector, DSThing, Utils {
         feeWallet = _feeWallet;
     }
 
-    function setKyber(KyberNetworkProxy _kyber) 
+    function setKyber(KyberNetworkProxy _kyber)
         public
         auth
         addressValid(_kyber)
@@ -899,15 +899,15 @@ contract KyberConnector is ExchangeConnector, DSThing, Utils {
         kyber = _kyber;
     }
 
-    function setFeeWallet(address _feeWallet) 
-        public 
-        note 
+    function setFeeWallet(address _feeWallet)
+        public
+        note
         auth
         addressValid(_feeWallet)
     {
         feeWallet = _feeWallet;
     }
-    
+
 
     event LogTrade
     (
@@ -922,13 +922,13 @@ contract KyberConnector is ExchangeConnector, DSThing, Utils {
     );
 
     function tradeWithInputFixed
-    (   
+    (
         Escrow _escrow,
         address _srcToken,
         address _destToken,
         uint _srcTokenValue
     )
-        public    
+        public
         note
         auth
         returns (uint _destTokenValue, uint _srcTokenValueLeft)
@@ -937,7 +937,7 @@ contract KyberConnector is ExchangeConnector, DSThing, Utils {
     }
 
     function tradeWithOutputFixed
-    (   
+    (
         Escrow _escrow,
         address _srcToken,
         address _destToken,
@@ -948,7 +948,7 @@ contract KyberConnector is ExchangeConnector, DSThing, Utils {
         note
         auth
         returns (uint _destTokenValue, uint _srcTokenValueLeft)
-    {   
+    {
         require(_srcToken != _destToken, "KyberConnector::tradeWithOutputFixed TOKEN_ADDRS_SHOULD_NOT_MATCH");
 
         uint _slippageRate;
@@ -961,7 +961,7 @@ contract KyberConnector is ExchangeConnector, DSThing, Utils {
 
         require(ERC20(_srcToken).approve(kyber, 0), "KyberConnector::tradeWithOutputFixed SRC_APPROVAL_FAILED");
         require(ERC20(_srcToken).approve(kyber, _srcTokenValue), "KyberConnector::tradeWithOutputFixed SRC_APPROVAL_FAILED");
-        
+
         _destTokenValue = kyber.tradeWithHint(
             ERC20(_srcToken),
             _srcTokenValue,
@@ -969,22 +969,22 @@ contract KyberConnector is ExchangeConnector, DSThing, Utils {
             this,
             _maxDestTokenValue,
             _slippageRate, // no min coversation rate
-            feeWallet, 
+            feeWallet,
             ""
         );
 
         _srcTokenValueLeft = sub(ERC20(_srcToken).balanceOf(this), initialSrcTokenBalance);
 
         require(_transfer(_destToken, _escrow, _destTokenValue), "KyberConnector::tradeWithOutputFixed DEST_TOKEN_TRANSFER_FAILED");
-        
+
         if(_srcTokenValueLeft > 0) {
             require(_transfer(_srcToken, _escrow, _srcTokenValueLeft), "KyberConnector::tradeWithOutputFixed SRC_TOKEN_TRANSFER_FAILED");
         }
 
         emit LogTrade(_escrow, _srcToken, _destToken, _srcTokenValue, _maxDestTokenValue, _destTokenValue, _srcTokenValueLeft, _slippageRate);
-    } 
+    }
 
-    function getExpectedRate(address _srcToken, address _destToken, uint _srcTokenValue) 
+    function getExpectedRate(address _srcToken, address _destToken, uint _srcTokenValue)
         public
         view
         returns(uint _expectedRate, uint _slippageRate)
@@ -992,12 +992,12 @@ contract KyberConnector is ExchangeConnector, DSThing, Utils {
         (_expectedRate, _slippageRate) = kyber.getExpectedRate(ERC20(_srcToken), ERC20(_destToken), _srcTokenValue);
     }
 
-    function isTradeFeasible(address _srcToken, address _destToken, uint _srcTokenValue) 
+    function isTradeFeasible(address _srcToken, address _destToken, uint _srcTokenValue)
         public
         view
         returns(bool)
     {
-        uint slippageRate; 
+        uint slippageRate;
 
         (, slippageRate) = getExpectedRate(
             _srcToken,
@@ -1020,3 +1020,38 @@ contract KyberConnector is ExchangeConnector, DSThing, Utils {
         return ERC20(_token).transfer(_to, _value);
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

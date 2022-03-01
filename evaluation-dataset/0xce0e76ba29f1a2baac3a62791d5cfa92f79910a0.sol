@@ -75,7 +75,7 @@ contract DSAuth is DSAuthEvents {
 
 contract AssetPriceOracle is DSAuth {
     // Maximum value expressible with uint128 is 340282366920938463463374607431768211456.
-    // Using 18 decimals for price records (standard Ether precision), 
+    // Using 18 decimals for price records (standard Ether precision),
     // the possible values are between 0 and 340282366920938463463.374607431768211456.
 
     struct AssetPriceRecord {
@@ -93,7 +93,7 @@ contract AssetPriceOracle is DSAuth {
 
     constructor() public {
     }
-    
+
     function recordAssetPrice(uint128 assetId, uint128 blockNumber, uint128 price) public auth {
         assetPriceRecords[assetId][blockNumber].price = price;
         assetPriceRecords[assetId][blockNumber].isRecord = true;
@@ -214,7 +214,7 @@ contract ContractForDifference is DSAuth {
     using SafeMath for int256;
 
     enum Position { Long, Short }
-    
+
     /**
      * A party to the contract. Either the maker or the taker.
      */
@@ -224,7 +224,7 @@ contract ContractForDifference is DSAuth {
         Position position;
         bool isPaid;
     }
-    
+
     struct Cfd {
         Party maker;
         Party taker;
@@ -247,8 +247,8 @@ contract ContractForDifference is DSAuth {
     uint128                 public numberOfContracts;
 
     event LogMakeCfd (
-    uint128 indexed cfdId, 
-    address indexed makerAddress, 
+    uint128 indexed cfdId,
+    address indexed makerAddress,
     Position indexed makerPosition,
     uint128 assetId,
     uint128 amount,
@@ -315,7 +315,7 @@ contract ContractForDifference is DSAuth {
         require(contractEndBlock > block.number); // Contract end block must be after current block.
         require(msg.value > 0); // Contract Wei amount must be more than zero - contracts for zero Wei does not make sense.
         require(makerAddress != address(0)); // Maker must provide a non-zero address.
-        
+
         uint128 contractId = numberOfContracts;
 
         /**
@@ -345,7 +345,7 @@ contract ContractForDifference is DSAuth {
         // contracts[contractId].contractEndBlock = contractEndBlock;
 
         numberOfContracts++;
-        
+
         emit LogMakeCfd(
             contractId,
             contracts[contractId].maker.addr,
@@ -360,9 +360,9 @@ contract ContractForDifference is DSAuth {
 
     function getCfd(
         uint128 cfdId
-        ) 
-        public 
-        view 
+        )
+        public
+        view
         returns (address makerAddress, Position makerPosition, address takerAddress, Position takerPosition, uint128 assetId, uint128 amount, uint128 startTime, uint128 endTime, bool isTaken, bool isSettled, bool isRefunded)
         {
         Cfd storage cfd = contracts[cfdId];
@@ -382,14 +382,14 @@ contract ContractForDifference is DSAuth {
     }
 
     function takeCfd(
-        uint128 cfdId, 
+        uint128 cfdId,
         address takerAddress
-        ) 
+        )
         public
         payable
         returns (bool success) {
         Cfd storage cfd = contracts[cfdId];
-        
+
         require(cfd.isTaken != true);                  // Contract must not be taken.
         require(cfd.isSettled != true);                // Contract must not be settled.
         require(cfd.isRefunded != true);               // Contract must not be refunded.
@@ -417,7 +417,7 @@ contract ContractForDifference is DSAuth {
             cfd.contractStartBlock,
             cfd.contractEndBlock
         );
-            
+
         return true;
     }
 
@@ -482,7 +482,7 @@ contract ContractForDifference is DSAuth {
     }
 
     function withdraw(
-        uint128 cfdId, 
+        uint128 cfdId,
         address partyAddress
     )
     public {
@@ -490,11 +490,11 @@ contract ContractForDifference is DSAuth {
         Party storage party = partyAddress == cfd.maker.addr ? cfd.maker : cfd.taker;
         require(party.withdrawBalance > 0); // The party must have a withdraw balance from previous settlement.
         require(!party.isPaid); // The party must have already been paid out, fx from a refund.
-        
+
         uint128 amount = party.withdrawBalance;
         party.withdrawBalance = 0;
         party.isPaid = true;
-        
+
         party.addr.transfer(amount);
 
         emit LogWithdrawal(
@@ -586,7 +586,7 @@ contract ContractForDifference is DSAuth {
         // Refund Maker
         cfd.maker.withdrawBalance = 0; // Refunding must reset withdraw balance, if any.
         cfd.maker.addr.transfer(cfd.amount);
-        
+
         emit LogCfdForceRefunded(
             cfdId,
             cfd.maker.addr,
@@ -594,9 +594,70 @@ contract ContractForDifference is DSAuth {
             cfd.taker.addr,
             takerAmount
         );
-    } 
+    }
 
     function () public {
         // dont receive ether via fallback method (by not having 'payable' modifier on this function).
     }
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

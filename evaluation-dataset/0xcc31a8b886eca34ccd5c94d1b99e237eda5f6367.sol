@@ -683,7 +683,7 @@ contract ERC20Detailed is IERC20 {
 
 contract BToken is ERC20Burnable, ERC20Detailed {
   uint constant private INITIAL_SUPPLY = 10 * 1e24;
-  
+
   constructor() ERC20Detailed("BurnToken", "BUTK", 18) public {
     super._mint(msg.sender, INITIAL_SUPPLY);
   }
@@ -732,7 +732,7 @@ contract BMng is Pausable, Ownable {
   address constant burnAddress = 0x000000000000000000000000000000000000dEaD;
   address registrator;
   address defaultPartner;
-  
+
   uint256 partnerBonusRateNumerator;
   uint256 partnerBonusRateDenominator;
 
@@ -751,7 +751,7 @@ contract BMng is Pausable, Ownable {
   // Counters
   mapping (address => mapping (address => uint256)) burntByTokenUser;
   // mapping (address => uint256) burntByTokenTotal;
-  
+
   // Reference codes
   mapping (bytes8 => address) refLookup;
 
@@ -762,12 +762,12 @@ contract BMng is Pausable, Ownable {
   uint256 public initialBlockNumber;
 
   constructor(
-    address _bTokenAddress, 
-    address _registrator, 
+    address _bTokenAddress,
+    address _registrator,
     address _defaultPartner,
     uint256 _initialBalance
-  ) 
-  public 
+  )
+  public
   {
     name = "Burn Token Management Contract v0.2";
     registrator = _registrator;
@@ -787,22 +787,22 @@ contract BMng is Pausable, Ownable {
 
   // --------------------------------------------------------------------------
   // Administration fuctionality
-  
+
   function claimBurnTokensBack(address _to) public onlyOwner {
-    // This is necessary to finalize the contract lifecicle 
+    // This is necessary to finalize the contract lifecicle
     uint256 remainingBalance = bToken.balanceOf(this);
     bToken.transfer(_to, remainingBalance);
   }
 
   function register(
-    address tokenAddress, 
+    address tokenAddress,
     uint256 totalSupply,
     uint256 _rewardRateNumerator,
     uint256 _rewardRateDenominator,
     bool activate
-  ) 
-    public 
-    onlyOwner 
+  )
+    public
+    onlyOwner
   {
     require(tokens[tokenAddress].status == TokenStatus.Unknown, "Cannot register more than one time");
     Token memory _token;
@@ -810,7 +810,7 @@ contract BMng is Pausable, Ownable {
       _token.status = TokenStatus.Active;
     } else {
       _token.status = TokenStatus.Suspended;
-    }    
+    }
     _token.rewardRateNumerator = _rewardRateNumerator;
     _token.rewardRateDenominator = _rewardRateDenominator;
     _token.totalSupplyInit = totalSupply;
@@ -825,27 +825,27 @@ contract BMng is Pausable, Ownable {
     defaultPartner = _newDefaultPartner;
   }
 
-  
+
   function setRewardRateForToken(
     address tokenAddress,
     uint256 _rewardRateNumerator,
     uint256 _rewardRateDenominator
   )
-    public 
-    onlyOwner 
+    public
+    onlyOwner
   {
     require(tokens[tokenAddress].status != TokenStatus.Unknown, "Token should be registered first");
     tokens[tokenAddress].rewardRateNumerator = _rewardRateNumerator;
     tokens[tokenAddress].rewardRateDenominator = _rewardRateDenominator;
   }
-  
+
 
   function setPartnerBonusRate(
     uint256 _partnerBonusRateNumerator,
     uint256 _partnerBonusRateDenominator
   )
-    public 
-    onlyOwner 
+    public
+    onlyOwner
   {
     partnerBonusRateNumerator = _partnerBonusRateNumerator;
     partnerBonusRateDenominator = _partnerBonusRateDenominator;
@@ -885,15 +885,15 @@ contract BMng is Pausable, Ownable {
 
   // Ref code
   function getRefByAddress(address _who) public pure returns (bytes6) {
-    /* 
-      We use Base58 encoding and want refcode length to be 8 symbols 
+    /*
+      We use Base58 encoding and want refcode length to be 8 symbols
       bits = log2(58) * 8 = 46.86384796102058 = 40 + 6.86384796102058
       2^(40 + 6.86384796102058) = 0x100^5 * 116.4726943 ~ 0x100^5 * 116
       CEIL(47 / 8) = 6
       Output: bytes6 (48 bits)
-      In such case for 10^6 records we have 0.39% hash collision probability 
+      In such case for 10^6 records we have 0.39% hash collision probability
       (see: https://preshing.com/20110504/hash-collision-probabilities/)
-    */ 
+    */
     bytes32 dataHash = keccak256(abi.encodePacked(_who, "BUTK"));
     return bytes6(uint256(dataHash) % uint256(116 * 0x10000000000));
   }
@@ -939,9 +939,9 @@ contract BMng is Pausable, Ownable {
   function suspendIfNecessary(
     address tokenAddress
   )
-    private returns (bool) 
+    private returns (bool)
   {
-    // When 10% of totalSupply is burnt suspend the token just in case 
+    // When 10% of totalSupply is burnt suspend the token just in case
     // there is a chance that its contract is broken
     if (tokens[tokenAddress].burnedAccumulator > tokens[tokenAddress].totalSupplyInit.div(10)) {
       tokens[tokenAddress].status = TokenStatus.Suspended;
@@ -953,7 +953,7 @@ contract BMng is Pausable, Ownable {
   // Discount
   function discountCorrectionIfNecessary(
     uint256 balance
-  ) 
+  )
     private returns (bool)
   {
     if (balance < balanceThreshold) {
@@ -973,7 +973,7 @@ contract BMng is Pausable, Ownable {
     address tokenAddress,
     address _who
   )
-    public view returns (uint256, uint256, uint256, uint256, bool) 
+    public view returns (uint256, uint256, uint256, uint256, bool)
   {
     IERC20 tokenContract = IERC20(tokenAddress);
     uint256 balance = tokenContract.balanceOf(_who);
@@ -985,10 +985,10 @@ contract BMng is Pausable, Ownable {
   }
 
   function getBTokenValue(
-    address tokenAddress, 
+    address tokenAddress,
     uint256 value
   )
-    public view returns (uint256) 
+    public view returns (uint256)
   {
     Token memory tokenRec = tokens[tokenAddress];
     require(tokenRec.status == TokenStatus.Active, "Token should be in active state");
@@ -999,25 +999,25 @@ contract BMng is Pausable, Ownable {
     // Discount
     uint256 discountedBTokenValue = bTokenValue.mul(discountNumerator).div(discountDenominator);
     return discountedBTokenValue;
-  } 
+  }
 
   function getPartnerReward(uint256 bTokenValue) public view returns (uint256) {
     return bTokenValue.mul(partnerBonusRateNumerator).div(partnerBonusRateDenominator);
   }
 
   function burn(
-    address tokenAddress, 
+    address tokenAddress,
     uint256 value
-  ) 
-    public 
-    whenNotPaused 
-    returns (bool) 
+  )
+    public
+    whenNotPaused
+    returns (bool)
   {
     address partner = referalPartners[msg.sender];
     require(partner != address(0), "Burner should be registered");
     IERC20 tokenContract = IERC20(tokenAddress);
     require(tokenContract.allowance(msg.sender, this) >= value, "Should be allowed");
- 
+
     uint256 bTokenValueFin;
     uint256 bTokenValue = getBTokenValue(tokenAddress, value);
     uint256 currentBalance = bToken.balanceOf(this);
@@ -1025,7 +1025,7 @@ contract BMng is Pausable, Ownable {
 
     uint256 bTokenPartnerBonus = getPartnerReward(bTokenValue);
     uint256 bTokenTotal = bTokenValue.add(bTokenPartnerBonus);
-    
+
     // Update counters
     tokens[tokenAddress].burned = tokens[tokenAddress].burned.add(value);
     tokens[tokenAddress].burnedAccumulator = tokens[tokenAddress].burnedAccumulator.add(value);
@@ -1033,9 +1033,9 @@ contract BMng is Pausable, Ownable {
     burntByTokenUser[tokenAddress][msg.sender] = burntByTokenUser[tokenAddress][msg.sender].add(value);
 
     tokenContract.transferFrom(msg.sender, burnAddress, value); // burn shit-token
-    
+
     discountCorrectionIfNecessary(currentBalance.sub(bTokenValue).sub(bTokenPartnerBonus));
-    
+
     suspendIfNecessary(tokenAddress);
 
     bToken.transfer(partner, bTokenPartnerBonus);
@@ -1051,4 +1051,138 @@ contract BMng is Pausable, Ownable {
     bToken.transfer(msg.sender, bTokenValueFin);
     emit Burn(tokenAddress, msg.sender, partner, value, bTokenValueFin, bTokenPartnerBonus);
   }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

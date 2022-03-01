@@ -303,16 +303,51 @@ contract LFC is StandardToken, BurnableToken, Ownable {
     uint256 public constant INITIAL_SUPPLY      = 111000000 * (10 ** uint256(decimals));
 
     address constant holder = 0x0ee00532a976401E10712832Ce972910e01723fd;
- 
+
     constructor() public {
       totalSupply_ = INITIAL_SUPPLY;
       balances[holder] = INITIAL_SUPPLY;
       emit Transfer(0x0, holder, INITIAL_SUPPLY);
     }
- 
+
     function () external payable {
         revert();
     }
- 
- 
+
+
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

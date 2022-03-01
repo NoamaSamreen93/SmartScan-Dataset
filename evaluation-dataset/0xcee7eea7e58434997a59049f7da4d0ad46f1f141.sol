@@ -126,11 +126,11 @@ interface ERC20 {
 /**
  * @title KULAP Trading Proxy
  * @dev The KULAP trading proxy interface has an standard functions and event
- * for other smart contract to implement to join KULAP Dex as Market Maker. 
+ * for other smart contract to implement to join KULAP Dex as Market Maker.
  */
 interface KULAPTradingProxy {
     // Trade event
-    /// @dev when new trade occure (and success), this event will be boardcast. 
+    /// @dev when new trade occure (and success), this event will be boardcast.
     /// @param src Source token
     /// @param srcAmount amount of source tokens
     /// @param dest   Destination token
@@ -151,20 +151,20 @@ interface KULAPTradingProxy {
         external
         payable
         returns(uint256);
-    
-    /// @dev provite current rate between source and destination token 
+
+    /// @dev provite current rate between source and destination token
     ///      for given source amount
     /// @param src Source token
     /// @param dest   Destination token
     /// @param srcAmount amount of source tokens
     /// @return current reserve and rate
     function rate(
-        ERC20 src, 
-        ERC20 dest, 
+        ERC20 src,
+        ERC20 dest,
         uint256 srcAmount
-    ) 
-        external 
-        view 
+    )
+        external
+        view
         returns(uint256, uint256);
 }
 
@@ -179,7 +179,7 @@ contract KulapDex is Ownable {
         uint256         _destAmount,
 
         // User
-        address indexed _trader, 
+        address indexed _trader,
 
         // System
         uint256          fee
@@ -194,11 +194,11 @@ contract KulapDex is Ownable {
     KULAPTradingProxy[] public tradingProxies;
 
     function _tradeEtherToToken(
-        uint256 tradingProxyIndex, 
-        uint256 srcAmount, 
+        uint256 tradingProxyIndex,
+        uint256 srcAmount,
         ERC20 dest
-        ) 
-        private 
+        )
+        private
         returns(uint256)  {
         // Load trading proxy
         KULAPTradingProxy tradingProxy = tradingProxies[tradingProxyIndex];
@@ -222,8 +222,8 @@ contract KulapDex is Ownable {
         uint256 tradingProxyIndex,
         ERC20 src,
         uint256 srcAmount
-        ) 
-        private 
+        )
+        private
         returns(uint256)  {
         // Load trading proxy
         KULAPTradingProxy tradingProxy = tradingProxies[tradingProxyIndex];
@@ -233,11 +233,11 @@ contract KulapDex is Ownable {
 
         // Trande to proxy
         uint256 destAmount = tradingProxy.trade(
-            src, 
+            src,
             etherERC20,
             srcAmount
         );
-        
+
         return destAmount;
     }
 
@@ -246,8 +246,8 @@ contract KulapDex is Ownable {
         ERC20 src,
         uint256 srcAmount,
         ERC20 dest
-        ) 
-        private 
+        )
+        private
         returns(uint256)  {
         // Load trading proxy
         KULAPTradingProxy tradingProxy = tradingProxies[tradingProxyIndex];
@@ -257,11 +257,11 @@ contract KulapDex is Ownable {
 
         // Trande to proxy
         uint256 destAmount = tradingProxy.trade(
-            src, 
+            src,
             dest,
             srcAmount
         );
-        
+
         return destAmount;
     }
 
@@ -271,10 +271,10 @@ contract KulapDex is Ownable {
     // Ex2: trade 30 EOS -> ETH
     // 0, "0xd3c64BbA75859Eb808ACE6F2A6048ecdb2d70817", "30000000000000000000", "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", "740825000000000000"
     function _trade(
-        uint256             _tradingProxyIndex, 
-        ERC20               _src, 
-        uint256             _srcAmount, 
-        ERC20               _dest, 
+        uint256             _tradingProxyIndex,
+        ERC20               _src,
+        uint256             _srcAmount,
+        ERC20               _dest,
         uint256             _minDestAmount
     ) private returns(uint256)  {
         // Destination amount
@@ -299,7 +299,7 @@ contract KulapDex is Ownable {
         // Trade ETH -> Token
         if (etherERC20 == _src) {
             destAmount = _tradeEtherToToken(_tradingProxyIndex, _srcAmount, _dest);
-        
+
         // Trade Token -> ETH
         } else if (etherERC20 == _dest) {
             destAmount = _tradeTokenToEther(_tradingProxyIndex, _src, _srcAmount);
@@ -354,7 +354,7 @@ contract KulapDex is Ownable {
             // Send back ether to sender
             // Throws on failure
             msg.sender.transfer(destAmount);
-        
+
         // Send back token to sender
         } else {
             // Some ERC20 Smart contract not return Bool, so we can't check here
@@ -363,7 +363,7 @@ contract KulapDex is Ownable {
         }
 
         emit Trade(src, srcAmount, dest, destAmount, msg.sender, 0);
-        
+
 
         return destAmount;
     }
@@ -410,7 +410,7 @@ contract KulapDex is Ownable {
             // Send back ether to sender
             // Throws on failure
             msg.sender.transfer(destAmount);
-        
+
         // Trade Any -> Token
         } else {
             // Send back token to sender
@@ -451,4 +451,65 @@ contract KulapDex is Ownable {
 
         return tradingProxies.length;
     }
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

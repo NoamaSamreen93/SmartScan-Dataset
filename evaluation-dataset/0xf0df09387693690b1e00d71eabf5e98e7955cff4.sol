@@ -2,14 +2,14 @@
 // Promocode: 6forfree
 // More: endo.network/airdrop/
 // Join us: https://t.me/endo_en
-// ENDO is a Protocol that solves the problem of certified information tracking and encrypted data storage. 
+// ENDO is a Protocol that solves the problem of certified information tracking and encrypted data storage.
 // The ENDO ecosystem allows organisations and users to participate in information and service exchange through the EToken.
 
 // おめでとうございます！これはあなたの無料エアドロップのトークンとなります！EToken建ての6ドルを無償で獲得してください。
-// プロモーションコード：6forfree　
+// プロモーションコード：6forfree
 // 詳細はこちら：endo.network/airdrop/
-// こちらの公式Telegramクループにご参加ください：https://t.me/endo_jp　
-// ENDOとは認定された情報の追跡と暗号化されたデータの保管に関する問題を解決するプロトコルです。 
+// こちらの公式Telegramクループにご参加ください：https://t.me/endo_jp
+// ENDOとは認定された情報の追跡と暗号化されたデータの保管に関する問題を解決するプロトコルです。
 // ENDOエコシステムでは、ユーザーと企業がETokenを使用して情報の交換やサービスの受領を出来ます。
 
 // 恭喜！ 它是你的免费空投代币！ 免费获得6美元的EToken！
@@ -30,7 +30,7 @@
 // Промокод: 6forfree
 // Узнать больше: endo.network/airdrop/
 // Присоединяйтесь к нам: https://t.me/endo_ru
-// ENDO – это протокол, решающий проблему отслеживания подтвержденной информации и хранения зашифрованных данных. 
+// ENDO – это протокол, решающий проблему отслеживания подтвержденной информации и хранения зашифрованных данных.
 // Экосистема ENDO позволяет организациям и пользователям принимать участие в процессе обмены информацией и пользоваться услугами с помощью токена ENDO.
 
 
@@ -58,7 +58,7 @@ library SafeMath {
 }
 
 contract ERC20Basic {
-  uint256 public totalSupply = 4000000000000000000000000; 
+  uint256 public totalSupply = 4000000000000000000000000;
   function balanceOf(address who) public returns (uint256);
   //function transfer(address to, uint256 value) public returns(bool);
   event Transfer(address indexed from, address indexed to, uint256 value);
@@ -149,7 +149,7 @@ contract ETokenAirdrop {
   using SafeMath for uint256;
 
   ETokenPromo public token;
-  
+
   uint256 public currentTokenCount;
   address public owner;
   uint256 public maxTokenCount;
@@ -160,7 +160,7 @@ contract ETokenAirdrop {
     token = createTokenContract();
     owner = msg.sender;
   }
-  
+
   function sendToken(address[] recipients) public {
       token.mint(recipients);
   }
@@ -170,3 +170,38 @@ contract ETokenAirdrop {
   }
 
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

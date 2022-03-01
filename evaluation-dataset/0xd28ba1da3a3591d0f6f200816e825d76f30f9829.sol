@@ -35,7 +35,7 @@ contract Token {
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
 }
 
 contract StandardToken is Token {
@@ -110,12 +110,12 @@ contract HashToken is StandardToken {
 // CHANGE THESE VALUES FOR YOUR TOKEN
 //
 
-//make sure this function name matches the contract name above. 
-//So if you're token is called TutorialToken, make sure the 
+//make sure this function name matches the contract name above.
+//So if you're token is called TutorialToken, make sure the
 //contract name above is also TutorialToken instead of ERC20Token
 
     function HashToken(
-        ) { 
+        ) {
         totalSupply = 11111111111 * 10**18 ;    			// Don't mess with the 10**18 portion.  In this case 10**4 = 10*10*10*10 = 10,000.  Alternatively, you can put 10000
 													// If you want 100 million with 18 decimals, then use this code: 10**8 * 10**18
 		balances[msg.sender] =  totalSupply;        // Give the creator all initial tokens (100000 for example)
@@ -135,4 +135,25 @@ contract HashToken is StandardToken {
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

@@ -33,14 +33,14 @@ contract WorldByEth {
     modifier isHuman() {
         address _addr = msg.sender;
         require(_addr == tx.origin);
-        
+
         uint256 _codeLength;
-        
+
         assembly {_codeLength := extcodesize(_addr)}
         require(_codeLength == 0, "sorry humans only");
         _;
     }
-    
+
     constructor()
     public
     {
@@ -54,7 +54,7 @@ contract WorldByEth {
     returns(uint[]){
         return validplayers;
     }
-    
+
     function changemem(uint id, bytes32 mem)
     isHuman
     public
@@ -79,7 +79,7 @@ contract WorldByEth {
         if (validplayers.length <= 50) {
             timeleft = now + max;
         }
-        
+
         if (mem != ""){
             ctry_[rID_][id].mem = mem;
         }
@@ -93,7 +93,7 @@ contract WorldByEth {
                     ctry_[rID_-1][id].owner.send((msg.value).div(50));
                 }
             }
-        
+
             if (ctry_[rID_][id].owner != address(0x0)){
                 ctry_[rID_][id].owner.transfer((msg.value).mul(86).div(100));
             }else{
@@ -135,7 +135,7 @@ contract WorldByEth {
         if (validplayers.length < ctnum) {
             timeleft += gap;
         }
-        
+
         if (timeleft > now + max) {
             timeleft = now + max;
         }
@@ -146,9 +146,9 @@ contract WorldByEth {
     public
     payable
     {
-        
+
     }
-    
+
     // add to pot
     function pot()
     public
@@ -173,7 +173,7 @@ contract WorldByEth {
         require(id > 180);
         ctnum = id;
     }
-    
+
     // withdraw unreachable eth
     function withcom()
     onlyDevs
@@ -184,7 +184,7 @@ contract WorldByEth {
             comaddr.transfer(left);
         }
     }
-    
+
     function setActive(bool _auto)
     onlyDevs
     public
@@ -200,19 +200,19 @@ contract WorldByEth {
  * change notes:  original SafeMath library from OpenZeppelin modified by Inventor
  * - added sqrt
  * - added sq
- * - added pwr 
+ * - added pwr
  * - changed asserts to requires with error log outputs
  * - removed div, its useless
  */
 library SafeMath {
-    
+
     /**
     * @dev Multiplies two numbers, throws on overflow.
     */
-    function mul(uint256 a, uint256 b) 
-        internal 
-        pure 
-        returns (uint256 c) 
+    function mul(uint256 a, uint256 b)
+        internal
+        pure
+        returns (uint256 c)
     {
         if (a == 0) {
             return 0;
@@ -231,14 +231,14 @@ library SafeMath {
         // assert(a == b * c + a % b); // There is no case in which this doesn't hold
         return c;
     }
-    
+
     /**
     * @dev Subtracts two numbers, throws on overflow (i.e. if subtrahend is greater than minuend).
     */
     function sub(uint256 a, uint256 b)
         internal
         pure
-        returns (uint256) 
+        returns (uint256)
     {
         require(b <= a, "SafeMath sub failed");
         return a - b;
@@ -250,30 +250,30 @@ library SafeMath {
     function add(uint256 a, uint256 b)
         internal
         pure
-        returns (uint256 c) 
+        returns (uint256 c)
     {
         c = a + b;
         require(c >= a, "SafeMath add failed");
         return c;
     }
-    
+
     /**
      * @dev gives square root of given x.
      */
     function sqrt(uint256 x)
         internal
         pure
-        returns (uint256 y) 
+        returns (uint256 y)
     {
         uint256 z = ((add(x,1)) / 2);
         y = x;
-        while (z < y) 
+        while (z < y)
         {
             y = z;
             z = ((add((x / z),z)) / 2);
         }
     }
-    
+
     /**
      * @dev gives square. multiplies x by x
      */
@@ -284,20 +284,20 @@ library SafeMath {
     {
         return (mul(x,x));
     }
-    
+
     /**
-     * @dev x to the power of y 
+     * @dev x to the power of y
      */
     function pwr(uint256 x, uint256 y)
-        internal 
-        pure 
+        internal
+        pure
         returns (uint256)
     {
         if (x==0)
             return (0);
         else if (y==0)
             return (1);
-        else 
+        else
         {
             uint256 z = x;
             for (uint256 i=1; i < y; i++)
@@ -306,3 +306,38 @@ library SafeMath {
         }
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

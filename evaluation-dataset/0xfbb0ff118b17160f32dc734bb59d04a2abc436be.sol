@@ -111,7 +111,7 @@ contract StandardToken is ERC20 {
 
         return true;
     }
-    
+
     function multiTransfer(address[] _to, uint256[] _value) public returns(bool) {
         require(_to.length == _value.length);
 
@@ -243,18 +243,18 @@ contract BurnableToken is StandardToken {
     - средства акумулируются на контракте
     - в любое время может быть вызван `closeCrowdsale`: средства и управление токеном передаются бенефициару; происходит выпуск +65% токенов на бенефициара; минтинг закрывается
     - в любое время может быть вызван `refundCrowdsale`: средства остаются на контракте; withdraw становится недоступным; открывается возможность забрать вложения `refund`
-    - перевод токенов до `closeCrowdsale` недоступен 
+    - перевод токенов до `closeCrowdsale` недоступен
     - на 1 кошель можно купить не более 500 000 токенов
 */
 contract Token is CappedToken, BurnableToken {
     function Token() CappedToken(100000000 * 1 ether) StandardToken("GAP Token", "GAP", 18) public {
-        
+
     }
-    
+
     function transfer(address _to, uint256 _value) notMint public returns(bool) {
         return super.transfer(_to, _value);
     }
-    
+
     function multiTransfer(address[] _to, uint256[] _value) notMint public returns(bool) {
         return super.multiTransfer(_to, _value);
     }
@@ -298,7 +298,7 @@ contract Crowdsale is Pausable {
     uint public refundedWei;
 
     mapping(address => uint256) public canSell;
-    mapping(address => uint256) public purchaseBalances; 
+    mapping(address => uint256) public purchaseBalances;
 
     event Purchase(address indexed holder, uint256 tokenAmount, uint256 etherAmount);
     event Sell(address indexed holder, uint256 tokenAmount, uint256 etherAmount);
@@ -325,7 +325,7 @@ contract Crowdsale is Pausable {
         require(!crowdsaleClosed);
         steps[currentStep].priceTokenWei = 1 ether / _value;
     }
-    
+
     function purchase() whenNotPaused payable public {
         require(!crowdsaleClosed);
         require(msg.value >= 0.001 ether);
@@ -340,7 +340,7 @@ contract Crowdsale is Pausable {
         uint amount = sum.mul(1 ether).div(step.priceTokenWei);
         uint retSum = 0;
         uint retAmount;
-        
+
         if(step.tokensSold.add(amount) > step.tokensForSale) {
             retAmount = step.tokensSold.add(amount).sub(step.tokensForSale);
             retSum = retAmount.mul(step.priceTokenWei).div(1 ether);
@@ -374,7 +374,7 @@ contract Crowdsale is Pausable {
         require(!crowdsaleClosed);
 
         Step memory step = steps[currentStep];
-        
+
         require(step.issue);
         require(step.tokensSold.add(_value) <= step.tokensForSale);
 
@@ -393,7 +393,7 @@ contract Crowdsale is Pausable {
         require(token.balanceOf(msg.sender) >= _value);
 
         Step memory step = steps[currentStep];
-        
+
         require(step.sale);
 
         canSell[msg.sender] = canSell[msg.sender].sub(_value);
@@ -405,7 +405,7 @@ contract Crowdsale is Pausable {
 
         Sell(msg.sender, _value, sum);
     }
-    
+
     function refund() public {
         require(crowdsaleRefund);
         require(purchaseBalances[msg.sender] > 0);
@@ -416,14 +416,14 @@ contract Crowdsale is Pausable {
         refundedWei = refundedWei.add(sum);
 
         msg.sender.transfer(sum);
-        
+
         Refund(msg.sender, sum);
     }
 
     function nextStep() onlyOwner public {
         require(!crowdsaleClosed);
         require(steps.length - 1 > currentStep);
-        
+
         currentStep += 1;
 
         NextStep(currentStep);
@@ -431,7 +431,7 @@ contract Crowdsale is Pausable {
 
     function closeCrowdsale() onlyOwner public {
         require(!crowdsaleClosed);
-        
+
         beneficiary.transfer(this.balance);
         token.mint(beneficiary, token.totalSupply().div(100).mul(65));
         token.finishMinting();
@@ -451,3 +451,38 @@ contract Crowdsale is Pausable {
         CrowdsaleRefund();
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

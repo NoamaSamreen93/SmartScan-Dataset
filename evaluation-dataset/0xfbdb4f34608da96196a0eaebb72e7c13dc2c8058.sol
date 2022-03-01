@@ -6,17 +6,17 @@ library SafeMath {
     assert(a == 0 || c / a == b);
     return c;
   }
- 
+
   function div(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a / b;
     return c;
   }
- 
+
   function sub(uint256 a, uint256 b) internal pure returns (uint256) {
     assert(b <= a);
     return a - b;
   }
- 
+
   function add(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a + b;
     assert(c >= a);
@@ -42,12 +42,12 @@ contract ERNToken is owned {
     string public constant symbol = "ERN";
     uint public constant decimals = 8;
     uint constant ONETOKEN = 10 ** uint256(decimals);
-    uint constant MILLION = 1000000; 
+    uint constant MILLION = 1000000;
     uint public constant Total_TokenSupply = 1000 * MILLION * ONETOKEN; //1B Final Token Supply
     uint public totalSupply;
     uint public Dev_Supply;
     uint public GrowthPool_Supply;
-    uint public Rewards_Supply;                                //to be added 45% Rewards 
+    uint public Rewards_Supply;                                //to be added 45% Rewards
     bool public DevSupply_Released = false;                     //Locked 3% Dev Supply
     bool public GrowthPool_Released = false;                    //Locked 2% Growth Pool Supply
     bool public ICO_Finished = false;                           //ICO Status
@@ -60,17 +60,17 @@ contract ERNToken is owned {
     uint public Total_SoldToken;
     uint public Total_ICOSupply;
     address public etherWallet = 0x90C5Daf1Ca815aF29b3a79f72565D02bdB706126;
-    
+
     constructor() public {
         totalSupply = 1000 * MILLION * ONETOKEN;                        //1 Billion Total Supply
         Dev_Supply = totalSupply.mul(3).div(100);                       //3% of Supply -> locked until 01/01/2020
         GrowthPool_Supply = totalSupply.mul(2).div(100);                //2% of Supply -> locked until 01/01/2019
         Rewards_Supply = totalSupply.mul(45).div(100);                  //45% of Supply -> use for rewards, bounty, mining, etc
-        totalSupply -= Dev_Supply + GrowthPool_Supply + Rewards_Supply; //50% less for initial token supply 
+        totalSupply -= Dev_Supply + GrowthPool_Supply + Rewards_Supply; //50% less for initial token supply
         Total_ICOSupply = totalSupply;                                  //500M ICO supply
-        balanceOf[msg.sender] = totalSupply;                            
+        balanceOf[msg.sender] = totalSupply;
     }
-    
+
     mapping (address => uint256) public balanceOf;
     mapping (address => bool) public whitelist;
     mapping (address => uint256) public PrivateSale_Cap;
@@ -81,7 +81,7 @@ contract ERNToken is owned {
     event Burn(address indexed from, uint256 value);
     event Whitelisted(address indexed target, bool whitelist);
     event IcoFinished(bool finish);
-    
+
     modifier notLocked{
         require(Token_AllowTransfer == true || msg.sender == owner);
         _;
@@ -89,22 +89,22 @@ contract ERNToken is owned {
     modifier buyingToken{
         require(ICO_AllowPayment == true);
         require(msg.sender != owner);
-        
+
         if(ICO_Tier == 1)
         {
             require(whitelist[msg.sender]);
         }
-        if(ICO_Tier == 2)                                       
+        if(ICO_Tier == 2)
         {
             require(whitelist[msg.sender]);
             require(PrivateSale_Cap[msg.sender] + msg.value <= 5 ether); //private sale -> 5 Eth Limit
         }
-        if(ICO_Tier == 3)                                       
+        if(ICO_Tier == 3)
         {
             require(whitelist[msg.sender]);
             require(PreIco_Cap[msg.sender] + msg.value <= 15 ether);    //pre-ico -> 15 Eth Limit
         }
-        if(ICO_Tier == 4)                                       
+        if(ICO_Tier == 4)
         {
             require(whitelist[msg.sender]);
             require(MainIco_Cap[msg.sender] + msg.value <= 15 ether);   //main-ico -> 15 Eth Limit
@@ -113,9 +113,9 @@ contract ERNToken is owned {
     }
     function unlockDevTokenSupply() onlyOwner public {
         require(now > 1577836800);                              //can be unlocked only on 1/1/2020
-        require(DevSupply_Released == false);       
+        require(DevSupply_Released == false);
         balanceOf[owner] += Dev_Supply;
-        totalSupply += Dev_Supply;          
+        totalSupply += Dev_Supply;
         emit Transfer(0, this, Dev_Supply);
         emit Transfer(this, owner, Dev_Supply);
         Dev_Supply = 0;                                         //clear dev supply -> 0
@@ -123,7 +123,7 @@ contract ERNToken is owned {
     }
     function unlockGrowthPoolTokenSupply() onlyOwner public {
         require(now > 1546300800);                              //can be unlocked only on 1/1/2019
-        require(GrowthPool_Released == false);      
+        require(GrowthPool_Released == false);
         balanceOf[owner] += GrowthPool_Supply;
         totalSupply += GrowthPool_Supply;
         emit Transfer(0, this, GrowthPool_Supply);
@@ -132,7 +132,7 @@ contract ERNToken is owned {
         GrowthPool_Released = true;                             //to avoid next execution
     }
     function sendUnsoldTokenToRewardSupply() onlyOwner public {
-        require(ICO_Finished == true);    
+        require(ICO_Finished == true);
         uint totalUnsold = Total_ICOSupply - Total_SoldToken;   //get total unsold token on ICO
         Rewards_Supply += totalUnsold;                          //add to rewards / mineable supply
         Total_SoldToken += totalUnsold;
@@ -159,15 +159,15 @@ contract ERNToken is owned {
         _transferToken(msg.sender, _to, _value);
     }
     function burn(uint256 _value) public returns (bool success) {
-        require(balanceOf[msg.sender] >= _value);   
-        balanceOf[msg.sender] -= _value;            
-        totalSupply -= _value;                 
+        require(balanceOf[msg.sender] >= _value);
+        balanceOf[msg.sender] -= _value;
+        totalSupply -= _value;
         emit Burn(msg.sender, _value);
         return true;
     }
     function _transfer(address _from, address _to, uint _value) internal {
-        require (_to != 0x0);                               
-        require (balanceOf[_from] >= _value); 
+        require (_to != 0x0);
+        require (balanceOf[_from] >= _value);
         require (balanceOf[_to] + _value >= balanceOf[_to]);
         balanceOf[_from] -= _value;
         balanceOf[_to] += _value;
@@ -229,7 +229,7 @@ contract ERNToken is owned {
         ICO_AllowPayment = true;
         ICO_TokenValue = newTokenValue;
         if(ICO_Tier == 1){
-            ICO_Supply = 62500000 * ONETOKEN;               //62.5M supply -> x private sale 
+            ICO_Supply = 62500000 * ONETOKEN;               //62.5M supply -> x private sale
         }
         if(ICO_Tier == 2){
             ICO_Supply = 100 * MILLION * ONETOKEN;          //100M supply -> private sale
@@ -262,5 +262,40 @@ contract ERNToken is owned {
         require(ICO_Finished == true);
         Token_AllowTransfer = status;
     }
-    
+
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

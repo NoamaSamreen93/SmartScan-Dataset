@@ -1,13 +1,13 @@
 pragma solidity ^0.4.25;
 
 /**
-  _____ _            _   _  ___  ____  _        ____                                      _ _         
- |_   _| |__   ___  | | | |/ _ \|  _ \| |      / ___|___  _ __ ___  _ __ ___  _   _ _ __ (_) |_ _   _ 
+  _____ _            _   _  ___  ____  _        ____                                      _ _
+ |_   _| |__   ___  | | | |/ _ \|  _ \| |      / ___|___  _ __ ___  _ __ ___  _   _ _ __ (_) |_ _   _
    | | | '_ \ / _ \ | |_| | | | | | | | |     | |   / _ \| '_ ` _ \| '_ ` _ \| | | | '_ \| | __| | | |
    | | | | | |  __/ |  _  | |_| | |_| | |___  | |__| (_) | | | | | | | | | | | |_| | | | | | |_| |_| |
    |_| |_| |_|\___| |_| |_|\___/|____/|_____|  \____\___/|_| |_| |_|_| |_| |_|\__,_|_| |_|_|\__|\__, |
-                                                                                                |___/ 
-																								
+                                                                                                |___/
+
 	Special thanks to P3D Hourglass scheme.
 	Hey, don't do drugs!
 */
@@ -51,13 +51,13 @@ contract Prosperity {
         require(myTokens() > 0);
         _;
     }
-    
+
     // only people with profits
     modifier onlyStronghands() {
         require(myDividends(true) > 0);
         _;
     }
-    
+
     // administrators can:
     // -> change the name of the contract
     // -> change the name of the token
@@ -72,31 +72,31 @@ contract Prosperity {
         require(administrator == _customerAddress);
         _;
     }
-    
+
     // ensures that the first tokens in the contract will be equally distributed
     // meaning, no divine dump will be ever possible
     // result: healthy longevity.
     modifier antiEarlyWhale(uint256 _amountOfEthereum){
         address _customerAddress = msg.sender;
-        
+
         // are we still in the vulnerable phase?
-        // if so, enact anti early whale protocol 
-        if( onlyAmbassadors && 
+        // if so, enact anti early whale protocol
+        if( onlyAmbassadors &&
 			((totalEthereumBalance() - _amountOfEthereum) <= ambassadorQuota_ ) &&
 			now < ACTIVATION_TIME)
 		{
             require(
                 // is the customer in the ambassador list?
                 ambassadors_[_customerAddress] == true &&
-                
+
                 // does the customer purchase exceed the max ambassador quota?
                 (ambassadorAccumulatedQuota_[_customerAddress] + _amountOfEthereum) <= ambassadorMaxPurchase_
-                
+
             );
-            
-            // updated the accumulated quota    
+
+            // updated the accumulated quota
             ambassadorAccumulatedQuota_[_customerAddress] = SafeMath.add(ambassadorAccumulatedQuota_[_customerAddress], _amountOfEthereum);
-        
+
         } else {
             // in case the ether count drops low, the ambassador phase won't reinitiate
 			// only write state variable once
@@ -104,38 +104,38 @@ contract Prosperity {
 				onlyAmbassadors = false;
 			}
         }
-		
+
 		_;
     }
-	
+
 	// ambassadors are not allowed to sell their tokens within the anti-pump-and-dump phase
 	// @Sordren
 	// hopefully many devs will use this as a standard
 	modifier ambassAntiPumpAndDump() {
-		
+
 		// we are still in ambassadors antiPumpAndDump phase
 		if (now <= antiPumpAndDumpEnd_) {
 			address _customerAddress = msg.sender;
-			
+
 			// require sender is not an ambassador
 			require(!ambassadors_[_customerAddress]);
 		}
-	
+
 		// execute
 		_;
 	}
-	
+
 	// ambassadors are not allowed to transfer tokens to non-amassador accounts within the anti-pump-and-dump phase
 	// @Sordren
 	modifier ambassOnlyToAmbass(address _to) {
-		
+
 		// we are still in ambassadors antiPumpAndDump phase
 		if (now <= antiPumpAndDumpEnd_){
 			address _from = msg.sender;
-			
+
 			// sender is ambassador
 			if (ambassadors_[_from]) {
-				
+
 				// sender is not the lending
 				// this is required for withdrawing capital from lending
 				if (_from != lendingAddress_) {
@@ -144,12 +144,12 @@ contract Prosperity {
 				}
 			}
 		}
-		
+
 		// execute
 		_;
 	}
-    
-    
+
+
     /*==============================
     =            EVENTS            =
     ==============================*/
@@ -159,32 +159,32 @@ contract Prosperity {
         uint256 tokensMinted,
         address indexed referredBy
     );
-    
+
     event onTokenSell(
         address indexed customerAddress,
         uint256 tokensBurned,
         uint256 ethereumEarned
     );
-    
+
     event onReinvestment(
         address indexed customerAddress,
         uint256 ethereumReinvested,
         uint256 tokensMinted
     );
-    
+
     event onWithdraw(
         address indexed customerAddress,
         uint256 ethereumWithdrawn
     );
-    
+
     // ERC20
     event Transfer(
         address indexed from,
         address indexed to,
         uint256 tokens
     );
-    
-    
+
+
     /*=====================================
     =            CONFIGURABLES            =
     =====================================*/
@@ -196,24 +196,24 @@ contract Prosperity {
 	uint8 constant internal referralBonus_ = 5;
     uint256 constant internal tokenPriceInitial_ =     0.0000001 ether;
     uint256 constant internal tokenPriceIncremental_ = 0.000000005 ether;
-    uint256 constant internal magnitude = 2**64;	
-    
+    uint256 constant internal magnitude = 2**64;
+
     // proof of stake (defaults at 100 tokens)
     uint256 public stakingRequirement = 20e18;
-    
+
     // ambassador program
     uint256 constant internal ambassadorMaxPurchase_ = 2 ether;
     uint256 constant internal ambassadorQuota_ = 20 ether;
-	
+
 	// anti pump and dump phase time (default 30 days)
 	uint256 constant internal antiPumpAndDumpTime_ = 90 days;								// remember it is constant, so it cannot be changed after deployment
 	uint256 constant public antiPumpAndDumpEnd_ = ACTIVATION_TIME + antiPumpAndDumpTime_;	// set anti-pump-and-dump time to 30 days after deploying
 	uint256 constant internal ACTIVATION_TIME = 1541966400;
-	
+
 	// when this is set to true, only ambassadors can purchase tokens (this prevents a whale premine, it ensures a fairly distributed upper pyramid)
     bool public onlyAmbassadors = true;
-    
-    
+
+
    /*================================
     =            DATASETS            =
     ================================*/
@@ -225,21 +225,21 @@ contract Prosperity {
     mapping(address => uint256) internal ambassadorAccumulatedQuota_;
     uint256 internal tokenSupply_ = 0;
     uint256 internal profitPerShare_;
-    
+
     // administrator (see above on what they can do)
     address internal administrator;
-	
+
 	// lending address
 	address internal lendingAddress_;
-	
+
 	// Address to send the 3% fee
     address public fundAddress_;
     uint256 internal totalEthFundReceived; 		// total ETH received from this contract
     uint256 internal totalEthFundCollected; 	// total ETH collected in this contract
-	
+
 	// ambassador program
 	mapping(address => bool) internal ambassadors_;
-	
+
 	// Special THC Platform control from scam game contracts on THC platform
     mapping(address => bool) public canAcceptTokens_; // contracts, which can accept THC tokens
 
@@ -248,7 +248,7 @@ contract Prosperity {
     =            PUBLIC FUNCTIONS            =
     =======================================*/
     /*
-    * -- APPLICATION ENTRY POINTS --  
+    * -- APPLICATION ENTRY POINTS --
     */
     constructor()
         public
@@ -257,7 +257,7 @@ contract Prosperity {
         administrator = 0x28436C7453EbA01c6EcbC8a9cAa975f0ADE6Fff1;
 		fundAddress_ = 0x1E2F082CB8fd71890777CA55Bd0Ce1299975B25f;
 		lendingAddress_ = 0x961FA070Ef41C2b68D1A50905Ea9198EF7Dbfbf8;
-        
+
         // add the ambassadors here.
         ambassadors_[0x28436C7453EbA01c6EcbC8a9cAa975f0ADE6Fff1] = true;	// tobi
         ambassadors_[0x92be79705F4Fab97894833448Def30377bc7267A] = true;	// fabi
@@ -267,12 +267,12 @@ contract Prosperity {
 		ambassadors_[0x7276262ce50d60770F4d4FA64dbA15805D8Bdc87] = true;	// lio
 		ambassadors_[lendingAddress_] 							 = true;	// lending, to be the first to buy tokens
 		ambassadors_[fundAddress_]								 = true;	// fund, to be able to be masternode
-		
+
 		// set lending ref
 		lastRef_[lendingAddress_] = fundAddress_;
     }
-    
-     
+
+
     /**
      * Converts all incoming ethereum to tokens for the caller, and passes down the referral
      */
@@ -285,7 +285,7 @@ contract Prosperity {
 		address _lastRef = handleLastRef(_referredBy);
 		purchaseInternal(msg.value, _lastRef);
     }
-    
+
     /**
      * Fallback function to handle ethereum that was send straight to the contract
      * Unfortunately we cannot use a referral address this way.
@@ -298,7 +298,7 @@ contract Prosperity {
 		address lastRef = handleLastRef(address(0));	// hopefully (for you) you used a referral somewhere in the past
 		purchaseInternal(msg.value, lastRef);
     }
-    
+
     /**
      * Converts all of caller's dividends to tokens.
      */
@@ -308,23 +308,23 @@ contract Prosperity {
     {
         // fetch dividends
         uint256 _dividends = myDividends(false); // retrieve ref. bonus later in the code
-        
+
         // pay out the dividends virtually
         address _customerAddress = msg.sender;
         payoutsTo_[_customerAddress] +=  (int256) (_dividends * magnitude);
-        
+
         // retrieve ref. bonus
         _dividends += referralBalance_[_customerAddress];
         referralBalance_[_customerAddress] = 0;
-        
+
         // dispatch a buy order with the virtualized "withdrawn dividends"
 		address _lastRef = handleLastRef(address(0));	// hopefully you used a referral somewhere in the past
         uint256 _tokens = purchaseInternal(_dividends, _lastRef);
-        
+
         // fire event
         emit onReinvestment(_customerAddress, _dividends, _tokens);
     }
-    
+
     /**
      * Alias of sell() and withdraw().
      */
@@ -335,7 +335,7 @@ contract Prosperity {
         address _customerAddress = msg.sender;
         uint256 _tokens = tokenBalanceLedger_[_customerAddress];
         if(_tokens > 0) sell(_tokens);
-        
+
         // lambo delivery service
         withdraw();
     }
@@ -350,21 +350,21 @@ contract Prosperity {
         // setup data
         address _customerAddress = msg.sender;
         uint256 _dividends = myDividends(false); // get ref. bonus later in the code
-        
+
         // update dividend tracker
         payoutsTo_[_customerAddress] +=  (int256) (_dividends * magnitude);
-        
+
         // add ref. bonus
         _dividends += referralBalance_[_customerAddress];
         referralBalance_[_customerAddress] = 0;
-        
+
         // lambo delivery service
         _customerAddress.transfer(_dividends);
-        
+
         // fire event
         emit onWithdraw(_customerAddress, _dividends);
     }
-    
+
     /**
      * Liquifies tokens to ethereum.
      */
@@ -382,29 +382,29 @@ contract Prosperity {
         uint256 _dividends = SafeMath.div(SafeMath.mul(_ethereum, dividendFee_), 100);				// 17%
 		uint256 _fundPayout = SafeMath.div(SafeMath.mul(_ethereum, fundFee_), 100);					// 3%
         uint256 _taxedEthereum =  SafeMath.sub(SafeMath.sub(_ethereum, _dividends), _fundPayout);	// Take out dividends and then _fundPayout
-		
+
 		// Add ethereum for fund
         totalEthFundCollected = SafeMath.add(totalEthFundCollected, _fundPayout);
-        
+
         // burn the sold tokens
         tokenSupply_ = SafeMath.sub(tokenSupply_, _tokens);
         tokenBalanceLedger_[_customerAddress] = SafeMath.sub(tokenBalanceLedger_[_customerAddress], _tokens);
-        
+
         // update dividends tracker
         int256 _updatedPayouts = (int256) (profitPerShare_ * _tokens + (_taxedEthereum * magnitude));
         payoutsTo_[_customerAddress] -= _updatedPayouts;
-        
+
         // dividing by zero is a bad idea
         if (tokenSupply_ > 0) {
             // update the amount of dividends per token
             profitPerShare_ = SafeMath.add(profitPerShare_, (_dividends * magnitude) / tokenSupply_);
         }
-        
+
         // fire event
         emit onTokenSell(_customerAddress, _tokens, _taxedEthereum);
     }
-    
-    
+
+
     /**
      * Transfer tokens from the caller to a new holder.
      * Remember, there's 0% fee here.
@@ -417,30 +417,30 @@ contract Prosperity {
     {
         // setup
         address _customerAddress = msg.sender;
-        
+
         // make sure we have the requested tokens
         // also disables transfers until ambassador phase is over
         // ( we dont want whale premines )
         require(_amountOfTokens <= tokenBalanceLedger_[_customerAddress]);
-        
+
         // withdraw all outstanding dividends first
         if(myDividends(true) > 0) withdraw();
 
         // exchange tokens
         tokenBalanceLedger_[_customerAddress] = SafeMath.sub(tokenBalanceLedger_[_customerAddress], _amountOfTokens);
         tokenBalanceLedger_[_toAddress] = SafeMath.add(tokenBalanceLedger_[_toAddress], _amountOfTokens);
-		
+
 		// update dividend trackers
         payoutsTo_[_customerAddress] -= (int256) (profitPerShare_ * _amountOfTokens);
         payoutsTo_[_toAddress] += (int256) (profitPerShare_ * _amountOfTokens);
-        
+
         // fire event
         emit Transfer(_customerAddress, _toAddress, _amountOfTokens);
-        
+
         // ERC20
         return true;
     }
-	
+
 	/**
     * Transfer token to a specified address and forward the data to recipient
     * ERC-677 standard
@@ -451,7 +451,7 @@ contract Prosperity {
     */
     function transferAndCall(address _to, uint256 _value, bytes _data)
 		external
-		returns (bool) 
+		returns (bool)
 	{
 		require(_to != address(0));
 		require(canAcceptTokens_[_to] == true); 	// security check that contract approved by THC platform
@@ -469,19 +469,19 @@ contract Prosperity {
      * Additional check that the game address we are sending tokens to is a contract
      * assemble the given address bytecode. If bytecode exists then the _addr is a contract.
      */
-     function isContract(address _addr) 
-		private 
-		constant 
-		returns (bool is_contract) 
+     function isContract(address _addr)
+		private
+		constant
+		returns (bool is_contract)
 	{
 		// retrieve the size of the code on target address, this needs assembly
 		uint length;
 		assembly { length := extcodesize(_addr) }
 		return length > 0;
      }
-	 
-    
-    /*----------  ADMINISTRATOR ONLY FUNCTIONS  ----------*/	
+
+
+    /*----------  ADMINISTRATOR ONLY FUNCTIONS  ----------*/
     /**
      * In case the amassador quota is not met, the administrator can manually disable the ambassador phase.
      */
@@ -491,22 +491,22 @@ contract Prosperity {
     {
         onlyAmbassadors = false;
     }
-	
+
 	/**
      * Sends FUND money to the Fund Contract
      */
     function payFund()
-		public 
+		public
 	{
 		uint256 ethToPay = SafeMath.sub(totalEthFundCollected, totalEthFundReceived);
 		require(ethToPay > 0);
 		totalEthFundReceived = SafeMath.add(totalEthFundReceived, ethToPay);
-      
+
 		if(!fundAddress_.call.value(ethToPay).gas(400000)()) {
 			totalEthFundReceived = SafeMath.sub(totalEthFundReceived, ethToPay);
 		}
     }
-    
+
     /**
      * In case one of us dies, we need to replace ourselves.
      */
@@ -516,7 +516,7 @@ contract Prosperity {
     {
         administrator = _identifier;
     }
-	
+
 	/**
      * Only Add game contract, which can accept THC tokens.
 	 * Disabling a contract is not possible after activating
@@ -527,7 +527,7 @@ contract Prosperity {
     {
       canAcceptTokens_[_address] = true;
     }
-    
+
     /**
      * Precautionary measures in case we need to adjust the masternode rate.
      */
@@ -537,7 +537,7 @@ contract Prosperity {
     {
         stakingRequirement = _amountOfTokens;
     }
-    
+
     /**
      * If we want to rebrand, we can.
      */
@@ -547,7 +547,7 @@ contract Prosperity {
     {
         name = _name;
     }
-    
+
     /**
      * If we want to rebrand, we can.
      */
@@ -558,7 +558,7 @@ contract Prosperity {
         symbol = _symbol;
     }
 
-    
+
     /*----------  HELPERS AND CALCULATORS  ----------*/
     /**
      * Method to view the current Ethereum stored in the contract
@@ -571,7 +571,7 @@ contract Prosperity {
     {
         return address(this).balance;
     }
-    
+
     /**
      * Retrieve the total token supply.
      */
@@ -582,7 +582,7 @@ contract Prosperity {
     {
         return tokenSupply_;
     }
-    
+
     /**
      * Retrieve the tokens owned by the caller.
      */
@@ -594,22 +594,22 @@ contract Prosperity {
         address _customerAddress = msg.sender;
         return balanceOf(_customerAddress);
     }
-    
+
     /**
      * Retrieve the dividends owned by the caller.
      * If `_includeReferralBonus` is to to 1/true, the referral bonus will be included in the calculations.
      * The reason for this, is that in the frontend, we will want to get the total divs (global + ref)
-     * But in the internal calculations, we want them separate. 
-     */ 
-    function myDividends(bool _includeReferralBonus) 
-        public 
-        view 
+     * But in the internal calculations, we want them separate.
+     */
+    function myDividends(bool _includeReferralBonus)
+        public
+        view
         returns(uint256)
     {
         address _customerAddress = msg.sender;
         return _includeReferralBonus ? dividendsOf(_customerAddress) + referralBalance_[_customerAddress] : dividendsOf(_customerAddress) ;
     }
-	
+
 	/**
 	 * Retrieve the last used referral address of the given address
 	 */
@@ -620,7 +620,7 @@ contract Prosperity {
 	{
 		return lastRef_[_addr];
 	}
-    
+
     /**
      * Retrieve the token balance of any single address.
      */
@@ -631,7 +631,7 @@ contract Prosperity {
     {
         return tokenBalanceLedger_[_customerAddress];
     }
-    
+
     /**
      * Retrieve the dividend balance of any single address.
      */
@@ -642,13 +642,13 @@ contract Prosperity {
     {
         return (uint256) ((int256)(profitPerShare_ * tokenBalanceLedger_[_customerAddress]) - payoutsTo_[_customerAddress]) / magnitude;
     }
-    
+
     /**
      * Return the buy price of 1 individual token.
      */
-    function sellPrice() 
-        public 
-        view 
+    function sellPrice()
+        public
+        view
         returns(uint256)
     {
         // our calculation relies on the token supply, so we need supply. Doh.
@@ -662,13 +662,13 @@ contract Prosperity {
             return _taxedEthereum;
         }
     }
-    
+
     /**
      * Return the sell price of 1 individual token.
      */
-    function buyPrice() 
-        public 
-        view 
+    function buyPrice()
+        public
+        view
         returns(uint256)
     {
         // our calculation relies on the token supply, so we need supply. Doh.
@@ -680,13 +680,13 @@ contract Prosperity {
             return _taxedEthereum;
         }
     }
-    
+
     /**
      * Function for the frontend to dynamically retrieve the price scaling of buy orders.
      */
     function calculateTokensReceived(uint256 _weiToSpend)
-        public 
-        view 
+        public
+        view
         returns(uint256)
     {
         uint256 _dividends = SafeMath.div(SafeMath.mul(_weiToSpend, dividendFee_), 100);			// 17%
@@ -695,13 +695,13 @@ contract Prosperity {
         uint256 _amountOfTokens = ethereumToTokens_(_taxedEthereum);
         return SafeMath.div(_amountOfTokens, 1e18);
     }
-    
+
     /**
      * Function for the frontend to dynamically retrieve the price scaling of sell orders.
      */
-    function calculateEthereumReceived(uint256 _tokensToSell) 
-        public 
-        view 
+    function calculateEthereumReceived(uint256 _tokensToSell)
+        public
+        view
         returns(uint256)
     {
         require(_tokensToSell <= tokenSupply_);
@@ -711,7 +711,7 @@ contract Prosperity {
         uint256 _taxedEthereum = SafeMath.sub(SafeMath.sub(_ethereum, _dividends), _fundPayout);	// 80%
         return _taxedEthereum;
     }
-	
+
 	/**
      * Function for the frontend to show ether waiting to be send to fund in contract
      */
@@ -722,28 +722,28 @@ contract Prosperity {
 	{
         return SafeMath.sub(totalEthFundCollected, totalEthFundReceived);
     }
-    
-    
+
+
     /*==========================================
     =            INTERNAL FUNCTIONS            =
     ==========================================*/
 	function handleLastRef(address _ref)
-		internal 
+		internal
 		returns(address)
 	{
 		address _customerAddress = msg.sender;			// sender
 		address _lastRef = lastRef_[_customerAddress];	// last saved ref
-		
+
 		// no cheating by referring yourself
 		if (_ref == _customerAddress) {
 			return _lastRef;
 		}
-		
+
 		// try to use last ref of customer
 		if (_ref == address(0)) {
 			return _lastRef;
 		} else {
-			// new ref is another address, replace 
+			// new ref is another address, replace
 			if (_ref != _lastRef) {
 				lastRef_[_customerAddress] = _ref;	// save new ref for next time
 				return _ref;						// return new ref
@@ -752,7 +752,7 @@ contract Prosperity {
 			}
 		}
 	}
-	
+
 	// Make sure we will send back excess if user sends more then 2 ether before 100 ETH in contract
     function purchaseInternal(uint256 _incomingEthereum, address _referredBy)
 		internal
@@ -778,7 +778,7 @@ contract Prosperity {
 			_customerAddress.transfer(_excess);
 		}
     }
-	
+
     function purchaseTokens(uint256 _incomingEthereum, address _referredBy)
         antiEarlyWhale(_incomingEthereum)
         internal
@@ -792,17 +792,17 @@ contract Prosperity {
         uint256 _dividends = SafeMath.sub(_undividedDividends, _referralPayout);									// 12% => 17% - 5%
         //uint256 _taxedEthereum = SafeMath.sub(SafeMath.sub(_incomingEthereum, _undividedDividends), _fundPayout);	// 80%
         totalEthFundCollected = SafeMath.add(totalEthFundCollected, _fundPayout);
-		
+
 		// _taxedEthereum should be used, but stack is too deep here
         uint256 _amountOfTokens = ethereumToTokens_(SafeMath.sub(SafeMath.sub(_incomingEthereum, _undividedDividends), _fundPayout));
         uint256 _fee = _dividends * magnitude;
- 
+
         // no point in continuing execution if OP is a poorfag russian hacker
         // prevents overflow in the case that the pyramid somehow magically starts being used by everyone in the world
         // (or hackers)
         // and yes we know that the safemath function automatically rules out the "greater then" equasion.
         require(_amountOfTokens > 0 && (SafeMath.add(_amountOfTokens,tokenSupply_) > tokenSupply_));
-        
+
         // is the user referred by a masternode?
         if(
             // is this a referred purchase?
@@ -810,7 +810,7 @@ contract Prosperity {
 
             // no cheating!
             _referredBy != _customerAddress &&
-            
+
             // does the referrer have at least X whole tokens?
             // i.e is the referrer a godly chad masternode
             tokenBalanceLedger_[_referredBy] >= stakingRequirement
@@ -823,35 +823,35 @@ contract Prosperity {
             _dividends = SafeMath.add(_dividends, _referralPayout);
             _fee = _dividends * magnitude;
         }
-        
+
         // we can't give people infinite ethereum
         if(tokenSupply_ > 0){
-            
+
             // add tokens to the pool
             tokenSupply_ = SafeMath.add(tokenSupply_, _amountOfTokens);
- 
+
             // take the amount of dividends gained through this transaction, and allocates them evenly to each shareholder
             profitPerShare_ += (_dividends * magnitude / (tokenSupply_));
-            
-            // calculate the amount of tokens the customer receives over his purchase 
+
+            // calculate the amount of tokens the customer receives over his purchase
             _fee = _fee - (_fee-(_amountOfTokens * (_dividends * magnitude / (tokenSupply_))));
-        
+
         } else {
             // add tokens to the pool
             tokenSupply_ = _amountOfTokens;
         }
-        
+
         // update circulating supply & the ledger address for the customer
         tokenBalanceLedger_[_customerAddress] = SafeMath.add(tokenBalanceLedger_[_customerAddress], _amountOfTokens);
-        
+
         // Tells the contract that the buyer doesn't deserve dividends for the tokens before they owned them;
         // really i know you think you do but you don't
         int256 _updatedPayouts = (int256) ((profitPerShare_ * _amountOfTokens) - _fee);
         payoutsTo_[_customerAddress] += _updatedPayouts;
-        
+
         // fire event
         emit onTokenPurchase(_customerAddress, _incomingEthereum, _amountOfTokens, _referredBy);
-        
+
         return _amountOfTokens;
     }
 
@@ -865,7 +865,7 @@ contract Prosperity {
         view
         returns(uint256)
     {
-        uint256 _tokensReceived = 
+        uint256 _tokensReceived =
 		(
 			// underflow attempts BTFO
 			SafeMath.sub(
@@ -889,10 +889,10 @@ contract Prosperity {
 			) / (tokenPriceIncremental_)
         ) - (tokenSupply_)
         ;
-  
+
         return _tokensReceived;
     }
-    
+
     /**
      * Calculate token sell value.
      * It's an algorithm, hopefully we gave you the whitepaper with it in scientific notation;
@@ -912,18 +912,18 @@ contract Prosperity {
                     +
                     (tokenPriceInitial_) * (_tokens)
                     +
-                    ((tokenPriceIncremental_) * (_tokens)) / 2        
+                    ((tokenPriceIncremental_) * (_tokens)) / 2
                 ), (
 					((tokenPriceIncremental_) * (_tokens**2)) / 2
 				) / 1e18
 			)
         ) / 1e18
 		;
-        
+
 		return _etherReceived;
     }
-    
-    
+
+
     //This is where all your gas goes, sorry
     //Not sorry, you probably only paid 1 gwei
     function sqrt(uint x) internal pure returns (uint y) {
@@ -988,12 +988,80 @@ library SafeMath {
 
 
 /**
-  _____ _            _   _  ___  ____  _        ____                                      _ _         
- |_   _| |__   ___  | | | |/ _ \|  _ \| |      / ___|___  _ __ ___  _ __ ___  _   _ _ __ (_) |_ _   _ 
+  _____ _            _   _  ___  ____  _        ____                                      _ _
+ |_   _| |__   ___  | | | |/ _ \|  _ \| |      / ___|___  _ __ ___  _ __ ___  _   _ _ __ (_) |_ _   _
    | | | '_ \ / _ \ | |_| | | | | | | | |     | |   / _ \| '_ ` _ \| '_ ` _ \| | | | '_ \| | __| | | |
    | | | | | |  __/ |  _  | |_| | |_| | |___  | |__| (_) | | | | | | | | | | | |_| | | | | | |_| |_| |
    |_| |_| |_|\___| |_| |_|\___/|____/|_____|  \____\___/|_| |_| |_|_| |_| |_|\__,_|_| |_|_|\__|\__, |
-                                                                                                |___/ 
-																								
+                                                                                                |___/
+
 	HODL responsibly. Don't drink and crypto!
 */
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

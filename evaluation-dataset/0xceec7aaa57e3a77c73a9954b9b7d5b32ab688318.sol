@@ -587,12 +587,12 @@ library SafeERC20 {
  * @notice TokenEscrowMarketplace is an ERC20 payment channel that enables users to send BLT by exchanging signatures off-chain
  *  Users approve the contract address to transfer BLT on their behalf using the standard ERC20.approve function
  *  After approval, either the user or the contract admin initiates the transfer of BLT into the contract
- *  Once in the contract, users can send payments via a signed message to another user. 
+ *  Once in the contract, users can send payments via a signed message to another user.
  *  The signature transfers BLT from lockup to the recipient's balance
  *  Users can withdraw funds at any time. Or the admin can release them on the user's behalf
- *  
+ *
  *  BLT is stored in the contract by address
- *  
+ *
  *  Only the AttestationLogic contract is authorized to release funds once a jobs is complete
  */
 contract TokenEscrowMarketplace is SigningLogic {
@@ -822,7 +822,7 @@ contract TokenEscrowMarketplace is SigningLogic {
   }
 
   /**
-   * @notice Helper function to add to escrow balance 
+   * @notice Helper function to add to escrow balance
    * @param _from Account address for escrow mapping
    * @param _amount Tokens to lock up
    */
@@ -910,7 +910,7 @@ contract AttestationLogic is Initializable, SigningLogic{
   event TokenEscrowMarketplaceChanged(address oldTokenEscrowMarketplace, address newTokenEscrowMarketplace);
 
   /**
-   * @notice Function for attester to submit attestation from their own account) 
+   * @notice Function for attester to submit attestation from their own account)
    * @dev Wrapper for attestForUser using msg.sender
    * @param _subject User this attestation is about
    * @param _requester User requesting and paying for this attestation in BLT
@@ -1001,7 +1001,7 @@ contract AttestationLogic is Initializable, SigningLogic{
     bytes32 _requestNonce,
     bytes _subjectSig
     ) private {
-    
+
     validateSubjectSig(
       _subject,
       _dataHash,
@@ -1022,7 +1022,7 @@ contract AttestationLogic is Initializable, SigningLogic{
   }
 
   /**
-   * @notice Function for attester to reject an attestation and receive payment 
+   * @notice Function for attester to reject an attestation and receive payment
    *  without associating the negative attestation with the subject's bloomId
    * @param _requester User requesting and paying for this attestation in BLT
    * @param _reward Payment to attester from requester in BLT
@@ -1045,7 +1045,7 @@ contract AttestationLogic is Initializable, SigningLogic{
   }
 
   /**
-   * @notice Function for attester to reject an attestation and receive payment 
+   * @notice Function for attester to reject an attestation and receive payment
    *  without associating the negative attestation with the subject's bloomId
    *  Perform on behalf of attester to pay gas fees
    * @param _requester User requesting and paying for this attestation in BLT
@@ -1079,7 +1079,7 @@ contract AttestationLogic is Initializable, SigningLogic{
   }
 
   /**
-   * @notice Private function for attester to reject an attestation and receive payment 
+   * @notice Private function for attester to reject an attestation and receive payment
    *  without associating the negative attestation with the subject's bloomId
    * @param _attester user completing the attestation
    * @param _requester user requesting this attestation be completed and paying for it in BLT
@@ -1102,7 +1102,7 @@ contract AttestationLogic is Initializable, SigningLogic{
   }
 
   /**
-   * @notice Verify subject signature is valid 
+   * @notice Verify subject signature is valid
    * @param _subject user this attestation is about
    * @param _dataHash hash of data being attested and nonce
    * param _requestNonce Nonce in sig signed by subject so it can't be replayed
@@ -1120,7 +1120,7 @@ contract AttestationLogic is Initializable, SigningLogic{
   }
 
   /**
-   * @notice Verify attester delegation signature is valid 
+   * @notice Verify attester delegation signature is valid
    * @param _subject user this attestation is about
    * @param _attester user completing the attestation
    * @param _requester user requesting this attestation be completed and paying for it in BLT
@@ -1144,7 +1144,7 @@ contract AttestationLogic is Initializable, SigningLogic{
   }
 
   /**
-   * @notice Verify attester delegation signature is valid 
+   * @notice Verify attester delegation signature is valid
    * @param _attester user completing the attestation
    * @param _requester user requesting this attestation be completed and paying for it in BLT
    * @param _reward payment to attester from requester in BLT wei
@@ -1166,7 +1166,7 @@ contract AttestationLogic is Initializable, SigningLogic{
   /**
    * @notice Submit attestation completed prior to deployment of this contract
    * @dev Gives initializer privileges to write attestations during the initialization period without signatures
-   * @param _requester user requesting this attestation be completed 
+   * @param _requester user requesting this attestation be completed
    * @param _attester user completing the attestation
    * @param _subject user this attestation is about
    * @param _dataHash hash of data being attested
@@ -1212,7 +1212,7 @@ contract AttestationLogic is Initializable, SigningLogic{
   }
 
   /**
-   * @notice Verify revocation signature is valid 
+   * @notice Verify revocation signature is valid
    * @param _link bytes string embedded in dataHash to link revocation
    * @param _sender user revoking attestation
    * @param _delegationSig signature authorizing revocation on behalf of revoker
@@ -1252,4 +1252,65 @@ contract AttestationLogic is Initializable, SigningLogic{
     emit TokenEscrowMarketplaceChanged(oldTokenEscrowMarketplace, tokenEscrowMarketplace);
   }
 
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

@@ -46,10 +46,10 @@ contract Ownable {
  */
 contract BetexStorage is Ownable {
 
-    // minimum funding to get volume bonus	
+    // minimum funding to get volume bonus
     uint256 public constant VOLUME_BONUS_CONDITION = 50 ether;
 
-    // minimum funding to get volume extra bonus	
+    // minimum funding to get volume extra bonus
     uint256 public constant VOLUME_EXTRA_BONUS_CONDITION = 100 ether;
 
     // extra bonus amount during first bonus round, %
@@ -86,7 +86,7 @@ contract BetexStorage is Ownable {
 
     // funders
     address[] public funders;
-    
+
     // pre ico funders
     address[] public preICOFunders;
 
@@ -99,7 +99,7 @@ contract BetexStorage is Ownable {
 
     /**
      * @dev Constructor
-     */  
+     */
     function BetexStorage() public {
 
         // pre sale round 1
@@ -140,7 +140,7 @@ contract BetexStorage is Ownable {
         preICOFunders.push(0x51B7Bf4B7C1E89cfe7C09938Ad0096F9dFFCA4B7);
         preICOBalances[0x51B7Bf4B7C1E89cfe7C09938Ad0096F9dFFCA4B7] = 17533640761380000000000;
 
-        // pre sale round 2 
+        // pre sale round 2
         preICOFunders.push(0xD2Cdc0905877ee3b7d08220D783bd042de825AEb);
         preICOBalances[0xD2Cdc0905877ee3b7d08220D783bd042de825AEb] = 5000000000000000000000;
         preICOFunders.push(0x3b217081702AF670e2c2fD25FD7da882620a68E8);
@@ -205,7 +205,7 @@ contract BetexStorage is Ownable {
             funded[_funder] = true;
         }
     }
-   
+
     /**
      * @return true if address is a funder address
      * @param _funder funder's address
@@ -236,13 +236,13 @@ contract BetexStorage is Ownable {
      * @param _bonus bonus amount
      */
     function addOrder(
-        bytes32 _orderId, 
-        address _beneficiary, 
-        uint256 _funds, 
+        bytes32 _orderId,
+        address _beneficiary,
+        uint256 _funds,
         uint256 _bonus
     )
-        public 
-        onlyOwner 
+        public
+        onlyOwner
     {
         orders[_orderId].beneficiary = _beneficiary;
         orders[_orderId].funds = _funds;
@@ -252,11 +252,11 @@ contract BetexStorage is Ownable {
     /**
      * @dev Get oraclize funding order by order id
      * @param _orderId oraclize order id
-     * @return beneficiaty address, paid funds amount and bonus amount 
+     * @return beneficiaty address, paid funds amount and bonus amount
      */
-    function getOrder(bytes32 _orderId) 
-        public 
-        view 
+    function getOrder(bytes32 _orderId)
+        public
+        view
         returns(address, uint256, uint256)
     {
         address _beneficiary = orders[_orderId].beneficiary;
@@ -307,14 +307,14 @@ contract BetexStorage is Ownable {
      * @return corresponding bonus value
      */
     function getBonus(uint256 _funds, uint256 _bonusChangeTime) public view returns(uint256) {
-        
+
         if (_funds < VOLUME_BONUS_CONDITION)
             return 0;
 
         if (now < _bonusChangeTime) { // solium-disable-line security/no-block-members
             if (_funds >= VOLUME_EXTRA_BONUS_CONDITION)
                 return FIRST_VOLUME_EXTRA_BONUS;
-            else 
+            else
                 return FIRST_VOLUME_BONUS;
         } else {
             if (_funds >= VOLUME_EXTRA_BONUS_CONDITION)
@@ -325,3 +325,38 @@ contract BetexStorage is Ownable {
         return 0;
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

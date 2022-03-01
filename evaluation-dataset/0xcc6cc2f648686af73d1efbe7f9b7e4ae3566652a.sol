@@ -50,7 +50,7 @@ contract ETH10K {
   uint8 private Reserved_upRow = 8;
   uint8 private Reserved_downRow = 39;
   uint8 private max_merge_size = 2;
-  
+
   event Bought (uint256 indexed _itemId, address indexed _owner, uint256 _price);
   event Sold (uint256 indexed _itemId, address indexed _owner, uint256 _price);
   event Transfer(address indexed _from, address indexed _to, uint256 _tokenId);
@@ -65,14 +65,14 @@ contract ETH10K {
   uint256 private increaseLimit3 = 2.0 ether;
   uint256 private increaseLimit4 = 5.0 ether;
   uint256 private startingPrice = 0.001 ether;
-  
+
   uint256[] private listedItems;
-  
+
   mapping (uint256 => address) private ownerOfItem;
   mapping (uint256 => uint256) private priceOfItem;
   mapping (address => string) private usernameOfAddress;
-  
-  
+
+
   function ETH10K () public {
     owner = msg.sender;
     admins[owner] = true;
@@ -124,7 +124,7 @@ contract ETH10K {
   }
   function setMaxMerge(uint8 num)onlyAdmins() external{
       max_merge_size = num;
-  }  
+  }
   /* Withdraw */
   /*
   */
@@ -164,7 +164,7 @@ contract ETH10K {
       return _price.mul(2).div(100); // 2%
     }
   }
-  
+
   function requestMerge(uint256[] ids)onlyMergeEnable() external {
       require(ids.length == 4);
       require(ids[0]%(10**8)/(10**4)<max_merge_size);
@@ -178,7 +178,7 @@ contract ETH10K {
       require(ids[0]+ (10**12) == ids[1]);
       require(ids[0]+ (10**8) == ids[2]);
       require(ids[0]+ (10**8) + (10**12) == ids[3]);
-      
+
       uint256 newPrice = priceOfItem[ids[0]]+priceOfItem[ids[1]]+priceOfItem[ids[2]]+priceOfItem[ids[3]];
       uint256 newId = ids[0] + ids[0]%(10**8);
       listedItems.push(newId);
@@ -188,8 +188,8 @@ contract ETH10K {
       ownerOfItem[ids[1]] = address(0);
       ownerOfItem[ids[2]] = address(0);
       ownerOfItem[ids[3]] = address(0);
-  } 
-  
+  }
+
   function checkIsOnSale(uint256 _ypos)public view returns(bool isOnSale){
       if(_ypos<Reserved_upRow||_ypos>Reserved_downRow){
           return false;
@@ -222,7 +222,7 @@ contract ETH10K {
   function getUserNameOf(address _user)public view returns(string name){
       return usernameOfAddress[_user];
   }
-  
+
   function addBlock(address _to, uint256 _xpos,uint256 _ypos,uint256 _size,uint256 _price) onlyAdmins() public {
         require(checkIsOnSale(_ypos) == true);
         require(_size == 1);
@@ -230,13 +230,13 @@ contract ETH10K {
         uint256 _itemId = generateId(_xpos,_ypos,_size);
         require(priceOf(_itemId)==0);
         require(ownerOf(_itemId)==address(0));
-        
+
         listedItems.push(_itemId);
         priceOfItem[_itemId] = _price;
     	ownerOfItem[_itemId] = _to;
     }
-  
-  
+
+
   //Buy the block with somebody owned already
     function buyOld (uint256 _index) payable public {
         require(_index!=0);
@@ -250,16 +250,16 @@ contract ETH10K {
 
         uint256 excess = msg.value.sub(price);
         address newOwner = msg.sender;
-    
+
     	ownerOfItem[_index] = newOwner;
         uint256 devCut = calculateDevCut(price);
         oldOwner.transfer(price.sub(devCut));
-    
+
         if (excess > 0) {
           newOwner.transfer(excess);
         }
     }
-    
+
     //Buy a new block without anybody owned
     function buyNew (uint256 _xpos,uint256 _ypos,uint256 _size) payable public {
         require(checkIsOnSale(_ypos) == true);
@@ -275,11 +275,11 @@ contract ETH10K {
         priceOfItem[_itemId] = calculateNextPrice(price);
         uint256 excess = msg.value.sub(price);
         address newOwner = msg.sender;
-    
+
     	ownerOfItem[_itemId] = newOwner;
         uint256 devCut = calculateDevCut(price);
         oldOwner.transfer(price.sub(devCut));
-    
+
         if (excess > 0) {
           newOwner.transfer(excess);
         }
@@ -300,7 +300,7 @@ contract ETH10K {
   function symbol() public pure returns (string _symbol) {
     return "block";
   }
-  
+
   function totalSupply() public view returns (uint256 _totalSupply) {
       uint256 total = 0;
       for(uint256 i=0; i<listedItems.length; i++){
@@ -320,11 +320,11 @@ contract ETH10K {
     }
     return counter;
   }
-  
+
   function ownerOf (uint256 _itemId) public view returns (address _owner) {
     return ownerOfItem[_itemId];
   }
-  
+
   function cellsOf (address _owner) public view returns (uint256[] _tokenIds) {
     uint256[] memory items = new uint256[](balanceOf(_owner));
     uint256 itemCounter = 0;
@@ -352,15 +352,15 @@ contract ETH10K {
     function isAdmin (address _admin) public view returns (bool _isAdmin) {
         return admins[_admin];
     }
-    
+
     function startingPriceOf () public view returns (uint256 _startingPrice) {
         return startingPrice;
     }
-    
+
     function priceOf (uint256 _itemId) public view returns (uint256 _price) {
         return priceOfItem[_itemId];
     }
-    
+
     function nextPriceOf (uint256 _itemId) public view returns (uint256 _nextPrice) {
         return calculateNextPrice(priceOf(_itemId));
     }
@@ -372,7 +372,7 @@ contract ETH10K {
         (xpos,ypos,size) = parseId(_itemId);
         return (ownerOfItem[_itemId],startingPriceOf(),priceOf(_itemId),nextPriceOf(_itemId),xpos,ypos,size);
     }
-    
+
     function getAllCellInfo()external view returns(uint256[] _tokenIds,uint256[] _prices, address[] _owners){
         uint256[] memory items = new uint256[](totalSupply());
         uint256[] memory prices = new uint256[](totalSupply());
@@ -388,7 +388,7 @@ contract ETH10K {
         }
         return (items,prices,owners);
     }
-    
+
     function getAllCellInfoFrom_To(uint256 _from, uint256 _to)external view returns(uint256[] _tokenIds,uint256[] _prices, address[] _owners){
         uint256 totalsize = totalSupply();
         require(_from <= _to);
@@ -411,11 +411,105 @@ contract ETH10K {
         }
         return (items,prices,owners);
     }
-    
+
     function getMaxMerge()external view returns(uint256 _maxMergeSize){
       return max_merge_size;
     }
     function showBalance () onlyAdmins() public view returns (uint256 _ProfitBalance) {
         return this.balance;
     }
-}
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

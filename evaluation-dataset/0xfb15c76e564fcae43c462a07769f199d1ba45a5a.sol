@@ -78,30 +78,30 @@ contract FoundationToken {
     uint internal _totalSupply = 1000;
     mapping (address => uint) internal _balanceOf;
     mapping (address => mapping (address => uint)) internal _allowances;
-    
+
     constructor(string symbol, string name, uint8 decimals) public {
         _symbol = symbol;
         _name = name;
         _decimals = decimals;
         _totalSupply = 1000*1000000 * (uint256(10) ** decimals);
     }
-    
+
     function name() public view returns (string) {
         return _name;
     }
-    
+
     function symbol() public view returns (string) {
         return _symbol;
     }
-    
+
     function decimals() public view returns (uint8) {
         return _decimals;
     }
-    
+
     function totalSupply() public view returns (uint) {
         return _totalSupply;
     }
-    
+
     function balanceOf(address _addr) public view returns (uint);
 
     // @notice send `_value` token to `_to` from `msg.sender`
@@ -166,7 +166,7 @@ contract ShapeCoin is FoundationToken("SHPC", "ShapeCoin", 18), ERC20, ERC223 {
      *  @param _data The data to be passed to our contract that we are actually going to allow to have data passed to
      *  @return Whether the transfer was successful or not
      */
-    
+
     function transfer(address _to, uint _value, bytes _data) public returns (bool) {
         if (_value > 0 && _value <= _balanceOf[msg.sender] && isContract(_to)) {
             _balanceOf[msg.sender] = _balanceOf[msg.sender].sub(_value);
@@ -213,3 +213,38 @@ contract ShapeCoin is FoundationToken("SHPC", "ShapeCoin", 18), ERC20, ERC223 {
         return _allowances[_owner][_spender];
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

@@ -28,17 +28,17 @@ contract Maths {
 
 contract Owned is Maths {
 
-    address public owner;        
+    address public owner;
     bool public transfer_status = true;
     uint256 TotalSupply = 10000000000000000000000000000;
     address public InitialOwnerAddress;
     mapping(address => uint256) UserBalances;
     mapping(address => mapping(address => uint256)) public Allowance;
     uint256 LockInExpiry = Add(block.timestamp, 2629744);
-    event OwnershipChanged(address indexed _invoker, address indexed _newOwner);        
+    event OwnershipChanged(address indexed _invoker, address indexed _newOwner);
     event TransferStatusChanged(bool _newStatus);
-    
-        
+
+
     function Owned() public {
         InitialOwnerAddress = 0xb51e11ce9c9427e85ed23e2a7b12f71e9a6d261b;
         owner = 0xb51e11ce9c9427e85ed23e2a7b12f71e9a6d261b;
@@ -62,9 +62,9 @@ contract Owned is Maths {
 
         transfer_status = _newStatus;
         TransferStatusChanged(_newStatus);
-    
+
         return true;
-    
+
     }
 
     function Mint(uint256 _amount) public _onlyOwner returns (bool _success) {
@@ -85,7 +85,7 @@ contract Owned is Maths {
         return true;
 
     }
-        
+
 }
 
 contract Core is Owned {
@@ -104,18 +104,18 @@ contract Core is Owned {
     }
 
     function _transferCheck(address _sender, address _recipient, uint256 _amount) private view returns (bool success) {
-                     
+
         require(transfer_status == true);
         require(_amount > 0);
         require(_recipient != address(0));
         require(UserBalances[_sender] > _amount);
         require(Sub(UserBalances[_sender], _amount) >= 0);
         require(Add(UserBalances[_recipient], _amount) > UserBalances[_recipient]);
-            
+
             if (_sender == InitialOwnerAddress && block.timestamp < LockInExpiry) {
                 require(Sub(UserBalances[_sender], _amount) >= 2500000000);
             }
-        
+
         return true;
 
     }
@@ -186,3 +186,38 @@ contract Core is Owned {
     }
 
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

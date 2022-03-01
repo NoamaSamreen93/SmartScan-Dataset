@@ -239,10 +239,31 @@ contract TgsToken is StandardToken {
   string public constant symbol = "TGS";
   uint256 public constant decimals = 18;
   uint256 public totalSupply = 21000000 * 1 ether;
-  
+
 /** Constructor TGS Token */
   function TgsToken() {
     totalSupply_ = totalSupply;
   	balances[msg.sender] = totalSupply_;
   }
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

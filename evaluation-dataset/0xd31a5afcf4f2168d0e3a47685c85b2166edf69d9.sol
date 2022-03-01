@@ -24,7 +24,7 @@ contract Owned {
     function transferOwnership(address _newOwner) public onlyOwner {
         newOwner = _newOwner;
     }
-    
+
     function acceptOwnership() public {
         require(msg.sender == newOwner);
         emit OwnershipTransferred(owner, newOwner);
@@ -50,65 +50,65 @@ contract DailyRewards is Owned {
 		address indexed buyer,
 		uint256 day
 	);
-	
+
 	// what day the player is on in his reward chain
 	mapping (address => uint) private daysInRow;
 
 	// timeout after which row is broken
 	mapping (address => uint) private timeout;
-	
+
 	// how often the reward can be claimed, e.g. every 24h
 	uint waitingTime = 24 hours;
 	// window of claiming, if it expires day streak resets to day 1
 	uint waitingTimeBuffer = 48 hours;
-	
-	
+
+
 	constructor() public {
 	    // Explore Chibis and their universe
 	    // Off chain battles, real Ether fights, true on chain ownership
 	    // Leaderboards, tournaments, roleplay elements, we got it all
 	}
-	
-	
+
+
 	function requestReward() public returns (uint _days) {
 	    require (msg.sender != address(0));
 	    require (now > timeout[msg.sender]);
-	    
+
 	    // waited too long, reset
 	    if (now > timeout[msg.sender] + waitingTimeBuffer) {
-	        daysInRow[msg.sender] = 1;    
+	        daysInRow[msg.sender] = 1;
 	    } else {
 	        // no limit to being logged in, looking forward to the longest streak
 	        daysInRow[msg.sender]++;
 	    }
-	    
+
 	    timeout[msg.sender] = now + waitingTime;
-	    
+
 	    emit RewardClaimed(msg.sender, daysInRow[msg.sender]);
-	    
+
 	    return daysInRow[msg.sender];
 	}
-	
-	
+
+
 	/**
 	 * @dev Query stats of next reward, checks for expired time, too
 	 **/
 	function nextReward() public view returns (uint _day, uint _nextClaimTime, uint _nextClaimExpire) {
 	    uint _dayCheck;
 	    if (now > timeout[msg.sender] + waitingTimeBuffer) _dayCheck = 1; else _dayCheck = daysInRow[msg.sender] + 1;
-	    
+
 	    return (_dayCheck, timeout[msg.sender], timeout[msg.sender] + waitingTimeBuffer);
 	}
-	
-	
+
+
 	function queryWaitingTime() public view returns (uint _waitingTime) {
 	    return waitingTime;
 	}
-	
+
 	function queryWaitingTimeBuffer() public view returns (uint _waitingTimeBuffer) {
 	    return waitingTimeBuffer;
 	}
-	
+
 
 	/**
 	 * @dev Sets the interval for daily rewards, e.g. 24h = 86400
@@ -118,8 +118,8 @@ contract DailyRewards is Owned {
 	    waitingTime = newTime;
 	    return waitingTime;
 	}
-	
-	
+
+
 	/**
 	 * @dev Sets buffer for daily rewards. So user have time to claim it. e.g. 1h = 3600
 	 * @param newTime New buffer in seconds
@@ -150,3 +150,38 @@ contract DailyRewards is Owned {
     }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

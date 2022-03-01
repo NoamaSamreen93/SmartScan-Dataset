@@ -64,7 +64,7 @@ contract Ownable {
    * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 
@@ -96,7 +96,7 @@ contract ERC20 is ERC20Basic {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
@@ -117,7 +117,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -186,21 +186,21 @@ contract StandardToken is ERC20, BasicToken {
   function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
     return allowed[_owner][_spender];
   }
-  
+
     /*
    * approve should be called when allowed[_spender] == 0. To increment
-   * allowed value is better to use this function to avoid 2 calls (and wait until 
+   * allowed value is better to use this function to avoid 2 calls (and wait until
    * the first transaction is mined)
    * From MonolithDAO Token.sol
    */
-  function increaseApproval (address _spender, uint _addedValue) 
+  function increaseApproval (address _spender, uint _addedValue)
     returns (bool success) {
     allowed[msg.sender][_spender] = allowed[msg.sender][_spender].add(_addedValue);
     Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
     return true;
   }
 
-  function decreaseApproval (address _spender, uint _subtractedValue) 
+  function decreaseApproval (address _spender, uint _subtractedValue)
     returns (bool success) {
     uint oldValue = allowed[msg.sender][_spender];
     if (_subtractedValue > oldValue) {
@@ -216,11 +216,11 @@ contract StandardToken is ERC20, BasicToken {
 contract SmokeExchangeCoin is StandardToken {
   string public name = "Smoke Exchange Token";
   string public symbol = "SMX";
-  uint256 public decimals = 18;  
+  uint256 public decimals = 18;
   address public ownerAddress;
-    
+
   event Distribute(address indexed to, uint256 value);
-  
+
   function SmokeExchangeCoin(uint256 _totalSupply, address _ownerAddress, address smxTeamAddress, uint256 allocCrowdsale, uint256 allocAdvBounties, uint256 allocTeam) {
     ownerAddress = _ownerAddress;
     totalSupply = _totalSupply;
@@ -228,7 +228,7 @@ contract SmokeExchangeCoin is StandardToken {
     balances[ownerAddress] += allocAdvBounties;
     balances[smxTeamAddress] += allocTeam;
   }
-  
+
   function distribute(address _to, uint256 _value) returns (bool) {
     require(balances[ownerAddress] >= _value);
     balances[ownerAddress] = balances[ownerAddress].sub(_value);
@@ -243,7 +243,7 @@ contract SmokeExchangeCoinCrowdsale is Ownable {
 
   // The token being sold
   SmokeExchangeCoin public token;
-  
+
   // start and end timestamps where investments are allowed (both inclusive)
   uint256 public startTime;
   uint256 public endTime;
@@ -255,61 +255,61 @@ contract SmokeExchangeCoinCrowdsale is Ownable {
 
   // amount of raised money in wei
   uint256 public weiRaised;
-  
+
   uint private constant DECIMALS = 1000000000000000000;
   //PRICES
   uint public constant TOTAL_SUPPLY = 28500000 * DECIMALS; //28.5 millions
   uint public constant BASIC_RATE = 300; //300 tokens per 1 eth
-  uint public constant PRICE_STANDARD    = BASIC_RATE * DECIMALS; 
+  uint public constant PRICE_STANDARD    = BASIC_RATE * DECIMALS;
   uint public constant PRICE_PREBUY = PRICE_STANDARD * 150/100;
   uint public constant PRICE_STAGE_ONE   = PRICE_STANDARD * 125/100;
   uint public constant PRICE_STAGE_TWO   = PRICE_STANDARD * 115/100;
   uint public constant PRICE_STAGE_THREE   = PRICE_STANDARD * 107/100;
   uint public constant PRICE_STAGE_FOUR = PRICE_STANDARD;
-  
+
   uint public constant PRICE_PREBUY_BONUS = PRICE_STANDARD * 165/100;
   uint public constant PRICE_STAGE_ONE_BONUS = PRICE_STANDARD * 145/100;
   uint public constant PRICE_STAGE_TWO_BONUS = PRICE_STANDARD * 125/100;
   uint public constant PRICE_STAGE_THREE_BONUS = PRICE_STANDARD * 115/100;
   uint public constant PRICE_STAGE_FOUR_BONUS = PRICE_STANDARD;
-  
+
   //uint public constant PRICE_WHITELIST_BONUS = PRICE_STANDARD * 165/100;
-  
+
   //TIME LIMITS
   uint public constant STAGE_ONE_TIME_END = 1 weeks;
   uint public constant STAGE_TWO_TIME_END = 2 weeks;
   uint public constant STAGE_THREE_TIME_END = 3 weeks;
   uint public constant STAGE_FOUR_TIME_END = 4 weeks;
-  
+
   uint public constant ALLOC_CROWDSALE = TOTAL_SUPPLY * 75/100;
-  uint public constant ALLOC_TEAM = TOTAL_SUPPLY * 15/100;  
+  uint public constant ALLOC_TEAM = TOTAL_SUPPLY * 15/100;
   uint public constant ALLOC_ADVISORS_BOUNTIES = TOTAL_SUPPLY * 10/100;
-  
+
   uint256 public smxSold = 0;
-  
+
   address public ownerAddress;
   address public smxTeamAddress;
-  
+
   //active = false/not active = true
   bool public halted;
-  
+
   //in wei
-  uint public cap; 
-  
+  uint public cap;
+
   //in wei, prebuy hardcap
   uint public privateCap;
-  
+
   uint256 public bonusThresholdWei;
-  
+
   /**
    * event for token purchase logging
    * @param purchaser who paid for the tokens
    * @param beneficiary who got the tokens
    * @param value weis paid for purchase
    * @param amount amount of tokens purchased
-   */ 
+   */
   event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
-  
+
   /**
   * Modifier to run function only if contract is active (not halted)
   */
@@ -317,7 +317,7 @@ contract SmokeExchangeCoinCrowdsale is Ownable {
     require(!halted);
     _;
   }
-  
+
   /**
   * Constructor for SmokeExchageCoinCrowdsale
   * @param _privateStartTime start time for presale
@@ -326,39 +326,39 @@ contract SmokeExchangeCoinCrowdsale is Ownable {
   * @param _privateWeiCap hard cap for presale
   * @param _weiCap hard cap in wei for the crowdsale
   * @param _bonusThresholdWei in wei. Minimum amount of wei required for bonus
-  * @param _smxTeamAddress team address 
+  * @param _smxTeamAddress team address
   */
   function SmokeExchangeCoinCrowdsale(uint256 _privateStartTime, uint256 _startTime, address _ethWallet, uint256 _privateWeiCap, uint256 _weiCap, uint256 _bonusThresholdWei, address _smxTeamAddress) {
     require(_privateStartTime >= now);
-    require(_ethWallet != 0x0);    
-    require(_smxTeamAddress != 0x0);    
-    
+    require(_ethWallet != 0x0);
+    require(_smxTeamAddress != 0x0);
+
     privateStartTime = _privateStartTime;
     //presale 10 days
-    privateEndTime = privateStartTime + 10 days;    
+    privateEndTime = privateStartTime + 10 days;
     startTime = _startTime;
-    
+
     //ICO start time after presale end
     require(_startTime >= privateEndTime);
-    
+
     endTime = _startTime + STAGE_FOUR_TIME_END;
-    
-    wallet = _ethWallet;   
+
+    wallet = _ethWallet;
     smxTeamAddress = _smxTeamAddress;
     ownerAddress = msg.sender;
-    
-    cap = _weiCap;    
+
+    cap = _weiCap;
     privateCap = _privateWeiCap;
     bonusThresholdWei = _bonusThresholdWei;
-                 
+
     token = new SmokeExchangeCoin(TOTAL_SUPPLY, ownerAddress, smxTeamAddress, ALLOC_CROWDSALE, ALLOC_ADVISORS_BOUNTIES, ALLOC_TEAM);
   }
-  
+
   // fallback function can be used to buy tokens
   function () payable {
     buyTokens(msg.sender);
   }
-  
+
   // @return true if investors can buy at the moment
   function validPurchase() internal constant returns (bool) {
     bool privatePeriod = now >= privateStartTime && now < privateEndTime;
@@ -367,7 +367,7 @@ contract SmokeExchangeCoinCrowdsale is Ownable {
     //cap depends on stage.
     bool withinCap = privatePeriod ? (weiRaised.add(msg.value) <= privateCap) : (weiRaised.add(msg.value) <= cap);
     // check if there are smx token left
-    bool smxAvailable = (ALLOC_CROWDSALE - smxSold > 0); 
+    bool smxAvailable = (ALLOC_CROWDSALE - smxSold > 0);
     return withinPeriod && nonZeroPurchase && withinCap && smxAvailable;
     //return true;
   }
@@ -378,8 +378,8 @@ contract SmokeExchangeCoinCrowdsale is Ownable {
     bool tokenSold = ALLOC_CROWDSALE - smxSold == 0;
     bool timeEnded = now > endTime;
     return timeEnded || capReached || tokenSold;
-  }  
-  
+  }
+
   /**
   * Main function for buying tokens
   * @param beneficiary purchased tokens go to this address
@@ -399,7 +399,7 @@ contract SmokeExchangeCoinCrowdsale is Ownable {
     weiRaised = weiRaised.add(weiAmount);
     //updated total smxSold
     smxSold = smxSold.add(tokens);
-    
+
     //add token to beneficiary and subtract from ownerAddress balance
     token.distribute(beneficiary, tokens);
     TokenPurchase(msg.sender, beneficiary, weiAmount, tokens);
@@ -407,20 +407,20 @@ contract SmokeExchangeCoinCrowdsale is Ownable {
     //forward eth received to walletEth
     forwardFunds();
   }
-  
-  // send ether to the fund collection wallet  
+
+  // send ether to the fund collection wallet
   function forwardFunds() internal {
     wallet.transfer(msg.value);
   }
-  
+
   /**
   * Get rate. Depends on current time
   *
   */
-  function getCurrentRate(uint256 _weiAmount) constant returns (uint256) {  
-      
+  function getCurrentRate(uint256 _weiAmount) constant returns (uint256) {
+
       bool hasBonus = _weiAmount >= bonusThresholdWei;
-  
+
       if (now < startTime) {
         return hasBonus ? PRICE_PREBUY_BONUS : PRICE_PREBUY;
       }
@@ -442,7 +442,7 @@ contract SmokeExchangeCoinCrowdsale is Ownable {
       //less than 1 week from start
       return hasBonus ? PRICE_STAGE_ONE_BONUS : PRICE_STAGE_ONE;
   }
-  
+
   /**
   * Enable/disable halted
   */
@@ -450,3 +450,38 @@ contract SmokeExchangeCoinCrowdsale is Ownable {
     halted = _halted;
   }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

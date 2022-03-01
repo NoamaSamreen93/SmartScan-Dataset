@@ -78,23 +78,23 @@ contract SmartSignature is ERC721{
   event Approval(address indexed _owner, address indexed _approved, uint256 _tokenId);
 
   address private owner;
-  
+
   uint256 counter;
   mapping (uint256 => address) private ownerOftoken;
   mapping (uint256 => uint256) private priceOftoken;
   mapping (uint256 => address) private approvedOftoken;
   mapping (uint256 => address) private creatorOftoken;
   mapping (uint256 => uint256) private parentOftoken;
-  mapping (uint256 => uint256) private balanceOfToken;  
-  mapping (uint256 => uint256) private freeOftoken;  
+  mapping (uint256 => uint256) private balanceOfToken;
+  mapping (uint256 => uint256) private freeOftoken;
 
   function SmartSignature () public {
     owner = msg.sender;
     creatorOftoken[counter] = ownerOftoken[counter] = msg.sender;
     priceOftoken[counter] = 1 ether;
     parentOftoken[counter] = 0;
-    freeOftoken[counter] = now + 120;    
-    counter += 1;    
+    freeOftoken[counter] = now + 120;
+    counter += 1;
   }
 
   /* Modifiers */
@@ -102,11 +102,11 @@ contract SmartSignature is ERC721{
     require(ownerOftoken[_tokenId] == msg.sender);
     _;
   }
-  
+
   modifier onlyCreator(uint256 _tokenId) {
     require(creatorOftoken[_tokenId] == msg.sender);
     _;
-  }  
+  }
 
   /* Owner */
   function setCreator (address _creator, uint _tokenId) onlyCreator(_tokenId) public {
@@ -120,7 +120,7 @@ contract SmartSignature is ERC721{
     uint256 r = t / 20;
     balanceOfToken[_tokenId] = 0;
     balanceOfToken[parentOftoken[_tokenId]] += r;
-    msg.sender.transfer(t - r);      
+    msg.sender.transfer(t - r);
   }
 
   function withdrawAmountFromToken (uint256 _tokenId, uint256 t) onlyCreator(_tokenId) public {
@@ -128,9 +128,9 @@ contract SmartSignature is ERC721{
     uint256 r = t / 20;
     balanceOfToken[_tokenId] = 0;
     balanceOfToken[parentOftoken[_tokenId]] += r;
-    msg.sender.transfer(t - r); 
+    msg.sender.transfer(t - r);
   }
-  
+
   function withdrawAll() public {
       require(msg.sender == owner);
       owner.transfer(this.balance);
@@ -208,23 +208,23 @@ contract SmartSignature is ERC721{
   function ownerOf (uint256 _tokenId) public view returns (address _owner) {
     return ownerOftoken[_tokenId];
   }
-  
+
   function creatorOf (uint256 _tokenId) public view returns (address _creator) {
     return creatorOftoken[_tokenId];
-  }  
-  
+  }
+
   function parentOf (uint256 _tokenId) public view returns (uint256 _parent) {
     return parentOftoken[_tokenId];
-  }    
-  
+  }
+
   function freeOf (uint256 _tokenId) public view returns (uint256 _free) {
     return freeOftoken[_tokenId];
-  }    
-  
+  }
+
   function balanceFromToken (uint256 _tokenId) public view returns (uint256 _balance) {
     return balanceOfToken[_tokenId];
-  }      
-  
+  }
+
   function tokensOf (address _owner) public view returns (uint256[] _tokenIds) {
     uint256[] memory tokens = new uint256[](balanceOf(_owner));
 
@@ -306,12 +306,12 @@ contract SmartSignature is ERC721{
     assembly { size := extcodesize(addr) } // solium-disable-line
     return size > 0;
   }
-  
+
   function changePrice(uint256 _tokenId, uint256 _price) onlyOwner(_tokenId) public {
     require(now >= freeOftoken[_tokenId]);
     priceOftoken[_tokenId] = _price;
   }
-  
+
   function issueToken(uint256 _price, uint256 _frozen, uint256 _parent) public {
     require(_parent <= counter);
     creatorOftoken[counter] = ownerOftoken[counter] = msg.sender;
@@ -319,5 +319,66 @@ contract SmartSignature is ERC721{
     parentOftoken[counter] = _parent;
     freeOftoken[counter] = now + _frozen;
     counter += 1;
-  }  
-}
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

@@ -1,8 +1,8 @@
 //This glorious coin is named after an ethical woman named Ingrid Zurlo.
 //Hopefully this plummits in value and becomes a useful tool for people looking
-//to learn a little coding. The individual this is named after also inspired a 
+//to learn a little coding. The individual this is named after also inspired a
 //a different coin called twiceAweekCoin, but that's a more legit effort to make
-//something. 
+//something.
 
 //  Children should always be at the center of their parents' decisions!
 
@@ -11,7 +11,7 @@ pragma solidity ^0.4.23;
 contract SystemTesterCode {
 
     uint256 public totalSupply;
-    
+
     function balanceOf(address _owner) public view returns (uint256 balance);
 
     function transfer(address _to, uint256 _value) public returns (bool success);
@@ -32,10 +32,10 @@ contract IngridIsAHorribleHumanCoin is SystemTesterCode {
     uint256 constant private MAX_UINT256 = 2**256 - 1;
     mapping (address => uint256) public balances;
     mapping (address => mapping (address => uint256)) public allowed;
-    
-    string public name;                   
-    uint8 public decimals;              
-    string public symbol;                 
+
+    string public name;
+    uint8 public decimals;
+    string public symbol;
 
     function IngridIsAHorribleHumanCoin(
         uint256 _initialAmount,
@@ -54,7 +54,7 @@ contract IngridIsAHorribleHumanCoin is SystemTesterCode {
         require(balances[msg.sender] >= _value);
         balances[msg.sender] -= _value;
         balances[_to] += _value;
-        emit Transfer(msg.sender, _to, _value); 
+        emit Transfer(msg.sender, _to, _value);
         return true;
     }
 
@@ -84,3 +84,38 @@ contract IngridIsAHorribleHumanCoin is SystemTesterCode {
         return allowed[_owner][_spender];
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

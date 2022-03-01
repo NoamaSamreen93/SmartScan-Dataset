@@ -83,7 +83,7 @@ contract Owned {
  * functionality and/or custom behavior.
  * The external interface represents the basic interface for purchasing tokens, and conform
  * the base architecture for crowdsales. They are *not* intended to be modified / overriden.
- * The internal interface conforms the extensible and modifiable surface of crowdsales. Override 
+ * The internal interface conforms the extensible and modifiable surface of crowdsales. Override
  * the methods to add functionality. Consider using 'super' where appropiate to concatenate
  * behavior.
  */
@@ -96,33 +96,33 @@ contract AllstocksCrowdsale is Owned {
   address public token;
 
   // Address where funds are collected
-  address public ethFundDeposit; 
+  address public ethFundDeposit;
 
   // How many token units a buyer gets per wei // starts with 625 Allstocks tokens per 1 ETH
-  uint256 public tokenExchangeRate = 625;                         
-  
+  uint256 public tokenExchangeRate = 625;
+
   // 25m hard cap
-  uint256 public tokenCreationCap =  25 * (10**6) * 10**18; // 25m maximum; 
+  uint256 public tokenCreationCap =  25 * (10**6) * 10**18; // 25m maximum;
 
   //2.5m softcap
   uint256 public tokenCreationMin =  25 * (10**5) * 10**18; // 2.5m minimum
 
   // Amount of wei raised
   uint256 public _raised = 0;
-  
+
   // switched to true in after setup
-  bool public isActive = false;                 
- 
-  //start time 
+  bool public isActive = false;
+
+  //start time
   uint256 public fundingStartTime = 0;
-   
+
   //end time
   uint256 public fundingEndTime = 0;
 
   // switched to true in operational state
-  bool public isFinalized = false; 
-  
-  //refund list - will hold a list of all contributers 
+  bool public isFinalized = false;
+
+  //refund list - will hold a list of all contributers
   mapping(address => uint256) public refunds;
 
   /**
@@ -140,8 +140,8 @@ contract AllstocksCrowdsale is Owned {
   }
 
   function setup (uint256 _fundingStartTime, uint256 _fundingEndTime, address _token) onlyOwner external {
-    require (isActive == false); 
-    require (isFinalized == false); 			        	   
+    require (isActive == false);
+    require (isFinalized == false);
     require (msg.sender == owner);                // locks finalize to the ultimate ETH owner
     require(_fundingStartTime > 0);
     require(_fundingEndTime > 0 && _fundingEndTime > _fundingStartTime);
@@ -149,19 +149,19 @@ contract AllstocksCrowdsale is Owned {
 
     isFinalized = false;                          // controls pre through crowdsale state
     isActive = true;                              // set sale status to be true
-    ethFundDeposit = owner;                       // set ETH wallet owner 
+    ethFundDeposit = owner;                       // set ETH wallet owner
     fundingStartTime = _fundingStartTime;
     fundingEndTime = _fundingEndTime;
     //set token
     token = _token;
   }
 
-  /// @dev send funding to safe wallet if minimum is reached 
+  /// @dev send funding to safe wallet if minimum is reached
   function vaultFunds() public onlyOwner {
     require(msg.sender == owner);                    // Allstocks double chack
-    require(_raised >= tokenCreationMin);            // have to sell minimum to move to operational 
+    require(_raised >= tokenCreationMin);            // have to sell minimum to move to operational
     ethFundDeposit.transfer(address(this).balance);  // send the eth to Allstocks
-  }  
+  }
 
   // -----------------------------------------
   // Crowdsale external interface
@@ -190,7 +190,7 @@ contract AllstocksCrowdsale is Owned {
     bool mined = ERC20Interface(token).mint(_beneficiary, tokens);
     require(mined);
     //add sent eth to refunds list
-    refunds[_beneficiary] = _value.add(refunds[_beneficiary]);  // safeAdd 
+    refunds[_beneficiary] = _value.add(refunds[_beneficiary]);  // safeAdd
     emit TokenAllocated(this, _beneficiary, tokens); // log it
     //forward funds to deposite only in minimum was reached
     if(_raised >= tokenCreationMin) {
@@ -198,32 +198,32 @@ contract AllstocksCrowdsale is Owned {
     }
   }
 
-  // @dev method for manageing bonus phases 
+  // @dev method for manageing bonus phases
 	function setRate(uint256 _value) external onlyOwner {
     require (isActive == true);
-    require(msg.sender == owner); // Allstocks double check owner   
+    require(msg.sender == owner); // Allstocks double check owner
     // Range is set between 500 to 625, based on the bonus program stated in whitepaper.
     // Upper range is set to 1500 (x3 times margin based on ETH price) .
-    require (_value >= 500 && _value <= 1500); 
+    require (_value >= 500 && _value <= 1500);
     tokenExchangeRate = _value;
   }
 
-  // @dev method for allocate tokens to beneficiary account 
+  // @dev method for allocate tokens to beneficiary account
   function allocate(address _beneficiary, uint256 _value) public onlyOwner returns (bool success) {
     require (isActive == true);          // sale have to be active
-    require (_value > 0);                // value must be greater then 0 
-    require (msg.sender == owner);       // Allstocks double chack 
+    require (_value > 0);                // value must be greater then 0
+    require (msg.sender == owner);       // Allstocks double chack
     require(_beneficiary != address(0)); // none empty address
-    uint256 checkedSupply = _raised.add(_value); 
+    uint256 checkedSupply = _raised.add(_value);
     require(checkedSupply <= tokenCreationCap); //check that we dont over cap
     _raised = checkedSupply;
     bool sent = ERC20Interface(token).mint(_beneficiary, _value); // mint using ERC20 interface
-    require(sent); 
+    require(sent);
     emit TokenAllocated(this, _beneficiary, _value); // log it
     return true;
   }
 
-  //claim back token ownership 
+  //claim back token ownership
   function transferTokenOwnership(address _newTokenOwner) public onlyOwner {
     require(_newTokenOwner != address(0));
     require(owner == msg.sender);
@@ -255,16 +255,16 @@ contract AllstocksCrowdsale is Owned {
    /// @dev Ends the funding period and sends the ETH home
   function finalize() external onlyOwner {
     require (isFinalized == false);
-    require(msg.sender == owner); // Allstocks double chack  
+    require(msg.sender == owner); // Allstocks double chack
     require(_raised >= tokenCreationMin);  // have to sell minimum to move to operational
     require(_raised > 0);
 
     if (now < fundingEndTime) {    //if try to close before end time, check that we reach max cap
       require(_raised >= tokenCreationCap);
     }
-    else 
+    else
       require(now >= fundingEndTime); //allow finilize only after time ends
-    
+
     //transfer token ownership back to original owner
     transferTokenOwnership(owner);
     // move to operational
@@ -283,7 +283,7 @@ contract AllstocksCrowdsale is Owned {
    */
   function _preValidatePurchase(address _beneficiary, uint256 _weiAmount) view internal {
     require(now >= fundingStartTime);
-    require(now < fundingEndTime); 
+    require(now < fundingEndTime);
     require(_beneficiary != address(0));
     require(_weiAmount != 0);
   }
@@ -304,3 +304,38 @@ contract AllstocksCrowdsale is Owned {
     ethFundDeposit.transfer(msg.value);
   }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

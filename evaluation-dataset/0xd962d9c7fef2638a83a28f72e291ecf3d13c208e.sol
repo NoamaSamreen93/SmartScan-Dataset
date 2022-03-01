@@ -10,7 +10,7 @@ library SafeMath {
     uint _quotient =  ((_numerator / denominator) + 5) / 10;
     return (value*_quotient/1000000000000000000);
   }
-  
+
   function mul(uint256 a, uint256 b) internal pure returns (uint256) {
     if (a == 0) {
       return 0;
@@ -40,34 +40,34 @@ library SafeMath {
 }
 
 contract TREASURE {
-    
+
     /*=====================================
     =       CONTRACT CONFIGURABLES        =
     =====================================*/
-    
+
     // Token Details
     string public name                                      = "TREASURE";
     string public symbol                                    = "TRS";
     uint8 constant public decimals                          = 18;
     uint256 constant internal tokenPriceInitial             = 0.000000001 ether;
-    
+
     // Token Price Increment & Decrement By 1Gwei
     uint256 constant internal tokenPriceIncDec              = 0.000000001 ether;
-    
+
     // Proof of Stake (Default at 1 Token)
     uint256 public stakingReq                               = 1e18;
     uint256 constant internal magnitude                     = 2**64;
-    
+
     // Dividend/Distribution Percentage
     uint8 constant internal referralFeePercent              = 5;
     uint8 constant internal dividendFeePercent              = 10;
     uint8 constant internal tradingFundWalletFeePercent     = 10;
     uint8 constant internal communityWalletFeePercent       = 10;
-    
+
     /*================================
     =            DATASETS            =
     ================================*/
-    
+
     // amount of shares for each address (scaled number)
     mapping(address => uint256) internal tokenBalanceLedger_;
     mapping(address => uint256) internal referralBalance_;
@@ -88,40 +88,40 @@ contract TREASURE {
     uint256 internal tempReferall                           = 0;
     uint256 internal tempSellingWithdraw                    = 0;
     uint256 internal profitPerShare_;
-    
+
     // When this is set to true, only ambassadors can purchase tokens
     bool public onlyAmbassadors = false;
-    
+
     // Community Wallet Address
     address internal constant CommunityWalletAddr           = address(0xa6ac94e896fBB8A2c27692e20B301D54D954071E);
     // Trading Fund Wallet Address
-    address internal constant TradingWalletAddr             = address(0x40E68DF89cAa6155812225F12907960608A0B9dd);  
+    address internal constant TradingWalletAddr             = address(0x40E68DF89cAa6155812225F12907960608A0B9dd);
 
-    // Administrator of this contract                        
+    // Administrator of this contract
     mapping(bytes32 => bool) public admin;
-    
+
     /*=================================
     =            MODIFIERS            =
     =================================*/
-    
+
     // Only people with tokens
     modifier onlybelievers() {
         require(myTokens() > 0);
         _;
     }
-    
+
     // Only people with profits
     modifier onlyhodler() {
         require(myDividends(true) > 0);
         _;
     }
-    
+
     // Only people with sold token
     modifier onlySelingholder() {
         require(sellingWithdrawBalance_[msg.sender] > 0);
         _;
     }
-     
+
     // Admin can do following things:
     //  1. Change the name of contract.
     //  2. Change the name of token.
@@ -136,124 +136,124 @@ contract TREASURE {
         require(admin[keccak256(_adminAddress)]);
         _;
     }
-    
+
     /*===========================================
     =       ADMINISTRATOR ONLY FUNCTIONS        =
     ===========================================*/
-    
+
     // Admin can manually disable the ambassador phase
     function disableInitialStage() onlyAdmin() public {
         onlyAmbassadors = false;
     }
-    
+
     function setAdmin(bytes32 _identifier, bool _status) onlyAdmin() public {
         admin[_identifier]      = _status;
     }
-    
+
     function setStakingReq(uint256 _tokensAmount) onlyAdmin() public {
         stakingReq              = _tokensAmount;
     }
-    
+
     function setName(string _tokenName) onlyAdmin() public {
         name                    = _tokenName;
     }
-    
+
     function setSymbol(string _tokenSymbol) onlyAdmin() public {
         symbol                  = _tokenSymbol;
     }
-    
+
     /*==============================
     =            EVENTS            =
     ==============================*/
-    
+
     event onTokenPurchase (
         address indexed customerAddress,
         uint256 incomingEthereum,
         uint256 tokensMinted,
         address indexed referredBy
     );
-    
+
     event onTokenSell (
         address indexed customerAddress,
         uint256 tokensBurned
     );
-    
+
     event onReinvestment (
         address indexed customerAddress,
         uint256 ethereumReinvested,
         uint256 tokensMinted
     );
-    
+
     event onWithdraw (
         address indexed customerAddress,
         uint256 ethereumWithdrawn
     );
-    
+
     event onSellingWithdraw (
         address indexed customerAddress,
         uint256 ethereumWithdrawn
-    
+
     );
-    
+
     event Transfer (
         address indexed from,
         address indexed to,
         uint256 tokens
     );
-    
+
     /*=======================================
     =            PUBLIC FUNCTIONS            =
     =======================================*/
-    
+
     function TREASURE() public {
         // Contract Admin
         admin[0x7cfa1051b7130edfac6eb71d17a849847cf6b7e7ad0b33fad4e124841e5acfbc] = true;
     }
-    
+
     // Check contract Ethereum Balance
     function totalEthereumBalance() public view returns(uint) {
         return this.balance;
     }
-    
+
     // Check tokens total supply
     function totalSupply() public view returns(uint256) {
         return tokenTotalSupply;
     }
-    
+
     // Check token balance owned by the caller
     function myTokens() public view returns(uint256) {
         address ownerAddress = msg.sender;
         return tokenBalanceLedger_[ownerAddress];
     }
-    
+
     // Check sold tokens
     function getSoldTokens() public view returns(uint256) {
         return soldTokens;
     }
-    
+
     // Check dividends owned by the caller
     function myDividends(bool _includeReferralBonus) public view returns(uint256) {
         address _customerAddress = msg.sender;
         return _includeReferralBonus ? dividendsOf(_customerAddress) + referralBalance_[_customerAddress] : dividendsOf(_customerAddress) ;
     }
-    
+
     // Check dividend balance of any single address
     function dividendsOf(address _customerAddress) view public returns(uint256) {
         return (uint256) ((int256)(profitPerShare_ * tokenBalanceLedger_[_customerAddress]) - payoutsTo_[_customerAddress]) / magnitude;
     }
-    
+
     // Check token balance of any address
     function balanceOf(address ownerAddress) public view returns(uint256) {
         return tokenBalanceLedger_[ownerAddress]; ///need to change
     }
-    
+
     // Check Selling Withdraw balance of address
     function sellingWithdrawBalance() view public returns(uint256) {
-        address _customerAddress = msg.sender; 
+        address _customerAddress = msg.sender;
         uint256 _sellingWithdraw = (uint256) (sellingWithdrawBalance_[_customerAddress]) ; // Get all balances
         return  _sellingWithdraw;
     }
-    
+
     // Get Buy Price of 1 individual token
     function sellPrice() public view returns(uint256) {
         if(tokenTotalSupply == 0){
@@ -263,7 +263,7 @@ contract TREASURE {
             return _ethereum - SafeMath.percent(_ethereum,15,100,18);
         }
     }
-    
+
     // Get Sell Price of 1 individual token
     function buyPrice() public view returns(uint256) {
         if(tokenTotalSupply == 0){
@@ -273,39 +273,39 @@ contract TREASURE {
             return _ethereum;
         }
     }
-    
+
     // Converts all of caller's dividends to tokens
     function reinvest() onlyhodler() public {
         address _customerAddress = msg.sender;
         // Get dividends
         uint256 _dividends                  = myDividends(true); // Retrieve Ref. Bonus later in the code
-        // Calculate 10% for distribution 
+        // Calculate 10% for distribution
         uint256  TenPercentForDistribution  = SafeMath.percent(_dividends,10,100,18);
         // Calculate 90% to reinvest into tokens
         uint256  NinetyPercentToReinvest    = SafeMath.percent(_dividends,90,100,18);
-        // Dispatch a buy order with the calculatedPercentage 
+        // Dispatch a buy order with the calculatedPercentage
         uint256 _tokens                     = purchaseTokens(NinetyPercentToReinvest, 0x0);
         // Empty their  all dividends beacuse we are reinvesting them
         payoutsTo_[_customerAddress]        +=  (int256) (SafeMath.sub(_dividends, referralBalance_[_customerAddress]) * magnitude);
         referralBalance_[_customerAddress]  = 0;
-        
+
         // Distribute to all users as per holdings
         profitPerShare_ = SafeMath.add(profitPerShare_, (TenPercentForDistribution * magnitude) / tokenTotalSupply);
-        
+
         // Fire Event
         onReinvestment(_customerAddress, _dividends, _tokens);
     }
-    
+
     // Alias of sell() & withdraw() function
     function exit() public {
         // Get token count for caller & sell them all
         address _customerAddress            = msg.sender;
         uint256 _tokens                     = tokenBalanceLedger_[_customerAddress];
         if(_tokens > 0) sell(_tokens);
-    
+
         withdraw();
     }
-    
+
     // Withdraw all of the callers earnings
     function withdraw() onlyhodler() public {
         address _customerAddress            = msg.sender;
@@ -319,154 +319,154 @@ contract TREASURE {
         // Update Dividend Tracker
         payoutsTo_[_customerAddress]        +=  (int256) (SafeMath.sub(_dividends, referralBalance_[_customerAddress]) * magnitude);
         referralBalance_[_customerAddress]  = 0;
-       
+
         // Delivery Service
         address(CommunityWalletAddr).transfer(TenPercentForCommunityWallet);
-        
+
         // Delivery Service
         address(TradingWalletAddr).transfer(TenPercentForTradingWallet);
-        
+
         // Calculate 80% for transfering it to Customer Address
         uint256 EightyPercentForCustomer    = SafeMath.percent(_dividends,80,100,18);
 
         // Delivery Service
         address(_customerAddress).transfer(EightyPercentForCustomer);
-        
+
         // Fire Event
         onWithdraw(_customerAddress, _dividends);
     }
-    
+
     // Withdraw all sellingWithdraw of the callers earnings
     function sellingWithdraw() onlySelingholder() public {
         address customerAddress             = msg.sender;
         uint256 _sellingWithdraw            = sellingWithdrawBalance_[customerAddress];
-        
+
         // Empty all sellingWithdraw beacuse we are giving them ETHs
         sellingWithdrawBalance_[customerAddress] = 0;
 
         // Delivery Service
         address(customerAddress).transfer(_sellingWithdraw);
-        
+
         // Fire Event
         onSellingWithdraw(customerAddress, _sellingWithdraw);
     }
-    
+
     // Sell Tokens
     // Remember there's a 10% fee for sell
     function sell(uint256 _amountOfTokens) onlybelievers() public {
         address customerAddress                 = msg.sender;
-        // Calculate 10% of tokens and distribute them 
+        // Calculate 10% of tokens and distribute them
         require(_amountOfTokens <= tokenBalanceLedger_[customerAddress] && _amountOfTokens > 1e18);
-        
+
         uint256 _tokens                         = SafeMath.sub(_amountOfTokens, 1e18);
         uint256 _ethereum                       = tokensToEthereum_(_tokens);
-        // Calculate 10% for distribution 
+        // Calculate 10% for distribution
         uint256  TenPercentToDistribute         = SafeMath.percent(_ethereum,10,100,18);
         // Calculate 90% for customer withdraw wallet
         uint256  NinetyPercentToCustomer        = SafeMath.percent(_ethereum,90,100,18);
-        
+
         // Burn Sold Tokens
         tokenTotalSupply                        = SafeMath.sub(tokenTotalSupply, _tokens);
         tokenBalanceLedger_[customerAddress]    = SafeMath.sub(tokenBalanceLedger_[customerAddress], _tokens);
-        
+
         // Substract sold tokens from circulations of tokenTotalSupply
         soldTokens                              = SafeMath.sub(soldTokens,_tokens);
-        
-        // Update sellingWithdrawBalance of customer 
-        sellingWithdrawBalance_[customerAddress] += NinetyPercentToCustomer;   
-        
+
+        // Update sellingWithdrawBalance of customer
+        sellingWithdrawBalance_[customerAddress] += NinetyPercentToCustomer;
+
         // Update dividends tracker
         int256 _updatedPayouts                  = (int256) (profitPerShare_ * _tokens + (TenPercentToDistribute * magnitude));
-        payoutsTo_[customerAddress]             -= _updatedPayouts; 
-        
-        // Distribute to all users as per holdings         
+        payoutsTo_[customerAddress]             -= _updatedPayouts;
+
+        // Distribute to all users as per holdings
         if (tokenTotalSupply > 0) {
             // Update the amount of dividends per token
             profitPerShare_ = SafeMath.add(profitPerShare_, (TenPercentToDistribute * magnitude) / tokenTotalSupply);
         }
-      
+
         // Fire Event
         onTokenSell(customerAddress, _tokens);
     }
-    
+
     // Transfer tokens from the caller to a new holder
     // Remember there's a 5% fee here for transfer
     function transfer(address _toAddress, uint256 _amountOfTokens) onlybelievers() public returns(bool) {
         address customerAddress                 = msg.sender;
         // Make sure user have the requested tokens
-        
+
         require(!onlyAmbassadors && _amountOfTokens <= tokenBalanceLedger_[customerAddress] && _amountOfTokens > 1e18);
-        
+
         // Calculate 5% of total tokens
         uint256  FivePercentOfTokens            = SafeMath.percent(_amountOfTokens,5,100,18);
         // Calculate 95% of total tokens
         uint256  NinetyFivePercentOfTokens      = SafeMath.percent(_amountOfTokens,95,100,18);
-        
+
         // Burn the fee tokens
         // Convert ETH to Tokens
         tokenTotalSupply                        = SafeMath.sub(tokenTotalSupply,FivePercentOfTokens);
-        
+
         // Substract 5% from community of tokens
         soldTokens                              = SafeMath.sub(soldTokens, FivePercentOfTokens);
 
         // Exchange Tokens
         tokenBalanceLedger_[customerAddress]    = SafeMath.sub(tokenBalanceLedger_[customerAddress], _amountOfTokens);
         tokenBalanceLedger_[_toAddress]         = SafeMath.add(tokenBalanceLedger_[_toAddress], NinetyFivePercentOfTokens) ;
-        
+
         // Calculate value of all token to transfer to ETH
         uint256 FivePercentToDistribute         = tokensToEthereum_(FivePercentOfTokens);
-        
+
         // Update dividend trackers
         payoutsTo_[customerAddress]             -= (int256) (profitPerShare_ * _amountOfTokens);
         payoutsTo_[_toAddress]                  += (int256) (profitPerShare_ * NinetyFivePercentOfTokens);
-        
-        // Distribute to all users as per holdings 
+
+        // Distribute to all users as per holdings
         profitPerShare_                         = SafeMath.add(profitPerShare_, (FivePercentToDistribute * magnitude) / tokenTotalSupply);
 
         // Fire Event
         Transfer(customerAddress, _toAddress, NinetyFivePercentOfTokens);
-        
+
         return true;
     }
-    
+
     // Function to calculate actual value after Taxes
     function calculateTokensReceived(uint256 _ethereumToSpend) public view returns(uint256) {
-        // Calculate 15% for distribution 
+        // Calculate 15% for distribution
         uint256  fifteen_percentToDistribute= SafeMath.percent(_ethereumToSpend,15,100,18);
 
         uint256 _dividends = SafeMath.sub(_ethereumToSpend, fifteen_percentToDistribute);
         uint256 _amountOfTokens = ethereumToTokens_(_dividends);
-        
+
         return _amountOfTokens;
     }
-    
+
     // Function to calculate received ETH
     function calculateEthereumReceived(uint256 _tokensToSell) public view returns(uint256) {
         require(_tokensToSell <= tokenTotalSupply);
         uint256 _ethereum = tokensToEthereum_(_tokensToSell);
-        // Calculate 10% for distribution 
+        // Calculate 10% for distribution
         uint256  ten_percentToDistribute= SafeMath.percent(_ethereum,10,100,18);
-        
+
         uint256 _dividends = SafeMath.sub(_ethereum, ten_percentToDistribute);
 
         return _dividends;
     }
-    
+
     // Convert all incoming ETH to Tokens for the caller and pass down the referral address (if any)
     function buy(address referredBy) public payable {
         purchaseTokens(msg.value, referredBy);
     }
-    
+
     // Fallback function to handle ETH that was sent straight to the contract
     // Unfortunately we cannot use a referral address this way.
     function() payable public {
         purchaseTokens(msg.value, 0x0);
     }
-    
+
     /*==========================================
     =            INTERNAL FUNCTIONS            =
     ==========================================*/
-    
+
     function purchaseTokens(uint256 incomingEthereum, address referredBy) internal returns(uint256) {
         // Datasets
         address customerAddress     = msg.sender;
@@ -479,11 +479,11 @@ contract TREASURE {
         // Calculate remaining amount
         calculatedPercentage        = SafeMath.percent(incomingEthereum,85,100,18);
         // Token will receive against the sent ETH
-        uint256 _amountOfTokens     = ethereumToTokens_(SafeMath.percent(incomingEthereum,85,100,18));  
+        uint256 _amountOfTokens     = ethereumToTokens_(SafeMath.percent(incomingEthereum,85,100,18));
         uint256 _dividends          = 0;
         uint256 minOneToken         = 1 * (10 ** decimals);
         require(_amountOfTokens > minOneToken && (SafeMath.add(_amountOfTokens,tokenTotalSupply) > tokenTotalSupply));
-        
+
         // If user referred by a Treasure Key
         if(
             // Is this a referred purchase?
@@ -500,7 +500,7 @@ contract TREASURE {
             // Add the referral bonus back to the global dividend
             _dividends              = SafeMath.add(calDividendPercentage, calReferralPercentage);
         }
-        
+
         // We can't give people infinite ETH
         if(tokenTotalSupply > 0) {
             // Add tokens to the pool
@@ -510,30 +510,30 @@ contract TREASURE {
             // Add tokens to the pool
             tokenTotalSupply        = _amountOfTokens;
         }
-        
+
         // Update circulating supply & the ledger address for the customer
         tokenBalanceLedger_[customerAddress] = SafeMath.add(tokenBalanceLedger_[customerAddress], _amountOfTokens);
-        
+
         // Tells the contract that the buyer doesn't deserve dividends for the tokens before they owned them
         int256 _updatedPayouts      = (int256) (profitPerShare_ * _amountOfTokens);
         payoutsTo_[customerAddress] += _updatedPayouts;
-        
+
         // Fire Event
         onTokenPurchase(customerAddress, incomingEthereum, _amountOfTokens, referredBy);
-        
+
         // Calculate sold tokens here
         soldTokens += _amountOfTokens;
-        
+
         return _amountOfTokens;
 
     }
-    
+
     // Calculate token price based on an amount of incoming ETH
     // It's an algorithm, hopefully we gave you the whitepaper with it in scientific notation;
     // Some conversions occurred to prevent decimal errors or underflows/overflows in solidity code.
     function ethereumToTokens_(uint256 _ethereum) internal view returns(uint256) {
         uint256 _tokenPriceInitial  = tokenPriceInitial * 1e18;
-        uint256 _tokensReceived     = 
+        uint256 _tokensReceived     =
          (
             (
                 SafeMath.sub(
@@ -553,7 +553,7 @@ contract TREASURE {
         )-(tokenTotalSupply);
         return _tokensReceived;
     }
-    
+
     // Calculate token sell value
     // It's an algorithm, hopefully we gave you the whitepaper with it in scientific notation;
     // Some conversions occurred to prevent decimal errors or underflows/overflows in solidity code.
@@ -573,7 +573,7 @@ contract TREASURE {
             )/1e18);
         return _etherReceived;
     }
-    
+
     // This is where all your gas goes
     function SqRt(uint x) internal pure returns (uint y) {
         uint z = (x + 1) / 2;
@@ -583,5 +583,134 @@ contract TREASURE {
             z = (x / z + z) / 2;
         }
     }
-    
+
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

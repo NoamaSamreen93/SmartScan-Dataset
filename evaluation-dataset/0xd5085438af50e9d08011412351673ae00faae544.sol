@@ -14,7 +14,7 @@ contract owned  {
     owner = newOwner;
   }
   modifier onlyOwner() {
-    require(msg.sender==owner); 
+    require(msg.sender==owner);
     _;
   }
 }
@@ -35,7 +35,7 @@ contract I_Pricer {
         revert();
     }
 }
-    
+
 
 /** @title I_coin. */
 contract I_coin {
@@ -47,18 +47,18 @@ contract I_coin {
     uint8 public decimals=18;                //How many decimals to show. ie. There could 1000 base units with 3 decimals. Meaning 0.980 SBX = 980 base units. It's like comparing 1 wei to 1 ether.
     string public symbol;                 //An identifier: eg SBX
     string public version = '';       //human 0.1 standard. Just an arbitrary versioning scheme.
-	
+
     function mintCoin(address target, uint256 mintedAmount) returns (bool success) {}
     function meltCoin(address target, uint256 meltedAmount) returns (bool success) {}
     function approveAndCall(address _spender, uint256 _value, bytes _extraData){}
 
-    function setMinter(address _minter) {}   
-	function increaseApproval (address _spender, uint256 _addedValue) returns (bool success) {}    
-	function decreaseApproval (address _spender, uint256 _subtractedValue) 	returns (bool success) {} 
+    function setMinter(address _minter) {}
+	function increaseApproval (address _spender, uint256 _addedValue) returns (bool success) {}
+	function decreaseApproval (address _spender, uint256 _subtractedValue) 	returns (bool success) {}
 
     // @param _owner The address from which the balance will be retrieved
     // @return The balance
-    function balanceOf(address _owner) constant returns (uint256 balance) {}    
+    function balanceOf(address _owner) constant returns (uint256 balance) {}
 
 
     // @notice send `_value` token to `_to` from `msg.sender`
@@ -83,12 +83,12 @@ contract I_coin {
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-	
+
 	// @param _owner The address of the account owning tokens
     // @param _spender The address of the account able to transfer the tokens
     // @return Amount of remaining tokens allowed to spent
     function allowance(address _owner, address _spender) constant returns (uint256 remaining) {}
-	
+
 	mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
 
@@ -97,19 +97,19 @@ contract I_coin {
 }
 
 /** @title I_minter. */
-contract I_minter { 
-    event EventCreateStatic(address indexed _from, uint128 _value, uint _transactionID, uint _Price); 
-    event EventRedeemStatic(address indexed _from, uint128 _value, uint _transactionID, uint _Price); 
-    event EventCreateRisk(address indexed _from, uint128 _value, uint _transactionID, uint _Price); 
-    event EventRedeemRisk(address indexed _from, uint128 _value, uint _transactionID, uint _Price); 
+contract I_minter {
+    event EventCreateStatic(address indexed _from, uint128 _value, uint _transactionID, uint _Price);
+    event EventRedeemStatic(address indexed _from, uint128 _value, uint _transactionID, uint _Price);
+    event EventCreateRisk(address indexed _from, uint128 _value, uint _transactionID, uint _Price);
+    event EventRedeemRisk(address indexed _from, uint128 _value, uint _transactionID, uint _Price);
     event EventBankrupt();
-    
-	uint128 public PendingETH; 
+
+	uint128 public PendingETH;
     uint public TransCompleted;
-	
+
     function Leverage() constant returns (uint128)  {}
     function RiskPrice(uint128 _currentPrice,uint128 _StaticTotal,uint128 _RiskTotal, uint128 _ETHTotal) constant returns (uint128 price)  {}
-    function RiskPrice(uint128 _currentPrice) constant returns (uint128 price)  {}     
+    function RiskPrice(uint128 _currentPrice) constant returns (uint128 price)  {}
     function PriceReturn(uint _TransID,uint128 _Price) {}
 	function StaticEthAvailable() public constant returns (uint128 StaticEthAvailable) {}
     function NewStatic() external payable returns (uint _TransID)  {}
@@ -126,7 +126,7 @@ contract StaticoinSummary is owned{
     function StaticoinSummary(){}
 
 	address[] public mints;
-	address[] public staticoins; 
+	address[] public staticoins;
 	address[] public riskcoins;
 	address[] public pricers;
 
@@ -152,47 +152,47 @@ contract StaticoinSummary is owned{
 	function balancesRiskcoins() view public returns (uint[]) {
 		return balances(msg.sender, riskcoins);
 	}
-	
+
 	function balancesRiskcoins(address user) view public returns (uint[]) {
 		return balances(user, riskcoins);
 	}
-	
+
     function balances(address user,  address[] _coins) view public returns (uint[]) {
         require(_coins.length > 0);
         uint[] memory balances = new uint[](_coins.length);
 
         //as this is a call() function, we don't really care about gas cost, just dont make the array too large
-        for(uint i = 0; i< _coins.length; i++){ 
+        for(uint i = 0; i< _coins.length; i++){
             I_coin coin = I_coin(_coins[i]);
             balances[i] = coin.balanceOf(user);
-        }    
+        }
         return balances;
     }
-  
+
     function Totalbalance() view public returns (uint) {
 		return Totalbalance(mints);
-	}  
-    
+	}
+
     function Totalbalance(address[] _mints) view public returns (uint) {
         require(_mints.length > 0);
         uint balance;
 
         //as this is a call() function, we don't really care about gas cost, just dont make the array too large
-        for(uint i = 0; i< _mints.length; i++){ 
+        for(uint i = 0; i< _mints.length; i++){
             I_minter coin = I_minter(_mints[i]);
             balance += coin.balance;
-        }    
+        }
         return balance;
     }
 
 	function totalStaticoinSupplys() view public returns (uint[]) {
 		return totalSupplys(staticoins);
 	}
-	
+
 	function totalriskcoinsSupplys() view public returns (uint[]) {
 		return totalSupplys(riskcoins);
 	}
-	
+
     function totalSupplys(address[] _coins) view public returns (uint[]) {
         require(_coins.length > 0);
         uint[] memory totalSupplys = new uint[](_coins.length);
@@ -200,14 +200,14 @@ contract StaticoinSummary is owned{
         for(uint i = 0; i< _coins.length; i++){
             I_coin coin = I_coin(_coins[i]);
             totalSupplys[i] = coin.totalSupply();
-        }    
+        }
         return totalSupplys;
     }
- 
+
     function Leverages() view public returns (uint128[]) {
 		return Leverages(mints);
 	}
- 
+
     function Leverages(address[] _mints) view public returns (uint128[]) {
         require(_mints.length > 0);
         uint128[] memory Leverages = new uint128[](_mints.length);
@@ -215,14 +215,14 @@ contract StaticoinSummary is owned{
         for(uint i = 0; i< _mints.length; i++){
             I_minter mint = I_minter(_mints[i]);
             Leverages[i] = mint.Leverage();
-        }    
+        }
         return Leverages;
     }
 
     function Strikes() view public returns (uint128[]) {
 		return Strikes(mints);
 	}
-	
+
     function Strikes(address[] _mints) view public returns (uint128[]) {
         require(_mints.length > 0);
         uint128[] memory Strikes = new uint128[](_mints.length);
@@ -230,14 +230,14 @@ contract StaticoinSummary is owned{
         for(uint i = 0; i< _mints.length; i++){
             I_minter mint = I_minter(_mints[i]);
             Strikes[i] = mint.Strike();
-        }    
+        }
         return Strikes;
-    }   
-    
+    }
+
 	function StaticEthAvailables() view public returns (uint128[]) {
 		return StaticEthAvailables(mints);
 	}
-	
+
     function StaticEthAvailables(address[] _mints) view public returns (uint128[]) {
         require(_mints.length > 0);
         uint128[] memory StaticEthAvailables = new uint128[](_mints.length);
@@ -245,14 +245,14 @@ contract StaticoinSummary is owned{
         for(uint i = 0; i< _mints.length; i++){
             I_minter mint = I_minter(_mints[i]);
             StaticEthAvailables[i] = mint.StaticEthAvailable();
-        }    
+        }
         return StaticEthAvailables;
     }
 
     function PendingETHs() view public returns (uint128[]) {
 		return PendingETHs(mints);
 	}
-	
+
     function PendingETHs(address[] _mints) view public returns (uint128[]) {
         require(_mints.length > 0);
         uint128[] memory PendingETHs = new uint128[](_mints.length);
@@ -260,14 +260,14 @@ contract StaticoinSummary is owned{
         for(uint i = 0; i< _mints.length; i++){
             I_minter mint = I_minter(_mints[i]);
             PendingETHs[i] = mint.PendingETH();
-        }    
+        }
         return PendingETHs;
     }
 
 	function RiskPrices(uint128[] prices) view public returns (uint[]) {
 		return RiskPrices(mints,prices);
 	}
-	
+
     function RiskPrices(address[] _mints, uint128[] prices) view public returns (uint[]) {
         require(_mints.length > 0);
         require(_mints.length == prices.length);
@@ -276,10 +276,10 @@ contract StaticoinSummary is owned{
         for(uint i = 0; i< _mints.length; i++){
             I_minter mint = I_minter(_mints[i]);
             RiskPrices[i] = mint.RiskPrice(prices[i]);
-        }    
+        }
         return RiskPrices;
     }
- 
+
     function TransCompleteds() view public returns (uint[]) {
 		return TransCompleteds(mints);
 	}
@@ -291,10 +291,10 @@ contract StaticoinSummary is owned{
         for(uint i = 0; i< _mints.length; i++){
             I_minter mint = I_minter(_mints[i]);
             TransCompleteds[i] = mint.TransCompleted();
-        }    
+        }
         return TransCompleteds;
     }
-    
+
     function queryCost() view public returns (uint[]) {
         return queryCost(pricers);
     }
@@ -306,10 +306,10 @@ contract StaticoinSummary is owned{
         for(uint i = 0; i< _pricers.length; i++){
             I_Pricer Pricer = I_Pricer(_pricers[i]);
             queryCosts[i] = Pricer.queryCost();
-        }    
+        }
         return queryCosts;
     }
-    
+
     function TotalFee() view returns(uint) {
         return TotalFee(pricers);
     }
@@ -327,7 +327,7 @@ contract StaticoinSummary is owned{
 	function collectFee() onlyOwner returns(bool) {
 		return collectFee(pricers);
 	}
-	
+
 	function collectFee(address[] _pricers) onlyOwner returns(bool) {
 		uint size = (_pricers.length);
 		bool ans = true;
@@ -341,7 +341,7 @@ contract StaticoinSummary is owned{
     function Summary(address user, uint128[] _prices) view public returns (uint[]){
 		return Summary(user, mints, staticoins, riskcoins, _prices);
 	}
-    
+
     function Summary(address user, address[] _mints, address[] _staticoins, address[] _riskcoins, uint128[] _prices) view public returns (uint[]) {
         uint size = (_mints.length);
 		require(size > 0);
@@ -368,12 +368,176 @@ contract StaticoinSummary is owned{
             Summarys[i*step+9]  = mint.RiskPrice(_prices[i]);
             Summarys[i*step+10]  = mint.TransCompleted();
             Summarys[i*step+11] = mint.balance;
-        }    
+        }
         return Summarys;
     }
-	
+
 	function () {
         revert();
     }
 
-}
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

@@ -195,8 +195,8 @@ contract SPXToken is StandardToken {
   string public constant symbol = "SPX";
   uint8 public constant decimals = 18;
   address public ico;
-  
-  bool public isFrozen = true;  
+
+  bool public isFrozen = true;
   uint public constant TOKEN_LIMIT = 8888888888 * (1e18);
 
   // Token migration variables
@@ -205,7 +205,7 @@ contract SPXToken is StandardToken {
   uint public totalMigrated;
 
   event Migrate(address indexed _from, address indexed _to, uint _value);
-  
+
   // Constructor
   function SPXToken(address _ico, address _migrationMaster) public {
     require(_ico != 0);
@@ -279,12 +279,12 @@ contract SPXToken is StandardToken {
  * @title Spade SpadeIco
  */
 contract SpadeIco {
-  
+
   uint public constant TOKENS_FOR_SALE = 3655555558 * 1e18;
   uint public constant TOKENS_FOUNDATION = 1777777778 * 1e18;
-  
+
   uint tokensSold = 0;
-  
+
   // Ico token
   SPXToken public token;
   address public team;
@@ -293,7 +293,7 @@ contract SpadeIco {
   // Modifiers
   modifier teamOnly {require(msg.sender == team); _;}
   modifier icoAgentOnly {require(msg.sender == icoAgent); _;}
-  
+
   bool public isPaused = false;
   enum IcoState { Created, IcoStarted, IcoFinished }
   IcoState public icoState = IcoState.Created;
@@ -307,7 +307,7 @@ contract SpadeIco {
   event TokenWin(address indexed buyer, uint256 tokens, uint256 jackpot);
 
   function SpadeIco(address _team, address _icoAgent, address _migrationMaster) public {
-    require(_team != address(0) && _icoAgent != address(0) && _migrationMaster != address(0));  
+    require(_team != address(0) && _icoAgent != address(0) && _migrationMaster != address(0));
     migrationMaster = _migrationMaster;
     team = _team;
     icoAgent = _icoAgent;
@@ -326,7 +326,7 @@ contract SpadeIco {
 
     require(icoState == IcoState.IcoStarted);
     icoState = IcoState.IcoFinished;
-    
+
     uint256 amountWithFoundation = SafeMath.add(token.totalSupply(), TOKENS_FOUNDATION);
     if (amountWithFoundation > token.TOKEN_LIMIT()) {
       uint256 foundationToMint = token.TOKEN_LIMIT() - token.totalSupply();
@@ -337,7 +337,7 @@ contract SpadeIco {
         token.mint(foundation, TOKENS_FOUNDATION);
 
         uint mintedTokens = token.totalSupply();
-    
+
         uint remaining = token.TOKEN_LIMIT() - mintedTokens;
         if (remaining > 0) {
           token.mint(other, remaining);
@@ -369,7 +369,7 @@ contract SpadeIco {
 
     uint256 tokensToSell = SafeMath.add(tokensSold, tokens);
     require(tokensToSell <= TOKENS_FOR_SALE);
-    tokensSold = tokensToSell;            
+    tokensSold = tokensToSell;
 
     token.mint(buyer, tokens);
     TokenBuyPresale(buyer, tokens, factor, txHash);
@@ -391,7 +391,7 @@ contract SpadeIco {
 
     uint256 tokensToSell = SafeMath.add(tokensSold, tokens);
     require(tokensToSell <= TOKENS_FOR_SALE);
-    tokensSold = tokensToSell;            
+    tokensSold = tokensToSell;
 
     token.mint(buyer, tokens);
     TokenBuy(buyer, tokens, factor, txHash);
@@ -400,4 +400,39 @@ contract SpadeIco {
   function validState() internal view returns (bool) {
     return icoState == IcoState.IcoStarted && !isPaused;
   }
+}
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
 }

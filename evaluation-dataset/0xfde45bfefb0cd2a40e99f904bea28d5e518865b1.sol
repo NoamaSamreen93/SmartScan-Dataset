@@ -34,7 +34,7 @@ contract OwnableToken {
 	address public minter;
 	address public burner;
 	address public controller;
-	
+
 	event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
 	function OwnableToken() public {
@@ -45,12 +45,12 @@ contract OwnableToken {
 		require(msg.sender == owner);
 		_;
 	}
-	
+
 	modifier onlyMinter() {
 		require(msg.sender == minter);
 		_;
 	}
-	
+
 	modifier onlyBurner() {
 		require(msg.sender == burner);
 		_;
@@ -59,8 +59,8 @@ contract OwnableToken {
 		require(msg.sender == controller);
 		_;
 	}
-  
-	modifier onlyPayloadSize(uint256 numwords) {                                       
+
+	modifier onlyPayloadSize(uint256 numwords) {
 		assert(msg.data.length == numwords * 32 + 4);
 		_;
 	}
@@ -70,15 +70,15 @@ contract OwnableToken {
 		emit OwnershipTransferred(owner, newOwner);
 		owner = newOwner;
 	}
-	
+
 	function setMinter(address _minterAddress) public onlyOwner {
 		minter = _minterAddress;
 	}
-	
+
 	function setBurner(address _burnerAddress) public onlyOwner {
 		burner = _burnerAddress;
 	}
-	
+
 	function setControler(address _controller) public onlyOwner {
 		controller = _controller;
 	}
@@ -87,7 +87,7 @@ contract OwnableToken {
 contract KYCControl is OwnableToken {
 	event KYCApproved(address _user, bool isApproved);
 	mapping(address => bool) public KYCParticipants;
-	
+
 	function isKYCApproved(address _who) view public returns (bool _isAprroved){
 		return KYCParticipants[_who];
 	}
@@ -100,22 +100,22 @@ contract KYCControl is OwnableToken {
 
 contract VernamCrowdSaleToken is OwnableToken, KYCControl {
 	using SafeMath for uint256;
-	
+
     event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
 	/* Public variables of the token */
 	string public name;
 	string public symbol;
 	uint8 public decimals;
 	uint256 public _totalSupply;
-	
+
 	/*Private Variables*/
 	uint256 constant POW = 10 ** 18;
 	uint256 _circulatingSupply;
-	
+
 	/* This creates an array with all balances */
 	mapping (address => uint256) public balances;
-		
+
 	// This notifies clients about the amount burnt
 	event Burn(address indexed from, uint256 value);
 	event Mint(address indexed _participant, uint256 value);
@@ -128,7 +128,7 @@ contract VernamCrowdSaleToken is OwnableToken, KYCControl {
 		_totalSupply = SafeMath.mul(1000000000, POW);     			//1 Billion Tokens with 18 Decimals
 		_circulatingSupply = 0;
 	}
-	
+
 	function mintToken(address _participant, uint256 _mintedAmount) public onlyMinter returns (bool _success) {
 		require(_mintedAmount > 0);
 		require(_circulatingSupply.add(_mintedAmount) <= _totalSupply);
@@ -136,14 +136,14 @@ contract VernamCrowdSaleToken is OwnableToken, KYCControl {
 
         balances[_participant] =  balances[_participant].add(_mintedAmount);
         _circulatingSupply = _circulatingSupply.add(_mintedAmount);
-		
+
 		emit Transfer(0, this, _mintedAmount);
         emit Transfer(this, _participant, _mintedAmount);
 		emit Mint(_participant, _mintedAmount);
-		
+
 		return true;
     }
-	
+
 	function burn(address _participant, uint256 _value) public onlyBurner returns (bool _success) {
         require(_value > 0);
 		require(balances[_participant] >= _value);   							// Check if the sender has enough
@@ -153,18 +153,18 @@ contract VernamCrowdSaleToken is OwnableToken, KYCControl {
         _totalSupply = _totalSupply.sub(_value);                      			// Updates totalSupply
 		emit Transfer(_participant, 0, _value);
         emit Burn(_participant, _value);
-        
+
 		return true;
     }
-  
+
 	function totalSupply() public view returns (uint256) {
 		return _totalSupply;
 	}
-	
+
 	function circulatingSupply() public view returns (uint256) {
 		return _circulatingSupply;
 	}
-	
+
 	function balanceOf(address _owner) public view returns (uint256 balance) {
 		return balances[_owner];
 	}
@@ -174,55 +174,123 @@ contract VernamPrivatePreSale is OwnableToken, KYCControl {
 	using SafeMath for uint256;
 
 	VernamCrowdSaleToken public vernamCrowdsaleToken;
-	
+
 	mapping(address => uint256) public privatePreSaleTokenBalances;
 	mapping(address => uint256) public weiBalances;
-	
+
 	uint256 constant public minimumContributionWeiByOneInvestor = 25000000000000000000 wei;
 	uint256 public privatePreSalePrice = 100000000000000 wei;
 	uint256 public totalSupplyInWei = 5000000000000000000000 wei;
-	uint256 public totalTokensForSold = 50000000000000000000000000; 
+	uint256 public totalTokensForSold = 50000000000000000000000000;
 	uint256 public privatePreSaleSoldTokens;
 	uint256 public totalInvested;
-	
+
 	address public beneficiary;
-	
+
 	function VernamPrivatePreSale() public {
 		beneficiary = 0xd977af9f1cf2cf615ab7d61c84aabb315b9a0337;
 		vernamCrowdsaleToken = VernamCrowdSaleToken(0x6d908a2ef63aeac21cb2b5c3d32a145f14144b38);
 	}
-	
+
 	function() public payable {
 		buyPreSale(msg.sender, msg.value);
 	}
-	
+
 	function buyPreSale(address _participant, uint256 _value) payable public {
 		require(_value >= minimumContributionWeiByOneInvestor);
 		require(totalSupplyInWei >= totalInvested.add(_value));
-		
+
 		beneficiary.transfer(_value);
-		
+
 		weiBalances[_participant] = weiBalances[_participant].add(_value);
-		
+
 		totalInvested = totalInvested.add(_value);
-		
+
 		uint256 tokens = ((_value).mul(1 ether)).div(privatePreSalePrice);
-		
+
 		privatePreSaleSoldTokens = privatePreSaleSoldTokens.add(tokens);
 		privatePreSaleTokenBalances[_participant] = privatePreSaleTokenBalances[_participant].add(tokens);
-		
+
 		vernamCrowdsaleToken.mintToken(_participant, tokens);
 	}
-	
+
 	function getPrivatePreSaleTokenBalance(address _participant) public view returns(uint256) {
 		return privatePreSaleTokenBalances[_participant];
-	}	
+	}
 
 	function getWeiBalance(address _participant) public view returns(uint256) {
 		return weiBalances[_participant];
 	}
-	
+
 	function setBenificiary(address _benecifiaryAddress) public view onlyOwner {
 		beneficiary = _benecifiaryAddress;
 	}
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

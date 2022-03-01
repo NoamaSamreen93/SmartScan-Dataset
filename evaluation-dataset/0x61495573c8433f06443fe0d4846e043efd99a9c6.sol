@@ -456,7 +456,7 @@ contract Crowdsale is Haltable {
    *
    */
   function investInternal(address receiver, uint128 customerId) stopInEmergency private {
-    uint weiAmount = msg.value;    
+    uint weiAmount = msg.value;
 
     // Account presale sales separately, so that they do not count against pricing tranches
     uint tokenAmount = pricingStrategy.calculatePrice(weiAmount, weiRaised - presaleWeiRaised, tokensSold, msg.sender, token.decimals());
@@ -480,8 +480,8 @@ contract Crowdsale is Haltable {
 
     // Update investor
     investedAmountOf[receiver] = investedAmountOf[receiver].add(weiAmount);
-    tokenAmountOf[receiver] = tokenAmountOf[receiver].add(tokenAmount);    
-    
+    tokenAmountOf[receiver] = tokenAmountOf[receiver].add(tokenAmount);
+
     // Update totals
     weiRaised = weiRaised.add(weiAmount);
     tokensSold = tokensSold.add(tokenAmount);
@@ -498,7 +498,7 @@ contract Crowdsale is Haltable {
     assignTokens(receiver, tokenAmount);
 
     // Pocket the money
-    if (!multisigWallet.send(weiAmount)) 
+    if (!multisigWallet.send(weiAmount))
       revert();
 
     // Tell us invest was success
@@ -506,7 +506,7 @@ contract Crowdsale is Haltable {
   }
 
   function getCurrentFgcCap() public constant returns (uint) {
-    if (block.timestamp < startsAt) 
+    if (block.timestamp < startsAt)
       return maxEthPerAddress;
 
     uint timeSinceStart = block.timestamp.sub(startsAt);
@@ -569,9 +569,9 @@ contract Crowdsale is Haltable {
    */
   function investWithSignedAddress(address addr, uint128 customerId, uint8 v, bytes32 r, bytes32 s) public payable {
      bytes32 hash = sha256(addr);
-     if (ecrecover(hash, v, r, s) != signerAddress) 
+     if (ecrecover(hash, v, r, s) != signerAddress)
       revert();
-     if (customerId == 0) 
+     if (customerId == 0)
       revert();  // UUIDv4 sanity check
      investInternal(addr, customerId);
   }
@@ -580,9 +580,9 @@ contract Crowdsale is Haltable {
    * Track who is the customer making the payment so we can send thank you email.
    */
   function investWithCustomerId(address addr, uint128 customerId) public payable {
-    if (requiredSignedAddress) 
+    if (requiredSignedAddress)
       revert(); // Crowdsale allows only server-side signed participants
-    if (customerId == 0) 
+    if (customerId == 0)
       revert();  // UUIDv4 sanity check
     investInternal(addr, customerId);
   }
@@ -591,9 +591,9 @@ contract Crowdsale is Haltable {
    * Allow anonymous contributions to this crowdsale.
    */
   function invest(address addr) public payable {
-    if (requireCustomerId) 
+    if (requireCustomerId)
       revert(); // Crowdsale needs to track partipants for thank you email
-    if (requiredSignedAddress) 
+    if (requiredSignedAddress)
       revert(); // Crowdsale allows only server-side signed participants
     investInternal(addr, 0);
   }
@@ -678,11 +678,11 @@ contract Crowdsale is Haltable {
     InvestmentPolicyChanged(requireCustomerId, requiredSignedAddress, signerAddress);
   }
 
-  /** 
+  /**
    * Set the base eth cap
    */
   function setBaseEthCap(uint _baseEthCap) onlyOwner {
-    if (_baseEthCap == 0) 
+    if (_baseEthCap == 0)
       revert();
     baseEthCap = _baseEthCap;
     BaseEthCapChanged(baseEthCap);
@@ -754,7 +754,7 @@ contract Crowdsale is Haltable {
    * The team can transfer the funds back on the smart contract in the case the minimum goal was not reached..
    */
   function loadRefund() public payable inState(State.Failure) {
-    if (msg.value == 0) 
+    if (msg.value == 0)
       revert();
     loadedRefund = loadedRefund.add(msg.value);
   }
@@ -767,12 +767,12 @@ contract Crowdsale is Haltable {
    */
   function refund() public inState(State.Refunding) {
     uint256 weiValue = investedAmountOf[msg.sender];
-    if (weiValue == 0) 
+    if (weiValue == 0)
       revert();
     investedAmountOf[msg.sender] = 0;
     weiRefunded = weiRefunded.add(weiValue);
     Refund(msg.sender, weiValue);
-    if (!msg.sender.send(weiValue)) 
+    if (!msg.sender.send(weiValue))
       revert();
   }
 
@@ -803,23 +803,23 @@ contract Crowdsale is Haltable {
    * We make it a function and do not assign the result to a variable, so there is no chance of the variable being stale.
    */
   function getState() public constant returns (State) {
-    if (finalized) 
+    if (finalized)
       return State.Finalized;
-    else if (address(finalizeAgent) == 0) 
+    else if (address(finalizeAgent) == 0)
       return State.Preparing;
-    else if (!finalizeAgent.isSane()) 
+    else if (!finalizeAgent.isSane())
       return State.Preparing;
-    else if (!pricingStrategy.isSane(address(this))) 
+    else if (!pricingStrategy.isSane(address(this)))
       return State.Preparing;
-    else if (block.timestamp < startsAt) 
+    else if (block.timestamp < startsAt)
       return State.PreFunding;
-    else if (block.timestamp <= endsAt && !isCrowdsaleFull()) 
+    else if (block.timestamp <= endsAt && !isCrowdsaleFull())
       return State.Funding;
-    else if (isMinimumGoalReached()) 
+    else if (isMinimumGoalReached())
       return State.Success;
-    else if (!isMinimumGoalReached() && weiRaised > 0 && loadedRefund >= weiRaised) 
+    else if (!isMinimumGoalReached() && weiRaised > 0 && loadedRefund >= weiRaised)
       return State.Refunding;
-    else 
+    else
       return State.Failure;
   }
 
@@ -839,7 +839,7 @@ contract Crowdsale is Haltable {
 
   /** Modified allowing execution only if the crowdsale is currently running.  */
   modifier inState(State state) {
-    if (getState() != state) 
+    if (getState() != state)
       revert();
     _;
   }
@@ -903,7 +903,7 @@ contract AllocatedCrowdsale is Crowdsale {
   /* The party who holds the full token pool and has approve()'ed tokens for this crowdsale */
   address public beneficiary;
 
-  function AllocatedCrowdsale(address _token, PricingStrategy _pricingStrategy, address _multisigWallet, uint _start, uint _end, uint _minimumFundingGoal, address _beneficiary, uint baseEthCap, uint maxEthPerAddress) 
+  function AllocatedCrowdsale(address _token, PricingStrategy _pricingStrategy, address _multisigWallet, uint _start, uint _end, uint _minimumFundingGoal, address _beneficiary, uint baseEthCap, uint maxEthPerAddress)
     Crowdsale(_token, _pricingStrategy, _multisigWallet, _start, _end, _minimumFundingGoal, baseEthCap, maxEthPerAddress) {
     beneficiary = _beneficiary;
   }
@@ -939,7 +939,42 @@ contract AllocatedCrowdsale is Crowdsale {
    * Use approve() given to this crowdsale to distribute the tokens.
    */
   function assignTokens(address receiver, uint256 tokenAmount) private {
-    if (!token.transferFrom(beneficiary, receiver, tokenAmount)) 
+    if (!token.transferFrom(beneficiary, receiver, tokenAmount))
       revert();
   }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

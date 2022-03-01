@@ -39,7 +39,7 @@ contract BasicAccessControl {
             totalModerators += 1;
         }
     }
-    
+
     function RemoveModerator(address _oldModerator) onlyOwner public {
         if (moderators[_oldModerator] == true) {
             moderators[_oldModerator] = false;
@@ -70,12 +70,12 @@ contract EtheremonAdventureSetting is BasicAccessControl {
     uint[4] public levelRewards = [1, 1, 1, 2];
     uint[11] public expRewards = [50, 50, 50, 50, 100, 100, 100, 100, 200, 200, 500];
     uint[6] public emontRewards = [300000000, 300000000, 500000000, 500000000, 1000000000, 150000000];
-    
+
     function setConfig(uint _levelItemClass, uint _expItemClass) onlyModerators public {
         levelItemClass = _levelItemClass;
         expItemClass = _expItemClass;
     }
-    
+
     function addSiteSet(uint _setId, uint _siteId) onlyModerators public {
         uint[] storage siteList = siteSet[_setId];
         for (uint index = 0; index < siteList.length; index++) {
@@ -85,7 +85,7 @@ contract EtheremonAdventureSetting is BasicAccessControl {
         }
         siteList.push(_siteId);
     }
-    
+
     function removeSiteSet(uint _setId, uint _siteId) onlyModerators public {
         uint[] storage siteList = siteSet[_setId];
         uint foundIndex = 0;
@@ -100,11 +100,11 @@ contract EtheremonAdventureSetting is BasicAccessControl {
             siteList.length--;
         }
     }
-    
+
     function setMonsterClassSiteSet(uint _monsterId, uint _siteSetId) onlyModerators public {
         monsterClassSiteSet[_monsterId] = _siteSetId;
     }
-    
+
     function setSiteRewards(uint _siteId, uint _monster_rate, uint _monster_id, uint _shard_rate, uint _shard_id, uint _level_rate, uint _exp_rate, uint _emont_rate) onlyModerators public {
         RewardData storage reward = siteRewards[_siteId];
         reward.monster_rate = _monster_rate;
@@ -115,19 +115,19 @@ contract EtheremonAdventureSetting is BasicAccessControl {
         reward.exp_rate = _exp_rate;
         reward.emont_rate = _emont_rate;
     }
-    
+
     function setLevelRewards(uint _index, uint _value) onlyModerators public {
         levelRewards[_index] = _value;
     }
-    
+
     function setExpRewards(uint _index, uint _value) onlyModerators public {
         expRewards[_index] = _value;
     }
-    
+
     function setEmontRewards(uint _index, uint _value) onlyModerators public {
         emontRewards[_index] = _value;
     }
-    
+
     function initSiteSet(uint _turn) onlyModerators public {
         if (_turn == 1) {
             siteSet[1] = [35, 3, 4, 37, 51, 8, 41, 11, 45, 47, 15, 16, 19, 52, 23, 36, 27, 30, 31];
@@ -150,7 +150,7 @@ contract EtheremonAdventureSetting is BasicAccessControl {
             siteSet[17] = [32, 1, 49, 36, 38, 6, 33, 8, 44, 12, 13, 48, 17, 19, 40, 54, 23, 26, 28];
         }
     }
-    
+
     function initMonsterClassSiteSet() onlyModerators public {
             monsterClassSiteSet[1] = 1;
             monsterClassSiteSet[2] = 2;
@@ -311,7 +311,7 @@ contract EtheremonAdventureSetting is BasicAccessControl {
             monsterClassSiteSet[157] = 16;
             monsterClassSiteSet[158] = 8;
     }
-    
+
     function initSiteRewards(uint _turn) onlyModerators public {
         if (_turn == 1) {
             siteRewards[1] = RewardData(25, 116, 350, 350, 50, 350, 225);
@@ -369,20 +369,20 @@ contract EtheremonAdventureSetting is BasicAccessControl {
             siteRewards[52] = RewardData(25, 151, 350, 332, 50, 350, 225);
             siteRewards[53] = RewardData(25, 146, 350, 332, 50, 350, 225);
             siteRewards[54] = RewardData(25, 148, 350, 332, 50, 350, 225);
-        } 
+        }
     }
-    
+
     function getSiteRewards(uint _siteId) constant public returns(uint monster_rate, uint monster_id, uint shard_rate, uint shard_id, uint level_rate, uint exp_rate, uint emont_rate) {
         RewardData storage reward = siteRewards[_siteId];
         return (reward.monster_rate, reward.monster_id, reward.shard_rate, reward.shard_id, reward.level_rate, reward.exp_rate, reward.emont_rate);
     }
-    
+
     function getSiteId(uint _classId, uint _seed) constant public returns(uint) {
         uint[] storage siteList = siteSet[monsterClassSiteSet[_classId]];
         if (siteList.length == 0) return 0;
         return siteList[_seed % siteList.length];
     }
-    
+
     function getSiteItem(uint _siteId, uint _seed) constant public returns(uint _monsterClassId, uint _tokenClassId, uint _value) {
         uint value = _seed % 1000;
         RewardData storage reward = siteRewards[_siteId];
@@ -396,7 +396,7 @@ contract EtheremonAdventureSetting is BasicAccessControl {
             return (0, reward.shard_id, 0);
         }
         value -= reward.shard_rate;
-        // level 
+        // level
         if (value < reward.level_rate) {
             return (0, levelItemClass, levelRewards[value%4]);
         }
@@ -409,3 +409,71 @@ contract EtheremonAdventureSetting is BasicAccessControl {
         return (0, 0, emontRewards[value%6]);
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

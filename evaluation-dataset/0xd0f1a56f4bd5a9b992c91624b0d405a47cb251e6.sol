@@ -3,8 +3,8 @@ pragma solidity ^0.4.24;
 
 
 /**
- * @title ERC20 interface 
- * 
+ * @title ERC20 interface
+ *
  */
 contract ERC20 {
   function totalSupply() public view returns (uint256);
@@ -20,7 +20,7 @@ contract ERC20 {
 
 
 /**
- * @title OwnableWithAdmin 
+ * @title OwnableWithAdmin
  * @dev The Ownable contract has an owner address, and provides basic authorization control
  * functions, this simplifies the implementation of "user permissions".
  */
@@ -146,8 +146,8 @@ library SafeMath {
       }
       return string(bstr);
   }
- 
-  
+
+
 }
 
 
@@ -156,7 +156,7 @@ library SafeMath {
  * @title AirDrop
  * @notice Contract is not payable.
  * Owner or admin can allocate tokens.
- * Tokens will be released direct. 
+ * Tokens will be released direct.
  *
  *
  */
@@ -172,7 +172,7 @@ contract AirDrop is OwnableWithAdmin {
   event LogRemoveAllocation(address indexed _recipient, uint256 _tokenAmountRemoved);
   event LogOwnerSetAllocation(address indexed _recipient, uint256 _totalAllocated);
   event LogTest();
-   
+
 
   // Amount of tokens claimed
   uint256 public grandTotalClaimed = 0;
@@ -185,7 +185,7 @@ contract AirDrop is OwnableWithAdmin {
 
   // Max token amount
   uint256 public hardCap = 0;
-  
+
 
 
   // Buyers total allocation
@@ -203,16 +203,16 @@ contract AirDrop is OwnableWithAdmin {
 
   //List of all addresses
   address[] public addresses;
-  
- 
+
+
   constructor(ERC20 _token) public {
-     
+
     require(_token != address(0));
 
     token = _token;
   }
 
-  
+
   /**
    * @dev fallback function ***DO NOT OVERRIDE***
    */
@@ -228,7 +228,7 @@ contract AirDrop is OwnableWithAdmin {
   function setManyAllocations (address[] _recipients, uint256 _tokenAmount) onlyOwnerOrAdmin  public{
     for (uint256 i = 0; i < _recipients.length; i++) {
       setAllocation(_recipients[i],_tokenAmount);
-    }    
+    }
   }
 
 
@@ -238,29 +238,29 @@ contract AirDrop is OwnableWithAdmin {
     * @param _tokenAmount Amount Allocated tokens + 18 decimals
     */
   function setAllocation (address _recipient, uint256 _tokenAmount) onlyOwnerOrAdmin  public{
-      require(_tokenAmount > 0);      
-      require(_recipient != address(0)); 
+      require(_tokenAmount > 0);
+      require(_recipient != address(0));
 
-      //Check hardCap 
+      //Check hardCap
       require(_validateHardCap(_tokenAmount));
 
       //Allocate tokens
-      _setAllocation(_recipient, _tokenAmount);    
+      _setAllocation(_recipient, _tokenAmount);
 
       //Increese token amount
-      tokensTotal = tokensTotal.add(_tokenAmount);  
+      tokensTotal = tokensTotal.add(_tokenAmount);
 
       //Logg Allocation
       emit LogOwnerSetAllocation(_recipient, _tokenAmount);
   }
 
   /**
-    * @dev Remove allocation 
+    * @dev Remove allocation
     * @param _recipient Users wallet
-    *  
+    *
     */
-  function removeAllocation (address _recipient) onlyOwner  public{         
-      require(_recipient != address(0)); 
+  function removeAllocation (address _recipient) onlyOwner  public{
+      require(_recipient != address(0));
       require(totalClaimed[_recipient] == 0); //Check if user claimed tokens
 
 
@@ -272,7 +272,7 @@ contract AirDrop is OwnableWithAdmin {
 
       //Reset allocation
       allocationsTotal[_recipient] = 0;
-       
+
       //Set buyer to false
       buyers[_recipient] = false;
 
@@ -281,17 +281,17 @@ contract AirDrop is OwnableWithAdmin {
 
 
  /**
-   * @dev Set internal allocation 
+   * @dev Set internal allocation
    *  _buyer The adress of the buyer
    *  _tokenAmount Amount Allocated tokens + 18 decimals
    */
   function _setAllocation (address _buyer, uint256 _tokenAmount) internal{
 
       if(!buyers[_buyer]){
-        //Add buyer to buyers list 
+        //Add buyer to buyers list
         buyers[_buyer] = true;
 
-        //Remove from list 
+        //Remove from list
         buyersReceived[_buyer] = false;
 
         //Add _buyer to addresses list
@@ -301,10 +301,10 @@ contract AirDrop is OwnableWithAdmin {
         allocationsTotal[_buyer] = 0;
 
 
-      }  
+      }
 
       //Add tokens to buyers allocation
-      allocationsTotal[_buyer]  = allocationsTotal[_buyer].add(_tokenAmount); 
+      allocationsTotal[_buyer]  = allocationsTotal[_buyer].add(_tokenAmount);
 
 
       //Logg Allocation
@@ -319,7 +319,7 @@ contract AirDrop is OwnableWithAdmin {
     */
   function checkAvailableTokens (address _recipient) public view returns (uint256) {
     //Check if user have bought tokens
-    require(buyers[_recipient]); 
+    require(buyers[_recipient]);
 
     return allocationsTotal[_recipient];
   }
@@ -336,7 +336,7 @@ contract AirDrop is OwnableWithAdmin {
 
   /**
     * @notice Withdraw available tokens
-    * 
+    *
     */
   function withdrawTokens() public {
     distributeTokens(msg.sender);
@@ -347,16 +347,16 @@ contract AirDrop is OwnableWithAdmin {
     *
     */
   function distributeTokens(address _recipient) public {
-    
+
     //Check have bought tokens
     require(buyers[_recipient]);
 
     //If all tokens are received, add _recipient to buyersReceived
-    //To prevent the loop to fail if user allready used the withdrawTokens 
+    //To prevent the loop to fail if user allready used the withdrawTokens
     buyersReceived[_recipient] = true;
 
     uint256 _availableTokens = allocationsTotal[_recipient];
-     
+
 
     //Check if contract has tokens
     require(token.balanceOf(this)>=_availableTokens);
@@ -377,7 +377,7 @@ contract AirDrop is OwnableWithAdmin {
 
     emit LogTokenClaimed(_recipient, _availableTokens, allocationsTotal[_recipient], grandTotalClaimed);
 
-    
+
 
   }
 
@@ -388,7 +388,7 @@ contract AirDrop is OwnableWithAdmin {
   }
 
 
-  function getListOfAddresses() public onlyOwnerOrAdmin view returns (address[]) {    
+  function getListOfAddresses() public onlyOwnerOrAdmin view returns (address[]) {
     return addresses;
   }
 
@@ -412,16 +412,51 @@ contract AirDrop is OwnableWithAdmin {
 
 /**
  * @title BYTMAirDrop
- *  
+ *
  *
 */
 contract BYTMAirDrop is AirDrop {
-  constructor(   
+  constructor(
     ERC20 _token
   ) public AirDrop(_token) {
 
     // 40,000,000 tokens
-    hardCap = 40000000 * (10**uint256(18)); 
+    hardCap = 40000000 * (10**uint256(18));
 
   }
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

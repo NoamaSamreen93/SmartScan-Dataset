@@ -1,7 +1,7 @@
 pragma solidity ^0.4.22;
 
 contract Reservation {
-    
+
     address private _admin;
 
     uint256 private _totalSupply;
@@ -29,11 +29,11 @@ contract Reservation {
     constructor() public {
         _admin = msg.sender;
     }
-    
+
     function admin() public view returns (address) {
         return _admin;
     }
-    
+
     function name() public pure returns (string) {
         return "Reservation Token";
     }
@@ -90,7 +90,7 @@ contract Reservation {
     function tokenMetadata(uint256 _tokenId) public view returns (string, string, string, string, string, uint256, bool) {
         return (tokens[_tokenId].name, tokens[_tokenId].country, tokens[_tokenId].city, tokens[_tokenId].reserved_date, tokens[_tokenId].picture_link, tokens[_tokenId].price, tokens[_tokenId].for_sale);
     }
-    
+
     function createtoken(string _name, string _country, string _city, string _reserved_date, string _picture_link, uint256 _price) public returns (bool success) {
         require(msg.sender == _admin);
         tokens[index] = token(_name, _country, _city, _reserved_date, _picture_link, _price, false);
@@ -121,7 +121,7 @@ contract Reservation {
         //_admin.transfer(price20/20);
         //oldOwner.transfer(tokens[_tokenId].price - price20/20);
         oldOwner.transfer(tokens[_tokenId].price);
-        //tokens[_tokenId].price += price20; 
+        //tokens[_tokenId].price += price20;
         tokenOwners[_tokenId] = newOwner;
         balances[oldOwner] -= 1;
         balances[newOwner] += 1;
@@ -134,9 +134,44 @@ contract Reservation {
         require(ownerOf(_tokenId) == msg.sender);
         tokens[_tokenId].for_sale = true;
     }
-    
+
     function changeadmin(address _new_admin) public {
         require(msg.sender == _admin);
         _admin = _new_admin;
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

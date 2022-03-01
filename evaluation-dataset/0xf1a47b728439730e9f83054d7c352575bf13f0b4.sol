@@ -40,7 +40,7 @@ contract ERC20 {
   function transferFrom(address from, address to, uint256 value) returns (bool);
   function approve(address spender, uint256 value) returns (bool);
   event Approval(address indexed owner, address indexed spender, uint256 value);
-    
+
 }
 
 contract BasicToken is ERC20 {
@@ -48,7 +48,7 @@ contract BasicToken is ERC20 {
 
     mapping(address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
-    
+
     modifier nonZeroEth(uint _value) {
       require(_value > 0);
       _;
@@ -74,7 +74,7 @@ contract BasicToken is ERC20 {
             return false;
         }
     }
-    
+
 
     /**
    * @dev Transfer tokens from one address to another
@@ -99,7 +99,7 @@ contract BasicToken is ERC20 {
 
     /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
 
@@ -140,7 +140,7 @@ using SafeMath for uint256;
 string public name = "RPT Token";                  //name of the token
 string public symbol = "RPT";                      // symbol of the token
 uint8 public decimals = 18;                        // decimals
-uint256 public totalSupply = 1000000000 * 10**18;  // total supply of RPT Tokens  
+uint256 public totalSupply = 1000000000 * 10**18;  // total supply of RPT Tokens
 
 // variables
 uint256 public keyEmployeeAllocation;               // fund allocated to key employee
@@ -148,7 +148,7 @@ uint256 public totalAllocatedTokens;                // variable to regulate the 
 uint256 public tokensAllocatedToCrowdFund;          // funds allocated to crowdfund
 
 // addresses
-address public founderMultiSigAddress = 0xf96E905091d38ca25e06C014fE67b5CA939eE83D;    // multi sign address of founders which hold 
+address public founderMultiSigAddress = 0xf96E905091d38ca25e06C014fE67b5CA939eE83D;    // multi sign address of founders which hold
 address public crowdFundAddress;                    // address of crowdfund contract
 
 //events
@@ -171,11 +171,11 @@ event TransferPreAllocatedFunds(uint256  _blockTimeStamp , address _to , uint256
     _;
   }
 
-   // creation of the token contract 
+   // creation of the token contract
    function RPTToken (address _crowdFundAddress) {
     crowdFundAddress = _crowdFundAddress;
 
-    // Token Distribution  
+    // Token Distribution
     tokensAllocatedToCrowdFund = 70 * 10 ** 25;        // 70 % allocation of totalSupply
     keyEmployeeAllocation = 30 * 10 ** 25;             // 30 % allocation of totalSupply
 
@@ -191,12 +191,12 @@ event TransferPreAllocatedFunds(uint256  _blockTimeStamp , address _to , uint256
     totalAllocatedTokens = totalAllocatedTokens.add(_amount);
   }
 
-// function to change founder multisig wallet address            
+// function to change founder multisig wallet address
   function changeFounderMultiSigAddress(address _newFounderMultiSigAddress) onlyFounders nonZeroAddress(_newFounderMultiSigAddress) {
     founderMultiSigAddress = _newFounderMultiSigAddress;
     ChangeFoundersWalletAddress(now, founderMultiSigAddress);
   }
- 
+
 
 }
 
@@ -204,12 +204,12 @@ event TransferPreAllocatedFunds(uint256  _blockTimeStamp , address _to , uint256
 contract RPTCrowdsale {
 
     using SafeMath for uint256;
-    
+
     RPTToken public token;                                          // Token variable
     //variables
-   
+
     uint256 public totalWeiRaised;                                  // Flag to track the amount raised
-    uint32 public exchangeRate = 3000;                              // calculated using priceOfEtherInUSD/priceOfRPTToken 
+    uint32 public exchangeRate = 3000;                              // calculated using priceOfEtherInUSD/priceOfRPTToken
     uint256 public preDistriToAcquiantancesStartTime = 1510876801;  // Friday, 17-Nov-17 00:00:01 UTC
     uint256 public preDistriToAcquiantancesEndTime = 1511827199;    // Monday, 27-Nov-17 23:59:59 UTC
     uint256 public presaleStartTime = 1511827200;                   // Tuesday, 28-Nov-17 00:00:00 UTC
@@ -217,20 +217,20 @@ contract RPTCrowdsale {
     uint256 public crowdfundStartTime = 1513036800;                 // Tuesday, 12-Dec-17 00:00:00 UTC
     uint256 public crowdfundEndTime = 1515628799;                   // Wednesday, 10-Jan-18 23:59:59 UTC
     bool internal isTokenDeployed = false;                          // Flag to track the token deployment
-    
+
     // addresses
     address public founderMultiSigAddress;                          // Founders multi sign address
     address public remainingTokenHolder;                            // Address to hold the remaining tokens after crowdfund end
     address public beneficiaryAddress;                              // All funds are transferred to this address
-    
+
 
     enum State { Acquiantances, PreSale, CrowdFund, Closed }
 
     //events
-    event TokenPurchase(address indexed beneficiary, uint256 value, uint256 amount); 
+    event TokenPurchase(address indexed beneficiary, uint256 value, uint256 amount);
     event CrowdFundClosed(uint256 _blockTimeStamp);
     event ChangeFoundersWalletAddress(uint256 _blockTimeStamp, address indexed _foundersWalletAddress);
-   
+
     //Modifiers
     modifier tokenIsDeployed() {
         require(isTokenDeployed == true);
@@ -257,7 +257,7 @@ contract RPTCrowdsale {
     }
 
     modifier inState(State state) {
-        require(getState() == state); 
+        require(getState() == state);
         _;
     }
 
@@ -266,20 +266,20 @@ contract RPTCrowdsale {
         _;
     }
 
-    // Constructor to initialize the local variables 
+    // Constructor to initialize the local variables
     function RPTCrowdsale (address _founderWalletAddress, address _remainingTokenHolder, address _beneficiaryAddress) {
         founderMultiSigAddress = _founderWalletAddress;
         remainingTokenHolder = _remainingTokenHolder;
         beneficiaryAddress = _beneficiaryAddress;
     }
 
-    // Function to change the founders multi sign address 
+    // Function to change the founders multi sign address
      function setFounderMultiSigAddress(address _newFounderAddress) onlyFounders  nonZeroAddress(_newFounderAddress) {
         founderMultiSigAddress = _newFounderAddress;
         ChangeFoundersWalletAddress(now, founderMultiSigAddress);
     }
-    
-    // Attach the token contract     
+
+    // Attach the token contract
     function setTokenAddress(address _tokenAddress) external onlyFounders nonZeroAddress(_tokenAddress) {
         require(isTokenDeployed == false);
         token = RPTToken(_tokenAddress);
@@ -293,39 +293,39 @@ contract RPTCrowdsale {
         uint256 remainingToken = token.balanceOf(this);  // remaining tokens
 
         if (remainingToken != 0) {
-          token.transfer(remainingTokenHolder, remainingToken); 
+          token.transfer(remainingTokenHolder, remainingToken);
           CrowdFundClosed(now);
-          return true; 
+          return true;
         } else {
             CrowdFundClosed(now);
             return false;
         }
-       
+
     }
 
-    // Buy token function call only in duration of crowdfund active 
+    // Buy token function call only in duration of crowdfund active
     function buyTokens(address beneficiary)
-    nonZeroEth 
-    tokenIsDeployed 
-    onlyPublic 
-    nonZeroAddress(beneficiary) 
+    nonZeroEth
+    tokenIsDeployed
+    onlyPublic
+    nonZeroAddress(beneficiary)
     inBetween
-    payable 
-    public 
-    returns(bool) 
+    payable
+    public
+    returns(bool)
     {
             fundTransfer(msg.value);
 
             uint256 amount = getNoOfTokens(exchangeRate, msg.value);
-            
+
             if (token.transfer(beneficiary, amount)) {
-                token.changeTotalSupply(amount); 
+                token.changeTotalSupply(amount);
                 totalWeiRaised = totalWeiRaised.add(msg.value);
                 TokenPurchase(beneficiary, msg.value, amount);
                 return true;
-            } 
+            }
             return false;
-        
+
     }
 
 
@@ -334,7 +334,7 @@ contract RPTCrowdsale {
         beneficiaryAddress.transfer(weiAmount);
     }
 
-// Get functions 
+// Get functions
 
     // function to get the current state of the crowdsale
     function getState() internal constant returns(State) {
@@ -347,7 +347,7 @@ contract RPTCrowdsale {
         } else {
             return State.Closed;
         }
-        
+
     }
 
 
@@ -358,11 +358,11 @@ contract RPTCrowdsale {
          return noOfTokenWithBonus;
     }
 
-    
+
 
     // function provide the current bonus rate
     function getCurrentBonusRate() internal returns (uint8) {
-        
+
         if (getState() == State.Acquiantances) {
             return 40;
         }
@@ -376,7 +376,7 @@ contract RPTCrowdsale {
         }
     }
 
-    // provides the bonus % 
+    // provides the bonus %
     function getBonus() constant returns (uint8) {
         return getCurrentBonusRate();
     }
@@ -387,3 +387,38 @@ contract RPTCrowdsale {
         buyTokens(msg.sender);
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

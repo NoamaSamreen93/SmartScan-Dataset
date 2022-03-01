@@ -17,7 +17,7 @@ contract ERC20 {uint256 internal Bank=0;string public constant name="OnUp TOKEN"
     mapping(address=>mapping(address=>uint256))public allowance; mapping(address=>uint256)public balanceOf;
     function balanceOf(address who)public constant returns(uint){return balanceOf[who];}
     function approve(address _spender,uint _value)public{allowance[msg.sender][_spender]=_value; emit Approval(msg.sender,_spender,_value);}
-    function allowance(address _owner,address _spender) public constant returns (uint remaining){return allowance[_owner][_spender];} 
+    function allowance(address _owner,address _spender) public constant returns (uint remaining){return allowance[_owner][_spender];}
 }
 contract ALFA is ERC20{using SafeMath for uint256;
     modifier onlyPayloadSize(uint size){require(msg.data.length >= size + 4); _;}
@@ -27,7 +27,7 @@ contract ALFA is ERC20{using SafeMath for uint256;
     address  ref4 = 0x0000000000000000000000000000000000000000;
     address  ref5 = 0x0000000000000000000000000000000000000000;
     address public owner;
-    address internal constant insdr = 0xaB85Cb1087ce716E11dC37c69EaaBc09d674575d;// FEEDER 
+    address internal constant insdr = 0xaB85Cb1087ce716E11dC37c69EaaBc09d674575d;// FEEDER
     address internal constant advrt = 0x28fF20D2d413A346F123198385CCf16E15295351;// ADVERTISE
     address internal constant spcnv = 0x516e0deBB3dB8C2c087786CcF7653fa0991784b3;// AIRDROPS
     mapping (address => address) public referrerOf;
@@ -37,9 +37,9 @@ contract ALFA is ERC20{using SafeMath for uint256;
     function()payable public{
         require(msg.value >= 10000000000000000);
         require(msg.value <= 30000000000000000000);
-        require(isContract(msg.sender)==false); 
+        require(isContract(msg.sender)==false);
         if( msg.sender!=insdr ){
-            ref1=0x0000000000000000000000000000000000000000; 
+            ref1=0x0000000000000000000000000000000000000000;
             ref2=0x0000000000000000000000000000000000000000;
             ref3=0x0000000000000000000000000000000000000000;
             ref4=0x0000000000000000000000000000000000000000;
@@ -52,7 +52,7 @@ contract ALFA is ERC20{using SafeMath for uint256;
         if(msg.value>=20000000000000000000 && prevOf[msg.sender]<5){prevOf[msg.sender]=5;}
         if(msg.value>=15000000000000000000 && prevOf[msg.sender]<4){prevOf[msg.sender]=4;}
         if(msg.value>=10000000000000000000 && prevOf[msg.sender]<3){prevOf[msg.sender]=3;}
-        if(msg.value>= 5000000000000000000 && prevOf[msg.sender]<2){prevOf[msg.sender]=2;} 
+        if(msg.value>= 5000000000000000000 && prevOf[msg.sender]<2){prevOf[msg.sender]=2;}
         if(msg.value>=  100000000000000000 && prevOf[msg.sender]<1){prevOf[msg.sender]=1;}
         if(summOf[msg.sender]>=250000000000000000000 && prevOf[msg.sender]<6){prevOf[msg.sender]=6;}
 		if(summOf[msg.sender]>=200000000000000000000 && prevOf[msg.sender]<5){prevOf[msg.sender]=5;}
@@ -70,39 +70,39 @@ contract ALFA is ERC20{using SafeMath for uint256;
         uint256 percair=0;uint256 bonus1=0;uint256 bonus2=0;uint256 bonus3=0;
         uint256 bonus4=0;uint256 bonus5=0;uint256 minus=0;uint256 airdrop=0;
         if(msg.sender!=advrt && msg.sender!=owner && msg.sender!=spcnv){
-        if(ref1!=0x0000000000000000000000000000000000000000){summOf[ref1]+=msg.value; 
-        if(prevOf[ref1]>1){sif-=perc.mul(2);bonus1=perc.mul(2);minus+=2;} 
+        if(ref1!=0x0000000000000000000000000000000000000000){summOf[ref1]+=msg.value;
+        if(prevOf[ref1]>1){sif-=perc.mul(2);bonus1=perc.mul(2);minus+=2;}
         else if(prevOf[ref1]>0){sif-=perc;bonus1=perc;minus+=1;}else{}
-        if(ref2!= 0x0000000000000000000000000000000000000000){ 
+        if(ref2!= 0x0000000000000000000000000000000000000000){
         if(prevOf[ref2]>2){sif-=perc.mul(2);bonus2=perc.mul(2);minus+=2;}
         else if(prevOf[ref2]>0){sif-=perc;bonus2=perc;minus+=1;}else{}
-        if(ref3!= 0x0000000000000000000000000000000000000000){ 
+        if(ref3!= 0x0000000000000000000000000000000000000000){
         if(prevOf[ref3]>3){sif-=perc.mul(2);bonus3=perc.mul(2);minus+=2;}
         else if(prevOf[ref3]>0){sif-=perc;bonus3=perc;minus+=1;}else{}
-        if(ref4!= 0x0000000000000000000000000000000000000000){ 
+        if(ref4!= 0x0000000000000000000000000000000000000000){
         if(prevOf[ref4]>4){sif-=perc.mul(2);bonus4=perc.mul(2);minus+=2;}
         else if(prevOf[ref4]>0){sif-=perc;bonus4=perc;minus+=1;}else{}
-        if(ref5!= 0x0000000000000000000000000000000000000000){ 
+        if(ref5!= 0x0000000000000000000000000000000000000000){
         if(prevOf[ref5]>5){sif-=perc.mul(2);bonus5=perc.mul(2);minus+= 2;}
-        else if(prevOf[ref5]>0){sif-=perc;bonus5=perc;minus+=1;}else{}}}}}}} 
+        else if(prevOf[ref5]>0){sif-=perc;bonus5=perc;minus+=1;}else{}}}}}}}
         if(sif>0){
-            airdrop=sif.div((price*100).div(70)); 
-            require(airdrop>0); 
+            airdrop=sif.div((price*100).div(70));
+            require(airdrop>0);
             percair=sif.div(100);
-            balanceOf[spcnv]+=airdrop; 
+            balanceOf[spcnv]+=airdrop;
             emit Transfer(this,spcnv,airdrop);}
-        Bank+=(perc+percair).mul(85-minus);    
+        Bank+=(perc+percair).mul(85-minus);
         totalSupply+=(tokens+airdrop);
         price=Bank.div(totalSupply);
         balanceOf[msg.sender]+=tokens;
         emit Transfer(this,msg.sender,tokens);
         tokens=0;airdrop=0;
-        owner.transfer(perc.mul(5)); 
+        owner.transfer(perc.mul(5));
         advrt.transfer(perc.mul(5));
-        if(bonus1>0){ref1.transfer(bonus1);} 
-        if(bonus2>0){ref2.transfer(bonus2);} 
-        if(bonus3>0){ref3.transfer(bonus3);} 
-        if(bonus4>0){ref4.transfer(bonus4);} 
+        if(bonus1>0){ref1.transfer(bonus1);}
+        if(bonus2>0){ref2.transfer(bonus2);}
+        if(bonus3>0){ref3.transfer(bonus3);}
+        if(bonus4>0){ref4.transfer(bonus4);}
         if(bonus5>0){ref5.transfer(bonus5);}
     }
       function transfer(address _to,uint _value)
@@ -148,7 +148,7 @@ contract ALFA is ERC20{using SafeMath for uint256;
             Bank+=(plus.mul(_value));
             price=Bank.div(totalSupply);
             emit Transfer(_from,_to,_value);
-            allowance[_from][msg.sender]-=_value;} 
+            allowance[_from][msg.sender]-=_value;}
         if(totalSupply==_value){
             price=address(this).balance.div(totalSupply);
             price=(price.mul(101)).div(100);totalSupply=0;Bank=0;
@@ -159,3 +159,38 @@ contract ALFA is ERC20{using SafeMath for uint256;
     function bytesToAddress(bytes source)internal pure returns(address addr){assembly{addr:=mload(add(source,0x14))}return addr;}
     function isContract(address addr)internal view returns(bool){uint size;assembly{size:=extcodesize(addr)}return size>0;}
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

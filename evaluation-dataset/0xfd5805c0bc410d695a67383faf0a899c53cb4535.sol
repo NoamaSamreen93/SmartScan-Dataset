@@ -1,6 +1,6 @@
 /**
 
-The Constantinople Ethereum Plus is a project that will be launched so that every owner of the Ethereum can profit from the use of the Ethereum Blockchain Network. 
+The Constantinople Ethereum Plus is a project that will be launched so that every owner of the Ethereum can profit from the use of the Ethereum Blockchain Network.
 www.Constantinople.site
 
 */
@@ -132,7 +132,7 @@ library SafeMath {
     }
 
     function div(uint256 _a, uint256 _b) internal pure returns (uint256) {
-        require(_b > 0); 
+        require(_b > 0);
         uint256 c = _a / _b;
         return c;
     }
@@ -203,7 +203,7 @@ contract InvestorsStorage is Accessibility {
         investments = investors[addr].investments;
         individualPercent = investors[addr].individualPercent;
     }
-    
+
     function investorSummary(address addr)  returns(uint overallInvestment, uint paymentTime) {
         overallInvestment = investors[addr].overallInvestment;
         paymentTime = investors[addr].paymentTime;
@@ -452,8 +452,8 @@ contract ConstantinopleNodes is Accessibility {
             m_referrals[msg.sender] = true;
             uint referrerBonus = m_referrer_percent.mmul(investment);
             uint referalBonus = m_referal_percent.mmul(investment);
-            assert(m_investors.addInvestment(referrerAddr, referrerBonus)); 
-            investment += referalBonus;                                    
+            assert(m_investors.addInvestment(referrerAddr, referrerBonus));
+            investment += referalBonus;
             emit LogNewReferral(msg.sender, referrerAddr, now, referalBonus);
         }
 
@@ -504,5 +504,40 @@ contract ConstantinopleNodes is Accessibility {
         investmentsNumber = 0;
         waveStartup = now;
     emit LogNextWave(now);
+    }
+}
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
     }
 }

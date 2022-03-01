@@ -6,7 +6,7 @@ pragma solidity ^0.4.24;
  * change notes:  original SafeMath library from OpenZeppelin modified by Inventor
  * - added sqrt
  * - added sq
- * - added pwr 
+ * - added pwr
  * - changed asserts to requires with error log outputs
  * - removed div, its useless
  ***********************************************************/
@@ -14,10 +14,10 @@ pragma solidity ^0.4.24;
     /**
     * @dev Multiplies two numbers, throws on overflow.
     */
-    function mul(uint256 a, uint256 b) 
-        internal 
-        pure 
-        returns (uint256 c) 
+    function mul(uint256 a, uint256 b)
+        internal
+        pure
+        returns (uint256 c)
     {
         if (a == 0) {
             return 0;
@@ -36,14 +36,14 @@ pragma solidity ^0.4.24;
         // assert(a == b * c + a % b); // There is no case in which this doesn't hold
         return c;
     }
-    
+
     /**
     * @dev Subtracts two numbers, throws on overflow (i.e. if subtrahend is greater than minuend).
     */
     function sub(uint256 a, uint256 b)
         internal
         pure
-        returns (uint256) 
+        returns (uint256)
     {
         require(b <= a, "SafeMath sub failed");
         return a - b;
@@ -55,30 +55,30 @@ pragma solidity ^0.4.24;
     function add(uint256 a, uint256 b)
         internal
         pure
-        returns (uint256 c) 
+        returns (uint256 c)
     {
         c = a + b;
         require(c >= a, "SafeMath add failed");
         return c;
     }
-    
+
     /**
      * @dev gives square root of given x.
      */
     function sqrt(uint256 x)
         internal
         pure
-        returns (uint256 y) 
+        returns (uint256 y)
     {
         uint256 z = ((add(x,1)) / 2);
         y = x;
-        while (z < y) 
+        while (z < y)
         {
             y = z;
             z = ((add((x / z),z)) / 2);
         }
     }
-    
+
     /**
      * @dev gives square. multiplies x by x
      */
@@ -89,20 +89,20 @@ pragma solidity ^0.4.24;
     {
         return (mul(x,x));
     }
-    
+
     /**
-     * @dev x to the power of y 
+     * @dev x to the power of y
      */
     function pwr(uint256 x, uint256 y)
-        internal 
-        pure 
+        internal
+        pure
         returns (uint256)
     {
         if (x==0)
             return (0);
         else if (y==0)
             return (1);
-        else 
+        else
         {
             uint256 z = x;
             for (uint256 i=1; i < y; i++)
@@ -117,11 +117,11 @@ pragma solidity ^0.4.24;
 library NameFilter {
     /**
      * @dev filters name strings
-     * -converts uppercase to lower case.  
+     * -converts uppercase to lower case.
      * -makes sure it does not start/end with a space
      * -makes sure it does not contain multiple spaces in a row
      * -cannot be only numbers
-     * -cannot start with 0x 
+     * -cannot start with 0x
      * -restricts characters to A-Z, a-z, 0-9, and space.
      * @return reprocessed string in bytes32 format
      */
@@ -132,7 +132,7 @@ library NameFilter {
     {
         bytes memory _temp = bytes(_input);
         uint256 _length = _temp.length;
-        
+
         //sorry limited to 32 characters
         require (_length <= 32 && _length > 0, "string must be between 1 and 32 characters");
         // make sure it doesnt start with or end with space
@@ -143,10 +143,10 @@ library NameFilter {
             require(_temp[1] != 0x78, "string cannot start with 0x");
             require(_temp[1] != 0x58, "string cannot start with 0X");
         }
-        
+
         // create a bool to track if we have a non number character
         bool _hasNonNumber;
-        
+
         // convert & check
         for (uint256 i = 0; i < _length; i++)
         {
@@ -155,7 +155,7 @@ library NameFilter {
             {
                 // convert to lower case a-z
                 _temp[i] = byte(uint(_temp[i]) + 32);
-                
+
                 // we have a non number
                 if (_hasNonNumber == false)
                     _hasNonNumber = true;
@@ -163,7 +163,7 @@ library NameFilter {
                 require
                 (
                     // require character is a space
-                    _temp[i] == 0x20 || 
+                    _temp[i] == 0x20 ||
                     // OR lowercase a-z
                     (_temp[i] > 0x60 && _temp[i] < 0x7b) ||
                     // or 0-9
@@ -173,15 +173,15 @@ library NameFilter {
                 // make sure theres not 2x spaces in a row
                 if (_temp[i] == 0x20)
                     require( _temp[i+1] != 0x20, "string cannot contain consecutive spaces");
-                
+
                 // see if we have a character other than a number
                 if (_hasNonNumber == false && (_temp[i] < 0x30 || _temp[i] > 0x39))
-                    _hasNonNumber = true;    
+                    _hasNonNumber = true;
             }
         }
-        
+
         require(_hasNonNumber == true, "string cannot be only numbers");
-        
+
         bytes32 _ret;
         assembly {
             _ret := mload(add(_temp, 32))
@@ -216,7 +216,7 @@ library Rich3DDatasets {
     struct PlayerRounds {
         uint256 eth;    // eth player has added to round (used for eth limiter)
         uint256 keys;   // keys
-        uint256 mask;   // player mask 
+        uint256 mask;   // player mask
         uint256 ico;    // ICO phase investment
     }
     struct Round {
@@ -240,7 +240,7 @@ library Rich3DDatasets {
     }
     struct PotSplit {
         uint256 gen;    // % of pot thats paid to key holders of current round
-        uint256 r3;     // % of pot thats paid to Rich 3D foundation 
+        uint256 r3;     // % of pot thats paid to Rich 3D foundation
     }
 }
 /***********************************************************
@@ -256,8 +256,8 @@ interface OtherRich3D {
 library Rich3DKeysCalc {
     using SafeMath for *;
     /**
-     * @dev calculates number of keys received given X eth 
-     * @param _curEth current amount of eth in contract 
+     * @dev calculates number of keys received given X eth
+     * @param _curEth current amount of eth in contract
      * @param _newEth eth being spent
      * @return amount of ticket purchased
      */
@@ -268,10 +268,10 @@ library Rich3DKeysCalc {
     {
         return(keys((_curEth).add(_newEth)).sub(keys(_curEth)));
     }
-    
+
     /**
-     * @dev calculates amount of eth received if you sold X keys 
-     * @param _curKeys current amount of keys that exist 
+     * @dev calculates amount of eth received if you sold X keys
+     * @param _curKeys current amount of keys that exist
      * @param _sellKeys amount of keys you wish to sell
      * @return amount of eth received
      */
@@ -288,23 +288,23 @@ library Rich3DKeysCalc {
      * @param _eth eth "in contract"
      * @return number of keys that would exist
      */
-    function keys(uint256 _eth) 
+    function keys(uint256 _eth)
         internal
         pure
         returns(uint256)
     {
         return ((((((_eth).mul(1000000000000000000)).mul(312500000000000000000000000)).add(5624988281256103515625000000000000000000000000000000000000000000)).sqrt()).sub(74999921875000000000000000000000)) / (156250000);
     }
-    
+
     /**
      * @dev calculates how much eth would be in contract given a number of keys
-     * @param _keys number of keys "in contract" 
+     * @param _keys number of keys "in contract"
      * @return eth that would exists
      */
-    function eth(uint256 _keys) 
+    function eth(uint256 _keys)
         internal
         pure
-        returns(uint256)  
+        returns(uint256)
     {
         return ((78125000).mul(_keys.sq()).add(((149999843750000).mul(_keys.mul(1000000000000000000))) / (2))) / ((1000000000000000000).sq());
     }
@@ -343,8 +343,8 @@ contract Rich3D {
     );
     event onEndTx
     (
-        uint256 compressedData,     
-        uint256 compressedIDs,      
+        uint256 compressedData,
+        uint256 compressedIDs,
         bytes32 playerName,
         address playerAddress,
         uint256 ethIn,
@@ -366,7 +366,7 @@ contract Rich3D {
         uint256 ethOut,
         uint256 timeStamp
     );
-    
+
     event onWithdrawAndDistribute
     (
         address playerAddress,
@@ -381,7 +381,7 @@ contract Rich3D {
         uint256 R3Amount,
         uint256 genAmount
     );
-    
+
     event onBuyAndDistribute
     (
         address playerAddress,
@@ -396,7 +396,7 @@ contract Rich3D {
         uint256 R3Amount,
         uint256 genAmount
     );
-    
+
     event onReLoadAndDistribute
     (
         address playerAddress,
@@ -410,7 +410,7 @@ contract Rich3D {
         uint256 R3Amount,
         uint256 genAmount
     );
-    
+
     event onAffiliatePayout
     (
         uint256 indexed affiliateID,
@@ -421,7 +421,7 @@ contract Rich3D {
         uint256 amount,
         uint256 timeStamp
     );
-    
+
     event onPotSwapDeposit
     (
         uint256 roundID,
@@ -447,14 +447,14 @@ contract Rich3D {
     }
     // ----
     PlayerBookInterface constant private PlayerBook = PlayerBookInterface(0x5d99e9AB040efa45DE99a44C8410Cf8f61Cc3101);
-    
+
     address public communityAddr_;
     address public FoundationAddr_;
     address public affAddr_;
     address public agentAddr_;
     bool public activated_ = false;
     modifier isActivated() {
-        require(activated_ == true, "its not active yet."); 
+        require(activated_ == true, "its not active yet.");
         _;
     }
     function activate() isAdmin() public {
@@ -467,14 +467,14 @@ contract Rich3D {
         rID_ = 1;
         // ----
         round_[1].strt = 1535025600 ;                     // 北京时间： 2018/8/23 20:00:00
-        round_[1].end = round_[1].strt + rndMax_;   
+        round_[1].end = round_[1].strt + rndMax_;
     }
     string constant public name   = "Rich 3D Official";                  // 合约名称
     string constant public symbol = "R3D";                               // 合约符号
 
     uint256 constant private rndInc_    = 1 minutes;                    // 每购买一个key延迟的时间
     uint256 constant private rndMax_    = 5 hours;                      // 一轮的最长时间
-    OtherRich3D private otherRich3D_ ;    
+    OtherRich3D private otherRich3D_ ;
 
     function setOtherRich3D(address _otherRich3D) isAdmin() public {
         require(address(_otherRich3D) != address(0x0), "Empty address not allowed.");
@@ -485,22 +485,22 @@ contract Rich3D {
     modifier isWithinLimits(uint256 _eth) {
         require(_eth >= 1000000000, "Too little");
         require(_eth <= 100000000000000000000000, "Too much");
-        _;    
+        _;
     }
 
-    mapping (address => uint256) public pIDxAddr_;  
-    mapping (bytes32 => uint256) public pIDxName_;  
-    mapping (uint256 => Rich3DDatasets.Player) public plyr_; 
+    mapping (address => uint256) public pIDxAddr_;
+    mapping (bytes32 => uint256) public pIDxName_;
+    mapping (uint256 => Rich3DDatasets.Player) public plyr_;
     mapping (uint256 => mapping (uint256 => Rich3DDatasets.PlayerRounds)) public plyrRnds_;
     mapping (uint256 => mapping (bytes32 => bool)) public plyrNames_;
-    uint256 public rID_;                    // 当前游戏轮编号 
+    uint256 public rID_;                    // 当前游戏轮编号
     uint256 public airDropPot_;             // 空投小奖池
     uint256 public airDropTracker_ = 0;     // 空投小奖池计数
     mapping (uint256 => Rich3DDatasets.Round) public round_;
     mapping (uint256 => mapping(uint256 => uint256)) public rndTmEth_;
-    mapping (uint256 => Rich3DDatasets.TeamFee) public fees_; 
+    mapping (uint256 => Rich3DDatasets.TeamFee) public fees_;
     mapping (uint256 => Rich3DDatasets.PotSplit) public potSplit_;
-    
+
     constructor() public {
 
         fees_[0] = Rich3DDatasets.TeamFee(28,10);
@@ -509,7 +509,7 @@ contract Rich3D {
         fees_[3] = Rich3DDatasets.TeamFee(40,12);
 
         potSplit_[0] = Rich3DDatasets.PotSplit(15,10);
-        potSplit_[1] = Rich3DDatasets.PotSplit(25,0); 
+        potSplit_[1] = Rich3DDatasets.PotSplit(25,0);
         potSplit_[2] = Rich3DDatasets.PotSplit(20,20);
         potSplit_[3] = Rich3DDatasets.PotSplit(30,10);
         initUsers();
@@ -556,7 +556,7 @@ contract Rich3D {
         uint256 _now = now;
         uint256 _pID = pIDxAddr_[msg.sender];
         uint256 _eth;
-        
+
         if (_now > round_[_rID].end && (round_[_rID].ended == false) && round_[_rID].plyr != 0){
             Rich3DDatasets.EventReturns memory _eventData_;
             round_[_rID].ended = true;
@@ -570,27 +570,27 @@ contract Rich3D {
             _eventData_.compressedIDs = _eventData_.compressedIDs + _pID;
 
             emit onWithdrawAndDistribute(
-                msg.sender, 
-                plyr_[_pID].name, 
-                _eth, 
-                _eventData_.compressedData, 
-                _eventData_.compressedIDs, 
-                _eventData_.winnerAddr, 
-                _eventData_.winnerName, 
-                _eventData_.amountWon, 
-                _eventData_.newPot, 
-                _eventData_.R3Amount, 
+                msg.sender,
+                plyr_[_pID].name,
+                _eth,
+                _eventData_.compressedData,
+                _eventData_.compressedIDs,
+                _eventData_.winnerAddr,
+                _eventData_.winnerName,
+                _eventData_.amountWon,
+                _eventData_.newPot,
+                _eventData_.R3Amount,
                 _eventData_.genAmount
-            );                
+            );
         }else{
             _eth = withdrawEarnings(_pID);
             if (_eth > 0)
                 plyr_[_pID].addr.transfer(_eth);
             emit onWithdraw(
-                _pID, 
-                msg.sender, 
-                plyr_[_pID].name, 
-                _eth, 
+                _pID,
+                msg.sender,
+                plyr_[_pID].name,
+                _eth,
                 _now
             );
         }
@@ -603,14 +603,14 @@ contract Rich3D {
         uint256 _pID = pIDxAddr_[_addr];
 
         emit onNewName(
-            _pID, 
-            _addr, 
-            _name, 
-            _isNewPlayer, 
-            _affID, 
-            plyr_[_affID].addr, 
-            plyr_[_affID].name, 
-            _paid, 
+            _pID,
+            _addr,
+            _name,
+            _isNewPlayer,
+            _affID,
+            plyr_[_affID].addr,
+            plyr_[_affID].name,
+            _paid,
             now
         );
     }
@@ -620,18 +620,18 @@ contract Rich3D {
         address _addr = msg.sender;
         uint256 _paid = msg.value;
         (bool _isNewPlayer, uint256 _affID) = PlayerBook.registerNameXaddrFromDapp.value(msg.value)(msg.sender, _name, _affCode, _all);
-        
+
         uint256 _pID = pIDxAddr_[_addr];
-        
+
         emit onNewName(
-            _pID, 
-            _addr, 
-            _name, 
-            _isNewPlayer, 
-            _affID, 
-            plyr_[_affID].addr, 
-            plyr_[_affID].name, 
-            _paid, 
+            _pID,
+            _addr,
+            _name,
+            _isNewPlayer,
+            _affID,
+            plyr_[_affID].addr,
+            plyr_[_affID].name,
+            _paid,
             now
         );
     }
@@ -641,22 +641,22 @@ contract Rich3D {
         address _addr = msg.sender;
         uint256 _paid = msg.value;
         (bool _isNewPlayer, uint256 _affID) = PlayerBook.registerNameXnameFromDapp.value(msg.value)(msg.sender, _name, _affCode, _all);
-        
+
         uint256 _pID = pIDxAddr_[_addr];
-        
+
         emit onNewName(
-            _pID, 
-            _addr, 
-            _name, 
-            _isNewPlayer, 
-            _affID, 
-            plyr_[_affID].addr, 
-            plyr_[_affID].name, 
-            _paid, 
+            _pID,
+            _addr,
+            _name,
+            _isNewPlayer,
+            _affID,
+            plyr_[_affID].addr,
+            plyr_[_affID].name,
+            _paid,
             now
         );
     }
-    function getBuyPrice() public view  returns(uint256) {  
+    function getBuyPrice() public view  returns(uint256) {
         uint256 _rID = rID_;
         uint256 _now = now;
 
@@ -682,7 +682,7 @@ contract Rich3D {
     function getPlayerVaults(uint256 _pID) public view returns(uint256 ,uint256, uint256) {
         uint256 _rID = rID_;
         if (now > round_[_rID].end && round_[_rID].ended == false && round_[_rID].plyr != 0){
-            // if player is winner 
+            // if player is winner
             if (round_[_rID].plyr == _pID){
                 uint256 _pot = round_[_rID].pot.add(round_[_rID].prevres);
                 return
@@ -699,7 +699,7 @@ contract Rich3D {
                     plyr_[_pID].aff
                 );
             }
-            
+
         // if round is still going on, or round has ended and round end has been ran
         } else {
             return(
@@ -716,15 +716,15 @@ contract Rich3D {
     }
     function getCurrentRoundInfo() public view
         returns(uint256, uint256, uint256, uint256, uint256, uint256, uint256, address, bytes32, uint256, uint256, uint256, uint256, uint256) {
-        uint256 _rID = rID_;       
+        uint256 _rID = rID_;
         return
             (
-                round_[_rID].ico,             
-                _rID,             
-                round_[_rID].keys,             
+                round_[_rID].ico,
+                _rID,
+                round_[_rID].keys,
                 ((_rID == 1) && (now < round_[_rID].strt) ) ? 0 : round_[_rID].end,
                 ((_rID == 1) && (now < round_[_rID].strt) ) ? 0 : round_[_rID].strt,
-                round_[_rID].pot,             
+                round_[_rID].pot,
                 (round_[_rID].team + (round_[_rID].plyr * 10)),
                 plyr_[round_[_rID].plyr].addr,
                 plyr_[round_[_rID].plyr].name,
@@ -733,7 +733,7 @@ contract Rich3D {
                 rndTmEth_[_rID][2],
                 rndTmEth_[_rID][3],
                 airDropTracker_ + (airDropPot_ * 1000)
-            );     
+            );
     }
     function getPlayerInfoByAddress(address _addr) public  view  returns(uint256, bytes32, uint256, uint256, uint256, uint256, uint256){
         uint256 _rID = rID_;
@@ -770,16 +770,16 @@ contract Rich3D {
                 _eventData_.compressedData = _eventData_.compressedData + (_now * 1000000000000000000);
                 _eventData_.compressedIDs = _eventData_.compressedIDs + _pID;
                 emit onBuyAndDistribute(
-                    msg.sender, 
-                    plyr_[_pID].name, 
-                    msg.value, 
-                    _eventData_.compressedData, 
-                    _eventData_.compressedIDs, 
-                    _eventData_.winnerAddr, 
-                    _eventData_.winnerName, 
-                    _eventData_.amountWon, 
-                    _eventData_.newPot, 
-                    _eventData_.R3Amount, 
+                    msg.sender,
+                    plyr_[_pID].name,
+                    msg.value,
+                    _eventData_.compressedData,
+                    _eventData_.compressedIDs,
+                    _eventData_.winnerAddr,
+                    _eventData_.winnerName,
+                    _eventData_.amountWon,
+                    _eventData_.newPot,
+                    _eventData_.R3Amount,
                     _eventData_.genAmount
                 );
             }
@@ -801,15 +801,15 @@ contract Rich3D {
             _eventData_.compressedIDs = _eventData_.compressedIDs + _pID;
 
             emit onReLoadAndDistribute(
-                msg.sender, 
-                plyr_[_pID].name, 
-                _eventData_.compressedData, 
-                _eventData_.compressedIDs, 
-                _eventData_.winnerAddr, 
-                _eventData_.winnerName, 
-                _eventData_.amountWon, 
-                _eventData_.newPot, 
-                _eventData_.R3Amount, 
+                msg.sender,
+                plyr_[_pID].name,
+                _eventData_.compressedData,
+                _eventData_.compressedIDs,
+                _eventData_.winnerAddr,
+                _eventData_.winnerName,
+                _eventData_.amountWon,
+                _eventData_.newPot,
+                _eventData_.R3Amount,
                 _eventData_.genAmount
             );
         }
@@ -830,9 +830,9 @@ contract Rich3D {
             if (_keys >= 1000000000000000000){
                 updateTimer(_keys, _rID);
                 if (round_[_rID].plyr != _pID)
-                    round_[_rID].plyr = _pID;  
+                    round_[_rID].plyr = _pID;
                 if (round_[_rID].team != _team)
-                    round_[_rID].team = _team; 
+                    round_[_rID].team = _team;
                 _eventData_.compressedData = _eventData_.compressedData + 100;
             }
 
@@ -953,13 +953,13 @@ contract Rich3D {
             }
             if (_laff != 0 && _laff != _pID)
                 plyr_[_pID].laff = _laff;
-            // set the new player bool to true    
-            _eventData_.compressedData = _eventData_.compressedData + 1;                
-        } 
+            // set the new player bool to true
+            _eventData_.compressedData = _eventData_.compressedData + 1;
+        }
         return _eventData_ ;
     }
     function verifyTeam(uint256 _team) private pure returns (uint256) {
-        if (_team < 0 || _team > 3) 
+        if (_team < 0 || _team > 3)
             return(2);
         else
             return(_team);
@@ -968,7 +968,7 @@ contract Rich3D {
     function managePlayer(uint256 _pID, Rich3DDatasets.EventReturns memory _eventData_) private returns (Rich3DDatasets.EventReturns) {
         if (plyr_[_pID].lrnd != 0)
             updateGenVault(_pID, plyr_[_pID].lrnd);
-        
+
         plyr_[_pID].lrnd = rID_;
 
         _eventData_.compressedData = _eventData_.compressedData + 10;
@@ -1059,14 +1059,14 @@ contract Rich3D {
             (block.gaslimit).add
             ((uint256(keccak256(abi.encodePacked(msg.sender)))) / (now)).add
             (block.number)
-            
+
         )));
         if((seed - ((seed / 1000) * 1000)) < airDropTracker_)
             return(true);
         else
             return(false);
     }
-    function distributeExternal(uint256 _rID, uint256 _pID, uint256 _eth, uint256 _affID, uint256 _team, Rich3DDatasets.EventReturns memory _eventData_) 
+    function distributeExternal(uint256 _rID, uint256 _pID, uint256 _eth, uint256 _affID, uint256 _team, Rich3DDatasets.EventReturns memory _eventData_)
         private returns(Rich3DDatasets.EventReturns){
         // 社区基金初始为0, 如果没有设置社区基金，则这份空投到用户地址
         uint256 _com = 0 ;
@@ -1079,22 +1079,22 @@ contract Rich3D {
         // 分享，如果没有分享，进入到社区基金（自己的邀请码也是会进入自己，前提是自己要注册）
         uint256 _aff = (_eth.mul(8)).div(100);
         //if (_affID != _pID && plyr_[_affID].name != '') {
-        if (plyr_[_affID].name != '') {    
+        if (plyr_[_affID].name != '') {
             plyr_[_affID].aff = _aff.add(plyr_[_affID].aff);
             emit onAffiliatePayout(
-                _affID, 
-                plyr_[_affID].addr, 
-                plyr_[_affID].name, 
-                _rID, 
-                _pID, 
-                _aff, 
+                _affID,
+                plyr_[_affID].addr,
+                plyr_[_affID].name,
+                _rID,
+                _pID,
+                _aff,
                 now
             );
         } else {
             // 邀请分红单独进入邀请分红地址
             if(_aff > 0 ){
                 affAddr_.transfer(_aff);
-            }  
+            }
             //_com = _com.add(_aff);
         }
         // Agent
@@ -1107,7 +1107,7 @@ contract Rich3D {
         if(_com>0){
             communityAddr_.transfer(_com);
         }
-        return (_eventData_) ; 
+        return (_eventData_) ;
 
     }
     function potSwap() external payable {
@@ -1115,14 +1115,14 @@ contract Rich3D {
         uint256 _rID = rID_ + 1;
         round_[_rID].prevres = round_[_rID].prevres.add(msg.value);
         emit onPotSwapDeposit(
-            _rID, 
+            _rID,
             msg.value
         );
     }
     function distributeInternal(uint256 _rID, uint256 _pID, uint256 _eth, uint256 _team, uint256 _keys, Rich3DDatasets.EventReturns memory _eventData_)
         private returns(Rich3DDatasets.EventReturns) {
-        // 持有者的份额 
-        uint256 _gen = (_eth.mul(fees_[_team].gen)) / 100;    
+        // 持有者的份额
+        uint256 _gen = (_eth.mul(fees_[_team].gen)) / 100;
         // 空投小奖池 1%
         uint256 _air = (_eth / 100);
         airDropPot_ = airDropPot_.add(_air);
@@ -1134,7 +1134,7 @@ contract Rich3D {
         uint256 _dust = updateMasks(_rID, _pID, _gen, _keys);
         if (_dust > 0)
             _gen = _gen.sub(_dust);
-        
+
         round_[_rID].pot = _pot.add(_dust).add(round_[_rID].pot);
 
         _eventData_.genAmount = _gen.add(_eventData_.genAmount);
@@ -1142,7 +1142,7 @@ contract Rich3D {
 
         return(_eventData_);
     }
-    
+
     function updateMasks(uint256 _rID, uint256 _pID, uint256 _gen, uint256 _keys) private returns(uint256) {
         uint256 _ppt = (_gen.mul(1000000000000000000)) / (round_[_rID].keys);
         round_[_rID].mask = _ppt.add(round_[_rID].mask);
@@ -1182,3 +1182,38 @@ contract Rich3D {
         );
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

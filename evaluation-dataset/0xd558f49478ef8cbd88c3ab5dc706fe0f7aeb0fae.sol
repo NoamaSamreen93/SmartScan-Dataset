@@ -4,7 +4,7 @@ pragma solidity ^0.4.22;
 
 /**
  * @dev SafeMath by openzepplin
- */ 
+ */
 library SafeMath {
     function mul(uint256 a, uint256 b) internal pure returns (uint256) {
         if (a == 0) {
@@ -16,9 +16,9 @@ library SafeMath {
     }
 
     function div(uint256 a, uint256 b) internal pure returns (uint256) {
-        // assert(b > 0); 
+        // assert(b > 0);
         uint256 c = a / b;
-        // assert(a == b * c + a % b); 
+        // assert(a == b * c + a % b);
         return c;
     }
 
@@ -800,7 +800,7 @@ contract usingOraclize {
     function oraclize_newRandomDSQuery(uint _delay, uint _nbytes, uint _customGasLimit) internal returns (bytes32){
         require((_nbytes > 0) && (_nbytes <= 32));
         // Convert from seconds to ledger timer ticks
-        _delay *= 10; 
+        _delay *= 10;
         bytes memory nbytes = new bytes(1);
         nbytes[0] = byte(_nbytes);
         bytes memory unonce = new bytes(32);
@@ -813,18 +813,18 @@ contract usingOraclize {
             mstore(add(sessionKeyHash, 0x20), sessionKeyHash_bytes32)
         }
         bytes memory delay = new bytes(32);
-        assembly { 
-            mstore(add(delay, 0x20), _delay) 
+        assembly {
+            mstore(add(delay, 0x20), _delay)
         }
-        
+
         bytes memory delay_bytes8 = new bytes(8);
         copyBytes(delay, 24, 8, delay_bytes8, 0);
 
         bytes[4] memory args = [unonce, nbytes, sessionKeyHash, delay];
         bytes32 queryId = oraclize_query("random", args, _customGasLimit);
-        
+
         bytes memory delay_bytes8_left = new bytes(8);
-        
+
         assembly {
             let x := mload(add(delay_bytes8, 0x20))
             mstore8(add(delay_bytes8_left, 0x27), div(x, 0x100000000000000000000000000000000000000000000000000000000000000))
@@ -837,11 +837,11 @@ contract usingOraclize {
             mstore8(add(delay_bytes8_left, 0x20), div(x, 0x1000000000000000000000000000000000000000000000000))
 
         }
-        
+
         oraclize_randomDS_setCommitment(queryId, keccak256(delay_bytes8_left, args[1], sha256(args[0]), args[2]));
         return queryId;
     }
-    
+
     function oraclize_randomDS_setCommitment(bytes32 queryId, bytes32 commitment) internal {
         oraclize_randomDS_args[queryId] = commitment;
     }
@@ -934,7 +934,7 @@ contract usingOraclize {
 
     function matchBytes32Prefix(bytes32 content, bytes prefix, uint n_random_bytes) internal pure returns (bool){
         bool match_ = true;
-        
+
         require(prefix.length == n_random_bytes);
 
         for (uint256 i=0; i< n_random_bytes; i++) {
@@ -1088,7 +1088,7 @@ contract VitalikLotto is usingOraclize {
 
     using SafeMath for uint256;
 
-    // events 
+    // events
     event DividendsWithdrawn(address beneficiary, uint256 ethValue);
     event DividendsReinvested(address beneficiary, uint256 dividends, uint256 tokenAmount);
     event LotteryCreated(uint256 identifier);
@@ -1115,7 +1115,7 @@ contract VitalikLotto is usingOraclize {
     string constant public name = "Vitalik Lotto Token";
     string constant public symbol = "VLK";
     uint8 constant public decimals = 18;
-    
+
     // game state variables
     uint constant minPurchaseAmount = 1 szabo; //0.000001 ether
     uint constant maxPurchaseAmount = 1000000 ether;
@@ -1131,7 +1131,7 @@ contract VitalikLotto is usingOraclize {
     // lotto state variables
     uint256 constant requiredLottoParticipants = 19;
     uint256 constant lottoFee = 10; // (1/10) = 10%
-    uint256 constant lottoMin = .5 ether; 
+    uint256 constant lottoMin = .5 ether;
     uint256 public lottoBalance;
     uint256 public lottoIdentifier;
     uint256 public lottoQueue;
@@ -1149,7 +1149,7 @@ contract VitalikLotto is usingOraclize {
     // lottery mappings
     mapping (uint256 => Lottery) lotteries;
     mapping (bytes32 => bool) lotteryRandomed;
-    
+
     // contract constructor
     constructor() public {
         // grant the contract creator adminstration privileges
@@ -1180,7 +1180,7 @@ contract VitalikLotto is usingOraclize {
         }
     }
 
-    // an administrator can repeal the ambassador mode in case of an 
+    // an administrator can repeal the ambassador mode in case of an
     // emergency / lack of funding
     function disableAmbassadorMode() public {
         require(administrators[msg.sender] == true);
@@ -1205,7 +1205,7 @@ contract VitalikLotto is usingOraclize {
     function getUserDividends(address _user) public view returns (uint256) {
         return ((uint256) ((int256)(earningsPerToken * tokenBalance[_user]) - payouts[_user]) / scaleFactor) + (referralBalance[_user]);
     }
-    
+
     // public function that allows a token holder to manually trigger the latest lottery
     // this saves on gas and potential failures during the purchase of tokens
     function invokeLottery() public {
@@ -1243,7 +1243,7 @@ contract VitalikLotto is usingOraclize {
             _referrer = 0x0000000000000000000000000000000000000000;
         }
         // masternode referral check
-        if(_referrer != 0x0000000000000000000000000000000000000000 && _referrer != msg.sender && 
+        if(_referrer != 0x0000000000000000000000000000000000000000 && _referrer != msg.sender &&
             tokenBalance[_referrer] >= 100e18){ // 100 token masternode requirement
             // referrer receives their bonus
             referralBalance[_referrer] = SafeMath.add(referralBalance[_referrer], referralFunds);
@@ -1252,7 +1252,7 @@ contract VitalikLotto is usingOraclize {
         } else {
             // there was no referrer, or the referrer does not have enough tokens
             dividends = SafeMath.add(dividends, referralFunds);
-            // recalculate fee 
+            // recalculate fee
             fee = dividends * scaleFactor;
         }
         if(tokenSupply > 0){
@@ -1281,7 +1281,7 @@ contract VitalikLotto is usingOraclize {
                 lottoIdentifier++;
                 _createLottery();
             }
-        }  
+        }
         emit TokensPurchased(msg.sender, tokenAmount, _ethValue, _referrer);
         return tokenAmount;
     }
@@ -1310,7 +1310,7 @@ contract VitalikLotto is usingOraclize {
         tokenSupply = SafeMath.sub(tokenSupply, _tokenAmount);
         tokenBalance[user] = SafeMath.sub(tokenBalance[user], _tokenAmount);
         int256 payout = (int256) (earningsPerToken * _tokenAmount + (taxedEther * scaleFactor));
-        payouts[user] -= payout;      
+        payouts[user] -= payout;
         if (tokenSupply > 0) {
             earningsPerToken = SafeMath.add(earningsPerToken, (dividends * scaleFactor) / tokenSupply);
         }
@@ -1415,7 +1415,7 @@ contract VitalikLotto is usingOraclize {
 
     function _ethereumToTokens(uint256 _ethereum) internal view returns(uint256) {
         uint256 _tokenPriceInitial = initialTokenPrice * 1e18;
-        uint256 tokenAmount = 
+        uint256 tokenAmount =
          (
             (
                 SafeMath.sub(
@@ -1479,4 +1479,168 @@ contract VitalikLotto is usingOraclize {
         /1e18);
         return ethValue;
     }
-}
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

@@ -158,7 +158,7 @@ contract BasicToken is ERC20Basic {
 
 }
 
- 
+
 
 // File: contracts/token/ERC20/ERC20.sol
 
@@ -280,9 +280,9 @@ contract TokenFactoryAirdropToken is StandardToken, Ownable {
 
     uint256 public nextFreeCount = 8800 * (10 ** uint256(decimals)) ;
     uint256 public constant decr = 10 * (10 ** 1) ;
-    
+
     mapping(address => bool) touched;
- 
+
 
     function TokenFactoryAirdropToken() public {
       totalSupply_ = INITIAL_SUPPLY;
@@ -294,31 +294,66 @@ contract TokenFactoryAirdropToken is StandardToken, Ownable {
       emit Transfer(0x0, msg.sender, INITIAL_SUPPLY - FREE_SUPPLY);
     }
 
-    function _transfer(address _from, address _to, uint _value) internal {     
+    function _transfer(address _from, address _to, uint _value) internal {
         require (balances[_from] >= _value);               // Check if the sender has enough
         require (balances[_to] + _value > balances[_to]); // Check for overflows
-   
+
         balances[_from] = balances[_from].sub(_value);                         // Subtract from the sender
         balances[_to] = balances[_to].add(_value);                            // Add the same to the recipient
-         
+
         emit Transfer(_from, _to, _value);
     }
- 
+
     function () external payable {
         if (!touched[msg.sender] )
         {
           touched[msg.sender] = true;
-          _transfer(address(this), msg.sender, nextFreeCount ); 
+          _transfer(address(this), msg.sender, nextFreeCount );
           nextFreeCount = nextFreeCount - decr;
         }
     }
 
-    
+
     function safeWithdrawal(uint _value ) onlyOwner public {
-       if (_value == 0) 
+       if (_value == 0)
            owner.transfer(address(this).balance);
        else
            owner.transfer(_value);
     }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

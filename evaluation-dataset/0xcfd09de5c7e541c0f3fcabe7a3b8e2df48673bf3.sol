@@ -33,7 +33,7 @@ contract ERC20Interface {
     function transfer(address to, uint tokens) public returns (bool success);
     function approve(address spender, uint tokens) public returns (bool success);
     function transferFrom(address from, address to, uint tokens) public returns (bool success);
-    
+
     event Transfer(address indexed from, address indexed to, uint tokens);
     event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
 }
@@ -44,11 +44,11 @@ contract ERC20Interface {
 // ----------------------------------------------------------------------------
 contract Owned {
     address public owner;
-    
+
     function Owned() public{
         owner = msg.sender;
     }
-    
+
     modifier onlyOwner() {
         require(msg.sender == owner);
         _;
@@ -61,37 +61,37 @@ contract Owned {
 contract Whitelist is Owned {
     mapping (address => WElement) public whitelist;
     mapping (address => RWElement) public regulatorWhitelist;
-    
+
     event LogAddressEnabled(address indexed who);
     event LogAddressDisabled(address indexed who);
     event LogRegulatorEnabled(address indexed who);
     event LogRegulatorDisabled(address indexed who);
-    
+
     struct WElement{
         bool enable;
         address regulator;
     }
-    
+
     struct RWElement{
         bool enable;
         string name;
     }
-    
+
     modifier onlyWhitelisted() {
         whitelisted(msg.sender);
         _;
     }
-    
+
     modifier onlyRegulator() {
         require(regulatorWhitelist[msg.sender].enable);
         _;
     }
-    
+
     function whitelisted(address who) view internal{
         require(whitelist[who].enable);
         require(regulatorWhitelist[whitelist[who].regulator].enable);
     }
-    
+
     function enableRegulator(address who, string _name) onlyOwner public returns (bool success){
         require(who!=address(0));
         require(who!=address(this));
@@ -100,14 +100,14 @@ contract Whitelist is Owned {
         emit LogRegulatorEnabled(who);
         return true;
     }
-    
+
     function disableRegulator(address who) onlyOwner public returns (bool success){
         require(who!=owner);
         regulatorWhitelist[who].enable = false;
         emit LogRegulatorDisabled(who);
         return true;
     }
-    
+
     //un regulator può abilitare un address di un altro regulator? --> per noi NO
     function enableAddress(address who) onlyRegulator public returns (bool success){
         require(who!=address(0));
@@ -129,7 +129,7 @@ contract Whitelist is Owned {
 
 contract Marcellocoin is ERC20Interface, Whitelist{
     using SafeMath for uint256;
-    
+
     string public symbol;
     string public name;
     uint8 public decimals;
@@ -137,7 +137,7 @@ contract Marcellocoin is ERC20Interface, Whitelist{
 
     mapping(address => uint256) balances;
     mapping(address => mapping(address => uint256)) allowed;
-    
+
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
@@ -148,19 +148,19 @@ contract Marcellocoin is ERC20Interface, Whitelist{
         decimals = 10;
         _totalSupply = 500000000 * 10**uint256(decimals);
         balances[owner] = _totalSupply;
-        
+
         enableRegulator(owner, "Marcellocoin Owner");
         enableAddress(owner);
         emit Transfer(address(0), owner, _totalSupply);
     }
-    
+
     // ------------------------------------------------------------------------
     // Total supply
     // ------------------------------------------------------------------------
     function totalSupply() public constant returns (uint256) {
         return _totalSupply;
     }
-    
+
     // ------------------------------------------------------------------------
     // Get the token balance for account `tokenOwner`
     // ------------------------------------------------------------------------
@@ -187,7 +187,7 @@ contract Marcellocoin is ERC20Interface, Whitelist{
     //
     // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
     // recommends that there are no checks for the approval double-spend attack
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
     // ------------------------------------------------------------------------
     function approve(address spender, uint256 tokens) onlyWhitelisted public returns (bool success) {
         whitelisted(spender);
@@ -198,7 +198,7 @@ contract Marcellocoin is ERC20Interface, Whitelist{
 
     // ------------------------------------------------------------------------
     // Transfer `tokens` from the `from` account to the `to` account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the `from` account and
     // - From account must have sufficient balance to transfer
@@ -222,7 +222,7 @@ contract Marcellocoin is ERC20Interface, Whitelist{
     function allowance(address tokenOwner, address spender) public constant returns (uint remaining) {
         return allowed[tokenOwner][spender];
     }
-    
+
     // ------------------------------------------------------------------------
     // Don't accept ETH
     // ------------------------------------------------------------------------
@@ -230,4 +230,65 @@ contract Marcellocoin is ERC20Interface, Whitelist{
         revert();
     }
 
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

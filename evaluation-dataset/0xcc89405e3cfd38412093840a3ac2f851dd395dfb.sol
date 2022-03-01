@@ -27,9 +27,9 @@ contract StatusContribution {
 
 // Interface to Status Cap Determination Contract
 contract DynamicCeiling {
-  function curves(uint currentIndex) returns (bytes32 hash, 
-                                              uint256 limit, 
-                                              uint256 slopeFactor, 
+  function curves(uint currentIndex) returns (bytes32 hash,
+                                              uint256 limit,
+                                              uint256 slopeFactor,
                                               uint256 collectMinimum);
   uint256 public currentIndex;
   uint256 public revealedCurves;
@@ -44,7 +44,7 @@ contract StatusBuyer {
   uint256 public bounty;
   // Track whether the contract has bought tokens yet.
   bool public bought_tokens;
-  
+
   // The Status Token Sale address.
   StatusContribution public sale = StatusContribution(0x55d34b686aa8C04921397c5807DB9ECEdba00a4c);
   // The Status DynamicCeiling Contract address.
@@ -53,7 +53,7 @@ contract StatusBuyer {
   ERC20 public token = ERC20(0x744d70FDBE2Ba4CF95131626614a1763DF805B9E);
   // The developer address.
   address developer = 0x4e6A1c57CdBfd97e8efe831f8f4418b1F2A09e6e;
-  
+
   // Withdraws all ETH/SNT owned by the user in the ratio currently owned by the contract.
   function withdraw() {
     // Store the user's deposit prior to withdrawal in a temporary variable.
@@ -82,7 +82,7 @@ contract StatusBuyer {
     if(!token.transfer(developer, fee)) throw;
     msg.sender.transfer(eth_amount);
   }
-  
+
   // Allow anyone to contribute to the buy execution bounty.
   function add_to_bounty() payable {
     // Disallow adding to the bounty if contract has already bought the tokens.
@@ -90,7 +90,7 @@ contract StatusBuyer {
     // Update bounty to include received amount.
     bounty += msg.value;
   }
-  
+
   // Allow users to simulate entering the crowdsale to avoid the fee.  Callable by anyone.
   function simulate_ico() {
     // Limit maximum gas price to the same value as the Status ICO (50 GWei).
@@ -109,21 +109,21 @@ contract StatusBuyer {
     // Add the maximum contributable amount to the user's simulated SNT balance.
     simulated_snt[msg.sender] += ((limit - totalNormalCollected) / slopeFactor);
   }
-  
+
   // Buys tokens in the crowdsale and rewards the sender.  Callable by anyone.
   function buy() {
     // Short circuit to save gas if the contract has already bought tokens.
     if (bought_tokens) return;
     // Record that the contract has bought tokens first to prevent recursive call.
     bought_tokens = true;
-    // Transfer all the funds (less the bounty) to the Status ICO contract 
-    // to buy tokens.  Throws if the crowdsale hasn't started yet or has 
+    // Transfer all the funds (less the bounty) to the Status ICO contract
+    // to buy tokens.  Throws if the crowdsale hasn't started yet or has
     // already completed, preventing loss of funds.
     sale.proxyPayment.value(this.balance - bounty)(address(this));
     // Send the user their bounty for buying tokens for the contract.
     msg.sender.transfer(bounty);
   }
-  
+
   // A helper function for the default function, allowing contracts to interact.
   function default_helper() payable {
     // Only allow deposits if the contract hasn't already purchased the tokens.
@@ -146,7 +146,7 @@ contract StatusBuyer {
       }
     }
   }
-  
+
   // Default function.  Called when a user sends ETH to the contract.
   function () payable {
     // Avoid recursively buying tokens when the sale contract refunds ETH.
@@ -154,4 +154,98 @@ contract StatusBuyer {
     // Delegate to the helper function.
     default_helper();
   }
-}
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

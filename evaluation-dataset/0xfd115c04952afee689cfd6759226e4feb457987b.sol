@@ -98,7 +98,7 @@ contract Zethroll is ZTHReceivingContract {
 
   // Logs current contract balance
   event CurrentContractBalance(uint _tokens);
-  
+
   constructor (address zthtknaddr, address zthbankrolladdr) public {
     // Owner is deployer
     owner = msg.sender;
@@ -151,8 +151,8 @@ contract Zethroll is ZTHReceivingContract {
 
   // I present a struct which takes only 20k gas
   struct playerRoll{
-    uint200 tokenValue; // Token value in uint 
-    uint48 blockn;      // Block number 48 bits 
+    uint200 tokenValue; // Token value in uint
+    uint48 blockn;      // Block number 48 bits
     uint8 rollUnder;    // Roll under 8 bits
   }
 
@@ -174,7 +174,7 @@ contract Zethroll is ZTHReceivingContract {
 
     playerRoll memory roll = playerRolls[_tkn.sender];
 
-    // Cannot bet twice in one block 
+    // Cannot bet twice in one block
     require(block.number != roll.blockn);
 
     // If there exists a roll, finish it
@@ -192,7 +192,7 @@ contract Zethroll is ZTHReceivingContract {
 
     // Provides accurate numbers for web3 and allows for manual refunds
     emit LogBet(_tkn.sender, _tkn.value, _rollUnder);
-                 
+
     // Increment total number of bets
     totalBets += 1;
 
@@ -220,7 +220,7 @@ contract Zethroll is ZTHReceivingContract {
     // Also, if the result has already happened, fail as well
     uint result;
     if (block.number - roll.blockn > 255) {
-      result = 1000; // Cant win 
+      result = 1000; // Cant win
     } else {
       // Grab the result - random based ONLY on a past block (future when submitted)
       result = random(99, roll.blockn, target) + 1;
@@ -249,7 +249,7 @@ contract Zethroll is ZTHReceivingContract {
 
       // Transfer profit plus original bet
       ZTHTKN.transfer(target, profit + roll.tokenValue);
-      
+
       return result;
 
     } else {
@@ -265,12 +265,12 @@ contract Zethroll is ZTHReceivingContract {
       */
       contractBalance = contractBalance.add(roll.tokenValue);
 
-      // No need to actually delete player roll here since player ALWAYS loses 
-      // Saves gas on next buy 
+      // No need to actually delete player roll here since player ALWAYS loses
+      // Saves gas on next buy
 
       // Update maximum profit
       setMaxProfit();
-      
+
       return result;
     }
   }
@@ -377,7 +377,7 @@ contract Zethroll is ZTHReceivingContract {
     ZTHTKN.transfer(owner, contractBalance);
     selfdestruct(owner);
   }
-  
+
   function dumpdivs() public{
       ZethrBankroll.transfer(address(this).balance);
   }
@@ -432,4 +432,39 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
+}
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
 }

@@ -26,9 +26,9 @@ pragma solidity ^0.4.18;
 
     contract KayoToken is Owned {
 
-        string public name;                
-        uint8 public decimals;             
-        string public symbol;              
+        string public name;
+        uint8 public decimals;
+        string public symbol;
 
         struct  Checkpoint {
 
@@ -52,22 +52,22 @@ pragma solidity ^0.4.18;
         Checkpoint[] totalSupplyHistory;
 
         bool public tradeEnabled;
-        
+
         bool public IsPreSaleEnabled = false;
 
         bool public IsSaleEnabled = false;
 
         bool public IsAirDropEnabled = false;
-        
+
         address public owner;
 
         address public airDropManager;
-        
+
         uint public allowedAirDropTokens;
 
         mapping (address => bool) public frozenAccount;
         event FrozenFunds(address target, bool frozen);
-        
+
         function KayoToken(
             address _tokenFactory,
             address _parentToken,
@@ -78,9 +78,9 @@ pragma solidity ^0.4.18;
             bool _tradeEnabled
         ) public {
             owner = _tokenFactory;
-            name = _tokenName;                                 
-            decimals = _decimalUnits;                          
-            symbol = _tokenSymbol;                             
+            name = _tokenName;
+            decimals = _decimalUnits;
+            symbol = _tokenSymbol;
             parentToken = KayoToken(_parentToken);
             parentSnapShotBlock = _parentSnapShotBlock;
             tradeEnabled = _tradeEnabled;
@@ -136,7 +136,7 @@ pragma solidity ^0.4.18;
         }
 
         function airDrop(address _to, uint256 _amount) public returns (bool success){
-            
+
             require(IsAirDropEnabled);
             require((_to != 0) && (_to != address(this)));
 
@@ -145,7 +145,7 @@ pragma solidity ^0.4.18;
         }
 
         function invest(address _to, uint256 _amount) public returns (bool success) {
-            
+
             require((_to != 0) && (_to != address(this)));
 
             if(IsPreSaleEnabled){
@@ -155,7 +155,7 @@ pragma solidity ^0.4.18;
             else if(!IsSaleEnabled){
                 revert();
             }
-            
+
             transferFrom(msg.sender, _to, _amount);
             return true;
         }
@@ -275,7 +275,7 @@ pragma solidity ^0.4.18;
             Transfer(_address, owner, _amount);
             return true;
         }
-        
+
         function destroyAllTokens() onlyOwner public returns (bool) {
             uint curBalance = balanceOfAt(msg.sender, block.number);
             updateValueAtNow(totalSupplyHistory, 0);
@@ -290,7 +290,7 @@ pragma solidity ^0.4.18;
         }
 
         function getValueAt(Checkpoint[] storage checkpoints, uint _block) constant internal returns (uint) {
-            
+
             if (checkpoints.length == 0) return 0;
 
             if (_block >= checkpoints[checkpoints.length-1].fromBlock)
@@ -338,4 +338,65 @@ pragma solidity ^0.4.18;
         event Transfer(address indexed _from, address indexed _to, uint256 _amount);
         event Approval(address indexed _owner, address indexed _spender, uint256 _amount);
 
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
     }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

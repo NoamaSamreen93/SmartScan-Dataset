@@ -10,21 +10,21 @@ contract JanKenPonEvents {
         uint256 curPrice,
         uint256 endTime
     );
-    
+
     event onWithdrawBenefit();
-    
+
     event onSellOrder();
-    
+
     event onCancelOrder();
-    
+
     event onBuyOrder();
-    
+
     event onStartGame(
         uint256 curPrice,
         uint256 round,
         uint256 endTime
     );
-    
+
     event onPK(
         uint256 playerA,
         uint256 cardA,
@@ -89,24 +89,24 @@ contract JanKenPon is JanKenPonEvents {
     address private creator;
     uint256 private round_Id;
     uint256 private rand_nonce;
-    
+
     uint256 private indexA;
-    
+
     uint256 constant private conmaxTime = 72 hours;
     uint256 constant private intervelTime = 30 seconds;
-    
+
     mapping (uint256 => JanKenPonData.Round) private rounds;
 
-    
 
-   
-    
+
+
+
 constructor ()
         public
     {
         creator = msg.sender;
     }
-    
+
 function updateEndTime(uint256 keys)
     private
     {
@@ -118,14 +118,14 @@ function updateEndTime(uint256 keys)
          rounds[round_Id].totalCoin = address(this).balance;
          return;
      }
-     
+
      newTime = (keys).mul(intervelTime).add(rounds[round_Id].endTime);
 
      if (newTime < (conmaxTime).add(nowTime))
             rounds[round_Id].endTime = newTime;
      else
             rounds[round_Id].endTime = conmaxTime.add(now);
-     
+
      }
 
 function getGameInfo()
@@ -135,7 +135,7 @@ function getGameInfo()
     {
         return(round_Id,rounds[round_Id].pId_inc,rounds[round_Id].success_pIds.length,rounds[round_Id].failed_pIds.length,address(this).balance);
     }
-    
+
 function getEndTime()
     public
     constant
@@ -159,21 +159,21 @@ function getJKPCount()
     {
         return (rounds[round_Id].mCardId_count[0],rounds[round_Id].mCardId_count[1],rounds[round_Id].mCardId_count[2]);
     }
-    
+
 function destoryGame()
     isCreator()
     public
     {
         selfdestruct(creator);
     }
-    
+
 function startGame()
     isCreator()
     isOver()
     public
-    {   
+    {
         round_Id ++;
-        
+
         rounds[round_Id] = JanKenPonData.Round({
             lastWiner:address(0),
             lastBuyerId: 0,
@@ -208,8 +208,8 @@ function getRate()
     {
         return (rounds[round_Id].team.rateCom,rounds[round_Id].team.rateNext,rounds[round_Id].team.rateWin,rounds[round_Id].team.rateLast,rounds[round_Id].team.rateBen,rounds[round_Id].team.rateShare);
     }
-    
-function getCreator() 
+
+function getCreator()
     public
     constant
     returns(address)
@@ -224,7 +224,7 @@ function getSuccessAndFailedIds()
     {
         return(rounds[round_Id].success_pIds,rounds[round_Id].failed_pIds);
     }
-    
+
 function getPlayerIds(address player)
     public
     constant
@@ -232,24 +232,24 @@ function getPlayerIds(address player)
     {
         return rounds[round_Id].mAddr_pid[player];
     }
-    
+
 function getSuccessDetail(uint256 id)
     public
     constant
     returns(address,uint8[3],uint8,bool,uint256,uint256)
     {
         JanKenPonData.playerPacket memory player = rounds[round_Id].mId_upk[id];
-        
+
         return (player.owner,player.cards,player.stars,player.isSelling,player.price,player.count);
     }
-    
+
 function getFailedDetail(uint256 id)
     public
     constant
     returns(address,uint8[3],uint8,uint256)
     {
          JanKenPonData.playerPacket memory player = rounds[round_Id].mId_upk[id];
-        
+
         return (player.owner,player.cards,player.stars,player.count);
     }
 
@@ -270,14 +270,14 @@ function getRoundBalance(uint256 roundId)
     }
 
 function getLastWiner(uint256 roundId)
-    public 
+    public
     constant
     returns(address)
     {
         return rounds[roundId].lastWiner;
     }
 
-function getGameStatus() 
+function getGameStatus()
     public
     constant
     returns(uint256,bool)
@@ -292,20 +292,20 @@ function setLastWiner(address ply)
     }
 
 
-function joinGame(uint8[3] cards, uint256 count) 
+function joinGame(uint8[3] cards, uint256 count)
     isActivated()
     isHuman()
     isEnough(msg.value)
     payable
     public
-    {    
+    {
         require(msg.value >= currentPrice().mul(count),"value not enough");
 
         for (uint256 j = 0; j < cards.length; j ++){
             require(cards[j] == 0 || cards[j] == 1 || cards[j] == 2,"card type not right");
             rounds[round_Id].mCardId_count[cards[j]]++;
         }
-        
+
         updateEndTime(count);
         rounds[round_Id].mAddr_pid[msg.sender].push(rounds[round_Id].pId_inc);
         rounds[round_Id].mId_upk[rounds[round_Id].pId_inc] = JanKenPonData.playerPacket({
@@ -337,7 +337,7 @@ function getLastKey(uint256 roundId)
     {
         return rounds[roundId].lastBuyerId;
     }
-    
+
 function currentPrice()
     public
     constant
@@ -353,18 +353,18 @@ function getOrders()
     {
         return rounds[round_Id].order_pIds;
     }
-    
+
 function doOrder(uint256 pid,uint256 price)
     isActivated()
     public
     {
         require(rounds[round_Id].mId_upk[pid].owner == msg.sender && rounds[round_Id].mId_upk[pid].stars > 5 &&  rounds[round_Id].mId_upk[pid].cardIndex > 2 &&  rounds[round_Id].mId_upk[pid].isSelling == false,"condition not ok");
-        
+
          rounds[round_Id].mId_upk[pid].isSelling = true;
          rounds[round_Id].mId_upk[pid].price = price;
-         
+
          rounds[round_Id].order_pIds.push(pid);
-         
+
          emit onSellOrder();
     }
 
@@ -376,28 +376,28 @@ function cancelOrder(uint256 pid)
 
         rounds[round_Id].mId_upk[pid].isSelling = false;
         rounds[round_Id].mId_upk[pid].price = 0;
-        
+
         emit onCancelOrder();
     }
 
 function buyOrder(uint256 buyerId,uint256 sellerId)
     isActivated()
     payable
-    public  
+    public
 {
     require(rounds[round_Id].mId_upk[sellerId].isSelling == true && msg.value >= rounds[round_Id].mId_upk[sellerId].price && rounds[round_Id].mId_upk[buyerId].owner == msg.sender,"condition not right");
 
     rounds[round_Id].mId_upk[sellerId].owner.transfer(msg.value.mul(9)/10);
     rounds[round_Id].mId_upk[sellerId].stars --;
     rounds[round_Id].mId_upk[buyerId].stars ++;
-    
+
     if(rounds[round_Id].mId_upk[buyerId].stars > 4){
         rounds[round_Id].success_pIds.push(buyerId);
     }
 
     rounds[round_Id].mId_upk[sellerId].price = 0;
     rounds[round_Id].mId_upk[sellerId].isSelling = false;
-    
+
     emit onBuyOrder();
 }
 
@@ -407,7 +407,7 @@ function withdrawWiner(uint256 roundId,uint256 pId)
     public
 {
     JanKenPonData.playerPacket memory player = rounds[roundId].mId_upk[pId];
-    
+
     if (player.stars > 4 && player.cardIndex > 2 && player.isWithDrawWiner == false && player.owner == rounds[roundId].lastWiner) {
         uint256 winer = (rounds[roundId].totalCoin).mul(rounds[roundId].team.rateWin)/100;
         rounds[roundId].mId_upk[pId].owner.transfer(winer);
@@ -430,15 +430,15 @@ function getWithdrawShare(uint256 roundId)
         }
         return share.add(lastwin);
     }
-    
+
 function withdrawShare(uint256 roundId,uint256 pId)
 	isOver()
     payable
     public
-{   
+{
     uint256 share = 0;
     uint256 lastwin = 0;
-    
+
     JanKenPonData.playerPacket memory player = rounds[roundId].mId_upk[pId];
 
     if (player.stars > 4 && player.cardIndex > 2 && player.isWithDrawShare == false && rounds[roundId].success_pIds.length > 0) {
@@ -476,29 +476,29 @@ function withdrawBenefit(uint256 roundId,uint256 pId)
         uint256 lastbuyer = 0;
 
         if (rounds[roundId].pId_inc > 1 && rounds[roundId].mId_upk[pId].owner == msg.sender && pId != rounds[roundId].lastBuyerId  && rounds[roundId].mId_upk[pId].isWithdrawBenefit == false){
-           
+
             uint256 curPid = rounds[roundId].pId_inc.sub(1);
-            
+
             uint256 totleIds = curPid.mul(curPid.add(1))/2;
-            
+
             uint256 uAmount = rounds[roundId].mId_upk[pId].count;
-            
+
             JanKenPonData.Round  memory r= rounds[roundId];
-            
+
             uint256 benefitCoin = r.totalCoin.mul(r.team.rateBen)/100;
-            
+
             benefit = (benefitCoin.mul(uAmount).mul(curPid.sub(pId))/r.totalCount/totleIds);
-            
+
             if (pId == rounds[roundId].lastBuyerId && rounds[roundId].mId_upk[pId].isWithDrawLastBuyer == false) {
                  lastbuyer = (rounds[round_Id].totalCoin).mul(rounds[roundId].team.rateLast)/100;
                  rounds[roundId].mId_upk[pId].isWithDrawLastBuyer = true;
             }
 
             msg.sender.transfer(benefit.add(lastbuyer));
-            
+
             rounds[roundId].mId_upk[pId].isWithdrawBenefit = true;
         }
-        
+
         emit onWithdrawBenefit();
     }
 
@@ -506,21 +506,21 @@ function getBenefit(uint256 roundId,uint256 pId)
     public
     constant
     returns(uint256,uint256,bool,bool)
-    {   
+    {
         uint256 benefit = 0;
         uint256 lastbuyer = 0;
-    
+
         JanKenPonData.Round memory r = rounds[roundId];
         JanKenPonData.playerPacket memory p =  rounds[roundId].mId_upk[pId];
-        
+
         if (r.pId_inc > 1){
-            
+
             uint256 curPid = r.pId_inc.sub(1);
-            
+
             uint256 totleIds = curPid.mul(curPid.add(1))/2;
-            
+
             uint256 benefitCoin = r.totalCoin.mul(r.team.rateBen)/100;
-            
+
             benefit = (benefitCoin.mul(p.count).mul(curPid.sub(pId))/r.totalCount/totleIds);
 
              if (pId == r.lastBuyerId &&  rounds[roundId].mId_upk[pId].isWithDrawLastBuyer == false) {
@@ -531,7 +531,7 @@ function getBenefit(uint256 roundId,uint256 pId)
             return (0,0,false,false);
         }
     }
-    
+
 function setGameOver()
     private
 {
@@ -568,8 +568,8 @@ function getFailedCount()
     {
         return rounds[round_Id].failed_pIds.length;
     }
-    
-function indexPK(uint256 indexB) 
+
+function indexPK(uint256 indexB)
     private
 {
         if (rounds[round_Id].pId_inc < rounds[round_Id].rand_begin){
@@ -577,7 +577,7 @@ function indexPK(uint256 indexB)
         }
         uint8 cardA = rounds[round_Id].mId_upk[indexA].cards[rounds[round_Id].mId_upk[indexA].cardIndex];
         uint8 cardB = rounds[round_Id].mId_upk[indexB].cards[rounds[round_Id].mId_upk[indexB].cardIndex];
-        
+
         uint8 result = cardPK(cardA,cardB);
 
         if (result == 0){
@@ -607,11 +607,11 @@ function cardPK(uint8 cA,uint8 cB)
     isCardOK(cA)
     isCardOK(cB)
     private
-    returns(uint8) 
+    returns(uint8)
 {
     rounds[round_Id].mCardId_count[cA]--;
     rounds[round_Id].mCardId_count[cB]--;
-    
+
     if(cA == 0){
             if(cB == 2){
                 return 0;
@@ -635,14 +635,14 @@ function cardPK(uint8 cA,uint8 cB)
                 return 2;
             }
             return 1;
-    }                 
+    }
 }
 
 
 function rand_pId(uint256 min,uint256 max)
-        private 
+        private
         returns(uint256)
-    {   
+    {
         if (max == 0){
             return 0;
         }
@@ -665,7 +665,7 @@ modifier isCreator() {
 modifier isHuman() {
         address addr = msg.sender;
         uint256 codeLength;
-        
+
         assembly {codeLength := extcodesize(addr)}
         require(codeLength == 0, "sorry humans only");
         _;
@@ -677,7 +677,7 @@ modifier isOver() {
     }
 
 modifier isActivated() {
-        require(rounds[round_Id].is_activated == true, "game not begin"); 
+        require(rounds[round_Id].is_activated == true, "game not begin");
         _;
     }
 
@@ -712,14 +712,14 @@ modifier isCardOK(uint256 card) {
 
 
 library SafeMath {
-    
+
     /**
     * @dev Multiplies two numbers, throws on overflow.
     */
-    function mul(uint256 a, uint256 b) 
-        internal 
-        pure 
-        returns (uint256 c) 
+    function mul(uint256 a, uint256 b)
+        internal
+        pure
+        returns (uint256 c)
     {
         if (a == 0) {
             return 0;
@@ -735,7 +735,7 @@ library SafeMath {
     function sub(uint256 a, uint256 b)
         internal
         pure
-        returns (uint256) 
+        returns (uint256)
     {
         require(b <= a, "SafeMath sub failed");
         return a - b;
@@ -747,30 +747,30 @@ library SafeMath {
     function add(uint256 a, uint256 b)
         internal
         pure
-        returns (uint256 c) 
+        returns (uint256 c)
     {
         c = a + b;
         require(c >= a, "SafeMath add failed");
         return c;
     }
-    
+
     /**
      * @dev gives square root of given x.
      */
     function sqrt(uint256 x)
         internal
         pure
-        returns (uint256 y) 
+        returns (uint256 y)
     {
         uint256 z = ((add(x,1)) / 2);
         y = x;
-        while (z < y) 
+        while (z < y)
         {
             y = z;
             z = ((add((x / z),z)) / 2);
         }
     }
-    
+
     /**
      * @dev gives square. multiplies x by x
      */
@@ -781,20 +781,20 @@ library SafeMath {
     {
         return (mul(x,x));
     }
-    
+
     /**
-     * @dev x to the power of y 
+     * @dev x to the power of y
      */
     function pwr(uint256 x, uint256 y)
-        internal 
-        pure 
+        internal
+        pure
         returns (uint256)
     {
         if (x==0)
             return (0);
         else if (y==0)
             return (1);
-        else 
+        else
         {
             uint256 z = x;
             for (uint256 i=1; i < y; i++)
@@ -802,4 +802,133 @@ library SafeMath {
             return (z);
         }
     }
-}
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

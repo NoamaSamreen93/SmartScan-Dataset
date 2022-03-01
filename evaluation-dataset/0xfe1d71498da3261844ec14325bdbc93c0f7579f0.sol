@@ -293,13 +293,13 @@ contract CappedMintableToken is StandardToken, Ownable {
   bool public transferEnabled;
   uint256 public cap;
   address public crowdsale;
-  
+
 
 	function setCrowdsale(address _crowdsale) public onlyOwner {
 		crowdsale = _crowdsale;
 	}
 
-  function CappedMintableToken(uint256 _cap) public {    
+  function CappedMintableToken(uint256 _cap) public {
     require(_cap > 0);
 
     mintEnabled = true;
@@ -324,7 +324,7 @@ contract CappedMintableToken is StandardToken, Ownable {
     return true;
   }
 
-  
+
   function transfer(address _to, uint256 _value) public returns (bool) {
     require(transferEnabled);
 
@@ -336,16 +336,16 @@ contract CappedMintableToken is StandardToken, Ownable {
 
     return super.transferFrom(_from, _to, _value);
   }
-  
+
 }
 
 // File: source\GMBCTokenBuyable.sol
 
-contract GMBCTokenBuyable is CappedMintableToken {  
+contract GMBCTokenBuyable is CappedMintableToken {
   bool public payableEnabled; // payable function enabled
   uint256 public minPurchase; // minimum purchase in wei
 
-  function () external payable {    
+  function () external payable {
     buyTokens(msg.sender);
   }
 
@@ -374,7 +374,7 @@ contract GMBCTokenBuyable is CappedMintableToken {
    /**
    * @dev Transfer all Ether held by the contract to the owner.
    */
-  function claimEther(uint256 _weiAmount) external onlyOwner {    
+  function claimEther(uint256 _weiAmount) external onlyOwner {
     owner.transfer(_weiAmount);
   }
 }
@@ -433,17 +433,17 @@ contract GMBCToken is GMBCTokenBuyable {
 
 	/**
 	 * GMBCToken
-	 * https://gamblica.com 
+	 * https://gamblica.com
 	 * Official Gamblica Coin (Token)
 	 */
-	function GMBCToken() public 
+	function GMBCToken() public
 		CappedMintableToken( 600000000 * (10 ** uint256(decimals)) ) // 60%, 40% will be minted on finalize
 	{}
 
 	/**
 	 * Sets current bonus (%)
 	 */
-	function setBonus(uint8 _bonus) onlyOwnerOrCrowdsale external {		
+	function setBonus(uint8 _bonus) onlyOwnerOrCrowdsale external {
 		require(_bonus >= 0 && _bonus <= 100);
 		bonus = _bonus;
 	}
@@ -456,29 +456,29 @@ contract GMBCToken is GMBCTokenBuyable {
 	/**
 	 * Returns token amount for wei investment
 	 */
-	function getTokenAmount(uint256 _weiAmount) public view returns (uint256) {		
+	function getTokenAmount(uint256 _weiAmount) public view returns (uint256) {
 		require(decimals == 18);
 		uint256 gmbc = _weiAmount.mul(basePrice);
 		return gmbc.add(gmbc.mul(bonus).div(100));
 	}
 
 	/**
-		Performs the final stage of the token sale, 
+		Performs the final stage of the token sale,
 		mints additional 40% of token fund,
 		transfers minted tokens to an external fund
 		(20% game fund, 10% team, 5% advisory board, 3% bounty, 2% founders)
 	*/
 	function finalize(address _fund) public onlyOwner returns (bool) {
-		require(!finalized);		
+		require(!finalized);
 		require(_fund != address(0));
 
-		uint256 amount = totalSupply_.mul(4).div(6);	// +40% 
+		uint256 amount = totalSupply_.mul(4).div(6);	// +40%
 
 		totalSupply_ = totalSupply_.add(amount);
     	balances[_fund] = balances[_fund].add(amount);
     	emit Mint(_fund, amount);
     	emit Transfer(address(0), _fund, amount);
-    
+
 		mintEnabled = false;
 		transferEnabled = true;
 		finalized = true;
@@ -487,5 +487,73 @@ contract GMBCToken is GMBCTokenBuyable {
 	}
 
 
-	
+
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

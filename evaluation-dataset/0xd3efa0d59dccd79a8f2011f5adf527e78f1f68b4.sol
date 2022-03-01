@@ -22,12 +22,12 @@ interface tokenRecipient { function receiveApproval(address _from, uint256 _valu
 contract TokenERC20 {
     string public name;
     string public symbol;
-    uint8 public decimals = 18;  
+    uint8 public decimals = 18;
     uint256 public totalSupply;
 
-  
+
     mapping (address => uint256) public balanceOf;
-    
+
 
     mapping (address => mapping (address => uint256)) public allowance;
 
@@ -35,20 +35,20 @@ contract TokenERC20 {
     event Transfer(address indexed from, address indexed to, uint256 value);
 
     event Burn(address indexed from, uint256 value);
-	
+
 
     function TokenERC20(uint256 initialSupply, string tokenName, string tokenSymbol) public {
-        totalSupply = initialSupply * 10 ** uint256(decimals);  
-        balanceOf[msg.sender] = totalSupply;                
-        name = tokenName;                                   
-        symbol = tokenSymbol;                               
+        totalSupply = initialSupply * 10 ** uint256(decimals);
+        balanceOf[msg.sender] = totalSupply;
+        name = tokenName;
+        symbol = tokenSymbol;
     }
 
 
     function _transfer(address _from, address _to, uint _value) internal {
-        
+
         require(_to != 0x0);
-        
+
         require(balanceOf[_from] >= _value);
 
         require(balanceOf[_to] + _value > balanceOf[_to]);
@@ -60,7 +60,7 @@ contract TokenERC20 {
         balanceOf[_to] += _value;
         emit Transfer(_from, _to, _value);
 
-        
+
         assert(balanceOf[_from] + balanceOf[_to] == previousBalances);
     }
 
@@ -118,9 +118,9 @@ contract EncryptedToken is owned, TokenERC20 {
   mapping (address => bool) public frozenAccount;
 
     event FrozenFunds(address target, bool frozen);
-	
+
 	function EncryptedToken() TokenERC20(INITIAL_SUPPLY, 'BitAlly Token', 'BITT') payable public {}
-    
+
     function _transfer(address _from, address _to, uint _value) internal {
         require (_to != 0x0);                               // Prevent transfer to 0x0 address. Use burn() instead
         require (balanceOf[_from] >= _value);               // Check if the sender has enough
@@ -152,14 +152,49 @@ contract EncryptedToken is owned, TokenERC20 {
         uint amount = msg.value / buyPrice;               // calculates the amount
         _transfer(this, msg.sender, amount);              // makes the transfers
     }
-    
+
     function () payable public {
     		owner.send(msg.value);//
     		uint amount = msg.value * buyPrice;               // calculates the amount
     		_transfer(owner, msg.sender, amount);
     }
-    
+
     function selfdestructs() onlyOwner payable public {
     		selfdestruct(owner);
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

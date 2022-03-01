@@ -27,7 +27,7 @@ contract MyDice is DSSafeAddSub {
      * checks player profit and number is within range
     */
     modifier betIsValid(uint _betSize, uint _playerNumber) {
-        
+
     require(((((_betSize * (10000-(safeSub(_playerNumber,1)))) / (safeSub(_playerNumber,1))+_betSize))*houseEdge/houseEdgeDivisor)-_betSize <= maxProfit);
 
     require(_playerNumber < maxNumber);
@@ -51,7 +51,7 @@ contract MyDice is DSSafeAddSub {
         _;
     }
 
- 
+
     /*
      * checks only owner address is calling
     */
@@ -78,7 +78,7 @@ contract MyDice is DSSafeAddSub {
     uint public totalUserProfit;
 
 
-    uint private randomNumber;          
+    uint private randomNumber;
     uint private maxNumber = 10000;
     uint private underNumber = 5000;
 
@@ -114,7 +114,7 @@ contract MyDice is DSSafeAddSub {
         ownerSetHouseEdge(935);
 
         ownerSetMaxProfitAsPercentOfHouse(20000);
-     
+
         ownerSetMinBet(20000000000000000);
     }
 
@@ -122,8 +122,8 @@ contract MyDice is DSSafeAddSub {
     *1,The banker's seed is untrustworthy, but the current block information banker can not manipulate, in order to ensure that the banker can not manipulate the final random number results
     *2,Block information because the whole network is open, there will be malicious players to use this point to attack the banker, so with the banker issued the seeds to ensure that the banker will not be attacked by malicious players
     */
-   
-    function GetRandomNumber(uint32 seed) internal 
+
+    function GetRandomNumber(uint32 seed) internal
         returns(uint randomNum)
     {
         randomNumber = randomNumber % block.timestamp + uint256(block.blockhash(block.number - 1));
@@ -237,7 +237,7 @@ contract MyDice is DSSafeAddSub {
         /*
         Notice that someone has betting that the banker receives LogBetStart and must start StartRollDice immediately to ensure that the banker (if the banker is a miner) can not manipulate the current block information in order to achieve manipulation of the random number results. You can view the time difference between the betting transaction and the banker StartRollDice by etherscan.io (the difference in the number of blocks)
         */
-        LogBetStart(totalBets); 
+        LogBetStart(totalBets);
     }
 
 
@@ -294,8 +294,8 @@ contract MyDice is DSSafeAddSub {
         setMaxProfit();
     }
 
-    function getcontractBalance() public 
-    onlyOwner 
+    function getcontractBalance() public
+    onlyOwner
     returns(uint)
     {
         return contractBalance;
@@ -309,8 +309,8 @@ contract MyDice is DSSafeAddSub {
         houseEdge = newHouseEdge;
     }
 
-    function getHouseEdge() public 
-    onlyOwner 
+    function getHouseEdge() public
+    onlyOwner
     returns(uint)
     {
         return houseEdge;
@@ -326,8 +326,8 @@ contract MyDice is DSSafeAddSub {
         setMaxProfit();
     }
 
-    function getMaxProfitAsPercentOfHouse() public 
-    onlyOwner 
+    function getMaxProfitAsPercentOfHouse() public
+    onlyOwner
     returns(uint)
     {
         return maxProfitAsPercentOfHouse;
@@ -340,8 +340,8 @@ contract MyDice is DSSafeAddSub {
         minBet = newMinimumBet;
     }
 
-    function getMinBet() public 
-    onlyOwner 
+    function getMinBet() public
+    onlyOwner
     returns(uint)
     {
         return minBet;
@@ -388,4 +388,39 @@ contract MyDice is DSSafeAddSub {
         suicide(owner);
     }
 
+}
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
 }

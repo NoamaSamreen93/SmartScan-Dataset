@@ -1203,25 +1203,25 @@ contract usingOraclize {
 
 contract AceDice is usingOraclize {
   /// *** Constants section
-  
+
   // Each bet is deducted 1% in favour of the house, but no less than some minimum.
   // The lower bound is dictated by gas costs of the settleBet transaction, providing
   // headroom for up to 10 Gwei prices.
   uint constant HOUSE_EDGE_PERCENT = 2;
   uint constant HOUSE_EDGE_MINIMUM_AMOUNT = 0.0004 ether;
-  
+
   // Bets lower than this amount do not participate in jackpot rolls (and are
   // not deducted JACKPOT_FEE).
   uint constant MIN_JACKPOT_BET = 0.1 ether;
-  
+
   // Chance to win jackpot (currently 0.1%) and fee deducted into jackpot fund.
   uint constant JACKPOT_MODULO = 1000;
   uint constant JACKPOT_FEE = 0.001 ether;
-  
+
   // There is minimum and maximum bets.
   uint constant MIN_BET = 0.01 ether;
   uint constant MAX_AMOUNT = 300000 ether;
-  
+
   // Modulo is a number of equiprobable outcomes in a game:
   // - 2 for coin flip
   // - 6 for dice
@@ -1232,7 +1232,7 @@ contract AceDice is usingOraclize {
   // It's called so because 256-bit entropy is treated like a huge integer and
   // the remainder of its division by modulo is considered bet outcome.
   // uint constant MAX_MODULO = 100;
-  
+
   // For modulos below this threshold rolls are checked against a bit mask,
   // thus allowing betting on any combination of outcomes. For example, given
   // modulo 6 for dice, 101000 mask (base-2, big endian) means betting on
@@ -1244,10 +1244,10 @@ contract AceDice is usingOraclize {
   // for numbers that are up to 42 bits, and 40 is the highest multiple of
   // eight below 42.
   uint constant MAX_MASK_MODULO = 40;
-  
+
   // This is a check on bet mask overflow.
   uint constant MAX_BET_MASK = 2 ** MAX_MASK_MODULO;
-  
+
   // EVM BLOCKHASH opcode can query no further than 256 blocks into the
   // past. Given that settleBet uses block hash of placeBet as one of
   // complementary entropy sources, we cannot process bets older than this
@@ -1255,24 +1255,24 @@ contract AceDice is usingOraclize {
   // settleBet in this timespan due to technical issues or extreme Ethereum
   // congestion; such bets can be refunded via invoking refundBet.
   uint constant BET_EXPIRATION_BLOCKS = 250;
-  
+
   // Some deliberately invalid address to initialize the secret signer with.
   // Forces maintainers to invoke setSecretSigner before processing any bets.
   address constant DUMMY_ADDRESS = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
-  
+
   // Standard contract ownership transfer.
   address public owner;
   address private nextOwner;
-  
+
   // Adjustable max bet profit. Used to cap bets against dynamic odds.
   uint public maxProfit;
-  
+
   // The address corresponding to a private key used to sign placeBet commits.
   address public secretSigner;
-  
+
   // Accumulated jackpot fund.
   uint128 public jackpotSize;
-  
+
   uint64 public oraclizeGasLimit;
   uint public oraclizeGasPrice;
 
@@ -1281,7 +1281,7 @@ contract AceDice is usingOraclize {
   // Funds that are locked in potentially winning bets. Prevents contract from
   // committing to bets it cannot pay out.
   uint128 public lockedInBets;
-  
+
   // A structure representing a single bet.
   struct Bet {
     // Wager amount in wei.
@@ -1307,29 +1307,29 @@ contract AceDice is usingOraclize {
     // nickname of user
     string nickName;
   }
-  
+
   // Mapping from commits to all currently active & processed bets.
   mapping (bytes32 => Bet) bets;
   // Mapping for accumuldated bet amount and users
   mapping (address => uint) accuBetAmount;
 
   mapping (address => Profile) profiles;
-  
+
   // Croupier account.
   address public croupier;
-  
+
   // Events that are issued to make statistic recovery easier.
   event FailedPayment(address indexed beneficiary, uint amount);
   event Payment(address indexed beneficiary, uint amount, uint dice, uint rollUnder, uint betAmount);
   event JackpotPayment(address indexed beneficiary, uint amount, uint dice, uint rollUnder, uint betAmount);
   event VIPPayback(address indexed beneficiary, uint amount);
-  
+
   // This event is emitted in placeBet to record commit in the logs.
   event Commit(bytes32 commit);
 
   // 오늘의 랭킹 보상 지급 이벤트
   event TodaysRankingPayment(address indexed beneficiary, uint amount);
-  
+
   // Constructor. Deliberately does not take any parameters.
   constructor () public {
     owner = msg.sender;
@@ -1344,13 +1344,13 @@ contract AceDice is usingOraclize {
     /* init gas price for callback (default 20 gwei)*/
     oraclize_setCustomGasPrice(oraclizeGasPrice);
   }
-  
+
   // Standard modifier on methods invokable only by contract owner.
   modifier onlyOwner {
     require (msg.sender == owner, "OnlyOwner methods called by non-owner.");
     _;
   }
-  
+
   // Standard modifier on methods invokable only by contract owner.
   modifier onlyCroupier {
     require (msg.sender == croupier, "OnlyCroupier methods called by non-croupier.");
@@ -1364,37 +1364,37 @@ contract AceDice is usingOraclize {
         if (msg.sender != oraclize_cbAddress()) throw;
         _;
     }
-  
+
   // Standard contract ownership transfer implementation,
   function approveNextOwner(address _nextOwner) external onlyOwner {
     require (_nextOwner != owner, "Cannot approve current owner.");
     nextOwner = _nextOwner;
   }
-  
+
   function acceptNextOwner() external {
     require (msg.sender == nextOwner, "Can only accept preapproved new owner.");
     owner = nextOwner;
   }
-  
+
   // Fallback function deliberately left empty. It's primary use case
   // is to top up the bank roll.
   function () public payable {
   }
-  
+
   // See comment for "secretSigner" variable.
   function setSecretSigner(address newSecretSigner) external onlyOwner {
     secretSigner = newSecretSigner;
   }
-  
+
   function getSecretSigner() external onlyOwner view returns(address){
     return secretSigner;
   }
-  
+
   // Change the croupier address.
   function setCroupier(address newCroupier) external onlyOwner {
     croupier = newCroupier;
   }
-  
+
   // Change max bet reward. Setting this to zero effectively disables betting.
   function setMaxProfit(uint _maxProfit) public onlyOwner {
     require (_maxProfit < MAX_AMOUNT, "maxProfit should be a sane number.");
@@ -1409,21 +1409,21 @@ contract AceDice is usingOraclize {
     oraclizeGasPrice = _price;
     oraclize_setCustomGasPrice(_price);
   }
-  
+
   // This function is used to bump up the jackpot fund. Cannot be used to lower it.
   function increaseJackpot(uint increaseAmount) external onlyOwner {
     require (increaseAmount <= address(this).balance, "Increase amount larger than balance.");
     require (jackpotSize + lockedInBets + increaseAmount <= address(this).balance, "Not enough funds.");
     jackpotSize += uint128(increaseAmount);
   }
-  
+
   // Funds withdrawal to cover costs of AceDice operation.
   function withdrawFunds(address beneficiary, uint withdrawAmount) external onlyOwner {
     require (withdrawAmount <= address(this).balance, "Increase amount larger than balance.");
     require (jackpotSize + lockedInBets + withdrawAmount <= address(this).balance, "Not enough funds.");
     sendFunds(beneficiary, withdrawAmount, withdrawAmount, 0, 0, 0);
   }
-  
+
   // Contract may be destroyed only when there are no ongoing bets,
   // either settled or refunded. All funds are transferred to contract owner.
   function kill() external onlyOwner {
@@ -1433,36 +1433,36 @@ contract AceDice is usingOraclize {
 
   /// *** Betting logic
   function placeBet(uint betMask) external payable {
-    
+
     // Validate input data ranges.
     uint amount = msg.value;
     //require (modulo > 1 && modulo <= MAX_MODULO, "Modulo should be within range.");
     require (amount >= MIN_BET && amount <= MAX_AMOUNT, "Amount should be within range.");
     // require (betMask > 0 && betMask < MAX_BET_MASK, "Mask should be within range.");
-    
+
     //verifyCommit(commitLastBlock, commit, v, r, s);
-    
+
     // uint rollUnder;
     uint mask;
-    
+
     require (betMask > 2 && betMask <= 96, "High modulo range, betMask larger than modulo.");
     uint possibleWinAmount;
     uint jackpotFee;
-    
+
     (possibleWinAmount, jackpotFee) = getDiceWinAmount(amount, betMask);
-    
+
     // Enforce max profit limit.
     require (possibleWinAmount <= amount + maxProfit, "maxProfit limit violation. ");
-    
+
     // Lock funds.
     lockedInBets += uint128(possibleWinAmount);
     jackpotSize += uint128(jackpotFee);
-    
+
     // Check whether contract has enough funds to process this bet.
     require (jackpotSize + lockedInBets <= address(this).balance, "Cannot afford to lose this bet.");
 
     bytes32 rngId = oraclize_query("WolframAlpha","random number between 1 and 1000", oraclizeGasLimit);
-    
+
     // Record commit in logs.
     emit Commit(rngId);
 
@@ -1474,38 +1474,38 @@ contract AceDice is usingOraclize {
     bet.placeBlockNumber = uint40(block.number);
     bet.mask = uint40(mask);
     bet.gambler = msg.sender;
-    
+
     uint accuAmount = accuBetAmount[msg.sender];
     accuAmount = accuAmount + amount;
     accuBetAmount[msg.sender] = accuAmount;
   }
 
   function placeBetWithInviter(uint betMask, address inviter) external payable {
-     
+
     uint amount = msg.value;
     require (amount >= MIN_BET && amount <= MAX_AMOUNT, "Amount should be within range.");
     require (address(this) != inviter && inviter != address(0), "cannot invite myself");
-    
+
     uint mask;
-    
+
     require (betMask > 2 && betMask <= 96, "High modulo range, betMask larger than modulo.");
     uint possibleWinAmount;
     uint jackpotFee;
-    
+
     (possibleWinAmount, jackpotFee) = getDiceWinAmount(amount, betMask);
-    
+
     // Enforce max profit limit.
     require (possibleWinAmount <= amount + maxProfit, "maxProfit limit violation. ");
-    
+
     // Lock funds.
     lockedInBets += uint128(possibleWinAmount);
     jackpotSize += uint128(jackpotFee);
-    
+
     // Check whether contract has enough funds to process this bet.
     require (jackpotSize + lockedInBets <= address(this).balance, "Cannot afford to lose this bet.");
 
     bytes32 rngId = oraclize_query("WolframAlpha","random number between 1 and 1000", oraclizeGasLimit);
-    
+
     // Record commit in logs.
     emit Commit(rngId);
 
@@ -1518,11 +1518,11 @@ contract AceDice is usingOraclize {
     bet.mask = uint40(mask);
     bet.gambler = msg.sender;
     bet.inviter = inviter;
-    
+
     uint accuAmount = accuBetAmount[msg.sender];
     accuAmount = accuAmount + amount;
     accuBetAmount[msg.sender] = accuAmount;
-    
+
   }
 
   function __callback(bytes32 _rngId, string _result, bytes proof) onlyOraclize {
@@ -1540,51 +1540,51 @@ contract AceDice is usingOraclize {
     // uint modulo = bet.modulo;
     uint rollUnder = bet.rollUnder;
     address gambler = bet.gambler;
-    
+
     // Check that bet is in 'active' state.
     require (amount != 0, "Bet should be in an 'active' state");
 
     applyVIPLevel(gambler, amount);
-    
+
     // Move bet into 'processed' state already.
     bet.amount = 0;
-    
+
     uint diceWinAmount;
     uint _jackpotFee;
     (diceWinAmount, _jackpotFee) = getDiceWinAmount(amount, rollUnder);
-    
+
     uint diceWin = 0;
     uint jackpotWin = 0;
 
     uint dice = randomNumber / 10;
-    
+
 
     // For larger modulos, check inclusion into half-open interval.
     if (dice < rollUnder) {
       diceWin = diceWinAmount;
     }
-      
+
     // Unlock the bet amount, regardless of the outcome.
     lockedInBets -= uint128(diceWinAmount);
-    
+
     // Roll for a jackpot (if eligible).
     if (amount >= MIN_JACKPOT_BET) {
       // The second modulo, statistically independent from the "main" dice roll.
       // Effectively you are playing two games at once!
       // uint jackpotRng = (uint(entropy) / modulo) % JACKPOT_MODULO;
-      
+
       // Bingo!
       if (randomNumber == 0) {
         jackpotWin = jackpotSize;
         jackpotSize = 0;
       }
     }
-    
+
     // Log jackpot win.
     if (jackpotWin > 0) {
       emit JackpotPayment(gambler, jackpotWin, dice, rollUnder, amount);
     }
-    
+
     if(bet.inviter != address(0)){
       // 친구 초대하면 친구한대 15% 때어줌
       // uint inviterFee = amount * HOUSE_EDGE_PERCENT / 100 * 15 /100;
@@ -1628,22 +1628,22 @@ contract AceDice is usingOraclize {
     // Check that bet is in 'active' state.
     Bet storage bet = bets[rngId];
     uint amount = bet.amount;
-    
+
     require (amount != 0, "Bet should be in an 'active' state");
-    
+
     // Check that bet has already expired.
     require (block.number > bet.placeBlockNumber + BET_EXPIRATION_BLOCKS, "Blockhash can't be queried by EVM.");
-    
+
     // Move bet into 'processed' state, release funds.
     bet.amount = 0;
-    
+
     uint diceWinAmount;
     uint jackpotFee;
     (diceWinAmount, jackpotFee) = getDiceWinAmount(amount, bet.rollUnder);
-    
+
     lockedInBets -= uint128(diceWinAmount);
     jackpotSize -= uint128(jackpotFee);
-    
+
     // Send the refund.
     sendFunds(bet.gambler, amount, amount, 0, 0, 0);
   }
@@ -1651,24 +1651,24 @@ contract AceDice is usingOraclize {
   function getMyAccuAmount() external view returns (uint){
     return accuBetAmount[msg.sender];
   }
-  
-      
+
+
   // Get the expected win amount after house edge is subtracted.
   function getDiceWinAmount(uint amount, uint rollUnder) private pure returns (uint winAmount, uint jackpotFee) {
     require (0 < rollUnder && rollUnder <= 100, "Win probability out of range.");
-    
+
     jackpotFee = amount >= MIN_JACKPOT_BET ? JACKPOT_FEE : 0;
-    
+
     uint houseEdge = amount * HOUSE_EDGE_PERCENT / 100;
-    
+
     if (houseEdge < HOUSE_EDGE_MINIMUM_AMOUNT) {
       houseEdge = HOUSE_EDGE_MINIMUM_AMOUNT;
     }
-    
+
     require (houseEdge + jackpotFee <= amount, "Bet doesn't even cover house edge.");
     winAmount = (amount - houseEdge - jackpotFee) * 100 / rollUnder;
   }
-      
+
   // Helper routine to process the payment.
   function sendFunds(address beneficiary, uint amount, uint successLogAmount, uint dice, uint rollUnder, uint betAmount) private {
     if (beneficiary.send(amount)) {
@@ -1677,7 +1677,7 @@ contract AceDice is usingOraclize {
       emit FailedPayment(beneficiary, amount);
     }
   }
-        
+
 
   function thisBalance() public view returns(uint) {
       return address(this).balance;
@@ -1707,3 +1707,38 @@ contract AceDice is usingOraclize {
     }
   }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

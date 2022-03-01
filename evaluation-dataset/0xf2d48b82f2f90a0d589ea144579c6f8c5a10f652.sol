@@ -532,11 +532,11 @@ interface EscrowDataInterface
 {
     ///@notice Create and fund a new escrow.
     function createEscrow(
-        bytes32 _tradeId, 
-        DSToken _token, 
-        address _buyer, 
-        address _seller, 
-        uint256 _value, 
+        bytes32 _tradeId,
+        DSToken _token,
+        address _buyer,
+        address _seller,
+        uint256 _value,
         uint16 _fee,
         uint32 _paymentWindowInSeconds
     ) external returns(bool);
@@ -634,7 +634,7 @@ contract DexC2C is DSAuth
         require(msg.sender == gateway, "Must be gateway contract");
         _;
     }
-    
+
     constructor(EscrowDataInterface _escrowData, address _signer) DSAuth() public{
         // require(_escrowData != address(0x00), "EscrowData address must exists");
         arbitrator = msg.sender;
@@ -878,7 +878,7 @@ contract DexC2C is DSAuth
         require(block.timestamp < params.expiry, "Signature has expired");
 
         emit CreatedEscrow(params.buyer, params.seller, _tradeHash, params.tradeToken);
-        return escrowData.createEscrow(params.tradeId, params.tradeToken, params.buyer, params.seller, params.value, 
+        return escrowData.createEscrow(params.tradeId, params.tradeToken, params.buyer, params.seller, params.value,
         params.fee, params.paymentWindowInSeconds);
     }
 
@@ -963,7 +963,7 @@ contract DexC2C is DSAuth
         }else{
             require(_caller == _buyer, "Must be buyer");
         }
-        
+
         require(escrowData.updateSellerCanCancelAfter(escrow.tradeHash, requestCancellationMinimumTime));
         emit BuyerPaid(_buyer, _seller, escrow.tradeHash, _token);
         return true;
@@ -1018,7 +1018,7 @@ contract DexC2C is DSAuth
         }else{
             require(_caller == _seller, "Must be buyer");
         }
-        
+
         escrowData.removeEscrow(escrow.tradeHash);
         emit CancelledBySeller(_buyer, _seller, escrow.tradeHash, _token);
         transferMinusFees(_token, _seller, _value, _gasFees, 0);
@@ -1087,7 +1087,7 @@ contract DexC2C is DSAuth
         bytes32 _tradeHash = keccak256(abi.encodePacked(_tradeId, _token, _buyer, _seller, _value, _fee));
         bool exists;
         uint32 sellerCanCancelAfter;
-        uint128 totalFeesSpentByRelayer; 
+        uint128 totalFeesSpentByRelayer;
         (exists, sellerCanCancelAfter, totalFeesSpentByRelayer) = escrowData.getEscrow(_tradeHash);
 
         return Escrow(_tradeHash, exists, sellerCanCancelAfter, totalFeesSpentByRelayer);
@@ -1104,7 +1104,7 @@ contract DexC2C is DSAuth
     ) internal pure returns (address){
         bytes memory _prefix = "\x19Ethereum Signed Message:\n32";
         bytes32 _prefixedHash = keccak256(abi.encodePacked(_prefix, _h));
-        return ecrecover(_prefixedHash, _v, _r, _s); 
+        return ecrecover(_prefixedHash, _v, _r, _s);
     }
 
     function getRelayedSender(
@@ -1140,7 +1140,7 @@ contract DexC2C is DSAuth
 /* import "ds-auth/auth.sol"; */
 
 contract DexC2CGateway is DSAuth{
-    
+
     DSToken constant internal ETH_TOKEN_ADDRESS = DSToken(0x00eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee);
     DexC2C dexc2c;
 
@@ -1297,7 +1297,7 @@ contract DexC2CGateway is DSAuth{
     ) internal pure returns (address){
         // bytes memory _prefix = "\x19Ethereum Signed Message:\n32";
         // bytes32 _prefixedHash = keccak256(abi.encodePacked(_prefix, _h));
-        // return ecrecover(_prefixedHash, _v, _r, _s); 
+        // return ecrecover(_prefixedHash, _v, _r, _s);
         return ecrecover(_h, _v, _r, _s);
     }
 
@@ -1316,3 +1316,38 @@ contract DexC2CGateway is DSAuth{
         return recoverAddress(_hash, _v, _r, _s);
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

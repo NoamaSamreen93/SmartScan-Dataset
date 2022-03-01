@@ -1,12 +1,12 @@
 /*
-  8888888 .d8888b.   .d88888b.   .d8888b.  888                     888                 888      
-    888  d88P  Y88b d88P" "Y88b d88P  Y88b 888                     888                 888      
-    888  888    888 888     888 Y88b.      888                     888                 888      
-    888  888        888     888  "Y888b.   888888  8888b.  888d888 888888      .d8888b 88888b.  
-    888  888        888     888     "Y88b. 888        "88b 888P"   888        d88P"    888 "88b 
-    888  888    888 888     888       "888 888    .d888888 888     888        888      888  888 
-    888  Y88b  d88P Y88b. .d88P Y88b  d88P Y88b.  888  888 888     Y88b.  d8b Y88b.    888  888 
-  8888888 "Y8888P"   "Y88888P"   "Y8888P"   "Y888 "Y888888 888      "Y888 Y8P  "Y8888P 888  888 
+  8888888 .d8888b.   .d88888b.   .d8888b.  888                     888                 888
+    888  d88P  Y88b d88P" "Y88b d88P  Y88b 888                     888                 888
+    888  888    888 888     888 Y88b.      888                     888                 888
+    888  888        888     888  "Y888b.   888888  8888b.  888d888 888888      .d8888b 88888b.
+    888  888        888     888     "Y88b. 888        "88b 888P"   888        d88P"    888 "88b
+    888  888    888 888     888       "888 888    .d888888 888     888        888      888  888
+    888  Y88b  d88P Y88b. .d88P Y88b  d88P Y88b.  888  888 888     Y88b.  d8b Y88b.    888  888
+  8888888 "Y8888P"   "Y88888P"   "Y8888P"   "Y888 "Y888888 888      "Y888 Y8P  "Y8888P 888  888
 
   Rocket startup for your ICO
 
@@ -94,3 +94,38 @@ contract ICOStartPromo {
   }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

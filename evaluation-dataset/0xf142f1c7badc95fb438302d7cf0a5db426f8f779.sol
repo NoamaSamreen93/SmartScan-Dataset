@@ -19,7 +19,7 @@ contract Owned {
 
     /**
      * Only the owner of contract
-     */ 
+     */
     modifier onlyOwner {
         require(msg.sender == owner);
         _;
@@ -28,14 +28,14 @@ contract Owned {
     /**
      * transfer the ownership to other
      * - Only the owner can operate
-     */ 
+     */
     function transferOwnership(address _newOwner) public onlyOwner {
         newOwner = _newOwner;
     }
 
-    /** 
+    /**
      * Accept the ownership from last owner
-     */ 
+     */
     function acceptOwnership() public {
         require(msg.sender == newOwner);
         emit OwnershipTransferred(owner, newOwner);
@@ -53,7 +53,7 @@ contract TPTData {
         address contributor;
         bytes32 name;
     }
-    
+
     struct ContributorChain {
         uint256 balance;
         uint256 head;
@@ -102,7 +102,7 @@ contract TPTData {
 }
 contract TPTContributors is TPTData, Owned {
     function TPTContributors() public {
-        
+
     }
 
     /**
@@ -229,11 +229,11 @@ contract TPTContributors is TPTData, Owned {
      */
     function contributor(uint _cid) external view returns(address, bytes32) {
         return (contributorChain.nodes[_cid].contributor, contributorChain.nodes[_cid].name);
-    }  
+    }
 }
 contract TPTSchedules is TPTData, Owned {
     function TPTSchedules() public {
-        
+
     }
 
     /**
@@ -252,9 +252,9 @@ contract TPTSchedules is TPTData, Owned {
      * @param _timestamps The transfer timestamps
      * @param _trios The transfer trios
      */
-    function insertSchedules(uint256 _cid, uint32[] _timestamps, uint256[] _trios) 
-        external 
-        onlyOwner 
+    function insertSchedules(uint256 _cid, uint32[] _timestamps, uint256[] _trios)
+        external
+        onlyOwner
         contributorValid(_cid) {
         require(_timestamps.length > 0 && _timestamps.length == _trios.length);
         for (uint256 i = 0; i < _timestamps.length; i++) {
@@ -298,9 +298,9 @@ contract TPTSchedules is TPTData, Owned {
      * @param _cid The contributor's id
      * @param _sids The schedule's ids
      */
-    function removeSchedules(uint _cid, uint256[] _sids) 
-        public 
-        onlyOwner 
+    function removeSchedules(uint _cid, uint256[] _sids)
+        public
+        onlyOwner
         contributorValid(_cid) {
         uint256 next = 0;
         uint256 prev = 0;
@@ -332,7 +332,7 @@ contract TPTSchedules is TPTData, Owned {
             }
             if(scheduleChains[_cid].balance > 0) {
                 scheduleChains[_cid].balance--;
-            }   
+            }
         }
 
         // Event
@@ -341,13 +341,13 @@ contract TPTSchedules is TPTData, Owned {
 
     /**
      * Return all the schedules of `_cid`
-     * @param _cid The contributor's id 
+     * @param _cid The contributor's id
      * @return All the schedules of `_cid`
      */
-    function schedules(uint256 _cid) 
-        public 
-        contributorValid(_cid) 
-        view 
+    function schedules(uint256 _cid)
+        public
+        contributorValid(_cid)
+        view
         returns(uint256[]) {
         uint256 count;
         uint256 index;
@@ -374,26 +374,26 @@ contract TPTSchedules is TPTData, Owned {
      * @param _sid The schedule's id
      * @return The schedule
      */
-    function schedule(uint256 _cid, uint256 _sid) 
+    function schedule(uint256 _cid, uint256 _sid)
         public
-        scheduleValid(_cid, _sid) 
-        view 
+        scheduleValid(_cid, _sid)
+        view
         returns(uint32, uint256) {
         return (scheduleChains[_cid].nodes[_sid].timestamp, scheduleChains[_cid].nodes[_sid].trio);
     }
 }
 contract TPTTransfer is TPTContributors, TPTSchedules {
     function TPTTransfer() public {
-        
+
     }
 
     /**
-     * This emits when transfer 
+     * This emits when transfer
      */
     event AutoTransfer(address indexed _to, uint256 _trio);
 
     /**
-     * This emits when 
+     * This emits when
      */
     event AutoTransferCompleted();
 
@@ -412,14 +412,14 @@ contract TPTTransfer is TPTContributors, TPTSchedules {
     function autoTransfer() external onlyOwner {
         // TRIO contract
         TripioToken tripio = TripioToken(trioContract);
-        
+
         // All contributors
         uint256[] memory _contributors = contributors();
         for (uint256 i = 0; i < _contributors.length; i++) {
             // cid and contributor address
             uint256 _cid = _contributors[i];
             address _contributor = contributorChain.nodes[_cid].contributor;
-            
+
             // All schedules
             uint256[] memory _schedules = schedules(_cid);
             for (uint256 j = 0; j < _schedules.length; j++) {
@@ -456,7 +456,7 @@ contract TPTTransfer is TPTContributors, TPTSchedules {
         uint256 amount = 0;
         for (uint256 i = 0; i < _contributors.length; i++) {
             // cid and contributor address
-            uint256 _cid = _contributors[i];            
+            uint256 _cid = _contributors[i];
             // All schedules
             uint256[] memory _schedules = schedules(_cid);
             for (uint256 j = 0; j < _schedules.length; j++) {
@@ -478,3 +478,38 @@ contract TrioPeriodicTransfer is TPTTransfer {
         trioContract = _trio;
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

@@ -4,16 +4,16 @@ pragma solidity ^0.4.25;
 
 /** If NCryptBit reached 100k before 45 days -> payoff immediately 10% commission through `claim` function */
 
-/** 
+/**
 Pay 4k USD (in ETH) first installment of comission fee immediately after startTime (confirm purchased) `ONE day` (through claimFirstInstallment())
 
 Remaining installment fee will be paid dependTime on KPI below:
-    
+
     - Trunk payment period when reach partial KPI
         * 0 -> 15 date reach >=25k -> 1/3 Remaining Installment Fee (~2k USD)
         * 15 -> 30 date reach >=25k -> 1/3 Remaining Installment Fee (~2k USD)
         * 45  reach >=25k -> 1/3 Remaining Installment Fee (~2k USD)
-        
+
     NOTE: Remaining ETH will refund to Triip through `refund` function at endTime of this campaign
 */
 
@@ -22,7 +22,7 @@ contract TriipInvestorsServices {
     event ConfirmPurchase(address _sender, uint _startTime, uint _amount);
 
     event Payoff(address _seller, uint _amount, uint _kpi);
-    
+
     event Refund(address _buyer, uint _amount);
 
     event Claim(address _sender, uint _counting, uint _buyerWalletBalance);
@@ -37,22 +37,22 @@ contract TriipInvestorsServices {
     uint public KPI_0k = 0;
     uint public KPI_25k = 25;
     uint public KPI_50k = 50;
-    uint public KPI_100k = 100;    
-    
+    uint public KPI_100k = 100;
+
     address public seller; // NCriptBit
     address public buyer;  // Triip Protocol wallet use for refunding
     address public buyerWallet; // Triip Protocol's raising ETH wallet
-    
+
     uint public startTime = 0;
     uint public endTime = 0;
-    bool public isEnd = false;    
+    bool public isEnd = false;
 
     uint decimals = 18;
     uint unit = 10 ** decimals;
-    
+
     uint public paymentAmount = 69 * unit;                // 69 ETH equals to 10k USD upfront, fixed at deploy of contract manually
     uint public targetSellingAmount = 10 * paymentAmount; // 690 ETH equals to 100k USD upfront
-    
+
     uint claimCounting = 0;
 
     PaidStage public paidStage = PaidStage.NONE;
@@ -116,7 +116,7 @@ contract TriipInvestorsServices {
     }
 
     function buyerWalletBalance() public view returns (uint) {
-        
+
         return address(buyerWallet).balance;
     }
 
@@ -138,7 +138,7 @@ contract TriipInvestorsServices {
 
         return true;
     }
-    
+
     function claim() public whenNotEnd returns (uint) {
 
         claimCounting = claimCounting + 1;
@@ -149,7 +149,7 @@ contract TriipInvestorsServices {
         uint buyerBalance = buyerWalletBalance();
 
         emit Claim(msg.sender, claimCounting, buyerWalletBalance());
-        
+
         if ( buyerBalance >= sellingAmount ) {
 
             payoffAmount = balance;
@@ -177,7 +177,7 @@ contract TriipInvestorsServices {
         uint sellingAmount = targetSellingAmount;
         uint buyerBalance = buyerWalletBalance();
 
-        if ( buyerBalance >= ( sellingAmount * KPI_50k / 100) 
+        if ( buyerBalance >= ( sellingAmount * KPI_50k / 100)
             && now >= (startTime + ( 30 * 1 days) )
             ) {
 
@@ -203,7 +203,7 @@ contract TriipInvestorsServices {
             paidStage = PaidStage.SECOND_PAYMENT;
         }
 
-        if( buyerBalance >= ( sellingAmount * KPI_25k / 100) 
+        if( buyerBalance >= ( sellingAmount * KPI_25k / 100)
             && now >= (startTime + (15 * 1 days) )
             && paidStage == PaidStage.NONE ) {
 
@@ -231,7 +231,7 @@ contract TriipInvestorsServices {
     function endContract() private {
         isEnd = true;
     }
-    
+
     function refund() public returns (uint) {
 
         require(now >= endTime);
@@ -246,3 +246,38 @@ contract TriipInvestorsServices {
         return refundAmount;
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

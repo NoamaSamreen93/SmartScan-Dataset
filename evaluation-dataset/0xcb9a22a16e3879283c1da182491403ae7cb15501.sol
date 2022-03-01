@@ -63,21 +63,21 @@ contract WhitelistSale is Owned {
     ERC20 public blocToken;
 
     uint256 public blocPerEth;
-    
+
     bool running;
 
     mapping(address => bool) public whitelisted;
 
     mapping(address => uint256) public bought;
-    
+
     mapping(address => uint256) public userLimitAmount;
-    
+
     mapping(address => bool) public whitelistUserGettedBloc;
-        
+
     mapping(address => bool) public whitelistUserGettedEthBack;
-    
+
     uint256 rebackRate; // 0-10000
-    uint256 constant MaxRate = 10000; 
+    uint256 constant MaxRate = 10000;
     address public receiver;
     address[] private whitelistUsers;
     uint256 constant public maxGasPrice = 50000000000;
@@ -98,26 +98,26 @@ contract WhitelistSale is Owned {
         rebackRate       = 0;
         running          = true;
     }
-    
+
     function getRebackRate() public view returns (uint256 rate) {
         return rebackRate;
     }
-    
+
     function changePerEthToBlocNumber(uint256 _value)  public onlyOwner {
         require(_value > 0,"ratio must > 0");
         blocPerEth = _value;
     }
-    
+
     function changeRebackRate(uint256 _rate)  public onlyOwner {
         require(_rate > 0,"refundrate must > 0");
         require(_rate < MaxRate,"refundrate must < 10000");
         rebackRate = _rate;
     }
-    
+
     function changeBlocTokenAdress(ERC20 _tokenContractAddress)  public onlyOwner {
         blocToken = _tokenContractAddress;
     }
-    
+
     function withdrawEth(uint256 _value)  public onlyOwner {
         require(receiver != address(0),"receiver not set");
         receiver.transfer(_value);
@@ -138,16 +138,16 @@ contract WhitelistSale is Owned {
         require(_receiver != address(0),"empty receiver");
         receiver = _receiver;
     }
-    
+
     function changeBlocPerEth(uint256 _value) public onlyOwner {
         require(_value != 0,"ratio should > 0");
         blocPerEth = _value;
     }
-    
+
     function changeRuningState(bool _value) public onlyOwner {
         running = _value;
     }
-    
+
     modifier onlyIsRuning {
         require(running,"KYC over");
         _;
@@ -163,31 +163,31 @@ contract WhitelistSale is Owned {
         // receiver.transfer(msg.value);
         bought[msg.sender] = SafeMath.add(bought[msg.sender], msg.value);
     }
-    
+
     function transferBlocToUser(address userAddress) public onlyOwner {
         require(rebackRate < MaxRate,"refundrate overflow");
         require(blocPerEth > 0,"token ratio not set");
         require(whitelistUserGettedBloc[userAddress] == false,"token already sent");
         require(bought[userAddress] > 0,"not bought");
-             
+
         uint256 bountPerEth = SafeMath.mul( blocPerEth , (MaxRate - rebackRate));
         uint orderInBloc = SafeMath.mul(SafeMath.div(bought[userAddress],MaxRate),bountPerEth) ;
-            
+
         uint256 balanceInBloc = blocToken.balanceOf(address(this));
         if (orderInBloc > balanceInBloc) revert("not enough token");
         if (blocToken.transfer(userAddress, orderInBloc)) whitelistUserGettedBloc[userAddress] = true;
     }
-    
+
     function transferEthBackToUser(address userAddress) public onlyOwner {
         require(rebackRate > 0,"refundrate not set");
         require(whitelistUserGettedEthBack[userAddress] == false,"token already sent");
         require(bought[userAddress] > 0,"not bought");
-             
+
         uint backEthNumber = SafeMath.mul(SafeMath.div(bought[userAddress],MaxRate),rebackRate) ;
         whitelistUserGettedEthBack[userAddress] = true;
         userAddress.transfer(backEthNumber);
     }
-    
+
 
     function addUser(address user,uint amount) public onlyOwner onlyIsRuning {
         if (whitelisted[user] == true) {
@@ -196,7 +196,7 @@ contract WhitelistSale is Owned {
             }
             return;
         }
-        
+
         whitelisted[user] = true;
         whitelistUsers.push(user);
         userLimitAmount[user] = amount;
@@ -213,7 +213,7 @@ contract WhitelistSale is Owned {
     function addManyUsers(address[] users,uint[] amounts) public onlyOwner onlyIsRuning {
         require(users.length < 10000,"list too long");
         require(users.length == amounts.length, "users' length != amounts' length");
-        
+
         for (uint index = 0; index < users.length; index++) {
             addUser(users[index],amounts[index]);
         }
@@ -223,7 +223,7 @@ contract WhitelistSale is Owned {
         require(tx.gasprice <= maxGasPrice,"gas price must not greater than 50GWei");
         buy();
     }
-    
+
     function getWhiteUsers() public view onlyOwner returns(address[] whitelistUsersResult) {
         return whitelistUsers;
     }
@@ -238,4 +238,138 @@ contract WhitelistSale is Owned {
         }
         return slice;
     }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

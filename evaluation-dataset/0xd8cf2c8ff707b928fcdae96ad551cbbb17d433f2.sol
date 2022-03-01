@@ -48,17 +48,17 @@ library SafeMath {
 
 /**
  * @title PNS - Physical Form of CryptoCurrency Name System
- * @dev Physical form cryptocurrency name system smart contract is implemented 
- * to manage and record physical form cryptocurrency manufacturers' 
- * informations, such as the name of the manufacturer, the public key 
- * of the key pair whose private key signed the certificate of the physical 
+ * @dev Physical form cryptocurrency name system smart contract is implemented
+ * to manage and record physical form cryptocurrency manufacturers'
+ * informations, such as the name of the manufacturer, the public key
+ * of the key pair whose private key signed the certificate of the physical
  * form cryptocurrency, etc.
- * 
+ *
  * @author Hui Xie - <hui.742369@gmail.com>
  */
 contract PNS {
 
-    using SafeMath for uint256; 
+    using SafeMath for uint256;
 
     // Event of register
     event Register(address indexed _from, string _mfr, bytes32 _mid);
@@ -102,10 +102,10 @@ contract PNS {
 
     // Storage index counter of midmapping
     uint256 internal midcounter;
-    
+
     /**
      * @dev Register a manufacturer.
-     * 
+     *
      * @param _mfr Manufacturer name
      * @return Manufacturer ID
      */
@@ -121,7 +121,7 @@ contract PNS {
 
         mfrmapping[mid].owner = msg.sender;
         mfrmapping[mid].mfr = _mfr;
-        
+
         emit Register(msg.sender, _mfr, mid);
 
         return mid;
@@ -129,7 +129,7 @@ contract PNS {
 
     /**
      * @dev Transfer ownership of a manufacturer.
-     * 
+     *
      * @param _mid Manufacturer ID
      * @param _owner Address of new owner
      * @return Batch ID
@@ -147,10 +147,10 @@ contract PNS {
 
         return _mid;
     }
-    
+
     /**
      * @dev Push(add) a batch.
-     * 
+     *
      * @param _mid Manufacturer ID
      * @param _bn Batch number
      * @param _key Public key
@@ -182,7 +182,7 @@ contract PNS {
 
     /**
      * @dev Set(change) batch number of an unlocked batch.
-     * 
+     *
      * @param _mid Manufacturer ID
      * @param _bid Batch ID
      * @param _bn Batch number
@@ -227,7 +227,7 @@ contract PNS {
 
     /**
      * @dev Set(change) public key of an unlocked batch.
-     * 
+     *
      * @param _mid Manufacturer ID
      * @param _bid Batch ID
      * @param _key Public key
@@ -254,7 +254,7 @@ contract PNS {
 
     /**
      * @dev Lock batch. Batch number and public key is unchangeable after it is locked.
-     * 
+     *
      * @param _mid Manufacturer ID
      * @param _bid Batch ID
      * @return Batch ID
@@ -278,7 +278,7 @@ contract PNS {
 
     /**
      * @dev Check batch by its batch ID and public key.
-     * 
+     *
      * @param _mid Manufacturer ID
      * @param _bid Batch ID
      * @param _key Public key
@@ -298,7 +298,7 @@ contract PNS {
 
     /**
      * @dev Get total number of manufacturers.
-     * 
+     *
      * @return Total number of manufacturers
      */
     function totalMfr() public view returns (uint256) {
@@ -307,7 +307,7 @@ contract PNS {
 
     /**
      * @dev Get manufacturer ID.
-     * 
+     *
      * @param _midcounter Storage index counter of midmapping
      * @return Manufacturer ID
      */
@@ -317,27 +317,27 @@ contract PNS {
 
     /**
      * @dev Get manufacturer owner.
-     * 
+     *
      * @param _mid Manufacturer ID
      * @return Manufacturer owner
      */
     function ownerOf(bytes32 _mid) public view returns (address) {
         return mfrmapping[_mid].owner;
     }
-    
+
     /**
      * @dev Get manufacturer name.
-     * 
+     *
      * @param _mid Manufacturer ID
      * @return Manufacturer name (Uppercase)
      */
     function mfrOf(bytes32 _mid) public view returns (string) {
         return mfrmapping[_mid].mfr;
     }
-    
+
     /**
      * @dev Get total batch number of a manufacturer.
-     * 
+     *
      * @param _mid Manufacturer ID
      * @return Total batch number
      */
@@ -347,7 +347,7 @@ contract PNS {
 
     /**
      * @dev Get batch ID.
-     * 
+     *
      * @param _mid Manufacturer ID
      * @param _bidcounter Storage index counter of bidmapping
      * @return Batch ID
@@ -358,7 +358,7 @@ contract PNS {
 
     /**
      * @dev Get batch number.
-     * 
+     *
      * @param _mid Manufacturer ID
      * @param _bid Batch ID
      * @return Batch number
@@ -366,10 +366,10 @@ contract PNS {
     function bnOf(bytes32 _mid, bytes32 _bid) public view returns (string) {
         return mfrmapping[_mid].batchmapping[_bid].bn;
     }
-    
+
     /**
      * @dev Get batch public key.
-     * 
+     *
      * @param _mid Manufacturer ID
      * @param _bid Batch ID
      * @return bytes Batch public key
@@ -382,7 +382,7 @@ contract PNS {
 
     /**
      * @dev Convert string to uppercase.
-     * 
+     *
      * @param _s String to convert
      * @return Converted string
      */
@@ -402,7 +402,7 @@ contract PNS {
 
     /**
      * @dev Get string length.
-     * 
+     *
      * @param _s String
      * @return length
      */
@@ -410,3 +410,132 @@ contract PNS {
         return bytes(_s).length;
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

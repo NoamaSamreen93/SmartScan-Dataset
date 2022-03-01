@@ -170,7 +170,7 @@ contract Bitcub is Ownable, ERC20 {
         emit Transfer(address(0), 0xaf0A558783E92a1aEC9dd2D10f2Dc9b9AF371212, 150000000*(10**18));
 
         //sends all the unallocated tokens (350,000,000 tokens) to the address of the contract creator (The Crowdsale Contract)
-        balances[msg.sender] = TOTALSUPPLY.sub(150000000*(10**18)); 
+        balances[msg.sender] = TOTALSUPPLY.sub(150000000*(10**18));
         //Transfer event for sending tokens to Crowdsale Contract
         emit Transfer(address(0), msg.sender, TOTALSUPPLY.sub(150000000*(10**18)));
     }
@@ -357,11 +357,11 @@ contract BitcubCrowdsale is Ownable {
 
     //minimum purchase for an buyer in amount of ether (1 token)
     uint256 public minPurchaseInEth = 0.01 ether;
-  
+
     //maximum investment for an investor in amount of tokens
     //To set max investment to 5% of total, it is 25,000,000 tokens, which is 250000 ETH
     uint256 public maxInvestment = 250000 ether;
-  
+
     //mapping to keep track of the amount invested by each address.
     mapping (address => uint256) internal invested;
 
@@ -377,7 +377,7 @@ contract BitcubCrowdsale is Ownable {
 
     //Constructor for crowdsale.
     constructor() public {
-        //hard coded times and wallets 
+        //hard coded times and wallets
         startTime = now ;
         tier1Start = startTime ;
         tier1End = 1528416000 ; //midnight on 2018-06-08 GMT
@@ -432,7 +432,7 @@ contract BitcubCrowdsale is Ownable {
         uint256 tokens = getTokenAmount(weiAmount);
 
         //Logic so that investors must purchase at least 1 token.
-        require(weiAmount >= minPurchaseInEth); 
+        require(weiAmount >= minPurchaseInEth);
 
         //Token transfer
         require(token.transfer(beneficiary, tokens));
@@ -495,3 +495,71 @@ contract BitcubCrowdsale is Ownable {
     }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

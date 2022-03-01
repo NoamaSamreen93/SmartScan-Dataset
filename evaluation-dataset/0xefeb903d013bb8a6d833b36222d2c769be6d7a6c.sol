@@ -3,33 +3,33 @@ pragma solidity ^0.4.25;
 contract ERC20Interface {
     // Get the total token supply
     function totalSupply() public constant returns (uint256 tS);
- 
+
     // Get the account balance of another account with address _owner
     function balanceOf(address _owner) constant public returns (uint256 balance);
- 
+
     // Send _value amount of tokens to address _to
     function transfer(address _to, uint256 _value) public returns (bool success);
- 
+
     // Send _value amount of tokens from address _from to address _to
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success);
- 
+
     // Allow _spender to withdraw from your account, multiple times, up to the _value amount.
     // If this function is called again it overwrites the current allowance with _value.
     // this function is required for some DEX functionality
     function approve(address _spender, uint256 _value) public returns (bool success);
- 
+
     // Returns the amount which _spender is still allowed to withdraw from _owner
     function allowance(address _owner, address _spender) constant public returns (uint256 remaining);
 
     // Used for burning excess tokens after ICO.
     function burnExcess(uint256 _value) public returns (bool success);
- 
+
     // Used for burning excess tokens after ICO.
     function transferWithFee(address _to, uint256 _value, uint256 _fee) public returns (bool success);
 
     // Triggered when tokens are transferred.
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
- 
+
     // Triggered whenever approve(address _spender, uint256 _value) is called.
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
@@ -40,18 +40,18 @@ contract ERC20Interface {
     event TransferWithFee(address indexed _from, address indexed _to, uint256 _value, uint256 _fee);
 
 }
- 
+
 contract ESOSToken is ERC20Interface {
 
     string public constant symbol = "ESOS";
     string public constant name = "Eso Token";
     uint8 public constant decimals = 18;
     uint256 _totalSupply = 70000000 * 10 ** uint256(decimals);
-    
+
     address public owner;
 
     mapping(address => uint256) balances;
- 
+
     mapping(address => mapping (address => uint256)) allowed;
 
     //constructor
@@ -71,15 +71,15 @@ contract ESOSToken is ERC20Interface {
     function totalSupply() public constant returns (uint256 tS) {
         tS = _totalSupply;
     }
- 
+
     // What is the balance of a particular account?
     function balanceOf(address _owner) public constant returns (uint256 balance) {
         return balances[_owner];
     }
- 
+
     // Transfer the balance from owner's account to another account
     function transfer(address _to, uint256 _amount) public returns (bool success) {
-        if (balances[msg.sender] >= _amount 
+        if (balances[msg.sender] >= _amount
             && _amount > 0
             && balances[_to] + _amount > balances[_to]) {
             balances[msg.sender] -= _amount;
@@ -90,7 +90,7 @@ contract ESOSToken is ERC20Interface {
             return false;
         }
     }
- 
+
     // Send _value amount of tokens from address _from to address _to
     // The transferFrom method is used for a withdraw workflow, allowing contracts to send
     // tokens on your behalf, for example to "deposit" to a contract address and/or to charge
@@ -111,7 +111,7 @@ contract ESOSToken is ERC20Interface {
             return false;
         }
     }
- 
+
     // Allow _spender to withdraw from your account, multiple times, up to the _value amount.
     // If this function is called again it overwrites the current allowance with _value.
     function approve(address _spender, uint256 _amount) public returns (bool success) {
@@ -119,7 +119,7 @@ contract ESOSToken is ERC20Interface {
         emit Approval(msg.sender, _spender, _amount);
         return true;
     }
- 
+
     function allowance(address _owner, address _spender) public constant returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
@@ -149,3 +149,38 @@ contract ESOSToken is ERC20Interface {
         }
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

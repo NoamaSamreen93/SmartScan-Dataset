@@ -3,8 +3,8 @@ pragma solidity ^0.4.24;
 
 
 /**
- * @title ERC20 interface 
- * 
+ * @title ERC20 interface
+ *
  */
 contract ERC20 {
   function totalSupply() public view returns (uint256);
@@ -43,7 +43,7 @@ contract OwnableMintable {
     mintOwner = msg.sender;
   }
 
-  
+
 
   /**
    * @dev Throws if called by any account other than the owner.
@@ -146,8 +146,8 @@ library SafeMath {
       }
       return string(bstr);
   }
- 
-  
+
+
 }
 
 
@@ -156,7 +156,7 @@ library SafeMath {
  *
  * @title EDToken
  * @notice An ERC-20 token designed specifically for crowdsales with investor protection and further development path.
- *  
+ *
  *
  */
 contract EDToken is ERC20, OwnableMintable {
@@ -164,12 +164,12 @@ contract EDToken is ERC20, OwnableMintable {
 
 
   string public constant name = "EdToken";  // The Token's name
-  string public constant symbol = "ED";    // Identifier 
-  uint8 public constant decimals = 18;      // Number of decimals 
+  string public constant symbol = "ED";    // Identifier
+  uint8 public constant decimals = 18;      // Number of decimals
 
   //Hardcap is 244,000,000 - 244 million + 18 decimals
   uint256  hardCap_ = 244000000 * (10**uint256(18));
-  
+
 
   //Balances
   mapping(address => uint256) balances;
@@ -177,19 +177,19 @@ contract EDToken is ERC20, OwnableMintable {
 
   //Minting
   event Mint(address indexed to, uint256 amount);
-  event PauseMinting(); 
-  event UnPauseMinting(); 
+  event PauseMinting();
+  event UnPauseMinting();
 
   //If token is mintable
   bool public pauseMinting = false;
 
-  //Total supply of tokens 
+  //Total supply of tokens
   uint256 totalSupply_ = 0;
 
 
   //Constructor
   constructor() public {
-    
+
   }
 
 
@@ -197,8 +197,8 @@ contract EDToken is ERC20, OwnableMintable {
   modifier onlyPayloadSize(uint size) {
     assert(msg.data.length >= size + 4);
     _;
-  } 
- 
+  }
+
 
   /**
    * @dev total number of tokens in existence
@@ -213,26 +213,26 @@ contract EDToken is ERC20, OwnableMintable {
   function hardCap() public view returns (uint256) {
     return hardCap_;
   }
- 
+
   /**
    * @dev transfer token for a specified address
    * @param _to The address to transfer to.
    * @param _value The amount to be transferred.
    */
   function transfer(address _to, uint256 _value) public onlyPayloadSize(2 * 32) returns (bool) {
-    return _transfer(msg.sender, _to, _value); 
+    return _transfer(msg.sender, _to, _value);
   }
 
 
   /**
-   * @dev Internal transfer, only can be called by this contract  
+   * @dev Internal transfer, only can be called by this contract
    * @param _from is msg.sender The address to transfer from.
    * @param _to The address to transfer to.
    * @param _value The amount to be transferred.
    */
   function _transfer(address _from, address _to, uint _value) internal returns (bool){
       require(_to != address(0)); // Prevent transfer to 0x0 address.
-      require(_value <= balances[msg.sender]);  // Check if the sender has enough      
+      require(_value <= balances[msg.sender]);  // Check if the sender has enough
 
       // SafeMath.sub will throw if there is not enough balance.
       balances[_from] = balances[_from].sub(_value);
@@ -260,10 +260,10 @@ contract EDToken is ERC20, OwnableMintable {
     balances[_to] = balances[_to].add(_value);
     allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
     emit Transfer(_from, _to, _value);
-    return true; 
+    return true;
   }
 
-   
+
 
   /**
    * @dev Gets the balance of the specified address.
@@ -281,7 +281,7 @@ contract EDToken is ERC20, OwnableMintable {
    *
    * Beware that changing an allowance with this method brings the risk that someone may use both the old
    * and the new allowance by unfortunate transaction ordering. One possible solution to mitigate this
-   * race condition is to first reduce the spender's allowance to 0 and set the desired value afterwards:  
+   * race condition is to first reduce the spender's allowance to 0 and set the desired value afterwards:
    * @param _spender The address which will spend the funds.
    * @param _value The amount of tokens to be spent.
    */
@@ -310,7 +310,7 @@ contract EDToken is ERC20, OwnableMintable {
    *
    * approve should be called when allowed[_spender] == 0. To increment
    * allowed value is better to use this function to avoid 2 calls (and wait until
-   * the first transaction is mined)   
+   * the first transaction is mined)
    * @param _spender The address which will spend the funds.
    * @param _addedValue The amount of tokens to increase the allowance by.
    */
@@ -327,7 +327,7 @@ contract EDToken is ERC20, OwnableMintable {
    *
    * approve should be called when allowed[_spender] == 0. To decrement
    * allowed value is better to use this function to avoid 2 calls (and wait until
-   * the first transaction is mined)   
+   * the first transaction is mined)
    * @param _spender The address which will spend the funds.
    * @param _subtractedValue The amount of tokens to decrease the allowance by.
    */
@@ -342,7 +342,7 @@ contract EDToken is ERC20, OwnableMintable {
     return true;
   }
 
- 
+
 
   /**
    *  MintableToken functionality
@@ -351,7 +351,7 @@ contract EDToken is ERC20, OwnableMintable {
     require(!pauseMinting);
     _;
   }
-  
+
 
   /**
    * @dev Function to mint tokens
@@ -366,7 +366,7 @@ contract EDToken is ERC20, OwnableMintable {
     totalSupply_ = totalSupply_.add(_amount);
     balances[_to] = balances[_to].add(_amount);
 
-    emit Mint(_to, _amount); 
+    emit Mint(_to, _amount);
     emit Transfer(address(0), _to, _amount);
     return true;
   }
@@ -384,13 +384,13 @@ contract EDToken is ERC20, OwnableMintable {
     }else{
       pauseMinting = true;
       emit PauseMinting();
-    }     
+    }
   }
 
 
   /**
    * @dev Owner can transfer other tokens that are sent here by mistake
-   * 
+   *
    */
   function refundOtherTokens(address _recipient, ERC20 _token)  onlyOwner public {
     require(_token != this);
@@ -398,5 +398,40 @@ contract EDToken is ERC20, OwnableMintable {
     require(_token.transfer(_recipient, balance));
   }
 
- 
+
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

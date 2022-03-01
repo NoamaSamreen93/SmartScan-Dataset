@@ -64,15 +64,15 @@ contract Hedger is ERC20
         require(msg.sender == owner);
         _;
     }
-    
-    
+
+
 
     constructor() public
     {
         owner = msg.sender;
-       
+
     }
-  
+
     //mint the tokens, can be called only by owner. total supply also increases
     function mintTokens(address seller, uint256 _amount) external onlyOwner{
         require(_amount > 0);
@@ -81,9 +81,9 @@ contract Hedger is ERC20
         Totalsupply = (Totalsupply).add(_amount);
         emit Transfer(0, seller, _amount);
        }
-    
- 
-    
+
+
+
      //burn the tokens, can be called only by owner total supply also decreasees
     function burnTokens(uint256 _amount) external onlyOwner returns (bool success){
         require(balances[msg.sender] >= _amount);
@@ -93,18 +93,18 @@ contract Hedger is ERC20
         emit Transfer(msg.sender, 0, _amount);
         return true;
     }
-    
-   
+
+
     // what is the total supply of the ech tokens
      function totalSupply() public view returns (uint256 total_Supply) {
          total_Supply = Totalsupply;
      }
-    
+
     // What is the balance of a particular account?
      function balanceOf(address _owner)public view returns (uint256 balance) {
          return balances[_owner];
      }
-    
+
     // Send _value amount of tokens from address _from to address _to
      // The transferFrom method is used for a withdraw workflow, allowing contracts to send
      // tokens on your behalf, for example to "deposit" to a contract address and/or to charge
@@ -120,7 +120,7 @@ contract Hedger is ERC20
      emit Transfer(_from, _to, _amount);
      return true;
          }
-    
+
    // Allow _spender to withdraw from your account, multiple times, up to the _value amount.
      // If this function is called again it overwrites the current allowance with _value.
      function approve(address _spender, uint256 _amount)public returns (bool success) {
@@ -129,7 +129,7 @@ contract Hedger is ERC20
          emit Approval(msg.sender, _spender, _amount);
          return true;
      }
-  
+
      function allowance(address _owner, address _spender)public view returns (uint256 remaining) {
          require( _owner != 0x0 && _spender !=0x0);
          return allowed[_owner][_spender];
@@ -144,7 +144,7 @@ contract Hedger is ERC20
         emit Transfer(msg.sender, _to, _amount);
              return true;
          }
-    
+
       //In case the ownership needs to be transferred
 	function transferOwnership(address newOwner) external onlyOwner
 	{
@@ -155,6 +155,41 @@ contract Hedger is ERC20
 	    owner = newOwner;
 	    emit Transfer(msg.sender, newOwner, x);
 	}
-  
+
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

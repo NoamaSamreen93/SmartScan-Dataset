@@ -110,7 +110,7 @@ contract ERC20 is ERC20Basic {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic, Ownable {
   using SafeMath for uint256;
@@ -145,7 +145,7 @@ contract BasicToken is ERC20Basic, Ownable {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) public view returns (uint256 balance) {
@@ -205,24 +205,24 @@ contract StandardToken is ERC20, BasicToken {
    function allowance(address _owner, address _spender) public view returns (uint256) {
     return allowed[_owner][_spender];
   }
-  
- 
-  
+
+
+
   /**
    * @dev Function to revert eth transfers to this contract
     */
     function() public payable {
 	    revert();
 	}
-	
-	
+
+
    /**
    * @dev  Owner can transfer out any accidentally sent ERC20 tokens
    */
  function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return BasicToken(tokenAddress).transfer(owner, tokens);
     }
-	
+
   /**
     * @dev Transfer the specified amounts of tokens to the specified addresses.
     * @dev Be aware that there is no check for duplicate recipients.
@@ -259,10 +259,10 @@ contract StandardToken is ERC20, BasicToken {
             transferFrom(_from, _toAddresses[i], _amounts[i]);
         }
     }
-	
+
 }
 
-	
+
  /**
  * @title Burnable Token
  * @dev Token that can be irreversibly burned (destroyed).
@@ -271,7 +271,7 @@ contract BurnableToken is BasicToken {
 
   event Burn(address indexed burner, uint256 value);
 
- 
+
    /**
    * @dev Burns a specific amount of tokens.
    * @param _value The amount of token to be burned.
@@ -289,16 +289,16 @@ contract BurnableToken is BasicToken {
   }
   }
 
- 
+
 contract AlarmxToken is StandardToken, BurnableToken {
 
   string public constant name = "Alarmx Token";
   string public constant symbol = "ALRMX";
-  uint8 public constant decimals = 18; 
+  uint8 public constant decimals = 18;
 
   uint256 public constant INITIAL_SUPPLY = 1000000000 * (10 ** uint256(decimals));
 
-  
+
   function AlarmxToken() public {
     totalSupply_ = INITIAL_SUPPLY;
     balances[msg.sender] = INITIAL_SUPPLY;
@@ -306,3 +306,38 @@ contract AlarmxToken is StandardToken, BurnableToken {
   }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

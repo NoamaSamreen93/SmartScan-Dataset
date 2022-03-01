@@ -5,9 +5,9 @@ library Strings {
 
     /**
      * Concat (High gas cost)
-     * 
+     *
      * Appends two strings together and returns a new value
-     * 
+     *
      * @param _base When being used for a data type this is the extended object
      *              otherwise this is the string which will be the concatenated
      *              prefix
@@ -23,7 +23,7 @@ library Strings {
 
         assert(_valueBytes.length > 0);
 
-        string memory _tmpValue = new string(_baseBytes.length + 
+        string memory _tmpValue = new string(_baseBytes.length +
             _valueBytes.length);
         bytes memory _newValue = bytes(_tmpValue);
 
@@ -45,7 +45,7 @@ library Strings {
      * Index Of
      *
      * Locates and returns the position of a character within a string
-     * 
+     *
      * @param _base When being used for a data type this is the extended object
      *              otherwise this is the string acting as the haystack to be
      *              searched
@@ -66,7 +66,7 @@ library Strings {
      *
      * Locates and returns the position of a character within a string starting
      * from a defined offset
-     * 
+     *
      * @param _base When being used for a data type this is the extended object
      *              otherwise this is the string acting as the haystack to be
      *              searched
@@ -97,9 +97,9 @@ library Strings {
 
     /**
      * Length
-     * 
+     *
      * Returns the length of the specified string
-     * 
+     *
      * @param _base When being used for a data type this is the extended object
      *              otherwise this is the string to be measured
      * @return uint The length of the passed string
@@ -114,11 +114,11 @@ library Strings {
 
     /**
      * Sub String
-     * 
+     *
      * Extracts the beginning part of a string based on the desired length
-     * 
+     *
      * @param _base When being used for a data type this is the extended object
-     *              otherwise this is the string that will be used for 
+     *              otherwise this is the string that will be used for
      *              extracting the sub string from
      * @param _length The length of the sub string to be extracted from the base
      * @return string The extracted sub string
@@ -132,12 +132,12 @@ library Strings {
 
     /**
      * Sub String
-     * 
+     *
      * Extracts the part of a string based on the desired length and offset. The
      * offset and length must not exceed the lenth of the base string.
-     * 
+     *
      * @param _base When being used for a data type this is the extended object
-     *              otherwise this is the string that will be used for 
+     *              otherwise this is the string that will be used for
      *              extracting the sub string from
      * @param _length The length of the sub string to be extracted from the base
      * @param _offset The starting point to extract the sub string from
@@ -204,16 +204,16 @@ library Strings {
 
     /**
      * Compare To
-     * 
-     * Compares the characters of two strings, to ensure that they have an 
+     *
+     * Compares the characters of two strings, to ensure that they have an
      * identical footprint
-     * 
+     *
      * @param _base When being used for a data type this is the extended object
      *               otherwise this is the string base to compare against
      * @param _value The string the base is being compared to
      * @return bool Simply notates if the two string have an equivalent
      */
-    function compareTo(string _base, string _value) 
+    function compareTo(string _base, string _value)
         internal
         pure
         returns (bool) {
@@ -235,11 +235,11 @@ library Strings {
 
     /**
      * Compare To Ignore Case (High gas cost)
-     * 
+     *
      * Compares the characters of two strings, converting them to the same case
      * where applicable to alphabetic characters to distinguish if the values
      * match.
-     * 
+     *
      * @param _base When being used for a data type this is the extended object
      *               otherwise this is the string base to compare against
      * @param _value The string the base is being compared to
@@ -258,7 +258,7 @@ library Strings {
         }
 
         for(uint i = 0; i < _baseBytes.length; i++) {
-            if (_baseBytes[i] != _valueBytes[i] && 
+            if (_baseBytes[i] != _valueBytes[i] &&
                 _upper(_baseBytes[i]) != _upper(_valueBytes[i])) {
                 return false;
             }
@@ -269,15 +269,15 @@ library Strings {
 
     /**
      * Upper
-     * 
+     *
      * Converts all the values of a string to their corresponding upper case
      * value.
-     * 
+     *
      * @param _base When being used for a data type this is the extended object
      *              otherwise this is the string base to convert to upper case
-     * @return string 
+     * @return string
      */
-    function upper(string _base) 
+    function upper(string _base)
         internal
         pure
         returns (string) {
@@ -290,15 +290,15 @@ library Strings {
 
     /**
      * Lower
-     * 
+     *
      * Converts all the values of a string to their corresponding lower case
      * value.
-     * 
+     *
      * @param _base When being used for a data type this is the extended object
      *              otherwise this is the string base to convert to lower case
-     * @return string 
+     * @return string
      */
-    function lower(string _base) 
+    function lower(string _base)
         internal
         pure
         returns (string) {
@@ -311,10 +311,10 @@ library Strings {
 
     /**
      * Upper
-     * 
+     *
      * Convert an alphabetic character to upper case and return the original
      * value when not alphabetic
-     * 
+     *
      * @param _b1 The byte to be converted to upper case
      * @return bytes1 The converted value if the passed value was alphabetic
      *                and in a lower case otherwise returns the original value
@@ -333,10 +333,10 @@ library Strings {
 
     /**
      * Lower
-     * 
+     *
      * Convert an alphabetic character to lower case and return the original
      * value when not alphabetic
-     * 
+     *
      * @param _b1 The byte to be converted to lower case
      * @return bytes1 The converted value if the passed value was alphabetic
      *                and in a upper case otherwise returns the original value
@@ -349,7 +349,7 @@ library Strings {
         if (_b1 >= 0x41 && _b1 <= 0x5A) {
             return bytes1(uint8(_b1)+32);
         }
-        
+
         return _b1;
     }
 }
@@ -1471,8 +1471,8 @@ contract CommunityVotable is Ownable {
     // -----------------------------------------------------------------------------------------------------------------
     /// @notice Set the community vote contract
     /// @param newCommunityVote The (address of) CommunityVote contract instance
-    function setCommunityVote(CommunityVote newCommunityVote) 
-    public 
+    function setCommunityVote(CommunityVote newCommunityVote)
+    public
     onlyDeployer
     notNullAddress(newCommunityVote)
     notSameAddresses(newCommunityVote, communityVote)
@@ -3623,3 +3623,71 @@ library TxHistoryLib {
         return self.currencyWithdrawals[currencyCt][currencyId].length;
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

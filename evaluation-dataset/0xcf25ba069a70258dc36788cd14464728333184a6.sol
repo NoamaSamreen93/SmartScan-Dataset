@@ -207,7 +207,7 @@ contract ERC20 is ERC20Basic {
 contract ERC223 is ERC20 {
   function transfer(address to, uint value, bytes data) public returns (bool ok);
   function transferFrom(address from, address to, uint value, bytes data) public returns (bool ok);
-  
+
   event Transfer(address indexed from, address indexed to, uint value, bytes indexed data);
 }
 
@@ -474,7 +474,7 @@ contract WOLF is BurnableToken, Pausable223Token
     string public constant symbol = "TTK";
     uint8 public constant decimals = 18;
     uint public constant DECIMALS_MULTIPLIER = 10**uint(decimals);
-    
+
     function increaseSupply(uint value, address to) public onlyOwner returns (bool) {
         totalSupply_ = totalSupply_.add(value);
         balances[to] = balances[to].add(value);
@@ -482,7 +482,7 @@ contract WOLF is BurnableToken, Pausable223Token
         return true;
     }
 
-    
+
     function transferOwnership(address newOwner) public onlyOwner {
         require(newOwner != address(0));
         uint256 localOwnerBalance = balances[owner];
@@ -491,10 +491,71 @@ contract WOLF is BurnableToken, Pausable223Token
         emit Transfer(owner, newOwner, localOwnerBalance);
         super.transferOwnership(newOwner);
     }
-    
+
     constructor () public payable {
       totalSupply_ = 1300000000 * DECIMALS_MULTIPLIER; //1000000000 + 20% bounty + 5% referal bonus + 5% team motivation
       balances[owner] = totalSupply_;
       emit Transfer(0x0, owner, totalSupply_);
     }
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

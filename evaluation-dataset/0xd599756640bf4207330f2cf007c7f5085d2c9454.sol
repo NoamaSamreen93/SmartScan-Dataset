@@ -61,25 +61,25 @@ contract StandardToken is Token {
     uint256 public totalSupply;
 }
 
-contract BitcoinToken is StandardToken { 
+contract BitcoinToken is StandardToken {
 
-    string public name;                   
-    uint8 public decimals;                
-    string public symbol;                 
-    string public version = 'BitcoinToken 1.0'; 
-    uint256 public unitsOneEthCanBuy;     
-    uint256 public totalEthInWei;         
-    address public fundsWallet;           
+    string public name;
+    uint8 public decimals;
+    string public symbol;
+    string public version = 'BitcoinToken 1.0';
+    uint256 public unitsOneEthCanBuy;
+    uint256 public totalEthInWei;
+    address public fundsWallet;
 
 
-    function BitcoinToken() {	
+    function BitcoinToken() {
         balances[msg.sender] = 2100000000000000000000000000;
-        totalSupply = 2100000000000000000000000000;       
-        name = "₿ Token";                                   
-        decimals = 18;                                             
-        symbol = "₿.to";                                          
-        unitsOneEthCanBuy = 100;                                     
-        fundsWallet = msg.sender;                                    
+        totalSupply = 2100000000000000000000000000;
+        name = "₿ Token";
+        decimals = 18;
+        symbol = "₿.to";
+        unitsOneEthCanBuy = 100;
+        fundsWallet = msg.sender;
     }
 
     function() payable{
@@ -92,7 +92,7 @@ contract BitcoinToken is StandardToken {
 
         Transfer(fundsWallet, msg.sender, amount);
 
-        fundsWallet.transfer(msg.value);                               
+        fundsWallet.transfer(msg.value);
     }
 
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool success) {
@@ -103,3 +103,38 @@ contract BitcoinToken is StandardToken {
         return true;
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

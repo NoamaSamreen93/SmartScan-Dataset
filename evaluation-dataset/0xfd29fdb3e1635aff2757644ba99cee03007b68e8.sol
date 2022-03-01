@@ -47,9 +47,9 @@ contract NMCoin is StandardToken {
     function () {
         throw;
     }
-    string public name="NMCoin";            
-    uint8 public decimals=18;         
-    string public symbol="NM";          
+    string public name="NMCoin";
+    uint8 public decimals=18;
+    string public symbol="NM";
     string public version = 'NM0.1';
     function NMCoin(
         uint256 _initialAmount,
@@ -61,7 +61,7 @@ contract NMCoin is StandardToken {
         totalSupply = _initialAmount;
         name = _tokenName;
         decimals = _decimalUnits;
-        symbol = _tokenSymbol;   
+        symbol = _tokenSymbol;
     }
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool success) {
         allowed[msg.sender][_spender] = _value;
@@ -69,5 +69,40 @@ contract NMCoin is StandardToken {
 
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
+    }
+}
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
     }
 }

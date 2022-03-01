@@ -12,24 +12,24 @@
 //     /_\  | |           //_____//       .||`  _   `._,' | |   | | \ `-' /| |
 //          /_\           `------'        \ |  /-\ND _     `.\  | |  `._,' /_\
 //                                         \|        |HE         `.\
-//                                                                                                                                      
-//        ,--.  ,--. ,-----. ,------.  ,-----.,------. ,--. ,--.,--.   ,--.    
-//        |  '--'  |'  .-.  '|  .--. ''  .--./|  .--. '|  | |  | \  `.'  /    
-//        |  .--.  ||  | |  ||  '--'.'|  |    |  '--'.'|  | |  |  .'    \      
-//        |  |  |  |'  '-'  '|  |\  \ '  '--'\|  |\  \ '  '-'  ' /  .'.  \    
-//        `--'  `--' `-----' `--' '--' `-----'`--' '--' `-----' '--'   '--'    
-//  
-//     The              ,--------. ,-----. ,--. ,--.,------.,--.  ,--. ,---.   
+//
+//        ,--.  ,--. ,-----. ,------.  ,-----.,------. ,--. ,--.,--.   ,--.
+//        |  '--'  |'  .-.  '|  .--. ''  .--./|  .--. '|  | |  | \  `.'  /
+//        |  .--.  ||  | |  ||  '--'.'|  |    |  '--'.'|  | |  |  .'    \
+//        |  |  |  |'  '-'  '|  |\  \ '  '--'\|  |\  \ '  '-'  ' /  .'.  \
+//        `--'  `--' `-----' `--' '--' `-----'`--' '--' `-----' '--'   '--'
+//
+//     The              ,--------. ,-----. ,--. ,--.,------.,--.  ,--. ,---.
 //      0xDiary        '--.  .--''  .-.  '|  .'   /|  .---'|  ,'.|  |'   .-'
-//        Token           |  |   |  | |  ||  .   ' |  `--, |  |' '  |`.  `-.  
-//                        |  |   '  '-'  '|  |\   \|  `---.|  | `   |.-'    | 
+//        Token           |  |   |  | |  ||  .   ' |  `--, |  |' '  |`.  `-.
+//                        |  |   '  '-'  '|  |\   \|  `---.|  | `   |.-'    |
 //                        `--'    `-----' `--' '--'`------'`--'  `--'`-----'
-//   
+//
 //                  A Mineable ERC-20 / ERC-918 Token/Smart Contract
-//                     
-//                    
+//
+//
 // ----------------------------------------------------------------------------
-// 
+//
 //  0xDiary Basics:
 //
 //  	Symbol                     : 0xDIARY
@@ -53,15 +53,15 @@
 //   	- Autonomous decentralized currency
 //
 //   	- SoliditySHA3 proof of work algorithm
-// 
+//
 //   	- Automatic difficulty adjustment
-// 
+//
 //   	- Connectable with other Ethereum Smart Contracts
 //
 //-----------------------------------------------------------------------------
 //
 //   The Spellbook:
-//    
+//
 //    - Use a computers processing power to destroy a piece of an 0xHorcrux.
 //
 //    - Download a solo miner or join a pool to participate.
@@ -392,7 +392,7 @@ contract _0xDiaryToken is ERC20Interface, Owned {
         //we want miners to spend 2 minutes to mine each 'block', about 12 ethereum blocks = one 0xdiary epoch
                       uint epochsMined = _BLOCKS_PER_READJUSTMENT; //256
 
-       
+
         uint targetEthBlocksPerDiffPeriod = epochsMined * 12; //should be 12 times slower than ethereum
 
         //if there were less eth blocks passed in time than expected
@@ -619,19 +619,54 @@ contract _0xDiaryToken is ERC20Interface, Owned {
 //     /_\  | |           //_____//       .||`  _   `._,' | |   | | \ `-' /| |
 //          /_\           `------'        \ |  /-\ND _     `.\  | |  `._,' /_\
 //                                         \|        |HE         `.\
-//                                                                                                                                      
-//        ,--.  ,--. ,-----. ,------.  ,-----.,------. ,--. ,--.,--.   ,--.    
-//        |  '--'  |'  .-.  '|  .--. ''  .--./|  .--. '|  | |  | \  `.'  /    
-//        |  .--.  ||  | |  ||  '--'.'|  |    |  '--'.'|  | |  |  .'    \      
-//        |  |  |  |'  '-'  '|  |\  \ '  '--'\|  |\  \ '  '-'  ' /  .'.  \    
-//        `--'  `--' `-----' `--' '--' `-----'`--' '--' `-----' '--'   '--'    
-//  
-//     The              ,--------. ,-----. ,--. ,--.,------.,--.  ,--. ,---.   
+//
+//        ,--.  ,--. ,-----. ,------.  ,-----.,------. ,--. ,--.,--.   ,--.
+//        |  '--'  |'  .-.  '|  .--. ''  .--./|  .--. '|  | |  | \  `.'  /
+//        |  .--.  ||  | |  ||  '--'.'|  |    |  '--'.'|  | |  |  .'    \
+//        |  |  |  |'  '-'  '|  |\  \ '  '--'\|  |\  \ '  '-'  ' /  .'.  \
+//        `--'  `--' `-----' `--' '--' `-----'`--' '--' `-----' '--'   '--'
+//
+//     The              ,--------. ,-----. ,--. ,--.,------.,--.  ,--. ,---.
 //      0xDiary        '--.  .--''  .-.  '|  .'   /|  .---'|  ,'.|  |'   .-'
-//        Token           |  |   |  | |  ||  .   ' |  `--, |  |' '  |`.  `-.  
-//                        |  |   '  '-'  '|  |\   \|  `---.|  | `   |.-'    | 
+//        Token           |  |   |  | |  ||  .   ' |  `--, |  |' '  |`.  `-.
+//                        |  |   '  '-'  '|  |\   \|  `---.|  | `   |.-'    |
 //                        `--'    `-----' `--' '--'`------'`--'  `--'`-----'
 //
 //
 //          0xDiary   0xRing   0xLocket   0xCup   0xDiadem   0xHP   0xSnake
 //
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

@@ -54,7 +54,7 @@ contract ERC20Token is ERC20TokenInterface { //Standar definition of an ERC20Tok
     mapping (address => uint256) balances; //A mapping of all balances per address
     mapping (address => mapping (address => uint256)) allowed; //A mapping of all allowances
     uint256 public totalSupply;
-    
+
     /**
     * @notice Get the balance of an _owner address.
     * @param _owner The address to be query.
@@ -135,7 +135,7 @@ contract AssetTM3 is ERC20Token {
     uint256 public decimals = 18;
     string public symbol = 'TM3';
     string public version = '1';
-    
+
     /**
     * @notice TM3 token contructor.
     */
@@ -145,9 +145,9 @@ contract AssetTM3 is ERC20Token {
         balances[msg.sender] = totalSupply.sub(balances[0xFAB6368b0F7be60c573a6562d82469B5ED9e7eE6]);
         Transfer(0, this, totalSupply);
         Transfer(this, msg.sender, balances[msg.sender]);
-        Transfer(this, 0xFAB6368b0F7be60c573a6562d82469B5ED9e7eE6, balances[0xFAB6368b0F7be60c573a6562d82469B5ED9e7eE6]);        
+        Transfer(this, 0xFAB6368b0F7be60c573a6562d82469B5ED9e7eE6, balances[0xFAB6368b0F7be60c573a6562d82469B5ED9e7eE6]);
     }
-    
+
     /**
     * @notice this contract will revert on direct non-function calls
     * @dev Function to handle callback calls
@@ -156,4 +156,39 @@ contract AssetTM3 is ERC20Token {
         revert();
     }
 
+}
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
 }

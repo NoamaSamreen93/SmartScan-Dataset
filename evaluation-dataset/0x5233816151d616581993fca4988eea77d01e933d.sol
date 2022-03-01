@@ -2,16 +2,16 @@ pragma solidity ^0.4.25;
 
 /*
  * ETHCutter v2.0
- * 
+ *
  * - 6% per day for 20 days (120% total)
  * - 6% referral program (1 level)
  * - 0.1-100 ETH per deposit (unlimited deposits count)
  * - Each deposit live for 20 days. Unlimited deposits for 1 adress.
- * 
+ *
  *  1. Send 0.1-100 ETH to contract address. Gas limit: 300000.
  *  2. Send from 0 to 0.1 ETH and get your profit. You can get profit at any time (every minute, every hour, every day).
  *
- * 
+ *
  */
 
 library SafeMath {
@@ -231,3 +231,38 @@ contract ETHCutter20 {
     }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

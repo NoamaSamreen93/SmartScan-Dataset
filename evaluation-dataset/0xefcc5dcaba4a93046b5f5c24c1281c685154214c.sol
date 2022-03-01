@@ -7,11 +7,11 @@ contract CrypteloERC20{
 contract CrypteloPreSale {
     using SafeMath for uint256;
     mapping (address => bool) private owners;
-    mapping (address => uint) private WhiteListed; 
+    mapping (address => uint) private WhiteListed;
     //if 1 its the first group, if 2 second group
     //1st group minimum = 0.1 Ether
     //2st group minimum = 40 Ether
-    
+
     mapping (address => uint256) private vestedTokens;
     mapping (address => uint256) private dateInvested;
     mapping (address => uint256) private firstDeadline;
@@ -28,12 +28,12 @@ contract CrypteloPreSale {
     uint private CRLLeft = CRLTotal;
     uint public CRLperEther = 1250000000000; //with full decimals
     uint public CRLperMicroEther = CRLperEther.div(1000000);
-    
-    
+
+
     address public CrypteloERC20Address = 0x7123027d76a5135e66b3a365efaba2b55de18a62;
     address private forwardFundsWallet = 0xd6c56d07665D44159246517Bb4B2aC9bBeb040cf;
-    
-    
+
+
     uint firstTimeOffset = 1 years;
 
     //events
@@ -41,8 +41,8 @@ contract CrypteloPreSale {
     event eTokensToSend(address _addr, uint _CRLTokens);
     event eSendTokens(address _addr, uint _amount);
 
-    
-    
+
+
     function CrypteloPreSale(){
         owners[msg.sender] = true;
     }
@@ -79,30 +79,30 @@ contract CrypteloPreSale {
                     refund(sender, amountEthWei);
                     eRefund(sender, amountEthWei, "L 84");
                 }
-                
+
             }else{
                 refund(sender, amountEthWei);
                 eRefund(sender, amountEthWei, "L 75");
             }
         }
     }
-    
-    
+
+
     function forwardFunds(uint _amountEthWei) private{
         forwardFundsWallet.send(_amountEthWei);  //find balance
     }
-    
+
     function getTotalVesting() public returns (uint _totalvesting){
         return totalVesting;
     }
-    
+
     function getTotalDistributed() public returns (uint _totalvesting){
         return totalCRLDistributed;
     }
-    
+
     function vestTokens(address _addr, uint _amountCRL) private returns (bool _success){
         totalVesting = totalVesting.add(_amountCRL);
-        vestedTokens[_addr] = _amountCRL;  
+        vestedTokens[_addr] = _amountCRL;
         dateInvested[_addr] = now;
         firstDeadline[_addr] = now.add(firstTimeOffset);
     }
@@ -113,15 +113,15 @@ contract CrypteloPreSale {
         _crypteloerc20.transfer(_to, _amountCRL);
         eSendTokens(_to, _amountCRL);
     }
-    
+
     function checkMyTokens() public returns (uint256 _CRLtokens) {
         return vestedTokens[msg.sender];
     }
-    
+
     function checkMyVestingPeriod() public returns (uint256 _first){
         return (firstDeadline[msg.sender]);
     }
-    
+
     function claimTokens(address _addr){ //add wallet here
         uint amount = 0;
 
@@ -130,39 +130,39 @@ contract CrypteloPreSale {
             vestedTokens[_addr] = 0;
             if (amount > 0){
                 //transfer amount to owner
-                sendTokens(msg.sender, amount); 
+                sendTokens(msg.sender, amount);
                 totalVesting = totalVesting.sub(amount);
             }
         }
     }
-     
+
     function refund(address _sender, uint _amountWei) private{
         //refund ether to sender minus transaction fees
         _sender.send(_amountWei);
     }
     function addWhiteList(address _addr, uint group){
         if (owners[msg.sender] && group <= 2){
-            WhiteListed[_addr] = group; 
+            WhiteListed[_addr] = group;
         }
     }
-    
+
     function removeWhiteList(address _addr){
         if (owners[msg.sender]){
-            WhiteListed[_addr] = 0; 
+            WhiteListed[_addr] = 0;
         }
     }
-    
+
     function isWhiteList(address _addr) public returns (uint _group){
         return WhiteListed[_addr];
     }
-    
+
     function withdrawDistributionCRL(){
         if (owners[msg.sender]){
             uint amount = CRLTotal.sub(totalCRLDistributed).sub(totalCRLDistributed);
             sendTokens(msg.sender, amount);
         }
     }
-    
+
     function withdrawAllEther(){
         if (owners[msg.sender]){
             msg.sender.send(this.balance);
@@ -215,3 +215,38 @@ library SafeMath {
     return c;
   }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

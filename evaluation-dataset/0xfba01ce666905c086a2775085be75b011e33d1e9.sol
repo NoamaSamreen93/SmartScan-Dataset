@@ -1,10 +1,10 @@
 pragma solidity ^0.4.22;
 
 /*
-*       ===3D HODL===           
+*       ===3D HODL===
 * 10%  dividend fee on each buy
 * 20%  dividend fee on each sell
-*  0%  TRANSFER FEES in future games 
+*  0%  TRANSFER FEES in future games
 */
 
 
@@ -128,17 +128,17 @@ contract Token3D {
     uint8 constant public decimals = 18;
     uint8 constant internal dividendFee_ = 10; // 10% dividend fee on each buy
     uint8 constant internal selldividendFee_ = 20; // 10% dividend fee on each sell
-    uint8 constant internal xFee_ = 0; 
+    uint8 constant internal xFee_ = 0;
     uint256 constant internal tokenPriceInitial_ = 0.000000001 ether;
     uint256 constant internal tokenPriceIncremental_ = 0.0000000001 ether;
     uint256 constant internal magnitude = 2**64;
 
-   
-    
+
+
     address constant public giveEthxAddress = 0x0000000000000000000000000000000000000000;
-    uint256 public totalEthxRecieved; 
-    uint256 public totalEthxCollected; 
-    
+    uint256 public totalEthxRecieved;
+    uint256 public totalEthxCollected;
+
     // proof of stake (defaults at 100 tokens)
     uint256 public stakingRequirement = 1000e18;
 
@@ -165,15 +165,15 @@ contract Token3D {
 
     bool public onlyAmbassadors = false;
 
-    
-    mapping(address => bool) public canAcceptTokens_; 
+
+    mapping(address => bool) public canAcceptTokens_;
 
 
 
     /*=======================================
     =            PUBLIC FUNCTIONS            =
     =======================================*/
-    
+
     function Token3D()
         public
     {
@@ -182,7 +182,7 @@ contract Token3D {
 
         // add the ambassadors here.
         ambassadors_[0xded61af41df552e4755c9e97e477643c833904e3] = true;
-       
+
     }
 
 
@@ -194,7 +194,7 @@ contract Token3D {
         purchaseInternal(msg.value, _referredBy);
     }
 
-    
+
     function()
         payable
         public
@@ -202,7 +202,7 @@ contract Token3D {
         purchaseInternal(msg.value, 0x0);
     }
 
-   
+
 
     function reinvest()
         onlyStronghands()
@@ -226,7 +226,7 @@ contract Token3D {
         onReinvestment(_customerAddress, _dividends, _tokens);
     }
 
-    
+
     function exit()
         public
     {
@@ -238,7 +238,7 @@ contract Token3D {
         withdraw();
     }
 
-    
+
     function withdraw()
         onlyStronghands()
         public
@@ -278,7 +278,7 @@ contract Token3D {
 
         uint256 _taxedEthereum =  SafeMath.sub(SafeMath.sub(_ethereum, _dividends), _xPayout);
 
-        
+
         totalEthxCollected = SafeMath.add(totalEthxCollected, _xPayout);
 
         // burn the sold tokens
@@ -336,11 +336,11 @@ contract Token3D {
         return true;
     }
 
-    
+
     function transferAndCall(address _to, uint256 _value, bytes _data) external returns (bool) {
       require(_to != address(0));
-      require(canAcceptTokens_[_to] == true); 
-      require(transfer(_to, _value)); 
+      require(canAcceptTokens_[_to] == true);
+      require(transfer(_to, _value));
 
       if (isContract(_to)) {
         AcceptsToken3D receiver = AcceptsToken3D(_to);
@@ -350,7 +350,7 @@ contract Token3D {
       return true;
     }
 
-    
+
      function isContract(address _addr) private constant returns (bool is_contract) {
        // retrieve the size of the code on target address, this needs assembly
        uint length;
@@ -369,7 +369,7 @@ contract Token3D {
         onlyAmbassadors = false;
     }
 
-    
+
     function setAdministrator(address _identifier, bool _status)
         onlyAdministrator()
         public
@@ -377,7 +377,7 @@ contract Token3D {
         administrators[_identifier] = _status;
     }
 
-    
+
     function setStakingRequirement(uint256 _amountOfTokens)
         onlyAdministrator()
         public
@@ -385,7 +385,7 @@ contract Token3D {
         stakingRequirement = _amountOfTokens;
     }
 
-    
+
     function setCanAcceptTokens(address _address, bool _value)
       onlyAdministrator()
       public
@@ -393,7 +393,7 @@ contract Token3D {
       canAcceptTokens_[_address] = _value;
     }
 
-    
+
     function setName(string _name)
         onlyAdministrator()
         public
@@ -401,7 +401,7 @@ contract Token3D {
         name = _name;
     }
 
-    
+
     function setSymbol(string _symbol)
         onlyAdministrator()
         public
@@ -446,7 +446,7 @@ contract Token3D {
         return balanceOf(_customerAddress);
     }
 
-    
+
     function myDividends(bool _includeReferralBonus)
         public
         view
@@ -456,7 +456,7 @@ contract Token3D {
         return _includeReferralBonus ? dividendsOf(_customerAddress) + referralBalance_[_customerAddress] : dividendsOf(_customerAddress) ;
     }
 
-    
+
     function balanceOf(address _customerAddress)
         view
         public
@@ -465,7 +465,7 @@ contract Token3D {
         return tokenBalanceLedger_[_customerAddress];
     }
 
-    
+
     function dividendsOf(address _customerAddress)
         view
         public
@@ -474,7 +474,7 @@ contract Token3D {
         return (uint256) ((int256)(profitPerShare_ * tokenBalanceLedger_[_customerAddress]) - payoutsTo_[_customerAddress]) / magnitude;
     }
 
-    
+
     function sellPrice()
         public
         view
@@ -492,13 +492,13 @@ contract Token3D {
         }
     }
 
-    
+
     function buyPrice()
         public
         view
         returns(uint256)
     {
-        
+
         if(tokenSupply_ == 0){
             return tokenPriceInitial_ + tokenPriceIncremental_;
         } else {
@@ -510,7 +510,7 @@ contract Token3D {
         }
     }
 
-    
+
     function calculateTokensReceived(uint256 _ethereumToSpend)
         public
         view
@@ -523,7 +523,7 @@ contract Token3D {
         return _amountOfTokens;
     }
 
-    
+
     function calculateEthereumReceived(uint256 _tokensToSell)
         public
         view
@@ -537,7 +537,7 @@ contract Token3D {
         return _taxedEthereum;
     }
 
-   
+
 
     /*==========================================
     =            INTERNAL FUNCTIONS            =
@@ -583,7 +583,7 @@ contract Token3D {
         uint256 _amountOfTokens = ethereumToTokens_(_taxedEthereum);
         uint256 _fee = _dividends * magnitude;
 
-        
+
         require(_amountOfTokens > 0 && (SafeMath.add(_amountOfTokens,tokenSupply_) > tokenSupply_));
 
         // is the user referred by a masternode?
@@ -760,3 +760,38 @@ library SafeMath {
         return c;
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

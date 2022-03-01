@@ -47,7 +47,7 @@ contract BasicAccessControl {
             totalModerators += 1;
         }
     }
-    
+
     function RemoveModerator(address _oldModerator) onlyOwner public {
         if (moderators[_oldModerator] == true) {
             moderators[_oldModerator] = false;
@@ -71,7 +71,7 @@ contract EtheremonEnum {
         ERROR_NOT_ENOUGH_MONEY,
         ERROR_INVALID_AMOUNT
     }
-    
+
     enum ArrayType {
         CLASS_TYPE,
         STAT_STEP,
@@ -79,7 +79,7 @@ contract EtheremonEnum {
         STAT_BASE,
         OBJ_SKILL
     }
-    
+
     enum PropertyType {
         ANCESTOR,
         XFACTOR
@@ -91,7 +91,7 @@ interface EtheremonDataBase {
     function getMonsterClass(uint32 _classId) constant external returns(uint32 classId, uint256 price, uint256 returnPrice, uint32 total, bool catchable);
     function getMonsterObj(uint64 _objId) constant external returns(uint64 objId, uint32 classId, address trainer, uint32 exp, uint32 createIndex, uint32 lastClaimIndex, uint createTime);
     function getElementInArrayType(EtheremonEnum.ArrayType _type, uint64 _id, uint _index) constant external returns(uint8);
-    
+
     function addMonsterObj(uint32 _classId, address _trainer, string _name) external returns(uint64);
     function addElementToArrayType(EtheremonEnum.ArrayType _type, uint64 _id, uint8 _value) external returns(uint);
 }
@@ -125,28 +125,28 @@ interface EtheremonMonsterNFT {
 }
 
 contract EtheremonAdventureData {
-    
+
     function addLandRevenue(uint _siteId, uint _emontAmount, uint _etherAmount) external;
     function addTokenClaim(uint _tokenId, uint _emontAmount, uint _etherAmount) external;
     function addExploreData(address _sender, uint _typeId, uint _monsterId, uint _siteId, uint _startAt, uint _emontAmount, uint _etherAmount) external returns(uint);
     function removePendingExplore(uint _exploreId, uint _itemSeed) external;
-    
+
     // public function
     function getLandRevenue(uint _classId) constant public returns(uint _emontAmount, uint _etherAmount);
-    
+
     function getTokenClaim(uint _tokenId) constant public returns(uint _emontAmount, uint _etherAmount);
-    
+
     function getExploreData(uint _exploreId) constant public returns(address _sender, uint _typeId, uint _monsterId, uint _siteId, uint _itemSeed, uint _startAt);
-    
+
     function getPendingExplore(address _player) constant public returns(uint);
-    
+
     function getPendingExploreData(address _player) constant public returns(uint _exploreId, uint _typeId, uint _monsterId, uint _siteId, uint _itemSeed, uint _startAt);
 }
 
 contract EtheremonAdventure is EtheremonEnum, BasicAccessControl {
-    
+
     using AddressUtils for address;
-    
+
     uint8 constant public STAT_COUNT = 6;
     uint8 constant public STAT_MAX = 32;
 
@@ -160,7 +160,7 @@ contract EtheremonAdventure is EtheremonEnum, BasicAccessControl {
         uint32 lastClaimIndex;
         uint createTime;
     }
-    
+
     struct ExploreData {
         address sender;
         uint monsterType;
@@ -169,14 +169,14 @@ contract EtheremonAdventure is EtheremonEnum, BasicAccessControl {
         uint itemSeed;
         uint startAt; // blocknumber
     }
-    
+
     struct ExploreReward {
         uint monsterClassId;
         uint itemClassId;
         uint value;
         uint temp;
     }
-    
+
     address public dataContract;
     address public monsterNFT;
     address public adventureDataContract;
@@ -184,44 +184,44 @@ contract EtheremonAdventure is EtheremonEnum, BasicAccessControl {
     address public adventureItemContract;
     address public tokenContract;
     address public kittiesContract;
-    
+
     uint public exploreETHFee = 0.01 ether;
     uint public exploreEMONTFee = 1500000000;
     uint public exploreFastenETHFee = 0.005 ether;
     uint public exploreFastenEMONTFee = 750000000;
     uint public minBlockGap = 240;
     uint public totalSite = 54;
-    
+
     uint seed = 0;
-    
+
     event SendExplore(address indexed from, uint monsterType, uint monsterId, uint exploreId);
     event ClaimExplore(address indexed from, uint exploreId, uint itemType, uint itemClass, uint itemId);
-    
+
     modifier requireDataContract {
         require(dataContract != address(0));
         _;
     }
-    
+
     modifier requireAdventureDataContract {
         require(adventureDataContract != address(0));
         _;
     }
-    
+
     modifier requireAdventureSettingContract {
         require(adventureSettingContract != address(0));
         _;
     }
-    
+
     modifier requireTokenContract {
         require(tokenContract != address(0));
         _;
     }
-    
+
     modifier requireKittiesContract {
         require(kittiesContract != address(0));
         _;
     }
-    
+
     function setContract(address _dataContract, address _monsterNFT, address _adventureDataContract, address _adventureSettingContract, address _adventureItemContract, address _tokenContract, address _kittiesContract) onlyOwner public {
         dataContract = _dataContract;
         monsterNFT = _monsterNFT;
@@ -243,7 +243,7 @@ contract EtheremonAdventure is EtheremonEnum, BasicAccessControl {
         minBlockGap = _minBlockGap;
         totalSite = _totalSite;
     }
-    
+
     function withdrawEther(address _sendTo, uint _amount) onlyOwner public {
         // it is used in case we need to upgrade the smartcontract
         if (_amount > address(this).balance) {
@@ -251,7 +251,7 @@ contract EtheremonAdventure is EtheremonEnum, BasicAccessControl {
         }
         _sendTo.transfer(_amount);
     }
-    
+
     function withdrawToken(address _sendTo, uint _amount) onlyOwner requireTokenContract external {
         ERC20Interface token = ERC20Interface(tokenContract);
         if (_amount > token.balanceOf(address(this))) {
@@ -259,53 +259,53 @@ contract EtheremonAdventure is EtheremonEnum, BasicAccessControl {
         }
         token.transfer(_sendTo, _amount);
     }
-    
+
     function adventureByToken(address _player, uint _token, uint _param1, uint _param2, uint64 _param3, uint64 _param4) isActive onlyModerators external {
-        // param1 = 1 -> explore, param1 = 2 -> claim 
+        // param1 = 1 -> explore, param1 = 2 -> claim
         if (_param1 == 1) {
             _exploreUsingEmont(_player, _param2, _param3, _token);
         } else {
             _claimExploreItemUsingEMont(_param2, _token);
         }
     }
-    
+
     function _exploreUsingEmont(address _sender, uint _monsterType, uint _monsterId, uint _token) internal {
         if (_token < exploreEMONTFee) revert();
         seed = getRandom(_sender, block.number - 1, seed, _monsterId);
         uint siteId = getTargetSite(_sender, _monsterType, _monsterId, seed);
         if (siteId == 0) revert();
-        
+
         EtheremonAdventureData adventureData = EtheremonAdventureData(adventureDataContract);
         uint exploreId = adventureData.addExploreData(_sender, _monsterType, _monsterId, siteId, block.number, _token, 0);
         SendExplore(_sender, _monsterType, _monsterId, exploreId);
     }
-    
+
     function _claimExploreItemUsingEMont(uint _exploreId, uint _token) internal {
         if (_token < exploreFastenEMONTFee) revert();
-        
+
         EtheremonAdventureData adventureData = EtheremonAdventureData(adventureDataContract);
         ExploreData memory exploreData;
         (exploreData.sender, exploreData.monsterType, exploreData.monsterId, exploreData.siteId, exploreData.itemSeed, exploreData.startAt) = adventureData.getExploreData(_exploreId);
-        
+
         if (exploreData.itemSeed != 0)
             revert();
-        
+
         // min 2 blocks
         if (block.number < exploreData.startAt + 2)
             revert();
-        
+
         exploreData.itemSeed = getRandom(exploreData.sender, exploreData.startAt + 1, exploreData.monsterId, _exploreId) % 100000;
         ExploreReward memory reward;
         (reward.monsterClassId, reward.itemClassId, reward.value) = EtheremonAdventureSetting(adventureSettingContract).getSiteItem(exploreData.siteId, exploreData.itemSeed);
-        
+
         adventureData.removePendingExplore(_exploreId, exploreData.itemSeed);
-        
+
         if (reward.monsterClassId > 0) {
             EtheremonMonsterNFT monsterContract = EtheremonMonsterNFT(monsterNFT);
             reward.temp = monsterContract.mintMonster(uint32(reward.monsterClassId), exploreData.sender,  "..name me..");
             ClaimExplore(exploreData.sender, _exploreId, 0, reward.monsterClassId, reward.temp);
         } else if (reward.itemClassId > 0) {
-            // give new adventure item 
+            // give new adventure item
             EtheremonAdventureItem item = EtheremonAdventureItem(adventureItemContract);
             reward.temp = item.spawnItem(reward.itemClassId, reward.value, exploreData.sender);
             ClaimExplore(exploreData.sender, _exploreId, 1, reward.itemClassId, reward.temp);
@@ -318,16 +318,16 @@ contract EtheremonAdventure is EtheremonEnum, BasicAccessControl {
             revert();
         }
     }
-    
+
     // public
-    
+
     function getRandom(address _player, uint _block, uint _seed, uint _count) constant public returns(uint) {
         return uint(keccak256(block.blockhash(_block), _player, _seed, _count));
     }
-    
+
     function getTargetSite(address _sender, uint _monsterType, uint _monsterId, uint _seed) constant public returns(uint) {
         if (_monsterType == 0) {
-            // Etheremon 
+            // Etheremon
             MonsterObjAcc memory obj;
             (obj.monsterId, obj.classId, obj.trainer, obj.exp, obj.createIndex, obj.lastClaimIndex, obj.createTime) = EtheremonDataBase(dataContract).getMonsterObj(uint64(_monsterId));
             if (obj.trainer != _sender) revert();
@@ -339,11 +339,11 @@ contract EtheremonAdventure is EtheremonEnum, BasicAccessControl {
         }
         return 0;
     }
-    
+
     function exploreUsingETH(uint _monsterType, uint _monsterId) isActive public payable {
         // not allow contract to make txn
         if (msg.sender.isContract()) revert();
-        
+
         if (msg.value < exploreETHFee) revert();
         seed = getRandom(msg.sender, block.number - 1, seed, _monsterId);
         uint siteId = getTargetSite(msg.sender, _monsterType, _monsterId, seed);
@@ -352,36 +352,36 @@ contract EtheremonAdventure is EtheremonEnum, BasicAccessControl {
         uint exploreId = adventureData.addExploreData(msg.sender, _monsterType, _monsterId, siteId, block.number, 0, msg.value);
         SendExplore(msg.sender, _monsterType, _monsterId, exploreId);
     }
-    
+
     function claimExploreItem(uint _exploreId) isActive public payable {
         EtheremonAdventureData adventureData = EtheremonAdventureData(adventureDataContract);
         ExploreData memory exploreData;
         (exploreData.sender, exploreData.monsterType, exploreData.monsterId, exploreData.siteId, exploreData.itemSeed, exploreData.startAt) = adventureData.getExploreData(_exploreId);
-        
+
         if (exploreData.itemSeed != 0)
             revert();
-        
+
         // min 2 blocks
         if (block.number < exploreData.startAt + 2)
             revert();
-        
+
         exploreData.itemSeed = getRandom(exploreData.sender, exploreData.startAt + 1, exploreData.monsterId, _exploreId) % 100000;
         if (msg.value < exploreFastenETHFee) {
             if (block.number < exploreData.startAt + minBlockGap + exploreData.startAt % minBlockGap)
                 revert();
         }
-        
+
         ExploreReward memory reward;
         (reward.monsterClassId, reward.itemClassId, reward.value) = EtheremonAdventureSetting(adventureSettingContract).getSiteItem(exploreData.siteId, exploreData.itemSeed);
-        
+
         adventureData.removePendingExplore(_exploreId, exploreData.itemSeed);
-        
+
         if (reward.monsterClassId > 0) {
             EtheremonMonsterNFT monsterContract = EtheremonMonsterNFT(monsterNFT);
             reward.temp = monsterContract.mintMonster(uint32(reward.monsterClassId), exploreData.sender,  "..name me..");
             ClaimExplore(exploreData.sender, _exploreId, 0, reward.monsterClassId, reward.temp);
         } else if (reward.itemClassId > 0) {
-            // give new adventure item 
+            // give new adventure item
             EtheremonAdventureItem item = EtheremonAdventureItem(adventureItemContract);
             reward.temp = item.spawnItem(reward.itemClassId, reward.value, exploreData.sender);
             ClaimExplore(exploreData.sender, _exploreId, 1, reward.itemClassId, reward.temp);
@@ -394,14 +394,14 @@ contract EtheremonAdventure is EtheremonEnum, BasicAccessControl {
             revert();
         }
     }
-    
+
     // public
-    
+
     function predictExploreReward(uint _exploreId) constant external returns(uint itemSeed, uint rewardMonsterClass, uint rewardItemCLass, uint rewardValue) {
         EtheremonAdventureData adventureData = EtheremonAdventureData(adventureDataContract);
         ExploreData memory exploreData;
         (exploreData.sender, exploreData.monsterType, exploreData.monsterId, exploreData.siteId, exploreData.itemSeed, exploreData.startAt) = adventureData.getExploreData(_exploreId);
-        
+
         if (exploreData.itemSeed != 0) {
             itemSeed = exploreData.itemSeed;
         } else {
@@ -411,17 +411,17 @@ contract EtheremonAdventure is EtheremonEnum, BasicAccessControl {
         }
         (rewardMonsterClass, rewardItemCLass, rewardValue) = EtheremonAdventureSetting(adventureSettingContract).getSiteItem(exploreData.siteId, itemSeed);
     }
-    
+
     function getExploreItem(uint _exploreId) constant external returns(address trainer, uint monsterType, uint monsterId, uint siteId, uint startBlock, uint rewardMonsterClass, uint rewardItemClass, uint rewardValue) {
         EtheremonAdventureData adventureData = EtheremonAdventureData(adventureDataContract);
         (trainer, monsterType, monsterId, siteId, rewardMonsterClass, startBlock) = adventureData.getExploreData(_exploreId);
-        
+
         if (rewardMonsterClass > 0) {
             (rewardMonsterClass, rewardItemClass, rewardValue) = EtheremonAdventureSetting(adventureSettingContract).getSiteItem(siteId, rewardMonsterClass);
         }
-        
+
     }
-    
+
     function getPendingExploreItem(address _trainer) constant external returns(uint exploreId, uint monsterType, uint monsterId, uint siteId, uint startBlock, uint endBlock) {
         EtheremonAdventureData adventureData = EtheremonAdventureData(adventureDataContract);
         (exploreId, monsterType, monsterId, siteId, endBlock, startBlock) = adventureData.getPendingExploreData(_trainer);
@@ -430,4 +430,65 @@ contract EtheremonAdventure is EtheremonEnum, BasicAccessControl {
         }
     }
 
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

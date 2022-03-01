@@ -403,7 +403,7 @@ contract LCP_Token is BurnableToken, Owned {
     string public constant name = "Life Care Plus";
     string public constant symbol = "LC+";
     uint8 public constant decimals = 18;
- 
+
     /// Maximum tokens to be allocated ( 3.0 billion LCP)
     uint256 public constant HARD_CAP = 3000000000 * 10**uint256(decimals);
 
@@ -434,11 +434,11 @@ contract LCP_Token is BurnableToken, Owned {
         require(totalSupply_ <= HARD_CAP);
     }
 
-    /// @dev Create a ReserveTokenVault 
+    /// @dev Create a ReserveTokenVault
     function createReserveTokensVault() external onlyOwner {
         require(reserveTokensVault == address(0));
 
-        /// Reserve tokens - 1.0 billion 
+        /// Reserve tokens - 1.0 billion
         uint256 reserveTokens = 1000000000;
         reserveTokensVault = createTokenVaultInt(reserveTokens);
 
@@ -485,7 +485,7 @@ contract LCP_Token is BurnableToken, Owned {
 
     /// @dev vest StartAt : day unit
     function vestTokensStartAtInt(
-                            address _beneficiary, 
+                            address _beneficiary,
                             uint256 _tokensAmountInt,
                             uint256 _startS,
                             uint256 _afterDay,
@@ -511,7 +511,7 @@ contract LCP_Token is BurnableToken, Owned {
         vestTokensStartAtInt(_beneficiary, _tokensAmountInt, now, _afterDay, _cliffDay, _durationDay);
     }
 
-    /// @dev vest the sale contributor tokens for 100 days, 1% gradual release 
+    /// @dev vest the sale contributor tokens for 100 days, 1% gradual release
     function vestCmdNow1PercentInt(address _beneficiary, uint256 _tokensAmountInt) external onlyOwner {
         vestTokensFromNowInt(_beneficiary, _tokensAmountInt, 0, 0, unlock100Days);
     }
@@ -556,10 +556,45 @@ contract LCP_Token is BurnableToken, Owned {
         TokenVesting(vestingOf[_owner]).revoke(this);
     }
 
-    /// @dev Create a ReserveTokenVault 
+    /// @dev Create a ReserveTokenVault
     function makeReserveToVault() external onlyOwner {
         require(reserveTokensVault != address(0));
         reserveTokensVault.fillUpAllowance();
     }
 
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

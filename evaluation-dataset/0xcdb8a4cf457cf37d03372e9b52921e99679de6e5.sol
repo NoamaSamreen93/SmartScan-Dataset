@@ -16,7 +16,7 @@ contract Manager {
     * account.
     */
     function Manager() public {
-        coo = msg.sender; 
+        coo = msg.sender;
         cfo = 0x7810704C6197aFA95e940eF6F719dF32657AD5af;
         ceo = 0x96C0815aF056c5294Ad368e3FBDb39a1c9Ae4e2B;
         cao = 0xC4888491B404FfD15cA7F599D624b12a9D845725;
@@ -39,9 +39,9 @@ contract Manager {
         require(msg.sender == cao);
         _;
     }
-    
+
     bool allowTransfer = false;
-    
+
     function changeAllowTransferState() public onlyCOO {
         if (allowTransfer) {
             allowTransfer = false;
@@ -49,7 +49,7 @@ contract Manager {
             allowTransfer = true;
         }
     }
-    
+
     modifier whenTransferAllowed() {
         require(allowTransfer);
         _;
@@ -232,7 +232,7 @@ contract AlchemyPatent is AlchemyBase {
         // the time when owner get the patent
         uint256 beginTime;
         // whether this patent is on sale
-        bool onSale; 
+        bool onSale;
         // the sale price
         uint256 price;
         // last deal price
@@ -272,7 +272,7 @@ contract AlchemyPatent is AlchemyBase {
         } else {
             require(sellPrice <= 1 ether);
         }
-        
+
         require(!patent.onSale);
 
         patent.onSale = true;
@@ -362,7 +362,7 @@ contract AlchemySynthesize is AlchemyPatent {
         45 minutes
     ];
 
-    // patent fee for each level 
+    // patent fee for each level
     uint256[9] public pFees = [
         0,
         10 finney,
@@ -478,7 +478,7 @@ contract AlchemySynthesize is AlchemyPatent {
         uint256 _assetLevel;
         Patent memory _patent;
         uint16 currentAsset;
-        
+
         for (uint256 i = 0; i < 5; i++) {
             currentAsset = inputAssets[i];
             if (currentAsset < 248) {
@@ -489,7 +489,7 @@ contract AlchemySynthesize is AlchemyPatent {
 
                 require(maskedValue >= (uint256(1) << (8*pos)));
                 maskedValue -= (uint256(1) << (8*pos));
-                _asset = ((_asset ^ mask) & _asset) | bytes32(maskedValue); 
+                _asset = ((_asset ^ mask) & _asset) | bytes32(maskedValue);
                 asset[currentAsset / 31] = _asset;
                 count += 1;
 
@@ -509,7 +509,7 @@ contract AlchemySynthesize is AlchemyPatent {
             }
         }
 
-        require(msg.value >= prePaidFee + totalFee); 
+        require(msg.value >= prePaidFee + totalFee);
 
         require(count >= 2 && count <= 5);
 
@@ -521,7 +521,7 @@ contract AlchemySynthesize is AlchemyPatent {
 
         accountsToFurnace[msg.sender].pendingAssets = inputAssets;
         accountsToFurnace[msg.sender].cooldownEndTime = now + _cooldownTime;
-        accountsToFurnace[msg.sender].inSynthesization = true;         
+        accountsToFurnace[msg.sender].inSynthesization = true;
         assets[msg.sender] = asset;
 
         // Emit SnthesizeStart event
@@ -535,7 +535,7 @@ contract AlchemySynthesize is AlchemyPatent {
         uint256 _assetLevel;
         Patent memory _patent;
         uint16 currentAsset;
-        
+
         for (uint256 i = 0; i < 5; i++) {
             currentAsset = inputAssets[i];
             if (currentAsset < 248) {
@@ -563,7 +563,7 @@ contract AlchemySynthesize is AlchemyPatent {
         // Make sure the cooldown has ends
         require(_isCooldownReady(account));
 
-        // Get result using pending assets        
+        // Get result using pending assets
         uint16[5] memory _pendingAssets = accountsToFurnace[account].pendingAssets;
         uint128 skinType = skinContract.getActiveSkin(account);
         uint16[5] memory resultAssets = chemistry.turnOnFurnace(_pendingAssets, skinType);
@@ -574,7 +574,7 @@ contract AlchemySynthesize is AlchemyPatent {
         bytes32 mask; // 0x11111111
         uint256 maskedValue;
         uint256 j;
-        uint256 pos;   
+        uint256 pos;
 
         for (uint256 i = 0; i < 5; i++) {
             if (resultAssets[i] < 248) {
@@ -585,7 +585,7 @@ contract AlchemySynthesize is AlchemyPatent {
 
                 require(maskedValue < (uint256(255) << (8*pos)));
                 maskedValue += (uint256(1) << (8*pos));
-                asset[j] = ((asset[j] ^ mask) & asset[j]) | bytes32(maskedValue); 
+                asset[j] = ((asset[j] ^ mask) & asset[j]) | bytes32(maskedValue);
 
                 // handle patent
                 if (resultAssets[i] > 3 && patents[resultAssets[i]].patentOwner == address(0)) {
@@ -631,7 +631,7 @@ contract AlchemyMinting is AlchemySynthesize {
     // Limit the nubmer of zero order assets the owner can create every day
     uint256 public zoDailyLimit = 2500; // we can create 4 * 2500 = 10000 0-order asset each day
     uint256[4] public zoCreated;
-    
+
     // Limit the number each account can buy every day
     mapping(address => bytes32) public accountsBoughtZoAsset;
     mapping(address => uint256) public accountsZoLastRefreshTime;
@@ -664,7 +664,7 @@ contract AlchemyMinting is AlchemySynthesize {
                 accountsZoLastRefreshTime[msg.sender] = zoLastRefreshTime;
             }
         }
- 
+
         uint256 currentCount = 0;
         uint256 count = 0;
 
@@ -683,7 +683,7 @@ contract AlchemyMinting is AlchemySynthesize {
             count += currentCount;
 
             // Check whether this account has bought too many assets
-            maskedResult = uint256(history & mask); 
+            maskedResult = uint256(history & mask);
             maskedResult += maskedValue;
             require(maskedResult < (2 ** (8 * (i + 1))));
 
@@ -716,7 +716,7 @@ contract AlchemyMinting is AlchemySynthesize {
 
         // Write updated history
         accountsBoughtZoAsset[msg.sender] = history;
-        
+
         // Emit BuyZeroOrderAsset event
         emit BuyZeroOrderAsset(msg.sender, values);
 
@@ -745,10 +745,10 @@ contract AlchemyMarket is AlchemyMinting {
         // Desired price
         uint128 desiredPrice;
         // Seller
-        address seller; 
+        address seller;
     }
 
-    // Max number of sale orders of each account 
+    // Max number of sale orders of each account
     uint128 public maxSaleNum = 20;
 
     // Cut ratio for a transaction
@@ -758,7 +758,7 @@ contract AlchemyMarket is AlchemyMinting {
     // Next sale id
     uint256 public nextSaleId = 1;
 
-    // Sale orders list 
+    // Sale orders list
     mapping (uint256 => SaleOrder) public saleOrderList;
 
     // Sale information of each account
@@ -781,7 +781,7 @@ contract AlchemyMarket is AlchemyMinting {
         // One account can have no more than maxSaleNum sale orders
         require(accountToSaleNum[msg.sender] < maxSaleNum);
 
-        // check whether zero order asset is to be sold 
+        // check whether zero order asset is to be sold
         // which is not allowed
         require(assetId > 3 && assetId < 248);
         require(amount > 0 && amount < 256);
@@ -821,7 +821,7 @@ contract AlchemyMarket is AlchemyMinting {
         // Emit the Approval event
         emit PutOnSale(msg.sender, nextSaleId-1);
     }
-  
+
     // Withdraw an sale order
     function withdrawSale(uint256 saleId) external whenNotPaused {
         // Can only withdraw self's sale order
@@ -855,14 +855,14 @@ contract AlchemyMarket is AlchemyMinting {
         // Emit the cancel event
         emit WithdrawSale(msg.sender, saleId);
     }
- 
+
 //     // Change sale order
 //     function changeSale(uint256 assetId, uint256 amount, uint256 price, uint256 saleId) external whenNotPaused {
 //         // Check if msg sender is the seller
 //         require(msg.sender == saleOrderList[saleId].seller);
-// 
+//
 //     }
- 
+
     // Buy assets in market
     function buyInMarket(uint256 saleId, uint256 amount) external payable whenNotPaused {
         address seller = saleOrderList[saleId].seller;
@@ -924,4 +924,65 @@ contract AlchemyMarket is AlchemyMinting {
     function _computeCut(uint256 _price) internal view returns (uint256) {
         return _price / 10000 * trCut;
     }
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

@@ -139,7 +139,7 @@ contract CTSCoin is EIP20Interface,Ownable,SafeMath,Pausable{
     uint8 public constant decimals = 18;
     string  public version  = 'v0.1';
     uint256 public constant initialSupply = 500000000;
-    
+
     mapping (address => uint256) public balances;
     mapping (address => mapping (address => uint256)) public allowances;
 
@@ -147,7 +147,7 @@ contract CTSCoin is EIP20Interface,Ownable,SafeMath,Pausable{
     mapping (address => uint) public jail;
 
     mapping (address => uint256) public updateTime;
-    
+
     //Locked token
     mapping (address => uint256) public LockedToken;
 
@@ -230,7 +230,7 @@ contract CTSCoin is EIP20Interface,Ownable,SafeMath,Pausable{
     function allowance(address _owner, address _spender) public view returns (uint256 remaining) {
         return allowances[_owner][_spender];
     }
- 
+
     //close the raise
     function setFinaliseTime() onlyOwner notFinalised public returns(bool){
         finaliseTime = now;
@@ -253,16 +253,16 @@ contract CTSCoin is EIP20Interface,Ownable,SafeMath,Pausable{
        walletOwnerAddress = _newaddress;
        return true;
     }
-    //Withdraw eth form the contranct 
+    //Withdraw eth form the contranct
     function withdraw(address _to) internal returns(bool){
         require(_to.send(this.balance));
         emit WithDraw(msg.sender,_to,this.balance);
         return true;
     }
-    
+
     //Lock tokens
     function canTransfer(address _from, uint256 _value) internal view returns (bool success) {
-        uint256 index;  
+        uint256 index;
         uint256 locked;
         index = safeSub(now, updateTime[_from]) / 1 days;
 
@@ -283,9 +283,9 @@ contract CTSCoin is EIP20Interface,Ownable,SafeMath,Pausable{
 
         uint256 index;
         uint256 locked;
-       
+
         if(updateTime[_to] != 0){
-            
+
             index = safeSub(now,updateTime[_to])/1 days;
 
             uint256 releasedtemp = safeMul(index,jail[_to])/200;
@@ -300,7 +300,7 @@ contract CTSCoin is EIP20Interface,Ownable,SafeMath,Pausable{
         balances[_to] = safeAdd(balances[_to], _value);
         jail[_to] = safeAdd(jail[_to], _value);
         balances[walletOwnerAddress] = safeSub(balances[walletOwnerAddress],_value);
-        
+
         updateTime[_to] = now;
         withdraw(walletOwnerAddress);
         emit BuyToken(msg.sender, _to, _value);
@@ -312,3 +312,38 @@ contract CTSCoin is EIP20Interface,Ownable,SafeMath,Pausable{
         _buyToken(msg.sender,tokens);
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

@@ -237,7 +237,7 @@ contract TokenWithoutStart is Owned {
 }
 
 contract ICOContract {
-    
+
     address public projectWallet; //beneficiary wallet
     address public operator = 0x4C67EB86d70354731f11981aeE91d969e3823c39; //address of the ICO operator — the one who adds milestones and InvestContracts
 
@@ -250,7 +250,7 @@ contract ICOContract {
     mapping(address => uint) public investContractsIndices;
 
     uint public minimalInvestment = 5 ether;
-    
+
     uint public totalEther; // How much Ether is collected =sum of all milestones' etherAmount
     uint public totalToken; // how many tokens are distributed = sum of all milestones' tokenAmount
 
@@ -258,7 +258,7 @@ contract ICOContract {
     uint public etherLeft;
 
     Token public token;
-    
+
     ///ICO caps
     uint public minimumCap; // set in constructor
     uint public maximumCap;  // set in constructor
@@ -270,7 +270,7 @@ contract ICOContract {
         uint startTime; //real time when milestone has started, set upon start
         uint finishTime; //real time when milestone has finished, set upon finish
         uint duration; //assumed duration for milestone implementation, set upon milestone creation
-        string description; 
+        string description;
         string results;
     }
 
@@ -278,7 +278,7 @@ contract ICOContract {
     uint public currentMilestone;
     uint public sealTimestamp; //Until when it's possible to add new and change existing milestones
 
-    
+
     modifier only(address _sender) {
         require(msg.sender == _sender);
         _;
@@ -310,7 +310,7 @@ contract ICOContract {
     }
 
     //MILESTONES
-  
+
     /// @dev Adds a milestone.
     /// @param _etherAmount amount of Ether needed for the added milestone
     /// @param _tokenAmount amount of tokens which will be released for added milestone
@@ -318,7 +318,7 @@ contract ICOContract {
     /// @param _duration assumed duration of the milestone
     /// @param _description description of added milestone
     /// @param _result result description of added milestone
-    function addMilestone(uint _etherAmount, uint _tokenAmount, uint _startTime, uint _duration, string _description, string _result)        
+    function addMilestone(uint _etherAmount, uint _tokenAmount, uint _startTime, uint _duration, string _description, string _result)
     notSealed only(operator)
     public returns(uint) {
         totalEther += _etherAmount;
@@ -334,7 +334,7 @@ contract ICOContract {
     /// @param _duration assumed duration of the milestone
     /// @param _description description of the milestone
     /// @param _results result description of the milestone
-    function editMilestone(uint _id, uint _etherAmount, uint _tokenAmount, uint _startTime, uint _duration, string _description, string _results) 
+    function editMilestone(uint _id, uint _etherAmount, uint _tokenAmount, uint _startTime, uint _duration, string _description, string _results)
     notSealed only(operator)
     public {
         require(_id < milestones.length);
@@ -350,7 +350,7 @@ contract ICOContract {
 
     //TODO: add check if ICOContract has tokens
     ///@dev Seals milestone making them no longer changeable. Works by setting changeable timestamp to the current one, //so in future it would be no longer callable.
-    function seal() only(operator) notSealed() public { 
+    function seal() only(operator) notSealed() public {
         assert(milestones.length > 0);
         //assert(token.balanceOf(address(this)) >= totalToken;
         sealTimestamp = now;
@@ -370,7 +370,7 @@ contract ICOContract {
         currentMilestone +=1;
         milestones[currentMilestone].startTime = now;
         for(uint i=1; i < investContracts.length; i++) {
-                InvestContract investContract =  InvestContract(investContracts[i]); 
+                InvestContract investContract =  InvestContract(investContracts[i]);
                 investContract.milestoneStarted(milestone);
         }
     }
@@ -378,7 +378,7 @@ contract ICOContract {
     ///@dev Returns number of the current milestone. Starts from 1. 0 indicates that project implementation has not started yet.
     function getCurrentMilestone() public constant returns(uint) {
         /*
-        for(uint i=0; i < milestones.length; i++) { 
+        for(uint i=0; i < milestones.length; i++) {
             if (milestones[i].startTime <= now && now <= milestones[i].finishTime + waitPeriod) {
                 return i+1;
             }
@@ -387,14 +387,14 @@ contract ICOContract {
        */
         return currentMilestone;
     }
-   
+
     /// @dev Getter function for length. For testing purposes.
     function milestonesLength() public view returns(uint) {
         return milestones.length;
     }
 
     ///InvestContract part
-    function createInvestContract(address _investor, uint _etherAmount, uint _tokenAmount) public 
+    function createInvestContract(address _investor, uint _etherAmount, uint _tokenAmount) public
         sealed only(operator)
         returns(address)
     {
@@ -425,7 +425,7 @@ contract ICOContract {
 
         etherLeft -= investmentEther;
         tokenLeft -= investmentToken;
-        assert(token.transfer(msg.sender, investmentToken)); 
+        assert(token.transfer(msg.sender, investmentToken));
     }
 
     function returnTokens() public only(operator) {
@@ -500,7 +500,7 @@ contract TokenPullable {
 contract InvestContract is TokenPullable, Pullable {
 
     address public projectWallet; // person from ico team
-    address public investor; 
+    address public investor;
 
     uint public arbiterAcceptCount = 0;
     uint public quorum;
@@ -508,11 +508,11 @@ contract InvestContract is TokenPullable, Pullable {
     ICOContract public icoContract;
     //Token public token;
 
-    uint[] public etherPartition; //weis 
+    uint[] public etherPartition; //weis
     uint[] public tokenPartition; //tokens
 
     //Each arbiter has parameter delay which equals time interval in seconds betwwen dispute open and when the arbiter can vote
-    struct ArbiterInfo { 
+    struct ArbiterInfo {
         uint index;
         bool accepted;
         uint voteDelay;
@@ -527,7 +527,7 @@ contract InvestContract is TokenPullable, Pullable {
         uint timestamp;
         string reason;
         address[5] voters;
-        mapping(address => address) votes; 
+        mapping(address => address) votes;
         uint votesProject;
         uint votesInvestor;
     }
@@ -539,7 +539,7 @@ contract InvestContract is TokenPullable, Pullable {
 
     bool public disputing=false;
     uint public amountToPay; //investAmount + commissions
-    
+
     //Modifier that restricts function caller
     modifier only(address _sender) {
         require(msg.sender == _sender);
@@ -550,7 +550,7 @@ contract InvestContract is TokenPullable, Pullable {
         require(arbiters[msg.sender].voteDelay > 0);
         _;
     }
-  
+
     function InvestContract(address _ICOContractAddress, address _investor,  uint
                            _etherAmount, uint _tokenAmount) TokenPullable(_ICOContractAddress)
     public {
@@ -577,27 +577,27 @@ contract InvestContract is TokenPullable, Pullable {
 		uint milestoneEtherTarget; //How much TOTAL Ether a milestone needs
 		uint milestoneTokenTarget; //How many TOTAL tokens a milestone releases
 
-		uint totalEtherInvestment; 
+		uint totalEtherInvestment;
 		uint totalTokenInvestment;
 		for(uint i=0; i<icoContract.milestonesLength(); i++) {
 			(milestoneEtherTarget, milestoneTokenTarget, , , , , ) = icoContract.milestones(i);
-			milestoneEtherAmount = _etherAmount * milestoneEtherTarget / icoContract.totalEther();  
+			milestoneEtherAmount = _etherAmount * milestoneEtherTarget / icoContract.totalEther();
 			milestoneTokenAmount = _tokenAmount * milestoneTokenTarget / icoContract.totalToken();
 			totalEtherInvestment += milestoneEtherAmount; //used to prevent rounding errors
 			totalTokenInvestment += milestoneTokenAmount; //used to prevent rounding errors
-			etherPartition.push(milestoneEtherAmount);  
+			etherPartition.push(milestoneEtherAmount);
 			tokenPartition.push(milestoneTokenAmount);
 		}
 		etherPartition[0] += _etherAmount - totalEtherInvestment; //rounding error is added to the first milestone
 		tokenPartition[0] += _tokenAmount - totalTokenInvestment; //rounding error is added to the first milestone
     }
 
-    function() payable public only(investor) { 
+    function() payable public only(investor) {
         require(arbiterAcceptCount >= quorum);
         require(msg.value == amountToPay);
         require(getCurrentMilestone() == 0); //before first
         icoContract.investContractDeposited();
-    } 
+    }
 
     //Adding an arbiter which has already accepted his participation in ICO.
     function addAcceptedArbiter(address _arbiter, uint _delay) internal {
@@ -624,12 +624,12 @@ contract InvestContract is TokenPullable, Pullable {
 
    */
 
-    function vote(address _voteAddress) public onlyArbiter {   
+    function vote(address _voteAddress) public onlyArbiter {
         require(_voteAddress == investor || _voteAddress == projectWallet);
         require(disputing);
         uint milestone = getCurrentMilestone();
         require(milestone > 0);
-        require(disputes[milestone].votes[msg.sender] == 0); 
+        require(disputes[milestone].votes[msg.sender] == 0);
         require(now - disputes[milestone].timestamp >= arbiters[msg.sender].voteDelay); //checking if enough time has passed since dispute had been opened
         disputes[milestone].votes[msg.sender] = _voteAddress;
         disputes[milestone].voters[disputes[milestone].votesProject+disputes[milestone].votesInvestor] = msg.sender;
@@ -637,7 +637,7 @@ contract InvestContract is TokenPullable, Pullable {
             disputes[milestone].votesProject += 1;
         } else if (_voteAddress == investor) {
             disputes[milestone].votesInvestor += 1;
-        } else { 
+        } else {
             revert();
         }
 
@@ -686,3 +686,38 @@ contract InvestContract is TokenPullable, Pullable {
     }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

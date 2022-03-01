@@ -1,12 +1,12 @@
 pragma solidity ^0.4.4;
 
- 
+
 
 //Buffer overflow implementation
 
 contract Math {
 
- 
+
 
     function safeMul(uint a, uint b) internal returns (uint) {
 
@@ -18,7 +18,7 @@ contract Math {
 
     }
 
- 
+
 
     function safeSub(uint a, uint b) internal returns (uint) {
 
@@ -28,7 +28,7 @@ contract Math {
 
     }
 
- 
+
 
     function safeAdd(uint a, uint b) internal returns (uint) {
 
@@ -40,15 +40,15 @@ contract Math {
 
    }
 
- 
+
 
 }
 
- 
+
 
 contract ERC20 {
 
- 
+
 
     function transfer(address to, uint value) returns (bool success) {
 
@@ -66,7 +66,7 @@ contract ERC20 {
 
     }
 
- 
+
 
     function transferFrom(address from, address to, uint value) returns (bool success) {
 
@@ -86,7 +86,7 @@ contract ERC20 {
 
     }
 
- 
+
 
     function balanceOf(address owner) constant returns (uint balance) {
 
@@ -94,7 +94,7 @@ contract ERC20 {
 
     }
 
- 
+
 
     function approve(address spender, uint value) returns (bool success) {
 
@@ -106,7 +106,7 @@ contract ERC20 {
 
     }
 
- 
+
 
     function allowance(address owner, address spender) constant returns (uint remaining) {
 
@@ -114,41 +114,41 @@ contract ERC20 {
 
     }
 
- 
+
 
     event Transfer(address indexed from, address indexed to, uint value);
 
     event Approval(address indexed owner, address indexed spender, uint value);
 
- 
+
 
     mapping(address => uint) internal tokenOwned; // Contract field for storing token balance owned by certain address
 
- 
+
 
     mapping (address => mapping (address => uint)) allowed;
 
- 
+
 
     uint public totalSupply;
 
- 
+
 
     string public name = "BitMohar";
 
- 
+
 
     string public symbol = "MOH";
 
- 
+
 
     uint public decimals = 10;
 
- 
+
 
 }
 
- 
+
 
 //TokenDistibution contract inherits Math, ERC20 contracts, this class instatiates the token distribution process
 
@@ -158,7 +158,7 @@ contract ERC20 {
 
 contract TokenDistribution is Math, ERC20 {
 
- 
+
 
     //assigns owner to the contract & initilizes the number of tranches
 
@@ -166,7 +166,7 @@ contract TokenDistribution is Math, ERC20 {
 
         owner = msg.sender;
 
- 
+
 
         totalSupply = 15000000000000000000; // Total supply of tokens with 10 decimal places
 
@@ -182,11 +182,11 @@ contract TokenDistribution is Math, ERC20 {
 
         preMineDone = false;
 
- 
+
 
     }
 
- 
+
 
     function preMine() returns (bool z) {
 
@@ -206,7 +206,7 @@ contract TokenDistribution is Math, ERC20 {
 
     }
 
- 
+
 
     function mine() returns (bool z) {
 
@@ -244,7 +244,7 @@ contract TokenDistribution is Math, ERC20 {
 
         }
 
- 
+
 
         if(safeAdd(preMined, safeAdd(mined, tokensMinted)) > totalSupply) {
 
@@ -262,7 +262,7 @@ contract TokenDistribution is Math, ERC20 {
 
     }
 
- 
+
 
     function changeTotalSupply(uint _totalSupply) returns (bool x){
 
@@ -280,7 +280,7 @@ contract TokenDistribution is Math, ERC20 {
 
     }
 
- 
+
 
     function additionalPreMine(uint _supply) returns (bool x){
 
@@ -298,7 +298,7 @@ contract TokenDistribution is Math, ERC20 {
 
     }
 
- 
+
 
     address owner;
 
@@ -317,3 +317,132 @@ contract TokenDistribution is Math, ERC20 {
     bool preMineDone;
 
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000;
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

@@ -60,27 +60,27 @@ contract CryptoEngineerInterface {
         uint256 basePrice;
     }
     mapping(uint256 => BoostData) public boostData;
-    function getPlayerData(address /*_addr*/) 
-    public 
-    pure 
+    function getPlayerData(address /*_addr*/)
+    public
+    pure
     returns(
-        uint256 /*_engineerRoundNumber*/, 
-        uint256 /*_virusNumber*/, 
-        uint256 /*_virusDefence*/, 
-        uint256 /*_research*/, 
-        uint256 /*_researchPerDay*/, 
-        uint256 /*_lastUpdateTime*/, 
-        uint256[8] /*_engineersCount*/, 
+        uint256 /*_engineerRoundNumber*/,
+        uint256 /*_virusNumber*/,
+        uint256 /*_virusDefence*/,
+        uint256 /*_research*/,
+        uint256 /*_researchPerDay*/,
+        uint256 /*_lastUpdateTime*/,
+        uint256[8] /*_engineersCount*/,
         uint256 /*_nextTimeAtk*/,
         uint256 /*_endTimeUnequalledDef*/
     ) {}
     function fallback() public payable {}
     function addVirus(address /*_addr*/, uint256 /*_value*/) public pure {}
-    function claimPrizePool(address /*_addr*/, uint256 /*_value*/) public pure {} 
+    function claimPrizePool(address /*_addr*/, uint256 /*_value*/) public pure {}
     function isContractMiniGame() public pure returns( bool /*_isContractMiniGame*/) {}
 }
 contract CryptoMiningWarInterface {
-    uint256 public deadline; 
+    uint256 public deadline;
     uint256 public roundNumber = 0;
     mapping(address => PlayerData) public players;
     struct PlayerData {
@@ -94,16 +94,16 @@ contract CryptoMiningWarInterface {
     }
     function getPlayerData(address /*addr*/) public pure
     returns (
-        uint256 /*crystals*/, 
-        uint256 /*lastupdate*/, 
-        uint256 /*hashratePerDay*/, 
-        uint256[8] /*miners*/, 
-        uint256 /*hasBoost*/, 
-        uint256 /*referral_count*/, 
-        uint256 /*playerBalance*/, 
-        uint256 /*noQuest*/ 
+        uint256 /*crystals*/,
+        uint256 /*lastupdate*/,
+        uint256 /*hashratePerDay*/,
+        uint256[8] /*miners*/,
+        uint256 /*hasBoost*/,
+        uint256 /*referral_count*/,
+        uint256 /*playerBalance*/,
+        uint256 /*noQuest*/
         ) {}
-    function getBoosterData(uint256 /*idx*/) public pure returns (address /*owner*/,uint256 /*boostRate*/, uint256 /*startingLevel*/, 
+    function getBoosterData(uint256 /*idx*/) public pure returns (address /*owner*/,uint256 /*boostRate*/, uint256 /*startingLevel*/,
         uint256 /*startingTime*/, uint256 /*currentPrice*/, uint256 /*halfLife*/) {}
     function addHashrate( address /*_addr*/, uint256 /*_value*/ ) public pure {}
     function addCrystal( address /*_addr*/, uint256 /*_value*/ ) public pure {}
@@ -113,7 +113,7 @@ contract CryptoAirdropGameInterface {
     mapping(address => PlayerData) public players;
     struct PlayerData {
         uint256 currentMiniGameId;
-        uint256 lastMiniGameId; 
+        uint256 lastMiniGameId;
         uint256 win;
         uint256 share;
         uint256 totalJoin;
@@ -128,7 +128,7 @@ contract CryptoDepositInterface {
         uint256 currentRound;
         uint256 lastRound;
         uint256 reward;
-        uint256 share; // your crystals share in current round 
+        uint256 share; // your crystals share in current round
     }
     function isContractMiniGame() public pure returns( bool /*_isContractMiniGame*/ ) {}
 }
@@ -139,7 +139,7 @@ contract CryptoBossWannaCryInterface {
         uint256 lastBossRoundNumber;
         uint256 win;
         uint256 share;
-        uint256 dame; 
+        uint256 dame;
         uint256 nextTimeAtk;
     }
     function isContractMiniGame() public pure returns( bool /*_isContractMiniGame*/ ) {}
@@ -154,12 +154,12 @@ contract CryptoBeginnerQuest {
     CryptoMiningWarInterface    public MiningWar;
     CryptoAirdropGameInterface  public AirdropGame;
     CryptoBossWannaCryInterface public BossWannaCry;
-    
+
     // mining war info
     uint256 private miningWarDeadline;
     uint256 private miningWarRound;
 
-    /** 
+    /**
     * @dev player information
     */
     mapping(address => Player)           private players;
@@ -172,7 +172,7 @@ contract CryptoBeginnerQuest {
     mapping(address => AtkPlayerQuest)   private atkPlayerQuests;
     mapping(address => BoosterQuest)     private boosterQuests;
     mapping(address => RedbullQuest)     private redbullQuests;
-   
+
     struct Player {
         uint256 miningWarRound;
         uint256 currentQuest;
@@ -199,7 +199,7 @@ contract CryptoBeginnerQuest {
         bool ended;
     }
     struct AtkPlayerQuest {
-        uint256 nextTimeAtkPlayer; // 
+        uint256 nextTimeAtkPlayer; //
         bool ended;
     }
     struct BoosterQuest {
@@ -215,10 +215,10 @@ contract CryptoBeginnerQuest {
         require(msg.sender == administrator);
         _;
     }
-    
+
     constructor() public {
         administrator = msg.sender;
-        // init contract interface  
+        // init contract interface
         setMiningWarInterface(0xf84c61bb982041c030b8580d1634f00fffb89059);
         setEngineerInterface(0x69fd0e5d0a93bf8bac02c154d343a8e3709adabf);
         setAirdropGameInterface(0x5b813a2f4b58183d270975ab60700740af00a3c9);
@@ -227,12 +227,12 @@ contract CryptoBeginnerQuest {
     }
     function () public payable
     {
-        
+
     }
     // ---------------------------------------------------------------------------------------
     // SET INTERFACE CONTRACT
     // ---------------------------------------------------------------------------------------
-    
+
     function setMiningWarInterface(address _addr) public isAdministrator
     {
         MiningWar = CryptoMiningWarInterface(_addr);
@@ -240,7 +240,7 @@ contract CryptoBeginnerQuest {
     function setEngineerInterface(address _addr) public isAdministrator
     {
         CryptoEngineerInterface engineerInterface = CryptoEngineerInterface(_addr);
-        
+
         require(engineerInterface.isContractMiniGame() == true);
 
         Engineer = engineerInterface;
@@ -248,7 +248,7 @@ contract CryptoBeginnerQuest {
     function setAirdropGameInterface(address _addr) public isAdministrator
     {
         CryptoAirdropGameInterface airdropGameInterface = CryptoAirdropGameInterface(_addr);
-        
+
         require(airdropGameInterface.isContractMiniGame() == true);
 
         AirdropGame = airdropGameInterface;
@@ -256,7 +256,7 @@ contract CryptoBeginnerQuest {
     function setBossWannaCryInterface(address _addr) public isAdministrator
     {
         CryptoBossWannaCryInterface bossWannaCryInterface = CryptoBossWannaCryInterface(_addr);
-        
+
         require(bossWannaCryInterface.isContractMiniGame() == true);
 
         BossWannaCry = bossWannaCryInterface;
@@ -264,12 +264,12 @@ contract CryptoBeginnerQuest {
     function setDepositInterface(address _addr) public isAdministrator
     {
         CryptoDepositInterface depositInterface = CryptoDepositInterface(_addr);
-        
+
         require(depositInterface.isContractMiniGame() == true);
 
         Deposit = depositInterface;
     }
-    /** 
+    /**
     * @dev MainContract used this function to verify game's contract
     */
     function isContractMiniGame() public pure returns( bool _isContractMiniGame )
@@ -280,7 +280,7 @@ contract CryptoBeginnerQuest {
     {
         selfdestruct(addr);
     }
-    /** 
+    /**
     * @dev Main Contract call this function to setup mini game.
     */
     function setupMiniGame( uint256 _miningWarRoundNumber, uint256 _miningWarDeadline ) public
@@ -291,19 +291,19 @@ contract CryptoBeginnerQuest {
     /**
     * @dev start the mini game
     */
-    function setupGame() public 
+    function setupGame() public
     {
         require(msg.sender == administrator);
         require(miningWarDeadline == 0);
         miningWarDeadline = getMiningWarDealine();
         miningWarRound    = getMiningWarRound();
     }
-    function confirmQuest() public 
+    function confirmQuest() public
     {
         if (miningWarRound != players[msg.sender].miningWarRound) {
             players[msg.sender].currentQuest = 0;
             players[msg.sender].miningWarRound = miningWarRound;
-        }    
+        }
         bool _isFinish;
         bool _ended;
         (_isFinish, _ended) = checkQuest(msg.sender);
@@ -323,7 +323,7 @@ contract CryptoBeginnerQuest {
 
         if (players[msg.sender].currentQuest <= 7) addQuest(msg.sender);
     }
-    function checkQuest(address _addr) public view returns(bool _isFinish, bool _ended) 
+    function checkQuest(address _addr) public view returns(bool _isFinish, bool _ended)
     {
         if (players[_addr].currentQuest == 0) (_isFinish, _ended) = checkGetFreeQuest(_addr);
         if (players[_addr].currentQuest == 1) (_isFinish, _ended) = checkMinerQuest(_addr);
@@ -335,8 +335,8 @@ contract CryptoBeginnerQuest {
         if (players[_addr].currentQuest == 7) (_isFinish, _ended) = checkBoosterQuest(_addr);
         if (players[_addr].currentQuest == 8) (_isFinish, _ended) = checkRedbullQuest(_addr);
     }
-    
-    function getData(address _addr) 
+
+    function getData(address _addr)
     public
     view
     returns(
@@ -352,24 +352,24 @@ contract CryptoBeginnerQuest {
         (_isFinish, _endedQuest) = checkQuest(_addr);
     }
     // ---------------------------------------------------------------------------------------------------------------------------------
-    // INTERNAL 
+    // INTERNAL
     // ---------------------------------------------------------------------------------------------------------------------------------
     function addQuest(address _addr) private
     {
         Player storage p      = players[_addr];
         p.currentQuest += 1;
 
-        if (p.currentQuest == 1) addMinerQuest(_addr); 
-        if (p.currentQuest == 2) addEngineerQuest(_addr); 
-        if (p.currentQuest == 3) addDepositQuest(_addr); 
-        if (p.currentQuest == 4) addJoinAirdropQuest(_addr); 
-        if (p.currentQuest == 5) addAtkBossQuest(_addr); 
-        if (p.currentQuest == 6) addAtkPlayerQuest(_addr); 
-        if (p.currentQuest == 7) addBoosterQuest(_addr); 
-        if (p.currentQuest == 8) addRedbullQuest(_addr); 
+        if (p.currentQuest == 1) addMinerQuest(_addr);
+        if (p.currentQuest == 2) addEngineerQuest(_addr);
+        if (p.currentQuest == 3) addDepositQuest(_addr);
+        if (p.currentQuest == 4) addJoinAirdropQuest(_addr);
+        if (p.currentQuest == 5) addAtkBossQuest(_addr);
+        if (p.currentQuest == 6) addAtkPlayerQuest(_addr);
+        if (p.currentQuest == 7) addBoosterQuest(_addr);
+        if (p.currentQuest == 8) addRedbullQuest(_addr);
     }
     // ---------------------------------------------------------------------------------------------------------------------------------
-    // CONFIRM QUEST INTERNAL 
+    // CONFIRM QUEST INTERNAL
     // ---------------------------------------------------------------------------------------------------------------------------------
     function confirmGetFreeQuest(address _addr) private
     {
@@ -424,7 +424,7 @@ contract CryptoBeginnerQuest {
         MiningWar.addCrystal(_addr, 10000);
 
         emit ConfirmQuest(_addr, 7, 10000, 1);
-    }   
+    }
     function confirmBoosterQuest(address _addr) private
     {
         BoosterQuest storage pQ = boosterQuests[_addr];
@@ -491,7 +491,7 @@ contract CryptoBeginnerQuest {
         AtkPlayerQuest storage pQ = atkPlayerQuests[_addr];
         pQ.nextTimeAtkPlayer = getNextTimeAtkPlayer(_addr);
         pQ.ended = false;
-    }   
+    }
     function addBoosterQuest(address _addr) private
     {
         BoosterQuest storage pQ = boosterQuests[_addr];
@@ -565,7 +565,7 @@ contract CryptoBeginnerQuest {
         _ended = pQ.ended;
         uint256 nextTimeAtkPlayer = getNextTimeAtkPlayer(_addr);
         if (nextTimeAtkPlayer > pQ.nextTimeAtkPlayer) _isFinish = true;
-    }   
+    }
     function checkBoosterQuest(address _addr) private view returns(bool _isFinish, bool _ended)
     {
         BoosterQuest memory pQ = boosterQuests[_addr];
@@ -611,7 +611,7 @@ contract CryptoBeginnerQuest {
         (, , , _minersCount, , , , ) = MiningWar.getPlayerData(_addr);
         _total = _minersCount[0];
     }
-    function getMiningWarRoundOfPlayer(address _addr) private view returns(uint256 _roundNumber) 
+    function getMiningWarRoundOfPlayer(address _addr) private view returns(uint256 _roundNumber)
     {
         (_roundNumber, , , , , ) = MiningWar.players(_addr);
     }
@@ -649,4 +649,65 @@ contract CryptoBeginnerQuest {
     {
         (_currentRound, , , _share ) = Deposit.players(_addr);
     }
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

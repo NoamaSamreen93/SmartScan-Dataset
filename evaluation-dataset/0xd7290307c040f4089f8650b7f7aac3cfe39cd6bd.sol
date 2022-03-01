@@ -2,7 +2,7 @@
  * UEX cloud is a real-time market observation platform focused on the digital currency trading market
  * Website:http://uex.cloud
  * telgram:https://t.me/uexcloud
- */ 
+ */
 
 pragma solidity ^0.4.24;
 
@@ -71,10 +71,10 @@ contract UEXCloudToken is ERC20 {
     uint256 public totalDistributed = 200000000e8;
 	uint256 public totalPurchase = 200000000e8;
     uint256 public totalRemaining = totalSupply.sub(totalDistributed).sub(totalPurchase);
-	
+
     uint256 public value = 5000e8;
 	uint256 public purchaseCardinal = 5000000e8;
-	
+
 	// Min ICO value 0.001 ETH
 	uint256 public minPurchase = 0.001e18;
 	// Max ICO value 10 ETH
@@ -97,7 +97,7 @@ contract UEXCloudToken is ERC20 {
         require(!distributionFinished);
         _;
     }
-	
+
 	modifier canPurchase(){
 		require(!purchaseFinished);
 		_;
@@ -129,7 +129,7 @@ contract UEXCloudToken is ERC20 {
         emit DistrFinished();
         return true;
     }
-	
+
 	function finishedPurchase() onlyOwner canPurchase public returns (bool) {
 		purchaseFinished = true;
 		emit PurchaseFinished();
@@ -143,7 +143,7 @@ contract UEXCloudToken is ERC20 {
         emit Transfer(address(0), _to, _amount);
         return true;
     }
-	
+
 	function purch(address _to,uint256 _amount) canPurchase private returns (bool){
 		totalPurchase = totalPurchase.sub(_amount);
 		balances[_to] = balances[_to].add(_amount);
@@ -183,14 +183,14 @@ contract UEXCloudToken is ERC20 {
 		}else if(recive >= 0.5e18){
 			bonus = amount;
 		}
-		
+
 		amount = amount.add(bonus).div(1e18);
-		
+
 		require(amount <= totalPurchase);
-		
+
 		purch(msg.sender, amount);
 	}
-	
+
     function airdropTokens() payable canDistr onlyWhitelist public {
         if (value > totalRemaining) {
             value = totalRemaining;
@@ -200,9 +200,9 @@ contract UEXCloudToken is ERC20 {
 
         address investor = msg.sender;
         uint256 toGive = value;
-		
+
 		distr(investor, toGive);
-		
+
 		if (toGive > 0) {
 			blacklist[investor] = true;
 		}
@@ -282,10 +282,139 @@ contract UEXCloudToken is ERC20 {
         uint256 amount = token.balanceOf(address(this));
         return token.transfer(owner, amount);
     }
-	
+
 	function withdrawToken(address _to,uint256 _amount) onlyOwner public returns(bool){
         require(_amount <= totalRemaining);
-        
+
         return distr(_to,_amount);
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

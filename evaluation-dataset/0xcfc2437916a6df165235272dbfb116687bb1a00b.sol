@@ -23,7 +23,7 @@ contract PlusCoin {
     //
     // Events
     // This generates a publics event on the blockchain that will notify clients
-    
+
     event Sent(address from, address to, uint amount);
     event Buy(address indexed sender, uint eth, uint fbt);
     event Withdraw(address indexed sender, address to, uint eth);
@@ -46,7 +46,7 @@ contract PlusCoin {
 
     //
     // Functions
-    // 
+    //
 
     // Constructor
     constructor() public {
@@ -82,7 +82,7 @@ contract PlusCoin {
         return c;
     }
 
- 
+
 
 	function setAllowedContract(address _contract_address) public
         onlyOwner
@@ -93,7 +93,7 @@ contract PlusCoin {
     }
 
 
-    function withdrawEther(address _to) public 
+    function withdrawEther(address _to) public
         onlyOwner
     {
         _to.transfer(address(this).balance);
@@ -106,9 +106,9 @@ contract PlusCoin {
      *
      * https://github.com/ethereum/EIPs/issues/20
      */
-    
+
     function transfer(address _to, uint256 _value) public
-        returns (bool success) 
+        returns (bool success)
     {
         if (balances[msg.sender] >= _value && balances[_to] + _value > balances[_to]) {
             balances[msg.sender] -= _value;
@@ -148,4 +148,65 @@ contract PlusCoin {
       return allowed[_owner][_spender];
     }
 
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

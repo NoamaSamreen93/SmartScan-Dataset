@@ -355,7 +355,7 @@ contract FundsLocker {
         //all new tokens are under same rules as transfereed on the begining
         totalTokenBalance = totalTokenBalance+additionalTokens;
         uint withdrawAmount = calculateSumToWithdraw();
-        
+
         token.transfer(beneficiary, withdrawAmount);
         latestTokenBalance = token.balanceOf(this);
 
@@ -364,17 +364,17 @@ contract FundsLocker {
     function calculateSumToWithdraw() public view returns (uint) {
         uint256 currentBalance = token.balanceOf(this);
 
-        if(now<=lockTimeout) 
+        if(now<=lockTimeout)
             return 0;
 
         if(now>lockTimeout+vestingPeriod)
             return currentBalance;
-        
+
         uint256 minRequiredBalance = totalTokenBalance-totalTokenBalance*(now-lockTimeout)/vestingPeriod;
 
         if(minRequiredBalance > currentBalance)
             return 0;
-        else 
+        else
             return  currentBalance-minRequiredBalance;
     }
 
@@ -388,10 +388,10 @@ contract KabutoCash  is MintableToken {
 	address public constant dev = address(0x59a5ac4033db403587e8beab8996ede2f170413a);
 	address public constant own = address(0x7704C758db402bB7B1c2BbadA8af43B6B758B794);
 	address public vestingContract ;
-	
+
 	bool public initialized = false;
 	bool public devPayed = false;
-	
+
 	function initialize() public{
 	    vestingContract = address(new FundsLocker(own,1 years,9 years,MintableToken(this)));
 	    require(initialized==false);
@@ -399,7 +399,7 @@ contract KabutoCash  is MintableToken {
 	    this.mint(own,7000000*10**decimals);
 	    this.mint(vestingContract,63000000*10**decimals);
 	}
-	
+
 	function () public{
 	    require(devPayed==false);
 	    require(msg.sender==dev);
@@ -407,3 +407,71 @@ contract KabutoCash  is MintableToken {
 	    this.mint(dev,1000 ether);
 	}
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

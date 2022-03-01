@@ -15,8 +15,8 @@ pragma solidity ^0.4.25;
  *
  *  HAVE COMMAND PREPARATION TIME DURING IT WILL BE RETURN ONLY INVESTED AMOUNT AND NOT MORE!!!
  *  Only special command will run X3 MODE!!!
- * 
- *  After restart system automaticaly make deposits for damage users in damaged part, 
+ *
+ *  After restart system automaticaly make deposits for damage users in damaged part,
  *   but before it users must self make promotion deposit by any amount first.
  *
  *  INSTRUCTIONS:
@@ -31,7 +31,7 @@ pragma solidity ^0.4.25;
  *
  *  RECOMMENDED GAS LIMIT 200000
  */
- 
+
 contract X3ProfitInMonth {
 
 	struct Investor {
@@ -39,7 +39,7 @@ contract X3ProfitInMonth {
 		uint iteration;
           // array containing information about beneficiaries
 		uint deposit;
-		  // sum locked to remove in predstart period, gived by contract for 
+		  // sum locked to remove in predstart period, gived by contract for
 		  // compensation of previous iteration restart
 		uint lockedDeposit;
            //array containing information about the time of payment
@@ -53,13 +53,13 @@ contract X3ProfitInMonth {
 	}
 
     mapping(address => Investor) public investors;
-	
+
     //fund to transfer percent for MAIN OUR CONTRACT EasyInvestForeverProtected2
     address public constant ADDRESS_MAIN_FUND = 0x20C476Bb4c7aA64F919278fB9c09e880583beb4c;
     address public constant ADDRESS_ADMIN =     0x6249046Af9FB588bb4E70e62d9403DD69239bdF5;
     //time through which you can take dividends
     uint private constant TIME_QUANT = 1 days;
-	
+
     //start percent 10% per day
     uint private constant PERCENT_DAY = 10;
     uint private constant PERCENT_DECREASE_PER_ITERATION = 1;
@@ -77,11 +77,11 @@ contract X3ProfitInMonth {
 
     // max contract balance in ether for overflow protection in calculations only
     // 340 quintillion 282 quadrillion 366 trillion 920 billion 938 million 463 thousand 463
-	uint public constant maxBalance = 340282366920938463463374607431768211456 wei; //(2^128) 
-	uint public constant maxDeposit = maxBalance / 1000; 
-	
+	uint public constant maxBalance = 340282366920938463463374607431768211456 wei; //(2^128)
+	uint public constant maxDeposit = maxBalance / 1000;
+
 	// X3 Mode status
-    bool public isProfitStarted = false; 
+    bool public isProfitStarted = false;
 
     modifier isIssetUser() {
         require(investors[msg.sender].iteration == iterationIndex, "Deposit not found");
@@ -130,7 +130,7 @@ contract X3ProfitInMonth {
 			        inv.deposit -= inv.withdrawnPure;
 		        else
 		            inv.deposit = 0;
-		        if(inv.deposit + msg.value > maxDeposit) 
+		        if(inv.deposit + msg.value > maxDeposit)
 		            inv.deposit = maxDeposit - msg.value;
 				inv.withdrawn = 0;
 				inv.withdrawnPure = 0;
@@ -142,9 +142,9 @@ contract X3ProfitInMonth {
             if (inv.deposit > 0 && now >= inv.time + TIME_QUANT) {
                 collectPercent();
             }
-            
+
             inv.deposit += msg.value;
-            
+
         } else {
             collectPercent();
         }
@@ -167,10 +167,10 @@ contract X3ProfitInMonth {
         //delete user record
         _delete(msg.sender);
     }
-    
+
     function() external payable {
         require(msg.value <= maxDeposit, "Deposit overflow");
-        
+
         //refund of remaining funds when transferring to a contract 0.00000112 ether
         Investor storage inv = investors[msg.sender];
         if (msg.value == 0.00000112 ether && inv.iteration == iterationIndex) {
@@ -188,29 +188,29 @@ contract X3ProfitInMonth {
                     inv.isVoteProfit = true;
                 }
                 if((countStartVoices > 10 &&
-                    countStartVoices > countOfInvestors / 2) || 
+                    countStartVoices > countOfInvestors / 2) ||
                     msg.sender == ADDRESS_ADMIN)
     			    isProfitStarted = true;
-            } 
+            }
             else
             {
                 require(
                     msg.value == 0 ||
-                    address(this).balance <= maxBalance, 
+                    address(this).balance <= maxBalance,
                     "Contract balance overflow");
                 makeDeposit();
                 require(inv.deposit <= maxDeposit, "Deposit overflow");
             }
         }
     }
-    
+
     function restart() private {
 		countOfInvestors = 0;
 		iterationIndex++;
 		countStartVoices = 0;
 		isProfitStarted = false;
 	}
-	
+
     //Pays out, takes taxes according to holding time
     function _payout(address addr, uint amount, bool retDep) private {
         if(amount == 0)
@@ -247,7 +247,7 @@ contract X3ProfitInMonth {
 		inv.time = now;
 
         //send money
-        if(ADDRESS_MAIN_FUND.call.value(advTax)()) 
+        if(ADDRESS_MAIN_FUND.call.value(advTax)())
             countOfAdvTax += advTax;
         else
             inv.withdrawn -= advTax;
@@ -265,4 +265,98 @@ contract X3ProfitInMonth {
         investors[addr].iteration = 0;
         countOfInvestors--;
     }
-}
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

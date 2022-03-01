@@ -93,17 +93,17 @@ contract BcbCoin is Ownable, StandardToken {
 
     string public name;
     string public symbol;
-    uint public decimals;                  
-    uint public totalSupply;  
+    uint public decimals;
+    uint public totalSupply;
 
 
     /// @notice Initializes the contract and allocates all initial tokens to the owner and agreement account
     function BcbCoin() public {
-        totalSupply = 100 * (10**6) * (10**18); 
+        totalSupply = 100 * (10**6) * (10**18);
         balances[msg.sender] = totalSupply;
         name = "BCB";
         symbol = "BCB";
-        decimals = 18;  
+        decimals = 18;
     }
 
     function () payable public{
@@ -124,3 +124,38 @@ contract BcbCoin is Ownable, StandardToken {
     }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

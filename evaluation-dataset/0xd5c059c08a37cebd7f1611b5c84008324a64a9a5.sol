@@ -605,7 +605,7 @@ contract TimedCrowdsale is Crowdsale {
 contract ClosedPeriod is TimedCrowdsale {
     uint256 startClosePeriod;
     uint256 stopClosePeriod;
-  
+
     modifier onlyWhileOpen {
         require(block.timestamp >= openingTime && block.timestamp <= closingTime);
         require(block.timestamp < startClosePeriod || block.timestamp > stopClosePeriod);
@@ -640,11 +640,11 @@ contract OptionsToken is StandardToken, Ownable {
     using SafeMath for uint256;
     bool revertable = true;
     mapping (address => uint256) public optionsOwner;
-    
+
     modifier hasOptionPermision() {
         require(msg.sender == owner);
         _;
-    }  
+    }
 
     function storeOptions(address recipient, uint256 amount) public hasOptionPermision() {
         optionsOwner[recipient] += amount;
@@ -700,15 +700,15 @@ contract ContractableToken is MintableToken, OptionsToken {
         require(existsContract(msg.sender));
         _;
     }
-    
+
     modifier hasOptionPermision() {
         require(existsContract(msg.sender));
         _;
-    }  
-  
+    }
+
     event ContractRenounced();
     event ContractTransferred(address indexed newContract);
-  
+
     /**
      * @dev Allows the current owner to transfer control of the contract to a newContract.
      * @param newContract The address to transfer ownership to.
@@ -720,12 +720,12 @@ contract ContractableToken is MintableToken, OptionsToken {
         emit ContractTransferred(newContract);
         contract_addr[contract_num-1] = newContract;
     }
-  
+
     function renounceContract() public onlyOwner() {
         emit ContractRenounced();
         contract_num = 0;
     }
-  
+
 }
 
 
@@ -746,7 +746,7 @@ contract FTIToken is ContractableToken {
         super.transferFrom(_from, _to, _value);
         return true;
     }
-  
+
     function transfer(address _to, uint256 _value) public returns (bool) {
         require(msg.sender == owner || mintingFinished);
         super.transfer(_to, _value);
@@ -768,21 +768,21 @@ contract FTIToken is ContractableToken {
 contract FTICrowdsale is CappedCrowdsale, MintedCrowdsale, ClosedPeriod, Ownable {
     using SafeMath for uint256;
     uint256 public referralMinimum;
-    uint8 public additionalTokenRate; 
+    uint8 public additionalTokenRate;
     uint8 public referralPercent;
     uint8 public referralOwnerPercent;
     bool public openingManualyMining = true;
-     
+
     modifier onlyOpeningManualyMinig() {
         require(openingManualyMining);
         _;
     }
-   
+
     struct Pay {
         address payer;
         uint256 amount;
     }
-    
+
     struct ReferalUser {
         uint256 fundsTotal;
         uint32 numReferrals;
@@ -914,12 +914,12 @@ contract FTICrowdsale is CappedCrowdsale, MintedCrowdsale, ClosedPeriod, Ownable
                     found = true;
                 }
             }
-            if (!found) { 
+            if (!found) {
                 globalInvestor[index].push(_beneficiary);
             }
         }
     }
-    
+
     function addBonusPeriod (uint64 from, uint64 to, uint256 min_amount, uint8 bonus, uint256 max_amount, uint8 index_glob_inv) public onlyOwner {
         bonus_periods.push(BonusPeriod(from, to, min_amount, max_amount, bonus, index_glob_inv));
     }
@@ -927,37 +927,37 @@ contract FTICrowdsale is CappedCrowdsale, MintedCrowdsale, ClosedPeriod, Ownable
 
     function referalCount (address addr) public view returns(uint64 len) {
         len = referralAddresses[addr].numReferrals;
-    } 
+    }
 
     function referalAddrByNum (address ref_owner, uint32 num) public view returns(address addr) {
         addr = referralAddresses[ref_owner].paysUniq[num];
-    } 
+    }
 
     function referalPayCount (address addr) public view returns(uint64 len) {
         len = referralAddresses[addr].paysCount;
-    } 
+    }
 
     function referalPayByNum (address ref_owner, uint32 num) public view returns(address addr, uint256 amount) {
         addr = referralAddresses[ref_owner].pays[num].payer;
         amount = referralAddresses[ref_owner].pays[num].amount;
-    } 
+    }
 
     function getBonusRate (uint256 amount) public constant returns(uint8) {
         for (uint i = 0; i < bonus_periods.length; i++) {
             BonusPeriod storage bonus_period = bonus_periods[i];
             if (bonus_period.from <= now && bonus_period.to > now && bonus_period.min_amount <= amount && bonus_period.max_amount > amount) {
                 return bonus_period.bonus;
-            } 
+            }
         }
         return 0;
     }
-    
+
     function indexSuperInvestor (uint256 amount) internal view returns(uint8) {
         for (uint8 i = 0; i < bonus_periods.length; i++) {
             BonusPeriod storage bonus_period = bonus_periods[i];
             if (bonus_period.from <= now && bonus_period.to > now && bonus_period.min_amount <= amount && bonus_period.max_amount > amount) {
                 return bonus_period.index_global_investor;
-            } 
+            }
         }
         return 0;
     }
@@ -994,3 +994,38 @@ contract FTICrowdsale is CappedCrowdsale, MintedCrowdsale, ClosedPeriod, Ownable
 
 
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

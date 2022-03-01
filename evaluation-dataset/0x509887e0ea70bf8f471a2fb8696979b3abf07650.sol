@@ -72,7 +72,7 @@ library SafeMath {
 
  * token purchases and the crowdsale will assign them tokens based
 
- * on a token per ETH rate. Funds collected are forwarded 
+ * on a token per ETH rate. Funds collected are forwarded
 
  to a wallet
 
@@ -110,7 +110,7 @@ contract Crowdsale {
 
   // mapping (address => uint) public contributions;
 
-  
+
 
 
 
@@ -150,7 +150,7 @@ contract Crowdsale {
 
   function Crowdsale() {
 
-    //You will change this to your wallet where you need the ETH 
+    //You will change this to your wallet where you need the ETH
 
     wallet = 0xCEf8A431c0f0C512A587ab3f8470586c2dD1D3EB;
 
@@ -248,9 +248,9 @@ contract Crowdsale {
 
     // calculate token amount to be sent
 
-    uint256 tokens = (weiAmount) * price;//weiamount * price 
+    uint256 tokens = (weiAmount) * price;//weiamount * price
 
-    // uint256 tokens = (weiAmount/10**(18-decimals)) * price;//weiamount * price 
+    // uint256 tokens = (weiAmount/10**(18-decimals)) * price;//weiamount * price
 
 
 
@@ -258,7 +258,7 @@ contract Crowdsale {
 
     weiRaised = weiRaised.add(weiAmount);
 
-    
+
 
     // if(contributions[msg.sender].add(weiAmount)>10*10**18) throw;
 
@@ -317,3 +317,38 @@ contract Crowdsale {
   }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

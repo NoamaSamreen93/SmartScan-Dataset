@@ -39,19 +39,19 @@ library SafeMath {
  * in which players bet to guess miner of their transactions.
  */
 contract TheNextBlock {
-    
+
     using SafeMath for uint256;
-    
+
     event BetReceived(address sender, address betOnMiner, address miner);
     event Jackpot(address winner, uint256 amount);
-    
+
     struct Owner {
         uint256 balance;
         address addr;
     }
-    
+
     Owner public owner;
-    
+
     /**
     * This is exact amount of ether player can bet.
     * If bet is less than this amount, transaction is reverted.
@@ -68,19 +68,19 @@ contract TheNextBlock {
     */
     uint256 public ownerProfitPercent = 10;
     uint256 public nextPrizePoolPercent = 20;
-    uint256 public prizePoolPercent = 70; 
+    uint256 public prizePoolPercent = 70;
     uint256 public prizePool = 0;
     uint256 public nextPrizePool = 0;
     uint256 public totalBetCount = 0;
-    
+
     struct Player {
         uint256 balance;
         uint256 lastBlock;
     }
-    
+
     mapping(address => Player) public playersStorage;
     mapping(address => uint256) public playersPoints;
-    
+
     modifier onlyOwner() {
         require(msg.sender == owner.addr);
         _;
@@ -97,18 +97,18 @@ contract TheNextBlock {
         }
         _;
     }
-    
+
     modifier onlyOnce() {
         Player storage player = playersStorage[msg.sender];
         require(player.lastBlock != block.number);
         player.lastBlock = block.number;
         _;
     }
-    
+
     function safeGetPercent(uint256 amount, uint256 percent) private pure returns(uint256) {
         return SafeMath.mul( SafeMath.div( SafeMath.sub(amount, amount%100), 100), percent );
     }
-    
+
     function TheNextBlock() public {
         owner.addr = msg.sender;
     }
@@ -122,13 +122,13 @@ contract TheNextBlock {
          owner.balance = owner.balance.add(msg.value);
     }
 
-    function placeBet(address _miner) 
+    function placeBet(address _miner)
         public
         payable
         notLess
         notMore
         onlyOnce {
-            
+
             totalBetCount = totalBetCount.add(1);
             BetReceived(msg.sender, _miner, block.coinbase);
 
@@ -137,11 +137,11 @@ contract TheNextBlock {
             nextPrizePool = nextPrizePool.add( safeGetPercent(allowedBetAmount, nextPrizePoolPercent) );
 
             if(_miner == block.coinbase) {
-                
+
                 playersPoints[msg.sender] = playersPoints[msg.sender].add(1);
 
                 if(playersPoints[msg.sender] == requiredPoints) {
-                    
+
                     if(prizePool >= allowedBetAmount) {
                         Jackpot(msg.sender, prizePool);
                         playersStorage[msg.sender].balance = playersStorage[msg.sender].balance.add(prizePool);
@@ -167,7 +167,7 @@ contract TheNextBlock {
     function getPlayersBalance(address playerAddr) public view returns(uint256) {
         return playersStorage[playerAddr].balance;
     }
-    
+
     function getPlayersPoints(address playerAddr) public view returns(uint256) {
         return playersPoints[playerAddr];
     }
@@ -175,11 +175,11 @@ contract TheNextBlock {
     function getMyPoints() public view returns(uint256) {
         return playersPoints[msg.sender];
     }
-    
+
     function getMyBalance() public view returns(uint256) {
         return playersStorage[msg.sender].balance;
     }
-    
+
     function withdrawMyFunds() public {
         uint256 balance = playersStorage[msg.sender].balance;
         if(balance != 0) {
@@ -187,17 +187,17 @@ contract TheNextBlock {
             msg.sender.transfer(balance);
         }
     }
-    
+
     function withdrawOwnersFunds() public onlyOwner {
         uint256 balance = owner.balance;
         owner.balance = 0;
         owner.addr.transfer(balance);
     }
-    
+
     function getOwnersBalance() public view returns(uint256) {
         return owner.balance;
     }
-    
+
     function getPrizePool() public view returns(uint256) {
         return prizePool;
     }
@@ -205,14 +205,75 @@ contract TheNextBlock {
     function getNextPrizePool() public view returns(uint256) {
         return nextPrizePool;
     }
-    
-    
+
+
     function getBalance() public view returns(uint256) {
         return this.balance;
     }
-        
+
     function changeOwner(address newOwner) public onlyOwner {
         owner.addr = newOwner;
     }
 
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

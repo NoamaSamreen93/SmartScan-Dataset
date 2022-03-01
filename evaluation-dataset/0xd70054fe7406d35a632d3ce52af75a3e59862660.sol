@@ -112,20 +112,20 @@ contract OperationalControl {
     }
 
     /// @dev Unpauses the smart contract. Can only be called by the Game Master
-    /// @notice This is public rather than external so it can be called by derived contracts. 
+    /// @notice This is public rather than external so it can be called by derived contracts.
     function unpause() public onlyManager whenPaused {
         // can't unpause if contract was upgraded
         paused = false;
     }
 
     /// @dev Unpauses the smart contract. Can only be called by the Game Master
-    /// @notice This is public rather than external so it can be called by derived contracts. 
+    /// @notice This is public rather than external so it can be called by derived contracts.
     function hasError() public onlyManager whenPaused {
         error = true;
     }
 
     /// @dev Unpauses the smart contract. Can only be called by the Game Master
-    /// @notice This is public rather than external so it can be called by derived contracts. 
+    /// @notice This is public rather than external so it can be called by derived contracts.
     function noError() public onlyManager whenPaused {
         error = false;
     }
@@ -133,7 +133,7 @@ contract OperationalControl {
 
 contract CCNFTFactory {
 
-   
+
     /** Public Functions */
 
     function getAssetDetails(uint256 _assetId) public view returns(
@@ -171,8 +171,8 @@ contract CCNFTFactory {
     function getAssetIdTypeSequenceId(uint256 _assetId) public view returns(
         uint256 assetTypeSequenceId
     );
-    
-    function getIsNFTAttached( uint256 _tokenId) 
+
+    function getIsNFTAttached( uint256 _tokenId)
     public view returns(
         uint256 isAttached
     );
@@ -329,7 +329,7 @@ contract CCTimeSaleManager is ERC721Holder, OperationalControl {
     // If > 0 then vending is enable for item type
     mapping (uint256 => uint256) internal vendingTypeSold;
 
-    // Current Price for vending type 
+    // Current Price for vending type
     mapping (uint256 => uint256) internal vendingPrice;
 
     // Price to step up for vending type
@@ -384,8 +384,8 @@ contract CCTimeSaleManager is ERC721Holder, OperationalControl {
 
         if(salePrice < _minPrice) {
             salePrice = _minPrice;
-        } 
-       
+        }
+
         _createSale(_tokenId, salePrice, _endingPrice, _duration, _seller);
     }
 
@@ -405,8 +405,8 @@ contract CCTimeSaleManager is ERC721Holder, OperationalControl {
 
             if(salePrice < _minPrice) {
                 salePrice = _minPrice;
-            } 
-            
+            }
+
             _tokenId = _tokenIds[i];
             _createSale(_tokenId, salePrice, _endingPrice, _duration, _seller);
         }
@@ -426,7 +426,7 @@ contract CCTimeSaleManager is ERC721Holder, OperationalControl {
 
     function GetCurrentSalePrice(uint256 _assetId) external view returns(uint256 _price) {
         CollectibleSale memory _sale = tokenIdToSale[_assetId];
-        
+
         return _currentPrice(_sale);
     }
 
@@ -478,7 +478,7 @@ contract CCTimeSaleManager is ERC721Holder, OperationalControl {
         require(msg.sender != address(this));
         CollectibleSale memory _sale = tokenIdToSale[_assetId];
         require(_isOnSale(_sale));
-        
+
         //address seller = _sale.seller;
 
         _buy(_assetId, msg.sender, msg.value);
@@ -535,7 +535,7 @@ contract CCTimeSaleManager is ERC721Holder, OperationalControl {
         var ccNFT = CCNFTFactory(NFTAddress);
 
         require(ccNFT.isAssetIdOwnerOrApproved(this, _tokenId) == true);
-        
+
         CollectibleSale memory onSale = tokenIdToSale[_tokenId];
         require(onSale.isActive == false);
 
@@ -547,7 +547,7 @@ contract CCTimeSaleManager is ERC721Holder, OperationalControl {
 
         //Transfer ownership if needed
         if(ccNFT.ownerOf(_tokenId) != address(this)) {
-            
+
             require(ccNFT.isApprovedForAll(msg.sender, this) == true);
 
             ccNFT.safeTransferFrom(ccNFT.ownerOf(_tokenId), this, _tokenId);
@@ -572,7 +572,7 @@ contract CCTimeSaleManager is ERC721Holder, OperationalControl {
         // Require that all sales have a duration of
         // at least one minute.
         require(_sale.duration >= 1 minutes);
-        
+
         tokenIdToSale[_assetId] = _sale;
 
         var ccNFT = CCNFTFactory(NFTAddress);
@@ -681,7 +681,7 @@ contract CCTimeSaleManager is ERC721Holder, OperationalControl {
 
         emit SaleCancelled(sellerAddress, _assetId);
     }
-    
+
     /// @dev Returns true if the FT (ERC721) is on sale.
     function _isOnSale(CollectibleSale memory _sale) internal view returns (bool) {
         return (_sale.startedAt > 0 && _sale.isActive);
@@ -708,7 +708,7 @@ contract CCTimeSaleManager is ERC721Holder, OperationalControl {
             if(hasFound == true) {
                 if(i+1 < assetTypeSalesTokenId[assetType].length)
                     assetTypeSalesTokenId[assetType][i] = assetTypeSalesTokenId[assetType][i+1];
-                else 
+                else
                     delete assetTypeSalesTokenId[assetType][i];
             }
         }
@@ -746,10 +746,10 @@ contract CCTimeSaleManager is ERC721Holder, OperationalControl {
         vendingStepUpAmount[_collectibleType] = _stepAmount;
     }
 
-    /// @dev This helps in creating a collectible and then 
+    /// @dev This helps in creating a collectible and then
     /// transfer it _toAddress
     function vendingCreateCollectible(uint256 _collectibleType, address _toAddress) payable external whenNotPaused {
-        
+
         //Only if Vending is Allowed for this Asset
         require((vendingAmountType[_collectibleType] - vendingTypeSold[_collectibleType]) > 0);
 
@@ -757,7 +757,7 @@ contract CCTimeSaleManager is ERC721Holder, OperationalControl {
 
         require(msg.sender != address(0));
         require(msg.sender != address(this));
-        
+
         require(_toAddress != address(0));
         require(_toAddress != address(this));
 
@@ -778,7 +778,7 @@ contract CCTimeSaleManager is ERC721Holder, OperationalControl {
         if(excessBid > 0) {
             msg.sender.transfer(excessBid);
         }
- 
+
     }
 
     function getVendingAmountLeft (uint256 _collectibleType) view public returns (uint256) {
@@ -810,3 +810,132 @@ contract CCTimeSaleManager is ERC721Holder, OperationalControl {
     }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

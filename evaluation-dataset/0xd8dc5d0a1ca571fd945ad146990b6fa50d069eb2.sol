@@ -102,11 +102,11 @@ contract Whitelist is Ownable {
     */
     event Disapproved(address indexed investor);
 
-    constructor(address _owner) 
-        public 
-        Ownable(_owner) 
+    constructor(address _owner)
+        public
+        Ownable(_owner)
     {
-        
+
     }
 
     /** @param _investor the address of investor to be checked
@@ -383,9 +383,9 @@ contract MintableToken is StandardToken, Ownable {
         _;
     }
 
-    constructor(address _owner) 
-        public 
-        Ownable(_owner) 
+    constructor(address _owner)
+        public
+        Ownable(_owner)
     {
 
     }
@@ -539,8 +539,8 @@ contract CompliantToken is Validator, DetailedERC20, MintableToken {
       */
     constructor(
         address _owner,
-        string _name, 
-        string _symbol, 
+        string _name,
+        string _symbol,
         uint8 _decimals,
         address whitelistAddress,
         address recipient,
@@ -648,7 +648,7 @@ contract CompliantToken is Validator, DetailedERC20, MintableToken {
       * @param _value amount of tokens to be transferred
       */
     function transferFrom(address _from, address _to, uint256 _value)
-        public 
+        public
         checkIsInvestorApproved(_from)
         checkIsInvestorApproved(_to)
         checkIsValueValid(_value)
@@ -656,7 +656,7 @@ contract CompliantToken is Validator, DetailedERC20, MintableToken {
     {
         uint256 allowedTransferAmount = allowed[_from][msg.sender];
         uint256 pendingAmount = pendingApprovalAmount[_from][msg.sender];
-        
+
         if (_from == feeRecipient) {
             require(_value.add(pendingAmount) <= balances[_from]);
             require(_value.add(pendingAmount) <= allowedTransferAmount);
@@ -685,13 +685,13 @@ contract CompliantToken is Validator, DetailedERC20, MintableToken {
       * @param nonce request recorded at this particular nonce
       */
     function approveTransfer(uint256 nonce)
-        external 
-        onlyValidator 
+        external
+        onlyValidator
         checkIsInvestorApproved(pendingTransactions[nonce].from)
         checkIsInvestorApproved(pendingTransactions[nonce].to)
         checkIsValueValid(pendingTransactions[nonce].value)
         returns (bool)
-    {   
+    {
         address from = pendingTransactions[nonce].from;
         address spender = pendingTransactions[nonce].spender;
         address to = pendingTransactions[nonce].to;
@@ -711,7 +711,7 @@ contract CompliantToken is Validator, DetailedERC20, MintableToken {
 
             if (spender != address(0)) {
                 allowedTransferAmount = allowedTransferAmount.sub(value);
-            } 
+            }
             pendingAmount = pendingAmount.sub(value);
 
         } else {
@@ -737,7 +737,7 @@ contract CompliantToken is Validator, DetailedERC20, MintableToken {
             to,
             value
         );
-        
+
         balances[from] = balanceFrom;
         balances[to] = balanceTo;
         allowed[from][spender] = allowedTransferAmount;
@@ -750,10 +750,10 @@ contract CompliantToken is Validator, DetailedERC20, MintableToken {
       * @param reason reason for rejection
       */
     function rejectTransfer(uint256 nonce, uint256 reason)
-        external 
+        external
         onlyValidator
         checkIsAddressValid(pendingTransactions[nonce].from)
-    {        
+    {
         address from = pendingTransactions[nonce].from;
         address spender = pendingTransactions[nonce].spender;
 
@@ -764,7 +764,7 @@ contract CompliantToken is Validator, DetailedERC20, MintableToken {
             pendingApprovalAmount[from][spender] = pendingApprovalAmount[from][spender]
                 .sub(pendingTransactions[nonce].value).sub(pendingTransactions[nonce].fee);
         }
-        
+
         emit TransferRejected(
             from,
             pendingTransactions[nonce].to,
@@ -772,7 +772,136 @@ contract CompliantToken is Validator, DetailedERC20, MintableToken {
             nonce,
             reason
         );
-        
+
         delete pendingTransactions[nonce];
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

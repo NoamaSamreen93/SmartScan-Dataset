@@ -2,15 +2,15 @@ pragma solidity ^0.4.24;
 
 
 /**
- * 
+ *
  * Author: Ace Casino
- * 
+ *
  * Token Details:-
  * Name: Ace Casino
  * Symbol: CASI
  * Decimals: 8
  * Total Supply: 2 Billion
- * 
+ *
  */
 
 
@@ -35,8 +35,8 @@ library SafeMath {
     assert(c / a == b);
     return c;
   }
-  
-  
+
+
 
   /**
   * @dev Integer division of two numbers, truncating the quotient.
@@ -121,7 +121,7 @@ contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
 
   mapping(address => uint256) balances;
-  
+
   mapping (address => bool) public frozenAccount;
 
   /* This generates a public event on the blockchain that will notify clients */
@@ -137,7 +137,7 @@ contract BasicToken is ERC20Basic {
         frozenAccount[target] = freeze;
         emit FrozenFunds(target, freeze);
     }
-    
+
    /**
      * @param addresses Addresses to be frozen
      * @param freeze either to freeze it or not
@@ -149,7 +149,7 @@ contract BasicToken is ERC20Basic {
         emit FrozenFunds(addresses[i], freeze[i]);
        }
     }
-    
+
   /**
   * @dev transfer token for a specified address
   * @param _to The address to transfer to.
@@ -157,7 +157,7 @@ contract BasicToken is ERC20Basic {
   */
   function transfer(address _to, uint256 _value)public returns (bool) {
     require(!frozenAccount[msg.sender]);
-    
+
     balances[msg.sender] = balances[msg.sender].sub(_value);
     balances[_to] = balances[_to].add(_value);
     emit Transfer(msg.sender, _to, _value);
@@ -332,7 +332,42 @@ contract AceCasinoToken is StandardToken {
     totalSupply = INITIAL_SUPPLY;
     balances[msg.sender] = INITIAL_SUPPLY;
   }
-  
 
 
+
+}
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
 }

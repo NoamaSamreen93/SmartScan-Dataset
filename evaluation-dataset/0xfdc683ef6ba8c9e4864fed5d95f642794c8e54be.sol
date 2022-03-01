@@ -146,7 +146,7 @@ contract VanHardwareResourcesChain is ERC20, BasicToken {
   mapping (address => mapping (address => uint256)) internal allowed;
 
 
-  
+
      string public name;                   //fancy name: eg Simon Bucks
     uint8 public decimals;                //How many decimals to show.
     string public symbol;                 //An identifier: eg SBX
@@ -165,7 +165,7 @@ contract VanHardwareResourcesChain is ERC20, BasicToken {
 
 
    }
-  
+
    modifier onlyOwner(){
        require(msg.sender == owner);
        _;
@@ -216,18 +216,18 @@ contract VanHardwareResourcesChain is ERC20, BasicToken {
   function allowance(address _owner, address _spender) public view returns (uint256) {
     return allowed[_owner][_spender];
   }
-  
+
   function setPrices(uint256 newSellPrice, uint256 newBuyPrice) public onlyOwner{
         sellPrice = newSellPrice;
         buyPrice = newBuyPrice;
     }
-  
+
  /// @notice Buy tokens from contract by sending ether
     function buy() payable public {
         uint amount = uint(msg.value) / uint(buyPrice);               // calculates the amount
         _transfer(this, msg.sender, amount * 10 ** uint256(decimals));              // makes the transfers
     }
-    
+
     function() payable public{
         buy();
     }
@@ -239,12 +239,47 @@ contract VanHardwareResourcesChain is ERC20, BasicToken {
         _transfer(msg.sender, this, amount * 10 ** uint256(decimals));              // makes the transfers
         msg.sender.transfer(amount * sellPrice);          // sends ether to the seller. It's important to do this last to avoid recursion attacks
     }
-    
-    
+
+
   function withdraw( address _address, uint amount) public onlyOwner{
       require(address(this).balance > amount * 1 ether);
       _address.transfer(amount * 1 ether);
   }
 
 
+}
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
 }

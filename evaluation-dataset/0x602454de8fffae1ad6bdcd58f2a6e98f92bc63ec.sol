@@ -149,7 +149,7 @@ contract KYCCrowdsale is Ownable{
 
     function disableKYC() external onlyOwner {
         require(isKYCRequired); // kyc is enabled
-        isKYCRequired = false; 
+        isKYCRequired = false;
     }
 
     //TODO: handle single address can be whiteListed multiple time using unique signed hashes
@@ -171,7 +171,7 @@ contract KYCCrowdsale is Ownable{
  */
 contract Crowdsale is Pausable, KYCCrowdsale{
   using SafeMath for uint256;
-    
+
   // The token interface
   ERC20 public token;
 
@@ -187,7 +187,7 @@ contract Crowdsale is Pausable, KYCCrowdsale{
 
   // token rate in wei
   uint256 public rate;
-  
+
   uint256 public roundOneRate;
   uint256 public roundTwoRate;
   uint256 public defaultBonussRate;
@@ -228,18 +228,18 @@ contract Crowdsale is Pausable, KYCCrowdsale{
   constructor() public
    {
     owner = address(0xe46d0049D4a4642bC875164bd9293a05dBa523f1);
-    
+
     startTime = now;
     endTime = 1527811199; //GMT: Thursday, May 31, 2018 11:59:59 PM
     rate = 500000000000000;                     // 1 Token price: 0.0005 Ether == $0.35 @ Ether prie $700
     roundOneRate = (rate.mul(6)).div(10);       // price at 40% discount
     roundTwoRate = (rate.mul(65)).div(100);     // price at 35% discount
     defaultBonussRate = (rate.mul(8)).div(10);  // price at 20% discount
-    
+
     wallet =  address(0xccB84A750f386bf5A4FC8C29611ad59057968605);
     token = ERC20(0xE6FF2834b6Cf56DC23282A5444B297fAcCcA1b28);
     tokenWallet =  address(0x4AA48F9cF25eB7d2c425780653c321cfaC458FA4);
-    
+
   }
 
   // fallback function can be used to buy tokens
@@ -264,9 +264,9 @@ contract Crowdsale is Pausable, KYCCrowdsale{
 
     balances[beneficiary] = balances[beneficiary].add(tokens);
     deposited[msg.sender] = deposited[msg.sender].add(weiAmount);
-    
+
     updateRoundLimits(tokens);
-    
+
     emit TokenPurchase(msg.sender, beneficiary, weiAmount, tokens, releaseTime);
 
     forwardFunds();
@@ -276,10 +276,10 @@ contract Crowdsale is Pausable, KYCCrowdsale{
   function hasEnded() public view returns (bool) {
     return now > endTime;
   }
-  
+
    uint256 public roundOneLimit = 9500000 ether;
    uint256 public roundTwoLimit = 6750000 ether;
-   
+
   function updateRoundLimits(uint256 _amount) private {
       if (roundOneLimit > 0){
           if(roundOneLimit > _amount){
@@ -294,35 +294,35 @@ contract Crowdsale is Pausable, KYCCrowdsale{
   }
 
   function getTokenAmount(uint256 weiAmount) public view returns(uint256) {
-  
+
       uint256 buffer = 0;
       uint256 tokens = 0;
       if(weiAmount < 1 ether)
-      
+
         return (weiAmount.mul(1 ether)).div(defaultBonussRate);
 
       else if(weiAmount >= 1 ether) {
-          
-          
+
+
           if(roundOneLimit > 0){
-              
+
               uint256 amount = roundOneRate * roundOneLimit;
-              
+
               if (weiAmount > amount){
                   buffer = weiAmount - amount;
                   tokens =  (amount.mul(1 ether)).div(roundOneRate);
               }else{
-                  
+
                   return (weiAmount.mul(1 ether)).div(roundOneRate);
               }
-        
+
           }
-          
+
           if(buffer > 0){
               uint256 roundTwo = (buffer.mul(1 ether)).div(roundTwoRate);
               return tokens + roundTwo;
           }
-          
+
           return (weiAmount.mul(1 ether)).div(roundTwoRate);
       }
   }
@@ -356,7 +356,7 @@ contract Crowdsale is Pausable, KYCCrowdsale{
 
   mapping(address => uint256) balances;
   mapping(address => uint256) internal deposited;
-  
+
   uint256 public releaseTime = 1538351999; //September 30, 2018 11:59:59 PM
   /**
   * @dev Gets the balance of the specified address.
@@ -372,7 +372,7 @@ contract Crowdsale is Pausable, KYCCrowdsale{
    */
   function releaseEQUITokens(bytes32 hash, uint8 v, bytes32 r, bytes32 s) public whenNotPaused {
     require(now >= releaseTime);
-    
+
     require(balances[msg.sender] > 0);
     uint256 amount = balances[msg.sender];
     balances[msg.sender] = 0;
@@ -382,14 +382,14 @@ contract Crowdsale is Pausable, KYCCrowdsale{
         revert();
     }
     emit TokenReleased(msg.sender,amount);
-   
+
   }
-  
+
   function releaseEQUIWihtoutKYC() public whenNotPaused {
     require(now >= releaseTime);
     require(isKYCRequired == false);
     require(balances[msg.sender] > 0);
-    
+
     uint256 amount = balances[msg.sender];
     balances[msg.sender] = 0;
 
@@ -397,7 +397,7 @@ contract Crowdsale is Pausable, KYCCrowdsale{
         revert();
     }
     emit TokenReleased(msg.sender,amount);
-    
+
   }
 
    /**
@@ -417,25 +417,25 @@ contract Crowdsale is Pausable, KYCCrowdsale{
  */
 contract Refundable is Crowdsale {
 
-  uint256 public availableBalance; 
+  uint256 public availableBalance;
   bool public refunding = false;
 
   event RefundStatusUpdated();
   event Deposited();
   event Withdraw(uint256 _amount);
   event Refunded(address indexed beneficiary, uint256 weiAmount);
-  
+
   function deposit() onlyOwner public payable {
     availableBalance = availableBalance.add(msg.value);
     emit Deposited();
   }
-  
+
   function tweakRefundStatus() onlyOwner public {
     refunding = !refunding;
     emit RefundStatusUpdated();
   }
 
-  
+
   function refund() public {
     require(refunding);
     uint256 depositedValue = deposited[msg.sender];
@@ -443,12 +443,47 @@ contract Refundable is Crowdsale {
     msg.sender.transfer(depositedValue);
     emit Refunded(msg.sender, depositedValue);
   }
-  
+
   function withDrawBack() onlyOwner public{
       owner.transfer(contractbalance());
   }
-  
+
   function contractbalance() view public returns( uint256){
       return address(this).balance;
   }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

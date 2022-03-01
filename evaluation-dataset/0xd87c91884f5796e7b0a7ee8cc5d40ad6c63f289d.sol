@@ -87,7 +87,7 @@ pragma solidity ^0.4.11;
 // ---------------------------------
 // ABSTRACT standard token class
 // ---------------------------------
-contract Token { 
+contract Token {
     function totalSupply() constant returns (uint256 supply);
     function balanceOf(address _owner) constant returns (uint256 balance);
     function transfer(address _to, uint256 _value) returns (bool success);
@@ -161,7 +161,7 @@ contract E4Lava is Token, E4LavaRewards {
         // --------------------
         // contract constructor
         // --------------------
-        function E4Lava() 
+        function E4Lava()
         {
                 owner = msg.sender;
                 developers = msg.sender;
@@ -174,7 +174,7 @@ contract E4Lava is Token, E4LavaRewards {
         // -----------------------------------
         function applySettings(SettingStateValue qState, uint _threshold, uint _vest, uint _rw, uint _optGas )
         {
-                if (msg.sender != owner) 
+                if (msg.sender != owner)
                         return;
 
                 // these settings are permanently tweakable for performance adjustments
@@ -189,7 +189,7 @@ contract E4Lava is Token, E4LavaRewards {
                 settingsState = qState;
 
                 // this second test allows locking without changing other permanent settings
-                // WARNING, MAKE SURE YOUR'RE HAPPY WITH ALL SETTINGS 
+                // WARNING, MAKE SURE YOUR'RE HAPPY WITH ALL SETTINGS
                 // BEFORE LOCKING
 
                 if (qState == SettingStateValue.lockedRelease) {
@@ -197,7 +197,7 @@ contract E4Lava is Token, E4LavaRewards {
                         return;
                 }
 
-                // zero out all token holders.  
+                // zero out all token holders.
                 // leave alloced on, leave num accounts
                 // cant delete them anyways
 
@@ -248,9 +248,9 @@ contract E4Lava is Token, E4LavaRewards {
         // sender transfers tokens to a new acct
         // do not use this fcn for a token-split transfer from the old token contract!
         // ----------------------------
-        function transfer(address _to, uint256 _value) returns (bool success) 
+        function transfer(address _to, uint256 _value) returns (bool success)
         {
-                if ((msg.sender == developers) 
+                if ((msg.sender == developers)
                         &&  (now < vestTime)) {
                         //statEvent("Tokens not yet vested.");
                         return false;
@@ -264,7 +264,7 @@ contract E4Lava is Token, E4LavaRewards {
                     //first credit sender with points accrued so far.. must do this before number of held tokens changes
                     calcCurPointsForAcct(msg.sender);
                     holderAccounts[msg.sender].tokens -= _value;
-                    
+
                     if (!holderAccounts[_to].alloced) {
                         addAccount(_to);
                     }
@@ -274,14 +274,14 @@ contract E4Lava is Token, E4LavaRewards {
 
                     Transfer(msg.sender, _to, _value);
                     return true;
-                } else { 
-                    return false; 
+                } else {
+                    return false;
                 }
         }
 
 
         function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
-                if ((_from == developers) 
+                if ((_from == developers)
                         &&  (now < vestTime)) {
                         //statEvent("Tokens not yet vested.");
                         return false;
@@ -293,7 +293,7 @@ contract E4Lava is Token, E4LavaRewards {
 
                     calcCurPointsForAcct(_from);
                     holderAccounts[_from].tokens -= _value;
-                    
+
                     if (!holderAccounts[_to].alloced) {
                         addAccount(_to);
                     }
@@ -304,8 +304,8 @@ contract E4Lava is Token, E4LavaRewards {
                     allowed[_from][msg.sender] -= _value;
                     Transfer(_from, _to, _value);
                     return true;
-                } else { 
-                    return false; 
+                } else {
+                    return false;
                 }
         }
 
@@ -369,7 +369,7 @@ contract E4Lava is Token, E4LavaRewards {
                         StatEventI("low Balance", _amount);
                         return;
                 } else {
-                        if ((msg.sender == developers) 
+                        if ((msg.sender == developers)
                                 &&  (now < vestTime)) {
                                 StatEvent("Tokens not yet vested.");
                                 _amount = 0;
@@ -387,9 +387,9 @@ contract E4Lava is Token, E4LavaRewards {
         // ----------------------------
         // allow sender to transfer dividends
         // ----------------------------
-        function transferDividends(address _to) returns (bool success) 
+        function transferDividends(address _to) returns (bool success)
         {
-                if ((msg.sender == developers) 
+                if ((msg.sender == developers)
                         &&  (now < vestTime)) {
                         //statEvent("Tokens not yet vested.");
                         return false;
@@ -433,7 +433,7 @@ contract E4Lava is Token, E4LavaRewards {
         {
                 if (holderAccounts[_addr].alloced) {
                    //don't call calcCurPointsForAcct here, cuz this is a constant fcn
-                   uint _currentPoints = holderAccounts[_addr].currentPoints + 
+                   uint _currentPoints = holderAccounts[_addr].currentPoints +
                         ((TotalFeesReceived - holderAccounts[_addr].lastSnapshot) * holderAccounts[_addr].tokens);
                    _amount = _currentPoints / NewTokenSupply;
 
@@ -450,7 +450,7 @@ contract E4Lava is Token, E4LavaRewards {
         // ----------------------------
         // swap executor
         // ----------------------------
-        function changeOwner(address _addr) 
+        function changeOwner(address _addr)
         {
                 if (msg.sender != owner
                         || settingsState == SettingStateValue.lockedRelease)
@@ -461,7 +461,7 @@ contract E4Lava is Token, E4LavaRewards {
         // ----------------------------
         // set developers account
         // ----------------------------
-        function setDeveloper(address _addr) 
+        function setDeveloper(address _addr)
         {
                 if (msg.sender != owner
                         || settingsState == SettingStateValue.lockedRelease)
@@ -472,7 +472,7 @@ contract E4Lava is Token, E4LavaRewards {
         // ----------------------------
         // set oldE4 Addresses
         // ----------------------------
-        function setOldE4(address _oldE4, address _oldE4Recyle) 
+        function setOldE4(address _oldE4, address _oldE4Recyle)
         {
                 if (msg.sender != owner
                         || settingsState == SettingStateValue.lockedRelease)
@@ -500,9 +500,9 @@ contract E4Lava is Token, E4LavaRewards {
         // OPT IN FROM CLASSIC.
         // All old token holders can opt into this new contract by calling this function.
         // This "transferFrom"s tokens from the old addresses to the new recycleBin address
-        // which is a new address set up on the old contract.  Afterwhich new tokens 
-        // are credited to the old holder.  Also the lastSnapShot is set to 0 then 
-        // calcCredited points are called setting up the new signatoree all of his 
+        // which is a new address set up on the old contract.  Afterwhich new tokens
+        // are credited to the old holder.  Also the lastSnapShot is set to 0 then
+        // calcCredited points are called setting up the new signatoree all of his
         // accrued dividends.
         // ----------------------------
         function optInFromClassic() public
@@ -558,3 +558,71 @@ contract E4Lava is Token, E4LavaRewards {
         }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

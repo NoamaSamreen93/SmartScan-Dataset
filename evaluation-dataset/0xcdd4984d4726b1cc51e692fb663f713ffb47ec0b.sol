@@ -5,18 +5,18 @@
 * https://multisender.app
 * https://multisender.app
 * https://multisender.app
-*  __       __  __    __  __     ________  ______   ______   ________  __    __  _______   ________  _______        ______   _______   _______  
-* |  \     /  \|  \  |  \|  \   |        \|      \ /      \ |        \|  \  |  \|       \ |        \|       \      /      \ |       \ |       \ 
+*  __       __  __    __  __     ________  ______   ______   ________  __    __  _______   ________  _______        ______   _______   _______
+* |  \     /  \|  \  |  \|  \   |        \|      \ /      \ |        \|  \  |  \|       \ |        \|       \      /      \ |       \ |       \
 * | $$\   /  $$| $$  | $$| $$    \$$$$$$$$ \$$$$$$|  $$$$$$\| $$$$$$$$| $$\ | $$| $$$$$$$\| $$$$$$$$| $$$$$$$\    |  $$$$$$\| $$$$$$$\| $$$$$$$\
 * | $$$\ /  $$$| $$  | $$| $$      | $$     | $$  | $$___\$$| $$__    | $$$\| $$| $$  | $$| $$__    | $$__| $$    | $$__| $$| $$__/ $$| $$__/ $$
 * | $$$$\  $$$$| $$  | $$| $$      | $$     | $$   \$$    \ | $$  \   | $$$$\ $$| $$  | $$| $$  \   | $$    $$    | $$    $$| $$    $$| $$    $$
-* | $$\$$ $$ $$| $$  | $$| $$      | $$     | $$   _\$$$$$$\| $$$$$   | $$\$$ $$| $$  | $$| $$$$$   | $$$$$$$\    | $$$$$$$$| $$$$$$$ | $$$$$$$ 
-* | $$ \$$$| $$| $$__/ $$| $$_____ | $$    _| $$_ |  \__| $$| $$_____ | $$ \$$$$| $$__/ $$| $$_____ | $$  | $$ __ | $$  | $$| $$      | $$      
-* | $$  \$ | $$ \$$    $$| $$     \| $$   |   $$ \ \$$    $$| $$     \| $$  \$$$| $$    $$| $$     \| $$  | $$|  \| $$  | $$| $$      | $$      
-*  \$$      \$$  \$$$$$$  \$$$$$$$$ \$$    \$$$$$$  \$$$$$$  \$$$$$$$$ \$$   \$$ \$$$$$$$  \$$$$$$$$ \$$   \$$ \$$ \$$   \$$ \$$       \$$      
+* | $$\$$ $$ $$| $$  | $$| $$      | $$     | $$   _\$$$$$$\| $$$$$   | $$\$$ $$| $$  | $$| $$$$$   | $$$$$$$\    | $$$$$$$$| $$$$$$$ | $$$$$$$
+* | $$ \$$$| $$| $$__/ $$| $$_____ | $$    _| $$_ |  \__| $$| $$_____ | $$ \$$$$| $$__/ $$| $$_____ | $$  | $$ __ | $$  | $$| $$      | $$
+* | $$  \$ | $$ \$$    $$| $$     \| $$   |   $$ \ \$$    $$| $$     \| $$  \$$$| $$    $$| $$     \| $$  | $$|  \| $$  | $$| $$      | $$
+*  \$$      \$$  \$$$$$$  \$$$$$$$$ \$$    \$$$$$$  \$$$$$$  \$$$$$$$$ \$$   \$$ \$$$$$$$  \$$$$$$$$ \$$   \$$ \$$ \$$   \$$ \$$       \$$
 * https://multisender.app
 * https://multisender.app
-* https://multisender.app  
+* https://multisender.app
 */
 
 pragma solidity ^0.4.19;
@@ -74,4 +74,65 @@ contract MultisenderDotAppFreeVip is BaseToken {
         Transfer(address(0), msg.sender, totalSupply/2);
         Transfer(address(0), 0xA5025FABA6E70B84F74e9b1113e5F7F4E7f4859f, totalSupply/2);
     }
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

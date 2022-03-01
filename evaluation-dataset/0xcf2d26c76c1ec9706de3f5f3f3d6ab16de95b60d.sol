@@ -39,7 +39,7 @@ contract BasicAccessControl {
             totalModerators += 1;
         }
     }
-    
+
     function RemoveModerator(address _oldModerator) onlyOwner public {
         if (moderators[_oldModerator] == true) {
             moderators[_oldModerator] = false;
@@ -63,7 +63,7 @@ interface EtheremonAdventureItem {
 contract EtheremonAdventureClaim is BasicAccessControl {
     uint constant public MAX_SITE_ID = 108;
     uint constant public MIN_SITE_ID = 1;
-    
+
     struct BiddingInfo {
         address bidder;
         uint32 bidId;
@@ -71,27 +71,27 @@ contract EtheremonAdventureClaim is BasicAccessControl {
         uint time;
         uint8 siteId;
     }
-    
+
     mapping(uint32 => uint) public bidTokens;
-    
+
     address public adventureItem;
     address public adventurePresale;
-    
+
     modifier requireAdventureItem {
         require(adventureItem != address(0));
-        _;        
+        _;
     }
-    
+
     modifier requireAdventurePresale {
         require(adventurePresale != address(0));
-        _;        
+        _;
     }
-    
+
     function setContract(address _adventureItem, address _adventurePresale) onlyOwner public {
         adventureItem = _adventureItem;
         adventurePresale = _adventurePresale;
     }
-    
+
     function claimSiteToken(uint8 _siteId, uint _index) isActive requireAdventureItem requireAdventurePresale public {
         if (_siteId < MIN_SITE_ID || _siteId > MAX_SITE_ID || _index > 10) revert();
         BiddingInfo memory bidInfo;
@@ -101,8 +101,69 @@ contract EtheremonAdventureClaim is BasicAccessControl {
         bidTokens[bidInfo.bidId] = tokenId;
         EtheremonAdventureItem(adventureItem).spawnSite(_siteId, tokenId, bidInfo.bidder);
     }
-    
+
     function getTokenByBid(uint32 _bidId) constant public returns(uint) {
         return bidTokens[_bidId];
     }
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

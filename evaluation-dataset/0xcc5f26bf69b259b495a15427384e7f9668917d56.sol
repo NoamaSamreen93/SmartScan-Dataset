@@ -224,9 +224,9 @@ contract Ownable {
  */
 
 contract MintableToken is StandardToken, Ownable {
-    
+
   event Mint(address indexed to, uint256 amount);
-  
+
   event MintFinished();
 
   bool public mintingFinished = false;
@@ -257,7 +257,7 @@ contract MintableToken is StandardToken, Ownable {
     return true;
   }
 
-  
+
 }
 
 /**
@@ -304,12 +304,12 @@ contract Pausable is Ownable {
   }
 }
 
-contract VestarinToken is MintableToken {	
-    
+contract VestarinToken is MintableToken {
+
   string public constant name = "Vestarin";
-   
+
   string public constant symbol = "VST";
-    
+
   uint32 public constant decimals = 18;
 
   mapping (address => uint) public locked;
@@ -323,7 +323,7 @@ contract VestarinToken is MintableToken {
     require(locked[_from] < now);
     return super.transferFrom(_from, _to, _value);
   }
-  
+
   function lock(address addr, uint periodInDays) public {
     require(locked[addr] < now && (msg.sender == saleAgent || msg.sender == addr));
     locked[addr] = now + periodInDays * 1 days;
@@ -347,7 +347,7 @@ contract StagedCrowdsale is Pausable {
   uint public period;
 
   uint public totalHardcap;
- 
+
   uint public totalInvested;
 
   Stage[] public stages;
@@ -374,7 +374,7 @@ contract StagedCrowdsale is Pausable {
   function removeStage(uint8 number) public onlyOwner {
     require(number >=0 && number < stages.length);
     Stage storage stage = stages[number];
-    totalHardcap = totalHardcap.sub(stage.hardcap);    
+    totalHardcap = totalHardcap.sub(stage.hardcap);
     delete stages[number];
     for (uint i = number; i < stages.length - 1; i++) {
       stages[i] = stages[i+1];
@@ -385,10 +385,10 @@ contract StagedCrowdsale is Pausable {
   function changeStage(uint8 number, uint hardcap, uint price) public onlyOwner {
     require(number >= 0 &&number < stages.length);
     Stage storage stage = stages[number];
-    totalHardcap = totalHardcap.sub(stage.hardcap);    
+    totalHardcap = totalHardcap.sub(stage.hardcap);
     stage.hardcap = hardcap.mul(1 ether);
     stage.price = price;
-    totalHardcap = totalHardcap.add(stage.hardcap);    
+    totalHardcap = totalHardcap.add(stage.hardcap);
   }
 
   function insertStage(uint8 numberAfter, uint hardcap, uint price) public onlyOwner {
@@ -418,7 +418,7 @@ contract StagedCrowdsale is Pausable {
     require(stages.length > 0 && now >= start && now < lastSaleDate());
     _;
   }
-  
+
   modifier isUnderHardcap() {
     require(totalInvested <= totalHardcap);
     _;
@@ -440,7 +440,7 @@ contract CommonSale is StagedCrowdsale {
   address public masterWallet;
 
   address public slaveWallet;
-  
+
   address public directMintAgent;
 
   uint public slaveWalletPercent = 30;
@@ -450,22 +450,22 @@ contract CommonSale is StagedCrowdsale {
   uint public minPrice;
 
   uint public totalTokensMinted;
-  
+
   bool public slaveWalletInitialized;
-  
+
   bool public slaveWalletPercentInitialized;
 
   VestarinToken public token;
-  
+
   modifier onlyDirectMintAgentOrOwner() {
     require(directMintAgent == msg.sender || owner == msg.sender);
     _;
   }
-  
+
   function setDirectMintAgent(address newDirectMintAgent) public onlyOwner {
     directMintAgent = newDirectMintAgent;
   }
-  
+
   function setMinPrice(uint newMinPrice) public onlyOwner {
     minPrice = newMinPrice;
   }
@@ -485,7 +485,7 @@ contract CommonSale is StagedCrowdsale {
     slaveWallet = newSlaveWallet;
     slaveWalletInitialized = true;
   }
-  
+
   function setToken(address newToken) public onlyOwner {
     token = VestarinToken(newToken);
   }
@@ -520,7 +520,7 @@ contract CommonSale is StagedCrowdsale {
   function() external payable {
     createTokens();
   }
-  
+
   function retrieveTokens(address anotherToken, address to) public onlyOwner {
     ERC20 alienToken = ERC20(anotherToken);
     alienToken.transfer(to, alienToken.balanceOf(this));
@@ -551,13 +551,13 @@ contract Presale is CommonSale {
 contract Mainsale is CommonSale {
 
   address public foundersTokensWallet;
-  
+
   address public bountyTokensWallet;
-  
+
   uint public foundersTokensPercent;
-  
+
   uint public bountyTokensPercent;
-  
+
   uint public lockPeriod;
 
   function setLockPeriod(uint newLockPeriod) public onlyOwner {
@@ -600,7 +600,7 @@ contract Mainsale is CommonSale {
 
 contract TestConfigurator is Ownable {
 
-  VestarinToken public token; 
+  VestarinToken public token;
 
   Presale public presale;
 
@@ -621,7 +621,7 @@ contract TestConfigurator is Ownable {
     presale.setStart(1510704000);
     presale.setPeriod(1);
     presale.setMinPrice(100000000000000000);
-    token.setSaleAgent(presale);	
+    token.setSaleAgent(presale);
 
     mainsale = new Mainsale();
 
@@ -651,7 +651,7 @@ contract TestConfigurator is Ownable {
 
 contract Configurator is Ownable {
 
-  VestarinToken public token; 
+  VestarinToken public token;
 
   Presale public presale;
 
@@ -672,7 +672,7 @@ contract Configurator is Ownable {
     presale.setStart(1517317200);
     presale.setPeriod(30);
     presale.setMinPrice(100000000000000000);
-    token.setSaleAgent(presale);	
+    token.setSaleAgent(presale);
 
     mainsale = new Mainsale();
 
@@ -702,4 +702,98 @@ contract Configurator is Ownable {
     mainsale.transferOwnership(owner);
   }
 
-}
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

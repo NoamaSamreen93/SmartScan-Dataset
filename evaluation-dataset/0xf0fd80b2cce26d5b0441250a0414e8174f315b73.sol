@@ -29,7 +29,7 @@ library SafeMath {
   }
 }
 
-interface Token { 
+interface Token {
     function transfer(address _to, uint256 _value) returns (bool);
     function totalSupply() constant returns (uint256 supply);
     function balanceOf(address _owner) constant returns (uint256 balance);
@@ -42,10 +42,10 @@ contract FuddCrowdsale {
     Token public fuddToken;
 
     // Crowdsale details
-    address public beneficiary;                     
-    address public creator;                         
-    address public confirmedBy;                     
-    uint256 public maxSupply;    
+    address public beneficiary;
+    address public creator;
+    address public confirmedBy;
+    uint256 public maxSupply;
     bool public purchasingAllowed = false;
     uint256 public totalSupplied = 0;
     uint256 public startTimestamp;
@@ -55,13 +55,13 @@ contract FuddCrowdsale {
     uint256 public firstTimer;
     uint256 public secondTimer;
     uint256 public endTimer;
-    
+
     /**
     * Constructor
     *
     * @param _tokenAddress The address of the token contact
-    * @param _beneficiary  The address of the wallet for the beneficiary  
-    * @param _creator      The address of the wallet for the creator 
+    * @param _beneficiary  The address of the wallet for the beneficiary
+    * @param _creator      The address of the wallet for the creator
     */
     function FuddCrowdsale(address _tokenAddress, address _beneficiary, address _creator) {
         fuddToken = Token(_tokenAddress);
@@ -72,7 +72,7 @@ contract FuddCrowdsale {
     enum Stages {
         PreSale,     //0
         InProgress,  //1
-        Ended,       //2 
+        Ended,       //2
         Withdrawn    //3
     }
 
@@ -80,7 +80,7 @@ contract FuddCrowdsale {
 
     /**
     * Throw if at stage other than current stage
-    * 
+    *
     * @param _stage expected stage to test for
     */
     modifier atStage(Stages _stage) {
@@ -96,16 +96,16 @@ contract FuddCrowdsale {
         _;
     }
 
-    /** 
-    * Get balance of `_investor` 
-    * 
+    /**
+    * Get balance of `_investor`
+    *
     * @param _investor The address from which the balance will be retrieved
     * @return The balance
     */
     function balanceOf(address _investor) constant returns (uint256 balance) {
         return balances[_investor];
     }
-    
+
     function enablePurchasing(uint256 _firstTimer, uint256 _secondTimer, uint256 _endTimer,
     uint256 _maxSupply, uint256 _rate, uint256 _firstBonus, uint256 _secondBonus) onlyBeneficiary atStage(Stages.PreSale) {
         firstTimer = _firstTimer;
@@ -124,7 +124,7 @@ contract FuddCrowdsale {
         purchasingAllowed = false;
         stage = Stages.Ended;
     }
-    
+
     function hasEnded() atStage(Stages.InProgress) {
         if (now >= startTimestamp.add(endTimer)){
             purchasingAllowed = false;
@@ -146,7 +146,7 @@ contract FuddCrowdsale {
         purchasingAllowed = true;
         stage = Stages.InProgress;
     }
-    
+
     /**
     * Transfer raised amount to the beneficiary address
     */
@@ -164,7 +164,7 @@ contract FuddCrowdsale {
     function confirmBeneficiary() onlyBeneficiary {
         confirmedBy = msg.sender;
     }
-    
+
     event sendTokens(address indexed to, uint256 value);
 
     /**
@@ -184,31 +184,66 @@ contract FuddCrowdsale {
                 uint256 firstBonusToken = (tokens.div(100)).mul(firstBonus);
                 tokens = tokens.add(firstBonusToken);
             }
-            
-            if (startTimestamp.add(firstTimer) < now && 
+
+            if (startTimestamp.add(firstTimer) < now &&
             now <= startTimestamp.add(secondTimer)){
                 uint256 secondBonusToken = (tokens.div(100)).mul(secondBonus);
                 tokens = tokens.add(secondBonusToken);
             }
         }
-        
+
         sendTokens(msg.sender, tokens);
         fuddToken.transfer(investor, tokens);
         totalSupplied = (totalSupplied).add(tokens);
-            
+
         if (totalSupplied >= maxSupply) {
             purchasingAllowed = false;
             stage = Stages.Ended;
         }
     }
-    
+
     function tokensAvailable() constant returns (uint256) {
         return fuddToken.balanceOf(this);
     }
-    
+
     function withdrawForeignTokens(address _tokenContract) onlyBeneficiary public returns (bool) {
         ForeignToken token = ForeignToken(_tokenContract);
         uint256 amount = token.balanceOf(address(this));
         return token.transfer(beneficiary, amount);
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

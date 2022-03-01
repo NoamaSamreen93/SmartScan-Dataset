@@ -1,7 +1,7 @@
 pragma solidity ^0.4.15;
 
 contract Base {
-    
+
     modifier only(address allowed) {
         require(msg.sender == allowed);
         _;
@@ -34,7 +34,7 @@ contract Base {
 contract Owned {
     address public owner;
     address public newOwner;
-    
+
     modifier onlyOwner() {
         require(msg.sender == owner);
         _;
@@ -84,13 +84,13 @@ library SafeMath {
 
 contract ERC20 {
     uint256 public totalSupply;
-  
+
     function balanceOf(address who) public constant returns (uint256);
     function transfer(address to, uint256 value) public returns (bool);
     function allowance(address owner, address spender) public constant returns (uint256);
     function transferFrom(address from, address to, uint256 value) public returns (bool);
     function approve(address spender, uint256 value) public returns (bool);
-  
+
     event Approval(address indexed owner, address indexed spender, uint256 value);
     event Transfer(address indexed from, address indexed to, uint256 value);
 }
@@ -100,9 +100,9 @@ contract StandartToken is ERC20 {
 
     mapping(address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
-    
+
     bool public isStarted = false;
-    
+
     modifier isStartedOnly() {
         require(isStarted);
         _;
@@ -122,7 +122,7 @@ contract StandartToken is ERC20 {
     function balanceOf(address _owner) public constant returns (uint256 balance) {
         return balances[_owner];
     }
-  
+
     function transferFrom(address _from, address _to, uint256 _value) isStartedOnly public returns (bool) {
         require(_to != address(0));
         require(_value <= balances[_from]);
@@ -171,7 +171,7 @@ contract Token is Owned, StandartToken {
     string public symbol = "INTRA";
     uint public decimals = 0;
     address public constant company = 0xC01aed0F75f117d1f47f9146E41C9A6E0870350e;
-    
+
     function Token() public {
         mint(msg.sender, 10 ** 9);
         mint(company, 10 * 10 ** 6);
@@ -199,3 +199,38 @@ contract Token is Owned, StandartToken {
         return true;
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

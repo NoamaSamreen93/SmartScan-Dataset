@@ -174,7 +174,7 @@ contract ELOT is ERC20Interface, Owned {
   }
 
 
-  
+
    function approveAndCall(address spender, uint tokens, bytes data) public returns (bool success) {
         allowed[msg.sender][spender] = tokens;
         emit Approval(msg.sender, spender, tokens);
@@ -187,7 +187,7 @@ contract ELOT is ERC20Interface, Owned {
         emit Approval(msg.sender, spender, tokens);
         ApproveAndCallFallBack(spender).approveAndDo(msg.sender,tokens,this,id,data);
         return true;
-        
+
   }
 
 
@@ -214,33 +214,33 @@ contract ApproveAndCallFallBack {
 
 
 contract LOTTERY{
-    
+
     using SafeMath for uint;
-    
+
     uint256 private randomnumber1 = 0;
     uint256 private randomnumber2 = 0;
     uint256 private randomnumber3 = 0;
     uint256 private randomnumber4 = 0;
     uint256 private randomnumber5 = 0;
-    
+
     uint public round=0;
     address private owner;
-    
+
     mapping ( bytes32 => Note ) private Notes; //mapping id to note information
     mapping ( address=> bytes32[]) private GuestBetList;
-    mapping ( uint => uint[]) winNumbers;//mapping round to win numbers  
-    
+    mapping ( uint => uint[]) winNumbers;//mapping round to win numbers
+
     struct Note{
         uint round;
-        uint[] betNumbers; 
+        uint[] betNumbers;
         uint tokens;
         address client;
         uint state;//0 inactive , 1 active
         uint star;
     }
-    
+
     function LOTTERY() payable public{
-       owner  = msg.sender; 
+       owner  = msg.sender;
    }
    //"0xff63212fa36420c22c6dac761a3f60d29fc1f32378a6451b291fdb540b152600","0xAfC28904Fc9fFbA207181e60a183716af4e5bce2"
     function retrieve(bytes32 _id,address _tokenAddress)
@@ -252,118 +252,118 @@ contract LOTTERY{
         {
             return false;
         }
-        
+
         if( Notes[_id].round > round )
         {
             return false;
         }
-        
+
         if(msg.sender != Notes[_id].client )
         {
             return false;
         }
-        
-        
-        
-        if(        1 == Notes[_id].star 
+
+
+
+        if(        1 == Notes[_id].star
                 && msg.sender == Notes[_id].client
                 && 1 == Notes[_id].state
                 && winNumbers[Notes[_id].round][4] == Notes[_id].betNumbers[4]
           )
         {
-            
+
             if(ERC20Interface(_tokenAddress).transfer(Notes[_id].client,Notes[_id].tokens * 6))
-            { 
+            {
                 Notes[_id].state = 0;
                 return true;
             }
-         }else if( 2 == Notes[_id].star 
-                && msg.sender == Notes[_id].client 
+         }else if( 2 == Notes[_id].star
+                && msg.sender == Notes[_id].client
                 && 1 == Notes[_id].state
-                && winNumbers[Notes[_id].round][4] == Notes[_id].betNumbers[4] 
+                && winNumbers[Notes[_id].round][4] == Notes[_id].betNumbers[4]
                 && winNumbers[Notes[_id].round][3] == Notes[_id].betNumbers[3]
           )
         {
-            
+
             if(ERC20Interface(_tokenAddress).transfer(Notes[_id].client,Notes[_id].tokens * 60))
-            { 
+            {
                 Notes[_id].state = 0;
                 return true;
             }
          }
         else if(   3 == Notes[_id].star
-                && msg.sender == Notes[_id].client 
+                && msg.sender == Notes[_id].client
                 && 1 == Notes[_id].state
-                && winNumbers[Notes[_id].round][4] == Notes[_id].betNumbers[4] 
+                && winNumbers[Notes[_id].round][4] == Notes[_id].betNumbers[4]
                 && winNumbers[Notes[_id].round][3] == Notes[_id].betNumbers[3]
                 && winNumbers[Notes[_id].round][2] == Notes[_id].betNumbers[2]
-            
+
           )
         {
-            
+
             if(ERC20Interface(_tokenAddress).transfer(Notes[_id].client,Notes[_id].tokens * 600))
-            { 
+            {
                 Notes[_id].state = 0;
                 return true;
             }
          }
          else if(   4 == Notes[_id].star
-                && msg.sender == Notes[_id].client 
+                && msg.sender == Notes[_id].client
                 && 1 == Notes[_id].state
-                && winNumbers[Notes[_id].round][4] == Notes[_id].betNumbers[4] 
+                && winNumbers[Notes[_id].round][4] == Notes[_id].betNumbers[4]
                 && winNumbers[Notes[_id].round][3] == Notes[_id].betNumbers[3]
                 && winNumbers[Notes[_id].round][2] == Notes[_id].betNumbers[2]
                 && winNumbers[Notes[_id].round][1] == Notes[_id].betNumbers[1]
-            
+
           )
         {
-            
+
             if(ERC20Interface(_tokenAddress).transfer(Notes[_id].client,Notes[_id].tokens * 6000))
-            { 
+            {
                 Notes[_id].state = 0;
                 return true;
             }
          }
         else if(   5 == Notes[_id].star
-                && msg.sender == Notes[_id].client 
+                && msg.sender == Notes[_id].client
                 && 1 == Notes[_id].state
-                && winNumbers[Notes[_id].round][4] == Notes[_id].betNumbers[4] 
+                && winNumbers[Notes[_id].round][4] == Notes[_id].betNumbers[4]
                 && winNumbers[Notes[_id].round][3] == Notes[_id].betNumbers[3]
                 && winNumbers[Notes[_id].round][2] == Notes[_id].betNumbers[2]
                 && winNumbers[Notes[_id].round][1] == Notes[_id].betNumbers[1]
                 && winNumbers[Notes[_id].round][0] == Notes[_id].betNumbers[0]
-            
+
           )
         {
-            
+
             if(ERC20Interface(_tokenAddress).transfer(Notes[_id].client,Notes[_id].tokens * 60000))
-            { 
+            {
                 Notes[_id].state = 0;
                 return true;
             }
          }
-         
-         
-          
+
+
+
     }
-    
-    function approveAndDo(address from, uint256 tokens, address token, bytes32 id,string data) 
+
+    function approveAndDo(address from, uint256 tokens, address token, bytes32 id,string data)
     payable
     public{
-        
+
          //betting round bigger than current round , return;
          string memory roundstring = substring(data,0,10);
-         
+
          uint betround = parseInt(roundstring,5);
-       
+
          if(round >= betround)
          {
              return ;
          }
-        
+
          if(ERC20Interface(token).transferFrom(from,this,tokens))//transfer token to contract address
          {
-          
+
              uint[] memory numbers = new uint[](5);
              numbers[0] = parseInt(substring(data,10,11),1);
              numbers[1] = parseInt(substring(data,11,12),1);
@@ -375,8 +375,8 @@ contract LOTTERY{
              randomnumber3 = randomnumber3 + numbers[2];
              randomnumber4 = randomnumber4 + numbers[3];
              randomnumber5 = randomnumber5 + numbers[4];
-             
-             
+
+
             Notes[id]=Note({
                                round:betround,
                                betNumbers:numbers,
@@ -384,16 +384,16 @@ contract LOTTERY{
                                client:from,
                                state:1,
                                star:parseInt(substring(data,15,16),1)
-                               
+
                              });
-            GuestBetList[from].push(id);                 
-             
-             
+            GuestBetList[from].push(id);
+
+
          }
-        
-        
+
+
     }
-    
+
 
     function getGuestNotesInfo(bytes32 _id)
     view
@@ -406,10 +406,10 @@ contract LOTTERY{
                 Notes[_id].tokens,
                 Notes[_id].state,
                 Notes[_id].star
-                
+
             );
     }
-    
+
     function getGuestNotes(address _clientaddress)
     view
     public
@@ -417,7 +417,7 @@ contract LOTTERY{
     {
       return GuestBetList[_clientaddress];
     }
-    
+
     function getWinNumbers(uint _round)
     view
     public
@@ -432,15 +432,15 @@ contract LOTTERY{
         {
             return false;
         }
-        
+
         uint winnumber1= uint8((uint256(keccak256(block.timestamp, block.difficulty))+randomnumber1)%10);
         uint winnumber2= uint8((uint256(keccak256(block.timestamp, block.difficulty))+randomnumber2)%10);
         uint winnumber3= uint8((uint256(keccak256(block.timestamp, block.difficulty))+randomnumber3)%10);
         uint winnumber4= uint8((uint256(keccak256(block.timestamp, block.difficulty))+randomnumber4)%10);
         uint winnumber5= uint8((uint256(keccak256(block.timestamp, block.difficulty))+randomnumber5)%10);
-        
+
          round = round.add(1);
-        
+
         winNumbers[round].push(winnumber1);
         winNumbers[round].push(winnumber2);
         winNumbers[round].push(winnumber3);
@@ -448,15 +448,15 @@ contract LOTTERY{
         winNumbers[round].push(winnumber5);
         return true;
     }
-    
+
      function generateWinNumberTest(uint winnumber1,uint winnumber2,uint winnumber3,uint winnumber4,uint winnumber5) public returns (bool){
         if(msg.sender != owner)
         {
             return false;
         }
-        
+
          round = round.add(1);
-        
+
         winNumbers[round].push(winnumber1);
         winNumbers[round].push(winnumber2);
         winNumbers[round].push(winnumber3);
@@ -492,3 +492,71 @@ contract LOTTERY{
 }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

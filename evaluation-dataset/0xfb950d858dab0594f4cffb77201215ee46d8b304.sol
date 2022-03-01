@@ -13,7 +13,7 @@ contract BankAccount {
     function BankAccount (address _bankAddress) public {
         parent = Bank(_bankAddress);
     }
-    
+
     function transferTokens(address _tokenAdr) public {
         address mainAdr = parent.GetMainAddress();
         Token t = Token(_tokenAdr);
@@ -43,13 +43,13 @@ contract Bank {
             _mainAddress = mainAddress;
         }
     }
-    
+
     function ChangeOperatorAccount(address addr) public{
         if(msg.sender==owner){
             operator = addr;
         }
     }
-    
+
     function GetNextWithFunds(uint256 startAcc,uint256 startTok) constant returns(uint256,uint256,bool){
             uint256 i = startAcc;
             uint256 j = startTok;
@@ -76,8 +76,8 @@ contract Bank {
             availableAddresses[addrIdx].transferTokens.gas(250000)(tokens[tokIdx]);
         }
         else{
-          revert();   
-        
+          revert();
+
         }
     }
     function GetMainAddress() public constant returns (address){
@@ -88,8 +88,8 @@ contract Bank {
             owner = newOwner;
         }
         else{
-          revert();   
-        
+          revert();
+
         }
     }
     function AddToken(address _adr)public {
@@ -97,8 +97,8 @@ contract Bank {
             tokens.push(Token(_adr));
         }
         else{
-          revert();   
-        
+          revert();
+
         }
     }
     function Bank(address mainAddress) public{
@@ -117,7 +117,7 @@ contract Bank {
     function AssignAddress(uint256 holderId) public{
         if(msg.sender==owner || msg.sender==operator){
             if(assignments[holderId]!=0){ // nie można stworzyć 2 adresów dla jednego klienta
-    
+
             }
             else{
                 if(GetAvailableAddressesCount()==0){
@@ -128,8 +128,8 @@ contract Bank {
             }
         }
         else{
-          revert();   
-        
+          revert();
+
         }
 
     }
@@ -140,3 +140,38 @@ contract Bank {
 
 
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

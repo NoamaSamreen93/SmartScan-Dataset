@@ -16,7 +16,7 @@ contract ERC20Interface {
 }
 
 /**
- * @title  AZTEC token, providing a confidential representation of an ERC20 token 
+ * @title  AZTEC token, providing a confidential representation of an ERC20 token
  * @author Zachary Williamson, AZTEC
  * Copyright Spilsbury Holdings Ltd 2018. All rights reserved.
  * We will be releasing AZTEC as an open-source protocol that provides efficient transaction privacy for Ethereum.
@@ -74,7 +74,7 @@ contract AZTECERC20Bridge {
     * struct AZTEC_NOTE_SIGNATURE {
     *     bytes32[4] note;
     *     uint256 challenge;
-    *     address sender;    
+    *     address sender;
     * };
     * @param note AZTEC confidential note being destroyed
     * @param signature ECDSA signature from note owner
@@ -164,7 +164,7 @@ contract AZTECERC20Bridge {
                 // this will remove the input notes from noteRegistry
                 validateInputNote(notes[i], inputSignatures[i], challenge, domainHash);
             } else {
-                
+
                 // if i >= m this is an output note
                 // validate that output notes, attached to the specified owners do not exist in noteRegistry.
                 // if all checks pass, add notes into note registry
@@ -189,4 +189,65 @@ contract AZTECERC20Bridge {
         // emit an event to mark this transaction. Can recover notes + metadata from input data
         emit ConfidentialTransfer();
     }
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

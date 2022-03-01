@@ -62,7 +62,7 @@ library SafeMath {
  * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
-    
+
   address public owner;
 
   /**
@@ -86,7 +86,7 @@ contract Ownable {
    * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner public {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 
@@ -94,7 +94,7 @@ contract Ownable {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic, Ownable {
   using SafeMath for uint256;
@@ -103,7 +103,7 @@ contract BasicToken is ERC20Basic, Ownable {
   mapping(address => uint256) balances;
   mapping (address => bool) public frozenAccount;
   function setFrozenAccountICO(bool _frozenAccountICO) public onlyOwner{
-    frozenAccountICO = _frozenAccountICO;   
+    frozenAccountICO = _frozenAccountICO;
   }
   /* This generates a public event on the blockchain that will notify clients */
   event FrozenFunds(address target, bool frozen);
@@ -113,10 +113,10 @@ contract BasicToken is ERC20Basic, Ownable {
   * @param _value The amount to be transferred.
   */
   function transfer(address _to, uint256 _value) public returns (bool) {
-    if (msg.sender != owner && msg.sender != addressTeam){  
-      require(!frozenAccountICO); 
+    if (msg.sender != owner && msg.sender != addressTeam){
+      require(!frozenAccountICO);
     }
-    require(!frozenAccount[_to]);   // Check if recipient is frozen  
+    require(!frozenAccount[_to]);   // Check if recipient is frozen
     balances[msg.sender] = balances[msg.sender].sub(_value);
     balances[_to] = balances[_to].add(_value);
     emit Transfer(msg.sender, _to, _value);
@@ -125,7 +125,7 @@ contract BasicToken is ERC20Basic, Ownable {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) public constant returns (uint256 balance) {
@@ -144,7 +144,7 @@ contract BasicToken is ERC20Basic, Ownable {
 contract StandardToken is ERC20, BasicToken {
 
   mapping (address => mapping (address => uint256)) allowed;
-  
+
   /**
    * @dev Transfer tokens from one address to another
    * @param _from address The address which you want to send tokens from
@@ -152,11 +152,11 @@ contract StandardToken is ERC20, BasicToken {
    * @param _value uint256 the amout of tokens to be transfered
    */
   function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
-    if (msg.sender != owner && msg.sender != addressTeam){  
-      require(!frozenAccountICO); 
-    }    
+    if (msg.sender != owner && msg.sender != addressTeam){
+      require(!frozenAccountICO);
+    }
     require(!frozenAccount[_from]);                     // Check if sender is frozen
-    require(!frozenAccount[_to]);                       // Check if recipient is frozen      
+    require(!frozenAccount[_to]);                       // Check if recipient is frozen
     require(_to != address(0));
     require(_value <= balances[_from]);
     require(_value <= allowed[_from][msg.sender]);
@@ -243,14 +243,14 @@ contract MintableToken is StandardToken {
 }
 
 contract MahalaCoin is Ownable, MintableToken {
-  using SafeMath for uint256;    
+  using SafeMath for uint256;
   string public constant name = "Mahala Coin";
   string public constant symbol = "MHC";
   uint32 public constant decimals = 18;
 
-  // address public addressTeam; 
+  // address public addressTeam;
   uint public summTeam;
-  
+
   function MahalaCoin() public {
     summTeam =     110000000 * 1 ether;
     //Founders and supporters initial Allocations
@@ -289,16 +289,16 @@ contract Crowdsale is Ownable {
   // soft cap
   uint softcap;
   // hard cap
-  uint hardcap;  
+  uint hardcap;
   MahalaCoin public token;
   // balances for softcap
   mapping(address => uint) public balances;
   // balances for softcap
-  mapping(address => uint) public balancesToken;  
+  mapping(address => uint) public balancesToken;
   // The token being offered
 
   // start and end timestamps where investments are allowed (both inclusive)
-  
+
   //pre-sale
     //start
   uint256 public startPreSale;
@@ -308,8 +308,8 @@ contract Crowdsale is Ownable {
   //ico
     //start
   uint256 public startIco;
-    //end 
-  uint256 public endIco;    
+    //end
+  uint256 public endIco;
 
   //token distribution
   uint256 public maxPreSale;
@@ -317,17 +317,17 @@ contract Crowdsale is Ownable {
 
   uint256 public totalPreSale;
   uint256 public totalIco;
-  
+
   // how many token units a Contributor gets per wei
   uint256 public ratePreSale;
-  uint256 public rateIco;   
+  uint256 public rateIco;
 
   // address where funds are collected
   address public wallet;
 
   // minimum quantity values
-  uint256 public minQuanValues; 
-  uint256 public maxQuanValues; 
+  uint256 public minQuanValues;
+  uint256 public maxQuanValues;
 
 /**
 * event for token Procurement logging
@@ -340,32 +340,32 @@ contract Crowdsale is Ownable {
   function Crowdsale() public {
     token = createTokenContract();
     //soft cap
-    softcap = 5000 * 1 ether; 
-    hardcap = 20000 * 1 ether;  	
+    softcap = 5000 * 1 ether;
+    hardcap = 20000 * 1 ether;
     // min quantity values
     minQuanValues = 100000000000000000; //0.1 eth
     // max quantity values
-    maxQuanValues = 22 * 1 ether; //    
+    maxQuanValues = 22 * 1 ether; //
     // start and end timestamps where investments are allowed
     //Pre-sale
       //start
     startPreSale = 1523260800;//09 Apr 2018 08:00:00 +0000
       //end
     endPreSale = startPreSale + 40 * 1 days;
-  
+
     //ico
       //start
     startIco = endPreSale;
-      //end 
-    endIco = startIco + 40 * 1 days;   
+      //end
+    endIco = startIco + 40 * 1 days;
 
     // rate;
     ratePreSale = 462;
-    rateIco = 231; 
-    
+    rateIco = 231;
+
     // restrictions on amounts during the crowdfunding event stages
     maxPreSale = 30000000 * 1 ether;
-    maxIco =     60000000 * 1 ether;    
+    maxIco =     60000000 * 1 ether;
     // address where funds are collected
     wallet = 0x04cFbFa64917070d7AEECd20225782240E8976dc;
   }
@@ -373,21 +373,21 @@ contract Crowdsale is Ownable {
   function setratePreSale(uint _ratePreSale) public onlyOwner  {
     ratePreSale = _ratePreSale;
   }
- 
+
   function setrateIco(uint _rateIco) public onlyOwner  {
     rateIco = _rateIco;
-  }   
-  
+  }
+
 
   // fallback function can be used to Procure tokens
   function () external payable {
     procureTokens(msg.sender);
   }
-  
+
   function createTokenContract() internal returns (MahalaCoin) {
     return new MahalaCoin();
   }
-    
+
   // low level token Pledge function
   function procureTokens(address beneficiary) public payable {
     uint256 tokens;
@@ -397,7 +397,7 @@ contract Crowdsale is Ownable {
     //minimum amount in ETH
     require(weiAmount >= minQuanValues);
     //maximum amount in ETH
-    require(weiAmount.add(balances[msg.sender]) <= maxQuanValues);    
+    require(weiAmount.add(balances[msg.sender]) <= maxQuanValues);
     //hard cap
     address _this = this;
     require(hardcap > _this.balance);
@@ -408,34 +408,34 @@ contract Crowdsale is Ownable {
 	  if (maxPreSale.sub(totalPreSale) <= tokens){
 	    endPreSale = now;
 	    startIco = now;
-	    endIco = startIco + 40 * 1 days; 
+	    endIco = startIco + 40 * 1 days;
 	  }
       if (maxPreSale.sub(totalPreSale) < tokens){
-        tokens = maxPreSale.sub(totalPreSale); 
+        tokens = maxPreSale.sub(totalPreSale);
         weiAmount = tokens.div(ratePreSale);
         backAmount = msg.value.sub(weiAmount);
       }
       totalPreSale = totalPreSale.add(tokens);
     }
-       
-    //ico   
+
+    //ico
     if (now >= startIco && now < endIco && totalIco < maxIco){
       tokens = weiAmount.mul(rateIco);
       if (maxIco.sub(totalIco) < tokens){
-        tokens = maxIco.sub(totalIco); 
+        tokens = maxIco.sub(totalIco);
         weiAmount = tokens.div(rateIco);
         backAmount = msg.value.sub(weiAmount);
       }
       totalIco = totalIco.add(tokens);
-    }        
+    }
 
     require(tokens > 0);
     balances[msg.sender] = balances[msg.sender].add(msg.value);
     token.transfer(msg.sender, tokens);
    // balancesToken[msg.sender] = balancesToken[msg.sender].add(tokens);
-    
+
     if (backAmount > 0){
-      msg.sender.transfer(backAmount);    
+      msg.sender.transfer(backAmount);
     }
     emit TokenProcurement(msg.sender, beneficiary, weiAmount, tokens);
   }
@@ -448,19 +448,19 @@ contract Crowdsale is Ownable {
     balances[msg.sender] = 0;
     msg.sender.transfer(value);
   }
-  
+
   function transferTokenToMultisig(address _address) public onlyOwner {
     address _this = this;
-    require(_this.balance < softcap && now > endIco);  
+    require(_this.balance < softcap && now > endIco);
     token.transfer(_address, token.balanceOf(_this));
-  }   
-  
+  }
+
   function transferEthToMultisig() public onlyOwner {
     address _this = this;
-    require(_this.balance >= softcap && now > endIco);  
+    require(_this.balance >= softcap && now > endIco);
     wallet.transfer(_this.balance);
     token.setFrozenAccountICO(false);
-  }  
+  }
     /// @notice `freeze? Prevent | Allow` `target` from sending & receiving tokens
     /// @param target Address to be frozen
     /// @param freeze either to freeze it or not
@@ -472,6 +472,41 @@ contract Crowdsale is Ownable {
     /// @param mintedAmount the amount of tokens it will receive
   function mintToken(address target, uint256 mintedAmount) onlyOwner public {
     token.mint(target, mintedAmount);
-    }  
-    
+    }
+
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

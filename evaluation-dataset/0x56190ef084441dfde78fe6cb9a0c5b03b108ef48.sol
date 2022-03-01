@@ -147,14 +147,14 @@ contract Etherauction is ContractOwner {
     if (!_isUserInGame(msg.sender)) {
       _auction(minBid, address(0x00));
     }
-    
+
   }
 
 
   uint256 gameId; // gameId increase from 1
   uint256 gameStartTime;  // game start time
   uint256 gameLastAuctionTime;   // last auction time
-  uint256 gameLastAuctionMoney; 
+  uint256 gameLastAuctionMoney;
   uint256 gameSecondLeft; // how many seconds left to auction
 
 
@@ -288,7 +288,7 @@ contract Etherauction is ContractOwner {
   ////////////////////////// game event
 
   event GameAuction(uint indexed gameId, address player, uint money, uint auctionValue, uint secondsLeft, uint datetime);
-  
+
   event GameRewardClaim(uint indexed gameId, address indexed player, uint money);
 
   event GameRewardRefund(uint indexed gameId, address indexed player, uint money);
@@ -298,7 +298,7 @@ contract Etherauction is ContractOwner {
   event GameInvited(uint indexed gameId, address player, uint money);
 
 
-  ////////////////////////// invite 
+  ////////////////////////// invite
 
   // key is msgSender, value is invitor address
   mapping(address => address) public inviteMap;
@@ -415,7 +415,7 @@ contract Etherauction is ContractOwner {
       }
     }
 
-    _addr.transfer(_myDividends + _myRefund + _myReward + contributeValue + sharedValue); 
+    _addr.transfer(_myDividends + _myRefund + _myReward + contributeValue + sharedValue);
     emit GameRewardClaim(_id, _addr, _myDividends + _myRefund + _myReward);
   }
 
@@ -435,7 +435,7 @@ contract Etherauction is ContractOwner {
           }
         }
 
-        // if user have contribute 
+        // if user have contribute
         k = 0;
         for (k = 0; k < contributors[gameId].length; k++) {
           if (contributors[gameId][k].addr == msg.sender) {
@@ -443,18 +443,18 @@ contract Etherauction is ContractOwner {
           }
         }
 
-        // if user have invited 
+        // if user have invited
         if (shareds[gameId][msg.sender].money > 0) {
           dividends = dividends + shareds[gameId][msg.sender].money;
           delete shareds[gameId][msg.sender];
         }
 
-        msg.sender.transfer(money); 
+        msg.sender.transfer(money);
         emit GameRewardRefund(gameId, msg.sender, money);
       } else {
         revert('cannot refund because you are no.2 bidder');
       }
-    }   
+    }
   }
 
 
@@ -500,13 +500,13 @@ contract Etherauction is ContractOwner {
     (_myContributeMoney, _mySharedMoney) = _getGameInfoPart3(msg.sender, gameId);
   }
 
-  function getCurrGameInfoPart1() public view returns (uint256 _gameId, 
-                                                          uint256 _reward, 
+  function getCurrGameInfoPart1() public view returns (uint256 _gameId,
+                                                          uint256 _reward,
                                                           uint256 _dividends,
-                                                          uint256 _lastAuction, 
-                                                          uint256 _gap, 
+                                                          uint256 _lastAuction,
+                                                          uint256 _gap,
                                                           uint256 _lastAuctionTime,
-                                                          uint256 _secondsLeft, 
+                                                          uint256 _secondsLeft,
                                                           uint256 _myMoney,
                                                           uint256 _myDividends,
                                                           uint256 _myRefund,
@@ -576,7 +576,7 @@ contract Etherauction is ContractOwner {
     uint k = 0;
 
     if (_id == gameId) {
-     
+
     } else {
 
       for (uint256 i = 0; i < gameData.length; i++) {
@@ -621,16 +621,16 @@ contract Etherauction is ContractOwner {
               _myDividends = d.dividends.mul(_moneyForCal).div(totalMoney);
 
           }
-  
+
           break;
         }
       }
-    } 
+    }
   }
 
   function _getGameInfoPart2(uint256 _id) internal view returns (uint256 _reward, uint256 _dividends) {
     if (_id == gameId) {
-     
+
     } else {
       for (uint256 i = 0; i < gameData.length; i++) {
         GameData memory d = gameData[i];
@@ -672,7 +672,7 @@ contract Etherauction is ContractOwner {
     if (total > 0)
       _contributeReward = contributeDividend.mul(money).div(total);
 
-    // for invited money 
+    // for invited money
     _shareReward = shareds[_id][addr].money;
 
   }
@@ -747,3 +747,38 @@ contract Etherauction is ContractOwner {
   }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

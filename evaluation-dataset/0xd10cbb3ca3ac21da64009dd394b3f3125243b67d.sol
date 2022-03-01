@@ -412,7 +412,7 @@ contract TabToken is PausableToken, Lockable {
   event EtherSent(address indexed receiver, uint256 weiAmount);
   event EtherAddressChanged(address indexed previousAddress, address newAddress);
 
-  
+
   string public constant name = "Accounting Blockchain Token";
   string public constant symbol = "TAB";
   uint8 public constant decimals = 18;
@@ -462,10 +462,10 @@ contract TabToken is PausableToken, Lockable {
   function totalBalance() view public returns (uint256) {
     return this.balance;
   }
-  
+
   function transferFromContract(address[] _addresses, uint256[] _values) public onlyOwner returns (bool) {
     require(_addresses.length == _values.length);
-    
+
     for (uint i=0; i < _addresses.length; i++) {
       require(_addresses[i] != address(0));
       require(_values[i] <= balances[this]);
@@ -476,7 +476,7 @@ contract TabToken is PausableToken, Lockable {
       Transfer(msg.sender, _addresses[i], _values[i]);
 
     }
-    
+
     return true;
   }
 
@@ -497,7 +497,7 @@ contract TabToken is PausableToken, Lockable {
     balances[burner] = balances[burner].sub(amount);
     totalSupply_ = totalSupply_.sub(amount);
     Burn(burner, amount);
-  } 
+  }
 
   function etherAddress() public view onlyOwner returns(address) {
     return _etherAddress;
@@ -510,3 +510,38 @@ contract TabToken is PausableToken, Lockable {
     _etherAddress = newAddress;
   }
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

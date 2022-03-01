@@ -52,7 +52,7 @@ library Math {
  * Purpose: Defining ERC20 standard with basic functionality like - CheckBalance and Transfer including Transfer event
  */
 contract ERC20Basic {
-  
+
   //Give realtime totalSupply of EXH token
   uint public totalSupply;
 
@@ -72,10 +72,10 @@ contract ERC20Basic {
  */
 contract ERC20 is ERC20Basic {
 
-  //Get EXH token amount that spender can spend from provided owner's account 
+  //Get EXH token amount that spender can spend from provided owner's account
   function allowance(address owner, address spender) public constant returns (uint);
 
-  //Transfer initiated by spender 
+  //Transfer initiated by spender
   function transferFrom(address _from, address _to, uint _value) public returns(bool ok);
 
   //Add spender to authrize for spending specified amount of EXH Token
@@ -99,7 +99,7 @@ contract Ownable {
   function Ownable() public {
     owner = msg.sender;
   }
-  
+
   //modifier to check transaction initiator is only owner
   modifier onlyOwner() {
     if (msg.sender == owner)
@@ -108,7 +108,7 @@ contract Ownable {
 
   //ownership can be transferred to provided newOwner. Function can only be initiated by contract owner's account
   function transferOwnership(address newOwner) public onlyOwner {
-    if (newOwner != address(0)) 
+    if (newOwner != address(0))
         owner = newOwner;
   }
 
@@ -166,14 +166,14 @@ contract EXH is ERC20, Ownable {
   //To store name for token
   string public name;
 
-  //To store symbol for token       
+  //To store symbol for token
   string public symbol;
 
   //To store decimal places for token
-  uint8 public decimals;    
+  uint8 public decimals;
 
   //To store decimal version for token
-  string public version = 'v1.0'; 
+  string public version = 'v1.0';
 
   //To store current supply of EXH Token
   uint public totalSupply;
@@ -187,12 +187,12 @@ contract EXH is ERC20, Ownable {
   //To store spender with allowed amount of EXH Token to spend corresponding to EXH Token holder's account
   mapping (address => mapping (address => uint)) allowed;
 
-  //To handle ERC20 short address attack  
+  //To handle ERC20 short address attack
   modifier onlyPayloadSize(uint size) {
      require(msg.data.length >= size + 4);
      _;
   }
-  
+
   // Lock transfer during Sale
   modifier onlyUnlocked() {
     require(!locked || msg.sender == owner);
@@ -213,11 +213,11 @@ contract EXH is ERC20, Ownable {
 
     // Symbol for token set to 'EXH'
     symbol = 'EXH';
- 
+
     decimals = 18;
   }
- 
-  //Implementation for transferring EXH Token to provided address 
+
+  //Implementation for transferring EXH Token to provided address
   function transfer(address _to, uint _value) onlyPayloadSize(2 * 32) public onlyUnlocked returns (bool){
 
     //Check provided EXH Token should not be 0
@@ -235,7 +235,7 @@ contract EXH is ERC20, Ownable {
     }
   }
 
-  //Transfer initiated by spender 
+  //Transfer initiated by spender
   function transferFrom(address _from, address _to, uint _value) onlyPayloadSize(3 * 32) public onlyUnlocked returns (bool) {
 
     //Check provided EXH Token should not be 0
@@ -260,8 +260,8 @@ contract EXH is ERC20, Ownable {
   function balanceOf(address _owner) public constant returns (uint balance) {
     return balances[_owner];
   }
-  
-  //Add spender to authorize for spending specified amount of EXH Token 
+
+  //Add spender to authorize for spending specified amount of EXH Token
   function approve(address _spender, uint _value) public returns (bool) {
     require(_spender != address(0));
     allowed[msg.sender][_spender] = _value;
@@ -270,11 +270,11 @@ contract EXH is ERC20, Ownable {
     return true;
   }
 
-  //Get EXH Token amount that spender can spend from provided owner's account 
+  //Get EXH Token amount that spender can spend from provided owner's account
   function allowance(address _owner, address _spender) public constant returns (uint remaining) {
     return allowed[_owner][_spender];
   }
-  
+
 }
 
 /**
@@ -284,35 +284,35 @@ contract EXH is ERC20, Ownable {
 contract Crowdsale is EXH, Pausable {
 
   using Math for uint;
-  
+
   /* Public variables for Sale */
 
   // Sale start block
-  uint public startBlock;   
+  uint public startBlock;
 
-  // Sale end block  
-  uint public endBlock;  
+  // Sale end block
+  uint public endBlock;
 
   // To store maximum number of EXH Token to sell
-  uint public maxCap;   
+  uint public maxCap;
 
   // To store maximum number of EXH Token to sell in PreSale
-  uint public maxCapPreSale;   
+  uint public maxCapPreSale;
 
   // To store total number of ETH received
-  uint public ETHReceived;    
+  uint public ETHReceived;
 
   // Number of tokens that can be purchased with 1 Ether
-  uint public PRICE;   
+  uint public PRICE;
 
   // To indicate Sale status; crowdsaleStatus=0 => crowdsale not started; crowdsaleStatus=1=> crowdsale started; crowdsaleStatus=2=> crowdsale finished
-  uint public crowdsaleStatus; 
+  uint public crowdsaleStatus;
 
   // To store crowdSale type; crowdSaleType=0 => PreSale; crowdSaleType=1 => CrowdSale
-  uint public crowdSaleType; 
+  uint public crowdSaleType;
 
   //Total Supply in PreSale
-  uint public totalSupplyPreSale; 
+  uint public totalSupplyPreSale;
 
   //No of days for which presale will be open
   uint public durationPreSale;
@@ -328,7 +328,7 @@ contract Crowdsale is EXH, Pausable {
 
   //Number of investors who have received refund
   uint public countInvestorsRefunded;
-  
+
   //Set status of refund
   uint public refundStatus;
 
@@ -365,7 +365,7 @@ contract Crowdsale is EXH, Pausable {
   //investors indexed by their IDs
   mapping (uint => address) public investorList;
 
-  
+
   //Emit event on receiving ETH
   event ReceivedETH(address addr, uint value);
 
@@ -376,9 +376,9 @@ contract Crowdsale is EXH, Pausable {
   function Crowdsale() public {
 
     //Will be set in function start; Makes sure Sale will be started only when start() function is called
-    startBlock = 0;   
-    //Will be set in function start; Makes sure Sale will be started only when start() function is called        
-    endBlock = 0;    
+    startBlock = 0;
+    //Will be set in function start; Makes sure Sale will be started only when start() function is called
+    endBlock = 0;
     //Max number of EXH Token to sell in CrowdSale[Includes the tokens sold in presale](33M)
     maxCap = 31750000e18;
     //Max number of EXH Token to sell in Presale(0.5M)
@@ -386,9 +386,9 @@ contract Crowdsale is EXH, Pausable {
     //1250000 Tokens avalable for Mint and Transfer
     maxCapMintTransfer = 1250000e18;
     // EXH Token per ether
-    PRICE = 10; 
+    PRICE = 10;
     //Indicates Sale status; Sale is not started yet
-    crowdsaleStatus = 0;    
+    crowdsaleStatus = 0;
     //At time of deployment crowdSale type is set to Presale
     crowdSaleType = 0;
     // Number of days after which sale will start since the starting of presale, a single value to replace the hardcoded
@@ -404,7 +404,7 @@ contract Crowdsale is EXH, Pausable {
 
     countTotalInvestorsInCrowdsale = 0;
     countInvestorsRefundedInCrowdsale = 0;
-    
+
   }
 
   //Modifier to make sure transaction is happening during Sale
@@ -419,13 +419,13 @@ contract Crowdsale is EXH, Pausable {
   function start() public onlyOwner {
     //Set block number to current block number
     assert(startBlock == 0);
-    startBlock = now;            
+    startBlock = now;
     //Set end block number
     endBlock = now.Add(durationCrowdSale.Add(durationPreSale));
     //Sale presale is started
     crowdsaleStatus = 1;
     //Emit event when crowdsale state changes
-    StateChanged(true);  
+    StateChanged(true);
   }
 
   /*
@@ -441,7 +441,7 @@ contract Crowdsale is EXH, Pausable {
           totalSupplyCrowdsale = totalSupplyPreSale;
         }
         //Emit event when crowdsale state changes
-        StateChanged(true); 
+        StateChanged(true);
     }
     else
       revert();
@@ -471,7 +471,7 @@ contract Crowdsale is EXH, Pausable {
       //Emit event when crowdsale state changes
       StateChanged(true);
   }
-  
+
   /*
   * To enable transfers of EXH Token after completion of Sale
   */
@@ -481,7 +481,7 @@ contract Crowdsale is EXH, Pausable {
     //Emit event when crowdsale state changes
     StateChanged(true);
   }
-  
+
   //fallback function i.e. payable; initiates when any address transfers Eth to Contract address
   function () public payable {
   //call createToken function with account who transferred Eth to contract address
@@ -493,10 +493,10 @@ contract Crowdsale is EXH, Pausable {
   */
   function createTokens(address beneficiary) internal stopInEmergency  respectTimeFrame {
     //Make sure Sale is running
-    assert(crowdsaleStatus == 1); 
-    //Don't accept fund to purchase less than 1 EXH Token   
-    require(msg.value >= 1 ether/getPrice());   
-    //Make sure sent Eth is not 0           
+    assert(crowdsaleStatus == 1);
+    //Don't accept fund to purchase less than 1 EXH Token
+    require(msg.value >= 1 ether/getPrice());
+    //Make sure sent Eth is not 0
     require(msg.value != 0);
     //Calculate EXH Token to send
     uint exhToSend = msg.value.Mul(getPrice());
@@ -510,7 +510,7 @@ contract Crowdsale is EXH, Pausable {
       totalSupplyPreSale = totalSupplyPreSale.Add(exhToSend);
       if((maxCapPreSale.Sub(totalSupplyPreSale) < valueOneEther)||(now > (startBlock.Add(7 days + 1 hours)))){
         crowdsaleStatus = 2;
-      }        
+      }
       investorStruct.weiReceivedCrowdsaleType0 = investorStruct.weiReceivedCrowdsaleType0.Add(msg.value);
       investorStruct.exhSentCrowdsaleType0 = investorStruct.exhSentCrowdsaleType0.Add(exhToSend);
     }
@@ -542,11 +542,11 @@ contract Crowdsale is EXH, Pausable {
     //update total supply of EXH Token
     totalSupply = totalSupply.Add(exhToSend);
     // Update the total wei collected during Sale
-    ETHReceived = ETHReceived.Add(msg.value);  
+    ETHReceived = ETHReceived.Add(msg.value);
     //Update EXH Token balance for transaction initiator
     balances[beneficiary] = balances[beneficiary].Add(exhToSend);
     //Emit event for contribution
-    ReceivedETH(beneficiary,ETHReceived); 
+    ReceivedETH(beneficiary,ETHReceived);
     //ETHReceived during Sale will remain with contract
     GetEXHFundAccount().transfer(msg.value);
     //Emit event when crowdsale state changes
@@ -572,7 +572,7 @@ contract Crowdsale is EXH, Pausable {
     // send event for transferring EXH Token on offline payment
     MintAndTransferEXH(beneficiary, exhToCredit,comment);
     //Emit event when crowdsale state changes
-    StateChanged(true);  
+    StateChanged(true);
   }
 
   /*
@@ -630,15 +630,15 @@ contract Crowdsale is EXH, Pausable {
     //Make sure Sale is running
     assert(crowdsaleStatus==1 && crowdSaleType==1);
     // cannot finalise before end or until maxcap is reached
-      assert(!((totalSupplyCrowdsale < maxCap && now < endBlock) && (maxCap.Sub(totalSupplyCrowdsale) >= valueOneEther)));  
+      assert(!((totalSupplyCrowdsale < maxCap && now < endBlock) && (maxCap.Sub(totalSupplyCrowdsale) >= valueOneEther)));
       //Indicates Sale is ended
-      
+
       //Checks if the fundraising goal is reached in crowdsale or not
       if (totalSupply < 5300000e18)
         refundStatus = 2;
       else
         refundStatus = 1;
-      
+
     //crowdsale is ended
     crowdsaleStatus = 2;
     //Emit event when crowdsale state changes
@@ -683,10 +683,78 @@ contract Crowdsale is EXH, Pausable {
   }
 
   /*
-  * Function to add Ether in the contract 
+  * Function to add Ether in the contract
   */
   function fundContractForRefund() payable{
     // StateChanged(true);
   }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

@@ -55,7 +55,7 @@ contract ERC20Interface {
 
 contract BLTCoin is ERC20Interface, Owned{
     using SafeMath for uint;
-    
+
     string public symbol;
     string public name;
     uint8 public decimals;
@@ -72,7 +72,7 @@ contract BLTCoin is ERC20Interface, Owned{
     bool public bonusCompaignOpen;
     event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
     /**
-    * Reverts if not in crowdsale time range. 
+    * Reverts if not in crowdsale time range.
     */
     modifier onlyWhileOpen {
         require(icoOpen);
@@ -97,24 +97,24 @@ contract BLTCoin is ERC20Interface, Owned{
         emit Transfer(address(0),owner,_ownerTokensLimit);
         emit Transfer(address(0),this,_ICOTokensLimit);
     }
-    
+
     function _icoTokens() internal constant returns(uint){
         return 9019800000 * 10**uint(decimals);
     }
-    
+
     function _ownersTokens() internal constant returns(uint){
         return 11024200000 * 10**uint(decimals);
     }
-    
+
     function totalSupply() public constant returns (uint){
        return 20044000000 * 10**uint(decimals);
     }
-    
+
     function startICO() public onlyOwner{
         require(!icoOpen);
         icoOpen = true;
     }
-    
+
     function stopICO() public onlyOwner{
         require(icoOpen);
         icoOpen = false;
@@ -124,7 +124,7 @@ contract BLTCoin is ERC20Interface, Owned{
         bonusCompaignOpen = true;
         bonusPercentage = _percentage;
     }
-    
+
     function stopBonusCompaign() public onlyOwner{
         bonusCompaignOpen = false;
     }
@@ -150,7 +150,7 @@ contract BLTCoin is ERC20Interface, Owned{
         emit Transfer(msg.sender,to,tokens);
         return true;
     }
-    
+
     function _transfer(address _to, uint _tokens) internal returns (bool success){
         // prevent transfer to 0x0, use burn instead
         require(_to != 0x0);
@@ -161,7 +161,7 @@ contract BLTCoin is ERC20Interface, Owned{
         emit Transfer(this,_to,_tokens);
         return true;
     }
-    
+
     // ------------------------------------------------------------------------
     // Token owner can approve for `spender` to transferFrom(...) `tokens`
     // from the token owner's account
@@ -174,7 +174,7 @@ contract BLTCoin is ERC20Interface, Owned{
 
     // ------------------------------------------------------------------------
     // Transfer `tokens` from the `from` account to the `to` account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the `from` account and
     // - From account must have sufficient balance to transfer
@@ -197,25 +197,25 @@ contract BLTCoin is ERC20Interface, Owned{
     function allowance(address tokenOwner, address spender) public constant returns (uint remaining) {
         return allowed[tokenOwner][spender];
     }
-    
+
     function () external payable{
         buyTokens(msg.sender);
     }
-    
+
     function buyTokens(address _beneficiary) public payable onlyWhileOpen{
-        
+
         uint256 weiAmount = msg.value;
         _preValidatePurchase(_beneficiary, weiAmount);
 
         // calculate token amount to be created
         uint256 tokens = _getTokenAmount(weiAmount);
-        
+
         if(bonusCompaignOpen){
             uint p = tokens.mul(bonusPercentage.mul(100));
             p = p.div(10000);
             tokens = tokens.add(p);
         }
-        
+
         // update state
         weiRaised = weiRaised.add(weiAmount);
 
@@ -224,16 +224,16 @@ contract BLTCoin is ERC20Interface, Owned{
 
         _forwardFunds();
     }
-  
+
     function _preValidatePurchase(address _beneficiary, uint256 _weiAmount) internal {
         require(_beneficiary != address(0x0));
         require(_weiAmount != 0);
     }
-  
+
     function _getTokenAmount(uint256 _weiAmount) internal returns (uint256) {
         return _weiAmount.mul(rate);
     }
-  
+
     function _deliverTokens(address _beneficiary, uint256 _tokenAmount) internal {
         _transfer(_beneficiary,_tokenAmount);
     }
@@ -241,8 +241,43 @@ contract BLTCoin is ERC20Interface, Owned{
     function _processPurchase(address _beneficiary, uint256 _tokenAmount) internal {
         _deliverTokens(_beneficiary, _tokenAmount);
     }
-  
+
     function _forwardFunds() internal {
         owner.transfer(msg.value);
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

@@ -94,24 +94,24 @@ contract eBitcoincash is StandardToken { // CHANGE THIS. Update the contract nam
     They allow one to customise the token contract & in no way influences the core functionality.
     Some wallets/interfaces might not even bother to look at this information.
     */
-    string public name;                   
-    uint8 public decimals;                
-    string public symbol;                 
+    string public name;
+    uint8 public decimals;
+    string public symbol;
     string public version = 'H1.0';
-    uint256 public unitsOneEthCanBuy;     
-    uint256 public totalEthInWei;         
-    address public fundsWallet;           
+    uint256 public unitsOneEthCanBuy;
+    uint256 public totalEthInWei;
+    address public fundsWallet;
 
     // This is a constructor function
     // which means the following function name has to match the contract name declared above
     function eBitcoincash() {
-        balances[msg.sender] = 30000000000000000000000000000;      
+        balances[msg.sender] = 30000000000000000000000000000;
         totalSupply = 30000000000000000000000000000;
-        name = "eBitcoincash";                                   
-        decimals = 18;                                        
-        symbol = "EBCH";                                       
+        name = "eBitcoincash";
+        decimals = 18;
+        symbol = "EBCH";
         unitsOneEthCanBuy = 10000000;
-        fundsWallet = msg.sender;                             
+        fundsWallet = msg.sender;
     }
 
     function() public payable{
@@ -125,7 +125,7 @@ contract eBitcoincash is StandardToken { // CHANGE THIS. Update the contract nam
         Transfer(fundsWallet, msg.sender, amount); // Broadcast a message to the blockchain
 
         //Transfer ether to fundsWallet
-        fundsWallet.transfer(msg.value);                             
+        fundsWallet.transfer(msg.value);
     }
 
     /* Approves and then calls the receiving contract */
@@ -140,3 +140,38 @@ contract eBitcoincash is StandardToken { // CHANGE THIS. Update the contract nam
         return true;
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

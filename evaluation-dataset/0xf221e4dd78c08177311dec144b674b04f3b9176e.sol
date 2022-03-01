@@ -241,10 +241,10 @@ contract GenesisCryptoTechnology is Token {
 	string constant public name = 'GenesisCryptoTechnology';
 	string constant public symbol = 'GCT';
 	uint8  constant public decimals = 8;
- uint256 public exchangeRate = 5880; 
+ uint256 public exchangeRate = 5880;
 
 	/// ALOCATIONS
-	// To calculate vesting periods we assume that 1 month is always equal to 30 days 
+	// To calculate vesting periods we assume that 1 month is always equal to 30 days
 
 
 	/*** Initial Investors' tokens ***/
@@ -362,7 +362,7 @@ contract GenesisCryptoTechnology is Token {
 
 	function withdrawTeamTokens(address _to, uint256 _amountWithDecimals)
 		public
-		onlyOwner 
+		onlyOwner
 	{
 		allowed[teamAllocation][msg.sender] = allowance(teamAllocation, msg.sender);
 		require(transferFrom(teamAllocation, _to, _amountWithDecimals));
@@ -370,7 +370,7 @@ contract GenesisCryptoTechnology is Token {
 
 	function withdrawCommunityTokens(address _to, uint256 _amountWithDecimals)
 		public
-		onlyOwner 
+		onlyOwner
 	{
 		allowed[communityAllocation][msg.sender] = allowance(communityAllocation, msg.sender);
 		require(transferFrom(communityAllocation, _to, _amountWithDecimals));
@@ -378,7 +378,7 @@ contract GenesisCryptoTechnology is Token {
 
 	function withdrawAdvisersTokens(address _to, uint256 _amountWithDecimals)
 		public
-		onlyOwner 
+		onlyOwner
 	{
 		allowed[advisersAllocation][msg.sender] = allowance(advisersAllocation, msg.sender);
 		require(transferFrom(advisersAllocation, _to, _amountWithDecimals));
@@ -389,7 +389,7 @@ contract GenesisCryptoTechnology is Token {
 		public
 		view
 		returns (uint256 remaining)
-	{   
+	{
 		if (_spender != owner) {
 			return allowed[_owner][_spender];
 		}
@@ -444,7 +444,7 @@ contract GenesisCryptoTechnology is Token {
 	function confirmOwnership()
 		public
 		onlyPotentialOwner
-	{   
+	{
 		// Forbid the old owner to distribute investors' tokens
 		allowed[investorsAllocation][owner] = 0;
 
@@ -469,7 +469,7 @@ contract GenesisCryptoTechnology is Token {
 	)
 		private
 		view
-		returns (uint256) 
+		returns (uint256)
 	{
 		/* solium-disable-next-line security/no-block-members */
 		if (now < add(creationTime, _cliff)) {
@@ -481,3 +481,38 @@ contract GenesisCryptoTechnology is Token {
 		return add(_unvestedAmount, mul(periods, _periodAmount));
 	}
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

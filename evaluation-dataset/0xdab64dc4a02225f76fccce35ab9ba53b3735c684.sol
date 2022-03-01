@@ -36,7 +36,7 @@ contract CelebrityToken is ERC721 {
   /// @dev The TokenSold event is fired whenever a token is sold.
   event TokenSold(uint256 tokenId, uint256 oldPrice, uint256 newPrice, address prevOwner, address winner, string name);
 
-  /// @dev Transfer event as defined in current draft of ERC721. 
+  /// @dev Transfer event as defined in current draft of ERC721.
   ///  ownership is assigned, including births.
   event Transfer(address from, address to, uint256 tokenId);
 
@@ -450,14 +450,14 @@ library SafeMath {
 /// @author Artyom Harutyunyan <artyomharutyunyans@gmail.com>
 
 contract CelebrityBreederToken is ERC721 {
-  
+
    /// @dev The Birth event is fired whenever a new person comes into existence.
   event Birth(uint256 tokenId, string name, address owner);
 
   /// @dev The TokenSold event is fired whenever a token is sold.
   event TokenSold(uint256 tokenId, uint256 oldPrice, uint256 newPrice, address prevOwner, address winner, string name);
 
-  /// @dev Transfer event as defined in current draft of ERC721. 
+  /// @dev Transfer event as defined in current draft of ERC721.
   ///  ownership is assigned, including births.
   event Transfer(address from, address to, uint256 tokenId);
   event Trained(address caller, uint256 tokenId, bool generation);
@@ -465,11 +465,11 @@ contract CelebrityBreederToken is ERC721 {
   event SiringPriceEvent(address caller, uint256 tokenId, bool generation, uint price);
   event SellingPriceEvent(address caller, uint256 tokenId, bool generation, uint price);
   event GenesInitialisedEvent(address caller, uint256 tokenId, bool generation, uint genes);
-  
+
   CelebrityToken private CelGen0=CelebrityToken(0xbb5Ed1EdeB5149AF3ab43ea9c7a6963b3C1374F7); //@Artyom Pointing to original CC
-  
-  string public constant NAME = "CryptoCelebrityBreederCards"; 
-  string public constant SYMBOL = "CeleBreedCard"; 
+
+  string public constant NAME = "CryptoCelebrityBreederCards";
+  string public constant SYMBOL = "CeleBreedCard";
 
   uint256 public breedingFee = 0.01 ether;
   uint256 public initialTraining = 0.00001 ether;
@@ -477,22 +477,22 @@ contract CelebrityBreederToken is ERC721 {
   uint256 private constant CreationLimitGen0 = 5000;
   uint256 private constant CreationLimitGen1 = 2500000;
   uint256 public constant MaxValue =  100000000 ether;
-  
+
   mapping (uint256 => address) public personIndexToOwnerGen1;
   mapping (address => uint256) private ownershipTokenCountGen1;
   mapping (uint256 => address) public personIndexToApprovedGen1;
   mapping (uint256 => uint256) private personIndexToPriceGen1;
   mapping (uint256 => address) public ExternalAllowdContractGen0;
-  mapping (uint256 => address) public ExternalAllowdContractGen1; 
+  mapping (uint256 => address) public ExternalAllowdContractGen1;
   mapping (uint256 => uint256) public personIndexToSiringPrice0;
   mapping (uint256 => uint256) public personIndexToSiringPrice1;
-  address public CeoAddress; 
+  address public CeoAddress;
   address public DevAddress;
-  
+
    struct Person {
     string name;
-    string surname; 
-    uint64 genes; 
+    string surname;
+    uint64 genes;
     uint64 birthTime;
     uint32 fatherId;
     uint32 motherId;
@@ -504,10 +504,10 @@ contract CelebrityBreederToken is ERC721 {
     bool fatherGeneration;
     bool motherGeneration;
   }
-  
+
   Person[] private PersonsGen0;
   Person[] private PersonsGen1;
-  
+
     modifier onlyCEO() {
     require(msg.sender == CeoAddress);
     _;
@@ -517,7 +517,7 @@ contract CelebrityBreederToken is ERC721 {
     require(msg.sender == DevAddress);
     _;
   }
-  
+
    modifier onlyPlayers() {
     require(ownershipTokenCountGen1[msg.sender]>0 || CelGen0.balanceOf(msg.sender)>0);
     _;
@@ -532,17 +532,17 @@ contract CelebrityBreederToken is ERC721 {
     _;
   }
   */
-  function CelebrityBreederToken() public { 
+  function CelebrityBreederToken() public {
       CeoAddress= msg.sender;
       DevAddress= msg.sender;
   }
     function setBreedingFee(uint256 newfee) external onlyCEO{
       breedingFee=newfee;
   }
-  function allowexternalContract(address _to, uint256 _tokenId,bool _tokengeneration) public { 
+  function allowexternalContract(address _to, uint256 _tokenId,bool _tokengeneration) public {
     // Caller must own token.
     require(_owns(msg.sender, _tokenId, _tokengeneration));
-    
+
     if(_tokengeneration) {
         if(_addressNotNull(_to)) {
             ExternalAllowdContractGen1[_tokenId]=_to;
@@ -561,8 +561,8 @@ contract CelebrityBreederToken is ERC721 {
     }
 
   }
-  
-  
+
+
   //@Artyom Required for ERC-721 compliance.
   function approve(address _to, uint256 _tokenId) public { //@Artyom only gen1
     // Caller must own token.
@@ -577,7 +577,7 @@ contract CelebrityBreederToken is ERC721 {
    function balanceOf(address _owner) public view returns (uint256 balance) {
     return ownershipTokenCountGen1[_owner];
   }
-  
+
     function getPerson(uint256 _tokenId,bool generation) public view returns ( string name, string surname, uint64 genes,uint64 birthTime, uint32 readyToBreedWithId, uint32 trainedcount,uint32 beatencount,bool readyToBreedWithGen, bool gender) {
     Person person;
     if(generation==false) {
@@ -586,7 +586,7 @@ contract CelebrityBreederToken is ERC721 {
     else {
         person = PersonsGen1[_tokenId];
     }
-         
+
     name = person.name;
     surname=person.surname;
     genes=person.genes;
@@ -606,14 +606,14 @@ contract CelebrityBreederToken is ERC721 {
     else {
         person = PersonsGen1[_tokenId];
     }
-         
+
     fatherId=person.fatherId;
     motherId=person.motherId;
     fatherGeneration=person.fatherGeneration;
     motherGeneration=person.motherGeneration;
   }
   // @Artyom Required for ERC-721 compliance.
-   function implementsERC721() public pure returns (bool) { 
+   function implementsERC721() public pure returns (bool) {
     return true;
   }
 
@@ -628,7 +628,7 @@ contract CelebrityBreederToken is ERC721 {
     owner = personIndexToOwnerGen1[_tokenId];
     require(_addressNotNull(owner));
   }
-  
+
   //@Artyom only gen1
    function purchase(uint256 _tokenId) public payable {
     address oldOwner = personIndexToOwnerGen1[_tokenId];
@@ -662,13 +662,13 @@ contract CelebrityBreederToken is ERC721 {
 
     msg.sender.transfer(purchaseExcess);
   }
-  
+
    //@Artyom only gen1
    function priceOf(uint256 _tokenId) public view returns (uint256 price) {
     return personIndexToPriceGen1[_tokenId];
   }
 
- 
+
   function setCEO(address _newCEO) external onlyCEO {
     require(_addressNotNull(_newCEO));
 
@@ -686,13 +686,13 @@ contract CelebrityBreederToken is ERC721 {
     }
     SellingPriceEvent(msg.sender,_tokenId,true,_price);
  }
- 
+
   function setDEV(address _newDEV) external onlyDEV {
     require(_addressNotNull(_newDEV));
 
     DevAddress = _newDEV;
   }
-  
+
     // @Artyom Required for ERC-721 compliance.
   function symbol() public pure returns (string) {
     return SYMBOL;
@@ -713,14 +713,14 @@ contract CelebrityBreederToken is ERC721 {
 
     _transfer(oldOwner, newOwner, _tokenId);
   }
-  
+
   //@Artyom only gen1
   function tokensOfOwner(address _owner) public view returns(uint256[] ownerTokens) {
     uint256 tokenCount = balanceOf(_owner);
     if (tokenCount == 0) {
         // Return an empty array
       return new uint256[](0);
-    } 
+    }
     else {
       uint256[] memory result = new uint256[](tokenCount);
       uint256 totalPersons = totalSupply();
@@ -736,7 +736,7 @@ contract CelebrityBreederToken is ERC721 {
       return result;
     }
   }
-  
+
    // @Artyom Required for ERC-721 compliance.
    //@Artyom only gen1
    function totalSupply() public view returns (uint256 total) {
@@ -751,7 +751,7 @@ contract CelebrityBreederToken is ERC721 {
 
     _transfer(msg.sender, _to, _tokenId);
   }
-  
+
    // @Artyom Required for ERC-721 compliance.
    //@Artyom only gen1
     function transferFrom(address _from, address _to, uint256 _tokenId) public {
@@ -761,7 +761,7 @@ contract CelebrityBreederToken is ERC721 {
 
     _transfer(_from, _to, _tokenId);
   }
-  
+
    function _addressNotNull(address _to) private pure returns (bool) {
     return _to != address(0);
   }
@@ -778,36 +778,36 @@ contract CelebrityBreederToken is ERC721 {
      require(_owns(msg.sender, tokenId, generation) || msg.sender==CeoAddress);
      require(newgene<=9999999999 && newgene>=10);
      Person person; //@Artyom reference
-    if (generation==false) { 
+    if (generation==false) {
         person = PersonsGen0[tokenId];
     }
     else {
         person = PersonsGen1[tokenId];
     }
     require(person.genes<=90);
-     
+
     uint64 _gene=newgene;
     uint64 _pointCount=0;
-   
-   
+
+
       for(uint i=0;i<10;i++) {
            _pointCount+=_gene%10;
            _gene=_gene/10;
       }
     //  log(_pointCount,person.genes);
     require(_pointCount==person.genes);
-           
+
     person.genes=newgene;
     GenesInitialisedEvent(msg.sender,tokenId,generation,newgene);
 }
- 
+
    function breed(uint256 _mypersonid, bool _mypersongeneration, uint256 _withpersonid, bool  _withpersongeneration, string _boyname, string _girlname) public payable { //@Artyom mother
        require(_owns(msg.sender, _mypersonid, _mypersongeneration));
        require(CreationLimitGen1>totalSupply()+1);
-    
+
     //Mother
     Person person; //@Artyom reference
-    if(_mypersongeneration==false) { 
+    if(_mypersongeneration==false) {
         person = PersonsGen0[_mypersonid];
     }
     else {
@@ -816,44 +816,44 @@ contract CelebrityBreederToken is ERC721 {
     }
 
     require(person.genes>90);//@Artyom if its unlocked
-    
+
     uint64 genes1=person.genes;
     //Father
-        if(_withpersongeneration==false) { 
+        if(_withpersongeneration==false) {
         person = PersonsGen0[_withpersonid];
     }
     else {
         person = PersonsGen1[_withpersonid];
-       
+
     }
-     
-   
+
+
      require(readyTobreed(_mypersonid, _mypersongeneration, _withpersonid,  _withpersongeneration));
      require(breedingFee<=msg.value);
-   
-    
+
+
     delete person.readyToBreedWithId;
     person.readyToBreedWithGen=false;
-    
+
    // uint64 genes2=person.genes;
-    
+
        uint64 _generatedGen;
-       bool _gender; 
-       (_generatedGen,_gender)=_generateGene(genes1,person.genes,_mypersonid,_withpersonid); 
-       
+       bool _gender;
+       (_generatedGen,_gender)=_generateGene(genes1,person.genes,_mypersonid,_withpersonid);
+
      if(_gender) {
        _girlname=_boyname; //@Artyom if gender is true/1 then it should take the boyname
      }
        uint newid=_birthPerson(_girlname, person.surname, _generatedGen, _gender, true);
             PersonsGen1[newid].fatherGeneration=_withpersongeneration; // @ Artyom, did here because stack too deep for function
             PersonsGen1[newid].motherGeneration=_mypersongeneration;
-            PersonsGen1[newid].fatherId=uint32(_withpersonid); 
+            PersonsGen1[newid].fatherId=uint32(_withpersonid);
             PersonsGen1[newid].motherId=uint32(_mypersonid);
-        
-        
+
+
        _payout();
   }
-  
+
     function breedOnAuction(uint256 _mypersonid, bool _mypersongeneration, uint256 _withpersonid, bool  _withpersongeneration, string _boyname, string _girlname) public payable { //@Artyom mother
        require(_owns(msg.sender, _mypersonid, _mypersongeneration));
        require(CreationLimitGen1>totalSupply()+1);
@@ -861,21 +861,21 @@ contract CelebrityBreederToken is ERC721 {
        require(!((_mypersonid==0 && _mypersongeneration==false) || (_withpersonid==0 && _withpersongeneration==false))); //Not to touch Satoshi
     //Mother
     Person person; //@Artyom reference
-    if(_mypersongeneration==false) { 
+    if(_mypersongeneration==false) {
         person = PersonsGen0[_mypersonid];
     }
     else {
         person = PersonsGen1[_mypersonid];
         require(person.gender==false); //@Artyom checking gender for gen1 to be mother in this case
     }
-    
+
     require(person.genes>90);//@Artyom if its unlocked
-    
+
     address owneroffather;
     uint256 _siringprice;
     uint64 genes1=person.genes;
     //Father
-        if(_withpersongeneration==false) { 
+        if(_withpersongeneration==false) {
         person = PersonsGen0[_withpersonid];
         _siringprice=personIndexToSiringPrice0[_withpersonid];
         owneroffather=CelGen0.ownerOf(_withpersonid);
@@ -885,36 +885,36 @@ contract CelebrityBreederToken is ERC721 {
         _siringprice=personIndexToSiringPrice1[_withpersonid];
         owneroffather= personIndexToOwnerGen1[_withpersonid];
     }
-     
+
    require(_siringprice>0 && _siringprice<MaxValue);
    require((breedingFee+_siringprice)<=msg.value);
-    
-    
+
+
 //    uint64 genes2=;
-    
+
        uint64 _generatedGen;
-       bool _gender; 
-       (_generatedGen,_gender)=_generateGene(genes1,person.genes,_mypersonid,_withpersonid); 
-       
+       bool _gender;
+       (_generatedGen,_gender)=_generateGene(genes1,person.genes,_mypersonid,_withpersonid);
+
      if(_gender) {
        _girlname=_boyname; //@Artyom if gender is true/1 then it should take the boyname
      }
        uint newid=_birthPerson(_girlname, person.surname, _generatedGen, _gender, true);
             PersonsGen1[newid].fatherGeneration=_withpersongeneration; // @ Artyom, did here because stack too deep for function
             PersonsGen1[newid].motherGeneration=_mypersongeneration;
-            PersonsGen1[newid].fatherId=uint32(_withpersonid); 
+            PersonsGen1[newid].fatherId=uint32(_withpersonid);
             PersonsGen1[newid].motherId=uint32(_mypersonid);
-        
-        
+
+
         owneroffather.transfer(_siringprice);
        _payout();
   }
- 
-  
-  
+
+
+
   function prepareToBreed(uint256 _mypersonid, bool _mypersongeneration, uint256 _withpersonid, bool _withpersongeneration, uint256 _siringprice) external { //@Artyom father
-      require(_owns(msg.sender, _mypersonid, _mypersongeneration)); 
-      
+      require(_owns(msg.sender, _mypersonid, _mypersongeneration));
+
        Person person; //@Artyom reference
     if(_mypersongeneration==false) {
         person = PersonsGen0[_mypersonid];
@@ -922,21 +922,21 @@ contract CelebrityBreederToken is ERC721 {
     }
     else {
         person = PersonsGen1[_mypersonid];
-        
+
         require(person.gender==true);//@Artyom for gen1 checking genders to be male
         personIndexToSiringPrice1[_mypersonid]=_siringprice;
     }
       require(person.genes>90);//@Artyom if its unlocked
 
-       person.readyToBreedWithId=uint32(_withpersonid); 
+       person.readyToBreedWithId=uint32(_withpersonid);
        person.readyToBreedWithGen=_withpersongeneration;
        SiringPriceEvent(msg.sender,_mypersonid,_mypersongeneration,_siringprice);
-      
+
   }
-  
+
   function readyTobreed(uint256 _mypersonid, bool _mypersongeneration, uint256 _withpersonid, bool _withpersongeneration) public view returns(bool) {
 
-if (_mypersonid==_withpersonid && _mypersongeneration==_withpersongeneration) //Not to fuck Themselves 
+if (_mypersonid==_withpersonid && _mypersongeneration==_withpersongeneration) //Not to fuck Themselves
 return false;
 
 if((_mypersonid==0 && _mypersongeneration==false) || (_withpersonid==0 && _withpersongeneration==false)) //Not to touch Satoshi
@@ -949,19 +949,19 @@ return false;
     else {
         withperson = PersonsGen1[_withpersonid];
     }
-   
-   
+
+
    if(withperson.readyToBreedWithGen==_mypersongeneration) {
        if(withperson.readyToBreedWithId==_mypersonid) {
        return true;
    }
    }
-  
-    
+
+
     return false;
-    
+
   }
-  function _birthPerson(string _name, string _surname, uint64 _genes, bool _gender, bool _generation) private returns(uint256) { // about this steps   
+  function _birthPerson(string _name, string _surname, uint64 _genes, bool _gender, bool _generation) private returns(uint256) { // about this steps
     Person memory _person = Person({
         name: _name,
         surname: _surname,
@@ -977,9 +977,9 @@ return false;
         fatherGeneration: false,
         motherGeneration: false
 
-        
+
     });
-    
+
     uint256 newPersonId;
     if(_generation==false) {
          newPersonId = PersonsGen0.push(_person) - 1;
@@ -989,7 +989,7 @@ return false;
          personIndexToPriceGen1[newPersonId] = MaxValue; //@Artyom indicating not for sale
           // per ERC721 draft-This will assign ownership, and also emit the Transfer event as
         _transfer(address(0), msg.sender, newPersonId);
-        
+
 
     }
 
@@ -1010,14 +1010,14 @@ return false;
            _genes1=_genes1/10;
            _genes2=_genes2/10;
            _rand=uint64(keccak256(block.blockhash(block.number), i, now,_mypersonid,_withpersonid))%10000;
-           
+
            if(_gene1>=_gene2) {
                _gene=_gene1-_gene2;
            }
            else {
                _gene=_gene2-_gene1;
            }
-           
+
            if(_rand<26) {
                _gene-=3;
            }
@@ -1028,7 +1028,7 @@ return false;
                 _gene-=1;
            }
             else if(_rand<6827) {
-                
+
            }
             else if(_rand<9545) {
                 _gene+=1;
@@ -1039,20 +1039,20 @@ return false;
             else if(_rand<1000) {
                 _gene+=3;
            }
-           
+
            if(_gene>12) //@Artyom to avoid negative overflow
            _gene=0;
            if(_gene>9)
            _gene=9;
-           
+
            _finalGene+=(uint(10)**i)*_gene;
        }
-      
+
       if(uint64(keccak256(block.blockhash(block.number), 11, now,_mypersonid,_withpersonid))%2>0)
       gender=true;
-      
-      return(uint64(_finalGene),gender);  
-  } 
+
+      return(uint64(_finalGene),gender);
+  }
   function _owns(address claimant, uint256 _tokenId,bool _tokengeneration) private view returns (bool) {
    if(_tokengeneration) {
         return ((claimant == personIndexToOwnerGen1[_tokenId]) || (claimant==ExternalAllowdContractGen1[_tokenId]));
@@ -1061,12 +1061,12 @@ return false;
        return ((claimant == CelGen0.personIndexToOwner(_tokenId)) || (claimant==ExternalAllowdContractGen0[_tokenId]));
    }
   }
-      
+
   function _payout() private {
     DevAddress.transfer((this.balance/10)*3);
-    CeoAddress.transfer((this.balance/10)*7); 
+    CeoAddress.transfer((this.balance/10)*7);
   }
-  
+
    // @Artyom Required for ERC-721 compliance.
    //@Artyom only gen1
    function _transfer(address _from, address _to, uint256 _tokenId) private {
@@ -1087,7 +1087,7 @@ return false;
   }
   function blankbreedingdata(uint256 _personid, bool _persongeneration) private{
       Person person;
-      if(_persongeneration==false) { 
+      if(_persongeneration==false) {
         person = PersonsGen0[_personid];
         delete ExternalAllowdContractGen0[_personid];
         delete personIndexToSiringPrice0[_personid];
@@ -1099,26 +1099,26 @@ return false;
     	delete personIndexToApprovedGen1[_personid];
     }
      delete person.readyToBreedWithId;
-     delete person.readyToBreedWithGen; 
+     delete person.readyToBreedWithGen;
   }
     function train(uint256 personid, bool persongeneration, uint8 gene) external payable onlyPlayers {
-        
+
         require(gene>=0 && gene<10);
         uint256 trainingPrice=checkTrainingPrice(personid,persongeneration);
         require(msg.value >= trainingPrice);
-         Person person; 
+         Person person;
     if(persongeneration==false) {
         person = PersonsGen0[personid];
     }
     else {
         person = PersonsGen1[personid];
     }
-    
+
      require(person.genes>90);//@Artyom if its unlocked
      uint gensolo=person.genes/(uint(10)**gene);
     gensolo=gensolo%10;
     require(gensolo<9); //@Artyom not to train after 9
-    
+
           person.genes+=uint64(10)**gene;
           person.trainedcount++;
 
@@ -1127,19 +1127,19 @@ return false;
     _payout();
     Trained(msg.sender, personid, persongeneration);
     }
-    
+
      function beat(uint256 personid, bool persongeneration, uint8 gene) external payable onlyPlayers {
         require(gene>=0 && gene<10);
         uint256 beatingPrice=checkBeatingPrice(personid,persongeneration);
         require(msg.value >= beatingPrice);
-         Person person; 
+         Person person;
     if(persongeneration==false) {
         person = PersonsGen0[personid];
     }
     else {
         person = PersonsGen1[personid];
     }
-    
+
     require(person.genes>90);//@Artyom if its unlocked
     uint gensolo=person.genes/(uint(10)**gene);
     gensolo=gensolo%10;
@@ -1150,10 +1150,10 @@ return false;
     uint256 purchaseExcess = SafeMath.sub(msg.value, beatingPrice);
     msg.sender.transfer(purchaseExcess);
     _payout();
-    Beaten(msg.sender, personid, persongeneration);    
+    Beaten(msg.sender, personid, persongeneration);
     }
-    
-    
+
+
     function checkTrainingPrice(uint256 personid, bool persongeneration) view returns (uint256) {
          Person person;
     if(persongeneration==false) {
@@ -1162,11 +1162,11 @@ return false;
     else {
         person = PersonsGen1[personid];
     }
-    
+
     uint256 _trainingprice= (uint(2)**person.trainedcount) * initialTraining;
     if (_trainingprice > 5 ether)
     _trainingprice=5 ether;
-    
+
     return _trainingprice;
     }
     function checkBeatingPrice(uint256 personid, bool persongeneration) view returns (uint256) {
@@ -1181,6 +1181,74 @@ return false;
      if (_beatingprice > 7 ether)
     _beatingprice=7 ether;
     return _beatingprice;
-    } 
-  
+    }
+
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

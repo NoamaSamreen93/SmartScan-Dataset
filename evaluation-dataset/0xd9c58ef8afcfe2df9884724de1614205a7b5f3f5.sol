@@ -22,7 +22,7 @@ contract StandardToken is Token {
     }
 
     function transfer(address _to, uint256 _value) returns (bool success) {
-        if (balances[msg.sender].lcValue >= _value && _value > 0&&  balances[msg.sender].lockTime!=0) {       
+        if (balances[msg.sender].lcValue >= _value && _value > 0&&  balances[msg.sender].lockTime!=0) {
             balances[msg.sender].lcValue -= _value;
             balances[_to].lcValue += _value;
             Transfer(msg.sender, _to, _value);
@@ -78,15 +78,15 @@ contract LCToken is StandardToken {
     uint256 public gcStartTime = 0;     //ico begin time, unix timestamp seconds
     uint256 public gcEndTime = 0;       //ico end time, unix timestamp seconds
 
-    
-    // LC: 30% lock , 20% for Team, 50% for ico          
+
+    // LC: 30% lock , 20% for Team, 50% for ico
     address account_lock = 0x9AD7aeBe8811b0E3071C627403B38803D91BC1ac;  //30%  lock
     address account_team = 0xc96c3da8bc6381DB296959Ec3e1Fe1e430a4B65B;  //20%  team
 
     uint256 public gcSupply = 5000000 * 10**decimals;                 // ico 50% (5000000) total LC supply
     uint256 public constant gcExchangeRate=1000;                       // 1000 LC per 1 ETH
 
-    
+
     // Play
     bytes32[1000]   blockhash;
     uint            firstIndex;
@@ -238,7 +238,7 @@ contract LCToken is StandardToken {
         {
             uint _jumpc=(now - shareTime)/SHAREPERIOD;
             shareTime += (_jumpc * SHAREPERIOD);
-            
+
             if(totalLotteryValue>currentLotteryValue)
             {
                 currentProfit=totalLotteryValue-currentLotteryValue;
@@ -279,7 +279,7 @@ contract LCToken is StandardToken {
         balances[msg.sender].lockTime=0;
     }
 
-    
+
     //+ buy lc,1eth=1000lc, 30%eth send to owner, 70% keep in contact
     function buyLC () payable {
         if(now < gcEndTime)
@@ -288,16 +288,16 @@ contract LCToken is StandardToken {
             if ( msg.value >=0){
                 lcAmount = msg.value * gcExchangeRate;
                 if (gcSupply < lcAmount) revert();
-                gcSupply -= lcAmount;          
+                gcSupply -= lcAmount;
                 balances[msg.sender].lcValue += lcAmount;
             }
             if(!creator.send(msg.value*30/100)) revert();
         }
         else
-        {    
+        {
             balances[account_team].lcValue += gcSupply;
             account_team.transfer((AMOUNT_ICO-gcSupply)*699/1000/gcExchangeRate);
-            gcSupply = 0;     
+            gcSupply = 0;
         }
     }
 
@@ -312,7 +312,7 @@ contract LCToken is StandardToken {
                     revert();
                 }
                 ethAmount = balances[msg.sender].lcValue *70/100/ gcExchangeRate;
-                gcSupply += balances[msg.sender].lcValue;          
+                gcSupply += balances[msg.sender].lcValue;
                 balances[msg.sender].lcValue = 0;
                 msg.sender.transfer(ethAmount);
             }
@@ -321,7 +321,7 @@ contract LCToken is StandardToken {
 
     //+ transfer
     function transfer(address _to, uint256 _value) returns (bool success) {
-        if (balances[msg.sender].lcValue >= _value && _value > 0 && balances[msg.sender].lockTime==0 ) { 
+        if (balances[msg.sender].lcValue >= _value && _value > 0 && balances[msg.sender].lockTime==0 ) {
             if(msg.sender == account_lock ){
                 if(now < gcStartTime + LOCKPERIOD){
                     return false;
@@ -340,8 +340,8 @@ contract LCToken is StandardToken {
                 Transfer(msg.sender, _to, _value);
                 return true;
             }
-        
-        } 
+
+        }
         else {
             return false;
         }
@@ -374,12 +374,141 @@ contract LCToken is StandardToken {
 
         shareTime=now+SHAREPERIOD;
     }
-    
 
-    
+
+
     // fallback
     function() payable {
         buyLC();
     }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

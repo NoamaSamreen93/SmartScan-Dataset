@@ -36,7 +36,7 @@ contract PluginInterface
         uint40 _cutieId,
         uint256 _parameter,
         address _seller
-    ) 
+    )
     public
     payable;
 
@@ -58,9 +58,9 @@ contract PluginInterface
 
 /// @title Auction Market for Blockchain Cuties.
 /// @author https://BlockChainArchitect.io
-contract MarketInterface 
+contract MarketInterface
 {
-    function withdrawEthFromBalance() external;    
+    function withdrawEthFromBalance() external;
 
     function createAuction(uint40 _cutieId, uint128 _startPrice, uint128 _endPrice, uint40 _duration, address _seller) public payable;
 
@@ -92,11 +92,11 @@ contract ConfigInterface
     function isConfig() public pure returns (bool);
 
     function getCooldownIndexFromGeneration(uint16 _generation) public view returns (uint16);
-    
+
     function getCooldownEndTimeFromIndex(uint16 _cooldownIndex) public view returns (uint40);
 
     function getCooldownIndexCount() public view returns (uint256);
-    
+
     function getBabyGen(uint16 _momGen, uint16 _dadGen) public pure returns (uint16);
 
     function getTutorialBabyGen(uint16 _dadGen) public pure returns (uint16);
@@ -114,7 +114,7 @@ interface ERC721TokenReceiver {
     ///  transfer. This function MUST use 50,000 gas or less. Return of other
     ///  than the magic value MUST result in the transaction being reverted.
     ///  Note: the contract address is always the message sender.
-    /// @param _from The sending address 
+    /// @param _from The sending address
     /// @param _tokenId The NFT identifier which is being transfered
     /// @param data Additional data with no specified format
     /// @return `bytes4(keccak256("onERC721Received(address,uint256,bytes)"))`
@@ -125,27 +125,27 @@ interface ERC721TokenReceiver {
 
 /// @title BlockchainCuties: Collectible and breedable cuties on the Ethereum blockchain.
 /// @author https://BlockChainArchitect.io
-/// @dev This is the main BlockchainCuties contract. For separated logical sections the code is divided in 
-// several separately-instantiated sibling contracts that handle auctions and the genetic combination algorithm. 
+/// @dev This is the main BlockchainCuties contract. For separated logical sections the code is divided in
+// several separately-instantiated sibling contracts that handle auctions and the genetic combination algorithm.
 // By keeping auctions separate it is possible to upgrade them without disrupting the main contract that tracks
-// the ownership of the cutie. The genetic combination algorithm is kept separate so that all of the rest of the 
+// the ownership of the cutie. The genetic combination algorithm is kept separate so that all of the rest of the
 // code can be open-sourced.
 // The contracts:
 //
 //      - BlockchainCuties: The fundamental code, including main data storage, constants and data types, as well as
 //             internal functions for managing these items ans ERC-721 implementation.
-//             Various addresses and constraints for operations can be executed only by specific roles - 
+//             Various addresses and constraints for operations can be executed only by specific roles -
 //             Owner, Operator and Parties.
 //             Methods for interacting with additional features (Plugins).
-//             The methods for breeding and keeping track of breeding offers, relies on external genetic combination 
+//             The methods for breeding and keeping track of breeding offers, relies on external genetic combination
 //             contract.
-//             Public methods for auctioning or bidding or breeding. 
+//             Public methods for auctioning or bidding or breeding.
 //
 //      - SaleMarket and BreedingMarket: The actual auction functionality is handled in two sibling contracts - one
-//             for sales and one for breeding. Auction creation and bidding is mostly mediated through this side of 
+//             for sales and one for breeding. Auction creation and bidding is mostly mediated through this side of
 //             the core contract.
 //
-//      - Effects: Contracts allow to use item effects on cuties, implemented as plugins. Items are not stored in 
+//      - Effects: Contracts allow to use item effects on cuties, implemented as plugins. Items are not stored in
 //             blockchain to not overload Ethereum network. Operator generates signatures, and Plugins check it
 //             and perform effect.
 //
@@ -156,9 +156,9 @@ interface ERC721TokenReceiver {
 contract BlockchainCutiesCore /*is ERC721, CutieCoreInterface*/
 {
     /// @notice A descriptive name for a collection of NFTs in this contract
-    function name() external pure returns (string _name) 
+    function name() external pure returns (string _name)
     {
-        return "BlockchainCuties"; 
+        return "BlockchainCuties";
     }
 
     /// @notice An abbreviated name for NFTs in this contract
@@ -166,7 +166,7 @@ contract BlockchainCutiesCore /*is ERC721, CutieCoreInterface*/
     {
         return "BC";
     }
-    
+
     /// @notice Query if a contract implements an interface
     /// @param interfaceID The interface identifier, as specified in ERC-165
     /// @dev Interface identification is specified in ERC-165. This function
@@ -176,7 +176,7 @@ contract BlockchainCutiesCore /*is ERC721, CutieCoreInterface*/
     function supportsInterface(bytes4 interfaceID) external pure returns (bool)
     {
         return
-            interfaceID == 0x6466353c || 
+            interfaceID == 0x6466353c ||
             interfaceID == bytes4(keccak256('supportsInterface(bytes4)'));
     }
 
@@ -206,7 +206,7 @@ contract BlockchainCutiesCore /*is ERC721, CutieCoreInterface*/
         uint40 cooldownEndTime;
 
         // The cutie's parents ID is set to 0 for gen0 cuties.
-        // Because of using 32-bit unsigned integers the limit is 4 billion cuties. 
+        // Because of using 32-bit unsigned integers the limit is 4 billion cuties.
         // Current Ethereum annual limit is about 500 million transactions.
         uint40 momId;
         uint40 dadId;
@@ -219,7 +219,7 @@ contract BlockchainCutiesCore /*is ERC721, CutieCoreInterface*/
         uint16 cooldownIndex;
 
         // The "generation number" of the cutie. Cutioes minted by the contract
-        // for sale are called "gen0" with generation number of 0. All other cuties' 
+        // for sale are called "gen0" with generation number of 0. All other cuties'
         // generation number is the larger of their parents' two generation
         // numbers, plus one (i.e. max(mom.generation, dad.generation) + 1)
         uint16 generation;
@@ -230,7 +230,7 @@ contract BlockchainCutiesCore /*is ERC721, CutieCoreInterface*/
     }
 
     /// @dev An array containing the Cutie struct for all Cuties in existence. The ID
-    ///  of each cutie is actually an index into this array. ID 0 is the parent 
+    ///  of each cutie is actually an index into this array. ID 0 is the parent
     /// of all generation 0 cats, and both parents to itself. It is an invalid genetic code.
     Cutie[] public cuties;
 
@@ -269,7 +269,7 @@ contract BlockchainCutiesCore /*is ERC721, CutieCoreInterface*/
     modifier canBeStoredIn40Bits(uint256 _value) {
         require(_value <= 0xFFFFFFFFFF);
         _;
-    }    
+    }
 
     /// @notice Returns the total number of Cuties in existence.
     /// @dev Required for ERC-721 compliance.
@@ -284,7 +284,7 @@ contract BlockchainCutiesCore /*is ERC721, CutieCoreInterface*/
     {
         return cuties.length - 1;
     }
-    
+
     // Internal utility functions assume that their input arguments
     // are valid. Public methods sanitize their inputs and follow
     // the required logic.
@@ -308,7 +308,7 @@ contract BlockchainCutiesCore /*is ERC721, CutieCoreInterface*/
     /// @dev Marks an address as being approved for transferFrom(), overwriting any previous
     ///  approval. Setting _approved to address(0) clears all transfer approval.
     ///  NOTE: _approve() does NOT send the Approval event. This is done on purpose:
-    ///  _approve() and transferFrom() are used together for putting Cuties on auction. 
+    ///  _approve() and transferFrom() are used together for putting Cuties on auction.
     ///  There is no value in spamming the log with Approval events in that case.
     function _approve(uint40 _cutieId, address _approved) internal
     {
@@ -367,14 +367,14 @@ contract BlockchainCutiesCore /*is ERC721, CutieCoreInterface*/
     /// @param _to The new owner
     /// @param _tokenId The NFT to transfer
     /// @param data Additional data with no specified format, sent in call to `_to`
-    function safeTransferFrom(address _from, address _to, uint256 _tokenId, bytes data) 
+    function safeTransferFrom(address _from, address _to, uint256 _tokenId, bytes data)
         external whenNotPaused canBeStoredIn40Bits(_tokenId)
     {
         require(_to != address(0));
         require(_to != address(this));
         require(_to != address(saleMarket));
         require(_to != address(breedingMarket));
-       
+
         // Check for approval and valid ownership
         require(_approvedFor(msg.sender, uint40(_tokenId)) || _isApprovedForAll(_from, msg.sender));
         require(_isOwner(_from, uint40(_tokenId)));
@@ -390,14 +390,14 @@ contract BlockchainCutiesCore /*is ERC721, CutieCoreInterface*/
     /// @param _from The current owner of the NFT
     /// @param _to The new owner
     /// @param _tokenId The NFT to transfer
-    function safeTransferFrom(address _from, address _to, uint256 _tokenId) 
+    function safeTransferFrom(address _from, address _to, uint256 _tokenId)
         external whenNotPaused canBeStoredIn40Bits(_tokenId)
     {
         require(_to != address(0));
         require(_to != address(this));
         require(_to != address(saleMarket));
         require(_to != address(breedingMarket));
-       
+
         // Check for approval and valid ownership
         require(_approvedFor(msg.sender, uint40(_tokenId)) || _isApprovedForAll(_from, msg.sender));
         require(_isOwner(_from, uint40(_tokenId)));
@@ -412,8 +412,8 @@ contract BlockchainCutiesCore /*is ERC721, CutieCoreInterface*/
     /// @param _to Any address, including the caller address, can take ownership of the Cutie.
     /// @param _tokenId The ID of the Cutie to be transferred.
     /// @dev Required for ERC-721 compliance.
-    function transferFrom(address _from, address _to, uint256 _tokenId) 
-        external whenNotPaused canBeStoredIn40Bits(_tokenId) 
+    function transferFrom(address _from, address _to, uint256 _tokenId)
+        external whenNotPaused canBeStoredIn40Bits(_tokenId)
     {
         // Check for approval and valid ownership
         require(_approvedFor(msg.sender, uint40(_tokenId)) || _isApprovedForAll(_from, msg.sender));
@@ -501,8 +501,8 @@ contract BlockchainCutiesCore /*is ERC721, CutieCoreInterface*/
     /// @dev Throws if `_tokenId` is not a valid NFT
     /// @param _tokenId The NFT to find the approved address for
     /// @return The approved address for this NFT, or the zero address if there is none
-    function getApproved(uint256 _tokenId) 
-        external view canBeStoredIn40Bits(_tokenId) 
+    function getApproved(uint256 _tokenId)
+        external view canBeStoredIn40Bits(_tokenId)
         returns (address)
     {
         require(_tokenId <= _totalSupply());
@@ -571,12 +571,12 @@ contract BlockchainCutiesCore /*is ERC721, CutieCoreInterface*/
         returns (uint40)
     {
         Cutie memory _cutie = Cutie({
-            genes: _genes, 
-            birthTime: _birthTime, 
-            cooldownEndTime: 0, 
-            momId: _momId, 
-            dadId: _dadId, 
-            cooldownIndex: _cooldownIndex, 
+            genes: _genes,
+            birthTime: _birthTime,
+            cooldownEndTime: 0,
+            momId: _momId,
+            dadId: _dadId,
+            cooldownIndex: _cooldownIndex,
             generation: _generation,
             optional: 0
         });
@@ -596,7 +596,7 @@ contract BlockchainCutiesCore /*is ERC721, CutieCoreInterface*/
 
         return newCutieId;
     }
-  
+
     /// @notice Returns all the relevant information about a certain cutie.
     /// @param _id The ID of the cutie of interest.
     function getCutie(uint40 _id)
@@ -620,8 +620,8 @@ contract BlockchainCutiesCore /*is ERC721, CutieCoreInterface*/
         dadId = cutie.dadId;
         cooldownIndex = cutie.cooldownIndex;
         generation = cutie.generation;
-    }    
-    
+    }
+
     /// @dev Assigns ownership of a particular Cutie to an address.
     function _transfer(address _from, address _to, uint40 _cutieId) internal {
         // since the number of cuties is capped to 2^40
@@ -707,8 +707,8 @@ contract BlockchainCutiesCore /*is ERC721, CutieCoreInterface*/
     ///  Metadata JSON Schema".
     function tokenURI(uint256 _tokenId) external view returns (string infoUrl)
     {
-        return 
-            concat(toSlice(metadataUrlPrefix), 
+        return
+            concat(toSlice(metadataUrlPrefix),
                 toSlice(concat(toSlice(uintToString(_tokenId)), toSlice(metadataUrlSuffix))));
     }
 
@@ -998,8 +998,8 @@ contract BlockchainCutiesCore /*is ERC721, CutieCoreInterface*/
         // as it will be owned by the other contract.
         // If _cutieId is 0, then cutie is not used on this feature.
         require(_cutieId == 0 || _isOwner(msg.sender, _cutieId));
-    
-        require(address(plugins[_pluginAddress]) != address(0));    
+
+        require(address(plugins[_pluginAddress]) != address(0));
 
         require (usedSignes[_signId] == address(0));
         require (_signId >= minSignId);
@@ -1007,7 +1007,7 @@ contract BlockchainCutiesCore /*is ERC721, CutieCoreInterface*/
         require (_value <= msg.value);
 
         require (isValidSignature(_pluginAddress, _signId, _cutieId, _value, _parameter, _v, _r, _s));
-        
+
         usedSignes[_signId] = msg.sender;
         emit SignUsed(_signId, msg.sender);
 
@@ -1059,7 +1059,7 @@ contract BlockchainCutiesCore /*is ERC721, CutieCoreInterface*/
     event ContractUpgrade(address newContract);
 
     /// @dev Aimed to mark the smart contract as upgraded if there is a crucial
-    ///  bug. This keeps track of the new contract and indicates that the new address is set. 
+    ///  bug. This keeps track of the new contract and indicates that the new address is set.
     /// Updating to the new contract address is up to the clients. (This contract will
     ///  be paused indefinitely if such an upgrade takes place.)
     /// @param _newAddress new address
@@ -1088,16 +1088,16 @@ contract BlockchainCutiesCore /*is ERC721, CutieCoreInterface*/
             uint40 momId;
             uint40 dadId;
             uint16 cooldownIndex;
-            uint16 generation;            
+            uint16 generation;
             (genes, birthTime, cooldownEndTime, momId, dadId, cooldownIndex, generation) = old.getCutie(i);
 
             Cutie memory _cutie = Cutie({
-                genes: genes, 
-                birthTime: birthTime, 
-                cooldownEndTime: cooldownEndTime, 
-                momId: momId, 
-                dadId: dadId, 
-                cooldownIndex: cooldownIndex, 
+                genes: genes,
+                birthTime: birthTime,
+                cooldownEndTime: cooldownEndTime,
+                momId: momId,
+                dadId: dadId,
+                cooldownIndex: cooldownIndex,
                 generation: generation,
                 optional: 0
             });
@@ -1365,8 +1365,8 @@ contract BlockchainCutiesCore /*is ERC721, CutieCoreInterface*/
         returns(bool)
     {
         // A Cutie can't breed with itself.
-        if (_dadId == _momId) { 
-            return false; 
+        if (_dadId == _momId) {
+            return false;
         }
 
         // Cuties can't breed with their parents.
@@ -1429,7 +1429,7 @@ contract BlockchainCutiesCore /*is ERC721, CutieCoreInterface*/
         Cutie storage dad = cuties[_dadId];
         return _canPairMate(mom, _momId, dad, _dadId) && _isBreedingPermitted(_dadId, _momId);
     }
-    
+
     /// @dev Internal check to see if a given dad and mom are a valid mating pair for
     ///  breeding via market (this method doesn't check ownership and if mating is allowed).
     function _canMateViaMarketplace(uint40 _momId, uint40 _dadId)
@@ -1456,7 +1456,7 @@ contract BlockchainCutiesCore /*is ERC721, CutieCoreInterface*/
     ///  fail.
     /// @param _momId The ID of the Cutie acting as mom (will end up give birth if successful)
     /// @param _dadId The ID of the Cutie acting as dad (will begin its breeding cooldown if successful)
-    function breedWith(uint40 _momId, uint40 _dadId) 
+    function breedWith(uint40 _momId, uint40 _dadId)
         public
         whenNotPaused
         payable
@@ -1621,12 +1621,12 @@ contract BlockchainCutiesCore /*is ERC721, CutieCoreInterface*/
     function withdrawBalances() external
     {
         require(
-            msg.sender == ownerAddress || 
+            msg.sender == ownerAddress ||
             msg.sender == operatorAddress);
 
         saleMarket.withdrawEthFromBalance();
         breedingMarket.withdrawEthFromBalance();
-        for (uint32 i = 0; i < pluginsArray.length; ++i)        
+        for (uint32 i = 0; i < pluginsArray.length; ++i)
         {
             pluginsArray[i].withdraw();
         }
@@ -1641,7 +1641,7 @@ contract BlockchainCutiesCore /*is ERC721, CutieCoreInterface*/
             msg.sender == party3address ||
             msg.sender == party4address ||
             msg.sender == party5address ||
-            msg.sender == ownerAddress || 
+            msg.sender == ownerAddress ||
             msg.sender == operatorAddress);
 
         require(party1address != 0);
@@ -1780,3 +1780,132 @@ contract BlockchainCutiesCore /*is ERC721, CutieCoreInterface*/
         result = r;
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

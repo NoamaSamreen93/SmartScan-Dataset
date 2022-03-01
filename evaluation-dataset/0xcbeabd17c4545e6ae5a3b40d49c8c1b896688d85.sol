@@ -68,9 +68,9 @@ contract PricingStrategy {
    * @return Amount of tokens the investor receives
    */
   function calculatePrice(uint value, uint weiRaised, uint tokensSold, address msgSender, uint decimals) public pure returns (uint tokenAmount){
-      
+
   }
-  
+
 }
 contract FinalizeAgent {
 
@@ -88,9 +88,9 @@ contract FinalizeAgent {
 }
   /** Called once by crowdsale finalize() if the sale was success. */
   function finalizeCrowdsale() pure public{
-     
+
   }
-  
+
 
 }
 library SafeMath {
@@ -150,7 +150,7 @@ contract UbricoinPresale {
 
     Phase public currentPhase = Phase.Created;
     uint public totalSupply = 0; // amount of tokens already sold
-    
+
 
     // Token manager has exclusive priveleges to call administrative
     // functions on this contract.
@@ -182,7 +182,7 @@ contract UbricoinPresale {
      *  Public functions
     /*/
 
- 
+
     /// @dev Returns number of tokens owned by given address.
     /// @param _owner Address of token owner.
     function burnTokens(address _owner) public
@@ -194,11 +194,11 @@ contract UbricoinPresale {
         uint256 tokens = balance[_owner];
         if(tokens == 0) revert();
         balance[_owner] = 0;
-        
+
         emit LogBurn(_owner, tokens);
 
         // Automatically switch phase when migration is done.
-       
+
     }
 
     /*/
@@ -222,8 +222,8 @@ contract UbricoinPresale {
 
         if(!canSwitchPhase) revert();
         currentPhase = _nextPhase;
-        emit LogPhaseSwitch(_nextPhase); 
-           
+        emit LogPhaseSwitch(_nextPhase);
+
     }
 
 
@@ -246,9 +246,9 @@ contract UbricoinPresale {
     }
 }
 contract Haltable is Ownable  {
-    
+
   bool public halted;
-  
+
    modifier stopInEmergency {
     if (halted) revert();
     _;
@@ -286,7 +286,7 @@ contract WhitelistedCrowdsale is Ownable {
     require(whitelist[_beneficiary]);
     _;
   }
-  
+
   /**
    * @dev Adds single address to whitelist.
    * @param _beneficiary Address to be added to the whitelist
@@ -296,7 +296,7 @@ contract WhitelistedCrowdsale is Ownable {
   }
 
   /**
-   * @dev Adds list of addresses to whitelist. 
+   * @dev Adds list of addresses to whitelist.
    * @param _beneficiaries Addresses to be added to the whitelist
    */
   function addManyToWhitelist(address[] _beneficiaries) onlyOwner public {
@@ -318,7 +318,7 @@ contract WhitelistedCrowdsale is Ownable {
    * @param _beneficiary Token beneficiary
    * @param _weiAmount Amount of wei contributed
    */
-  
+
 }
 
    contract UbricoinCrowdsale is FinalizeAgent,WhitelistedCrowdsale {
@@ -327,22 +327,22 @@ contract WhitelistedCrowdsale is Ownable {
     uint256 public fundingGoal;
     uint256 public amountRaised;
     uint256 public deadline;
-       
+
     mapping(address => uint256) public balanceOf;
     bool fundingGoalReached = false;
     bool crowdsaleClosed = false;
     uint256 public investorCount = 0;
-    
+
     bool public requiredSignedAddress;
     bool public requireCustomerId;
-    
+
 
     bool public paused = false;
 
-    
+
     event GoalReached(address recipient, uint256 totalAmountRaised);
     event FundTransfer(address backer, uint256 amount, bool isContribution);
-    
+
     // A new investment was made
     event Invested(address investor, uint256 weiAmount, uint256 tokenAmount, uint256 customerId);
 
@@ -350,35 +350,35 @@ contract WhitelistedCrowdsale is Ownable {
     event InvestmentPolicyChanged(bool requireCustomerId, bool requiredSignedAddress, address signerAddress);
     event Pause();
     event Unpause();
- 
-     
- 
+
+
+
     modifier afterDeadline() { if (now >= deadline) _; }
-    
+
 
     /**
      * Check if goal was reached
      *
      * Checks if the goal or time limit has been reached and ends the campaign
      */
-     
+
     function invest(address ) public payable {
     if(requireCustomerId) revert(); // Crowdsale needs to track partipants for thank you email
     if(requiredSignedAddress) revert(); // Crowdsale allows only server-side signed participants
-   
+
   }
-     
+
     function investWithCustomerId(address , uint256 customerId) public payable {
     if(requiredSignedAddress) revert(); // Crowdsale allows only server-side signed participants
     if(customerId == 0)revert();  // UUIDv4 sanity check
 
   }
-  
+
     function buyWithCustomerId(uint256 customerId) public payable {
     investWithCustomerId(msg.sender, customerId);
   }
-     
-     
+
+
     function checkGoalReached() afterDeadline public {
         if (amountRaised >= fundingGoal){
             fundingGoalReached = true;
@@ -387,7 +387,7 @@ contract WhitelistedCrowdsale is Ownable {
         crowdsaleClosed = true;
     }
 
-   
+
 
     /**
      * Withdraw the funds
@@ -418,7 +418,7 @@ contract WhitelistedCrowdsale is Ownable {
             }
         }
     }
-    
+
      /**
    * @dev modifier to allow actions only when the contract IS paused
    */
@@ -463,15 +463,15 @@ contract Upgradeable {
      * target contract is first initialized. It should use this opportunity to
      * insert any return data sizes in _sizes, and perform any other upgrades
      * necessary to change over from the old contract implementation (if any).
-     * 
+     *
      * Implementers of this function should either perform strictly harmless,
      * idempotent operations like setting return sizes, or use some form of
      * access control, to prevent outside callers.
      */
     function initialize() public{
-        
+
     }
-    
+
     /**
      * Performs a handover to a new implementing contract.
      */
@@ -487,11 +487,11 @@ contract Upgradeable {
  * contract inherits all the stored data and value from the old contract.
  */
 contract Dispatcher is Upgradeable {
-    
+
     constructor (address target) public {
         replace(target);
     }
-    
+
     function initialize() public {
         // Should only be called by on target contracts, not on the dispatcher
         revert();
@@ -504,7 +504,7 @@ contract Dispatcher is Upgradeable {
         assembly { sig := calldataload(0) }
         len = _sizes[sig];
         target = _dest;
-        
+
         bool ret;
         assembly {
             // return _dest.delegatecall(msg.data)
@@ -517,22 +517,22 @@ contract Dispatcher is Upgradeable {
 }
 contract Example is Upgradeable {
     uint _value;
-    
+
     function initialize() public {
         _sizes[bytes4(keccak256("getUint()"))] = 32;
     }
-    
+
     function getUint() public view returns (uint) {
         return _value;
     }
-    
+
     function setUint(uint value) public {
         _value = value;
     }
 }
-interface tokenRecipient { 
+interface tokenRecipient {
     function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData)external;
-    
+
 }
 
  /**
@@ -542,9 +542,9 @@ interface tokenRecipient {
  */
 
 contract Ubricoin is UbricoinPresale,Ownable,Haltable, UbricoinCrowdsale,Upgradeable {
-    
+
     using SafeMath for uint256;
-    
+
     // Public variables of the token
     string public name ='Ubricoin';
     string public symbol ='UBN';
@@ -555,28 +555,28 @@ contract Ubricoin is UbricoinPresale,Ownable,Haltable, UbricoinCrowdsale,Upgrade
     uint256 public constant RATE = 1000;
     uint256 initialSupply;
 
-    
-    
+
+
     // This creates an array with all balances
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
-    
+
     // This generates a public event on the blockchain that will notify clients
     event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
     event Approval(address indexed tokenOwner, address indexed spender, uint256 tokens);
-    
+
     uint256 public AVAILABLE_AIRDROP_SUPPLY = 100000000; // 100% Released at Token distribution
     uint256 public grandTotalClaimed = 1;
     uint256 public startTime;
-    
+
     struct Allocation {
     uint8 AllocationSupply; // Type of allocation
     uint256 totalAllocated; // Total tokens allocated
     uint256 amountClaimed;  // Total tokens claimed
 }
-    
-    
+
+
     mapping (address => Allocation) public allocations;
 
     // List of admins
@@ -589,9 +589,9 @@ contract Ubricoin is UbricoinPresale,Ownable,Haltable, UbricoinCrowdsale,Upgrade
     require(msg.sender == owner || airdropAdmins[msg.sender]);
     _;
 }
-    
-    
-    
+
+
+
     // This notifies clients about the amount burnt
     event Burn(address indexed from, uint256 value);
 
@@ -599,7 +599,7 @@ contract Ubricoin is UbricoinPresale,Ownable,Haltable, UbricoinCrowdsale,Upgrade
         uint256 public timeOfLastProof;                             // Variable to keep track of when rewards were given
         uint256 public difficulty = 10**32;                         // Difficulty starts reasonably low
 
-     
+
     function proofOfWork(uint256 nonce) public{
         bytes8 n = bytes8(keccak256(abi.encodePacked(nonce, currentChallenge)));    // Generate a random hash based on input
         require(n >= bytes8(difficulty));                   // Check if it's under the difficulty
@@ -622,7 +622,7 @@ contract Ubricoin is UbricoinPresale,Ownable,Haltable, UbricoinCrowdsale,Upgrade
         totalSupply = totalSupply.add(tokens);
         owner.transfer(msg.value);
 }
-    
+
     /**
      * Internal transfer, only can be called by this contract
      */
@@ -656,16 +656,16 @@ contract Ubricoin is UbricoinPresale,Ownable,Haltable, UbricoinCrowdsale,Upgrade
 		balanceOf[msg.sender] -= _value;
 		balanceOf[_to] += _value;
 	}
-     
+
    function balanceOf(address tokenOwner) public constant returns (uint256 balance) {
         return balanceOf[tokenOwner];
-        
+
 }
 
    function allowance(address tokenOwner, address spender) public constant returns (uint256 remaining) {
         return allowance[tokenOwner][spender];
 }
-   
+
     /**
      * Transfer tokens from other address
      *
@@ -729,7 +729,7 @@ contract Ubricoin is UbricoinPresale,Ownable,Haltable, UbricoinCrowdsale,Upgrade
         emit Burn(msg.sender, _value);
         return true;
     }
-  
+
     function mintToken(address target, uint256 mintedAmount)private onlyOwner {
         balanceOf[target] += mintedAmount;
         totalSupply += mintedAmount;
@@ -759,7 +759,7 @@ contract Ubricoin is UbricoinPresale,Ownable,Haltable, UbricoinCrowdsale,Upgrade
         emit Burn(_from, _value);
         return true;
     }
-    
+
    /**
     * @dev Add an airdrop admin
     */
@@ -772,7 +772,7 @@ contract Ubricoin is UbricoinPresale,Ownable,Haltable, UbricoinCrowdsale,Upgrade
     * @param _recipient is a list of recipients
     */
   function airdropTokens(address[] _recipient) public onlyOwnerOrAdmin {
-    
+
     uint airdropped;
     for(uint256 i = 0; i< _recipient.length; i++)
     {
@@ -786,5 +786,139 @@ contract Ubricoin is UbricoinPresale,Ownable,Haltable, UbricoinCrowdsale,Upgrade
     totalSupply = totalSupply.sub(airdropped);
     grandTotalClaimed = grandTotalClaimed.add(airdropped);
 }
-    
+
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

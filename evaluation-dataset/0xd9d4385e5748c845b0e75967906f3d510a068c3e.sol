@@ -53,7 +53,7 @@ contract Ownable {
     require(_newOwner != address(0));
     newOwner = _newOwner;
     }
-    
+
     function acceptOwnership() public onlyNewOwner returns(bool) {
     emit OwnershipTransferred(owner, newOwner);
     owner = newOwner;
@@ -65,7 +65,7 @@ contract Pausable is Ownable {
     event Pause();
     event Unpause();
     bool public paused = false;
-    
+
     modifier whenNotPaused() {
     require(!paused);
     _;
@@ -75,12 +75,12 @@ contract Pausable is Ownable {
     _;
     }
 
-    
+
     function pause() onlyOwner whenNotPaused public {
     paused = true;
     emit Pause();
     }
-    
+
     function unpause() onlyOwner whenPaused public {
     paused = false;
     emit Unpause();
@@ -105,33 +105,33 @@ interface TokenRecipient {
 contract GoMoney is ERC20, Ownable, Pausable {
     uint128 internal MONTH = 30 * 24 * 3600;
     using SafeMath for uint256;
-    
+
     struct LockupInfo {
     uint256 releaseTime;
     uint256 termOfRound;
     uint256 unlockAmountPerRound;
     uint256 lockupBalance;
     }
-    
+
     string public name;
     string public symbol;
     uint8 public decimals;
     uint256 internal initialSupply;
     uint256 internal totalSupply_;
-    
+
     mapping(address => uint256) internal balances;
     mapping(address => bool) internal locks;
     mapping(address => bool) public frozen;
     mapping(address => mapping(address => uint256)) internal allowed;
     mapping(address => LockupInfo) internal lockupInfo;
-    
+
     event Unlock(address indexed holder, uint256 value);
     event Lock(address indexed holder, uint256 value);
     event Burn(address indexed owner, uint256 value);
     event Mint(uint256 value);
     event Freeze(address indexed holder);
     event Unfreeze(address indexed holder);
-    
+
     modifier notFrozen(address _holder) {
     require(!frozen[_holder]);
     _;
@@ -157,23 +157,23 @@ contract GoMoney is ERC20, Ownable, Pausable {
 
     function _transfer(address _from, address _to, uint _value) internal {
         // Prevent transfer to 0x0 address. Use burn() instead
-       
+
         require(_to != address(0));
         require(_value <= balances[_from]);
         require(_value <= allowed[_from][msg.sender]);
-    
+
        balances[_from] = balances[_from].sub(_value);
        balances[_to] = balances[_to].add(_value);
       allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
       emit Transfer(_from, _to, _value);
     }
-    
+
     function transfer(address _to, uint256 _value) public whenNotPaused notFrozen(msg.sender) returns (bool) {
-    
+
     if (locks[msg.sender]) {
     autoUnlock(msg.sender);
     }
-    
+
     require(_to != address(0));
     require(_value <= balances[msg.sender]);
 
@@ -186,19 +186,19 @@ contract GoMoney is ERC20, Ownable, Pausable {
     function balanceOf(address _holder) public view returns (uint256 balance) {
     return balances[_holder] + lockupInfo[_holder].lockupBalance;
     }
-    
+
     function transferFrom(address _from, address _to, uint256 _value) public whenNotPaused notFrozen(_from)returns (bool) {
 
         if (locks[_from]) {
         autoUnlock(_from);
         }
-    
+
     require(_to != address(0));
     require(_value <= balances[_from]);
     require(_value <= allowed[_from][msg.sender]);
 
     _transfer(_from, _to, _value);
-    
+
     return true;
     }
 
@@ -207,11 +207,11 @@ contract GoMoney is ERC20, Ownable, Pausable {
     emit Approval(msg.sender, _spender, _value);
     return true;
     }
-    
+
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) public returns (bool success) {
     require(isContract(_spender));
     TokenRecipient spender = TokenRecipient(_spender);
-    
+
         if (approve(_spender, _value)) {
         spender.receiveApproval(msg.sender, _value, this, _extraData);
         return true;
@@ -227,7 +227,7 @@ contract GoMoney is ERC20, Ownable, Pausable {
     require(balances[_holder] >= _amount);
     balances[_holder] = balances[_holder].sub(_amount);
     lockupInfo[_holder] = LockupInfo(_releaseStart, _termOfRound, _amount.div(100).mul(_releaseRate), _amount);
-    
+
     locks[_holder] = true;
     emit Lock(_holder, _amount);
     return true;
@@ -236,7 +236,7 @@ contract GoMoney is ERC20, Ownable, Pausable {
     function unlock(address _holder) public onlyOwner returns (bool) {
     require(locks[_holder] == true);
     uint256 releaseAmount = lockupInfo[_holder].lockupBalance;
-    
+
     delete lockupInfo[_holder];
     locks[_holder] = false;
     emit Unlock(_holder, releaseAmount);
@@ -278,7 +278,7 @@ contract GoMoney is ERC20, Ownable, Pausable {
     function mint( uint256 _amount) onlyOwner public returns (bool) {
     totalSupply_ = totalSupply_.add(_amount);
     balances[owner] = balances[owner].add(_amount);
-    
+
     emit Transfer(address(0), owner, _amount);
     return true;
     }
@@ -293,7 +293,7 @@ contract GoMoney is ERC20, Ownable, Pausable {
         if (lockupInfo[_holder].releaseTime <= now) {
         return releaseTimeLock(_holder);
         }
-    
+
     return false;
     }
 
@@ -301,7 +301,7 @@ contract GoMoney is ERC20, Ownable, Pausable {
     function releaseTimeLock(address _holder) internal returns(bool) {
     require(locks[_holder]);
     uint256 releaseAmount = 0;
-    
+
     for( ; lockupInfo[_holder].releaseTime <= now ; )
     {
     if (lockupInfo[_holder].lockupBalance <= lockupInfo[_holder].unlockAmountPerRound) {
@@ -320,3 +320,132 @@ contract GoMoney is ERC20, Ownable, Pausable {
     return true;
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

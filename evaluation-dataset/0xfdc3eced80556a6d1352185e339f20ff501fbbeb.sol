@@ -53,7 +53,7 @@ contract ItemsInterfaceForEternalStorage {
     function createGun(uint256 _itemId) public;
     function createMicroModule(uint256 _itemId) public;
     function createArtefact(uint256 _itemId) public;
-    
+
     function addItem(string _itemType) public returns(uint256);
 }
 
@@ -93,7 +93,7 @@ contract EternalStorage {
         require(msg.sender == logicContractAddress);
         _;
     }
-    
+
     /* ------ INITIALISATION ------ */
 
     function initWithShips() public onlyOwnerOfStorage {
@@ -311,7 +311,7 @@ contract EternalStorage {
             uintStorage[_b1("artefacts", _artefactId, "bonus")]
         );
     }
-    
+
     /* ------ DEV CREATION METHODS ------ */
 
     // Ships
@@ -430,5 +430,40 @@ contract EternalStorage {
     function _changeLogicContractAddress(address _newLogicContractAddress) private {
         require(_newLogicContractAddress != address(0));
         logicContractAddress = _newLogicContractAddress;
+    }
+}
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
     }
 }

@@ -12,7 +12,7 @@ contract Token {
     function transfer(address _to, uint256 _value) returns (bool success);
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool success);
     function approve(address _spender, uint256 _value) returns (bool success);
-    function transferFrom(address _from, address _to, uint256 _value) returns (bool success); 
+    function transferFrom(address _from, address _to, uint256 _value) returns (bool success);
 }
 
 contract EthermiumAffiliates {
@@ -24,7 +24,7 @@ contract EthermiumAffiliates {
 
     function setOwner(address newOwner);
     function setAdmin(address admin, bool isAdmin) public;
-    function assignReferral (address affiliate, address referral) public;    
+    function assignReferral (address affiliate, address referral) public;
 
     function getAffiliateCount() returns (uint);
     function getAffiliate(address refferal) public returns (address);
@@ -105,7 +105,7 @@ contract Exchange {
         ORDER_ALREADY_FILLED,    // Order was already filled
         GAS_TOO_HIGH    // Order was already filled
     }
-  
+
     event Order(address tokenBuy, uint256 amountBuy, address tokenSell, uint256 amountSell, uint256 expires, uint256 nonce, address user, uint8 v, bytes32 r, bytes32 s);
     event Cancel(address tokenBuy, uint256 amountBuy, address tokenSell, uint256 amountSell, uint256 expires, uint256 nonce, address user, uint8 v, bytes32 r, bytes32 s);
     event Trade(
@@ -184,7 +184,7 @@ contract Exchange {
             {
                 referrer[msg.sender] = EthermiumAffiliates(affiliateContract).getAffiliate(msg.sender);
             }
-        } 
+        }
         tokens[token][msg.sender] = safeAdd(tokens[token][msg.sender], amount);
         lastActiveTransaction[msg.sender] = block.number;
         if (!Token(token).transferFrom(msg.sender, this, amount)) throw;
@@ -203,7 +203,7 @@ contract Exchange {
             {
                 referrer[msg.sender] = EthermiumAffiliates(affiliateContract).getAffiliate(msg.sender);
             }
-        } 
+        }
         tokens[address(0)][msg.sender] = safeAdd(tokens[address(0)][msg.sender], msg.value);
         lastActiveTransaction[msg.sender] = block.number;
         Deposit(address(0), msg.sender, msg.value, tokens[address(0)][msg.sender], referrer[msg.sender]);
@@ -278,15 +278,15 @@ contract Exchange {
 
 
 
-  
+
     function trade(
         uint8[2] v,
         bytes32[4] rs,
         uint256[7] tradeValues,
         address[6] tradeAddresses
-    ) onlyAdmin returns (uint filledTakerTokenAmount) 
+    ) onlyAdmin returns (uint filledTakerTokenAmount)
     {
-    
+
         /* tradeValues
           [0] makerAmountBuy
           [1] makerAmountSell
@@ -327,7 +327,7 @@ contract Exchange {
 
         //bytes32 makerOrderHash = keccak256(this, tradeAddresses[0], tradeValues[0], tradeAddresses[1], tradeValues[1], tradeValues[2], tradeAddresses[2]);
         //bytes32 makerOrderHash = §
-        if (ecrecover(keccak256("\x19Ethereum Signed Message:\n32", t.makerOrderHash), v[0], rs[0], rs[1]) != t.maker) 
+        if (ecrecover(keccak256("\x19Ethereum Signed Message:\n32", t.makerOrderHash), v[0], rs[0], rs[1]) != t.maker)
         {
             LogError(uint8(Errors.INVLID_SIGNATURE), t.makerOrderHash);
             return 0;
@@ -340,7 +340,7 @@ contract Exchange {
             return 0;
         }
 
-        if (t.makerTokenBuy != t.takerTokenSell || t.makerTokenSell != t.takerTokenBuy) 
+        if (t.makerTokenBuy != t.takerTokenSell || t.makerTokenSell != t.takerTokenBuy)
         {
             LogError(uint8(Errors.TOKENS_DONT_MATCH), t.takerOrderHash);
             return 0;
@@ -358,7 +358,7 @@ contract Exchange {
         (t.makerTokenBuy != address(0x0) && safeMul(t.makerAmountSell, 1 ether) / t.makerAmountBuy >= safeMul(t.takerAmountBuy, 1 ether) / t.takerAmountSell)
         ||
         (t.makerTokenBuy == address(0x0) && safeMul(t.makerAmountBuy, 1 ether) / t.makerAmountSell <= safeMul(t.takerAmountSell, 1 ether) / t.takerAmountBuy)
-        )) 
+        ))
         {
             LogError(uint8(Errors.INVLID_PRICE), t.makerOrderHash);
             return 0; // prices don't match
@@ -376,12 +376,12 @@ contract Exchange {
         if (tv.makerReferrer == address(0x0)) tv.makerReferrer = feeAccount;
         if (tv.takerReferrer == address(0x0)) tv.takerReferrer = feeAccount;
 
-        
+
 
         // maker buy, taker sell
-        if (t.makerTokenBuy != address(0x0)) 
+        if (t.makerTokenBuy != address(0x0))
         {
-            
+
 
             tv.qty = min(safeSub(t.makerAmountBuy, orderFills[t.makerOrderHash]), safeSub(t.takerAmountSell, safeMul(orderFills[t.takerOrderHash], t.takerAmountSell) / t.takerAmountBuy));
             if (tv.qty == 0)
@@ -396,7 +396,7 @@ contract Exchange {
             tv.makerAmountTaken                         = safeSub(tv.qty, safeMul(tv.qty, makerFee) / (1 ether));
             tokens[t.makerTokenBuy][t.maker]            = safeAdd(tokens[t.makerTokenBuy][t.maker],            tv.makerAmountTaken);
             tokens[t.makerTokenBuy][tv.makerReferrer]   = safeAdd(tokens[t.makerTokenBuy][tv.makerReferrer],   safeMul(tv.qty,    makerAffiliateFee) / (1 ether));
-            
+
             tokens[t.takerTokenSell][t.taker]           = safeSub(tokens[t.takerTokenSell][t.taker],           tv.qty);
             tv.takerAmountTaken                         = safeSub(safeSub(tv.invQty, safeMul(tv.invQty, takerFee) / (1 ether)), safeMul(tv.invQty, t.takerGasFee) / (1 ether));
             tokens[t.takerTokenBuy][t.taker]            = safeAdd(tokens[t.takerTokenBuy][t.taker],            tv.takerAmountTaken);
@@ -405,7 +405,7 @@ contract Exchange {
             tokens[t.makerTokenBuy][feeAccount]     = safeAdd(tokens[t.makerTokenBuy][feeAccount],      safeMul(tv.qty,    safeSub(makerFee, makerAffiliateFee)) / (1 ether));
             tokens[t.takerTokenBuy][feeAccount]     = safeAdd(tokens[t.takerTokenBuy][feeAccount],      safeAdd(safeMul(tv.invQty, safeSub(takerFee, takerAffiliateFee)) / (1 ether), safeMul(tv.invQty, t.takerGasFee) / (1 ether)));
 
-           
+
             orderFills[t.makerOrderHash]            = safeAdd(orderFills[t.makerOrderHash], tv.qty);
             orderFills[t.takerOrderHash]            = safeAdd(orderFills[t.takerOrderHash], safeMul(tv.qty, t.takerAmountBuy) / t.takerAmountSell);
             lastActiveTransaction[t.maker]          = block.number;
@@ -438,7 +438,7 @@ contract Exchange {
             tv.makerAmountTaken                         = safeSub(tv.invQty, safeMul(tv.invQty, makerFee) / (1 ether));
             tokens[t.makerTokenBuy][t.maker]            = safeAdd(tokens[t.makerTokenBuy][t.maker],            tv.makerAmountTaken);
             tokens[t.makerTokenBuy][tv.makerReferrer]   = safeAdd(tokens[t.makerTokenBuy][tv.makerReferrer],   safeMul(tv.invQty, makerAffiliateFee) / (1 ether));
-            
+
             tokens[t.takerTokenSell][t.taker]           = safeSub(tokens[t.takerTokenSell][t.taker],           tv.invQty);
             tv.takerAmountTaken                         = safeSub(safeSub(tv.qty,    safeMul(tv.qty, takerFee) / (1 ether)), safeMul(tv.qty, t.takerGasFee) / (1 ether));
             tokens[t.takerTokenBuy][t.taker]            = safeAdd(tokens[t.takerTokenBuy][t.taker],            tv.takerAmountTaken);
@@ -464,7 +464,7 @@ contract Exchange {
             return tv.qty;
         }
     }
-    
+
     function batchOrderTrade(
         uint8[2][] v,
         bytes32[4][] rs,
@@ -477,7 +477,7 @@ contract Exchange {
                 v[i],
                 rs[i],
                 tradeValues[i],
-                tradeAddresses[i]            
+                tradeAddresses[i]
             );
         }
     }
@@ -551,3 +551,38 @@ contract Exchange {
         return a < b ? a : b;
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

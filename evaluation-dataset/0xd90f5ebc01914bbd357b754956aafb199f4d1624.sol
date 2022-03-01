@@ -6,7 +6,7 @@ contract GeneSynthesisInterface {
     function isGeneSynthesis() public pure returns (bool);
 
     /**
-     * @dev Synthesizes the genes of yin and yang Kydy, and returns the result as the child's genes. 
+     * @dev Synthesizes the genes of yin and yang Kydy, and returns the result as the child's genes.
      * @param gene1 genes of yin Kydy
      * @param gene2 genes of yang Kydy
      * @return the genes of the child
@@ -23,8 +23,8 @@ contract KydyAccessControl {
     /**
      * This contract defines access control for the following important roles of the Dyverse:
      *
-     *     - The CEO: The CEO can assign roles and change the addresses of the smart contracts. 
-     *         It can also solely unpause the smart contract. 
+     *     - The CEO: The CEO can assign roles and change the addresses of the smart contracts.
+     *         It can also solely unpause the smart contract.
      *
      *     - The CFO: The CFO can withdraw funds from the KydyCore and the auction contracts.
      *
@@ -32,10 +32,10 @@ contract KydyAccessControl {
      *
      */
 
-    /// @dev Used when contract is upgraded. 
+    /// @dev Used when contract is upgraded.
     event ContractUpgrade(address newContract);
 
-    // The assigned addresses of each role, as defined in this contract. 
+    // The assigned addresses of each role, as defined in this contract.
     address public ceoAddress;
     address public cfoAddress;
     address public cooAddress;
@@ -171,7 +171,7 @@ contract ERC165 is ERC165Interface {
 }
 
 // Every ERC-721 compliant contract must implement the ERC721 and ERC165 interfaces.
-/** 
+/**
  * @title ERC-721 Non-Fungible Token Standard
  * @dev See https://github.com/ethereum/EIPs/blob/master/EIPS/eip-721.md
  * Note: the ERC-165 identifier for this interface is 0x80ac58cd.
@@ -300,7 +300,7 @@ contract ERC721Basic is ERC165 {
 
     // ERC721Metadata
     // The metadata extension is OPTIONAL for ERC-721 smart contracts (see "caveats", below). This allows your smart contract to be interrogated for its name and for details about the assets which your NFTs represent.
-    
+
     /**
      * @title ERC-721 Non-Fungible Token Standard, optional metadata extension
      * @dev See https://github.com/ethereum/EIPs/blob/master/EIPS/eip-721.md
@@ -430,7 +430,7 @@ library Address {
 /**
  * @title The base contract of Dyverse. ERC-721 compliant.
  * @author VREX Lab Co., Ltd
- * @dev See the KydyCore contract for more info on details. 
+ * @dev See the KydyCore contract for more info on details.
  */
 contract KydyBase is KydyAccessControl, ERC721Basic {
     using SafeMath for uint256;
@@ -439,14 +439,14 @@ contract KydyBase is KydyAccessControl, ERC721Basic {
     /*** EVENT ***/
 
     /**
-     * @dev The Creation event takes place whenever a new Kydy is created via Synthesis or minted by the COO.  
+     * @dev The Creation event takes place whenever a new Kydy is created via Synthesis or minted by the COO.
      */
     event Created(address indexed owner, uint256 kydyId, uint256 yinId, uint256 yangId, uint256 genes);
 
     /*** DATA TYPES ***/
 
     /**
-     * @dev Every Kydy in the Dyverse is a copy of this structure. 
+     * @dev Every Kydy in the Dyverse is a copy of this structure.
      */
     struct Kydy {
         // The Kydy's genetic code is stored into 256-bits and never changes.
@@ -462,23 +462,23 @@ contract KydyBase is KydyAccessControl, ERC721Basic {
         uint32 yinId;
         uint32 yangId;
 
-        // The ID of the yang Kydy that the yin Kydy is creating with. 
+        // The ID of the yang Kydy that the yin Kydy is creating with.
         uint32 synthesizingWithId;
 
-        // The recharge index that represents the duration of the recharge for this Kydy. 
-        // After each synthesis, this increases by one for both yin and yang Kydys of the synthesis. 
+        // The recharge index that represents the duration of the recharge for this Kydy.
+        // After each synthesis, this increases by one for both yin and yang Kydys of the synthesis.
         uint16 rechargeIndex;
 
-        // The generation index of this Kydy. The newly created Kydy takes the generation index of the parent 
-        // with a larger generation index. 
+        // The generation index of this Kydy. The newly created Kydy takes the generation index of the parent
+        // with a larger generation index.
         uint16 generation;
     }
 
     /*** CONSTANTS ***/
 
     /**
-     * @dev An array table of the recharge duration. Referred to as "creation time" for yin 
-     *  and "synthesis recharge" for yang Kydys. Maximum duration is 4 days. 
+     * @dev An array table of the recharge duration. Referred to as "creation time" for yin
+     *  and "synthesis recharge" for yang Kydys. Maximum duration is 4 days.
      */
     uint32[14] public recharges = [
         uint32(1 minutes),
@@ -502,7 +502,7 @@ contract KydyBase is KydyAccessControl, ERC721Basic {
     /*** STORAGE ***/
 
     /**
-     * @dev This array contains the ID of every Kydy as an index. 
+     * @dev This array contains the ID of every Kydy as an index.
      */
     Kydy[] kydys;
 
@@ -630,7 +630,7 @@ contract KydyBase is KydyAccessControl, ERC721Basic {
     /**
      * @dev Internal function to add a Kydy ID to the new owner's list.
      * @param _to address the new owner's address
-     * @param _tokenId uint256 ID of the transferred Kydy 
+     * @param _tokenId uint256 ID of the transferred Kydy
      */
     function _addTokenTo(address _to, uint256 _tokenId) internal {
         // Checks if the owner of the Kydy is 0x0 before the transfer.
@@ -644,7 +644,7 @@ contract KydyBase is KydyAccessControl, ERC721Basic {
     /**
      * @dev Internal function to remove a Kydy ID from the previous owner's list.
      * @param _from address the previous owner's address
-     * @param _tokenId uint256 ID of the transferred Kydy 
+     * @param _tokenId uint256 ID of the transferred Kydy
      */
     function _removeTokenFrom(address _from, uint256 _tokenId) internal {
         // Checks the current owner of the Kydy is '_from'.
@@ -682,7 +682,7 @@ contract KydyBase is KydyAccessControl, ERC721Basic {
     }
 
     /**
-     * @dev Internal function that creates a new Kydy and stores it. 
+     * @dev Internal function that creates a new Kydy and stores it.
      * @param _yinId The ID of the yin Kydy (zero for Generation 0 Kydy)
      * @param _yangId The ID of the yang Kydy (zero for Generation 0 Kydy)
      * @param _generation The generation number of the new Kydy.
@@ -1022,7 +1022,7 @@ contract KydyOwnership is KydyBase {
         bytes4 retval = ERC721TokenReceiver(_to).onERC721Received(msg.sender, _from, _tokenId, _data);
         return (retval == _ERC721_RECEIVED);
     }
-    
+
     /**
      * @dev Gets the token name.
      *  Required for ERC721Metadata compliance.
@@ -1100,7 +1100,7 @@ contract KydyOwnership is KydyBase {
 /**
  * @title This manages synthesis and creation of Kydys.
  * @author VREX Lab Co., Ltd
- * @dev Please reference the KydyCore contract for details. 
+ * @dev Please reference the KydyCore contract for details.
  */
 contract KydySynthesis is KydyOwnership {
 
@@ -1120,7 +1120,7 @@ contract KydySynthesis is KydyOwnership {
     uint256 public creatingKydys;
 
     /**
-     * @dev The address of the sibling contract that mixes and combines genes of the two parent Kydys. 
+     * @dev The address of the sibling contract that mixes and combines genes of the two parent Kydys.
      */
     GeneSynthesisInterface public geneSynthesis;
 
@@ -1139,10 +1139,10 @@ contract KydySynthesis is KydyOwnership {
     }
 
     /**
-     * @dev Checks that the Kydy is able to synthesize. 
+     * @dev Checks that the Kydy is able to synthesize.
      */
     function _isReadyToSynthesize(Kydy _kyd) internal view returns (bool) {
-        // Double-checking if there is any pending creation event. 
+        // Double-checking if there is any pending creation event.
         return (_kyd.synthesizingWithId == 0) && (_kyd.rechargeEndBlock <= uint64(block.number));
     }
 
@@ -1173,7 +1173,7 @@ contract KydySynthesis is KydyOwnership {
 
     /**
      * @notice Grants approval to another user to synthesize with one of your Kydys.
-     * @param _address The approved address of the yin Kydy that can synthesize with your yang Kydy. 
+     * @param _address The approved address of the yin Kydy that can synthesize with your yang Kydy.
      * @param _yangId Your kydy that _address can now synthesize with.
      */
     function approveSynthesizing(address _address, uint256 _yangId)
@@ -1186,19 +1186,19 @@ contract KydySynthesis is KydyOwnership {
 
     /**
      * @dev Updates the minimum payment required for calling bringKydyHome(). Only COO
-     *  can call this function. 
+     *  can call this function.
      */
     function setAutoCreationFee(uint256 value) external onlyCOO {
         autoCreationFee = value;
     }
 
-    /// @dev Checks if this Kydy is creating and if the creation period is complete. 
+    /// @dev Checks if this Kydy is creating and if the creation period is complete.
     function _isReadyToBringKydyHome(Kydy _yin) private view returns (bool) {
         return (_yin.synthesizingWithId != 0) && (_yin.rechargeEndBlock <= uint64(block.number));
     }
 
     /**
-     * @notice Checks if this Kydy is able to synthesize 
+     * @notice Checks if this Kydy is able to synthesize
      * @param _kydyId reference the ID of the Kydy
      */
     function isReadyToSynthesize(uint256 _kydyId)
@@ -1226,7 +1226,7 @@ contract KydySynthesis is KydyOwnership {
     }
 
     /**
-     * @dev Internal check to see if these yang and yin are a valid couple. 
+     * @dev Internal check to see if these yang and yin are a valid couple.
      * @param _yin A reference to the Kydy struct of the potential yin.
      * @param _yinId The yin's ID.
      * @param _yang A reference to the Kydy struct of the potential yang.
@@ -1271,7 +1271,7 @@ contract KydySynthesis is KydyOwnership {
     }
 
     /**
-     * @dev Internal check to see if these yang and yin Kydys, connected via market, are a valid couple for synthesis. 
+     * @dev Internal check to see if these yang and yin Kydys, connected via market, are a valid couple for synthesis.
      */
     function _canSynthesizeWithViaAuction(uint256 _yinId, uint256 _yangId)
         internal
@@ -1284,7 +1284,7 @@ contract KydySynthesis is KydyOwnership {
     }
 
     /**
-     * @dev Checks if the two Kydys can synthesize together, including checks for ownership and synthesizing approvals. 
+     * @dev Checks if the two Kydys can synthesize together, including checks for ownership and synthesizing approvals.
      * @param _yinId ID of the yin Kydy
      * @param _yangId ID of the yang Kydy
      */
@@ -1319,7 +1319,7 @@ contract KydySynthesis is KydyOwnership {
         delete synthesizeAllowedToAddress[_yinId];
         delete synthesizeAllowedToAddress[_yangId];
 
-        // When a Kydy starts creating, this number is increased. 
+        // When a Kydy starts creating, this number is increased.
         creatingKydys++;
 
         // Emits the Creating event.
@@ -1400,7 +1400,7 @@ contract KydySynthesis is KydyOwnership {
             parentGen = yang.generation;
         }
 
-        // The baby Kydy receives its genes 
+        // The baby Kydy receives its genes
         uint256 childGenes = geneSynthesis.synthGenes(yin.genes, yang.genes);
 
         // The baby Kydy is now on blockchain
@@ -1410,10 +1410,10 @@ contract KydySynthesis is KydyOwnership {
         // Clears the synthesis status of the parents
         delete yin.synthesizingWithId;
 
-        // When a baby Kydy is created, this number is decreased back. 
+        // When a baby Kydy is created, this number is decreased back.
         creatingKydys--;
 
-        // Sends the fee to the person who called this. 
+        // Sends the fee to the person who called this.
         msg.sender.transfer(autoCreationFee);
 
         // Returns the new Kydy's ID.
@@ -1505,7 +1505,7 @@ contract AuctionBase is ERC721Holder {
     }
 
     /**
-     * @dev Adds an auction to the list of open auctions. 
+     * @dev Adds an auction to the list of open auctions.
      * @param _tokenId ID of the token to be put on auction.
      * @param _auction Auction information of this token to open.
      */
@@ -1557,7 +1557,7 @@ contract AuctionBase is ERC721Holder {
             seller.transfer(sellerProceeds);
         }
 
-        // Computes the excess funds included with the bid and transfers it back to bidder. 
+        // Computes the excess funds included with the bid and transfers it back to bidder.
         uint256 bidExcess = _bidAmount - price;
 
         // Returns the exceeded funds.
@@ -1733,7 +1733,7 @@ contract Auction is Pausable, AuctionBase {
 
     /**
      * @dev Cancels an auction when the contract is paused.
-     * Only the owner may do this, and NFTs are returned to the seller. 
+     * Only the owner may do this, and NFTs are returned to the seller.
      * @param _tokenId ID of the token on auction to cancel.
      */
     function cancelAuctionWhenPaused(uint256 _tokenId)
@@ -1861,13 +1861,13 @@ contract SynthesizingAuction is Auction {
 contract SaleAuction is Auction {
 
     /**
-     * @dev To make sure we are addressing to the right auction. 
+     * @dev To make sure we are addressing to the right auction.
      */
     bool public isSaleAuction = true;
 
     // Last 5 sale price of Generation 0 Kydys.
     uint256[5] public lastGen0SalePrices;
-    
+
     // Total number of Generation 0 Kydys sold.
     uint256 public gen0SaleCount;
 
@@ -1909,7 +1909,7 @@ contract SaleAuction is Auction {
     }
 
     /**
-     * @dev Updates lastSalePrice only if the seller is nonFungibleContract. 
+     * @dev Updates lastSalePrice only if the seller is nonFungibleContract.
      */
     function bid(uint256 _tokenId)
         external
@@ -1939,23 +1939,23 @@ contract SaleAuction is Auction {
 }
 
 /**
- * @title This contract defines how sales and synthesis auctions for Kydys are created. 
+ * @title This contract defines how sales and synthesis auctions for Kydys are created.
  * @author VREX Lab Co., Ltd
  */
 contract KydyAuction is KydySynthesis {
 
     /**
-     * @dev The address of the Auction contract which handles ALL sales of Kydys, both user-generated and Generation 0. 
+     * @dev The address of the Auction contract which handles ALL sales of Kydys, both user-generated and Generation 0.
      */
     SaleAuction public saleAuction;
 
     /**
-     * @dev The address of another Auction contract which handles synthesis auctions. 
+     * @dev The address of another Auction contract which handles synthesis auctions.
      */
     SynthesizingAuction public synthesizingAuction;
 
     /**
-     * @dev Sets the address for the sales auction. Only CEO may call this function. 
+     * @dev Sets the address for the sales auction. Only CEO may call this function.
      * @param _address The address of the sale contract.
      */
     function setSaleAuctionAddress(address _address) external onlyCEO {
@@ -1993,7 +1993,7 @@ contract KydyAuction is KydySynthesis {
         require(_owns(msg.sender, _kydyId));
         require(!isCreating(_kydyId));
         _approve(_kydyId, saleAuction);
- 
+
         saleAuction.createAuction(
             _kydyId,
             _price,
@@ -2002,7 +2002,7 @@ contract KydyAuction is KydySynthesis {
     }
 
     /**
-     * @dev Creates a synthesis auction. 
+     * @dev Creates a synthesis auction.
      */
     function createSynthesizingAuction(
         uint256 _kydyId,
@@ -2058,7 +2058,7 @@ contract KydyAuction is KydySynthesis {
         external
         whenNotPaused
     {
-        // Checks if the Kydy is in auction. 
+        // Checks if the Kydy is in auction.
         require(_owns(saleAuction, _kydyId));
         // Gets the seller of the Kydy.
         (address seller,,) = saleAuction.getAuction(_kydyId);
@@ -2069,8 +2069,8 @@ contract KydyAuction is KydySynthesis {
     }
 
     /**
-     * @dev Cancels an synthesis auction. 
-     * @param _kydyId ID of the Kydy on the synthesis auction. 
+     * @dev Cancels an synthesis auction.
+     * @param _kydyId ID of the Kydy on the synthesis auction.
      */
     function cancelSynthesizingAuction(
         uint256 _kydyId
@@ -2085,7 +2085,7 @@ contract KydyAuction is KydySynthesis {
     }
 
     /**
-     * @dev Transfers the balance. 
+     * @dev Transfers the balance.
      */
     function withdrawAuctionBalances() external onlyCLevel {
         saleAuction.withdrawBalance();
@@ -2176,18 +2176,18 @@ contract KydyTravelInterface {
  * @title The Dyverse : A decentralized universe of Kydys, the unique 3D characters and avatars on the Blockchain.
  * @author VREX Lab Co., Ltd
  * @dev This is the main KydyCore contract. It keeps track of the kydys over the blockchain, and manages
- *  general operation of the contracts, metadata and important addresses, including defining who can withdraw 
+ *  general operation of the contracts, metadata and important addresses, including defining who can withdraw
  *  the balance from the contract.
  */
 contract KydyCore is KydyMinting {
 
-    // This is the main Kydy contract. To keep the code upgradable and secure, we broke up the code in two different ways.  
-    // First, we separated auction and gene combination functions into several sibling contracts. This allows us to securely 
-    // fix bugs and upgrade contracts, if necessary. Please note that while we try to make most code open source, 
-    // some code regarding gene combination is not open-source to make it more intriguing for users. 
-    // However, as always, advanced users will be able to figure out how it works. 
+    // This is the main Kydy contract. To keep the code upgradable and secure, we broke up the code in two different ways.
+    // First, we separated auction and gene combination functions into several sibling contracts. This allows us to securely
+    // fix bugs and upgrade contracts, if necessary. Please note that while we try to make most code open source,
+    // some code regarding gene combination is not open-source to make it more intriguing for users.
+    // However, as always, advanced users will be able to figure out how it works.
     //
-    // We also break the core function into a few files, having one contract for each of the major functionalities of the Dyverse. 
+    // We also break the core function into a few files, having one contract for each of the major functionalities of the Dyverse.
     // The breakdown is as follows:
     //
     //      - KydyBase: This contract defines the most fundamental core functionalities, including data storage and management.
@@ -2196,11 +2196,11 @@ contract KydyCore is KydyMinting {
     //
     //      - KydyOwnership: This contract provides the methods required for basic non-fungible token transactions.
     //
-    //      - KydySynthesis: This contract contains how new baby Kydy is created via a process called the Synthesis. 
+    //      - KydySynthesis: This contract contains how new baby Kydy is created via a process called the Synthesis.
     //
-    //      - KydyAuction: This contract manages auction creation and bidding. 
+    //      - KydyAuction: This contract manages auction creation and bidding.
     //
-    //      - KydyMinting: This contract defines how we create new Generation 0 Kydys. There is a limit of 8,888 Gen 0 Kydys. 
+    //      - KydyMinting: This contract defines how we create new Generation 0 Kydys. There is a limit of 8,888 Gen 0 Kydys.
 
     // Upgraded version of the core contract.
     // Should be used when the core contract is broken and an upgrade is required.
@@ -2220,7 +2220,7 @@ contract KydyCore is KydyMinting {
     }
 
     /**
-     * @dev Used to mark the smart contract as upgraded when an upgrade happens. 
+     * @dev Used to mark the smart contract as upgraded when an upgrade happens.
      * @param _v2Address Upgraded version of the core contract.
      */
     function setNewAddress(address _v2Address) external onlyCEO whenPaused {
@@ -2240,8 +2240,8 @@ contract KydyCore is KydyMinting {
     }
 
     /**
-     * @notice Returns all info about a given Kydy. 
-     * @param _id ID of the Kydy you are enquiring about. 
+     * @notice Returns all info about a given Kydy.
+     * @param _id ID of the Kydy you are enquiring about.
      */
     function getKydy(uint256 _id)
         external
@@ -2274,7 +2274,7 @@ contract KydyCore is KydyMinting {
     }
 
     /**
-     * @dev Overrides unpause() to make sure that all external contract addresses are set before unpause. 
+     * @dev Overrides unpause() to make sure that all external contract addresses are set before unpause.
      * @notice This should be public rather than external.
      */
     function unpause() public onlyCEO whenPaused {
@@ -2310,7 +2310,7 @@ contract KydyCore is KydyMinting {
 
     /**
      * @dev Adds the Kydy Travel Plugin contract to the Kydy Core contract.
-     * @notice We have a plan to add some fun features to the Dyverse. 
+     * @notice We have a plan to add some fun features to the Dyverse.
      *  Your Kydy will travel all over our world while you carry on with your life.
      *  During their travel, they will earn some valuable coins which will then be given to you.
      *  Please stay tuned!
@@ -2319,3 +2319,132 @@ contract KydyCore is KydyMinting {
         travelCore = KydyTravelInterface(_newTravelCore);
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

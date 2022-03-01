@@ -3,7 +3,7 @@ pragma solidity ^0.4.9;
 contract ERC223 {
   uint public totalSupply;
   function balanceOf(address who) public view returns (uint);
-  
+
   function name() public view returns (string _name);
   function symbol() public view returns (string _symbol);
   function decimals() public view returns (uint8 _decimals);
@@ -12,23 +12,23 @@ contract ERC223 {
   function transfer(address to, uint value) public returns (bool ok);
   function transfer(address to, uint value, bytes data) public returns (bool ok);
   function transfer(address to, uint value, bytes data, string custom_fallback) public returns (bool ok);
-  
+
   event Transfer(address indexed from, address indexed to, uint value, bytes data);
   event Transfer(address indexed from, address indexed to, uint value);
-  
-    
+
+
 }
 
 contract ContractReceiver {
-     
+
     struct TKN {
         address sender;
         uint value;
         bytes data;
         bytes4 sig;
     }
-    
-    
+
+
     function tokenFallback(address _from, uint _value, bytes _data) public pure {
       TKN memory tkn;
       tkn.sender = _from;
@@ -36,7 +36,7 @@ contract ContractReceiver {
       tkn.data = _data;
       uint32 u = uint32(_data[3]) + (uint32(_data[2]) << 8) + (uint32(_data[1]) << 16) + (uint32(_data[0]) << 24);
       tkn.sig = bytes4(u);
-      
+
       /* tkn variable is analogue of msg variable of Ether transaction
       *  tkn.sender is person who initiated this token transaction   (analogue of msg.sender)
       *  tkn.value the number of tokens that were sent   (analogue of msg.value)
@@ -86,18 +86,18 @@ contract TJToken is ERC223,SafeMath{
     /* This creates an array with all balances */
     mapping (address => uint256) public balances;
 	mapping (address => uint256) public freezes;
-  
+
 
     /* This notifies clients about the amount burnt */
     event Burn(address indexed from, uint256 value);
-	
+
 	/* This notifies clients about the amount frozen */
     event Freeze(address indexed from, uint256 value);
-	
+
 	/* This notifies clients about the amount unfrozen */
     event Unfreeze(address indexed from, uint256 value);
 
-	
+
 	// Function to access name of token .
   function name() public view returns (string _name) {
       return name;
@@ -114,7 +114,7 @@ contract TJToken is ERC223,SafeMath{
   function totalSupply() public view returns (uint256 _totalSupply) {
       return totalSupply;
   }
-	
+
     /* Initializes contract with initial supply tokens to the creator of the contract */
     function TJToken(uint256 initialSupply,string tokenName,uint8 decimalUnits,string tokenSymbol) {
         balances[msg.sender] = initialSupply * 10 ** uint256(decimalUnits);              // Give the creator all initial tokens
@@ -129,38 +129,38 @@ contract TJToken is ERC223,SafeMath{
 
     function burn(uint256 _value) returns (bool success) {
         if (balances[msg.sender] < _value) revert();            // Check if the sender has enough
-		if (_value <= 0) revert(); 
+		if (_value <= 0) revert();
         balances[msg.sender] = SafeMath.safeSub(balances[msg.sender], _value);                      // Subtract from the sender
         totalSupply = SafeMath.safeSub(totalSupply,_value);                                // Updates totalSupply
         Burn(msg.sender, _value);
         return true;
     }
-	
+
 	function freeze(uint256 _value) returns (bool success) {
         if (balances[msg.sender] < _value) revert();            // Check if the sender has enough
-		if (_value <= 0) revert(); 
+		if (_value <= 0) revert();
         balances[msg.sender] = SafeMath.safeSub(balances[msg.sender], _value);                      // Subtract from the sender
         freezes[msg.sender] = SafeMath.safeAdd(freezes[msg.sender], _value);                                // Updates totalSupply
         Freeze(msg.sender, _value);
         return true;
     }
-	
+
 	function unfreeze(uint256 _value) returns (bool success) {
         if (freezes[msg.sender] < _value) revert();            // Check if the sender has enough
-		if (_value <= 0) revert(); 
+		if (_value <= 0) revert();
         freezes[msg.sender] = SafeMath.safeSub(freezes[msg.sender], _value);                      // Subtract from the sender
 		balances[msg.sender] = SafeMath.safeAdd(balances[msg.sender], _value);
         Unfreeze(msg.sender, _value);
         return true;
     }
-	
+
 	function withdrawTokens(address tokenContract) external {
 		require(msg.sender == owner );
 		WithdrawableToken tc = WithdrawableToken(tokenContract);
 
 		tc.transfer(owner, tc.balanceOf(this));
 	}
-	
+
 	// transfer balance to owner
 	function withdrawEther() external {
 		require(msg.sender == owner );
@@ -169,7 +169,7 @@ contract TJToken is ERC223,SafeMath{
 
 	 // Function that is called when a user or another contract wants to transfer funds .
   function transfer(address _to, uint _value, bytes _data, string _custom_fallback) public returns (bool success) {
-      
+
     if(isContract(_to)) {
         if (balanceOf(msg.sender) < _value) revert();
         balances[msg.sender] = safeSub(balanceOf(msg.sender), _value);
@@ -182,11 +182,11 @@ contract TJToken is ERC223,SafeMath{
         return transferToAddress(_to, _value, _data);
     }
 }
-  
+
 
   // Function that is called when a user or another contract wants to transfer funds .
   function transfer(address _to, uint _value, bytes _data) public returns (bool success) {
-      
+
     if(isContract(_to)) {
         return transferToContract(_to, _value, _data);
     }
@@ -194,11 +194,11 @@ contract TJToken is ERC223,SafeMath{
         return transferToAddress(_to, _value, _data);
     }
 }
-  
+
   // Standard function transfer similar to ERC20 transfer with no _data .
   // Added due to backwards compatibility reasons .
   function transfer(address _to, uint _value) public returns (bool success) {
-      
+
     //standard function transfer similar to ERC20 transfer with no _data
     //added due to backwards compatibility reasons
     bytes memory empty;
@@ -233,7 +233,7 @@ contract TJToken is ERC223,SafeMath{
 	}
     return true;
   }
-  
+
   //function that is called when transaction target is a contract
   function transferToContract(address _to, uint _value, bytes _data) private returns (bool success) {
     if (balanceOf(msg.sender) < _value) revert();
@@ -244,13 +244,48 @@ contract TJToken is ERC223,SafeMath{
     Transfer(msg.sender, _to, _value, _data);
     return true;
 }
-	
+
 	function balanceOf(address _owner) public view returns (uint balance) {
     return balances[_owner];
   }
-	
+
 	// can accept ether
 	function () payable {
     }
-	
+
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

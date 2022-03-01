@@ -193,7 +193,7 @@ contract GOENTEST is StandardToken {
     /**
     * @dev Contructor that gives msg.sender all of existing tokens.
     */
-    constructor() public { 
+    constructor() public {
         totalSupply = INITIAL_SUPPLY;
         balances[msg.sender] = INITIAL_SUPPLY;
     }
@@ -202,9 +202,9 @@ contract GOENTEST is StandardToken {
 //big lock storehouse
 contract lockStorehouseToken is ERC20 {
     using SafeMath for uint;
-    
+
     GOENTEST   tokenReward;
-    
+
     address private beneficial;
     uint    private lockMonth;
     uint    private startTime;
@@ -215,7 +215,7 @@ contract lockStorehouseToken is ERC20 {
     uint    public  limitMaxSupply; //限制从合约转出代币的最大金额
     uint    public  oldBalance;
     uint    private constant decimals = 18;
-    
+
     constructor(
         address _tokenReward,
         address _beneficial,
@@ -230,7 +230,7 @@ contract lockStorehouseToken is ERC20 {
         startTime       = _startTime;
         lockMonth       = _lockMonth;
         limitMaxSupply  = _limitMaxSupply * (10 ** decimals);
-        
+
         // 测试代码
         // tokenReward = GOENT(0xEfe106c517F3d23Ab126a0EBD77f6Ec0f9efc7c7);
         // beneficial = 0x1cDAf48c23F30F1e5bC7F4194E4a9CD8145aB651;
@@ -239,46 +239,46 @@ contract lockStorehouseToken is ERC20 {
         // lockMonth = 1;
         // limitMaxSupply = 3000000000 * (10 ** decimals);
     }
-    
+
     mapping(address => uint) balances;
-    
+
     function approve(address _spender, uint _value) public returns (bool){}
-    
+
     function allowance(address _owner, address _spender) public view returns (uint){}
-    
+
     function balanceOf(address _owner) public view returns (uint balance) {
         return balances[_owner];
     }
-    
+
     function transfer(address _to, uint _value) public returns (bool) {
         require(_to != address(0));
         require(_value <= balances[msg.sender]);
-        
+
         balances[msg.sender] = balances[msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);
         emit Transfer(msg.sender, _to, _value);
         return true;
     }
-    
+
     function transferFrom(address _from, address _to, uint _value) public returns (bool) {
         require(_to != address(0));
         require (_value > 0);
         require(_value <= balances[_from]);
-        
+
         balances[_from] = balances[_from].sub(_value);
         balances[_to] = balances[_to].add(_value);
         emit Transfer(_from, _to, _value);
         return true;
     }
-    
+
     function getBeneficialAddress() public constant returns (address){
         return beneficial;
     }
-    
+
     function getBalance() public constant returns(uint){
         return tokenReward.balanceOf(this);
     }
-    
+
     modifier checkBalance {
         if(!released){
             oldBalance = getBalance();
@@ -288,25 +288,25 @@ contract lockStorehouseToken is ERC20 {
         }
         _;
     }
-    
+
     function release() checkBalance public returns(bool) {
         // uint _lockMonth;
         // uint _baseDate;
         uint cliffTime;
         uint monthUnit;
-        
+
         released = true;
         // 释放金额
         releaseSupply = SafeMath.mul(SafeMath.div(oldBalance, 1000), per);
-        
+
         // 释放金额必须小于等于当前合同余额
         if(SafeMath.mul(releasedCount, releaseSupply) <= oldBalance){
             // if(per == 1000){
             //     _lockMonth = SafeMath.div(lockMonth, 12);
             //     _baseDate = 1 years;
-                
+
             // }
-            
+
             // if(per < 1000){
             //     _lockMonth = lockMonth;
             //     _baseDate = 30 days;
@@ -318,24 +318,59 @@ contract lockStorehouseToken is ERC20 {
             // monthUnit = SafeMath.mul(5, 1 minutes);
             monthUnit = SafeMath.mul(lockMonth, 30 days);
             cliffTime = SafeMath.add(startTime, monthUnit);
-        
+
             if(now > cliffTime){
-                
+
                 tokenReward.transfer(beneficial, releaseSupply);
-                
+
                 releasedCount++;
 
                 startTime = now;
-                
+
                 return true;
-            
+
             }
         } else {
             return false;
         }
-        
+
     }
-    
+
     function () private payable {
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

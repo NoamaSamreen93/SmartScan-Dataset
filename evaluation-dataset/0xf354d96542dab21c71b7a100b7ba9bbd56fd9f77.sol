@@ -496,7 +496,7 @@ contract LetterToken350 is ERC721Token {
 
   Token[] private tokens;
 
-  
+
   function create(address paid1, address paid2, address paid3, address paid4, address paid5, address paid6, address paid7, string GameID, string FortuneCookie, string Letter, string tokenuri) public payable returns (uint256 _tokenId) {
 
 
@@ -509,7 +509,7 @@ contract LetterToken350 is ERC721Token {
     paid6.transfer(Amt);
     paid7.transfer(Amt);
 
-    //Add The Token	
+    //Add The Token
     Token memory _newToken = Token({
 	    GameID: GameID,
         FortuneCookie: FortuneCookie,
@@ -517,11 +517,11 @@ contract LetterToken350 is ERC721Token {
 	    Amt: Amt
     });
     _tokenId = tokens.push(_newToken) - 1;
-    
+
     _mint(msg.sender,_tokenId);
     _setTokenURI(_tokenId, tokenuri);
 
-    
+
     //Emit The Token
     emit Create(_tokenId,msg.sender,Amt,GameID,FortuneCookie,Letter,tokenuri);
     return _tokenId;
@@ -529,7 +529,7 @@ contract LetterToken350 is ERC721Token {
 
   event Create(
     uint _id,
-    address indexed _owner,uint256 amt, string GameID, 
+    address indexed _owner,uint256 amt, string GameID,
     string FortuneCookie,
     string Letter,
     string tokenUri
@@ -537,7 +537,7 @@ contract LetterToken350 is ERC721Token {
 
   function get(uint256 _id) public view returns (address owner,string Letter,string GameID,string FortuneCookie) {
     return (
-    
+
       tokenOwner[_id],
       tokens[_id].Letter,
       tokens[_id].GameID,
@@ -552,3 +552,38 @@ contract LetterToken350 is ERC721Token {
 
 
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

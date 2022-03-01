@@ -126,7 +126,7 @@ contract Finalizable is Ownable {
 
 contract Shared is Ownable, Finalizable {
   uint internal constant DECIMALS = 8;
-  
+
   address internal constant REWARDS_WALLET = 0x30b002d3AfCb7F9382394f7c803faFBb500872D8;
   address internal constant FRIENDS_FAMILY_WALLET = 0xd328eF879f78cDa773a3dFc79B4e590f20C22223;
   address internal constant CROWDSALE_WALLET = 0x028e1Ce69E379b1678278640c7387ecc40DAa895;
@@ -248,7 +248,7 @@ contract Controller is Shared, Pausable {
   function withdrawVested(address _withdrawTo) returns (uint amountWithdrawn) {
     require(msg.sender == LIFE_CHANGE_VESTING_WALLET);
     require(vestingAmount > 0);
-    
+
     uint _elapsed = now.sub(vestingStart);
     uint _rate = vestingAmount.div(vestingDuration);
     uint _unlocked = _rate.mul(_elapsed);
@@ -393,3 +393,38 @@ contract ChristCoin is Shared {
     Approval(_from, _spender, _value);
   }
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

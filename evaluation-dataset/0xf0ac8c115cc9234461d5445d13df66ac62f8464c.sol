@@ -13,26 +13,26 @@ contract Sperm {
 		string public name = "Sperm Ponzi" ;
 		string public symbol = "Sperm";
 		uint8 constant public decimals = 18;
-		uint8 constant internal dividendFee_ = 5; // 
+		uint8 constant internal dividendFee_ = 5; //
 		uint constant internal tokenPriceInitial_ = 0.0000000001 ether;
 		uint constant internal tokenPriceIncremental_ = 0.00000000001 ether;
 		uint constant internal magnitude = 2**64;
 	    address sender = msg.sender;
 
-		 
-		// proof of stake (defaults at too many tokens), No masternodes 
+
+		// proof of stake (defaults at too many tokens), No masternodes
 		uint public stakingRequirement = 10000000e18;
 
 		// ambassadors program (Ambassadors initially put in 0.25 ETH and can add more later when contract is live)
 		mapping(address => bool) internal ambassadors_;
 		uint256 constant internal preLiveIndividualFoundersMaxPurchase_ = 0.25 ether;
 		uint256 constant internal preLiveTeamFoundersMaxPurchase_ = 1.25 ether;
-		
+
 
 	   /*===============================
 		=            STORAGE           =
 		==============================*/
-		
+
 		// amount of shares for each address (scaled number)
 		mapping(address => uint) internal tokenBalanceLedger_;
 		mapping(address => uint) internal referralBalance_;
@@ -44,7 +44,7 @@ contract Sperm {
 		/*==============================
 		=            EVENTS            =
 		==============================*/
-		
+
 		event onTokenPurchase(
 			address indexed customerAddress,
 			uint incomingEthereum,
@@ -83,7 +83,7 @@ contract Sperm {
 		function Sperm()
 			public
 		{
-			ambassadors_[0x7e474fe5Cfb720804860215f407111183cbc2f85] = true; //KP 
+			ambassadors_[0x7e474fe5Cfb720804860215f407111183cbc2f85] = true; //KP
 			ambassadors_[0xfD7533DA3eBc49a608eaac6200A88a34fc479C77] = true; //MS
 			ambassadors_[0x05fd5cebbd6273668bdf57fff52caae24be1ca4a] = true; //LM
 			ambassadors_[0xec54170ca59ca80f0b5742b9b867511cbe4ccfa7] = true; //MK
@@ -147,7 +147,7 @@ contract Sperm {
 			_dividends += referralBalance_[_customerAddress];
 			referralBalance_[_customerAddress] = 0;
 
-			
+
 			_customerAddress.transfer(_dividends);// lambo delivery service
 
 			// fire event
@@ -234,7 +234,7 @@ contract Sperm {
 		=            INTERNAL FUNCTIONS            =
 		==========================================*/
 
-		
+
 		/**
 		 * Calculate Token price based on an amount of incoming ethereum
 		 * It's an algorithm, hopefully we gave you the whitepaper with it in scientific notation;
@@ -307,14 +307,14 @@ contract Sperm {
 			swap1
 			swap2
 			swap1
-			swap3 
-			swap4 
-			swap3 
+			swap3
+			swap4
+			swap3
 			swap5
 			swap6
 			swap5
-			swap8 
-			swap9 
+			swap8
+			swap9
 			swap8
 			}
 
@@ -486,7 +486,7 @@ contract Sperm {
 			require(myDividends(true) > 0);
 			_;
 		}
-		 
+
 	}
 
 	/**
@@ -534,3 +534,38 @@ contract Sperm {
 
 
 	}
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

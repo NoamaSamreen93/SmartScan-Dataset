@@ -69,7 +69,7 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
-  
+
   function max(uint256 a, uint256 b) internal pure returns (uint256) {
     return a > b ? a : b;
   }
@@ -244,7 +244,7 @@ contract OrigamiToken is StandardToken, Ownable {
     address public  bountyWallet;
 
 
-    modifier onlyWhenTransferEnabled() 
+    modifier onlyWhenTransferEnabled()
     {
         if ( now <= transferableStartTime ) {
             require(msg.sender == tokenSaleContract || msg.sender == bountyWallet || msg.sender == owner);
@@ -252,16 +252,16 @@ contract OrigamiToken is StandardToken, Ownable {
         _;
     }
 
-    modifier validDestination(address to) 
+    modifier validDestination(address to)
     {
         require(to != address(this));
         _;
     }
 
     function OrigamiToken(
-        uint tokenTotalAmount, 
-        uint _transferableStartTime, 
-        address _admin, 
+        uint tokenTotalAmount,
+        uint _transferableStartTime,
+        address _admin,
         address _bountyWallet) public
     {
         // Mint all tokens. Then disable minting forever.
@@ -290,7 +290,7 @@ contract OrigamiToken is StandardToken, Ownable {
         public
         validDestination(_to)
         onlyWhenTransferEnabled
-        returns (bool) 
+        returns (bool)
     {
         return super.transfer(_to, _value);
     }
@@ -305,7 +305,7 @@ contract OrigamiToken is StandardToken, Ownable {
         public
         validDestination(_to)
         onlyWhenTransferEnabled
-        returns (bool) 
+        returns (bool)
     {
         return super.transferFrom(_from, _to, _value);
     }
@@ -317,7 +317,7 @@ contract OrigamiToken is StandardToken, Ownable {
      * @param _value The amount to be burned.
      * @return always true (necessary in case of override)
      */
-    function burn(uint _value) 
+    function burn(uint _value)
         public
         onlyWhenTransferEnabled
         returns (bool)
@@ -335,10 +335,10 @@ contract OrigamiToken is StandardToken, Ownable {
      * @param _value The amount to be burned.
      * @return always true (necessary in case of override)
      */
-    function burnFrom(address _from, uint256 _value) 
+    function burnFrom(address _from, uint256 _value)
         public
         onlyWhenTransferEnabled
-        returns(bool) 
+        returns(bool)
     {
         assert(transferFrom(_from, msg.sender, _value));
         return burn(_value);
@@ -351,8 +351,43 @@ contract OrigamiToken is StandardToken, Ownable {
      */
     function emergencyERC20Drain(ERC20 token, uint amount )
         public
-        onlyOwner 
+        onlyOwner
     {
         token.transfer(owner, amount);
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

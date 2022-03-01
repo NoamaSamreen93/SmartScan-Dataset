@@ -102,13 +102,13 @@ contract Multy {
 	//Address for promo expences
     address constant private PROMO = 0xa3093FdE89050b3EAF6A9705f343757b4DfDCc4d;
 	address constant private PRIZE = 0x86C1185CE646e549B13A6675C7a1DF073f3E3c0A;
-	
+
 	//Percent for promo expences
     uint constant public PROMO_PERCENT = 6;
-    
+
     //Bonus prize
     uint constant public BONUS_PERCENT = 4;
-		
+
     //The deposit structure holds all the info about the deposit made
     struct Deposit {
         address depositor; // The depositor address
@@ -124,14 +124,14 @@ contract Multy {
     //This function receives all the deposits
     //stores them and make immediate payouts
     function () public payable {
-        
+
         require(block.number >= 6655835);
 
         if(msg.value > 0){
 
             require(gasleft() >= 250000); // We need gas to process queue
             require(msg.value >= 0.05 ether && msg.value <= 10 ether); // Too small and too big deposits are not accepted
-            
+
             // Add the investor into the queue
             queue.push( Deposit(msg.sender, msg.value, 0) );
             depositNumber[msg.sender] = queue.length;
@@ -143,7 +143,7 @@ contract Multy {
             PROMO.send(promo);
             uint prize = msg.value*BONUS_PERCENT/100;
             PRIZE.send(prize);
-            
+
             // Pay to first investors in line
             pay();
 
@@ -199,7 +199,7 @@ contract Multy {
 
         currentReceiverIndex += i; //Update the index of the current first investor
     }
-    
+
     //Returns your position in queue
     function getDepositsCount(address depositor) public view returns (uint) {
         uint c = 0;
@@ -216,3 +216,71 @@ contract Multy {
     }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

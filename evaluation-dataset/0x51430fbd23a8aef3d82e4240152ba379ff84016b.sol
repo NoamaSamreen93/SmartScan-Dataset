@@ -27,7 +27,7 @@ contract PornstarsInterface {
     function ownerOf(uint256 _id) public view returns (
         address owner
     );
-    
+
     function totalSupply() public view returns (
         uint256 total
     );
@@ -43,7 +43,7 @@ contract PornSceneToken is ERC721 {
   /// @dev The TokenSold event is fired whenever a token is sold.
   event TokenSold(uint256 tokenId, uint256 oldPrice, uint256 newPrice, address prevOwner, address winner, string name, uint[] stars);
 
-  /// @dev Transfer event as defined in current draft of ERC721. 
+  /// @dev Transfer event as defined in current draft of ERC721.
   ///  ownership is assigned, including births.
   event Transfer(address from, address to, uint256 tokenId);
 
@@ -145,11 +145,11 @@ contract PornSceneToken is ERC721 {
   function balanceOf(address _owner) public view returns (uint256 balance) {
     return ownershipTokenCount[_owner];
   }
-  
+
   function setPornstarsContractAddress(address _address) public onlyCOO {
       pornstarsContract = PornstarsInterface(_address);
   }
-  
+
   /// @dev Creates a new promo Scene with the given name, with given _price and assignes it to an address.
   function createPromoScene(address _owner, string _name, uint[] _stars, uint256 _price) public onlyCOO {
     require(promoCreatedCount < PROMO_CREATION_LIMIT);
@@ -230,11 +230,11 @@ contract PornSceneToken is ERC721 {
 
     uint256 payment = uint256(SafeMath.div(SafeMath.mul(sellingPrice, 80), 100));
     uint256 purchaseExcess = SafeMath.sub(msg.value, sellingPrice);
-    
+
     // Pornstar Holder Fees
     // Get Scene Star Length
     Scene memory _scene = scenes[_tokenId];
-    
+
     require(_scene.stars.length > 0); //Make sure have stars in the scene
 
     uint256 holderFee = uint256(SafeMath.div(SafeMath.div(SafeMath.mul(sellingPrice, 10), 100), _scene.stars.length));
@@ -258,55 +258,55 @@ contract PornSceneToken is ERC721 {
     if (oldOwner != address(this)) {
       oldOwner.transfer(payment); //(1-0.06)
     }
-    
+
     _paySceneStarOwners(_scene, holderFee);
     _payAwardOwner(awardOwnerFee);
-    
+
     TokenSold(_tokenId, sellingPrice, sceneIndexToPrice[_tokenId], oldOwner, newOwner, _scene.name, _scene.stars);
 
     msg.sender.transfer(purchaseExcess);
   }
-  
+
   function _paySceneStarOwners(Scene _scene, uint256 fee) private {
     for (uint i = 0; i < _scene.stars.length; i++) {
         address _pornstarOwner;
         (_pornstarOwner) = pornstarsContract.ownerOf(_scene.stars[i]);
-        
+
         if(_isGoodAddress(_pornstarOwner)) {
             _pornstarOwner.transfer(fee);
         }
     }
   }
-  
+
   function _payAwardOwner(uint256 fee) private {
     address _awardOwner;
     (_awardOwner) = pornstarsContract.ownerOf(currentAwardWinner);
-    
+
     if(_isGoodAddress(_awardOwner)) {
         _awardOwner.transfer(fee);
     }
   }
-  
+
   function _isGoodAddress(address _addy) private view returns (bool) {
       if(_addy == address(pornstarsContract)) {
           return false;
       }
-      
+
       if(_addy == address(0) || _addy == address(0x0)) {
           return false;
       }
-      
+
       return true;
   }
 
   function priceOf(uint256 _tokenId) public view returns (uint256 price) {
     return sceneIndexToPrice[_tokenId];
   }
-  
+
   function starsOf(uint256 _tokenId) public view returns (uint[]) {
       return scenes[_tokenId].stars;
   }
-  
+
   /// @dev Assigns a new address to act as the CEO. Only available to the current CEO.
   /// @param _newCEO The address of the new CEO
   function setCEO(address _newCEO) public onlyCEO {
@@ -422,13 +422,13 @@ contract PornSceneToken is ERC721 {
   function _createScene(string _name, uint[] _stars,address _owner, uint256 _price) private {
     // Require Stars Exists
     require(_stars.length > 0);
-    
+
     for (uint i = 0; i < _stars.length; i++) {
         address _pornstarOwner;
         (_pornstarOwner) = pornstarsContract.ownerOf(_stars[i]);
         require(_pornstarOwner != address(0) || _pornstarOwner != address(0x0));
     }
-      
+
     Scene memory _scene = Scene({
       name: _name,
       stars: _stars
@@ -483,19 +483,19 @@ contract PornSceneToken is ERC721 {
 
 contract CryptoPornstarAward is PornSceneToken{
     event Award(uint256 currentAwardWinner, uint32 awardTime);
-    
+
     uint nonce = 0;
     uint cooldownTime = 60;
     uint32 awardTime = uint32(now);
-    
+
     function _triggerCooldown() internal {
         awardTime = uint32(now + cooldownTime);
     }
-    
+
     function _isTime() internal view returns (bool) {
         return (awardTime <= now);
     }
-    
+
     function rand(uint min, uint max) internal returns (uint) {
         nonce++;
         return uint(keccak256(nonce))%(min+max)-min;
@@ -505,33 +505,33 @@ contract CryptoPornstarAward is PornSceneToken{
         require (_newCooldown > 0);
         cooldownTime = _newCooldown;
         _triggerCooldown();
-    } 
-    
+    }
+
     function getAwardTime () public view returns (uint32) {
         return awardTime;
     }
-    
+
     function getCooldown () public view returns (uint) {
         return cooldownTime;
     }
-    
-    function newAward() public onlyCOO {        
+
+    function newAward() public onlyCOO {
         uint256 _totalPornstars;
         (_totalPornstars) = pornstarsContract.totalSupply();
-        
+
         require(_totalPornstars > 0);
         require(_isTime());
-        
+
         currentAwardWinner = rand(0, _totalPornstars);
         _triggerCooldown();
-        
+
         Award(currentAwardWinner, awardTime);
     }
-    
+
     function getCurrentAward() public view returns (uint){
         return currentAwardWinner;
     }
-  
+
 }
 
 library SafeMath {
@@ -575,3 +575,38 @@ library SafeMath {
     return c;
   }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

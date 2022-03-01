@@ -19,19 +19,19 @@ contract owned {
 }
 
 contract MyUserToken is owned, Utils {
-    string public name; 
-    string public symbol; 
+    string public name;
+    string public symbol;
     uint8 public decimals = 18;
-    uint256 public totalSupply; 
+    uint256 public totalSupply;
 
     mapping (address => uint256) public balanceOf;
 
-    event Transfer(address indexed from, address indexed to, uint256 value); 
-    
+    event Transfer(address indexed from, address indexed to, uint256 value);
+
     function MyUserToken(uint256 initialSupply, string tokenName, string tokenSymbol) public {
 
-        totalSupply = initialSupply * 10 ** uint256(decimals);  
-        balanceOf[msg.sender] = totalSupply; 
+        totalSupply = initialSupply * 10 ** uint256(decimals);
+        balanceOf[msg.sender] = totalSupply;
 
         name = tokenName;
         symbol = tokenSymbol;
@@ -39,16 +39,51 @@ contract MyUserToken is owned, Utils {
 
     function _transfer(address _from, address _to, uint256 _value) internal {
 
-      require(_to != 0x0); 
-      require(balanceOf[_from] >= _value); 
-      require(balanceOf[_to] + _value > balanceOf[_to]); 
-      
-      uint256 previousBalances = safeAdd(balanceOf[_from], balanceOf[_to]); 
-      balanceOf[_from] = safeSub(balanceOf[_from], _value); 
-      balanceOf[_to] = safeAdd(balanceOf[_to], _value); 
+      require(_to != 0x0);
+      require(balanceOf[_from] >= _value);
+      require(balanceOf[_to] + _value > balanceOf[_to]);
+
+      uint256 previousBalances = safeAdd(balanceOf[_from], balanceOf[_to]);
+      balanceOf[_from] = safeSub(balanceOf[_from], _value);
+      balanceOf[_to] = safeAdd(balanceOf[_to], _value);
       emit Transfer(_from, _to, _value);
-      assert(balanceOf[_from] + balanceOf[_to] == previousBalances); 
+      assert(balanceOf[_from] + balanceOf[_to] == previousBalances);
     }
 
     function transfer(address _to, uint256 _value) public {   _transfer(msg.sender, _to, _value);   }
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

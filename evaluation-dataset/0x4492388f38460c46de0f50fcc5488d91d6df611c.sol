@@ -44,16 +44,16 @@ library SafeMath {
 
 
 contract ERC20Basic {
-    
+
   function totalSupply() public view returns (uint256);
   function balanceOf(address who) public view returns (uint256);
   function transfer(address to, uint256 value) public returns (bool);
   event Transfer(address indexed from, address indexed to, uint256 value);
-  
+
 }
 
 contract ERC20 is ERC20Basic {
-    
+
   function allowance(address owner, address spender)
     public view returns (uint256);
 
@@ -81,7 +81,7 @@ contract DetailedERC20 is ERC20 {
 }
 
 /**
- * @title 实现ERC20基本合约的接口 
+ * @title 实现ERC20基本合约的接口
  * @dev 基本的StandardToken，不包含allowances.
  */
 contract BasicToken is ERC20Basic {
@@ -90,7 +90,7 @@ contract BasicToken is ERC20Basic {
   mapping(address => uint256) balances;
 
   uint256 totalSupply_;
-  
+
   function totalSupply() public view returns (uint256) {
     return totalSupply_;
   }
@@ -173,10 +173,45 @@ contract GoldHaiBei is StandardBurnableToken {
     string public name = 'GoldHaiBei';
     string public symbol = 'JHB';
     uint8 public decimals = 8;
-    uint256 public INITIAL_SUPPLY = 14897284100000000; 
+    uint256 public INITIAL_SUPPLY = 14897284100000000;
   constructor() public {
     totalSupply_ = INITIAL_SUPPLY;
     balances[msg.sender] = INITIAL_SUPPLY;
   }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

@@ -95,7 +95,7 @@ contract Ownable {
 /**
  * @title DragonAdvisors
  * @dev DragonAdvisors works like a tap and release tokens periodically
- * to advisors on the owners permission 
+ * to advisors on the owners permission
  */
 contract DragonAdvisors is Ownable{
   using SafeERC20 for ERC20Basic;
@@ -109,7 +109,7 @@ contract DragonAdvisors is Ownable{
 
   // amount of tokens available for release
   uint256 public releasedTokens;
-  
+
   event TokenTapAdjusted(uint256 released);
 
   constructor() public {
@@ -117,7 +117,7 @@ contract DragonAdvisors is Ownable{
     owner = address(0xA5101498679Fa973c5cF4c391BfF991249934E73);      // overriding owner
 
     advisor = address(0x4768f69DD6a786284FD28FB5E5ec70419C02Bf5E);
-    
+
     releasedTokens = 0;
   }
 
@@ -128,14 +128,14 @@ contract DragonAdvisors is Ownable{
     require(_amount > 0);
     require(releasedTokens >= _amount);
     releasedTokens = releasedTokens.sub(_amount);
-    
+
     uint256 balance = token.balanceOf(this);
     require(balance >= _amount);
-    
+
 
     token.safeTransfer(advisor, _amount);
   }
-  
+
   /**
    * @notice Owner can move tokens to any address
    */
@@ -148,7 +148,7 @@ contract DragonAdvisors is Ownable{
 
     token.safeTransfer(_to, _amount);
   }
-  
+
   function adjustTap(uint256 _amount) external onlyOwner{
       require(_amount > 0);
       uint256 balance = token.balanceOf(this);
@@ -156,8 +156,69 @@ contract DragonAdvisors is Ownable{
       releasedTokens = _amount;
       emit TokenTapAdjusted(_amount);
   }
-  
+
   function () public payable {
       revert();
   }
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

@@ -336,13 +336,13 @@ contract SeeleToken is PausableToken {
 
     /// Fields that are only changed in constructor
     /// seele sale  contract
-    address public minter; 
+    address public minter;
 
     /// Fields that can be changed by functions
     mapping (address => uint) public lockedBalances;
 
     /// claim flag
-    bool public claimedFlag;  
+    bool public claimedFlag;
 
     /*
      * MODIFIERS
@@ -369,14 +369,14 @@ contract SeeleToken is PausableToken {
     }
 
     /**
-     * CONSTRUCTOR 
-     * 
+     * CONSTRUCTOR
+     *
      * @dev Initialize the Seele Token
-     * @param _minter The SeeleCrowdSale Contract 
-     * @param _maxTotalSupply total supply token    
+     * @param _minter The SeeleCrowdSale Contract
+     * @param _maxTotalSupply total supply token
      */
-    function SeeleToken(address _minter, address _admin, uint _maxTotalSupply) 
-        public 
+    function SeeleToken(address _minter, address _admin, uint _maxTotalSupply)
+        public
         validAddress(_admin)
         validAddress(_minter)
         {
@@ -387,10 +387,10 @@ contract SeeleToken is PausableToken {
     }
 
     /**
-     * EXTERNAL FUNCTION 
-     * 
+     * EXTERNAL FUNCTION
+     *
      * @dev SeeleCrowdSale contract instance mint token
-     * @param receipent The destination account owned mint tokens    
+     * @param receipent The destination account owned mint tokens
      * @param amount The amount of mint token
      * @param isLock Lock token flag
      * be sent to this address.
@@ -412,9 +412,9 @@ contract SeeleToken is PausableToken {
     }
 
 
-    function setClaimedFlag(bool flag) 
+    function setClaimedFlag(bool flag)
         public
-        onlyOwner 
+        onlyOwner
     {
         claimedFlag = flag;
     }
@@ -427,7 +427,7 @@ contract SeeleToken is PausableToken {
     function claimTokens(address[] receipents)
         public
         canClaimed
-    {        
+    {
         for (uint i = 0; i < receipents.length; i++) {
             address receipent = receipents[i];
             balances[receipent] = balances[receipent].add(lockedBalances[receipent]);
@@ -467,7 +467,7 @@ contract SeeleCrowdSale is Pausable {
     uint public constant OPEN_SALE_STAKE = 625; // for public
     uint public constant OTHER_STAKE = 6375;    // for others
 
-    
+
     uint public constant DIVISOR_STAKE = 10000;
 
     // max open sale tokens
@@ -488,7 +488,7 @@ contract SeeleCrowdSale is Pausable {
     /// Accumulator for open sold tokens
     uint public openSoldTokens;
     /// ERC20 compilant seele token contact instance
-    SeeleToken public seeleToken; 
+    SeeleToken public seeleToken;
 
     /// tags show address can join in open sale
     mapping (address => bool) public fullWhiteList;
@@ -515,7 +515,7 @@ contract SeeleCrowdSale is Pausable {
     modifier ceilingNotReached() {
         require(openSoldTokens < MAX_OPEN_SOLD);
         _;
-    }  
+    }
 
     modifier isSaleEnded() {
         require(now > endTime || openSoldTokens >= MAX_OPEN_SOLD);
@@ -529,18 +529,18 @@ contract SeeleCrowdSale is Pausable {
     }
 
     function SeeleCrowdSale (
-        address _wallet, 
+        address _wallet,
         address _minerAddress,
         address _otherAddress
-        ) public 
-        validAddress(_wallet) 
-        validAddress(_minerAddress) 
-        validAddress(_otherAddress) 
+        ) public
+        validAddress(_wallet)
+        validAddress(_minerAddress)
+        validAddress(_otherAddress)
         {
-        paused = true;  
+        paused = true;
         wallet = _wallet;
         minerAddress = _minerAddress;
-        otherAddress = _otherAddress;     
+        otherAddress = _otherAddress;
 
         openSoldTokens = 0;
         /// Create seele token contract instance
@@ -567,7 +567,7 @@ contract SeeleCrowdSale is Pausable {
     }
 
     /// @dev batch set quota for user admin
-    /// if openTag <=0, removed 
+    /// if openTag <=0, removed
     function setWhiteList(address[] users, bool openTag)
         external
         onlyOwner
@@ -581,7 +581,7 @@ contract SeeleCrowdSale is Pausable {
 
 
     /// @dev batch set quota for early user quota
-    /// if openTag <=0, removed 
+    /// if openTag <=0, removed
     function addWhiteList(address user, bool openTag)
         external
         onlyOwner
@@ -593,9 +593,9 @@ contract SeeleCrowdSale is Pausable {
     }
 
     /// @dev Emergency situation
-    function setWallet(address newAddress)  external onlyOwner { 
+    function setWallet(address newAddress)  external onlyOwner {
         NewWallet(owner, wallet, newAddress);
-        wallet = newAddress; 
+        wallet = newAddress;
     }
 
     /// @return true if sale not ended, false otherwise.
@@ -604,8 +604,8 @@ contract SeeleCrowdSale is Pausable {
     }
 
     /**
-     * Fallback function 
-     * 
+     * Fallback function
+     *
      * @dev If anybody sends Ether directly to this  contract, consider he is getting seele token
      */
     function () public payable {
@@ -617,21 +617,21 @@ contract SeeleCrowdSale is Pausable {
      */
     /// @dev Exchange msg.value ether to Seele for account recepient
     /// @param receipient Seele tokens receiver
-    function buySeele(address receipient) 
-        internal 
-        whenNotPaused  
-        ceilingNotReached 
+    function buySeele(address receipient)
+        internal
+        whenNotPaused
+        ceilingNotReached
         notEarlierThan(startTime)
         earlierThan(endTime)
         validAddress(receipient)
-        returns (bool) 
+        returns (bool)
     {
         // Do not allow contracts to game the system
-        require(!isContract(msg.sender));    
+        require(!isContract(msg.sender));
         require(tx.gasprice <= 100000000000 wei);
         require(msg.value >= MIN_LIMIT);
 
-        bool inWhiteListTag = fullWhiteList[receipient];       
+        bool inWhiteListTag = fullWhiteList[receipient];
         require(inWhiteListTag == true);
 
         uint stage = STAGE_3;
@@ -673,7 +673,7 @@ contract SeeleCrowdSale is Pausable {
                 uint refund2 = fund2.sub(MAX_STAGE_2_LIMIT);
                 value = value.sub(refund2);
                 msg.sender.transfer(refund2);
-            }            
+            }
         }
 
         uint tokenAvailable = MAX_OPEN_SOLD.sub(openSoldTokens);
@@ -682,10 +682,10 @@ contract SeeleCrowdSale is Pausable {
         uint toCollect;
         (toFund, toCollect) = costAndBuyTokens(tokenAvailable, value);
         if (toFund > 0) {
-            require(seeleToken.mint(receipient, toCollect,true));         
+            require(seeleToken.mint(receipient, toCollect,true));
             wallet.transfer(toFund);
             openSoldTokens = openSoldTokens.add(toCollect);
-            NewSale(receipient, toFund, toCollect);             
+            NewSale(receipient, toFund, toCollect);
         }
 
         // not enough token sale, just return eth
@@ -697,7 +697,7 @@ contract SeeleCrowdSale is Pausable {
         if ( stage == STAGE_1 ) {
             firstStageFund[receipient] = firstStageFund[receipient].add(toFund);
         }else if ( stage == STAGE_2 ) {
-            secondStageFund[receipient] = secondStageFund[receipient].add(toFund);          
+            secondStageFund[receipient] = secondStageFund[receipient].add(toFund);
         }
     }
 
@@ -728,4 +728,133 @@ contract SeeleCrowdSale is Pausable {
         }
         return size > 0;
     }
-}
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

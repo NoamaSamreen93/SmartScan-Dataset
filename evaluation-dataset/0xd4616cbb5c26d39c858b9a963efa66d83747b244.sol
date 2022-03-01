@@ -75,16 +75,16 @@ contract BMEvents {
 /// change notes: original SafeMath library from OpenZeppelin modified by Inventor
 /// - added sqrt
 /// - added sq
-/// - added pwr 
+/// - added pwr
 /// - changed asserts to requires with error log outputs
 /// - removed div, its useless
 library SafeMath {
-    
+
     /// @dev Multiplies two numbers, throws on overflow.
-    function mul(uint256 a, uint256 b) 
-        internal 
-        pure 
-        returns (uint256 c) 
+    function mul(uint256 a, uint256 b)
+        internal
+        pure
+        returns (uint256 c)
     {
         if (a == 0) {
             return 0;
@@ -99,7 +99,7 @@ library SafeMath {
     function sub(uint256 a, uint256 b)
         internal
         pure
-        returns (uint256) 
+        returns (uint256)
     {
         require(b <= a, "SafeMath sub failed");
         return a - b;
@@ -110,19 +110,19 @@ library SafeMath {
     function add(uint256 a, uint256 b)
         internal
         pure
-        returns (uint256 c) 
+        returns (uint256 c)
     {
         c = a + b;
         require(c >= a, "SafeMath add failed");
         return c;
     }
-    
+
 
     /// @dev gives square root of given x.
     function sqrt(uint256 x)
         internal
         pure
-        returns (uint256 y) 
+        returns (uint256 y)
     {
         uint256 z = ((add(x, 1)) / 2);
         y = x;
@@ -143,10 +143,10 @@ library SafeMath {
     }
 
 
-    /// @dev x to the power of y 
+    /// @dev x to the power of y
     function pwr(uint256 x, uint256 y)
-        internal 
-        pure 
+        internal
+        pure
         returns (uint256)
     {
         if (x == 0) {
@@ -168,9 +168,9 @@ library SafeMath {
 // key calculation
 library BMKeyCalc {
     using SafeMath for *;
-    
-    /// @dev calculates number of keys received given X eth 
-    /// @param _curEth current amount of eth in contract 
+
+    /// @dev calculates number of keys received given X eth
+    /// @param _curEth current amount of eth in contract
     /// @param _newEth eth being spent
     /// @return amount of ticket purchased
     function keysRec(uint256 _curEth, uint256 _newEth)
@@ -182,8 +182,8 @@ library BMKeyCalc {
     }
 
 
-    /// @dev calculates amount of eth received if you sold X keys 
-    /// @param _curKeys current amount of keys that exist 
+    /// @dev calculates amount of eth received if you sold X keys
+    /// @param _curKeys current amount of keys that exist
     /// @param _sellKeys amount of keys you wish to sell
     /// @return amount of eth received
     function ethRec(uint256 _curKeys, uint256 _sellKeys)
@@ -197,18 +197,18 @@ library BMKeyCalc {
     /// @dev calculates how many keys would exist with given an amount of eth
     /// @param _eth eth "in contract"
     /// @return number of keys that would exist
-    function keys(uint256 _eth) 
+    function keys(uint256 _eth)
         internal
         pure
         returns(uint256)
     {
         return ((((((_eth).mul(1000000000000000000)).mul(3125000000000000000000000000)).add(562498828125610351562500000000000000000000000000000000000000000000)).sqrt()).sub(749999218750000000000000000000000)) / (1562500000);
     }
-    
+
     /// @dev calculates how much eth would be in contract given a number of keys
-    /// @param _keys number of keys "in contract" 
+    /// @param _keys number of keys "in contract"
     /// @return eth that would exists
-    function eth(uint256 _keys) 
+    function eth(uint256 _keys)
         internal
         pure
         returns(uint256)
@@ -230,7 +230,7 @@ library BMDatasets {
         bool paused;                     // game paused
         bool ended;                      // game ended
         bool canceled;                   // game canceled
-        uint256 winnerTeam;              // winner team        
+        uint256 winnerTeam;              // winner team
         uint256 withdrawDeadline;        // deadline for withdraw fund
         string gameEndComment;           // comment for game ending or canceling
         uint256 closeTime;               // betting close time
@@ -240,7 +240,7 @@ library BMDatasets {
         uint256 totalEth;                // total eth invested
         uint256 totalWithdrawn;          // total withdrawn by players
         uint256 winningVaultInst;        // current "instant" winning vault
-        uint256 winningVaultFinal;       // current "final" winning vault        
+        uint256 winningVaultFinal;       // current "final" winning vault
         bool fundCleared;                // fund already cleared
     }
 
@@ -372,7 +372,7 @@ contract BMSport is BMEvents, Ownable {
 
     string constant public name_ = "BMSport";
     uint256 public gameIDIndex_;
-    
+
     // (gameID => gameData)
     mapping(uint256 => BMDatasets.Game) public game_;
 
@@ -441,7 +441,7 @@ contract BMSport is BMEvents, Ownable {
     {
         require(_gameID < gameIDIndex_, "incorrect game id");
         require(game_[_gameID].gameStartTime == 0, "already activated");
-        
+
         // TODO: do some initialization
         game_[_gameID].gameStartTime = _startTime;
 
@@ -470,7 +470,7 @@ contract BMSport is BMEvents, Ownable {
     {
         // fetch player id
         uint256 _pID = BMBook.getPlayerID(msg.sender);
-        
+
         // purchase keys for each team
         buysCore(_gameID, _pID, _teamEth);
     }
@@ -727,7 +727,7 @@ contract BMSport is BMEvents, Ownable {
             _instWin[i] = getPlayerInstWinning(_gameID, _pID, i);
             _potWin[i] = getPlayerPotWinning(_gameID, _pID, i);
         }
-        
+
         return (BMBook.getPlayerName(_pID), _eth, _keys, _instWin, _potWin);
     }
 
@@ -738,12 +738,12 @@ contract BMSport is BMEvents, Ownable {
     /// @param _keys Number of keys (in wei).
     /// @return Price for the number of keys to buy (in wei).
     function getBuyPrice(uint256 _gameID, uint256 _team, uint256 _keys)
-        public 
+        public
         view
         isActivated(_gameID)
         isValidTeam(_gameID, _team)
         returns(uint256)
-    {                  
+    {
         return ((teams_[_gameID][_team].keys.add(_keys)).ethRec(_keys));
     }
 
@@ -774,7 +774,7 @@ contract BMSport is BMEvents, Ownable {
 
         return (_totalEth, _eth);
     }
-    
+
 
     /// @notice Get the number of keys can be bought with an amount of ETH.
     /// @param _gameID Game ID of the game.
@@ -782,12 +782,12 @@ contract BMSport is BMEvents, Ownable {
     /// @param _eth Amount of ETH in wei.
     /// @return Number of keys can be bought (in wei).
     function getKeysfromETH(uint256 _gameID, uint256 _team, uint256 _eth)
-        public 
+        public
         view
         isActivated(_gameID)
         isValidTeam(_gameID, _team)
         returns(uint256)
-    {                  
+    {
         return (teams_[_gameID][_team].eth).keysRec(_eth);
     }
 
@@ -856,8 +856,8 @@ contract BMSport is BMEvents, Ownable {
         }
 
         // check assigned ETH for each team is the same as msg.value
-        require(_totalEth == msg.value, "Total ETH is not the same as msg.value");        
-            
+        require(_totalEth == msg.value, "Total ETH is not the same as msg.value");
+
         // update game data and player data
         gameStatus_[_gameID].totalEth = _totalEth.add(gameStatus_[_gameID].totalEth);
         players_[_pID][_gameID].eth = _totalEth.add(players_[_pID][_gameID].eth);
@@ -916,12 +916,12 @@ contract BMSport is BMEvents, Ownable {
             the basic thing to understand here.  is were going to have a global
             tracker based on profit per share for each round, that increases in
             relevant proportion to the increase in share supply.
-            
+
             the player will have an additional mask that basically says "based
             on the rounds mask, my shares, and how much i've already withdrawn,
             how much is still owed to me?"
         */
-        
+
         // calc profit per key & round mask based on this buy:  (dust goes to pot)
         if (teams_[_gameID][_team].keys > 0) {
             uint256 _ppt = (_gen.mul(1000000000000000000)) / (teams_[_gameID][_team].keys);
@@ -959,7 +959,7 @@ contract BMSport is BMEvents, Ownable {
     * @dev Allows the current owner to transfer Banker_Address to a new banker.
     * @param banker The address to transfer Banker_Address to.
     */
-    function transferBanker(BMForwarderInterface banker) 
+    function transferBanker(BMForwarderInterface banker)
     public
     onlyOwner()
     {
@@ -1028,7 +1028,7 @@ contract BMSport is BMEvents, Ownable {
     modifier isWithinLimits(uint256 _eth) {
         require(_eth >= 1000000000, "too little money");
         require(_eth <= 100000000000000000000000, "too much money");
-        _;    
+        _;
     }
 
 
@@ -1039,4 +1039,133 @@ contract BMSport is BMEvents, Ownable {
         require(_team < game_[_gameID].numberOfTeams, "there is no such team");
         _;
     }
-}
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

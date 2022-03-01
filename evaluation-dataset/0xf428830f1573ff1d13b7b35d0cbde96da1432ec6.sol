@@ -384,16 +384,51 @@ contract PausableToken is StandardToken, Pausable {
 // File: contracts/FTTtoken.sol
 
 contract FTTtoken is MintableToken, PausableToken {
-  string public name = "FastTruckToken"; 
+  string public name = "FastTruckToken";
   string public symbol = "FTT";
   uint public decimals = 2;
   address privateSaleAddress = 0xeDd84ef9D279a57a86cF2223e2a4ac579249d8a8;
-  address reserveAddress = 0xC8eD531A83d90a5CD557033a562eF539b8250c8d; 
+  address reserveAddress = 0xC8eD531A83d90a5CD557033a562eF539b8250c8d;
 
   function FTTtoken() public {
     mint(privateSaleAddress, 15000000 * (10 ** decimals));
     mint(reserveAddress,    985000000 * (10 ** decimals));
-    
+
     finishMinting();
   }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

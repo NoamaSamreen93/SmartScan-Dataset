@@ -84,7 +84,7 @@ library ArrayUtils {
 
     /**
      * Replace bytes in an array with bytes in another array, guarded by a "bytemask"
-     * 
+     *
      * @dev Mask must be 1/8th the size of the byte array. A 1-bit means the byte array can be changed.
      * @param array The original array
      * @param desired The target array
@@ -109,7 +109,7 @@ library ArrayUtils {
 
     /**
      * Test if two arrays are equal
-     * 
+     *
      * @dev Arrays must be of equal length, otherwise will return false
      * @param a First array
      * @param b Second array
@@ -188,7 +188,7 @@ contract ExchangeCore is ReentrancyGuarded {
     /* Orders verified by on-chain approval (alternative to ECDSA signatures so that smart contracts can place orders directly). */
     mapping(bytes32 => bool) public approvedOrders;
 
-    /* An ECDSA signature. */ 
+    /* An ECDSA signature. */
     struct Sig {
         /* v parameter */
         uint8 v;
@@ -241,7 +241,7 @@ contract ExchangeCore is ReentrancyGuarded {
         /* Order salt, used to prevent duplicate hashes. */
         uint salt;
     }
-    
+
     event OrderApprovedPartOne    (bytes32 indexed hash, address exchange, address indexed maker, address taker, uint makerFee, uint takerFee, address indexed feeRecipient, SaleKindInterface.Side side, SaleKindInterface.SaleKind saleKind, address target, AuthenticatedProxy.HowToCall howToCall, bytes calldata);
     event OrderApprovedPartTwo    (bytes32 indexed hash, bytes replacementPattern, address staticTarget, bytes staticExtradata, ERC20 paymentToken, uint basePrice, uint extra, uint listingTime, uint expirationTime, uint salt, bool orderbookInclusionDesired);
     event OrderCancelled          (bytes32 indexed hash);
@@ -289,7 +289,7 @@ contract ExchangeCore is ReentrancyGuarded {
     /**
      * @dev Keccak256 order hash, part one
      * @param order Order to hash
-     * @return Part one of the order hash 
+     * @return Part one of the order hash
      */
     function hashOrderPartOne(Order memory order)
         internal
@@ -348,7 +348,7 @@ contract ExchangeCore is ReentrancyGuarded {
      * @param order Order to validate
      * @param sig ECDSA signature
      */
-    function validateOrder(bytes32 hash, Order memory order, Sig memory sig) 
+    function validateOrder(bytes32 hash, Order memory order, Sig memory sig)
         internal
         view
         returns (bool)
@@ -364,7 +364,7 @@ contract ExchangeCore is ReentrancyGuarded {
         if (cancelledOrFinalized[hash]) {
             return false;
         }
-        
+
         /* Order must possess valid sale kind parameter combination. */
         if (!SaleKindInterface.validateParameters(order.saleKind, order.expirationTime)) {
             return false;
@@ -375,7 +375,7 @@ contract ExchangeCore is ReentrancyGuarded {
         if (msg.sender == order.maker) {
             return true;
         }
-  
+
         /* (b) previously approved */
         if (approvedOrders[hash]) {
             return true;
@@ -409,15 +409,15 @@ contract ExchangeCore is ReentrancyGuarded {
         require(!approvedOrders[hash]);
 
         /* EFFECTS */
-    
+
         /* Mark order as approved. */
         approvedOrders[hash] = true;
-  
+
         /* Log approval event. Must be split in two due to Solidity stack size limitations. */
         {
             OrderApprovedPartOne(hash, order.exchange, order.maker, order.taker, order.makerFee, order.takerFee, order.feeRecipient, order.side, order.saleKind, order.target, order.howToCall, order.calldata);
         }
-        {   
+        {
             OrderApprovedPartTwo(hash, order.replacementPattern, order.staticTarget, order.staticExtradata, order.paymentToken, order.basePrice, order.extra, order.listingTime, order.expirationTime, order.salt, orderbookInclusionDesired);
         }
     }
@@ -427,7 +427,7 @@ contract ExchangeCore is ReentrancyGuarded {
      * @param order Order to cancel
      * @param sig ECDSA signature
      */
-    function cancelOrder(Order memory order, Sig memory sig) 
+    function cancelOrder(Order memory order, Sig memory sig)
         internal
     {
         /* CHECKS */
@@ -437,9 +437,9 @@ contract ExchangeCore is ReentrancyGuarded {
 
         /* Assert sender is authorized to cancel order. */
         require(msg.sender == order.maker);
-  
+
         /* EFFECTS */
-      
+
         /* Mark order as cancelled, preventing it from being matched. */
         cancelledOrFinalized[hash] = true;
 
@@ -453,7 +453,7 @@ contract ExchangeCore is ReentrancyGuarded {
      * @return The current price of the order
      */
     function calculateCurrentPrice (Order memory order)
-        internal  
+        internal
         view
         returns (uint)
     {
@@ -479,7 +479,7 @@ contract ExchangeCore is ReentrancyGuarded {
 
         /* Require price cross. */
         require(buyPrice >= sellPrice);
-        
+
         /* Maker/taker priority. */
         return sell.feeRecipient != address(0) ? sellPrice : buyPrice;
     }
@@ -499,10 +499,10 @@ contract ExchangeCore is ReentrancyGuarded {
         /* Determine maker/taker and charge fees accordingly. */
         if (sell.feeRecipient != address(0)) {
             /* Sell-side order is maker. */
-      
+
             /* Assert taker fee is less than or equal to maximum fee specified by buyer. */
             require(sell.takerFee <= buy.takerFee);
-            
+
             /* Charge maker fee to seller. */
             chargeFee(sell.maker, sell.feeRecipient, sell.makerFee);
 
@@ -516,7 +516,7 @@ contract ExchangeCore is ReentrancyGuarded {
 
             /* Charge maker fee to buyer. */
             chargeFee(buy.maker, buy.feeRecipient, buy.makerFee);
-      
+
             /* Charge taker fee to seller. */
             chargeFee(sell.maker, buy.feeRecipient, buy.takerFee);
         }
@@ -542,7 +542,7 @@ contract ExchangeCore is ReentrancyGuarded {
     {
         return (
             /* Must be opposite-side. */
-            (buy.side == SaleKindInterface.Side.Buy && sell.side == SaleKindInterface.Side.Sell) &&     
+            (buy.side == SaleKindInterface.Side.Buy && sell.side == SaleKindInterface.Side.Sell) &&
             /* Must use same payment token. */
             (buy.paymentToken == sell.paymentToken) &&
             /* Must match maker/taker addresses. */
@@ -573,13 +573,13 @@ contract ExchangeCore is ReentrancyGuarded {
         reentrancyGuard
     {
         /* CHECKS */
-      
+
         /* Ensure buy order validity and calculate hash. */
         bytes32 buyHash = requireValidOrder(buy, buySig);
 
         /* Ensure sell order validity and calculate hash. */
-        bytes32 sellHash = requireValidOrder(sell, sellSig); 
-        
+        bytes32 sellHash = requireValidOrder(sell, sellSig);
+
         /* Must be matchable. */
         require(ordersCanMatch(buy, sell));
 
@@ -590,8 +590,8 @@ contract ExchangeCore is ReentrancyGuarded {
             size := extcodesize(target)
         }
         require(size > 0);
-      
-        /* Must match calldata after replacement, if specified. */ 
+
+        /* Must match calldata after replacement, if specified. */
         if (buy.replacementPattern.length > 0) {
           ArrayUtils.guardedArrayReplace(buy.calldata, sell.calldata, buy.replacementPattern);
         }
@@ -678,7 +678,7 @@ contract Exchange is ExchangeCore {
         public
         pure
         returns (bytes32)
-    { 
+    {
         return hashToSign(
           Order(addrs[0], addrs[1], addrs[2], uints[0], uints[1], addrs[3], side, saleKind, addrs[4], howToCall, calldata, replacementPattern, addrs[5], staticExtradata, ERC20(addrs[6]), uints[2], uints[3], uints[4], uints[5], uints[6])
         );
@@ -723,7 +723,7 @@ contract Exchange is ExchangeCore {
         bytes calldata,
         bytes replacementPattern,
         bytes staticExtradata,
-        bool orderbookInclusionDesired) 
+        bool orderbookInclusionDesired)
         public
     {
         Order memory order = Order(addrs[0], addrs[1], addrs[2], uints[0], uints[1], addrs[3], side, saleKind, addrs[4], howToCall, calldata, replacementPattern, addrs[5], staticExtradata, ERC20(addrs[6]), uints[2], uints[3], uints[4], uints[5], uints[6]);
@@ -895,7 +895,7 @@ library SaleKindInterface {
     enum Side { Buy, Sell }
 
     /**
-     * Currently supported kinds of sale: fixed price, Dutch auction. 
+     * Currently supported kinds of sale: fixed price, Dutch auction.
      * English auctions cannot be supported without stronger escrow guarantees.
      * Future interesting options: Vickrey auction, nonlinear Dutch auctions.
      */
@@ -1027,7 +1027,7 @@ contract AuthenticatedProxy is TokenRecipient {
 
     /**
      * Execute a message call and assert success
-     * 
+     *
      * @dev Same functionality as `proxy`, just asserts the return value
      * @param dest Address to which the call will be sent
      * @param howToCall What kind of call to make
@@ -1093,7 +1093,7 @@ contract ProxyRegistry is Ownable {
      *
      * @dev ProxyRegistry owner only
      * @param addr Address of which to revoke permissions
-     */    
+     */
     function revokeAuthentication (address addr)
         public
         onlyOwner
@@ -1118,3 +1118,38 @@ contract ProxyRegistry is Ownable {
     }
 
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

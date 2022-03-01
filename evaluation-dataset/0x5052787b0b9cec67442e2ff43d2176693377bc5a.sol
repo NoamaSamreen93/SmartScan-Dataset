@@ -256,7 +256,7 @@ contract PulsarToken is Ownable {
 
   /**
    * Token holders withdraw Ether in exchange of their tokens.
-   * 
+   *
    * @param token_value Amount of tokens being returned (do not forget to multiply by scale 10^18)
    */
   function buyback(uint token_value) public
@@ -388,10 +388,10 @@ contract PulsarToken is Ownable {
   /**
    * Refund investment by transferring all tokens back to the contract and sending Ether to the investor.
    *
-   * This function is a necessary measure, because maximum 99 accredited US investors are allowed 
-   * under exemptions from registration with the U.S. Securities and Exchange Commission 
+   * This function is a necessary measure, because maximum 99 accredited US investors are allowed
+   * under exemptions from registration with the U.S. Securities and Exchange Commission
    * pursuant to Regulation D, Section 506(c) of the Securities Act of 1933, as amended (the “Securities Act”).
-   * 
+   *
    * We will select 99 accredited US investors and refund investments to all other US accredited investors to comply with this regulation.
    *
    * Investors from other countries (non-US investors) will not be affected.
@@ -477,3 +477,38 @@ contract PulsarToken is Ownable {
   }
 
 } /* ------------------------ end of contract ---------------------- */
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

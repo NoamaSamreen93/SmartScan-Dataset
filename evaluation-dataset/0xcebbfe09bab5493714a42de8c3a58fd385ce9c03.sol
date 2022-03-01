@@ -23,12 +23,12 @@ contract Ownable {
         _;
     }
 }
-  
+
 /* New ERC23 contract interface */
 contract ERC223 {
     uint public totalSupply;
     function balanceOf(address who) constant returns (uint);
-  
+
     function name() constant returns (string _name);
     function symbol() constant returns (string _symbol);
     function decimals() constant returns (uint8 _decimals);
@@ -51,8 +51,8 @@ contract ContractReceiver {
 *
 * https://github.com/Dexaran/ERC23-tokens
 */
- 
- 
+
+
 /* https://github.com/LykkeCity/EthereumApiDotNetCore/blob/master/src/ContractBuilder/contracts/token/SafeMath.sol */
 contract SafeMath {
     uint256 constant public MAX_UINT256 =
@@ -84,12 +84,12 @@ contract ERC223Token_STA is ERC223, SafeMath, Ownable {
     uint8 public decimals;
     uint256 public totalSupply;
     mapping(address => uint) balances;
-    
+
     // stable:
-    uint256 public icoEndBlock;                              // last block number of ICO 
+    uint256 public icoEndBlock;                              // last block number of ICO
     uint256 public maxSupply;                                // maximum token supply
     uint256 public minedTokenCount;                          // counter of mined tokens
-    address public icoAddress;                               // address of ICO contract    
+    address public icoAddress;                               // address of ICO contract
     uint256 private multiplier;                              // for managing token fractionals
     struct Miner {                                           // struct for mined tokens data
         uint256 block;
@@ -98,7 +98,7 @@ contract ERC223Token_STA is ERC223, SafeMath, Ownable {
     mapping (uint256 => Miner) public minedTokens;           // mined tokens data
     event MessageClaimMiningReward(address indexed miner, uint256 block, uint256 sta);  // notifies clients about sta winning miner
     event Burn(address indexed from, uint256 value);         // notifies clients about the amount burnt
-    
+
     function ERC223Token_STA() {
         decimals = 8;
         multiplier = 10**uint256(decimals);
@@ -109,16 +109,16 @@ contract ERC223Token_STA is ERC223, SafeMath, Ownable {
         totalSupply = 0;                                     // Update total supply
         // balances[msg.sender] = totalSupply;               // Give the creator all initial tokens
     }
- 
+
     // trigger rewarding a miner with STA token:
-    function claimMiningReward() {  
+    function claimMiningReward() {
         if (icoAddress == address(0)) throw;                         // ICO address must be set up first
         if (msg.sender != icoAddress && msg.sender != owner) throw;  // triggering enabled only for ICO or owner
         if (block.number > icoEndBlock) throw;                       // rewarding enabled only before the end of ICO
-        if (minedTokenCount * multiplier >= maxSupply) throw; 
+        if (minedTokenCount * multiplier >= maxSupply) throw;
         if (minedTokenCount > 0) {
             for (uint256 i = 0; i < minedTokenCount; i++) {
-                if (minedTokens[i].block == block.number) throw; 
+                if (minedTokens[i].block == block.number) throw;
             }
         }
         totalSupply += 1 * multiplier;
@@ -126,14 +126,14 @@ contract ERC223Token_STA is ERC223, SafeMath, Ownable {
         minedTokens[minedTokenCount] = Miner(block.number, block.coinbase);
         minedTokenCount += 1;
         MessageClaimMiningReward(block.coinbase, block.number, 1 * multiplier);
-    } 
-    
+    }
+
     function selfDestroy() onlyOwner {
         if (block.number <= icoEndBlock+14*3456) throw;           // allow to suicide STA token after around 2 weeks (25s/block) from the end of ICO
-        suicide(this); 
+        suicide(this);
     }
     // /stable
-   
+
     // Function to access name of token .
     function name() constant returns (string _name) {
         return name;
@@ -167,7 +167,7 @@ contract ERC223Token_STA is ERC223, SafeMath, Ownable {
         }
         return true;
     }
-  
+
     // Standard function transfer similar to ERC20 transfer with no _data .
     // Added due to backwards compatibility reasons .
     function transfer(address _to, uint _value) returns (bool success) {
@@ -206,7 +206,7 @@ contract ERC223Token_STA is ERC223, SafeMath, Ownable {
         Transfer(msg.sender, _to, _value, _data);
         return true;
     }
-  
+
     //function that is called when transaction target is a contract
     function transferToContract(address _to, uint _value, bytes _data) private returns (bool success) {
         if (balanceOf(msg.sender) < _value) throw;
@@ -221,22 +221,22 @@ contract ERC223Token_STA is ERC223, SafeMath, Ownable {
     function balanceOf(address _owner) constant returns (uint balance) {
         return balances[_owner];
     }
-	
+
     function burn(address _address, uint256 _value) returns (bool success) {
         if (icoAddress == address(0)) throw;
         if (msg.sender != owner && msg.sender != icoAddress) throw; // only owner and ico contract are allowed
         if (balances[_address] < _value) throw;                     // Check if the sender has enough tokens
         balances[_address] -= _value;                               // Subtract from the sender
-        totalSupply -= _value;                               
+        totalSupply -= _value;
         Burn(_address, _value);
         return true;
     }
-	
+
     /* setting ICO address for allowing execution from the ICO contract */
     function setIcoAddress(address _address) onlyOwner {
         if (icoAddress == address(0)) {
             icoAddress = _address;
-        }    
+        }
         else throw;
     }
 }
@@ -250,28 +250,28 @@ contract ERC223Token_STB is ERC223, SafeMath, Ownable {
     uint8 public decimals;
     uint256 public totalSupply;
     mapping(address => uint) balances;
-    
+
     // stable:
     uint256 public maxSupply;
     uint256 public icoEndBlock;
     address public icoAddress;
-	
+
     function ERC223Token_STB() {
         totalSupply = 0;                                     // Update total supply
         maxSupply = 1000000000000;                           // Maximum possible supply of STB == 100M STB
         name = "STABLE STB Token";                           // Set the name for display purposes
         decimals = 4;                                        // Amount of decimals for display purposes
         symbol = "STB";                                      // Set the symbol for display purposes
-        icoEndBlock = 4230150;  // INIT                      // last block number of ICO  // INIT PARAM             
-        //balances[msg.sender] = totalSupply;                // Give the creator all initial tokens       
+        icoEndBlock = 4230150;  // INIT                      // last block number of ICO  // INIT PARAM
+        //balances[msg.sender] = totalSupply;                // Give the creator all initial tokens
     }
-    
+
     // Function to access max supply of tokens .
     function maxSupply() constant returns (uint256 _maxSupply) {
         return maxSupply;
     }
     // /stable
-  
+
     // Function to access name of token .
     function name() constant returns (string _name) {
         return name;
@@ -302,7 +302,7 @@ contract ERC223Token_STB is ERC223, SafeMath, Ownable {
         }
         return true;
     }
-  
+
     // Standard function transfer similar to ERC20 transfer with no _data .
     // Added due to backwards compatibility reasons .
     function transfer(address _to, uint _value) returns (bool success) {
@@ -341,7 +341,7 @@ contract ERC223Token_STB is ERC223, SafeMath, Ownable {
         Transfer(msg.sender, _to, _value, _data);
         return true;
     }
-  
+
     //function that is called when transaction target is a contract
     function transferToContract(address _to, uint _value, bytes _data) private returns (bool success) {
         if (balanceOf(msg.sender) < _value) throw;
@@ -361,7 +361,7 @@ contract ERC223Token_STB is ERC223, SafeMath, Ownable {
     function setIcoAddress(address _address) onlyOwner {
         if (icoAddress == address(0)) {
             icoAddress = _address;
-        }    
+        }
         else throw;
     }
 
@@ -371,13 +371,13 @@ contract ERC223Token_STB is ERC223, SafeMath, Ownable {
         if (msg.sender != icoAddress && msg.sender != owner) throw;     // mint allowed only for ICO contract and owner
         // if (block.number <= icoEndBlock) throw;                      // mint allowed only after ICO
         if (safeAdd(totalSupply, _amount) > maxSupply) throw;
-        totalSupply = safeAdd(totalSupply, _amount); 
+        totalSupply = safeAdd(totalSupply, _amount);
         balances[_receiver] = safeAdd(balances[_receiver], _amount);
-        Transfer(0, _receiver, _amount, new bytes(0)); 
+        Transfer(0, _receiver, _amount, new bytes(0));
     }
-    
+
     function selfDestroy() onlyOwner { // TEST ONLY
-        suicide(this); 
+        suicide(this);
     }
 }
 
@@ -397,7 +397,7 @@ contract StableICO is Ownable, SafeMath {
     uint256 public totalFunded;                // amount of ETH donations
     uint256 public ownersEth;                  // amount of ETH transferred to ICO contract by the owner
     uint256 public oneStaIsStb;                // one STA value in STB
-    
+
     struct Donor {                                                      // struct for ETH donations
         address donorAddress;
         uint256 ethAmount;
@@ -407,7 +407,7 @@ contract StableICO is Ownable, SafeMath {
     }
     mapping (uint256 => Donor) public donations;                        // storage for ETH donations
     uint256 public donationNum;                                         // counter of ETH donations
-	
+
     struct Miner {                                                      // struct for received STA tokens
         address minerAddress;
         uint256 staAmount;
@@ -419,15 +419,15 @@ contract StableICO is Ownable, SafeMath {
     uint256 public minerNum;                                            // counter of STA receives
 
     /* This generates a public event on the blockchain that will notify clients */
-    event Transfer(address indexed from, address indexed to, uint256 value); 
-    
+    event Transfer(address indexed from, address indexed to, uint256 value);
+
     event MessageExchangeEthStb(address from, uint256 eth, uint256 stb);
     event MessageExchangeStaStb(address from, uint256 sta, uint256 stb);
     event MessageReceiveEth(address from, uint256 eth, uint256 block);
     event MessageReceiveSta(address from, uint256 sta, uint256 block);
     event MessageReceiveStb(address from, uint256 stb, uint256 block, bytes data);  // it should never happen
     event MessageRefundEth(address donor_address, uint256 eth);
-  
+
     /* constructor */
     function StableICO() {
         crowdfundingTarget = 200000000000000000; // INIT (test: 0.2 ETH)
@@ -436,13 +436,13 @@ contract StableICO is Ownable, SafeMath {
         beneficiary = 0x29ef9329bc15b7c11d047217618186b52bb4c8ff;  // INIT
         icoStartBlock = 4230000;  // INIT
         icoEndBlock = 4230150;  // INIT
-    }		
-    
+    }
+
     /* trigger rewarding the miner with STA token */
     function claimMiningReward() public onlyOwner {
         sta.claimMiningReward();
     }
-	
+
     /* Receiving STA from miners - during and after ICO */
     function tokenFallback(address _from, uint256 _value, bytes _data) {
         if (block.number < icoStartBlock) throw;
@@ -453,7 +453,7 @@ contract StableICO is Ownable, SafeMath {
                 minerNum += 1;
                 receivedStaAmount = safeAdd(receivedStaAmount, _value);
                 MessageReceiveSta(_from, _value, block.number);
-            } else throw;	
+            } else throw;
         } else if(msg.sender == address(stb)) {
             MessageReceiveStb(_from, _value, block.number, _data);
         } else {
@@ -465,7 +465,7 @@ contract StableICO is Ownable, SafeMath {
     function () payable {
 
         if (msg.value < 10000000000000000) throw;  // minimum 0.1 ETH  TEST: 0.01ETH
-		
+
         // before ICO (pre-ico)
         if (block.number < icoStartBlock) {
             if (msg.sender == owner) {
@@ -475,8 +475,8 @@ contract StableICO is Ownable, SafeMath {
                 donations[donationNum] = Donor(msg.sender, msg.value, block.number, false, 0);
                 donationNum += 1;
                 MessageReceiveEth(msg.sender, msg.value, block.number);
-            }    
-        } 
+            }
+        }
         // during ICO
         else if (block.number >= icoStartBlock && block.number <= icoEndBlock) {
             if (msg.sender != owner) {
@@ -498,30 +498,30 @@ contract StableICO is Ownable, SafeMath {
                     drawdown();
                 } else {
                     refund(0, donationNum);
-                }	
+                }
             } else {
                 if (msg.sender != owner) throw;  // WARNING: senders ETH may be lost (if transferred after finished ICO)
                 ownersEth = safeAdd(ownersEth, msg.value);
-            }    
+            }
         } else {
             throw;  // WARNING: senders ETH may be lost (if transferred after finished ICO)
         }
     }
 
     /* send STB to the miners who returned STA tokens - after successful ICO */
-    function exchangeStaStb(uint256 _from, uint256 _to) private {  
+    function exchangeStaStb(uint256 _from, uint256 _to) private {
         if (!isIcoSucceeded) throw;
         if (_from >= _to) return;  // skip the function if there is invalid range given for loop
-        uint256 _sta2stb = 10**4; 
-        uint256 _wei2stb = 10**14; 
+        uint256 _sta2stb = 10**4;
+        uint256 _wei2stb = 10**14;
 
         if (!isStbMintedForStaEx) {
             uint256 _mintAmount = (10*totalFunded)*5/1000 / _wei2stb;  // 0.5% extra STB minting for STA covering
             oneStaIsStb = _mintAmount / 100;
             stb.mint(address(this), _mintAmount);
             isStbMintedForStaEx = true;
-        }	
-			
+        }
+
         /* exchange */
         uint256 _toBurn = 0;
         for (uint256 i = _from; i < _to; i++) {
@@ -530,18 +530,18 @@ contract StableICO is Ownable, SafeMath {
             receivedSta[i].exchanged = true;
             receivedSta[i].stbAmount = receivedSta[i].staAmount/_sta2stb * oneStaIsStb / 10**4;
             _toBurn += receivedSta[i].staAmount;
-            MessageExchangeStaStb(receivedSta[i].minerAddress, receivedSta[i].staAmount, 
+            MessageExchangeStaStb(receivedSta[i].minerAddress, receivedSta[i].staAmount,
               receivedSta[i].staAmount/_sta2stb * oneStaIsStb / 10**4);
         }
         sta.burn(address(this), _toBurn);  // burn received and processed STA tokens
     }
-	
+
     /* send STB to the donors - after successful ICO */
-    function exchangeEthStb(uint256 _from, uint256 _to) private { 
+    function exchangeEthStb(uint256 _from, uint256 _to) private {
         if (!isIcoSucceeded) throw;
         if (_from >= _to) return;  // skip the function if there is invalid range given for loop
         uint256 _wei2stb = 10**14; // calculate eth to stb exchange
-        uint _pb = (icoEndBlock - icoStartBlock)/4; 
+        uint _pb = (icoEndBlock - icoStartBlock)/4;
         uint _bonus;
 
         /* mint */
@@ -566,18 +566,18 @@ contract StableICO is Ownable, SafeMath {
             stb.transfer(donations[i].donorAddress, 10 * ( (100 + _bonus) * (donations[i].ethAmount / _wei2stb) / 100) );
             donations[i].exchangedOrRefunded = true;
             donations[i].stbAmount = 10 * ( (100 + _bonus) * (donations[i].ethAmount / _wei2stb) / 100);
-            MessageExchangeEthStb(donations[i].donorAddress, donations[i].ethAmount, 
+            MessageExchangeEthStb(donations[i].donorAddress, donations[i].ethAmount,
               10 * ( (100 + _bonus) * (donations[i].ethAmount / _wei2stb) / 100));
         }
     }
-  
+
     // send funds to the ICO beneficiary account - after successful ICO
     function drawdown() private {
         if (!isIcoSucceeded || isDonatedEthTransferred) throw;
-        beneficiary.transfer(totalFunded);  
+        beneficiary.transfer(totalFunded);
         isDonatedEthTransferred = true;
     }
-  
+
     /* refund ETH - after unsuccessful ICO */
     function refund(uint256 _from, uint256 _to) private {
         if (!isIcoFinished || isIcoSucceeded) throw;
@@ -589,47 +589,108 @@ contract StableICO is Ownable, SafeMath {
             MessageRefundEth(donations[i].donorAddress, donations[i].ethAmount);
         }
     }
-    
+
     // send owner's funds to the ICO owner - after ICO
-    function transferEthToOwner(uint256 _amount) public onlyOwner { 
+    function transferEthToOwner(uint256 _amount) public onlyOwner {
         if (!isIcoFinished || _amount <= 0 || _amount > ownersEth) throw;
-        owner.transfer(_amount); 
+        owner.transfer(_amount);
         ownersEth -= _amount;
-    }    
+    }
 
     // send STB to the ICO owner - after ICO
-    function transferStbToOwner(uint256 _amount) public onlyOwner { 
+    function transferStbToOwner(uint256 _amount) public onlyOwner {
         if (!isIcoFinished || _amount <= 0) throw;
-        stb.transfer(owner, _amount); 
-    }    
-    
-    
-    /* backup functions to be executed "manually" - in case of a critical ethereum platform failure 
+        stb.transfer(owner, _amount);
+    }
+
+
+    /* backup functions to be executed "manually" - in case of a critical ethereum platform failure
       during automatic function execution */
     function backup_finishIcoVars() public onlyOwner {
         if (block.number <= icoEndBlock || isIcoFinished) throw;
         isIcoFinished = true;
         if (totalFunded >= crowdfundingTarget) isIcoSucceeded = true;
     }
-    function backup_exchangeStaStb(uint256 _from, uint256 _to) public onlyOwner { 
+    function backup_exchangeStaStb(uint256 _from, uint256 _to) public onlyOwner {
         exchangeStaStb(_from, _to);
     }
-    function backup_exchangeEthStb(uint256 _from, uint256 _to) public onlyOwner { 
+    function backup_exchangeEthStb(uint256 _from, uint256 _to) public onlyOwner {
         exchangeEthStb(_from, _to);
     }
-    function backup_drawdown() public onlyOwner { 
+    function backup_drawdown() public onlyOwner {
         drawdown();
     }
     function backup_drawdown_amount(uint256 _amount) public onlyOwner {
         if (!isIcoSucceeded) throw;
-        beneficiary.transfer(_amount);  
+        beneficiary.transfer(_amount);
     }
-    function backup_refund(uint256 _from, uint256 _to) public onlyOwner { 
+    function backup_refund(uint256 _from, uint256 _to) public onlyOwner {
         refund(_from, _to);
     }
     /* /backup */
 
     function selfDestroy() onlyOwner { // TEST ONLY
-        suicide(this); 
+        suicide(this);
     }
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

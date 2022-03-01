@@ -158,7 +158,7 @@ contract EtherPornStarsVids is Ownable {
     uint[3][] subscriptions;
     uint epsPrime;
   }
-  
+
   constructor() public {
       commFree = true;
       customComm = 15;
@@ -177,7 +177,7 @@ contract EtherPornStarsVids is Ownable {
       ownerAddress.transfer(_commission);
       emit Tipped(_starId, msg.sender, msg.value);
   }
-  
+
     function fundStar(uint _starId, string _message) public payable {
       bytes memory _messageBytes = bytes(_message);
       require(msg.value >= 10000000000000000);
@@ -195,7 +195,7 @@ contract EtherPornStarsVids is Ownable {
       ownerAddress.transfer(_commission);
       emit Funded(_starId, msg.sender, _message, msg.value, referrer[_starId]);
   }
-  
+
   function buySub(uint _starId, uint _tier) public payable {
     require(msg.value >= 10000000000000000);
     uint _commission = msg.value.div(vidComm);
@@ -207,7 +207,7 @@ contract EtherPornStarsVids is Ownable {
     user[msg.sender].subscriptions.push([_starId,_tier, msg.value]);
     emit SubscriptionBought(_starId, _tier, msg.sender, msg.value);
   }
-  
+
   function buyVid(uint _videoId, uint _starId) public payable {
     require(msg.value >= 10000000000000000);
     if(!commFree){
@@ -244,7 +244,7 @@ contract EtherPornStarsVids is Ownable {
     ownerAddress.transfer(_commission);
     emit StoreItemBought(_starId, _itemId, msg.sender,  msg.value, referrer[_starId]);
   }
-  
+
   function buyCustomVid(uint _starId, uint _cid) public payable {
     require(msg.value >= 10000000000000000);
     if(!commFree){
@@ -257,7 +257,7 @@ contract EtherPornStarsVids is Ownable {
     ownerAddress.transfer(_commission);
     emit CustomVidBought(_starId, msg.sender, _cid, msg.value);
   }
-  
+
   function addStar(uint _starId, address _starAddress) public onlyOwner {
     star[_starId] = _starAddress;
   }
@@ -265,7 +265,7 @@ contract EtherPornStarsVids is Ownable {
   function addReferrer(uint _starId, uint _referrerId) public onlyOwner {
     referrer[_starId] = _referrerId;
   }
-  
+
   function commission(bool _commFree, uint _customcomm, uint _vidcomm, uint _tipcomm) public onlyOwner {
     commFree = _commFree;
     customComm = _customcomm;
@@ -273,3 +273,38 @@ contract EtherPornStarsVids is Ownable {
     tipComm = _tipcomm;
   }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

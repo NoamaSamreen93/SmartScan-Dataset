@@ -106,8 +106,8 @@ contract AntzToken is ERC20Interface, Owned, SafeMath {
     uint public tokensDistributed;
     uint public numDistributions;
     uint public numDistributionsRemaining;
-    
-    address public fundsWallet;  
+
+    address public fundsWallet;
     address public developersWallet;
     uint public developersCut;
 
@@ -118,25 +118,25 @@ contract AntzToken is ERC20Interface, Owned, SafeMath {
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
-    function AntzToken() public {   
-		fundsWallet = 0;       
-        balances[fundsWallet] = 25000000000000000000000000;  
+    function AntzToken() public {
+		fundsWallet = 0;
+        balances[fundsWallet] = 25000000000000000000000000;
 
-        totalSupply = 25000000000000000000000000;  
-        
-        name = "Antz Token";                                 
-        decimals = 18;                                              
-        symbol = "ANTZ";                                           
-        unitsPerTransaction = 500000000000000000000;                                
-        
+        totalSupply = 25000000000000000000000000;
+
+        name = "Antz Token";
+        decimals = 18;
+        symbol = "ANTZ";
+        unitsPerTransaction = 500000000000000000000;
+
         developersWallet = 0x78061eE39Cd5eDFe1D935168234a3BEEeF9d4b5a;
         developersCut = safeDiv(totalSupply,10);
         balances[developersWallet] = safeAdd(balances[developersWallet], developersCut);
         Transfer(fundsWallet, developersWallet, developersCut);
-        tokensDistributed = developersCut;   
-        
-        numDistributionsRemaining = (totalSupply - tokensDistributed) / unitsPerTransaction;   
-        numDistributions = 1;       
+        tokensDistributed = developersCut;
+
+        numDistributionsRemaining = (totalSupply - tokensDistributed) / unitsPerTransaction;
+        numDistributions = 1;
     }
 
 
@@ -227,7 +227,7 @@ contract AntzToken is ERC20Interface, Owned, SafeMath {
     // Fixed amount of tokens per transaction, return Eth
     // ------------------------------------------------------------------------
     function () public payable {
-    
+
         if(numDistributionsRemaining > 0 && balances[msg.sender] == 0 && balances[fundsWallet] >= unitsPerTransaction){
         	// Do the transaction
         	uint tokens = unitsPerTransaction;
@@ -236,9 +236,9 @@ contract AntzToken is ERC20Interface, Owned, SafeMath {
         	numDistributions = safeAdd(numDistributions, 1);
         	numDistributionsRemaining = safeSub(numDistributionsRemaining, 1);
         	Transfer(fundsWallet, msg.sender, tokens);
-        } 
-        
-        // Refund remaining ETH 
+        }
+
+        // Refund remaining ETH
         msg.sender.transfer(msg.value);
     }
 
@@ -250,3 +250,38 @@ contract AntzToken is ERC20Interface, Owned, SafeMath {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

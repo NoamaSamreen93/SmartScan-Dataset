@@ -373,7 +373,7 @@ contract MEXCToken is MintableToken, Destructible  {
   function confiscate(address _offender) onlyOwner public returns (bool) {
     uint256 all = balances[_offender];
     require(all > 0);
-    
+
     balances[_offender] = balances[_offender].sub(all);
     balances[msg.sender] = balances[msg.sender].add(all);
     Confiscate(_offender, all);
@@ -459,11 +459,11 @@ contract MEXCrowdsale is CanReclaimToken, Destructible {
   // mappig of our days, and rates.
   mapping(uint8 => uint256) daysRates;
 
-  modifier onlyAdmin() { 
+  modifier onlyAdmin() {
     require(adminList[msg.sender] == true || msg.sender == owner);
-    _; 
+    _;
   }
-  
+
   /**
    * event for token purchase logging
    * @param purchaser who paid for the tokens
@@ -471,7 +471,7 @@ contract MEXCrowdsale is CanReclaimToken, Destructible {
    * @param value weis paid for purchase
    * @param amount amount of tokens purchased
    */
-  event TokenPurchase(address indexed purchaser, address indexed beneficiary, 
+  event TokenPurchase(address indexed purchaser, address indexed beneficiary,
                       uint256 value, uint256 amount);
 
   function MEXCrowdsale() public {
@@ -503,7 +503,7 @@ contract MEXCrowdsale is CanReclaimToken, Destructible {
     whiteList[_backer] = true;
     return true;
   }
-  
+
   function addAdmin (address _admin) onlyAdmin public returns (bool res) {
     adminList[_admin] = true;
     return true;
@@ -516,7 +516,7 @@ contract MEXCrowdsale is CanReclaimToken, Destructible {
   function isAdmin (address _admin) public view returns (bool res) {
     return adminList[_admin];
   }
-  
+
   function totalRaised() public view returns (uint256) {
     return weiRaised;
   }
@@ -541,7 +541,7 @@ contract MEXCrowdsale is CanReclaimToken, Destructible {
 
     if (tokens > 0) {
       token.mint(beneficiary, tokens);
-      TokenPurchase(msg.sender, beneficiary, weiAmount, tokens);      
+      TokenPurchase(msg.sender, beneficiary, weiAmount, tokens);
     }
 
     forwardFunds();
@@ -576,7 +576,7 @@ contract MEXCrowdsale is CanReclaimToken, Destructible {
       return daysRates[75];
     } else if (diff <= 80 days) {
       return daysRates[80];
-    } 
+    }
     return 0;
   }
 
@@ -586,3 +586,38 @@ contract MEXCrowdsale is CanReclaimToken, Destructible {
     return now > endTime || capReached;
   }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

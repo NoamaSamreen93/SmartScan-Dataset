@@ -56,24 +56,24 @@ contract CpData is Ownable {
 
     uint256 public constant MAX_PROMO_GIRLS = 6000;
     uint256 public promoCreatedCount;
-    
+
     uint256 public constant MAX_GEN0_GIRLS = 30000;
     uint256 public gen0CreatedCount;
-        
+
     DnaMixer public dnaMixer;
 
     Girl[] girls;
 
     mapping (uint256 => address) public girlIdToOwner;
     mapping (uint256 => Auction) public girlIdToAuction;
-    
+
 }
 
 
 contract CpInternals is CpData {
 
     function _transfer(address _from, address _to, uint256 _girlId) internal {
-        girlIdToOwner[_girlId] = _to;        
+        girlIdToOwner[_girlId] = _to;
         Transfer(_from, _to, _girlId);
     }
 
@@ -168,7 +168,7 @@ contract CpApis is CpInternals {
     function setDnaMixerAddress(address _address) external onlyOwner {
         dnaMixer = DnaMixer(_address);
     }
-    
+
     function transfer(address _to, uint256 _girlId) external {
         require(_to != address(0));
         require(_to != address(this));
@@ -182,7 +182,7 @@ contract CpApis is CpInternals {
         owner = girlIdToOwner[_girlId];
         require(owner != address(0));
     }
-    
+
     function createAuction(uint256 _girlId, uint256 _startingPriceWei, uint256 _endingPriceWei, uint256 _duration, bool _isCombine) external {
         require(_startingPriceWei > _endingPriceWei);
         require(_startingPriceWei > 0);
@@ -210,7 +210,7 @@ contract CpApis is CpInternals {
 
         AuctionCreated(_girlId, _startingPriceWei, _endingPriceWei, _duration, _isCombine);
     }
-    
+
     function bid(uint256 _girlId, uint256 _myGirl) external payable {
         Auction storage auction = girlIdToAuction[_girlId];
 
@@ -224,7 +224,7 @@ contract CpApis is CpInternals {
         if (isCombine) {
             Girl storage sourceGirl1 = girls[_girlId];
             Girl storage sourceGirl2 = girls[_myGirl];
-    
+
             require(sourceGirl1.combinesLeft > 0);
             require(sourceGirl2.combinesLeft > 0);
             require(sourceGirl1.combineCooledDown < now);
@@ -254,7 +254,7 @@ contract CpApis is CpInternals {
         require(_girlId1 != _girlId2);
         require(girlIdToOwner[_girlId1] == msg.sender);
         require(girlIdToOwner[_girlId2] == msg.sender);
-                        
+
         Girl storage sourceGirl1 = girls[_girlId1];
         Girl storage sourceGirl2 = girls[_girlId2];
 
@@ -274,7 +274,7 @@ contract CpApis is CpInternals {
         delete girlIdToAuction[_girlId];
         AuctionCancelled(_girlId);
     }
-    
+
     function getAuction(uint256 _girlId) external view returns(address seller, uint256 startingPriceWei, uint256 endingPriceWei, uint256 duration, uint256 startedAt, bool isCombine) {
         Auction storage auction = girlIdToAuction[_girlId];
         require(auction.startingPriceWei > 0);
@@ -306,3 +306,38 @@ contract CryptoPussyMain is CpApis {
         require(msg.sender == address(0));
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

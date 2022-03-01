@@ -57,7 +57,7 @@ contract Ownable {
 
 contract Authorizable is Ownable {
     mapping(address => bool) public authorized;
-  
+
     event AuthorizationSet(address indexed addressAuthorized, bool indexed authorization);
 
     constructor() public {
@@ -73,7 +73,7 @@ contract Authorizable is Ownable {
         emit AuthorizationSet(addressAuthorized, authorization);
         authorized[addressAuthorized] = authorization;
     }
-  
+
 }
 
 contract ERC20Basic {
@@ -108,7 +108,7 @@ contract BasicToken is ERC20Basic {
         emit Transfer(_sender, _to, _value);
         return true;
     }
-  
+
     function transfer(address _to, uint256 _value) public returns (bool) {
 	    return transferFunction(msg.sender, _to, _value);
     }
@@ -120,20 +120,20 @@ contract BasicToken is ERC20Basic {
 
 contract ERC223TokenCompatible is BasicToken {
   using SafeMath for uint256;
-  
+
   event Transfer(address indexed from, address indexed to, uint256 value, bytes indexed data);
 
 	function transfer(address _to, uint256 _value, bytes _data, string _custom_fallback) public returns (bool success) {
 		require(_to != address(0), "_to != address(0)");
         require(_to != address(this), "_to != address(this)");
 		require(_value <= balances[msg.sender], "_value <= balances[msg.sender]");
-		
+
         balances[msg.sender] = balances[msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);
 		if( isContract(_to) ) {
 			require( _to.call.value(0)( bytes4( keccak256( abi.encodePacked( _custom_fallback ) ) ), msg.sender, _value, _data), "_to.call.value(0)(bytes4(keccak256(_custom_fallback)), msg.sender, _value, _data)" );
 
-		} 
+		}
 		emit Transfer(msg.sender, _to, _value, _data);
 		return true;
 	}
@@ -263,7 +263,7 @@ contract BurnToken is StandardToken {
     uint256 public initialSupply;
 
     event Burn(address indexed burner, uint256 value);
-    
+
     constructor(uint256 _totalSupply) internal {
         initialSupply = _totalSupply;
     }
@@ -277,11 +277,11 @@ contract BurnToken is StandardToken {
         emit Burn(_burner, _value);
 		return true;
     }
-    
+
 	function burn(uint256 _value) public returns(bool) {
         return burnFunction(msg.sender, _value);
     }
-	
+
 	function burnFrom(address _from, uint256 _value) public returns (bool) {
 		require(_value <= allowed[_from][msg.sender], "_value <= allowed[_from][msg.sender]"); // check if it has the budget allowed
 		burnFunction(_from, _value);
@@ -301,16 +301,51 @@ contract Token is ERC20Basic, ERC223TokenCompatible, StandardToken, HumanStandar
 }
 
 contract TokenStart is Token, StartToken  {
-    constructor(string _name, string _symbol, uint8 _decimals, uint256 _totalSupply ) public 
-    Token(_name, _symbol, _decimals, _totalSupply ) 
+    constructor(string _name, string _symbol, uint8 _decimals, uint256 _totalSupply ) public
+    Token(_name, _symbol, _decimals, _totalSupply )
     {
     }
 }
 
 contract TokenStartBurn is Token, StartToken, BurnToken  {
-    constructor(string _name, string _symbol, uint8 _decimals, uint256 _totalSupply ) public 
-    Token(_name, _symbol, _decimals, _totalSupply ) 
-    BurnToken(_totalSupply) 
+    constructor(string _name, string _symbol, uint8 _decimals, uint256 _totalSupply ) public
+    Token(_name, _symbol, _decimals, _totalSupply )
+    BurnToken(_totalSupply)
     {
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

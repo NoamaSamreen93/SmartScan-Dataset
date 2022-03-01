@@ -1,8 +1,8 @@
 pragma solidity ^0.4.24;
 
 /**
- * @title ERC20 interface 
- * 
+ * @title ERC20 interface
+ *
  */
 contract ERC20 {
   function totalSupply() public view returns (uint256);
@@ -139,7 +139,7 @@ library SafeMath {
       require(b != 0);
       return a % b;
   }
- 
+
 
   function uint2str(uint i) internal pure returns (string){
       if (i == 0) return "0";
@@ -157,20 +157,20 @@ library SafeMath {
       }
       return string(bstr);
   }
- 
-  
+
+
 }
 
 
 /**
- * @title ZBX Token  
+ * @title ZBX Token
  *
  */
 contract ZBXToken is ERC20, Ownable {
   using SafeMath for uint256;
 
   string public constant name = "ZBX Token";
-  string public constant symbol = "ZBX"; 
+  string public constant symbol = "ZBX";
   uint8 public constant decimals = 18;
 
 
@@ -183,7 +183,7 @@ contract ZBXToken is ERC20, Ownable {
 
   //Total amount of tokens is 500,000,000 - 500 million + 18 decimals
   uint256 public hardcap = 500000000 * (10**uint256(18));
- 
+
   //Enable/Disable mint and burn functions
   bool private _enbaleActions = true;
 
@@ -211,8 +211,8 @@ contract ZBXToken is ERC20, Ownable {
   modifier onlyPayloadSize(uint size) {
     assert(msg.data.length >= size + 4);
     _;
-  } 
- 
+  }
+
 
   /**
    * @dev total number of tokens in existence
@@ -229,16 +229,16 @@ contract ZBXToken is ERC20, Ownable {
   function balanceOf(address _owner) public view returns (uint256 balance) {
     return _balances[_owner];
   }
- 
- 
+
+
   /**
    * @dev transfer token for a specified address
    * @param _to The address to transfer to.
    * @param _value The amount to be transferred.
    */
-  function transfer(address _to, uint256 _value) public onlyPayloadSize(2 * 32) returns (bool) {    
+  function transfer(address _to, uint256 _value) public onlyPayloadSize(2 * 32) returns (bool) {
       require(_to != address(0)); // Prevent transfer to 0x0 address.
-      require(_value <= _balances[msg.sender]);  // Check if the sender has enough      
+      require(_value <= _balances[msg.sender]);  // Check if the sender has enough
 
       // SafeMath.sub will throw if there is not enough balance.
       _balances[msg.sender] = _balances[msg.sender].sub(_value);
@@ -266,7 +266,7 @@ contract ZBXToken is ERC20, Ownable {
     _balances[_to] = _balances[_to].add(_value);
     _allowed[_from][msg.sender] = _allowed[_from][msg.sender].sub(_value);
     emit Transfer(_from, _to, _value);
-    return true; 
+    return true;
   }
 
 
@@ -275,7 +275,7 @@ contract ZBXToken is ERC20, Ownable {
    *
    * Beware that changing an allowance with this method brings the risk that someone may use both the old
    * and the new allowance by unfortunate transaction ordering. One possible solution to mitigate this
-   * race condition is to first reduce the spender's allowance to 0 and set the desired value afterwards:  
+   * race condition is to first reduce the spender's allowance to 0 and set the desired value afterwards:
    * @param _spender The address which will spend the funds.
    * @param _value The amount of tokens to be spent.
    */
@@ -304,7 +304,7 @@ contract ZBXToken is ERC20, Ownable {
    *
    * approve should be called when _allowed[_spender] == 0. To increment
    * _allowed value is better to use this function to avoid 2 calls (and wait until
-   * the first transaction is mined)   
+   * the first transaction is mined)
    * @param _spender The address which will spend the funds.
    * @param _addedValue The amount of tokens to increase the allowance by.
    */
@@ -321,7 +321,7 @@ contract ZBXToken is ERC20, Ownable {
    *
    * approve should be called when _allowed[_spender] == 0. To decrement
    * _allowed value is better to use this function to avoid 2 calls (and wait until
-   * the first transaction is mined)   
+   * the first transaction is mined)
    * @param _spender The address which will spend the funds.
    * @param _subtractedValue The amount of tokens to decrease the allowance by.
    */
@@ -339,17 +339,17 @@ contract ZBXToken is ERC20, Ownable {
 
   /**
    * @dev Function to toggle token actions
-   * 
+   *
    */
   function toggleActions()  onlyOwner public {
     if(_enbaleActions){
-      _enbaleActions = false; 
+      _enbaleActions = false;
     }else{
-      _enbaleActions = true; 
-    }     
+      _enbaleActions = true;
+    }
   }
 
- 
+
   /**
    * @dev Burns a specific amount of tokens.
    * @param _account The account whose tokens will be burnt.
@@ -384,7 +384,7 @@ contract ZBXToken is ERC20, Ownable {
 
   /**
    * @dev Owner can transfer tokens that are sent to the contract by mistake
-   * 
+   *
    */
   function refundTokens(address _recipient, ERC20 _token)  onlyOwner public {
     require(_token.transfer(_recipient, _token.balanceOf(this)));
@@ -393,18 +393,147 @@ contract ZBXToken is ERC20, Ownable {
 
   /**
    * @dev transfer balance to owner
-   * 
+   *
    */
   function withdrawEther(uint256 amount) onlyOwner public {
     owner().transfer(amount);
   }
-  
+
   /**
    * @dev accept ether
-   * 
+   *
    */
   function() public payable {
   }
 
- 
+
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

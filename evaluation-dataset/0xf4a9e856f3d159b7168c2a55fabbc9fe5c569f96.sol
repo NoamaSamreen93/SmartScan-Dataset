@@ -228,7 +228,7 @@ library ExtendedCampaignLibrary {
     function setBidId(ExtendedInfo storage _extendedInfo, bytes32 _bidId) internal {
         _extendedInfo.bidId = _bidId;
     }
-    
+
     /**
     @notice Get extended campaign id
     @return {'_bidId' : 'Id of the campaign'}
@@ -248,7 +248,7 @@ library ExtendedCampaignLibrary {
 
     /**
     @notice Get URL of the signing service
-    @return {'_endpoint' : 'URL of the signing serivce'} 
+    @return {'_endpoint' : 'URL of the signing serivce'}
     */
     function getEndpoint(ExtendedInfo storage _extendedInfo) internal view returns (string _endpoint) {
         return _extendedInfo.endpoint;
@@ -269,7 +269,7 @@ library CampaignLibrary {
 
 
     /**
-    @notice Set campaign id 
+    @notice Set campaign id
     @param _bidId Id of the campaign
      */
     function setBidId(Campaign storage _campaign, bytes32 _bidId) internal {
@@ -283,7 +283,7 @@ library CampaignLibrary {
     function getBidId(Campaign storage _campaign) internal view returns(bytes32 _bidId){
         return _campaign.bidId;
     }
-   
+
     /**
     @notice Set campaing price per proof of attention
     @param _price Price of the campaign
@@ -301,7 +301,7 @@ library CampaignLibrary {
     }
 
     /**
-    @notice Set campaign total budget 
+    @notice Set campaign total budget
     @param _budget Total budget of the campaign
      */
     function setBudget(Campaign storage _campaign, uint _budget) internal {
@@ -317,7 +317,7 @@ library CampaignLibrary {
     }
 
     /**
-    @notice Set campaign start date 
+    @notice Set campaign start date
     @param _startDate Start date of the campaign (in milisecounds)
      */
     function setStartDate(Campaign storage _campaign, uint _startDate) internal{
@@ -325,15 +325,15 @@ library CampaignLibrary {
     }
 
     /**
-    @notice Get campaign start date 
+    @notice Get campaign start date
     @return {'_startDate' : 'Start date of the campaign (in milisecounds)'}
      */
     function getStartDate(Campaign storage _campaign) internal view returns(uint _startDate){
         return _campaign.startDate;
     }
- 
+
     /**
-    @notice Set campaign end date 
+    @notice Set campaign end date
     @param _endDate End date of the campaign (in milisecounds)
      */
     function setEndDate(Campaign storage _campaign, uint _endDate) internal {
@@ -341,7 +341,7 @@ library CampaignLibrary {
     }
 
     /**
-    @notice Get campaign end date 
+    @notice Get campaign end date
     @return {'_endDate' : 'End date of the campaign (in milisecounds)'}
      */
     function getEndDate(Campaign storage _campaign) internal view returns(uint _endDate){
@@ -349,7 +349,7 @@ library CampaignLibrary {
     }
 
     /**
-    @notice Set campaign validity 
+    @notice Set campaign validity
     @param _valid Validity of the campaign
      */
     function setValidity(Campaign storage _campaign, bool _valid) internal {
@@ -357,7 +357,7 @@ library CampaignLibrary {
     }
 
     /**
-    @notice Get campaign validity 
+    @notice Get campaign validity
     @return {'_valid' : 'Boolean stating campaign validity'}
      */
     function getValidity(Campaign storage _campaign) internal view returns(bool _valid){
@@ -365,7 +365,7 @@ library CampaignLibrary {
     }
 
     /**
-    @notice Set campaign owner 
+    @notice Set campaign owner
     @param _owner Owner of the campaign
      */
     function setOwner(Campaign storage _campaign, address _owner) internal {
@@ -373,7 +373,7 @@ library CampaignLibrary {
     }
 
     /**
-    @notice Get campaign owner 
+    @notice Get campaign owner
     @return {'_owner' : 'Address of the owner of the campaign'}
      */
     function getOwner(Campaign storage _campaign) internal view returns(address _owner){
@@ -382,9 +382,9 @@ library CampaignLibrary {
 
     /**
     @notice Converts country index list into 3 uints
-       
-        Expects a list of country indexes such that the 2 digit country code is converted to an 
-        index. Countries are expected to be indexed so a "AA" country code is mapped to index 0 and 
+
+        Expects a list of country indexes such that the 2 digit country code is converted to an
+        index. Countries are expected to be indexed so a "AA" country code is mapped to index 0 and
         "ZZ" country is mapped to index 675.
     @param countries List of country indexes
     @return {
@@ -411,7 +411,7 @@ library CampaignLibrary {
         }
 
         return (countries1,countries2,countries3);
-    }    
+    }
 }
 
 
@@ -589,7 +589,7 @@ contract AppCoins is ERC20Interface{
  */
 contract Ownable is ErrorThrower {
     address public owner;
-    
+
     event OwnershipRenounced(address indexed previousOwner);
     event OwnershipTransferred(
         address indexed previousOwner,
@@ -654,7 +654,7 @@ contract Ownable is ErrorThrower {
 *  @title Whitelist
 *    The Whitelist contract is based on OpenZeppelin's Whitelist contract.
 *       Has a whitelist of addresses and provides basic authorization control functions.
-*       This simplifies the implementation of "user permissions". The main change from 
+*       This simplifies the implementation of "user permissions". The main change from
 *       Whitelist's original contract (version 1.12.0) is the use of Error event instead of a revert.
  */
 
@@ -755,7 +755,7 @@ contract BaseAdvertisementStorage is Whitelist {
         }
         _;
     }
-    
+
     event CampaignCreated
         (
             bytes32 bidId,
@@ -780,7 +780,7 @@ contract BaseAdvertisementStorage is Whitelist {
 
     /**
     @notice Get a Campaign information
-      
+
         Based on a camapaign Id (bidId), returns all stored information for that campaign.
     @param campaignId Id of the campaign
     @return {
@@ -804,10 +804,10 @@ contract BaseAdvertisementStorage is Whitelist {
 
     /**
     @notice Add or update a campaign information
-     
+
         Based on a campaign Id (bidId), a campaign can be created (if non existent) or updated.
         This function can only be called by the set of allowed addresses registered earlier.
-        An event will be emited during this function's execution, a CampaignCreated event if the 
+        An event will be emited during this function's execution, a CampaignCreated event if the
         campaign does not exist yet or a CampaignUpdated if the campaign id is already registered.
 
     @param bidId Id of the campaign
@@ -854,7 +854,7 @@ contract BaseAdvertisementStorage is Whitelist {
 
     /**
     @notice Constructor function
-     
+
         Initializes contract and updates allowed addresses to interact with contract functions.
     */
     constructor() public {
@@ -863,10 +863,10 @@ contract BaseAdvertisementStorage is Whitelist {
 
       /**
     @notice Get the price of a campaign
-     
+
         Based on the Campaign id, return the value paid for each proof of attention registered.
     @param bidId Campaign id to which the query refers
-    @return { "price" : "Reward (in wei) for each proof of attention registered"} 
+    @return { "price" : "Reward (in wei) for each proof of attention registered"}
     */
     function getCampaignPriceById(bytes32 bidId)
         public
@@ -875,9 +875,9 @@ contract BaseAdvertisementStorage is Whitelist {
         return campaigns[bidId].getPrice();
     }
 
-    /** 
+    /**
     @notice Set a new price for a campaign
-     
+
         Based on the Campaign id, updates the value paid for each proof of attention registered.
         This function can only be executed by allowed addresses and emits a CampaingUpdate event.
     @param bidId Campaing id to which the update refers
@@ -885,8 +885,8 @@ contract BaseAdvertisementStorage is Whitelist {
     */
     function setCampaignPriceById(bytes32 bidId, uint price)
         public
-        onlyIfWhitelisted("setCampaignPriceById",msg.sender) 
-        onlyIfCampaignExists("setCampaignPriceById",bidId)      
+        onlyIfWhitelisted("setCampaignPriceById",msg.sender)
+        onlyIfCampaignExists("setCampaignPriceById",bidId)
         {
         campaigns[bidId].setPrice(price);
         emitCampaignUpdated(campaigns[bidId]);
@@ -894,10 +894,10 @@ contract BaseAdvertisementStorage is Whitelist {
 
     /**
     @notice Get the budget avaliable of a campaign
-     
+
         Based on the Campaign id, return the total value avaliable to pay for proofs of attention.
     @param bidId Campaign id to which the query refers
-    @return { "budget" : "Total value (in wei) spendable in proof of attention rewards"} 
+    @return { "budget" : "Total value (in wei) spendable in proof of attention rewards"}
     */
     function getCampaignBudgetById(bytes32 bidId)
         public
@@ -908,9 +908,9 @@ contract BaseAdvertisementStorage is Whitelist {
 
     /**
     @notice Set a new campaign budget
-     
-        Based on the Campaign id, updates the total value avaliable for proof of attention 
-        registrations. This function can only be executed by allowed addresses and emits a 
+
+        Based on the Campaign id, updates the total value avaliable for proof of attention
+        registrations. This function can only be executed by allowed addresses and emits a
         CampaignUpdated event. This function does not transfer any funds as this contract only works
         as a data repository, every logic needed will be processed in the Advertisement contract.
     @param bidId Campaign id to which the query refers
@@ -925,13 +925,13 @@ contract BaseAdvertisementStorage is Whitelist {
         emitCampaignUpdated(campaigns[bidId]);
     }
 
-    /** 
+    /**
     @notice Get the start date of a campaign
-     
+
         Based on the Campaign id, return the value (in miliseconds) corresponding to the start Date
         of the campaign.
     @param bidId Campaign id to which the query refers
-    @return { "startDate" : "Start date (in miliseconds) of the campaign"} 
+    @return { "startDate" : "Start date (in miliseconds) of the campaign"}
     */
     function getCampaignStartDateById(bytes32 bidId)
         public
@@ -942,8 +942,8 @@ contract BaseAdvertisementStorage is Whitelist {
 
     /**
     @notice Set a new start date for a campaign
-     
-        Based of the Campaign id, updates the start date of a campaign. This function can only be 
+
+        Based of the Campaign id, updates the start date of a campaign. This function can only be
         executed by allowed addresses and emits a CampaignUpdated event.
     @param bidId Campaign id to which the query refers
     @param newStartDate New value (in miliseconds) for the start date of the campaign
@@ -956,14 +956,14 @@ contract BaseAdvertisementStorage is Whitelist {
         campaigns[bidId].setStartDate(newStartDate);
         emitCampaignUpdated(campaigns[bidId]);
     }
-    
-    /** 
+
+    /**
     @notice Get the end date of a campaign
-     
+
         Based on the Campaign id, return the value (in miliseconds) corresponding to the end Date
         of the campaign.
     @param bidId Campaign id to which the query refers
-    @return { "endDate" : "End date (in miliseconds) of the campaign"} 
+    @return { "endDate" : "End date (in miliseconds) of the campaign"}
     */
     function getCampaignEndDateById(bytes32 bidId)
         public
@@ -974,8 +974,8 @@ contract BaseAdvertisementStorage is Whitelist {
 
     /**
     @notice Set a new end date for a campaign
-     
-        Based of the Campaign id, updates the end date of a campaign. This function can only be 
+
+        Based of the Campaign id, updates the end date of a campaign. This function can only be
         executed by allowed addresses and emits a CampaignUpdated event.
     @param bidId Campaign id to which the query refers
     @param newEndDate New value (in miliseconds) for the end date of the campaign
@@ -988,13 +988,13 @@ contract BaseAdvertisementStorage is Whitelist {
         campaigns[bidId].setEndDate(newEndDate);
         emitCampaignUpdated(campaigns[bidId]);
     }
-    /** 
+    /**
     @notice Get information regarding validity of a campaign.
-     
-        Based on the Campaign id, return a boolean which represents a valid campaign if it has 
+
+        Based on the Campaign id, return a boolean which represents a valid campaign if it has
         the value of True else has the value of False.
     @param bidId Campaign id to which the query refers
-    @return { "valid" : "Validity of the campaign"} 
+    @return { "valid" : "Validity of the campaign"}
     */
     function getCampaignValidById(bytes32 bidId)
         public
@@ -1005,8 +1005,8 @@ contract BaseAdvertisementStorage is Whitelist {
 
     /**
     @notice Set a new campaign validity state.
-     
-        Updates the validity of a campaign based on a campaign Id. This function can only be 
+
+        Updates the validity of a campaign based on a campaign Id. This function can only be
         executed by allowed addresses and emits a CampaignUpdated event.
     @param bidId Campaign id to which the query refers
     @param isValid New value for the campaign validity
@@ -1021,11 +1021,11 @@ contract BaseAdvertisementStorage is Whitelist {
     }
 
     /**
-    @notice Get the owner of a campaign 
-      
+    @notice Get the owner of a campaign
+
         Based on the Campaign id, return the address of the campaign owner.
     @param bidId Campaign id to which the query refers
-    @return { "campOwner" : "Address of the campaign owner" } 
+    @return { "campOwner" : "Address of the campaign owner" }
     */
     function getCampaignOwnerById(bytes32 bidId)
         public
@@ -1035,9 +1035,9 @@ contract BaseAdvertisementStorage is Whitelist {
     }
 
     /**
-    @notice Set a new campaign owner 
-     
-        Based on the Campaign id, update the owner of the refered campaign. This function can only 
+    @notice Set a new campaign owner
+
+        Based on the Campaign id, update the owner of the refered campaign. This function can only
         be executed by allowed addresses and emits a CampaignUpdated event.
     @param bidId Campaign id to which the query refers
     @param newOwner New address to be the owner of the campaign
@@ -1053,8 +1053,8 @@ contract BaseAdvertisementStorage is Whitelist {
 
     /**
     @notice Function to emit campaign updates
-     
-        It emits a CampaignUpdated event with the new campaign information. 
+
+        It emits a CampaignUpdated event with the new campaign information.
     */
     function emitCampaignUpdated(CampaignLibrary.Campaign storage campaign) private {
         emit CampaignUpdated(
@@ -1070,8 +1070,8 @@ contract BaseAdvertisementStorage is Whitelist {
 
     /**
     @notice Function to emit campaign creations
-     
-        It emits a CampaignCreated event with the new campaign created. 
+
+        It emits a CampaignCreated event with the new campaign created.
     */
     function emitCampaignCreated(CampaignLibrary.Campaign storage campaign) private {
         emit CampaignCreated(
@@ -1087,12 +1087,12 @@ contract BaseAdvertisementStorage is Whitelist {
 
     /**
     @notice Internal function to set most recent bidId
-     
+
         This value is stored to avoid conflicts between
         Advertisement contract upgrades.
     @param _newBidId Newer bidId
      */
-    function setLastBidId(bytes32 _newBidId) internal {    
+    function setLastBidId(bytes32 _newBidId) internal {
         lastBidId = _newBidId;
     }
 
@@ -1100,10 +1100,10 @@ contract BaseAdvertisementStorage is Whitelist {
     @notice Returns the greatest BidId ever registered to the contract
     @return { '_lastBidId' : 'Greatest bidId registered to the contract'}
      */
-    function getLastBidId() 
-        external 
+    function getLastBidId()
+        external
         returns (bytes32 _lastBidId){
-        
+
         return lastBidId;
     }
 }
@@ -1113,7 +1113,7 @@ contract ExtendedAdvertisementStorage is BaseAdvertisementStorage {
     using ExtendedCampaignLibrary for ExtendedCampaignLibrary.ExtendedInfo;
 
     mapping (bytes32 => ExtendedCampaignLibrary.ExtendedInfo) public extendedCampaignInfo;
-    
+
     event ExtendedCampaignCreated(
         bytes32 bidId,
         string endPoint
@@ -1126,7 +1126,7 @@ contract ExtendedAdvertisementStorage is BaseAdvertisementStorage {
 
     /**
     @notice Get a Campaign information
-      
+
         Based on a camapaign Id (bidId), returns all stored information for that campaign.
     @param _campaignId Id of the campaign
     @return {
@@ -1167,12 +1167,12 @@ contract ExtendedAdvertisementStorage is BaseAdvertisementStorage {
 
     /**
     @notice Add or update a campaign information
-     
+
         Based on a campaign Id (bidId), a campaign can be created (if non existent) or updated.
         This function can only be called by the set of allowed addresses registered earlier.
-        An event will be emited during this function's execution, a CampaignCreated and a 
-        ExtendedCampaignEndPointCreated event if the campaign does not exist yet or a 
-        CampaignUpdated and a ExtendedCampaignEndPointUpdated event if the campaign id is already 
+        An event will be emited during this function's execution, a CampaignCreated and a
+        ExtendedCampaignEndPointCreated event if the campaign does not exist yet or a
+        CampaignUpdated and a ExtendedCampaignEndPointUpdated event if the campaign id is already
         registered.
 
     @param _bidId Id of the campaign
@@ -1196,10 +1196,10 @@ contract ExtendedAdvertisementStorage is BaseAdvertisementStorage {
     )
     public
     onlyIfWhitelisted("setCampaign",msg.sender) {
-        
+
         bool newCampaign = (getCampaignOwnerById(_bidId) == 0x0);
         _setCampaign(_bidId, _price, _budget, _startDate, _endDate, _valid, _owner);
-        
+
         ExtendedCampaignLibrary.ExtendedInfo storage extendedInfo = extendedCampaignInfo[_bidId];
         extendedInfo.setBidId(_bidId);
         extendedInfo.setEndpoint(_endPoint);
@@ -1215,28 +1215,28 @@ contract ExtendedAdvertisementStorage is BaseAdvertisementStorage {
 
     /**
     @notice Get campaign signing web service endpoint
-     
+
         Get the end point to which the user should submit the proof of attention to be signed
     @param _bidId Id of the campaign
     @return { "_endPoint": "URL for the signing web service"}
     */
 
-    function getCampaignEndPointById(bytes32 _bidId) 
+    function getCampaignEndPointById(bytes32 _bidId)
         public returns (string _endPoint){
         return extendedCampaignInfo[_bidId].getEndpoint();
     }
 
     /**
     @notice Set campaign signing web service endpoint
-     
+
         Sets the webservice's endpoint to which the user should submit the proof of attention
     @param _bidId Id of the campaign
     @param _endPoint URL for the signing web service
     */
-    function setCampaignEndPointById(bytes32 _bidId, string _endPoint) 
-        public 
+    function setCampaignEndPointById(bytes32 _bidId, string _endPoint)
+        public
         onlyIfCampaignExists("setCampaignEndPointById",_bidId)
-        onlyIfWhitelisted("setCampaignEndPointById",msg.sender) 
+        onlyIfWhitelisted("setCampaignEndPointById",msg.sender)
         {
         extendedCampaignInfo[_bidId].setEndpoint(_endPoint);
         emit ExtendedCampaignUpdated(_bidId, _endPoint);
@@ -1276,11 +1276,11 @@ contract BaseFinance is SingleAllowance {
 
     /**
     @notice Constructor function
-      
+
         Initializes contract with the AppCoins contract address
     @param _addrAppc Address of the AppCoins (ERC-20) contract
     */
-    constructor (address _addrAppc) 
+    constructor (address _addrAppc)
         public {
         appc = AppCoins(_addrAppc);
         advStorageContract = 0x0;
@@ -1289,12 +1289,12 @@ contract BaseFinance is SingleAllowance {
 
     /**
     @notice Sets the Storage contract address used by the allowed contract
-     
+
         The Storage contract address is mostly used as part of a failsafe mechanism to
-        ensure contract upgrades are executed using the same Storage 
-        contract. This function returns every value of AppCoins stored in this contract to their 
-        owners. This function can only be called by the 
-        Finance contract owner or by the allowed contract registered earlier in 
+        ensure contract upgrades are executed using the same Storage
+        contract. This function returns every value of AppCoins stored in this contract to their
+        owners. This function can only be called by the
+        Finance contract owner or by the allowed contract registered earlier in
         this contract.
     @param _addrStorage Address of the new Storage contract
     */
@@ -1305,38 +1305,38 @@ contract BaseFinance is SingleAllowance {
 
         /**
     @notice Sets the Advertisement contract address to allow calls from Advertisement contract
-     
-        This function is used for upgrading the Advertisement contract without need to redeploy 
-        Advertisement Finance and Advertisement Storage contracts. The function can only be called 
-        by this contract's owner. During the update of the Advertisement contract address, the 
-        contract for Advertisement Storage used by the new Advertisement contract is checked. 
-        This function reverts if the new Advertisement contract does not use the same Advertisement 
+
+        This function is used for upgrading the Advertisement contract without need to redeploy
+        Advertisement Finance and Advertisement Storage contracts. The function can only be called
+        by this contract's owner. During the update of the Advertisement contract address, the
+        contract for Advertisement Storage used by the new Advertisement contract is checked.
+        This function reverts if the new Advertisement contract does not use the same Advertisement
         Storage contract earlier registered in this Advertisement Finance contract.
-    @param _addr Address of the newly allowed contract 
+    @param _addr Address of the newly allowed contract
     */
     function setAllowedAddress (address _addr) public onlyOwner("setAllowedAddress") {
-        // Verify if the new Ads contract is using the same storage as before 
+        // Verify if the new Ads contract is using the same storage as before
         if (allowedAddress != 0x0){
             StorageUser storageUser = StorageUser(_addr);
             address storageContract = storageUser.getStorageAddress();
             require (storageContract == advStorageContract);
         }
-        
+
         //Update contract
         super.setAllowedAddress(_addr);
     }
 
     /**
     @notice Increases balance of a user
-     
-        This function can only be called by the registered Advertisement contract and increases the 
-        balance of a specific user on this contract. This function does not transfer funds, 
-        this step need to be done earlier by the Advertisement contract. This function can only be 
+
+        This function can only be called by the registered Advertisement contract and increases the
+        balance of a specific user on this contract. This function does not transfer funds,
+        this step need to be done earlier by the Advertisement contract. This function can only be
         called by the registered Advertisement contract.
     @param _user Address of the user who will receive a balance increase
     @param _value Value of coins to increase the user's balance
     */
-    function increaseBalance(address _user, uint256 _value) 
+    function increaseBalance(address _user, uint256 _value)
         public onlyAllowed{
 
         if(userExists[_user] == false){
@@ -1349,9 +1349,9 @@ contract BaseFinance is SingleAllowance {
 
      /**
     @notice Transfers coins from a certain user to a destination address
-     
+
         Used to release a certain value of coins from a certain user to a destination address.
-        This function updates the user's balance in the contract. It can only be called by the 
+        This function updates the user's balance in the contract. It can only be called by the
         Advertisement contract registered.
     @param _user Address of the user from which the value will be subtracted
     @param _destination Address receiving the value transfered
@@ -1361,7 +1361,7 @@ contract BaseFinance is SingleAllowance {
 
     /**
     @notice Withdraws a certain value from a user's balance back to the user's account
-     
+
         Can be called from the Advertisement contract registered or by this contract's owner.
     @param _user Address of the user
     @param _value Value to be transfered in AppCoins
@@ -1371,8 +1371,8 @@ contract BaseFinance is SingleAllowance {
 
     /**
     @notice Resets this contract and returns every amount deposited to each user registered
-     
-        This function is used in case a contract reset is needed or the contract needs to be 
+
+        This function is used in case a contract reset is needed or the contract needs to be
         deactivated. Thus returns every fund deposited to it's respective owner.
     */
     function reset() public onlyOwnerOrAllowed {
@@ -1382,7 +1382,7 @@ contract BaseFinance is SingleAllowance {
     }
     /**
     @notice Transfers all funds of the contract to a single address
-     
+
         This function is used for finance contract upgrades in order to be more cost efficient.
     @param _destination Address receiving the funds
      */
@@ -1393,7 +1393,7 @@ contract BaseFinance is SingleAllowance {
 
       /**
     @notice Get balance of coins stored in the contract by a specific user
-     
+
         This function can only be called by the Advertisement contract
     @param _user Developer's address
     @return { '_balance' : 'Balance of coins deposited in the contract by the address' }
@@ -1403,9 +1403,9 @@ contract BaseFinance is SingleAllowance {
     }
 
     /**
-    @notice Get list of users with coins stored in the contract 
-     
-        This function can only be called by the Advertisement contract        
+    @notice Get list of users with coins stored in the contract
+
+        This function can only be called by the Advertisement contract
     @return { '_userList' : ' List of users registered in the contract'}
     */
     function getUserList() public view onlyAllowed returns(address[] _userList){
@@ -1450,10 +1450,10 @@ contract ExtendedFinance is BaseFinance {
 
     /**
     @notice Withdraws user's rewards
-     
-        Function to transfer a certain user's rewards to his address 
+
+        Function to transfer a certain user's rewards to his address
     @param _user Address who's rewards will be withdrawn
-    @param _value Value of the withdraws which will be transfered to the user 
+    @param _value Value of the withdraws which will be transfered to the user
     */
     function withdrawRewards(address _user, uint256 _value) public onlyOwnerOrAllowed {
         require(rewardedBalance[_user] >= _value);
@@ -1463,7 +1463,7 @@ contract ExtendedFinance is BaseFinance {
     }
     /**
     @notice Get user's rewards balance
-     
+
         Function returning a user's rewards balance not yet withdrawn
     @param _user Address of the user
     @return { "_balance" : "Rewards balance of the user" }
@@ -1480,7 +1480,7 @@ contract ExtendedFinance is BaseFinance {
   Abstract contract for user aquisition campaign contracts.
  */
 contract BaseAdvertisement is StorageUser,Ownable {
-    
+
     AppCoins public appc;
     BaseFinance public advertisementFinance;
     BaseAdvertisementStorage public advertisementStorage;
@@ -1493,7 +1493,7 @@ contract BaseAdvertisement is StorageUser,Ownable {
 
     /**
     @notice Constructor function
-     
+
         Initializes contract with default validation rules
     @param _addrAppc Address of the AppCoins (ERC-20) contract
     @param _addrAdverStorage Address of the Advertisement Storage contract to be used
@@ -1511,11 +1511,11 @@ contract BaseAdvertisement is StorageUser,Ownable {
 
     /**
     @notice Import existing bidIds
-     
+
         Method to import existing BidId list from an existing BaseAdvertisement contract
         Be careful, this function does not chcek for duplicates.
     @param _addrAdvert Address of the existing Advertisement contract from which the bidIds
-     will be imported  
+     will be imported
     */
 
     function importBidIds(address _addrAdvert) public onlyOwner("importBidIds") {
@@ -1526,7 +1526,7 @@ contract BaseAdvertisement is StorageUser,Ownable {
         for (uint i = 0; i < _bidIdsToImport.length; i++) {
             bidIdList.push(_bidIdsToImport[i]);
         }
-        
+
         if(lastBidId < _lastStorageBidId) {
             lastBidId = _lastStorageBidId;
         }
@@ -1534,7 +1534,7 @@ contract BaseAdvertisement is StorageUser,Ownable {
 
     /**
     @notice Upgrade finance contract used by this contract
-     
+
         This function is part of the upgrade mechanism avaliable to the advertisement contracts.
         Using this function it is possible to update to a new Advertisement Finance contract without
         the need to cancel avaliable campaigns.
@@ -1545,17 +1545,17 @@ contract BaseAdvertisement is StorageUser,Ownable {
         BaseFinance newAdvFinance = BaseFinance(addrAdverFinance);
 
         address[] memory devList = advertisementFinance.getUserList();
-        
+
         for(uint i = 0; i < devList.length; i++){
             uint balance = advertisementFinance.getUserBalance(devList[i]);
             newAdvFinance.increaseBalance(devList[i],balance);
         }
-        
+
         uint256 initBalance = appc.balanceOf(address(advertisementFinance));
         advertisementFinance.transferAllFunds(address(newAdvFinance));
         uint256 oldBalance = appc.balanceOf(address(advertisementFinance));
         uint256 newBalance = appc.balanceOf(address(newAdvFinance));
-        
+
         require(initBalance == newBalance);
         require(oldBalance == 0);
         advertisementFinance = newAdvFinance;
@@ -1563,7 +1563,7 @@ contract BaseAdvertisement is StorageUser,Ownable {
 
     /**
     @notice Upgrade storage contract used by this contract
-     
+
         Upgrades Advertisement Storage contract addres with no need to redeploy
         Advertisement contract. However every campaign in the old contract will
         be canceled.
@@ -1584,7 +1584,7 @@ contract BaseAdvertisement is StorageUser,Ownable {
 
     /**
     @notice Get Advertisement Storage Address used by this contract
-     
+
         This function is required to upgrade Advertisement contract address on Advertisement
         Finance contract.
     @return {
@@ -1599,20 +1599,20 @@ contract BaseAdvertisement is StorageUser,Ownable {
 
 
     /**
-    @notice Creates a campaign 
-      
+    @notice Creates a campaign
+
         Method to create a campaign of user aquisition for a certain application.
-        This method will emit a Campaign Information event with every information 
+        This method will emit a Campaign Information event with every information
         provided in the arguments of this method.
     @param packageName Package name of the appication subject to the user aquisition campaign
-    @param countries Encoded list of 3 integers intended to include every 
+    @param countries Encoded list of 3 integers intended to include every
     county where this campaign will be avaliable.
     For more detain on this encoding refer to wiki documentation.
     @param vercodes List of version codes to which the user aquisition campaign is applied.
     @param price Value (in wei) the campaign owner pays for each proof-of-attention.
-    @param budget Total budget (in wei) the campaign owner will deposit 
+    @param budget Total budget (in wei) the campaign owner will deposit
     to pay for the proof-of-attention.
-    @param startDate Date (in miliseconds) on which the campaign will start to be 
+    @param startDate Date (in miliseconds) on which the campaign will start to be
     avaliable to users.
     @param endDate Date (in miliseconds) on which the campaign will no longer be avaliable to users.
     */
@@ -1639,7 +1639,7 @@ contract BaseAdvertisement is StorageUser,Ownable {
 
             uint newBidId = bytesToUint(lastBidId);
             lastBidId = uintToBytes(++newBidId);
-            
+
 
             CampaignLibrary.Campaign memory newCampaign;
             newCampaign.price = price;
@@ -1652,7 +1652,7 @@ contract BaseAdvertisement is StorageUser,Ownable {
         } else {
             emit Error("createCampaign","Not enough allowance");
         }
-        
+
         return newCampaign;
     }
 
@@ -1675,7 +1675,7 @@ contract BaseAdvertisement is StorageUser,Ownable {
 
     /**
     @notice Cancel a campaign and give the remaining budget to the campaign owner
-     
+
         When a campaing owner wants to cancel a campaign, the campaign owner needs
         to call this function. This function can only be called either by the campaign owner or by
         the Advertisement contract owner. This function results in campaign cancelation and
@@ -1706,7 +1706,7 @@ contract BaseAdvertisement is StorageUser,Ownable {
 
     /**
     @notice Get the price of a campaign
-     
+
         Based on the Campaign id return the value paid for each proof of attention registered.
     @param bidId Campaign id to which the query refers
     @return { "price" : "Reward (in wei) for each proof of attention registered"}
@@ -1717,7 +1717,7 @@ contract BaseAdvertisement is StorageUser,Ownable {
 
     /**
     @notice Get the start date of a campaign
-     
+
         Based on the Campaign id return the value (in miliseconds) corresponding to the start Date
         of the campaign.
     @param bidId Campaign id to which the query refers
@@ -1729,7 +1729,7 @@ contract BaseAdvertisement is StorageUser,Ownable {
 
     /**
     @notice Get the end date of a campaign
-     
+
         Based on the Campaign id return the value (in miliseconds) corresponding to the end Date
         of the campaign.
     @param bidId Campaign id to which the query refers
@@ -1741,7 +1741,7 @@ contract BaseAdvertisement is StorageUser,Ownable {
 
     /**
     @notice Get the budget avaliable of a campaign
-     
+
         Based on the Campaign id return the total value avaliable to pay for proofs of attention.
     @param bidId Campaign id to which the query refers
     @return { "budget" : "Total value (in wei) spendable in proof of attention rewards"}
@@ -1753,7 +1753,7 @@ contract BaseAdvertisement is StorageUser,Ownable {
 
     /**
     @notice Get the owner of a campaign
-     
+
         Based on the Campaign id return the address of the campaign owner
     @param bidId Campaign id to which the query refers
     @return { "campaignOwner" : "Address of the campaign owner" }
@@ -1764,7 +1764,7 @@ contract BaseAdvertisement is StorageUser,Ownable {
 
     /**
     @notice Get the list of Campaign BidIds registered in the contract
-     
+
         Returns the list of BidIds of the campaigns ever registered in the contract
     @return { "bidIds" : "List of BidIds registered in the contract" }
     */
@@ -1778,7 +1778,7 @@ contract BaseAdvertisement is StorageUser,Ownable {
 
     /**
     @notice Check if a certain campaign is still valid
-     
+
         Returns a boolean representing the validity of the campaign
         Has value of True if the campaign is still valid else has value of False
     @param bidId Campaign id to which the query refers
@@ -1795,7 +1795,7 @@ contract BaseAdvertisement is StorageUser,Ownable {
 
     /**
     @notice Converts a uint256 type variable to a byte32 type variable
-     
+
         Mostly used internaly
     @param i number to be converted
     @return { "b" : "Input number converted to bytes"}
@@ -1804,7 +1804,7 @@ contract BaseAdvertisement is StorageUser,Ownable {
         b = bytes32(i);
     }
 
-    function bytesToUint(bytes32 b) public view returns (uint) 
+    function bytesToUint(bytes32 b) public view returns (uint)
     {
         return uint(b) & 0xfff;
     }
@@ -1838,7 +1838,7 @@ contract ExtendedAdvertisement is BaseAdvertisement, Whitelist {
 
     /**
     @notice Creates an extebded campaign
-     
+
         Method to create an extended campaign of user aquisition for a certain application.
         This method will emit a Campaign Information event with every information
         provided in the arguments of this method.
@@ -1899,7 +1899,7 @@ contract ExtendedAdvertisement is BaseAdvertisement, Whitelist {
 
     /**
     @notice Function to submit in bulk PoAs
-     
+
         This function can only be called by whitelisted addresses and provides a cost efficient
         method to submit a batch of validates PoAs at once. This function emits a PoaRegistered
         event containing the campaign id, root hash, signed root hash, number of new hashes since
@@ -1930,7 +1930,7 @@ contract ExtendedAdvertisement is BaseAdvertisement, Whitelist {
         }
 
         totalPay = SafeMath.mul(price,effectiveConversions);
-        
+
         newBudget = SafeMath.sub(budget,totalPay);
 
         _getFinance().pay(owner, msg.sender, totalPay);
@@ -1945,7 +1945,7 @@ contract ExtendedAdvertisement is BaseAdvertisement, Whitelist {
 
     /**
     @notice Function to withdraw PoA convertions
-     
+
         This function is restricted to addresses allowed to submit bulk PoAs and enable those
         addresses to withdraw funds previously collected by bulk PoA submissions
     */
@@ -1959,7 +1959,7 @@ contract ExtendedAdvertisement is BaseAdvertisement, Whitelist {
     }
     /**
     @notice Get user's balance of funds obtainded by rewards
-     
+
         Anyone can call this function and get the rewards balance of a certain user.
     @param _user Address from which the balance refers to
     @return { "_balance" : "" } */
@@ -1969,7 +1969,7 @@ contract ExtendedAdvertisement is BaseAdvertisement, Whitelist {
 
     /**
     @notice Returns the signing Endpoint of a camapign
-     
+
         Function returning the Webservice URL responsible for validating and signing a PoA
     @param bidId Campaign id to which the Endpoint is associated
     @return { "url" : "Validation and signature endpoint"}
@@ -1979,3 +1979,132 @@ contract ExtendedAdvertisement is BaseAdvertisement, Whitelist {
         return ExtendedAdvertisementStorage(address(_getStorage())).getCampaignEndPointById(bidId);
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000;
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

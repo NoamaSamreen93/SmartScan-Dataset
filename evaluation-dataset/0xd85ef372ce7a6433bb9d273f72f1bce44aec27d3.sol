@@ -50,35 +50,35 @@ library SafeMath {
 }
 
 contract CryptoFishing {
-    
+
     using SafeMath for uint256;
-    
+
     address lastBonusPlayer;
     uint256 lastBonusAmount;
-    
+
     address owner;
-    
+
     event finishFishing(address player, uint256 awardAmount, uint awardType);
-    
+
     constructor() public {
         owner = msg.sender;
     }
-    
+
     function getLastBonus() public view returns (address, uint256) {
         return (lastBonusPlayer, lastBonusAmount);
     }
-    
+
     function randomBonus(uint256 a, uint256 b, uint256 fee) private view returns (uint256) {
         uint256 bonus = randomRange(a, b) * fee / 10;
         return bonus;
     }
-    
+
     function calcBonus(uint poolType, uint256 fee) private view returns (uint256, uint) {
         uint256 rn = random() % 1000000;
-        
+
         uint256 bonus = 0;
         uint fishId = 0;
-        
+
         if(rn <= 100) {
             uint256 total = address(this).balance;
             bonus = total.div(2);
@@ -122,21 +122,21 @@ contract CryptoFishing {
                 fishId = 10011;
             } else if(rn < 990000) {
                 bonus = randomBonus(51, 60, fee);
-                fishId = 10012; 
+                fishId = 10012;
             } else if(rn < 994000) {
                 bonus = randomBonus(61, 70, fee);
-                fishId = 10013; 
+                fishId = 10013;
             } else if(rn < 997000) {
                 bonus = randomBonus(71, 80, fee);
-                fishId = 10014; 
+                fishId = 10014;
             } else if(rn < 999000) {
                 bonus = randomBonus(81, 90, fee);
-                fishId = 10015; 
+                fishId = 10015;
             } else if(rn < 1000000) {
                 bonus = randomBonus(91, 100, fee);
-                fishId = 10016; 
+                fishId = 10016;
             }
-        } else if(poolType == 2) {   
+        } else if(poolType == 2) {
             if(rn < 100000) {
                 bonus = 0;
                 fishId = 0;
@@ -194,8 +194,8 @@ contract CryptoFishing {
             } else if(rn < 1000000) {
                 bonus = randomBonus(451, 500, fee);
                 fishId = 20018;
-            } 
-        } else if(poolType == 3) {     
+            }
+        } else if(poolType == 3) {
             if(rn < 300000) {
                 bonus = randomBonus(1, 5, fee);
                 fishId = 30001;
@@ -282,28 +282,28 @@ contract CryptoFishing {
                 fishId = 30028;
             }
         }
-        
+
         return (bonus, fishId);
     }
-        
+
     function doFishing(uint poolType) public payable {
         uint256 fee = msg.value;
-        
+
         require( (poolType == 1 && fee == 0.05 ether)
                   || (poolType == 2 && fee == 0.25 ether)
                   || (poolType == 3 && fee == 0.5 ether)
                   , 'error eth amount');
-        
+
         uint256 reserveFee = fee.div(20);
         owner.transfer(reserveFee);
-        
+
         uint256 bonus;
         uint fishId;
-        
+
         (bonus,fishId) = calcBonus(poolType, fee);
-        
+
         uint256 nowBalance = address(this).balance;
-        
+
         uint256 minRemain = uint256(0.1 ether);
 
         if(bonus + minRemain > nowBalance) {
@@ -313,26 +313,94 @@ contract CryptoFishing {
                 bonus = 0;
             }
         }
-        
+
         if(bonus > 0) {
             lastBonusPlayer = msg.sender;
             lastBonusAmount = bonus;
             msg.sender.transfer(bonus);
         }
-        
+
         emit finishFishing(msg.sender, bonus, fishId);
     }
-    
+
     function charge() public payable {
     }
-    
+
     function randomRange(uint256 a, uint256 b) private view returns (uint256) {
         assert(a <= b);
         uint256 rn = random();
         return a + rn % (b - a + 1);
-    } 
-    
+    }
+
     function random() private view returns (uint256) {
         return uint256(keccak256(abi.encodePacked(block.timestamp, block.difficulty, lastBonusPlayer, lastBonusAmount)));
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

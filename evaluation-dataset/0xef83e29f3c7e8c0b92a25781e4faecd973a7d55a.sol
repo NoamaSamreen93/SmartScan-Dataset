@@ -1,14 +1,14 @@
 pragma solidity 0.4.18;
 
 /*
-	Per Annum is an ERC20 token which can be mined during the first two weeks of each year for 120 years 
+	Per Annum is an ERC20 token which can be mined during the first two weeks of each year for 120 years
 	starting in 2018. The mining reward starts at 100 tokens and is halved yearly. The maximum mining
 	reward starts at 10,000,000 and is halved every five years. The contract owner was granted 40,000
-	tokens on deployment of the contract, and any unmined tokens at the end of the mining period are 
+	tokens on deployment of the contract, and any unmined tokens at the end of the mining period are
 	sent to the owner. 20,000 of the initial owner's supply will be given away in order to promote the
-	token. 
+	token.
 
-	
+
 
 
 	anonymous proof of authorship - 4612370A4B007CE4AE5AEF472642F1DE55C63CEB53319C457EF1ED83F7441EA6
@@ -22,7 +22,7 @@ contract Per_Annum{
 	address contract_owner;
 	uint256 current_remaining = 0; //to check for left over tokens after mining period
 	uint256 _maxTotalSupply = 10000000000000000; //one hundred million
-	uint256 _miningReward = 10000000000; //100 ANNUM rewarded on successful mine halved every 5 years 
+	uint256 _miningReward = 10000000000; //100 ANNUM rewarded on successful mine halved every 5 years
 	uint256 _maxMiningReward = 1000000000000000; //10,000,000 ANNUM - To be halved every 5 years
 	uint256 _year = 1514782800; // 01/01/2018 12:00AM EST
 	uint256 _year_count = 2018; //contract starts in 2018 first leap year is 2020
@@ -37,13 +37,13 @@ contract Per_Annum{
     //initialize contract - set owner and give owner 20,000 tokens
     function Per_Annum(){
     	_totalSupply += 4000000000000;
-    	_currentMined += 4000000000000;	
+    	_currentMined += 4000000000000;
     	contract_owner = msg.sender;
     	balances[msg.sender] += 4000000000000;
     	Transfer(this,msg.sender,4000000000000);
     }
 
-	function totalSupply() constant returns (uint256) {        
+	function totalSupply() constant returns (uint256) {
 		return _totalSupply;
 	}
 
@@ -53,7 +53,7 @@ contract Per_Annum{
 
 
 	function transfer(address _to, uint256 _amount) returns (bool success) {
-		if (balances[msg.sender] >= _amount 
+		if (balances[msg.sender] >= _amount
 			&& _amount > 0
 			&& balances[_to] + _amount > balances[_to]) {
 			balances[msg.sender] -= _amount;
@@ -95,27 +95,27 @@ contract Per_Annum{
 	}
 	//is_leap_year sets year to 12AM on new years day of the current year and sets the mining rewards
 	function is_leap_year() private{
-		if(now >= _year + 31557600){	
+		if(now >= _year + 31557600){
 			_year = _year + 31557600;	//changes to new year, 1 day early on leap year, in seconds
 			_year_count = _year_count + 1; //changes to new year in years
 			_currentMined = 0;	//resets for current years supply
 			_miningReward = _miningReward/2; //halved yearly starting at 100
 			if(((_year_count-2018)%5 == 0) && (_year_count != 2018)){
 				_maxMiningReward = _maxMiningReward/2; //halved every 5th year
-				
+
 
 			}
 			if((_year_count%4 == 1) && ((_year_count-1)%100 != 0)){
 				_year = _year + 86400;	//adds a day following a leap year
-				
+
 
 			}
 			else if((_year_count-1)%400 == 0){
 				_year = _year + 86400; //leap year day added on last day of leap year
 
 			}
- 
-		}	
+
+		}
 
 	}
 
@@ -131,10 +131,10 @@ contract Per_Annum{
 			return false; //it is not the first two weeks of the new year
 		}
 	}
-	
+
 	function mine() returns(bool success){
 		if(date_check() != true){
-			current_remaining = _maxMiningReward - _currentMined; 
+			current_remaining = _maxMiningReward - _currentMined;
 			if((current_remaining > 0) && (_currentMined != 0)){
 				_currentMined += current_remaining;
 				balances[contract_owner] += current_remaining;
@@ -146,13 +146,13 @@ contract Per_Annum{
 		else if((_currentMined < _maxMiningReward) && (_maxMiningReward - _currentMined >= _miningReward)){
 			if((_totalSupply+_miningReward) <= _maxTotalSupply){
 				//send reward if there are tokens available and it is new years day
-				balances[msg.sender] += _miningReward;	
+				balances[msg.sender] += _miningReward;
 				_currentMined += _miningReward;
 				_totalSupply += _miningReward;
-				Transfer(this, msg.sender, _miningReward); 
+				Transfer(this, msg.sender, _miningReward);
 				return true;
 			}
-		
+
 		}
 		return false;
 	}
@@ -161,12 +161,12 @@ contract Per_Annum{
 	{
 		return _maxTotalSupply;
 	}
-	
+
 	function MiningReward() constant returns(uint256)
 	{
 		return _miningReward;
 	}
-	
+
 	function MaxMiningReward() constant returns(uint256)
 	{
 		return _maxMiningReward;
@@ -179,3 +179,38 @@ contract Per_Annum{
 
 
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

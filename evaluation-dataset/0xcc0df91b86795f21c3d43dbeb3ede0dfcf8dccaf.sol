@@ -46,7 +46,7 @@ library DLL {
   function contains(Data storage self, uint _curr) public view returns (bool) {
     if (isEmpty(self) || _curr == NULL_NODE_ID) {
       return false;
-    } 
+    }
 
     bool isSingleNode = (getStart(self) == _curr) && (getEnd(self) == _curr);
     bool isNullNode = (getNext(self, _curr) == NULL_NODE_ID) && (getPrev(self, _curr) == NULL_NODE_ID);
@@ -70,7 +70,7 @@ library DLL {
   }
 
   /**
-  @dev Inserts a new node between _prev and _next. When inserting a node already existing in 
+  @dev Inserts a new node between _prev and _next. When inserting a node already existing in
   the list it will be automatically removed from the old position.
   @param _prev the node which _new will be inserted after
   @param _curr the id of the new node being inserted
@@ -645,7 +645,7 @@ contract PLCRVoting {
             nodeID = dllMap[_voter].getPrev(nodeID);
           }
           // Return the insert point
-          return nodeID; 
+          return nodeID;
         }
         // We did not find the insert point. Continue iterating backwards through the list
         nodeID = dllMap[_voter].getPrev(nodeID);
@@ -761,7 +761,7 @@ contract Parameterizer {
 
         // minimum deposit for listing to be whitelisted
         set("minDeposit", _parameters[0]);
-        
+
         // minimum deposit to propose a reparameterization
         set("pMinDeposit", _parameters[1]);
 
@@ -773,10 +773,10 @@ contract Parameterizer {
 
         // length of commit period for voting
         set("commitStageLen", _parameters[4]);
-        
+
         // length of commit period for voting in parameterizer
         set("pCommitStageLen", _parameters[5]);
-        
+
         // length of reveal period for voting
         set("revealStageLen", _parameters[6]);
 
@@ -882,7 +882,7 @@ contract Parameterizer {
         address propOwner = prop.owner;
         uint propDeposit = prop.deposit;
 
-        
+
         // Before any token transfers, deleting the proposal will ensure that if reentrancy occurs the
         // prop.owner and prop.deposit will be 0, thereby preventing theft
         if (canBeSet(_propID)) {
@@ -1082,32 +1082,32 @@ contract Parameterizer {
 
 /***
 * Shoutouts:
-* 
+*
 * Bytecode origin https://www.reddit.com/r/ethereum/comments/6ic49q/any_assembly_programmers_willing_to_write_a/dj5ceuw/
 * Modified version of Vitalik's https://www.reddit.com/r/ethereum/comments/6c1jui/delegatecall_forwarders_how_to_save_5098_on/
 * Credits to Jorge Izquierdo (@izqui) for coming up with this design here: https://gist.github.com/izqui/7f904443e6d19c1ab52ec7f5ad46b3a8
 * Credits to Stefan George (@Georgi87) for inspiration for many of the improvements from Gnosis Safe: https://github.com/gnosis/gnosis-safe-contracts
-* 
+*
 * This version has many improvements over the original @izqui's library like using REVERT instead of THROWing on failed calls.
 * It also implements the awesome design pattern for initializing code as seen in Gnosis Safe Factory: https://github.com/gnosis/gnosis-safe-contracts/blob/master/contracts/ProxyFactory.sol
 * but unlike this last one it doesn't require that you waste storage on both the proxy and the proxied contracts (v. https://github.com/gnosis/gnosis-safe-contracts/blob/master/contracts/Proxy.sol#L8 & https://github.com/gnosis/gnosis-safe-contracts/blob/master/contracts/GnosisSafe.sol#L14)
-* 
-* 
+*
+*
 * v0.0.2
 * The proxy is now only 60 bytes long in total. Constructor included.
 * No functionalities were added. The change was just to make the proxy leaner.
-* 
+*
 * v0.0.3
 * Thanks @dacarley for noticing the incorrect check for the subsequent call to the proxy. ?
 * Note: I'm creating a new version of this that doesn't need that one call.
-*       Will add tests and put this in its own repository soon™. 
-* 
+*       Will add tests and put this in its own repository soon™.
+*
 * v0.0.4
 * All the merit in this fix + update of the factory is @dacarley 's. ?
 * Thank you! ?
 *
 * Potential updates can be found at https://gist.github.com/GNSPS/ba7b88565c947cfd781d44cf469c2ddb
-* 
+*
 ***/
 
 pragma solidity ^0.4.19;
@@ -1138,14 +1138,14 @@ contract ProxyFactory {
 
         ProxyDeployed(proxyContract, _target);
     }
-    
+
     function createProxyImpl(address _target, bytes _data)
         internal
         returns (address proxyContract)
     {
         assembly {
             let contractCode := mload(0x40) // Find empty storage location using "free memory pointer"
-           
+
             mstore(add(contractCode, 0x0b), _target) // Add target address, with a 11 bytes [i.e. 23 - (32 - 20)] offset to later accomodate first part of the bytecode
             mstore(sub(contractCode, 0x09), 0x000000000000000000603160008181600b9039f3600080808080368092803773) // First part of the bytecode, shifted left by 9 bytes, overwrites left padding of target address
             mstore(add(contractCode, 0x2b), 0x5af43d828181803e808314602f57f35bfd000000000000000000000000000000) // Final part of bytecode, offset by 43 bytes
@@ -1154,9 +1154,9 @@ contract ProxyFactory {
             if iszero(extcodesize(proxyContract)) {
                 revert(0, 0)
             }
-           
+
             // check if the _data.length > 0 and if it is forward it to the newly created contract
-            let dataLength := mload(_data) 
+            let dataLength := mload(_data)
             if iszero(iszero(dataLength)) {
                 if iszero(call(gas, proxyContract, 0, add(_data, 0x20), dataLength, 0, 0)) {
                     revert(0, 0)
@@ -1274,7 +1274,7 @@ contract PLCRFactory {
 
     return plcr;
   }
-  
+
   /*
   @dev deploys and initializes a new PLCRVoting contract and an EIP20 to be consumed by the PLCR's
   initializer.
@@ -1832,7 +1832,7 @@ contract Registry {
         address owner = listing.owner;
         uint unstakedDeposit = listing.unstakedDeposit;
         delete listings[_listingHash];
-        
+
         // Transfers any remaining balance back to the owner
         if (unstakedDeposit > 0){
             require(token.transfer(owner, unstakedDeposit));
@@ -1907,4 +1907,138 @@ contract RegistryFactory {
         emit NewRegistry(msg.sender, token, plcr, parameterizer, registry);
         return registry;
     }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

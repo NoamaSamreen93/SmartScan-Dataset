@@ -7,7 +7,7 @@ contract ERC20 {
   function allowance(address owner, address spender) constant returns (uint256);
   function transferFrom(address from, address to, uint256 value) returns (bool);
   function approve(address spender, uint256 value) returns (bool);
-  event Approval(address indexed owner, address indexed spender, uint256 value);  
+  event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
 /**
@@ -62,7 +62,7 @@ contract BasicToken is ERC20 {
             return false;
         }
     }
-    
+
 
     /**
    * @dev Transfer tokens from one address to another
@@ -87,7 +87,7 @@ contract BasicToken is ERC20 {
 
     /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
 
@@ -141,7 +141,7 @@ contract EPTToken is BasicToken {
 
     //events
     event ChangeFoundersWalletAddress(uint256 _blockTimeStamp, address indexed _foundersWalletAddress);
-    
+
     //modifierss
 
     modifier nonZeroAddress(address _to){
@@ -163,13 +163,13 @@ contract EPTToken is BasicToken {
         @dev EPTToken Constructor to initiate the variables with some input argument
         @param _crowdFundAddress This is the address of the crowdfund which leads the distribution of tokens
         @param _founderMultiSigAddress This is the address of the founder which have the hold over the contract.
-    
+
      */
-    
+
     function EPTToken(address _crowdFundAddress, address _founderMultiSigAddress) {
         crowdFundAddress = _crowdFundAddress;
         founderMultiSigAddress = _founderMultiSigAddress;
-    
+
         //token allocation
         tokensAllocatedToCrowdFund = 32 * 10**24;
         foundersAllocation = 32 * 10**24;
@@ -195,23 +195,23 @@ contract EPTToken is BasicToken {
         @dev changeFounderMultiSigAddress function use to change the ownership of the contract
         @param _newFounderMultiSigAddress New address which will take the ownership of the contract
      */
-    
+
     function changeFounderMultiSigAddress(address _newFounderMultiSigAddress) onlyFounders nonZeroAddress(_newFounderMultiSigAddress) {
         founderMultiSigAddress = _newFounderMultiSigAddress;
         ChangeFoundersWalletAddress(now, founderMultiSigAddress);
     }
 
-  
+
 }
 
 
 contract EPTCrowdfund {
-    
+
     using SafeMath for uint256;
 
     EPTToken public token;                                      // Token contract reference
-    
-    address public beneficiaryAddress;                          // Address where all funds get allocated 
+
+    address public beneficiaryAddress;                          // Address where all funds get allocated
     address public founderAddress;                              // Founders address
     uint256 public crowdfundStartTime = 1516579201;             // Monday, 22-Jan-18 00:00:01 UTC
     uint256 public crowdfundEndTime = 1518998399;               // Sunday, 18-Feb-18 23:59:59 UTC
@@ -221,15 +221,15 @@ contract EPTCrowdfund {
     bool private tokenDeployed = false;                         // Flag to track the token deployment -- only can be set once
     uint256 public tokenSold;                                   // Counter to track the amount of token sold
     uint256 private ethRate;
-    
-    
+
+
     //events
     event ChangeFounderAddress(address indexed _newFounderAddress , uint256 _timestamp);
     event TokenPurchase(address indexed _beneficiary, uint256 _value, uint256 _amount);
     event CrowdFundClosed(uint256 _timestamp);
-    
+
     enum State {PreSale, CrowdSale, Finish}
-    
+
     //Modifiers
     modifier onlyfounder() {
         require(msg.sender == founderAddress);
@@ -263,7 +263,7 @@ contract EPTCrowdfund {
 
     /**
         @dev EPTCrowdfund Constructor used to initialize the required variable.
-        @param _founderAddress Founder address 
+        @param _founderAddress Founder address
         @param _ethRate Rate of ether in dollars at the time of deployment.
         @param _beneficiaryAddress Address that hold all funds collected from investors
 
@@ -274,10 +274,10 @@ contract EPTCrowdfund {
         founderAddress = _founderAddress;
         ethRate = uint256(_ethRate);
     }
-   
+
     /**
         @dev setToken Function used to set the token address into the contract.
-        @param _tokenAddress variable that contains deployed token address 
+        @param _tokenAddress variable that contains deployed token address
      */
 
     function setToken(address _tokenAddress) nonZeroAddress(_tokenAddress) onlyfounder {
@@ -285,8 +285,8 @@ contract EPTCrowdfund {
          token = EPTToken(_tokenAddress);
          tokenDeployed = true;
     }
-    
-    
+
+
     /**
         @dev changeFounderWalletAddress used to change the wallet address or change the ownership
         @param _newAddress new founder wallet address
@@ -297,12 +297,12 @@ contract EPTCrowdfund {
          ChangeFounderAddress(founderAddress,now);
     }
 
-    
+
     /**
-        @dev buyTokens function used to buy the tokens using ethers only. sale 
-            is only processed between start time and end time. 
+        @dev buyTokens function used to buy the tokens using ethers only. sale
+            is only processed between start time and end time.
         @param _beneficiary address of the investor
-        @return bool 
+        @return bool
      */
 
     function buyTokens (address _beneficiary)
@@ -316,13 +316,13 @@ contract EPTCrowdfund {
     returns (bool)
     {
          uint256 amount = msg.value.mul(((ethRate.mul(100)).div(getRate())));
-    
+
         if (token.transfer(_beneficiary, amount)) {
             fundTransfer(msg.value);
-            
+
             ethRaised = ethRaised.add(msg.value);
             tokenSold = tokenSold.add(amount);
-            token.changeTotalSupply(amount); 
+            token.changeTotalSupply(amount);
             TokenPurchase(_beneficiary, msg.value, amount);
             return true;
         }
@@ -333,7 +333,7 @@ contract EPTCrowdfund {
         @dev setEthRate function used to set the ether Rate
         @param _newEthRate latest eth rate
         @return bool
-     
+
      */
 
     function setEthRate(uint256 _newEthRate) onlyfounder returns (bool) {
@@ -345,14 +345,14 @@ contract EPTCrowdfund {
     /**
         @dev getRate used to get the price of each token on weekly basis
         @return uint256 price of each tokens in dollar
-    
+
      */
 
     function getRate() internal returns(uint256) {
 
         if (getState() == State.PreSale) {
             return 10;
-        } 
+        }
         if(getState() == State.CrowdSale) {
             if (now >= crowdfundStartTime + 3 weeks && now <= crowdfundEndTime) {
                 return 30;
@@ -365,16 +365,16 @@ contract EPTCrowdfund {
             }
             if (now >= crowdfundStartTime) {
                 return 15;
-            }  
+            }
         } else {
             return 0;
         }
-              
-    }  
+
+    }
 
     /**
         @dev `getState` used to findout the state of the crowdfund
-        @return State 
+        @return State
      */
 
     function getState() private returns(State) {
@@ -404,8 +404,8 @@ contract EPTCrowdfund {
             return true;
         }
         CrowdFundClosed(now);
-        return false;    
- } 
+        return false;
+ }
 
     /**
         @dev fundTransfer used to transfer collected ether into the beneficary address
@@ -423,3 +423,132 @@ contract EPTCrowdfund {
     }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

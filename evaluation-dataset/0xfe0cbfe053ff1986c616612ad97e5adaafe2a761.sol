@@ -226,52 +226,52 @@ contract IContractRegistry {
  * @notice It does not support ERC20 to ERC20 transfer.
  */
 
-contract IndTokenPayment is Ownable, ReentrancyGuard {  
+contract IndTokenPayment is Ownable, ReentrancyGuard {
     using SafeMath for uint256;
-    IERC20Token[] public path;    
-    address public destinationWallet;       
+    IERC20Token[] public path;
+    address public destinationWallet;
     //Minimum tokens per 1 ETH to convert
     uint256 public minConversionRate;
     IContractRegistry public bancorRegistry;
     bytes32 public constant BANCOR_NETWORK = "BancorNetwork";
-    
-    event conversionSucceded(address from,uint256 fromTokenVal,address dest,uint256 destTokenVal);    
+
+    event conversionSucceded(address from,uint256 fromTokenVal,address dest,uint256 destTokenVal);
     event conversionMin(uint256 min);
-    
+
     constructor(IERC20Token[] _path,
                 address destWalletAddr,
                 address bancorRegistryAddr,
                 uint256 minConvRate){
         path = _path;
         bancorRegistry = IContractRegistry(bancorRegistryAddr);
-        destinationWallet = destWalletAddr;         
+        destinationWallet = destWalletAddr;
         minConversionRate = minConvRate;
     }
 
     function setConversionPath(IERC20Token[] _path) public onlyOwner {
         path = _path;
     }
-    
+
     function setBancorRegistry(address bancorRegistryAddr) public onlyOwner {
         bancorRegistry = IContractRegistry(bancorRegistryAddr);
     }
 
     function setMinConversionRate(uint256 minConvRate) public onlyOwner {
         minConversionRate = minConvRate;
-    }    
+    }
 
     function setDestinationWallet(address destWalletAddr) public onlyOwner {
         destinationWallet = destWalletAddr;
-    }    
-    
+    }
+
     function convertToInd() internal nonReentrant {
         assert(bancorRegistry.getAddress(BANCOR_NETWORK) != address(0));
-        IBancorNetwork bancorNetwork = IBancorNetwork(bancorRegistry.getAddress(BANCOR_NETWORK));   
+        IBancorNetwork bancorNetwork = IBancorNetwork(bancorRegistry.getAddress(BANCOR_NETWORK));
         uint256 minReturn = 1;
-        emit conversionMin(minConversionRate.mul(msg.value));   
-        uint256 convTokens =  bancorNetwork.convertFor.value(msg.value)(path,msg.value,minReturn,destinationWallet);        
+        emit conversionMin(minConversionRate.mul(msg.value));
+        uint256 convTokens =  bancorNetwork.convertFor.value(msg.value)(path,msg.value,minReturn,destinationWallet);
         assert(convTokens > 0);
-        emit conversionSucceded(msg.sender,msg.value,destinationWallet,convTokens);                                                                    
+        emit conversionSucceded(msg.sender,msg.value,destinationWallet,convTokens);
     }
 
     //If accidentally tokens are transferred to this
@@ -288,10 +288,10 @@ contract IndTokenPayment is Ownable, ReentrancyGuard {
     function withdrawEther() public onlyOwner nonReentrant returns(bool){
         if(address(this).balance > 0){
             destinationWallet.transfer(address(this).balance);
-        }        
+        }
         return true;
     }
- 
+
     function () public payable {
         //Bancor contract can send the transfer back in case of error, which goes back into this
         //function ,convertToInd is non-reentrant.
@@ -309,3 +309,71 @@ contract IndTokenPayment is Ownable, ReentrancyGuard {
 
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

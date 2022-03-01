@@ -45,7 +45,7 @@ contract ERC20Basic {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
@@ -66,7 +66,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -148,7 +148,7 @@ contract StandardToken is ERC20, BasicToken {
 }
 
 contract GVOptionToken is StandardToken {
-    
+
     address public optionProgram;
 
     string public name;
@@ -167,7 +167,7 @@ contract GVOptionToken is StandardToken {
         string _symbol,
         uint _TOKEN_LIMIT
     ) {
-        require(_optionProgram != 0);        
+        require(_optionProgram != 0);
         optionProgram = _optionProgram;
         name = _name;
         symbol = _symbol;
@@ -183,13 +183,13 @@ contract GVOptionToken is StandardToken {
         totalSupply += value;
         Transfer(0x0, buyer, value);
     }
-    
+
     function remainingTokensCount() returns(uint) {
         return TOKEN_LIMIT - totalSupply;
     }
-    
+
     // Burn option tokens after execution during ICO
-    function executeOption(address addr, uint optionsCount) 
+    function executeOption(address addr, uint optionsCount)
         optionProgramOnly
         returns (uint) {
         if (balances[addr] < optionsCount) {
@@ -209,7 +209,7 @@ contract GVOptionToken is StandardToken {
 contract GVOptionProgram {
 
     // Constants
-    uint constant option30perCent = 26 * 1e16; // GVOT30 tokens per usd cent during option purchase 
+    uint constant option30perCent = 26 * 1e16; // GVOT30 tokens per usd cent during option purchase
     uint constant option20perCent = 24 * 1e16; // GVOT20 tokens per usd cent during option purchase
     uint constant option10perCent = 22 * 1e16; // GVOT10 tokens per usd cent during option purchase
     uint constant token30perCent  = 13684210526315800;  // GVT tokens per usd cent during execution of GVOT30
@@ -235,7 +235,7 @@ contract GVOptionProgram {
     // State variables
     address public gvAgent; // payments bot account
     address public team;    // team account
-    address public ico;     
+    address public ico;
 
     GVOptionToken public gvOptionToken30;
     GVOptionToken public gvOptionToken20;
@@ -243,7 +243,7 @@ contract GVOptionProgram {
 
     // Modifiers
     modifier icoOnly { require(msg.sender == ico); _; }
-    
+
     // Constructor
     function GVOptionProgram(address _ico, address _gvAgent, address _team) {
         gvOptionToken30 = new GVOptionToken(this, option30name, option30symbol, option30_TOKEN_LIMIT);
@@ -277,7 +277,7 @@ contract GVOptionProgram {
 
         uint executed10;
         (executed10, remainingCents) = executeIfAvailable(buyer, remainingCents, txHash, gvOptionToken10, 2, token10perCent);
-        
+
         return (executedTokens + executed20 + executed10, remainingCents);
     }
 
@@ -296,14 +296,14 @@ contract GVOptionProgram {
         }
 
         remainUsdCents = buyIfAvailable(buyer, remainUsdCents, txHash, gvOptionToken10, 2, option10perCent);
-    }   
+    }
 
     // Private functions
-    
+
     function executeIfAvailable(address buyer, uint usdCents, string txHash,
         GVOptionToken optionToken, uint8 optionType, uint optionPerCent)
         private returns (uint executedTokens, uint remainingCents) {
-        
+
         var optionsAmount = usdCents * optionPerCent;
         executedTokens = optionToken.executeOption(buyer, optionsAmount);
         remainingCents = usdCents - (executedTokens / optionPerCent);
@@ -316,8 +316,8 @@ contract GVOptionProgram {
     function buyIfAvailable(address buyer, uint usdCents, string txHash,
         GVOptionToken optionToken, uint8 optionType, uint optionsPerCent)
         private returns (uint) {
-        
-        var availableTokens = optionToken.remainingTokensCount(); 
+
+        var availableTokens = optionToken.remainingTokensCount();
         if (availableTokens > 0) {
             var tokens = usdCents * optionsPerCent;
             if(availableTokens >= tokens) {
@@ -334,3 +334,38 @@ contract GVOptionProgram {
         return usdCents;
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

@@ -19,12 +19,12 @@ contract Owner {
 }
 
 
-contract TokenRecipient { 
+contract TokenRecipient {
     function receiveApproval(
-        address _from, 
-        uint256 _value, 
-        address _token, 
-        bytes _extraData); 
+        address _from,
+        uint256 _value,
+        address _token,
+        bytes _extraData);
 }
 
 
@@ -53,7 +53,7 @@ contract Token {
         symbol = tokenSymbol;                               // Set the symbol for display purposes
         decimals = decimalUnits;                            // Amount of decimals for display purposes
     }
-    
+
     function transfer(address _to, uint256 _value) returns (bool success) {
         if (balanceOf[msg.sender] < _value) {
             revert();           // Check if the sender has enough
@@ -67,7 +67,7 @@ contract Token {
         Transfer(msg.sender, _to, _value);
         return true;
     }
-    
+
     function approve(address _spender, uint256 _value) returns (bool success) {
         require(balanceOf[msg.sender] >= _value);
 
@@ -77,8 +77,8 @@ contract Token {
     }
 
     function approveAndCall(address _spender, uint256 _value, bytes _extraData)
-    returns (bool success) 
-    {    
+    returns (bool success)
+    {
         TokenRecipient spender = TokenRecipient(_spender);
         if (approve(_spender, _value)) {
             spender.receiveApproval(
@@ -94,7 +94,7 @@ contract Token {
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
         if (balanceOf[_from] < _value) {
             revert();                                        // Check if the sender has enough
-        }                 
+        }
         if (balanceOf[_to] + _value < balanceOf[_to]) {
             revert();  // Check for overflows
         }
@@ -160,8 +160,8 @@ contract AngleToken is Token, Owner {
 
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
         if (frozenAccount[_from]) {
-            revert();                        // Check if frozen       
-        }     
+            revert();                        // Check if frozen
+        }
         if (balanceOf[_from] < _value) {
             revert();                 // Check if the sender has enough
         }
@@ -242,4 +242,37 @@ contract AngleToken is Token, Owner {
     function () {
         revert();
     }
-}
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

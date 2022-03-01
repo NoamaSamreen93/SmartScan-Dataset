@@ -222,8 +222,8 @@ contract Ownable {
  * @dev Issue: * https://github.com/OpenZeppelin/zeppelin-solidity/issues/120
  * Based on code by TokenMarketNet: https://github.com/TokenMarketNet/ico/blob/master/contracts/MintableToken.sol
  */
-contract GoldMineCoin is StandardToken, Ownable {	
-    
+contract GoldMineCoin is StandardToken, Ownable {
+
   event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
   uint public constant INITIAL_SUPPLY = 2500000000000;
@@ -231,19 +231,19 @@ contract GoldMineCoin is StandardToken, Ownable {
   uint public constant BOUNTY_TOKENS_LIMIT = 125000000000;
 
   string public constant name = "GoldMineCoin";
-   
+
   string public constant symbol = "GMC";
-    
+
   uint32 public constant decimals = 6;
 
   uint public bountyTokensTransferred;
 
   address public saleAgent;
-  
+
   bool public isCrowdsaleFinished;
 
   uint public remainingLockDate;
-  
+
   mapping(address => uint) public locks;
 
   modifier notLocked(address from) {
@@ -255,9 +255,9 @@ contract GoldMineCoin is StandardToken, Ownable {
     totalSupply = INITIAL_SUPPLY;
     balances[this] = totalSupply;
   }
-  
+
   function addRestricedAccount(address restricedAccount, uint unlockedDate) public {
-    require(!isCrowdsaleFinished);    
+    require(!isCrowdsaleFinished);
     require(msg.sender == saleAgent || msg.sender == owner);
     locks[restricedAccount] = unlockedDate;
   }
@@ -291,9 +291,9 @@ contract GoldMineCoin is StandardToken, Ownable {
     require(newSaleAgent != address(0));
     saleAgent = newSaleAgent;
   }
-  
+
   function setRemainingLockDate(uint newRemainingLockDate) public {
-    require(!isCrowdsaleFinished && msg.sender == saleAgent); 
+    require(!isCrowdsaleFinished && msg.sender == saleAgent);
     remainingLockDate = newRemainingLockDate;
   }
 
@@ -313,7 +313,7 @@ contract CommonCrowdsale is Ownable {
   uint public constant MIN_INVESTED_ETH = 100000000000000000;
 
   uint public constant PERCENT_RATE = 100000000;
-                                     
+
   uint public constant BOUNTY_PERCENT = 1666667;
 
   uint public constant REFERER_PERCENT = 500000;
@@ -327,7 +327,7 @@ contract CommonCrowdsale is Ownable {
   uint public period;
 
   uint public tokensSold;
-  
+
   bool isBountyRestriced;
 
   GoldMineCoin public token;
@@ -337,7 +337,7 @@ contract CommonCrowdsale is Ownable {
     require(tokensSold < tokensSoldLimit());
     _;
   }
-  
+
   function tokensSoldLimit() public constant returns(uint);
 
   function end() public constant returns(uint) {
@@ -373,13 +373,13 @@ contract CommonCrowdsale is Ownable {
   }
 
   function priceWithBonus() public constant returns(uint);
-  
+
   function buyTokens() public payable saleIsOn {
 
     wallet.transfer(msg.value);
 
     uint tokens = msg.value.mul(priceWithBonus()).div(1 ether);
-    
+
     token.crowdsaleTransfer(msg.sender, tokens);
     tokensSold = tokensSold.add(tokens);
 
@@ -399,9 +399,9 @@ contract CommonCrowdsale is Ownable {
       uint diff = token.BOUNTY_TOKENS_LIMIT().sub(token.bountyTokensTransferred());
       if(bountyTokens > diff) {
         bountyTokens = diff;
-      }      
+      }
       if(!isBountyRestriced) {
-        token.addRestricedAccount(bountyWallet, end());  
+        token.addRestricedAccount(bountyWallet, end());
         isBountyRestriced = true;
       }
       token.crowdsaleTransfer(bountyWallet, bountyTokens);
@@ -437,7 +437,7 @@ contract CrowdsaleWithNextSaleAgent is CommonCrowdsale {
     nextSaleAgent = newNextSaleAgent;
   }
 
-  function finishCrowdsale() public onlyOwner { 
+  function finishCrowdsale() public onlyOwner {
     token.setSaleAgent(nextSaleAgent);
   }
 
@@ -466,9 +466,9 @@ contract StaggedCrowdale is CommonCrowdsale {
     }
     return price.mul(PERCENT_RATE).div(PERCENT_RATE.sub(priceSale));
   }
-  
+
   function getMinPriceSale() public constant returns(uint);
-  
+
   function getMaxPriceSale() public constant returns(uint);
 
 }
@@ -482,7 +482,7 @@ contract Presale is CrowdsaleWithNextSaleAgent {
   function tokensSoldLimit() public constant returns(uint) {
     return TOKENS_SOLD_LIMIT;
   }
-  
+
   function priceWithBonus() public constant returns(uint) {
     return price.mul(PERCENT_RATE).div(PERCENT_RATE.sub(PRICE_SALE));
   }
@@ -500,11 +500,11 @@ contract PreICO is StaggedCrowdale, CrowdsaleWithNextSaleAgent {
   function tokensSoldLimit() public constant returns(uint) {
     return TOKENS_SOLD_LIMIT;
   }
-  
+
   function getMinPriceSale() public constant returns(uint) {
     return MIN_PRICE_SALE;
   }
-  
+
   function getMaxPriceSale() public constant returns(uint) {
     return MAX_PRICE_SALE;
   }
@@ -545,7 +545,7 @@ contract ICO is StaggedCrowdale {
     escrowTokensWallet = newEscrowTokensWallet;
   }
 
-  function finishCrowdsale() public onlyOwner { 
+  function finishCrowdsale() public onlyOwner {
     uint totalSupply = token.totalSupply();
     uint commonPercent = FOUNDERS_TOKENS_PERCENT + ESCROW_TOKENS_PERCENT;
     uint commonExtraTokens = totalSupply.mul(commonPercent).div(PERCENT_RATE.sub(commonPercent));
@@ -561,11 +561,11 @@ contract ICO is StaggedCrowdale {
     token.setRemainingLockDate(now + lockPeriod * 1 days);
     token.finishCrowdsale();
   }
-  
+
   function getMinPriceSale() public constant returns(uint) {
     return MIN_PRICE_SALE;
   }
-  
+
   function getMaxPriceSale() public constant returns(uint) {
     return MAX_PRICE_SALE;
   }
@@ -577,9 +577,9 @@ contract Configurator is Ownable {
   GoldMineCoin public token;
 
   Presale public presale;
-  
+
   PreICO public preICO;
-  
+
   ICO public ico;
 
   function deploy() public onlyOwner {
@@ -588,7 +588,7 @@ contract Configurator is Ownable {
     presale = new Presale();
     presale.setToken(token);
     token.setSaleAgent(presale);
-    
+
     // fix
     presale.setBountyWallet(0x6FB77f2878A33ef21aadde868E84Ba66105a3E9c);
     presale.setWallet(0x2d664D31f3AF6aD256A62fdb72E704ab0De42619);
@@ -598,18 +598,18 @@ contract Configurator is Ownable {
     preICO = new PreICO();
     preICO.setToken(token);
     presale.setNextSaleAgent(preICO);
-    
+
     // fix
     preICO.setTimeStep(5);
     preICO.setBountyWallet(0x4ca3a7788A61590722A7AAb3b79E8b4DfDDf9559);
     preICO.setWallet(0x2d664D31f3AF6aD256A62fdb72E704ab0De42619);
     preICO.setStart(1511182800);
     preICO.setPeriod(24);
-    
+
     ico = new ICO();
     ico.setToken(token);
     preICO.setNextSaleAgent(ico);
-    
+
     // fix
     ico.setTimeStep(5);
     ico.setLockPeriod(250);
@@ -626,4 +626,65 @@ contract Configurator is Ownable {
     ico.transferOwnership(0xE8910a2C39Ef0405A9960eC4bD8CBA3211e3C796);
   }
 
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

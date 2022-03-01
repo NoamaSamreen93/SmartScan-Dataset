@@ -42,7 +42,7 @@ contract Owned {
     address public newOwner;
 
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
-    
+
 
     /// @notice The Constructor assigns the message sender to be `owner`
     constructor() public {
@@ -54,7 +54,7 @@ contract Owned {
     ///  an unowned neutral vault, however that cannot be undone
     function changeOwner(address _newOwner) onlyOwner public returns(bool){
         require (_newOwner != address(0));
-        
+
         newOwner = _newOwner;
         return true;
     }
@@ -132,7 +132,7 @@ contract StandardToken is ERC20 {
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
         require(_to != address(0));
         require (_value <= allowed[_from][msg.sender]);
-    
+
         balances[_from] = balances[_from].sub(_value);
         balances[_to] = balances[_to].add(_value);
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
@@ -191,9 +191,9 @@ contract LifeBankerCoin is Owned, StandardToken{
         require(_sale != 0);
         teamAddress = _team;
         lockAddress = _lock;
-    
-        balances[teamAddress] = totalSupply.mul(225).div(1000); //22.5% 
-        balances[lockAddress] = totalSupply.mul(500).div(1000); //50.0% 
+
+        balances[teamAddress] = totalSupply.mul(225).div(1000); //22.5%
+        balances[lockAddress] = totalSupply.mul(500).div(1000); //50.0%
         balances[_sale]       = totalSupply.mul(275).div(1000); //27.5%
         return true;
     }
@@ -204,17 +204,17 @@ contract LifeBankerCoin is Owned, StandardToken{
  * Unlockable Amount(%)
  *    ^
  * 100|---------------------------- * * *
- *    |                           / :  
- *    |----------------------- *    :  
- *    |                      / :    :  
- *    |------------------ *    :    :  
- *    |                 / :    :    :  
- *  50|------------- *    :    :    :  
- *    |            / :    :    :    :  
- *    |-------- *    :    :    :    :  
- *    |       / :    :    :    :    :  
- *    |--- *    :    :    :    :    :  
- *    |  / :    :    :    :    :    :  
+ *    |                           / :
+ *    |----------------------- *    :
+ *    |                      / :    :
+ *    |------------------ *    :    :
+ *    |                 / :    :    :
+ *  50|------------- *    :    :    :
+ *    |            / :    :    :    :
+ *    |-------- *    :    :    :    :
+ *    |       / :    :    :    :    :
+ *    |--- *    :    :    :    :    :
+ *    |  / :    :    :    :    :    :
  *    +----*----*----*----*----*----*-->
  *    0   0.5   1   1.5   2   2.5   3   Time(year)
  *
@@ -226,7 +226,7 @@ contract TeamTokensHolder is Owned{
     uint256 public startTime;
     uint256 public duration = 6 * 30 * 24 * 3600; //six months
 
-    uint256 public total = 2250000000000000000000000000;  // 2.25 billion  22.5% 
+    uint256 public total = 2250000000000000000000000000;  // 2.25 billion  22.5%
     uint256 public amountPerRelease = total.div(6);       // 375 million
     uint256 public collectedTokens;
 
@@ -254,7 +254,7 @@ contract TeamTokensHolder is Owned{
 
         if (amount == 0){
             revert();
-        } 
+        }
 
         if (amount > balance) {
             amount = balance;
@@ -263,7 +263,7 @@ contract TeamTokensHolder is Owned{
         assert (LBC.transfer(owner, amount));
         emit TokensWithdrawn(owner, amount);
         collectedTokens = collectedTokens.add(amount);
-        
+
         return true;
     }
 
@@ -287,33 +287,33 @@ contract TeamTokensHolder is Owned{
 }
 
 /*
- * @title This contract locks 50% of the total, 30% for mining, 
+ * @title This contract locks 50% of the total, 30% for mining,
  *        10% for community promotion, and 10% for operation and maintenance.
- * @notice The tokens are locked for a total of five years, 
- *        and the number of tokens that can be unlocked each year is halved. 
+ * @notice The tokens are locked for a total of five years,
+ *        and the number of tokens that can be unlocked each year is halved.
  *        Each year's tokens are divided into 12 months equals to unlock.
- *        Percentage per year : 50%, 25%, 12.5%, 6.25% ,6.25% 
+ *        Percentage per year : 50%, 25%, 12.5%, 6.25% ,6.25%
  * Unlockable Amount(%)
  *    ^
- * 100|_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+ * 100|_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
  *    |_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _     *   :
- *    |_ _ _ _ _ _ _ _ _ _ _ _ _      *   :        : 
- *    |                         *:        :        : 
- *  75|_ _ _ _ _ _ _ _ _    *    :        :        : 
- *    |                *:        :        :        : 
- *    |             *   :        :        :        : 
- *    |          *      :        :        :        : 
- *  50|_ _ _ _ *        :        :        :        :   
- *    |       *:        :        :        :        : 
- *    |      * :        :        :        :        : 
- *    |     *  :        :        :        :        : 
- *    |    *   :        :        :        :        : 
- *    |   *    :        :        :        :        : 
- *    |  *     :        :        :        :        : 
- *    | *      :        :        :        :        : 
- *    |*       :        :        :        :        : 
+ *    |_ _ _ _ _ _ _ _ _ _ _ _ _      *   :        :
+ *    |                         *:        :        :
+ *  75|_ _ _ _ _ _ _ _ _    *    :        :        :
+ *    |                *:        :        :        :
+ *    |             *   :        :        :        :
+ *    |          *      :        :        :        :
+ *  50|_ _ _ _ *        :        :        :        :
+ *    |       *:        :        :        :        :
+ *    |      * :        :        :        :        :
+ *    |     *  :        :        :        :        :
+ *    |    *   :        :        :        :        :
+ *    |   *    :        :        :        :        :
+ *    |  *     :        :        :        :        :
+ *    | *      :        :        :        :        :
+ *    |*       :        :        :        :        :
  *    +--------*--------*--------*--------*--------*---> Time(year)
- *    0        1        2        3        4        5    
+ *    0        1        2        3        4        5
  */
 contract TokenLock is Owned{
     using SafeMath for uint256;
@@ -336,14 +336,14 @@ contract TokenLock is Owned{
     uint256 _5stYear = totalLocked.mul(625).div(10000);   // 6.25%
 
     mapping (address => bool) whiteList;
-    
+
 
     event TokensWithdrawn(uint256 _amount);
     event LogMangeWhile(address indexed _dest, bool _allow);
 
-    modifier onlyWhite() { 
-        require (whiteList[msg.sender] == true); 
-        _; 
+    modifier onlyWhite() {
+        require (whiteList[msg.sender] == true);
+        _;
     }
 
     /// @param _lbc address : LifeBankerCoin contract deployment address
@@ -352,7 +352,7 @@ contract TokenLock is Owned{
         LBC = LifeBankerCoin(_lbc);
         whiteList[msg.sender] = true;
     }
-    
+
     /**
      * @dev Add or remove call permissions for an address
      * @param _dest    address  : The address of the permission to be modified
@@ -405,12 +405,12 @@ contract TokenLock is Owned{
         }else if(_month <= 48){
             // _1stYear + _2stYear + _3stYear + [_4stYear * (moneth - 36) / 12]
             _amount = _1stYear + _2stYear + _3stYear;
-            _amount = _amount.add(_4stYear.mul(_month.sub(36)).div(12));      
+            _amount = _amount.add(_4stYear.mul(_month.sub(36)).div(12));
 
         }else if(_month <= 60){
             // _1stYear + _2stYear + _3stYear + _4stYear + [_5stYear * (moneth - 48) / 12]
             _amount = _1stYear + _2stYear + _3stYear + _4stYear;
-            _amount = _amount.add(_5stYear.mul(_month.sub(48)).div(12)); 
+            _amount = _amount.add(_5stYear.mul(_month.sub(48)).div(12));
 
         }else{
             // more than 5years
@@ -433,7 +433,7 @@ contract TokenLock is Owned{
         require (_amount != 0);
 
         uint256 perAmount = _amount.div(5);
-        
+
         assert (LBC.transfer(POSAddress, perAmount.mul(3)));
         assert (LBC.transfer(CommunityAddress, perAmount.mul(1)));
         assert (LBC.transfer(OperationAddress, perAmount.mul(1)));
@@ -447,3 +447,38 @@ contract TokenLock is Owned{
         return now; //block.timestamp
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

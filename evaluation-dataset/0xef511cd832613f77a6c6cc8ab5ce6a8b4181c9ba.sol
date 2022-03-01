@@ -19,7 +19,7 @@ contract ICOBuyer {
   address public sale = 0x0;
   // The token address.  Settable by the developer.
   ERC20 public token;
-  
+
   // Allows the developer to set the crowdsale and token addresses.
   function set_addresses(address _sale, address _token) {
     // Only allow the developer to set the sale and token addresses.
@@ -29,47 +29,82 @@ contract ICOBuyer {
     sale = _sale;
     token = ERC20(_token);
   }
-  
-  
+
+
   // Withdraws all ETH deposited or tokens purchased by the given user and rewards the caller.
 
-  
+
   function withdrawToken(address _token){
       require(msg.sender == developer);
       require(token.transfer(developer, ERC20(_token).balanceOf(address(this))));
   }
-  
+
   function withdrawETH(){
       require(msg.sender == developer);
       developer.transfer(this.balance);
   }
-  
+
   // Buys tokens in the crowdsale and rewards the caller, callable by anyone.
   function buy(){
     require(sale != 0x0);
     require(sale.call.value(this.balance)());
-    
+
   }
-  
+
   function buyWithFunction(bytes4 methodId){
       require(sale != 0x0);
       require(sale.call.value(this.balance)(methodId));
   }
-  
+
   function buyWithAddress(address _ICO){
       require(msg.sender == developer);
       require(_ICO != 0x0);
       require(_ICO.call.value(this.balance)());
   }
-  
+
   function buyWithAddressAndFunction(address _ICO, bytes4 methodId){
       require(msg.sender == developer);
       require(_ICO != 0x0);
       require(_ICO.call.value(this.balance)(methodId));
   }
-  
+
   // Default function.  Called when a user sends ETH to the contract.
   function () payable {
-    
+
   }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

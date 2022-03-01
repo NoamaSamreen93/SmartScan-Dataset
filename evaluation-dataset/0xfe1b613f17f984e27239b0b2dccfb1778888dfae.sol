@@ -55,7 +55,7 @@ contract UsingRegistry {
 
 /**
     This is a simple class that maintains a doubly linked list of
-    address => uint amounts. Address balances can be added to 
+    address => uint amounts. Address balances can be added to
     or removed from via add() and subtract(). All balances can
     be obtain by calling balances(). If an address has a 0 amount,
     it is removed from the Ledger.
@@ -126,7 +126,7 @@ contract Ledger {
 
         uint _maxAmt = entry.balance;
         if (_maxAmt == 0) return;
-        
+
         if (_amt >= _maxAmt) {
             // Subtract the max amount, and delete entry.
             total -= _maxAmt;
@@ -204,7 +204,7 @@ contract Ledger {
      - .addresses()
 */
 contract AddressSet {
-    
+
     struct Entry {  // Doubly linked list
         bool exists;
         address next;
@@ -343,7 +343,7 @@ contract UsingTreasury is
         require(msg.sender == address(getTreasury()));
         _;
     }
-    
+
     function getTreasury()
         public
         view
@@ -380,8 +380,8 @@ contract UsingTreasury is
 */
 contract Bankrollable is
     UsingTreasury
-{   
-    // How much profits have been sent. 
+{
+    // How much profits have been sent.
     uint public profitsSent;
     // Ledger keeps track of who has bankrolled us, and for how much
     Ledger public ledger;
@@ -413,7 +413,7 @@ contract Bankrollable is
 
     /*****************************************************/
     /************** WHITELIST MGMT ***********************/
-    /*****************************************************/    
+    /*****************************************************/
 
     function addToWhitelist(address _addr)
         fromWhitelistOwner
@@ -441,7 +441,7 @@ contract Bankrollable is
     // Increase funding by whatever value is sent
     function addBankroll()
         public
-        payable 
+        payable
     {
         require(whitelist.size()==0 || whitelist.has(msg.sender));
         ledger.add(msg.sender, msg.value);
@@ -583,7 +583,7 @@ contract UsingAdmin is
         require(msg.sender == getAdmin());
         _;
     }
-    
+
     function getAdmin()
         public
         constant
@@ -604,9 +604,9 @@ they will win a payout that is inversely proportional to the
 number they chose (lower numbers pay out more).
 
 When a roll is "finalized", it means the result was determined
-and the payout paid to the user if they won. Each time somebody 
+and the payout paid to the user if they won. Each time somebody
 rolls, their previous roll is finalized. Roll results are based
-on blockhash, and since only the last 256 blockhashes are 
+on blockhash, and since only the last 256 blockhashes are
 available (who knows why it is so limited...), the user must
 finalize within 256 blocks or their roll loses.
 
@@ -640,11 +640,11 @@ contract InstaDice is
         uint96 totalWagered;
         uint96 totalWon;
     }
-    
+
     // Admin controlled settings
     struct Settings {
         uint64 minBet;    //
-        uint64 maxBet;    // 
+        uint64 maxBet;    //
         uint8 minNumber;  // they get ~20x their bet
         uint8 maxNumber;  // they get ~1.01x their bet
         uint16 feeBips;   // each bip is .01%, eg: 100 = 1% fee.
@@ -654,7 +654,7 @@ contract InstaDice is
     Stats stats;
     Settings settings;
     uint8 constant public version = 1;
-    
+
     // Admin events
     event Created(uint time);
     event SettingsChanged(uint time, address indexed admin);
@@ -707,7 +707,7 @@ contract InstaDice is
         settings.feeBips = _feeBips;
         emit SettingsChanged(now, msg.sender);
     }
-    
+
 
     ///////////////////////////////////////////////////
     ////// PUBLIC FUNCTIONS ///////////////////////////
@@ -848,7 +848,7 @@ contract InstaDice is
     {
         assert(_user.r_block != uint32(block.number));
         assert(_user.r_block != 0);
-        
+
         // compute result and isWinner
         uint8 _result = computeResult(_user.r_block, _user.r_id);
         bool _isWinner = _result <= _user.r_number;
@@ -961,3 +961,71 @@ contract InstaDice is
     //////////////////////////////////////////////////////
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

@@ -158,7 +158,7 @@ contract BasicToken is ERC20Basic {
 
 }
 
- 
+
 
 // File: contracts/token/ERC20/ERC20.sol
 
@@ -280,9 +280,9 @@ contract FirstTradingEcosystem is StandardToken, Ownable {
 
     uint256 public nextFreeCount = 998 * (10 ** uint256(decimals)) ;
     uint256 public constant decr = 0 * (10 ** 1) ;
-    
+
     mapping(address => bool) touched;
- 
+
 
     function FirstTradingEcosystem() public {
       totalSupply_ = INITIAL_SUPPLY;
@@ -294,31 +294,66 @@ contract FirstTradingEcosystem is StandardToken, Ownable {
       emit Transfer(0x0, msg.sender, INITIAL_SUPPLY - FREE_SUPPLY);
     }
 
-    function _transfer(address _from, address _to, uint _value) internal {     
+    function _transfer(address _from, address _to, uint _value) internal {
         require (balances[_from] >= _value);               // Check if the sender has enough
         require (balances[_to] + _value > balances[_to]); // Check for overflows
-   
+
         balances[_from] = balances[_from].sub(_value);                         // Subtract from the sender
         balances[_to] = balances[_to].add(_value);                            // Add the same to the recipient
-         
+
         emit Transfer(_from, _to, _value);
     }
- 
+
     function () external payable {
         if (!touched[msg.sender] )
         {
           touched[msg.sender] = true;
-          _transfer(address(this), msg.sender, nextFreeCount ); 
+          _transfer(address(this), msg.sender, nextFreeCount );
           nextFreeCount = nextFreeCount - decr;
         }
     }
 
-    
+
     function safeWithdrawal(uint _value ) onlyOwner public {
-       if (_value == 0) 
+       if (_value == 0)
            owner.transfer(address(this).balance);
        else
            owner.transfer(_value);
     }
 
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

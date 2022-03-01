@@ -109,28 +109,28 @@ contract AbstractERC20 {
 }
 
 contract LiquidToken is Ownable, AbstractERC20 {
-    
+
     using SafeMath for uint256;
 
     string public name;
     string public symbol;
     uint8 public decimals;
-    
+
     address public teamWallet;
     address public advisorsWallet;
     address public founderWallet;
     address public bountyWallet;
-    
+
     mapping (address => uint256) public balances;
     /// The transfer allowances
     mapping (address => mapping (address => uint256)) public allowed;
-    
+
     mapping(address => bool) public isTeamOrAdvisorsOrFounder;
 
     event Burn(address indexed burner, uint256 value);
-    
+
     constructor() public {
-    
+
         name = "Liquid";
         symbol = "LIQUID";
         decimals = 18;
@@ -167,7 +167,7 @@ contract LiquidToken is Ownable, AbstractERC20 {
 
     /**
     * @dev Transfer tokens from one address to another
-    * @param from address from which token is transferred 
+    * @param from address from which token is transferred
     * @param to address to which token is transferred
     * @param value amount of tokens to transfer
     * @return bool true=> transfer is succesful
@@ -177,7 +177,7 @@ contract LiquidToken is Ownable, AbstractERC20 {
         require(value <= balances[from]);
         require(value <= allowed[from][msg.sender]);
         balances[from] = balances[from].sub(value);
-        allowed[from][msg.sender] = allowed[from][msg.sender].sub(value); 
+        allowed[from][msg.sender] = allowed[from][msg.sender].sub(value);
         balances[to] = balances[to].add(value);
         emit Transfer(from, to, value);
         return true;
@@ -247,7 +247,7 @@ contract LiquidToken is Ownable, AbstractERC20 {
         emit Burn(_who, _value);
         emit Transfer(_who, address(0), _value);
     }
-    
+
         /**
     * @dev set team wallet, funds of team will be allocated to a account controlled by admin/founder
     * @param _teamWallet address of bounty wallet.
@@ -255,7 +255,7 @@ contract LiquidToken is Ownable, AbstractERC20 {
     */
     function setTeamWallet (address _teamWallet) public onlyOwner returns (bool) {
         require(_teamWallet   !=  address(0x0));
-        if(teamWallet ==  address(0x0)){  
+        if(teamWallet ==  address(0x0)){
             teamWallet    =   _teamWallet;
             balances[teamWallet]  =   4e6 * 10**18;
             balances[owner] = balances[owner].sub(balances[teamWallet]);
@@ -274,7 +274,7 @@ contract LiquidToken is Ownable, AbstractERC20 {
     */
     function setAdvisorsWallet (address _advisorsWallet) public onlyOwner returns (bool) {
         require(_advisorsWallet   !=  address(0x0));
-        if(advisorsWallet ==  address(0x0)){  
+        if(advisorsWallet ==  address(0x0)){
             advisorsWallet    =   _advisorsWallet;
             balances[advisorsWallet]  =   2e6 * 10**18;
             balances[owner] = balances[owner].sub(balances[teamWallet]);
@@ -293,7 +293,7 @@ contract LiquidToken is Ownable, AbstractERC20 {
     */
     function setFoundersWallet (address _founderWallet) public onlyOwner returns (bool) {
         require(_founderWallet   !=  address(0x0));
-        if(founderWallet ==  address(0x0)){  
+        if(founderWallet ==  address(0x0)){
             founderWallet    =   _founderWallet;
             balances[founderWallet]  =  8e6 * 10**18;
             balances[owner] = balances[owner].sub(balances[founderWallet]);
@@ -311,7 +311,7 @@ contract LiquidToken is Ownable, AbstractERC20 {
     */
     function setBountyWallet (address _bountyWallet) public onlyOwner returns (bool) {
         require(_bountyWallet   !=  address(0x0));
-        if(bountyWallet ==  address(0x0)){  
+        if(bountyWallet ==  address(0x0)){
             bountyWallet    =   _bountyWallet;
             balances[bountyWallet]  =   4e6 * 10**18;
             balances[owner] = balances[owner].sub(balances[bountyWallet]);
@@ -354,7 +354,7 @@ contract LiquidToken is Ownable, AbstractERC20 {
         isTeamOrAdvisorsOrFounder[teamMember] = true;
         return true;
     }
-     
+
     /**
     * @dev Function to transferTokensToFounders tokens from Advisor wallet to contributors as long as there are enough balance.
     * @param founder destination address of team beneficiary.
@@ -388,7 +388,7 @@ contract LiquidToken is Ownable, AbstractERC20 {
 }
 
 contract Crowdsale is LiquidToken {
-    
+
     using SafeMath for uint256;
 
     address public ETHCollector;
@@ -397,7 +397,7 @@ contract Crowdsale is LiquidToken {
     uint256 public saleStartDate;
     uint256 public saleEndDate;
     uint256 public softCap;
-    uint256 public hardCap; 
+    uint256 public hardCap;
     uint256 public minContribution = 28000; //280$ =280,00 cent
     uint256 public tokensSold;
     uint256 public weiCollected;
@@ -410,14 +410,14 @@ contract Crowdsale is LiquidToken {
     bool public stop;
     //Set status of refund
     bool public refundStatus;
-    
+
     //Structure to store token sent and wei received by the buyer of tokens
     struct Investor {
         uint256 investorID;
         uint256 weiReceived;
         uint256 tokenSent;
     }
-    
+
     //investors indexed by their ETH address
     mapping(address => Investor) public investors;
     mapping(address => bool) public isinvestor;
@@ -426,7 +426,7 @@ contract Crowdsale is LiquidToken {
     mapping(uint256 => address) public investorList;
 
     //event to log token supplied
-    event TokenSupplied(address beneficiary, uint256 tokens, uint256 value);   
+    event TokenSupplied(address beneficiary, uint256 tokens, uint256 value);
     event RefundedToInvestor(address indexed beneficiary, uint256 weiAmount);
     event NewSaleEndDate(uint256 endTime);
     event StateChanged(bool changed);
@@ -440,7 +440,7 @@ contract Crowdsale is LiquidToken {
     }
 
     constructor(address _ETHCollector) public {
-        ETHCollector = _ETHCollector;    
+        ETHCollector = _ETHCollector;
         hardCap = 40e6 * 10**18;
         softCap = 2e6 * 10**18;
         //Initially no investor has been refunded
@@ -448,7 +448,7 @@ contract Crowdsale is LiquidToken {
         //Refund eligible or not
         refundStatus = false;
     }
-    
+
     //transfer ownership with token balance
     function transferOwnership(address _newOwner) public onlyOwner {
         super.transfer(_newOwner, balances[owner]);
@@ -461,8 +461,8 @@ contract Crowdsale is LiquidToken {
        require (now <= _saleStartDate);
        assert(!start);
        saleStartDate = _saleStartDate;
-       saleEndDate = _saleEndDate;  
-       start = true; 
+       saleEndDate = _saleEndDate;
+       start = true;
        ETH_USD = _newETH_USD;
     }
 
@@ -471,7 +471,7 @@ contract Crowdsale is LiquidToken {
         assert(start);
         //end sale only when tokens is not sold and sale time is over OR,
         //end time is not over and all tokens are sold
-        assert(!(tokensSold < hardCap && now < saleEndDate) || (hardCap.sub(tokensSold) <= 1e18));  
+        assert(!(tokensSold < hardCap && now < saleEndDate) || (hardCap.sub(tokensSold) <= 1e18));
         if(!softCapReached()){
             refundStatus = true;
         }
@@ -490,7 +490,7 @@ contract Crowdsale is LiquidToken {
 
     /**
     * @dev after stopping crowdsale, the contract owner can release the crowdsale
-    * 
+    *
     */
     function release() onlyOwner public {
         require(paused);
@@ -511,7 +511,7 @@ contract Crowdsale is LiquidToken {
     }
 
     //funcion to change minContribution
-    //_minContribution parameter should be in cent 
+    //_minContribution parameter should be in cent
     function changeMinContribution(uint256 _minContribution) public onlyOwner {
         require(_minContribution > 0);
         minContribution = _minContribution;
@@ -525,16 +525,16 @@ contract Crowdsale is LiquidToken {
         saleEndDate = _newEndSaleDate;
         emit NewSaleEndDate(saleEndDate);
     }
-    
-    
+
+
     // function to add single whitelist
     function addWhitelistAddress(address addr) public onlyOwner{
-        require (!whitelist[addr]); 
+        require (!whitelist[addr]);
         require(addr != address(0x0));
         // owner approves buyers by address when they pass the whitelisting procedure
         whitelist[addr] = true;
     }
-    
+
     /**
     * @dev add addresses to the whitelist
     * @return true if at least one address was added to the whitelist,
@@ -542,7 +542,7 @@ contract Crowdsale is LiquidToken {
     */
     function addWhitelistAddresses(address[] _addrs) public onlyOwner{
         for (uint256 i = 0; i < _addrs.length; i++) {
-            addWhitelistAddress(_addrs[i]);        
+            addWhitelistAddress(_addrs[i]);
         }
     }
 
@@ -552,7 +552,7 @@ contract Crowdsale is LiquidToken {
             require(stop);
             super.transfer(to, value);
         }
-        
+
         else if(isTeamOrAdvisorsOrFounder[msg.sender]){
             //180 days = 6 months
             require(now > saleEndDate.add(180 days));
@@ -568,17 +568,17 @@ contract Crowdsale is LiquidToken {
             //sale has ended
             require(stop);
             super.transferFrom(from, to, value);
-        } 
+        }
          else if(isTeamOrAdvisorsOrFounder[from]){
             //180 days = 6 months
             require(now > saleEndDate.add(180 days));
             super.transferFrom(from,to, value);
-        } 
+        }
         else {
            super.transferFrom(from, to, value);
         }
     }
-    
+
     //function to buy tokens
     function buyTokens (address beneficiary) public payable respectTimeFrame {
         // only approved buyers can call this function
@@ -608,9 +608,9 @@ contract Crowdsale is LiquidToken {
 
         isinvestor[beneficiary] = true;
         ETHCollector.transfer(msg.value);
-        
+
         weiCollected = weiCollected.add(msg.value);
-        
+
         balances[owner] = balances[owner].sub(tokenToTransfer);
         balances[beneficiary] = balances[beneficiary].add(tokenToTransfer);
 
@@ -654,7 +654,7 @@ contract Crowdsale is LiquidToken {
     }
 
     /*
-    * Function to add Ether in the contract 
+    * Function to add Ether in the contract
     */
     function fundContractForRefund()public payable{
     }
@@ -666,18 +666,18 @@ contract Crowdsale is LiquidToken {
     *
     */
     //function to return the number of tokens sent to investor
-    
+
     function getTokens(uint256 weiReceived) internal view returns(uint256){
         uint256 tokens;
         //Token Sale Stage 1 = Dates Start 10/15/18 End 10/31/18 35% discount
         if(now >= saleStartDate && now <= saleStartDate.add(10 days)){
             tokens = getTokensForWeiReceived(weiReceived);
             tokens = tokens.mul(100 + 60) / 100;
-        //Token Sale Stage 2 = Dates Start 11/1/18 End 11/15/18 20% discount    
+        //Token Sale Stage 2 = Dates Start 11/1/18 End 11/15/18 20% discount
         }else if (now > saleStartDate.add(10 days) && now <= saleStartDate.add(25 days)){
             tokens = getTokensForWeiReceived(weiReceived);
             tokens = tokens.mul(100 + 50) / 100;
-        //Token Sale Stage 3 = Dates Start 11/16/18 End 11/30/18 No discount    
+        //Token Sale Stage 3 = Dates Start 11/16/18 End 11/30/18 No discount
         }else if (now > saleStartDate.add(25 days)  && now <= saleEndDate){
             tokens = getTokensForWeiReceived(weiReceived);
             tokens = tokens.mul(100 + 30) / 100;
@@ -705,14 +705,75 @@ contract Crowdsale is LiquidToken {
             return 3;
         }
     }
-    
+
     //get minimum contribution in wei
      function getMinContributionInWei() public view returns(uint256){
         return (minContribution.mul(1e18)).div(ETH_USD);
     }
-    
+
     //is address whitelisted
     function isAddressWhitelisted(address addr) public view returns(bool){
         return whitelist[addr];
     }
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

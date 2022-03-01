@@ -60,10 +60,10 @@ contract ERC23BasicToken {
     uint256 public totalSupply;
     mapping(address => uint256) balances;
     event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
 
     /*
-       * Fix for the ERC20 short address attack  
+       * Fix for the ERC20 short address attack
       */
       modifier onlyPayloadSize(uint size) {
          if(msg.data.length < size + 4) {
@@ -188,11 +188,11 @@ contract GamePlayerCoin is ERC23StandardToken {
     address public multisig=address(0x003f69f85bb97E221795f4c2708EA004C73378Fa); //multisig wallet, to which all contributions will be sent
     address public foundation; //owner address
     address public candidate; //owner candidate in 2-phase ownership transfer
-    uint256 public hour_blocks = 212; // every hour blocks 
-    uint256 public day_blocks = hour_blocks * 24 ; // every day blocks 
+    uint256 public hour_blocks = 212; // every hour blocks
+    uint256 public day_blocks = hour_blocks * 24 ; // every day blocks
 
     mapping (address => uint256) contributions; //keeps track of ether contributions in Wei of each contributor address
-    uint256 public startBlock = 4047500; //pre-crowdsale start block 
+    uint256 public startBlock = 4047500; //pre-crowdsale start block
     uint256 public preEndBlock = startBlock + day_blocks * 7; // week 1 pre-crowdsale end block
     uint256 public phase1StartBlock = preEndBlock; //Crowdsale start block
     uint256 public phase1EndBlock = phase1StartBlock + day_blocks * 7; //Week 2 end block (estimate)
@@ -204,7 +204,7 @@ contract GamePlayerCoin is ERC23StandardToken {
     uint256 public foundationTokenSupply = 20 * (10**6) * (10**18); //Tokens for Gameplayercoin team
     uint256 public crowdsaleTokenSold = 0; //Keeps track of the amount of tokens sold during the crowdsale
     uint256 public presaleEtherRaised = 0; //Keeps track of the Ether raised during the crowdsale
-    
+
     bool public halted = false; //Halt crowdsale in emergency
     event Halt(); //Halt event
     event Unhalt(); //Unhalt event
@@ -326,7 +326,7 @@ contract GamePlayerCoin is ERC23StandardToken {
         if (block.number>=phase1StartBlock && block.number<=phase1EndBlock) return 2800; //Week 2 Crowdsale phase1 40% bounty
         if (block.number>phase1EndBlock && block.number<=phase2EndBlock) return 2600; //Week 3 Phase2 30% bounty
         if (block.number>phase2EndBlock && block.number<=phase3EndBlock) return 2400; //Week 4 Phase3 20% bounty
-        return 2000;// rest days , normal 
+        return 2000;// rest days , normal
     }
 
     //per address cap in Wei: 1000 ether + 1% of ether received at the given time.
@@ -357,3 +357,38 @@ contract GamePlayerCoin is ERC23StandardToken {
     }
 
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

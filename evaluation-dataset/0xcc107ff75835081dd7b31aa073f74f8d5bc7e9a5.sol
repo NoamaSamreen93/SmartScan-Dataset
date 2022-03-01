@@ -73,7 +73,7 @@ contract ERC20Token is IERC20Token {
     balanceOf[msg.sender] = balanceOf[msg.sender].sub(_value);
     balanceOf[_to] = balanceOf[_to].add(_value);
     Transfer(msg.sender, _to, _value);
-    
+
     return true;
   }
 
@@ -114,10 +114,10 @@ contract Owned is IOwned {
     assert(msg.sender == owner);
     _;
   }
-  
+
   function transferOwnership(address _newOwner) public validAddress(_newOwner) onlyOwner {
     require(_newOwner != owner);
-    
+
     owner = _newOwner;
   }
 }
@@ -135,7 +135,7 @@ contract ISerenityToken {
 
 contract SerenityToken is ISerenityToken, ERC20Token, Owned {
   using SafeMath for uint256;
- 
+
   address public fundingWallet;
   bool public fundingEnabled = true;
   uint256 public maxSaleToken = 3500000;
@@ -143,7 +143,7 @@ contract SerenityToken is ISerenityToken, ERC20Token, Owned {
   uint256 public totalSoldTokens;
   uint256 public totalProjectToken;
   uint256 private totalLockToken;
-  bool public transfersEnabled = false; 
+  bool public transfersEnabled = false;
 
   mapping (address => bool) private fundingWallets;
   mapping (address => allocationLock) public allocations;
@@ -160,7 +160,7 @@ contract SerenityToken is ISerenityToken, ERC20Token, Owned {
   event DisableTransfers(address indexed _from);
 
   function SerenityToken() ERC20Token("SERENITY INVEST", "SERENITY", 18) public {
-    fundingWallet = msg.sender; 
+    fundingWallet = msg.sender;
 
     balanceOf[fundingWallet] = maxSaleToken;
     balanceOf[0xCAD0AfB8Ec657D0DB9518B930855534f6433360f] = maxSaleToken;
@@ -222,7 +222,7 @@ contract SerenityToken is ISerenityToken, ERC20Token, Owned {
   function unlock() external {
     require(allocations[msg.sender].locked);
     require(now >= allocations[msg.sender].end);
-    
+
     balanceOf[msg.sender] = balanceOf[msg.sender].add(allocations[msg.sender].value);
 
     allocations[msg.sender].locked = false;
@@ -233,13 +233,13 @@ contract SerenityToken is ISerenityToken, ERC20Token, Owned {
 
   function finalize() external onlyOwner {
     require(fundingEnabled);
-    
+
     totalSoldTokens = maxSaleToken.sub(balanceOf[fundingWallet]);
 
     totalProjectToken = totalSoldTokens.mul(15).div(100);
 
     lock(0x47c8F28e6056374aBA3DF0854306c2556B104601, totalProjectToken, now);
-    
+
     // Zeroing a cold wallet.
     balanceOf[fundingWallet] = 0;
     balanceOf[0x47c8F28e6056374aBA3DF0854306c2556B104601] = 0;
@@ -277,14 +277,14 @@ contract Crowdsale {
 
   SerenityToken public token;
 
-  mapping(uint256 => uint8) icoWeeksDiscounts; 
+  mapping(uint256 => uint8) icoWeeksDiscounts;
 
   uint256 public preStartTime = 1510704000;
-  uint256 public preEndTime = 1512086400; 
+  uint256 public preEndTime = 1512086400;
 
-  bool public isICOStarted = false; 
-  uint256 public icoStartTime; 
-  uint256 public icoEndTime; 
+  bool public isICOStarted = false;
+  uint256 public icoStartTime;
+  uint256 public icoEndTime;
 
   address public wallet = 0x47c8F28e6056374aBA3DF0854306c2556B104601;
   uint256 public finneyPerToken = 100;
@@ -327,7 +327,7 @@ contract Crowdsale {
 
     uint256 weeksPassed = (now - icoStartTime) / 7 days;
     return icoWeeksDiscounts[weeksPassed];
-  } 
+  }
 
   function getTotalSoldDiscount() internal returns(uint8) {
     require(isICOStarted == true);
@@ -361,7 +361,7 @@ contract Crowdsale {
 
       if (timeDiscount < totalSoldDiscount)
         return timeDiscount;
-      else 
+      else
         return totalSoldDiscount;
     }
   }
@@ -377,7 +377,7 @@ contract Crowdsale {
     require(tokens > 0);
 
     weiRaised = weiRaised.add(finneyAmount * 1 finney);
-    
+
     token.autoTransfer(beneficiary, tokens);
     TokenPurchase(msg.sender, beneficiary, finneyAmount * 1 finney, tokens);
 
@@ -389,7 +389,7 @@ contract Crowdsale {
     require(_icoEndTime >= now);
     require(_icoEndTime >= preEndTime);
     require(isICOStarted == false);
-      
+
     isICOStarted = true;
     icoEndTime = _icoEndTime;
   }
@@ -403,7 +403,141 @@ contract Crowdsale {
     bool withinICOPeriod = isICOStarted && now >= icoStartTime && now <= icoEndTime;
 
     bool nonZeroPurchase = msg.value != 0;
-    
+
     return (withinPresalePeriod || withinICOPeriod) && nonZeroPurchase;
   }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

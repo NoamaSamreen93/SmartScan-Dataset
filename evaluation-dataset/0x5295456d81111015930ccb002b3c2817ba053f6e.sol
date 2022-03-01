@@ -18,9 +18,9 @@ library SafeMath {
   }
 
   function div(uint256 a, uint256 b) internal pure returns (uint256) {
-    
+
     uint256 c = a / b;
-    
+
     return c;
   }
 
@@ -96,7 +96,7 @@ contract BasicToken is ERC20Basic {
     require(_to != address(0));
     require(_value <= balances[msg.sender]);
 
-    
+
     balances[msg.sender] = balances[msg.sender].sub(_value);
     balances[_to] = balances[_to].add(_value);
     Transfer(msg.sender, _to, _value);
@@ -249,8 +249,8 @@ contract BurnableToken is StandardToken {
     function burn(uint256 _value) public {
         require(_value > 0);
         require(_value <= balances[msg.sender]);
-        
-        
+
+
 
         address burner = msg.sender;
         balances[burner] = balances[burner].sub(_value);
@@ -335,55 +335,55 @@ contract Mineral is BurnableToken, Ownable {
 
     mapping(address => uint[][72]) public deployRange;
 
-    
-    
-    uint public timeScale = 1; 
 
-    
-    
+
+    uint public timeScale = 1;
+
+
+
     mapping(uint32 => uint32[3][72]) private areaHourDeployed;
 
-    
+
     struct AreaHourDeployed {
         uint32[72] lastCollectHour;
-        
-        mapping(uint32 => uint32[3][72]) hour; 
+
+        mapping(uint32 => uint32[3][72]) hour;
     }
-    
-    
+
+
     mapping(address => AreaHourDeployed) private userAreaHourDeployed;
 
-    
+
     uint8 public constant CHECK_POINT_HOUR = 4;
 
-    
-    
+
+
     mapping(uint32 => uint32[72]) private areaCheckPoints;
 
-    
+
     mapping(uint32 => uint) private dayAverageOutput;
 
-    
+
     struct AreaCheckPoint {
-        
+
         mapping(uint32 => uint32[72]) hour;
     }
 
-    
-    
+
+
     mapping(address => AreaCheckPoint) private userAreaCheckPoints;
 
     uint256 amountEther;
 
-    
+
     mapping (address => uint) public remainEther;
 
     uint32 public constractDeployTime = uint32(now) / 1 hours * 1 hours;
 
-    mapping(address => uint) activeArea; 
-    
+    mapping(address => uint) activeArea;
+
     bool enableWhiteList = true;
-    mapping(address => bool) whiteUserList;    
+    mapping(address => bool) whiteUserList;
     address serverAddress;
 
     address coldWallet;
@@ -432,7 +432,7 @@ contract Mineral is BurnableToken, Ownable {
         timeScale = scale;
     }
 
-    
+
     function setConstractDeployTime(uint32 time) public onlyOwner {
         constractDeployTime = time;
     }*/
@@ -505,13 +505,13 @@ contract Mineral is BurnableToken, Ownable {
         int64 userInc = 0;
         uint32[3] storage ptUser;
         AreaHourDeployed storage _userAreaHourDeployed = userAreaHourDeployed[user];
-        
+
         for (h = nc; h <= hour; ++h) {
-            
-            
-            
+
+
+
             ptUser = _userAreaHourDeployed.hour[h][area];
-            userInc += ptUser[0] + ptUser[1] + ptUser[2] - _userAreaHourDeployed.hour[h - 4][area][0] - 
+            userInc += ptUser[0] + ptUser[1] + ptUser[2] - _userAreaHourDeployed.hour[h - 4][area][0] -
                 _userAreaHourDeployed.hour[h - 8][area][1] - _userAreaHourDeployed.hour[h - 24][area][2];
         }
         return userAreaCheckPoints[user].hour[nc][area] + uint32(userInc);
@@ -533,11 +533,11 @@ contract Mineral is BurnableToken, Ownable {
         int64 userInc = 0;
         int64 totalInc = 0;
         uint32[3] storage ptArea;
-        
+
         for (h = nc; h <= hour; ++h) {
-            
-            
-            
+
+
+
             ptArea = areaHourDeployed[h][area];
             totalInc += ptArea[0] + ptArea[1] + ptArea[2] - areaHourDeployed[h - 4][area][0] - areaHourDeployed[h - 8][area][1] - areaHourDeployed[h - 24][area][2];
         }
@@ -546,7 +546,7 @@ contract Mineral is BurnableToken, Ownable {
     }
 
     function updateArea(uint areaId) internal pure returns (uint) {
-        
+
         uint row = areaId / 8;
         uint colum = areaId % 8;
 
@@ -563,7 +563,7 @@ contract Mineral is BurnableToken, Ownable {
         if (colum+1 < 8) {
             result |= uint(1) << (row*8+colum+1);
         }
-        
+
         return result;
     }
 
@@ -571,7 +571,7 @@ contract Mineral is BurnableToken, Ownable {
         if (enableCheckArea) {
             uint[] memory distinctArea = new uint[](area.length);
             uint distinctAreaLength = 0;
-        
+
             for (uint i = 0; i < area.length; i++) {
                 bool find = false;
                 for (uint j = 0; j < distinctAreaLength; j++) {
@@ -579,7 +579,7 @@ contract Mineral is BurnableToken, Ownable {
                         find = true;
                         break;
                     }
-                }     
+                }
                 if (!find) {
                     distinctArea[distinctAreaLength] = area[i];
                     distinctAreaLength += 1;
@@ -610,11 +610,11 @@ contract Mineral is BurnableToken, Ownable {
         if (_user == address(0)) {
             _user = msg.sender;
         }
-        
+
         uint32 _hour = uint32((now - constractDeployTime) * timeScale / 1 hours);
 
         checkArea(area, user);
-        
+
         uint payment = _deployMiners(_user, _hour, area, period, count);
         _updateCheckPoints(_user, _hour, area, period, count);
 
@@ -625,7 +625,7 @@ contract Mineral is BurnableToken, Ownable {
         } else {
             amountEther += payment;
         }
-        
+
     }
 
     /*function deployMinersTest(uint32 _hour, address user, uint32[] area, uint32[] period, uint32[] count) public checkWhiteList payable {
@@ -636,10 +636,10 @@ contract Mineral is BurnableToken, Ownable {
         if (_user == address(0)) {
             _user = msg.sender;
         }
-        
+
 
         checkArea(area, user);
-        
+
         uint payment = _deployMiners(_user, _hour, area, period, count);
         _updateCheckPoints(_user, _hour, area, period, count);
 
@@ -653,8 +653,8 @@ contract Mineral is BurnableToken, Ownable {
         uint32 minerCount = 0;
         uint32[3][72] storage _areaDeployed = areaHourDeployed[_hour];
         uint32[3][72] storage _userAreaDeployed = userAreaHourDeployed[_user].hour[_hour];
-        
-        
+
+
         for (uint index = 0; index < area.length; ++index) {
             require (period[index] == 4 || period[index] == 8 || period[index] == 24);
             if (period[index] == 4) {
@@ -676,7 +676,7 @@ contract Mineral is BurnableToken, Ownable {
             adjustDeployRange(area[index], _hour, _hour + period[index]);
         }
         return payment;
-    }   
+    }
 
     function adjustDeployRange(uint area, uint start, uint end) internal {
         uint len = deployRange[msg.sender][area].length;
@@ -685,7 +685,7 @@ contract Mineral is BurnableToken, Ownable {
         } else {
             uint s = uint128(deployRange[msg.sender][area][len - 1]);
             uint e = uint128(deployRange[msg.sender][area][len - 1] >> 128);
-            
+
             if (start >= s && start < e) {
                 end = e > end ? e : end;
                 deployRange[msg.sender][area][len - 1] = s | (end << 128);
@@ -698,7 +698,7 @@ contract Mineral is BurnableToken, Ownable {
     function getDeployArrayLength(uint area) public view returns (uint) {
         return deployRange[msg.sender][area].length;
     }
-    
+
     function getDeploy(uint area, uint index) public view returns (uint,uint) {
         uint s = uint128(deployRange[msg.sender][area][index]);
         uint e = uint128(deployRange[msg.sender][area][index] >> 128);
@@ -736,7 +736,7 @@ contract Mineral is BurnableToken, Ownable {
         }
     }
 
-    
+
 
     event DeployMiner(address addr, uint32 area, uint32 start, uint32 end, uint32 count);
 
@@ -746,8 +746,8 @@ contract Mineral is BurnableToken, Ownable {
         return userAreaHourDeployed[msg.sender].lastCollectHour[area];
     }
 
-    
-    
+
+
     function collect(address user, uint32[] area) public  checkWhiteList whenNotPaused {
         require(address(dayQualitysContract) != address(0));
         uint32 current = uint32((now - constractDeployTime) * timeScale / 1 hours);
@@ -757,7 +757,7 @@ contract Mineral is BurnableToken, Ownable {
             _user = msg.sender;
         }
         uint total = 0;
-        
+
         for (uint a = 0; a < area.length; ++a) {
             uint len = deployRange[msg.sender][area[a]].length;
             bool finish = true;
@@ -766,21 +766,21 @@ contract Mineral is BurnableToken, Ownable {
                 uint e = uint128(deployRange[msg.sender][area[a]][i] >> 128);
                 if (current < e && current >= s ) {
                     total += _collect(_user, uint32(s), current, area[a]);
-                    
+
                     deployRange[msg.sender][area[a]][i] = current | (e << 128);
                     finish = false;
                 } else if (current >= e) {
                     total += _collect(_user, uint32(s), uint32(e), area[a]);
                 }
             }
-            
+
             if (finish) {
                 deployRange[msg.sender][area[a]].length = 0;
             } else {
                 deployRange[msg.sender][area[a]][0] = deployRange[msg.sender][area[a]][len - 1];
                 deployRange[msg.sender][area[a]].length = 1;
             }
-        }    
+        }
 
         ERC20(this).transfer(_user, total);
     }
@@ -793,11 +793,11 @@ contract Mineral is BurnableToken, Ownable {
         uint32[] memory userMiners = new uint32[](CHECK_POINT_HOUR);
         uint32 ps = start/CHECK_POINT_HOUR*CHECK_POINT_HOUR+CHECK_POINT_HOUR;
         if (ps >= end) {
-            
+
             (income, writeCount) = _collectMinersByCheckPoints(_user, area, start, end, totalMiners, userMiners, writeCount);
             result += income;
         } else {
-            
+
             (income, writeCount) = _collectMinersByCheckPoints(_user, area, start, ps, totalMiners, userMiners, writeCount);
             result += income;
 
@@ -816,8 +816,8 @@ contract Mineral is BurnableToken, Ownable {
         //now start from start's nearest check point
         writeCount = _writeCount;
         income = 0;
-        
-        
+
+
         if (userAreaCheckPoints[_user].hour[start/CHECK_POINT_HOUR*CHECK_POINT_HOUR][area] == 0 && userAreaCheckPoints[_user].hour[start/CHECK_POINT_HOUR*CHECK_POINT_HOUR + CHECK_POINT_HOUR][area] == 0) {
             return;
         }
@@ -829,7 +829,7 @@ contract Mineral is BurnableToken, Ownable {
                 if (dayAverageOutput[d] != 0) {
                     break;
                 }
-            } 
+            }
             ao = dayAverageOutput[d];
             for (d = d+1; d <= start / 24; ++d) {
                 ao = ao*9996/10000;
@@ -848,14 +848,14 @@ contract Mineral is BurnableToken, Ownable {
         require(week > 0);
 
         ao = week * ao / 10 / 24 / 72;
-        
+
         income = _getTotalIncomeAt(end - start, userMiners, totalMiners, ao, week);
 
-        if (week == 10) { 
+        if (week == 10) {
             income = income * 8 / 10;
-        } else if (week == 5) { 
+        } else if (week == 5) {
             income = income * 6 / 10;
-        } 
+        }
     }
 
     function _getTotalIncomeAt(uint32 hourLength, uint32[] memory userMiners, uint32[] memory totalMiners, uint areaOutput, uint week) internal view returns(uint) {
@@ -866,7 +866,7 @@ contract Mineral is BurnableToken, Ownable {
             }
         }
         return income;
-    } 
+    }
 
     function _getMinersByCheckPoints(address _user, uint32 area, uint32 start, uint32 end, uint32[] memory totalMiners, uint32[] memory userMiners) internal view {
         require((end - start) <= CHECK_POINT_HOUR);
@@ -877,11 +877,11 @@ contract Mineral is BurnableToken, Ownable {
         uint32[3] storage ptUser;
         uint32[3] storage ptArea;
         AreaHourDeployed storage _userAreaHourDeployed = userAreaHourDeployed[_user];
-        
+
         for (h = start/CHECK_POINT_HOUR*CHECK_POINT_HOUR; h <= start; ++h) {
-            
-            
-            
+
+
+
             ptUser = _userAreaHourDeployed.hour[h][area];
             ptArea = areaHourDeployed[h][area];
             totalInc += ptArea[0] + ptArea[1] + ptArea[2] - areaHourDeployed[h - 4][area][0] - areaHourDeployed[h - 8][area][1] - areaHourDeployed[h - 24][area][2];
@@ -893,9 +893,9 @@ contract Mineral is BurnableToken, Ownable {
 
         uint32 i = 1;
         for (h = start + 1; h < end; ++h) {
-            
-            
-            
+
+
+
             ptUser = _userAreaHourDeployed.hour[h][area];
             ptArea = areaHourDeployed[h][area];
             totalMiners[i] = totalMiners[i-1] + ptArea[0] + ptArea[1] + ptArea[2] - areaHourDeployed[h - 4][area][0] - areaHourDeployed[h - 8][area][1] - areaHourDeployed[h - 24][area][2];
@@ -904,16 +904,16 @@ contract Mineral is BurnableToken, Ownable {
         }
     }
 
-    
+
     function withdraw() public {
-        uint remain = remainEther[msg.sender]; 
+        uint remain = remainEther[msg.sender];
         require(remain > 0);
         remainEther[msg.sender] = 0;
 
         msg.sender.transfer(remain);
     }
 
-    
+
     function withdrawMinerFee() public onlyOwner {
         require(amountEther > 0);
         owner.transfer(amountEther);
@@ -967,3 +967,38 @@ contract Mineral is BurnableToken, Ownable {
         return ret;
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

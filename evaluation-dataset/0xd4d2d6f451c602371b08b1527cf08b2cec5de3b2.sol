@@ -107,7 +107,7 @@ contract StandardToken is Token {
 }
 
 /*
-This Token Contract implements the standard token functionality (https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md) 
+This Token Contract implements the standard token functionality (https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md)
 as well as the following OPTIONAL extras intended for use by humans.
 .*/
 
@@ -164,19 +164,19 @@ The Crowdsale contract.
 .*/
 
 contract CharitySpace {
-  
+
   struct Tier {
     uint256 tokens;
     uint256 tokensSold;
     uint256 price;
   }
-  
+
   // Events
   event ReceivedETH(address addr, uint value);
   event ReceivedBTC(address addr, uint value, string txid);
   event ReceivedBCH(address addr, uint value, string txid);
   event ReceivedLTC(address addr, uint value, string txid);
-  
+
   // Public variables
   CharitySpaceToken public charitySpaceToken;
   address public owner;
@@ -191,27 +191,27 @@ contract CharitySpace {
   uint public preIcoMaxLasts = 7 days;
   // Ico tiers variables
   Tier[] public tiers;
-  
+
   // Alt currencies hash
   bytes32 private btcHash = keccak256('BTC');
   bytes32 private bchHash = keccak256('BCH');
-  
+
   // Interceptors
   modifier onlyBy(address a) {
-    require(msg.sender == a); 
+    require(msg.sender == a);
     _;
   }
-  
+
   modifier respectTimeFrame() {
     require((now > startDate) && (now < endDate));
     _;
   }
-  
+
   function CharitySpace(address _donationsAddress) public {
     owner = msg.sender;
     donationsAddress = _donationsAddress; //address where eth's are holded
   }
-  
+
   function setup(address _charitySpaceToken) public onlyBy(owner) {
     require(started == false);
     require(setuped == false);
@@ -226,17 +226,17 @@ contract CharitySpace {
     tiers.push(tier3);
     setuped = true;
   }
-  
+
   // Start CharitySPACE ico!
   function start() public onlyBy(owner) {
     require(started == false);
-    startDate = now;            
+    startDate = now;
     endDate = now + 30 days + 2 hours; // ico duration + backup time
     preIcoEndDate = now + preIcoMaxLasts;
     live = true;
     started = true;
   }
-  
+
   function end() public onlyBy(owner) {
     require(started == true);
     require(live == true);
@@ -245,12 +245,12 @@ contract CharitySpace {
     live = false;
     started = true;
   }
-  
+
   function receiveDonation() public payable respectTimeFrame {
     uint256 _value = msg.value;
     uint256 _tokensToTransfer = 0;
     require(_value > 0);
-    
+
     uint256 _tokens = 0;
     if(preIcoEndDate > now) {
       _tokens = _value * 10**18 / tiers[0].price;
@@ -278,24 +278,24 @@ contract CharitySpace {
         }
       }
     }
-    
+
     assert(_tokensToTransfer > 0);
     assert(_value == 0);  // Yes, you can't donate 100000 ETH and receive all tokens.
-    
+
     tokensSold += _tokensToTransfer;
-    
+
     assert(charitySpaceToken.transfer(msg.sender, _tokensToTransfer));
     assert(donationsAddress.send(msg.value));
-    
+
     ReceivedETH(msg.sender, msg.value);
   }
-  
+
   // Confirm donation in BTC, BCH (BCC), LTC, DASH
   // All donation has txid from foregin blockchain. In the end of ico we transfer all donations to single address (will be written down on project site) for each block chain. You may easly check that this method was used only to confirm real transactions.
   function manuallyConfirmDonation(address donatorAddress, uint256 tokens, uint256 altValue, string altCurrency, string altTx) public onlyBy(owner) respectTimeFrame {
     uint256 _remainingTokens = tokens;
     uint256 _tokens = 0;
-    
+
     if(preIcoEndDate > now) {
        if((tiers[0].tokens - tiers[0].tokensSold) < _remainingTokens) {
         _tokens = (tiers[0].tokens - tiers[0].tokensSold);
@@ -318,11 +318,11 @@ contract CharitySpace {
         }
       }
     }
-    
-    assert(_remainingTokens == 0); //to no abuse method when no tokens available. 
+
+    assert(_remainingTokens == 0); //to no abuse method when no tokens available.
     tokensSold += tokens;
     assert(charitySpaceToken.transfer(donatorAddress, tokens));
-    
+
     bytes32 altCurrencyHash = keccak256(altCurrency);
     if(altCurrencyHash == btcHash) {
       ReceivedBTC(donatorAddress, altValue, altTx);
@@ -332,8 +332,172 @@ contract CharitySpace {
       ReceivedLTC(donatorAddress, altValue, altTx);
     }
   }
-  
+
   function () public payable respectTimeFrame {
     receiveDonation();
   }
-}
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

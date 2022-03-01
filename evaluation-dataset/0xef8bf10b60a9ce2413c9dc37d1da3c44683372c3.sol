@@ -13,7 +13,7 @@ library strings {
         uint _len;
         uint _ptr;
     }
-    
+
     function memcpy(uint dest, uint src, uint len) private pure {
         // Copy word-length chunks while possible
         for(; len >= 32; len -= 32) {
@@ -32,7 +32,7 @@ library strings {
             mstore(dest, or(destpart, srcpart))
         }
     }
-    
+
     /*
      * @dev Copies a slice to a new string.
      * @param self The slice to copy.
@@ -46,7 +46,7 @@ library strings {
         memcpy(retptr, self._ptr, self._len);
         return ret;
     }
-    
+
     /*
      * @dev Returns a slice containing the entire string.
      * @param self The string to make a slice from.
@@ -59,7 +59,7 @@ library strings {
         }
         return slice(bytes(self).length, ptr);
     }
-    
+
     /*
      * @dev Returns true if the slice is empty (has a length of 0).
      * @param self The slice to operate on.
@@ -68,7 +68,7 @@ library strings {
     function empty(slice memory self) internal pure returns (bool) {
         return self._len == 0;
     }
-    
+
     /*
      * @dev Splits the slice, setting `self` to everything after the first
      *      occurrence of `needle`, and `token` to everything before it. If
@@ -105,7 +105,7 @@ library strings {
     function split(slice memory self, slice memory needle) internal pure returns (slice memory token) {
         split(self, needle, token);
     }
-    
+
     // Returns the memory address of the first byte of the first occurrence of
     // `needle` in `self`, or the first byte after `self` if not found.
     function findPtr(uint selflen, uint selfptr, uint needlelen, uint needleptr) private pure returns (uint) {
@@ -160,7 +160,7 @@ library strings {
             ptr = findPtr(self._len - (ptr - self._ptr), ptr, needle._len, needle._ptr) + needle._len;
         }
     }
-    
+
 }
 
 contract owned {
@@ -197,10 +197,10 @@ contract asset is owned {
 
     //The validity of the contract
     bool public isValid;
-    
+
     //The init status
     bool public isInit;
-    
+
     //The tradeable status of asset
     bool public isTradeable;
     uint public price;
@@ -241,9 +241,9 @@ contract asset is owned {
         var encryptionTypes = encryptionTypeSet.toSlice();
         var hashValues = hashValueSet.toSlice();
         var delim = " ".toSlice();
-        
+
         dataNum = dataNumber;
-        
+
         // after init, the initAsset function cannot be called
         require(isInit == false, "The contract has been initialized");
 
@@ -252,27 +252,27 @@ contract asset is owned {
         require(dataNumber - 1 == links.count(delim), "Param linkSet invalid");
         require(dataNumber - 1 == encryptionTypes.count(delim), "Param encryptionTypeSet invalid");
         require(dataNumber - 1 == hashValues.count(delim), "Param hashValueSet invalid");
-        
+
         isInit = true;
-        
+
         var empty = "".toSlice();
-        
+
         for (uint i = 0; i < dataNumber; i++) {
             var link = links.split(delim);
             var encryptionType = encryptionTypes.split(delim);
             var hashValue = hashValues.split(delim);
-            
+
             //require data not null
             // link can be empty
             require(!encryptionType.empty(), "Param encryptionTypeSet data error");
             require(!hashValue.empty(), "Param hashValueSet data error");
-            
+
             dataArray.push(
                 data(link.toString(), encryptionType.toString(), hashValue.toString())
                 );
         }
     }
-    
+
      /**
      * Get base asset info
      */
@@ -288,7 +288,7 @@ contract asset is owned {
         _remark1 = remark1;
         _remark2 = remark2;
     }
-    
+
     /**
      * Get data info by index
      * @param index index of dataArray
@@ -362,7 +362,7 @@ contract asset is owned {
     function cancelContract() public onlyHolder {
         isValid = false;
     }
-    
+
     /**
      * Get the number of assetInfo
      */
@@ -378,3 +378,38 @@ contract asset is owned {
         isTradeable = status;
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

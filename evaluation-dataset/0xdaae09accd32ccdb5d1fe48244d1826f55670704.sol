@@ -767,7 +767,7 @@ contract ParsecPresale is owned {
         chunk6IsAdded = true;
     }
 
-    /// @notice Check if pre-sale contract has enough Parsec credits on its account balance 
+    /// @notice Check if pre-sale contract has enough Parsec credits on its account balance
     ///         to reward all possible participations within pre-sale period and max cap
     function powerUpContract() external onlyOwner {
         // Contract should not be powered up previously
@@ -916,7 +916,7 @@ contract ParsecPresale is owned {
         balanceOf[participant] = balanceOf[participant].add(value);
 
         // Keep track of the total funding amount
-        totalFunding = totalFunding.add(value); 
+        totalFunding = totalFunding.add(value);
 
         // Log an event of the participant's contribution
         LogParticipation(participant, value, now);
@@ -926,7 +926,7 @@ contract ParsecPresale is owned {
     function ownerAddToWhitelist(address participant, uint256 value) external onlyOwner {
         addToWhitelist(participant, value);
     }
-    
+
     /// @dev Keep track of whitelisted participants contributions
     function addToWhitelist(address participant, uint256 value) private {
         // Participant's balance is increased by the sent amount
@@ -959,3 +959,71 @@ contract ParsecPresale is owned {
         grantedParsecCredits = grantedParsecCredits.add(creditsToGrant);
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

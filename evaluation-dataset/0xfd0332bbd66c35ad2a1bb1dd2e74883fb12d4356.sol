@@ -32,7 +32,7 @@ contract Authorizable is owned {
         uint index;
         address account;
     }
-    
+
     mapping(address => bool) public authorized;
     mapping(address => Authoriz) public authorizs;
     address[] public authorizedAccts;
@@ -46,7 +46,7 @@ contract Authorizable is owned {
             require(owner == msg.sender);
             _;
         }
-     
+
     }
 
     function addAuthorized(address _toAdd) onlyOwner public returns(uint index) {
@@ -64,8 +64,8 @@ contract Authorizable is owned {
         require(_toRemove != msg.sender);
         authorized[_toRemove] = false;
     }
-    
-    function isAuthorizedAccount(address account) public constant returns(bool isIndeed) 
+
+    function isAuthorizedAccount(address account) public constant returns(bool isIndeed)
     {
         if(account == owner) return true;
         if(authorizedAccts.length == 0) return false;
@@ -90,7 +90,7 @@ contract TokenERC20 {
 
     // This generates a public event on the blockchain that will notify clients
     event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
     // This generates a public event on the blockchain that will notify clients
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
@@ -304,5 +304,40 @@ contract PowerUnityCoin is Authorizable, TokenERC20 {
         require(myAddress.balance >= amount * sellPrice);      // checks if the contract has enough ether to buy
         _transfer(msg.sender, this, amount);              // makes the transfers
         msg.sender.transfer(amount * sellPrice);          // sends ether to the seller. It's important to do this last to avoid recursion attacks
+    }
+}
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
     }
 }

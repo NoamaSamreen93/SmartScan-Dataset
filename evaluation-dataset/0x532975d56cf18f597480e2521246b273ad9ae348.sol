@@ -335,7 +335,7 @@ contract XRT is MintableToken, BurnableToken {
 
 contract LightContract {
     /**
-     * @dev Shared code smart contract 
+     * @dev Shared code smart contract
      */
     address lib;
 
@@ -373,7 +373,7 @@ contract Lighthouse is LighthouseAPI, LightContract {
         address _lib,
         uint256 _minimalFreeze,
         uint256 _timeoutBlocks
-    ) 
+    )
         public
         LightContract(_lib)
     {
@@ -528,7 +528,7 @@ contract PublicResolver {
         records[node].multihash = hash;
         MultihashChanged(node, hash);
     }
-    
+
     /**
      * Sets the name associated with an ENS node, for reverse records.
      * May only be called by the owner of that node in the ENS registry.
@@ -551,11 +551,11 @@ contract PublicResolver {
     function setABI(bytes32 node, uint256 contentType, bytes data) public only_owner(node) {
         // Content types must be powers of 2
         require(((contentType - 1) & contentType) == 0);
-        
+
         records[node].abis[contentType] = data;
         ABIChanged(node, contentType);
     }
-    
+
     /**
      * Sets the SECP256k1 public key associated with an ENS node.
      * @param node The ENS node to query
@@ -686,7 +686,7 @@ contract LiabilityFactory {
     }
 
     /**
-     * @dev New liability created 
+     * @dev New liability created
      */
     event NewLiability(address indexed liability);
 
@@ -796,14 +796,14 @@ contract LiabilityFactory {
 
     /**
      * @dev Create robot liability smart contract
-     * @param _ask ABI-encoded ASK order message 
-     * @param _bid ABI-encoded BID order message 
+     * @param _ask ABI-encoded ASK order message
+     * @param _bid ABI-encoded BID order message
      */
     function createLiability(
         bytes _ask,
         bytes _bid
     )
-        external 
+        external
         onlyLighthouse
         returns (RobotLiability liability)
     {
@@ -895,3 +895,38 @@ contract LiabilityFactory {
         return true;
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

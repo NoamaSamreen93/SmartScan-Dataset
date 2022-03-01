@@ -58,7 +58,7 @@ contract LoveBankAccessControl {
         );
         _;
     }
-    
+
     /// @dev Assigns a new address to act as the CEO. Only available to the current CEO.
     /// @param _newCEO is the address of the new CEO
     function setCEO(address _newCEO) external onlyCEO {
@@ -79,7 +79,7 @@ contract LoveBankAccessControl {
         require(_newCOO != address(0));
         cooAddress = _newCOO;
     }
-    
+
     /*** Pausable functionality adapted from OpenZeppelin ***/
 
     /// @dev Modifier to allow actions only when the contract IS NOT paused
@@ -111,33 +111,33 @@ contract LoveBankAccessControl {
     }
 }
 
-/// @title Love Account Base Contract for LoveBank. Holds all common structs, events and base 
+/// @title Love Account Base Contract for LoveBank. Holds all common structs, events and base
 ///  variables for love accounts.
 /// @author Diana Kudrow <https://github.com/lovebankcrypto>
 /// @dev Create new account by couple ,deposit or bless by all, withdraw with both sides' confirmation
 
 contract LoveAccountBase{
 
-    // An individual new contrat is build whenever a new couple create a new love account through the 
+    // An individual new contrat is build whenever a new couple create a new love account through the
     // BankCore Contract. The love account contract plays seceral roles:
     //
-    //     - Information Storage: owners names, wallet addresses, love-ID, their milestones in 
+    //     - Information Storage: owners names, wallet addresses, love-ID, their milestones in
     //        relationship, diary……
     //
-    //     - Balance Storage: each account keep their deposit in seperate contrat for safety and 
+    //     - Balance Storage: each account keep their deposit in seperate contrat for safety and
     //        privilege concern
     //
-    //     - Access Control: only receive message from one of owners, triggered by bank for safety 
+    //     - Access Control: only receive message from one of owners, triggered by bank for safety
     //        reason
-    //     
-    //     - Deposit/Bless(fallback), Withdraw, BreakUp, MileStone, Diary: 5 main function of our 
+    //
+    //     - Deposit/Bless(fallback), Withdraw, BreakUp, MileStone, Diary: 5 main function of our
     //        love bank
 
     /*** EVENTS ***/
-    
+
     /// @dev The Deposit event is fired whenever a value>0 ether is transfered into loveaccount
     event Deposit(address _from, uint _value);
-    
+
     /*** DATA TYPES ***/
     /// @dev choices of all account status and milestones
     enum Status{BreakUp, Active, RequestPending, FirstMet,  //0-3
@@ -158,7 +158,7 @@ contract LoveAccountBase{
     }
 
     /*** STORAGE ***/
-    
+
     /// @dev Nicename of the FOUNDER of this love account
     bytes32 public name1;
 
@@ -197,7 +197,7 @@ contract LoveAccountBase{
 
     /// @dev Status of the account: BreakUp, Active(defult), RequestPending
     Status public status=Status.Active;
-    
+
     /// @dev A mapping from timestamp to Status. Keep track of all Memory Moment for lovers
     mapping (uint64=>StonePage) public milestone;
 
@@ -228,7 +228,7 @@ contract LoveAccountBase{
 
     /// @dev Modifier to allow actions only when message sender is Bank
     modifier callByBank() {require(msg.sender == BANKACCOUNT);_;}
-    
+
     /// @dev Rarely used! Only happen when extreme circumstances
     function changeBankAccount(address newBank) external callByBank{
         require(newBank!=address(0));
@@ -239,16 +239,16 @@ contract LoveAccountBase{
     ///  lover's account, AND you cannot re-activate this very account! Think about your sweet
     ///  moments before you hurt someone's heart!!
     function breakup(
-        address _breaker, uint256 _fee) external payable 
+        address _breaker, uint256 _fee) external payable
         notBreakup oneOfOwners(_breaker) callByBank{
         if(_fee!=0){BankCore(BANKACCOUNT).receiveFee.value(_fee)();}
         if(_breaker==owner1) {owner2.transfer(this.balance);}
         if(_breaker==owner2) {owner1.transfer(this.balance);}
         status=Status.BreakUp;
     }
-    
-    /// @dev Log withdraw info when first receice request 
-    function withdraw(uint256 amount, 
+
+    /// @dev Log withdraw info when first receice request
+    function withdraw(uint256 amount,
         address _to, uint256 _fee) external notBreakup oneOfOwners(_to) callByBank{
         require(this.balance>=amount);
         // change status to pending
@@ -260,14 +260,14 @@ contract LoveAccountBase{
 
     /// @dev Confirm request and send money; erase info logs
     function withdrawConfirm(
-        uint256 _amount, 
+        uint256 _amount,
         address _confirmer) external payable notBreakup oneOfOwners(_confirmer) callByBank{
         // check for matching withdraw request
         require(uint(status)==2);
         require(_amount==request_amount);
         require(_confirmer!=withdrawer);
         require(this.balance>=request_amount);
-        
+
         // send service fee to bank
         if(request_fee!=0){BankCore(BANKACCOUNT).receiveFee.value(request_fee)();}
         withdrawer.transfer(request_amount-request_fee);
@@ -278,7 +278,7 @@ contract LoveAccountBase{
         request_amount=0;
         request_fee=0;
     }
-    
+
     /// @dev Log big events(pre-set-choice) in relationship, time stamp is required
     function mileStone(address _sender, uint64 _time, uint8 _choice) external notBreakup oneOfOwners(_sender) callByBank {
         milestone[next_stone_id]=StonePage({
@@ -294,9 +294,9 @@ contract LoveAccountBase{
         	logtime: uint64(now),
         	contant: _diary
         });
-        next_diary_id++;  
+        next_diary_id++;
     }
-    
+
     // @dev Fallback function for deposit and blessing income
     function() external payable notBreakup {
         require(msg.value>0);
@@ -305,7 +305,7 @@ contract LoveAccountBase{
 }
 
 
-/// @title Basic contract of LoveBank that defines the Creating, Saving, and Using of love 
+/// @title Basic contract of LoveBank that defines the Creating, Saving, and Using of love
 /// accounts under the protect of one Bank contract.
 /// @author Diana Kudrow <https://github.com/lovebankcrypto>
 contract Bank is LoveBankAccessControl{
@@ -313,8 +313,8 @@ contract Bank is LoveBankAccessControl{
     /*** EVENTS ***/
 
     /// @dev Create event is fired whenever a new love account is created, and a new contract
-    ///  address is created 
-    event Create(bytes32 _name1, bytes32 _name2, address _conadd, 
+    ///  address is created
+    event Create(bytes32 _name1, bytes32 _name2, address _conadd,
                 address _address1, address _address2, uint64 _loveID);
     /// @dev Breakup event is fired when someone breakup with another
     event Breakup(uint _time);
@@ -328,7 +328,7 @@ contract Bank is LoveBankAccessControl{
     event WithdrawConfirm(uint _amount, uint _confirmTime);
 
     /*** DATA TYPES ***/
-    
+
     struct pending {
         bool pending;
         address withdrawer;
@@ -351,12 +351,12 @@ contract Bank is LoveBankAccessControl{
     /*** STORAGE ***/
 
     /// @dev The ID of the next signing couple, also the number of current signed accounts
-    uint64 public next_id=0; 
+    uint64 public next_id=0;
     /// @dev A mapping from owers addresses' sha256 to love account address
     mapping (bytes16 => address)  public sig_to_add;
     /// @dev A mapping from love account address to withdraw demand detail
     mapping (address => pending) public pendingList;
-    
+
     /// @dev Create a new love account and log in Bank
     /// @param name1 is nicename of the FOUNDER of this love account
     /// @param name2 is nicename of the FOUNDER's lover
@@ -371,7 +371,7 @@ contract Bank is LoveBankAccessControl{
         // calculate open account service fee
         if (_ifFree()){fee=0;} else{fee=OPEN_FEE;}
         require(msg.sender==address1   &&
-                address1!=address2     && 
+                address1!=address2     &&
                 address1!=address(0)   &&
                 address2!=address(0)   &&
                 msg.value>=fee);
@@ -389,7 +389,7 @@ contract Bank is LoveBankAccessControl{
         }
         next_id++;
     }
-    
+
     /// @dev Calculate service fee; to avoid ufixed data type, dev=(1/charge rate)
     /// @param _dev is inverse of charging rate. If service fee is 1%, _dev=100
     function _calculate(uint256 _amount, uint _dev) internal pure returns(uint256 _int){
@@ -403,8 +403,8 @@ contract Bank is LoveBankAccessControl{
         } else {return true;}
     }
 
-    /// @dev THINK TWICE! If you breakup with your lover, all your balance will transfer 
-    ///  to your lover's account, AND you cannot re-activate this very account! Think about 
+    /// @dev THINK TWICE! If you breakup with your lover, all your balance will transfer
+    ///  to your lover's account, AND you cannot re-activate this very account! Think about
     ///  your sweet moments before you hurt someone's heart!!
     /// @param _conadd is contract address of love account
     function sendBreakup(address _conadd) external whenNotPaused {
@@ -424,7 +424,7 @@ contract Bank is LoveBankAccessControl{
     /// @param _time is time stamp of the time of event
     /// @param _choice is uint of enum. See Love Account Base to understand how milestone work
     function sendMileStone(
-        address _conadd, uint _time, 
+        address _conadd, uint _time,
         uint _choice) external payable whenNotPaused {
         require(msg.value >= STONE_FEE);
         uint8 _choice8 = uint8(_choice);
@@ -433,14 +433,14 @@ contract Bank is LoveBankAccessControl{
         LoveAccountBase(_conadd).mileStone(msg.sender, uint64(_time), _choice8);
         StoneLog(_time, _choice8);
     }
-    
+
     /// @dev Log diary, time stamp is now
     /// @param _conadd is contract address of love account
     function sendDiary(address _conadd, bytes _diary) external whenNotPaused{
         LoveAccountBase(_conadd).Diary(msg.sender, _diary);
         DiaryLog(now, _diary);
     }
-    
+
     /// @dev Log withdraw info when first receice request
     /// @param _conadd is contract address of love account
     /// @param _amount is the amount of money to withdraw in unit wei
@@ -448,7 +448,7 @@ contract Bank is LoveBankAccessControl{
         // Make sure no valid withdraw is pending
         require(!pendingList[_conadd].pending || now>pendingList[_conadd].endTime);
         uint256 _fee;
-        uint256 _amount256 = uint256(_amount); 
+        uint256 _amount256 = uint256(_amount);
         require(_amount256==_amount);
 
         // Fee calculation
@@ -470,11 +470,11 @@ contract Bank is LoveBankAccessControl{
     }
 
     /// @dev Confirm request and send money; erase info logs
-    /// @param _conadd is contract address of love account 
+    /// @param _conadd is contract address of love account
     /// @param _amount is the amount of money to withdraw in unit wei
     function bankConfirm(address _conadd, uint _amount) external whenNotPaused{
         // Confirm matching request
-        uint256 _amount256 = uint256(_amount); 
+        uint256 _amount256 = uint256(_amount);
         require(_amount256==_amount);
         require(pendingList[_conadd].pending && now<pendingList[_conadd].endTime);
         require(pendingList[_conadd].withdrawer != msg.sender);
@@ -489,10 +489,10 @@ contract Bank is LoveBankAccessControl{
     }
 }
 
-/// @title Promotion contract of LoveBank. 
+/// @title Promotion contract of LoveBank.
 /// @author Diana Kudrow <https://github.com/lovebankcrypto>
-/// @dev All CLevel OPs, for promotion. CFO can define free-of-charge time, and CEO can lower the 
-///  service fee. (Yeah, we won't raise charge for sure, it's in the contrat!) 
+/// @dev All CLevel OPs, for promotion. CFO can define free-of-charge time, and CEO can lower the
+///  service fee. (Yeah, we won't raise charge for sure, it's in the contrat!)
 contract LovePromo is Bank{
 
     /// @dev Withdraw your money for FREEEEEE! Or too if you wanna break up
@@ -506,17 +506,17 @@ contract LovePromo is Bank{
 
 
     /// @dev Set new charging rate
-    /// @param _withdrawFee is inverse of charging rate to avoid ufixed data type. 
+    /// @param _withdrawFee is inverse of charging rate to avoid ufixed data type.
     ///  _withdrawFee=(1/x). If withdraw fee is 1%, _withdrawFee=100
-    /// @param _breakupFee is inverse of charging rate to avoid ufixed data type. 
+    /// @param _breakupFee is inverse of charging rate to avoid ufixed data type.
     ///  _breakupFee=(1/x). If breakup fee is 2%, _breakupFee=50
     /// @param _stone is Milestone logging fee, wei (diary is free of charge, cost only gas)
     /// @param _open is Open account fee, wei
 
     function setFee(
-        uint _withdrawFee, 
-        uint _breakupFee, 
-        uint _stone, 
+        uint _withdrawFee,
+        uint _breakupFee,
+        uint _stone,
         uint _open) external onlyCEO {
 
         /// Service fee of withdraw NO HIGHER THAN 1%
@@ -541,12 +541,12 @@ contract LovePromo is Bank{
         _start = uint64(FREE_START);
         _end = uint64(FREE_END);
     }
-    
+
     /// @dev Just for checking
     function getFee() external view onlyCLevel returns(
-        uint64 _withdrawFee, 
-        uint64 _breakupFee, 
-        uint _stone, 
+        uint64 _withdrawFee,
+        uint64 _breakupFee,
+        uint _stone,
         uint _open){
 
         _withdrawFee = WD_FEE_VERSE;
@@ -564,17 +564,17 @@ contract LovePromo is Bank{
 contract BankCore is LovePromo {
 
     // This is the main LoveBank contract. The function of our DApp is quite straight forward:
-    //  to create a account for couple, which is displayed on our website. Owers can put money in 
+    //  to create a account for couple, which is displayed on our website. Owers can put money in
     //  as well as strangers. Withdraw request can only be done with both owners permission.
     //  In honor of eternal love, the party who puts forward a breakup will transfer all the remain
     //  balance to the other party by default.
-    // 
+    //
     //  To make the contract more logical, we simple seperate our contract in following parts:
     //
-    //      - LoveBankAccessControl: This contract manages the various addresses and constraints for 
+    //      - LoveBankAccessControl: This contract manages the various addresses and constraints for
     //             operations that can be executed only by specific roles. Namely CEO, CFO and COO.
     //
-    //      - Bank is LoveBankAccessControl: In this contract we define the main stucture of our 
+    //      - Bank is LoveBankAccessControl: In this contract we define the main stucture of our
     //              Love Bank and the methord to create accounts. Also, all the operations of users are
     //              defined here, like money withdraw, breakup, diary, milestones. Lots of modifiers
     //              are used to protect user's safety.
@@ -582,7 +582,7 @@ contract BankCore is LovePromo {
     //      - LovePromo is Bank: Here are some simple operations for COO to set free-charge time and for CEO
     //              to lower the charge rate.
     //
-    //      - BankCore is LovePromo: inherit all previous contract. Contains all the big moves, like: 
+    //      - BankCore is LovePromo: inherit all previous contract. Contains all the big moves, like:
     //              creating a bank, set defult C-Level users, unpause, update (only when hugh bug happens),
     //              withdraw money, etc.
     //
@@ -627,7 +627,7 @@ contract BankCore is LovePromo {
         // Actually unpause the contract.
         super.unpause();
     }
-    
+
     /// @dev Rarely used! Only happen when extreme circumstances
     /// @param _conadd is contract address of love account
     /// @param newBank is newBank contract addess if updated
@@ -643,19 +643,80 @@ contract BankCore is LovePromo {
             cfoAddress.transfer(this.balance);
         }
     }
-    
+
     /// @dev Get Love account contrat address through Bank contract index
     function getContract(address _add1, address _add2) external view returns(address){
         bytes16 _sig = bytes16(keccak256(_add1))^bytes16(keccak256(_add2));
         return sig_to_add[_sig];
     }
-    
+
     /// @dev Receive service fee from sub contracts
     function receiveFee() external payable{}
-    
+
     /// @dev Reject all deposit from outside CLevel accounts
     function() external payable onlyCLevel {
         require(msg.value>0);
         DepositBank(msg.sender, msg.value);
     }
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

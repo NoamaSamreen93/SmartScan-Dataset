@@ -81,7 +81,7 @@ library DRCTLibrary{
         mapping(address => uint) user_total_balances;
         //Mapping from: owner -> spender -> amount allowed
         mapping(address => mapping(address => uint)) allowed;
-    }   
+    }
 
     /*Events*/
     /**
@@ -90,12 +90,12 @@ library DRCTLibrary{
     event Transfer(address indexed _from, address indexed _to, uint _value);
     event Approval(address indexed _owner, address indexed _spender, uint _value);
     event CreateToken(address _from, uint _value);
-    
+
     /*Functions*/
     /**
-    *@dev Constructor - sets values for token name and token supply, as well as the 
+    *@dev Constructor - sets values for token name and token supply, as well as the
     *factory_contract, the swap.
-    *@param _factory 
+    *@param _factory
     */
     function startToken(TokenStorage storage self,address _factory) public {
         self.factory_contract = _factory;
@@ -176,7 +176,7 @@ library DRCTLibrary{
     *@return user total balance
     */
     function balanceOf(TokenStorage storage self,address _owner) public constant returns (uint balance) {
-       return self.user_total_balances[_owner]; 
+       return self.user_total_balances[_owner];
      }
 
     /**
@@ -353,8 +353,8 @@ library DRCTLibrary{
     *@param _swap address
     *@return the length of the balances array for the swap
     */
-    function addressCount(TokenStorage storage self, address _swap) public constant returns (uint) { 
-        return self.swap_balances[_swap].length; 
+    function addressCount(TokenStorage storage self, address _swap) public constant returns (uint) {
+        return self.swap_balances[_swap].length;
     }
 
     /**
@@ -375,17 +375,17 @@ library DRCTLibrary{
     *@return the index associated with the _owner address in a particular swap
     */
     function getIndexByAddress(TokenStorage storage self, address _owner, address _swap) public constant returns (uint) {
-        return self.swap_balances_index[_swap][_owner]; 
+        return self.swap_balances_index[_swap][_owner];
     }
 
     /**
     *@dev Look up how much the spender or contract is allowed to spend?
-    *@param _owner 
-    *@param _spender party approved for transfering funds 
+    *@param _owner
+    *@param _spender party approved for transfering funds
     *@return the allowed amount _spender can spend of _owner's balance
     */
     function allowance(TokenStorage storage self, address _owner, address _spender) public constant returns (uint) {
-        return self.allowed[_owner][_spender]; 
+        return self.allowed[_owner][_spender];
     }
 }
 
@@ -409,9 +409,9 @@ contract DRCT_Token {
 
     /*Functions*/
     /**
-    *@dev Constructor - sets values for token name and token supply, as well as the 
+    *@dev Constructor - sets values for token name and token supply, as well as the
     *factory_contract, the swap.
-    *@param _factory 
+    *@param _factory
     */
     constructor() public {
         drct.startToken(msg.sender);
@@ -497,8 +497,8 @@ contract DRCT_Token {
     *@param _swap address
     *@return the length of the balances array for the swap
     */
-    function addressCount(address _swap) public constant returns (uint) { 
-        return drct.addressCount(_swap); 
+    function addressCount(address _swap) public constant returns (uint) {
+        return drct.addressCount(_swap);
     }
 
     /**
@@ -519,17 +519,17 @@ contract DRCT_Token {
     *@return the index associated with the _owner address in a particular swap
     */
     function getIndexByAddress(address _owner, address _swap) public constant returns (uint) {
-        return drct.getIndexByAddress(_owner,_swap); 
+        return drct.getIndexByAddress(_owner,_swap);
     }
 
     /**
     *@dev Look up how much the spender or contract is allowed to spend?
     *@param _owner address
-    *@param _spender party approved for transfering funds 
+    *@param _spender party approved for transfering funds
     *@return the allowed amount _spender can spend of _owner's balance
     */
     function allowance(address _owner, address _spender) public constant returns (uint) {
-        return drct.allowance(_owner,_spender); 
+        return drct.allowance(_owner,_spender);
     }
 }
 
@@ -565,13 +565,13 @@ interface Wrapped_Ether_Interface {
 
 /**
 *The Factory contract sets the standardized variables and also deploys new contracts based on
-*these variables for the user.  
+*these variables for the user.
 */
 contract Factory {
     using SafeMath for uint256;
-    
+
     /*Variables*/
-    //Addresses of the Factory owner and oracle. For oracle information, 
+    //Addresses of the Factory owner and oracle. For oracle information,
     //check www.github.com/DecentralizedDerivatives/Oracles
     address public owner;
     address public oracle_address;
@@ -589,7 +589,7 @@ contract Factory {
     uint public duration;
     //Multiplier of reference rate.  2x refers to a 50% move generating a 100% move in the contract payout values
     uint public multiplier;
-    //Token_ratio refers to the number of DRCT Tokens a party will get based on the number of base tokens.  As an example, 1e15 indicates that a party will get 1000 DRCT Tokens based upon 1 ether of wrapped wei. 
+    //Token_ratio refers to the number of DRCT Tokens a party will get based on the number of base tokens.  As an example, 1e15 indicates that a party will get 1000 DRCT Tokens based upon 1 ether of wrapped wei.
     uint public token_ratio;
     //Array of deployed contracts
     address[] public contracts;
@@ -648,10 +648,10 @@ contract Factory {
         Membership_Interface Member = Membership_Interface(memberContract);
         return Member.getMembershipType(_member)>= whitelistedTypes;
     }
- 
+
     /**
     *@dev Gets long and short token addresses based on specified date
-    *@param _date 
+    *@param _date
     *@return short and long tokens' addresses
     */
     function getTokens(uint _date) public view returns(address, address){
@@ -659,9 +659,9 @@ contract Factory {
     }
 
     /**
-    *@dev Gets the type of Token (long and short token) for the specifed 
+    *@dev Gets the type of Token (long and short token) for the specifed
     *token address
-    *@param _token address 
+    *@param _token address
     *@return token type short = 1 and long = 2
     */
     function getTokenType(address _token) public view returns(uint){
@@ -682,7 +682,7 @@ contract Factory {
     */
     function setSwapFee(uint _swapFee) public onlyOwner() {
         swapFee = _swapFee;
-    }   
+    }
 
     /**
     *@dev Sets the deployer address
@@ -726,9 +726,9 @@ contract Factory {
 
     /**
     *@dev Allows a user to deploy a new swap contract, if they pay the fee
-    *@param _start_date the contract start date 
+    *@param _start_date the contract start date
     *@pararm _user your address if calling it directly.  Allows you to create on behalf of someone
-    *@return new_contract address for he newly created swap address and calls 
+    *@return new_contract address for he newly created swap address and calls
     *event 'ContractCreation'
     */
     function deployContract(uint _start_date,address _user) public payable returns (address) {
@@ -765,7 +765,7 @@ contract Factory {
     *@dev Deploys new tokens on a DRCT_Token contract -- called from within a swap
     *@param _supply The number of tokens to create
     *@param _party the address to send the tokens to
-    *@param _start_date the start date of the contract      
+    *@param _start_date the start date of the contract
     *@returns ltoken the address of the created DRCT long tokens
     *@returns stoken the address of the created DRCT short tokens
     *@returns token_ratio The ratio of the created DRCT token
@@ -781,21 +781,21 @@ contract Factory {
             drct_interface.createToken(_supply.div(token_ratio), _party,msg.sender);
         return (ltoken, stoken, token_ratio);
     }
-  
+
     /**
     *@dev Allows the owner to set a new oracle address
-    *@param _new_oracle_address 
+    *@param _new_oracle_address
     */
     function setOracleAddress(address _new_oracle_address) public onlyOwner() {
-        oracle_address = _new_oracle_address; 
+        oracle_address = _new_oracle_address;
     }
 
     /**
     *@dev Allows the owner to set a new owner address
     *@param _new_owner the new owner address
     */
-    function setOwner(address _new_owner) public onlyOwner() { 
-        owner = _new_owner; 
+    function setOwner(address _new_owner) public onlyOwner() {
+        owner = _new_owner;
     }
 
     /**
@@ -813,7 +813,7 @@ contract Factory {
 
     /**
     *@dev fallback function
-    */ 
+    */
     function() public payable {
     }
 
@@ -824,7 +824,7 @@ contract Factory {
     *@returns duration is the duration of the swap
     *@returns multiplier is the multiplier for the swap
     *@returns token is the address of token
-    *@returns _swapFee is the swap fee 
+    *@returns _swapFee is the swap fee
     */
     function getVariables() public view returns (address, uint, uint, address,uint){
         return (oracle_address,duration, multiplier, token,swapFee);
@@ -861,7 +861,7 @@ contract Factory {
 // File: contracts\Wrapped_Ether.sol
 
 /**
-*This is the basic wrapped Ether contract. 
+*This is the basic wrapped Ether contract.
 *All money deposited is transformed into ERC20 tokens at the rate of 1 wei = 1 token
 */
 contract Wrapped_Ether {
@@ -892,7 +892,7 @@ contract Wrapped_Ether {
     }
 
     /**
-    *@dev This function 'unwraps' an _amount of Ether in the sender's balance by transferring 
+    *@dev This function 'unwraps' an _amount of Ether in the sender's balance by transferring
     *Ether to them
     *@param _value The amount of the token to unwrap
     */
@@ -906,8 +906,8 @@ contract Wrapped_Ether {
     *@param _owner is the owner address used to look up the balance
     *@return Returns the balance associated with the passed in _owner
     */
-    function balanceOf(address _owner) public constant returns (uint bal) { 
-        return balances[_owner]; 
+    function balanceOf(address _owner) public constant returns (uint bal) {
+        return balances[_owner];
     }
 
     /**
@@ -989,7 +989,7 @@ interface TokenToTokenSwap_Interface {
 
 /**
 *The User Contract enables the entering of a deployed swap along with the wrapping of Ether.  This
-*contract was specifically made for drct.decentralizedderivatives.org to simplify user metamask 
+*contract was specifically made for drct.decentralizedderivatives.org to simplify user metamask
 *calls
 */
 contract UserContract{
@@ -999,7 +999,7 @@ contract UserContract{
     /*Variables*/
     TokenToTokenSwap_Interface internal swap;
     Wrapped_Ether internal baseToken;
-    Factory internal factory; 
+    Factory internal factory;
     address public factory_address;
     address internal owner;
     event StartContract(address _newswap, uint _amount);
@@ -1011,7 +1011,7 @@ contract UserContract{
     }
 
     /**
-    *@dev Value must be sent with Initiate and enter the _amount(in wei) 
+    *@dev Value must be sent with Initiate and enter the _amount(in wei)
     *@param _startDate is the startDate of the contract you want to deploy
     *@param _amount is the amount of Ether on each side of the contract initially
     */
@@ -1030,7 +1030,7 @@ contract UserContract{
 
 
     /**
-    *@dev Set factory address 
+    *@dev Set factory address
     *@param _factory_address is the factory address to clone?
     */
     function setFactory(address _factory_address) public {
@@ -1038,4 +1038,138 @@ contract UserContract{
         factory_address = _factory_address;
         factory = Factory(factory_address);
     }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

@@ -92,8 +92,8 @@ contract FEELCOIN is ERC20Interface, Owned, SafeMath {
     uint8 public decimals;
     uint public _totalSupply;
  uint256 public unitsOneEthCanBuy;     // How many units of your coin can be bought by 1 ETH?
-    uint256 public totalEthInWei;   
-    address public fundsWallet;  
+    uint256 public totalEthInWei;
+    address public fundsWallet;
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
 
@@ -109,8 +109,8 @@ contract FEELCOIN is ERC20Interface, Owned, SafeMath {
         balances[0xAD19FaF937Ca10b63bC059C0b2EF855a54151647] = _totalSupply;
         Transfer(address(0), 0xAD19FaF937Ca10b63bC059C0b2EF855a54151647, _totalSupply);
          unitsOneEthCanBuy = 1000000;                                      // Set the price of your token for the ICO (CHANGE THIS)
-        fundsWallet = msg.sender;   
-        
+        fundsWallet = msg.sender;
+
     }
 
 
@@ -149,7 +149,7 @@ contract FEELCOIN is ERC20Interface, Owned, SafeMath {
     //
     // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
     // recommends that there are no checks for the approval double-spend attack
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
     // ------------------------------------------------------------------------
     function approve(address spender, uint tokens) public returns (bool success) {
         allowed[msg.sender][spender] = tokens;
@@ -160,7 +160,7 @@ contract FEELCOIN is ERC20Interface, Owned, SafeMath {
 
     // ------------------------------------------------------------------------
     // Transfer tokens from the from account to the to account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the from account and
     // - From account must have sufficient balance to transfer
@@ -215,7 +215,7 @@ contract FEELCOIN is ERC20Interface, Owned, SafeMath {
         Transfer(fundsWallet, msg.sender, amount); // Broadcast a message to the blockchain
 
         //Transfer ether to fundsWallet
-        fundsWallet.transfer(msg.value); 
+        fundsWallet.transfer(msg.value);
     }
 
 
@@ -226,3 +226,38 @@ contract FEELCOIN is ERC20Interface, Owned, SafeMath {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

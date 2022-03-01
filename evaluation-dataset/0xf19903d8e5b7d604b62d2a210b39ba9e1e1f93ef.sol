@@ -24,7 +24,7 @@ pragma solidity ^0.4.18;
       function transfer(address to, uint tokens) public returns (bool success);
       function approve(address spender, uint tokens) public returns (bool success);
       function transferFrom(address from, address to, uint tokens) public returns (bool success);
-  
+
       event Transfer(address indexed from, address indexed to, uint tokens);
       event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
   }
@@ -34,18 +34,18 @@ pragma solidity ^0.4.18;
  contract Owned {
       address public owner;
       address public newOwner;
-  
+
       event OwnershipTransferred(address indexed _from, address indexed _to);
-  
+
       function Owned() public {
           owner = msg.sender;
       }
-  
+
       modifier onlyOwner {
           require(msg.sender == owner);
           _;
       }
-  
+
       function transferOwnership(address _newOwner) public onlyOwner {
           newOwner = _newOwner;
       }
@@ -58,19 +58,19 @@ pragma solidity ^0.4.18;
   }
  contract STASHToken is STASHInterface, Owned {
      using SafeMath for uint;
- 
+
      string public symbol;
      string public  name;
      uint8 public decimals;
      uint public _totalSupply;
-     uint256 public unitsOneEthCanBuy;     
-     uint256 public totalEthInWei;           
-     address public fundsWallet;          
- 
+     uint256 public unitsOneEthCanBuy;
+     uint256 public totalEthInWei;
+     address public fundsWallet;
+
      mapping(address => uint) balances;
      mapping(address => mapping(address => uint)) allowed;
- 
- 
+
+
      function STASHToken() public {
          symbol = "STASH";
          name = "BitStash";
@@ -78,31 +78,31 @@ pragma solidity ^0.4.18;
          _totalSupply = 36000000000 * 10**uint(decimals);
          balances[owner] = _totalSupply;
          Transfer(address(0), owner, _totalSupply);
-         unitsOneEthCanBuy = 600000;                                     
-         fundsWallet = msg.sender;                                   
+         unitsOneEthCanBuy = 600000;
+         fundsWallet = msg.sender;
      }
- 
+
      function totalSupply() public constant returns (uint) {
          return _totalSupply  - balances[address(0)];
      }
- 
+
      function balanceOf(address tokenOwner) public constant returns (uint balance) {
          return balances[tokenOwner];
      }
- 
+
      function transfer(address to, uint tokens) public returns (bool success) {
          balances[msg.sender] = balances[msg.sender].sub(tokens);
          balances[to] = balances[to].add(tokens);
          Transfer(msg.sender, to, tokens);
          return true;
      }
- 
+
      function approve(address spender, uint tokens) public returns (bool success) {
          allowed[msg.sender][spender] = tokens;
          Approval(msg.sender, spender, tokens);
          return true;
      }
- 
+
      function transferFrom(address from, address to, uint tokens) public returns (bool success) {
          balances[from] = balances[from].sub(tokens);
          allowed[from][msg.sender] = allowed[from][msg.sender].sub(tokens);
@@ -110,11 +110,11 @@ pragma solidity ^0.4.18;
          Transfer(from, to, tokens);
          return true;
      }
- 
+
      function allowance(address tokenOwner, address spender) public constant returns (uint remaining) {
          return allowed[tokenOwner][spender];
      }
- 
+
      function() payable public{
         totalEthInWei = totalEthInWei + msg.value;
         uint256 amount = msg.value * unitsOneEthCanBuy;
@@ -128,7 +128,7 @@ pragma solidity ^0.4.18;
         Transfer(fundsWallet, msg.sender, amount); // Broadcast a message to the blockchain
 
         //Transfer ether to fundsWallet
-        fundsWallet.transfer(msg.value);                               
+        fundsWallet.transfer(msg.value);
     }
 
     /* Approves and then calls the receiving contract */
@@ -142,8 +142,43 @@ pragma solidity ^0.4.18;
         if(!_spender.call(bytes4(bytes32(keccak256("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { revert(); }
         return true;
     }
- 
+
      function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
          return STASHInterface(tokenAddress).transfer(owner, tokens);
      }
+ }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
  }

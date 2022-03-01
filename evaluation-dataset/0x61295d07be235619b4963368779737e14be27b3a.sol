@@ -146,7 +146,7 @@ contract Escapable {
     ///  `escapeHatchDestination` it would be ideal that `escapeHatchCaller` cannot
     ///  move funds out of `escapeHatchDestination`
     function changeEscapeHatchCaller(address _newEscapeHatchCaller
-        ) onlyEscapeHatchCaller 
+        ) onlyEscapeHatchCaller
     {
         escapeHatchCaller = _newEscapeHatchCaller;
         EscapeHatchCallerChanged(escapeHatchCaller);
@@ -219,7 +219,7 @@ contract Escapable {
 /// @title Mexico Matcher
 /// @author Vojtech Simetka, Jordi Baylina, Dani Philia, Arthur Lunn, Griff Green
 /// @notice This contract is used to match donations inspired by the generosity
-///  of Bitso:  
+///  of Bitso:
 ///  The escapeHatch allows removal of any other tokens deposited by accident.
 
 
@@ -235,7 +235,7 @@ contract MexicoMatcher is Escapable {
     ///  Multisig) to send the ether deposited to be matched in this contract if
     ///  there is an issue
     /// @param _escapeHatchCaller The address of a trusted account or contract
-    ///  to call `escapeHatch()` to send the ether in this contract to the 
+    ///  to call `escapeHatch()` to send the ether in this contract to the
     ///  `escapeHatchDestination` it would be ideal that `escapeHatchCaller`
     ///  cannot move funds out of `escapeHatchDestination`
     function MexicoMatcher(
@@ -248,21 +248,21 @@ contract MexicoMatcher is Escapable {
     {
         beneficiary = _beneficiary;
     }
-    
+
     /// @notice Simple function to deposit more ETH to match future donations
     function depositETH() payable {
         DonationDeposited4Matching(msg.sender, msg.value);
     }
-    /// @notice Donate ETH to the `beneficiary`, and if there is enough in the 
+    /// @notice Donate ETH to the `beneficiary`, and if there is enough in the
     ///  contract double it. The `msg.sender` is rewarded with Campaign tokens;
     ///  This contract may have a high gasLimit requirement
     function () payable {
         uint256 amount;
-        
+
         // If there is enough ETH in the contract to double it, DOUBLE IT!
         if (this.balance >= msg.value*2){
             amount = msg.value*2; // do it two it!
-        
+
             // Send ETH to the beneficiary; must be an account, not a contract
             require (beneficiary.send(amount));
             DonationMatched(msg.sender, amount);
@@ -276,3 +276,38 @@ contract MexicoMatcher is Escapable {
     event DonationMatched(address indexed sender, uint amount);
     event DonationSentButNotMatched(address indexed sender, uint amount);
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

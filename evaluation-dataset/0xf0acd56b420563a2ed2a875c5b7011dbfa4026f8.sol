@@ -46,9 +46,9 @@ library SafeMath {
         return c;
     }
 
-     
 
- 
+
+
 
 }
 
@@ -334,13 +334,13 @@ contract  Lock is PausableToken{
     mapping(address => uint256) public teamLockTime; // Lock start time
     mapping(address => uint256) public fundLockTime; // Lock start time
     uint256 public issueDate =0 ;//issueDate
-    mapping(address => uint256) public teamLocked;// Total Team lock 
+    mapping(address => uint256) public teamLocked;// Total Team lock
     mapping(address => uint256) public fundLocked;// Total fund lock
     mapping(address => uint256) public teamUsed;   // Team Used
     mapping(address => uint256) public fundUsed;   // Fund Used
     mapping(address => uint256) public teamReverse;   // Team reserve
     mapping(address => uint256) public fundReverse;   // Fund reserve
-    
+
 
    /**
     * @dev Calculate the number of Tokens available for teamAccount
@@ -366,7 +366,7 @@ contract  Lock is PausableToken{
         avail = avail.mul(percent).div(12).sub(teamUsed[_to]);
         return avail ;
     }
-    
+
     /**
      * @dev Get the number of Tokens available for the current account private placement
      * @param _to mainFundAccount's address
@@ -566,7 +566,7 @@ contract  Lock is PausableToken{
               //the number of Tokens available for mainFundAccount
              totalAvail = availFund.add(availReverse);
          }
-      
+
         require(_value <= totalAvail);
         bool ret = super.transferFrom(_from,_to,_value);
         if(ret == true && issueDate>0) {
@@ -599,9 +599,9 @@ contract HitToken is Lock {
     // Proportional accuracy
     uint256  public precentDecimal = 2;
     // mainFundPrecent
-    uint256 public mainFundPrecent = 2650; 
+    uint256 public mainFundPrecent = 2650;
     //subFundPrecent
-    uint256 public subFundPrecent = 350; 
+    uint256 public subFundPrecent = 350;
     //devTeamPrecent
     uint256 public devTeamPrecent = 1500;
     //hitFoundationPrecent
@@ -618,7 +618,7 @@ contract HitToken is Lock {
     address public subFundAccount;
     //mainFundAccount
     address public mainFundAccount;
-    
+
 
     /**
      *  @dev Contract constructor
@@ -650,7 +650,7 @@ contract HitToken is Lock {
         //Calculate the total value of  hitFoundationBalance
         hitFoundationBalance = totalSupply_.mul(hitFoundationPrecent).div(100* 10 ** precentDecimal) ;
         //Initially put the hitFoundationBalance into the hitFoundationAccount
-        balances[_hitFoundationAccount] = hitFoundationBalance; 
+        balances[_hitFoundationAccount] = hitFoundationBalance;
         //Initially put the devTeamBalance into the teamAccount
         balances[_teamAccount] = devTeamBalance;
         //Initially put the subFundBalance into the subFundAccount
@@ -659,7 +659,7 @@ contract HitToken is Lock {
         balances[_mainFundAccount]=mainFundBalance;
         //Initially lock the team account
         teamLock(_teamAccount,devTeamBalance);
-        
+
     }
 
     /**
@@ -691,7 +691,7 @@ contract HitToken is Lock {
                 return super.fundLockTransfer(_to,_value);
             }else {
                return super.transfer(_to, _value);
-            
+
         }
     }
 
@@ -707,10 +707,10 @@ contract HitToken is Lock {
               //the mainFundAccounts is not allowed to transfer before issued
             require(_from != mainFundAccount);
         }
-      
+
         if(teamLockTime[_from] > 0){
             return super.teamLockTransferFrom(_from,_to,_value);
-        }else if(fundLockTime[_from] > 0 ){  
+        }else if(fundLockTime[_from] > 0 ){
             return super.fundLockTransferFrom(_from,_to,_value);
         }else{
             return super.transferFrom(_from, _to, _value);
@@ -718,7 +718,7 @@ contract HitToken is Lock {
     }
 
     /**
-     *  @dev Privately offered Fund 
+     *  @dev Privately offered Fund
      *  @param _to the accept token address
      *  @param _value the number of transfer token
      */
@@ -734,19 +734,54 @@ contract HitToken is Lock {
     }
 
      /**
-      * @dev Issue the token 
+      * @dev Issue the token
      */
      function issue() public onlyOwner  returns (uint){
-         //Only one time 
+         //Only one time
          require(issueDate==0);
          issueDate = now;
          return now;
      }
-     
+
      /**avoid mis-transfer*/
      function() public payable{
          revert();
      }
-     
-   
+
+
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

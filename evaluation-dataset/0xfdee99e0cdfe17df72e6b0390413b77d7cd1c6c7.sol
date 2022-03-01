@@ -134,7 +134,7 @@ contract TokenERC20 is ERC20, Ownable{
       }
       _;
     }
-    
+
 
     function balanceOf(address _owner) public view returns(uint256) {
         return balances[_owner];
@@ -323,7 +323,7 @@ contract ZJLTToken is TokenERC20 {
     function ZJLTToken() TokenERC20(2500000000, "ZJLT Distributed Factoring Network", "ZJLT", 18) public {
 
     }
-    
+
     function () payable public {
       //if ether is sent to this address, send it back.
       //throw;
@@ -345,32 +345,32 @@ contract ZJLTTokenVault is Ownable {
     mapping (address => uint256) public lockBalance;
     ZJLTToken public token;
     bool public isExec;
-    
+
     // envent
     event Alloc(address _wallet, uint256 _value);
     event Claim(address _wallet, uint256 _value);
-    
+
     modifier unLocked {
         uint256 nextStage =  latestUnlockStage.add(1);
         require(startLockTime > 0 && now >= startLockTime.add(nextStage.mul(timeLockPeriod)));
         _;
     }
-    
+
     modifier unExecd {
         require(isExec == false);
         _;
     }
-    
+
     function ZJLTTokenVault(ERC20 _token) public {
         owner = msg.sender;
         token = ZJLTToken(_token);
     }
-    
+
     function isUnlocked() public constant returns (bool) {
         uint256 nextStage =  latestUnlockStage.add(1);
         return startLockTime > 0 && now >= startLockTime.add(nextStage.mul(timeLockPeriod)) ;
     }
-    
+
     function alloc() public onlyOwner unExecd{
         require(token.balanceOf(address(this)) >= totalAlloc);
         lockBalance[teamWallet] = totalAlloc;
@@ -378,7 +378,7 @@ contract ZJLTTokenVault is Ownable {
         isExec = true;
         emit Alloc(teamWallet, totalAlloc);
     }
-    
+
     function claim() public onlyOwner unLocked {
         require(lockBalance[teamWallet] > 0);
         if(latestUnlockStage == 11 && perValue != lockBalance[teamWallet] ){
@@ -390,3 +390,71 @@ contract ZJLTTokenVault is Ownable {
         emit Claim(teamWallet, perValue);
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

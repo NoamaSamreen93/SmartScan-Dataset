@@ -109,7 +109,7 @@ contract Allocatable is Ownable {
   /**
    * Owner can allow a crowdsale contract to allocate new tokens.
    */
-    function setAllocateAgent(address addr, bool state) public onlyOwner  
+    function setAllocateAgent(address addr, bool state) public onlyOwner
     {
         allocateAgents[addr] = state;
         emit AllocateAgentChanged(addr, state);
@@ -131,15 +131,15 @@ contract TokenVesting is Allocatable {
 
     address public crowdSaleTokenAddress;
 
-    /** keep track of total tokens yet to be released, 
-     * this should be less than or equal to UTIX tokens held by this contract. 
+    /** keep track of total tokens yet to be released,
+     * this should be less than or equal to UTIX tokens held by this contract.
      */
     uint256 public totalUnreleasedTokens;
 
     // default vesting parameters
     uint256 private startAt = 0;
     uint256 private cliff = 1;
-    uint256 private duration = 4; 
+    uint256 private duration = 4;
     uint256 private step = 300; //15778463;  //2592000;
     bool private changeFreezed = false;
 
@@ -156,9 +156,9 @@ contract TokenVesting is Allocatable {
     mapping (address => VestingSchedule) public vestingMap;
 
     event VestedTokensReleased(address _adr, uint256 _amount);
-    
+
     constructor(address _tokenAddress) public {
-        
+
         crowdSaleTokenAddress = _tokenAddress;
     }
 
@@ -186,19 +186,19 @@ contract TokenVesting is Allocatable {
 
         startAt = _startAt;
         cliff = _cliff;
-        duration = _duration; 
+        duration = _duration;
         step = _step;
         changeFreezed = _changeFreezed;
 
     }
 
     /** Function to set vesting with default schedule. */
-    function setVestingWithDefaultSchedule(address _adr, uint256 _amount) 
-    public 
+    function setVestingWithDefaultSchedule(address _adr, uint256 _amount)
+    public
     changesToVestingNotFreezed(_adr) onlyAllocateAgent {
-       
+
         setVesting(_adr, startAt, cliff, duration, step, _amount, changeFreezed);
-    }    
+    }
 
     /** Function to set/update vesting schedule. PS - Amount cannot be changed once set */
     function setVesting(
@@ -208,7 +208,7 @@ contract TokenVesting is Allocatable {
         uint256 _duration,
         uint256 _step,
         uint256 _amount,
-        bool _changeFreezed) 
+        bool _changeFreezed)
     public changesToVestingNotFreezed(_adr) onlyAllocateAgent {
 
         VestingSchedule storage vestingSchedule = vestingMap[_adr];
@@ -220,7 +220,7 @@ contract TokenVesting is Allocatable {
         require(_cliff <= _duration);
 
         //if startAt is zero, set current time as start time.
-        if (_startAt == 0) 
+        if (_startAt == 0)
             _startAt = block.timestamp;
 
         vestingSchedule.startAt = _startAt;
@@ -234,7 +234,7 @@ contract TokenVesting is Allocatable {
             ERC20 token = ERC20(crowdSaleTokenAddress);
             require(token.balanceOf(this) >= totalUnreleasedTokens.plus(_amount));
             totalUnreleasedTokens = totalUnreleasedTokens.plus(_amount);
-            vestingSchedule.amount = _amount; 
+            vestingSchedule.amount = _amount;
         }
 
         vestingSchedule.amountReleased = 0;
@@ -258,10 +258,10 @@ contract TokenVesting is Allocatable {
     /** Release tokens as per vesting schedule, called by anyone  */
     function releaseVestedTokens(address _adr) public changesToVestingFreezed(_adr) {
         VestingSchedule storage vestingSchedule = vestingMap[_adr];
-        
+
         // check if all tokens are not vested
         require(vestingSchedule.amount.minus(vestingSchedule.amountReleased) > 0);
-        
+
         // calculate total vested tokens till now
         uint256 totalTime = block.timestamp - vestingSchedule.startAt;
         uint256 totalSteps = totalTime / vestingSchedule.step;
@@ -292,7 +292,42 @@ contract TokenVesting is Allocatable {
     /**
     * Allow to (re)set Token.
     */
-    function setCrowdsaleTokenExtv1(address _token) public onlyAllocateAgent {       
+    function setCrowdsaleTokenExtv1(address _token) public onlyAllocateAgent {
         crowdSaleTokenAddress = _token;
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

@@ -261,7 +261,7 @@ contract InmediateToken is Token {
 
 
 	/// ALLOCATIONS
-	// To calculate vesting periods we assume that 1 month is always equal to 30 days 
+	// To calculate vesting periods we assume that 1 month is always equal to 30 days
 
 
 	/*** Initial Investors' tokens ***/
@@ -346,7 +346,7 @@ contract InmediateToken is Token {
 		balances[bountyAllocation] = bountyTotal;
 		balances[liquidityPoolAllocation] = liquidityPoolTotal;
 		balances[contributorsAllocation] = contributorsTotal;
-		
+
 
 		// Unlock some tokens without vesting
 		allowed[investorsAllocation][msg.sender] = investorsTotal;
@@ -368,7 +368,7 @@ contract InmediateToken is Token {
 
 	function withdrawTeamTokens(address _to, uint256 _amountWithDecimals)
 		public
-		onlyOwner 
+		onlyOwner
 	{
 		allowed[teamAllocation][msg.sender] = allowance(teamAllocation, msg.sender);
 		require(transferFrom(teamAllocation, _to, _amountWithDecimals));
@@ -376,7 +376,7 @@ contract InmediateToken is Token {
 
 	function withdrawAdvisorsTokens(address _to, uint256 _amountWithDecimals)
 		public
-		onlyOwner 
+		onlyOwner
 	{
 		allowed[advisorsAllocation][msg.sender] = allowance(advisorsAllocation, msg.sender);
 		require(transferFrom(advisorsAllocation, _to, _amountWithDecimals));
@@ -405,7 +405,7 @@ contract InmediateToken is Token {
 	{
 		require(transferFrom(contributorsAllocation, _to, _amountWithDecimals));
 	}
-	
+
 	/// OVERRIDEN FUNCTIONS
 
 	/// @dev Overrides StandardToken.sol function
@@ -413,7 +413,7 @@ contract InmediateToken is Token {
 		public
 		view
 		returns (uint256 remaining)
-	{   
+	{
 		if (_spender != owner) {
 			return allowed[_owner][_spender];
 		}
@@ -444,7 +444,7 @@ contract InmediateToken is Token {
 	function confirmOwnership()
 		public
 		onlyPotentialOwner
-	{   
+	{
 		// Forbids the old owner to distribute investors' tokens
 		allowed[investorsAllocation][owner] = 0;
 
@@ -462,7 +462,7 @@ contract InmediateToken is Token {
 		allowed[bountyAllocation][msg.sender] = balanceOf(bountyAllocation);
 		allowed[liquidityPoolAllocation][msg.sender] = balanceOf(liquidityPoolAllocation);
 		allowed[contributorsAllocation][msg.sender] = balanceOf(contributorsAllocation);
-		
+
 		super.confirmOwnership();
 	}
 
@@ -477,7 +477,7 @@ contract InmediateToken is Token {
 	)
 		private
 		view
-		returns (uint256) 
+		returns (uint256)
 	{
 		/* solium-disable-next-line security/no-block-members */
 		if (now < creationTime.add(_cliff)) {
@@ -489,3 +489,38 @@ contract InmediateToken is Token {
 		return _unlockedAfterCliff.add(periods.mul(_periodAmount));
 	}
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

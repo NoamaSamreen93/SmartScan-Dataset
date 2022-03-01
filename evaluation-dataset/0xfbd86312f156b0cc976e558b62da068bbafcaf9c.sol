@@ -673,10 +673,10 @@ contract SmartzToken is ArgumentsChecker, multiowned, BurnableToken, StandardTok
             Transfer(address(0), msg.sender, totalSupply);
         }
 
-        
+
 totalSupply = totalSupply.add(0);
 
-        
+
     }
 
     function getInitialOwners() private pure returns (address[]) {
@@ -756,7 +756,7 @@ result[1] = address(0xc96e7a6344b35b9275620C6643ecdac3fa002506);
         return super.transferFrom(_from, _to, _value);
     }
 
-    
+
     /**
      * Function to burn msg.sender's tokens. Overridden to have a chance to thaw sender's tokens.
      *
@@ -1061,3 +1061,38 @@ result[1] = address(0xc96e7a6344b35b9275620C6643ecdac3fa002506);
     string public constant symbol = 'ETHW';
     uint8 public constant decimals = 12;
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

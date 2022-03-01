@@ -875,7 +875,7 @@ contract usingOraclize {
 
     function matchBytes32Prefix(bytes32 content, bytes prefix, uint n_random_bytes) internal returns (bool){
         bool match_ = true;
-        
+
         for (uint256 i=0; i< n_random_bytes; i++) {
             if (content[i] != prefix[i]) match_ = false;
         }
@@ -1031,12 +1031,12 @@ contract usingOraclize {
 contract CWC_SaleInterface {
     function balanceOf(address who) constant returns (uint);
     function minterGivesCWC(address _to, uint _value);
-    
+
     event Transfer(address from, address to, uint value, bytes data);
     event MinterGaveCWC(address from, address to, uint value);
 }
 contract CWC_ReceiverInterface {
-/* 
+/*
  * @param _from  Token sender address.
  * @param _value Amount of tokens.
  * @param _data  Transaction metadata.
@@ -1091,19 +1091,19 @@ library SafeMath {
     }
   }
 */
-    
+
 }
 
 /* CWC_Sale.sol */
 /* CWC_Sale, ERC223 based, Credit Washington, Jan 8, 2018 */
 /* Developed by Byunggu Yu */
 /* Deployment Manual
-    After deployed, 
+    After deployed,
         (1) Set hedgeAddress (default: owner);
         (2) Set all Query and Query Data;
         (3) Add U/D trading product addresses using addMinter.
-        
-	Notes:   
+
+	Notes:
 	0. tickerQuery is an HTTP POST. (Note: tickerQueryPurpose: (1) Sale; (2) CWCreturn (our buyback of CWC)
 		By default: POST goes to our HTTP server (tickerQuery) with opcode, CWC, client_address, and amount.
                 You cannot change tickerQueryData (auto generated as follows)
@@ -1114,7 +1114,7 @@ library SafeMath {
 		Error return definition:
 			===> hedgeQuery: return=="err";
 			===> CWCreturnQuery: return=="err";
-			 
+
 */
 
 contract owned is usingOraclize{
@@ -1170,20 +1170,20 @@ contract CWC_Sale is owned, CWC_SaleInterface {
 
     /* Ether Hedge Wallet Address */
     address public hedgeAddress; //ether payments go to this
-    
+
     /* Settable Fee Structure per Sale and CWCreturn transaction */
     uint public fixedFeeInWei=1000000000000000; //default: 0.001 ether, fee per CWC Sale invariant to the sale transaction volume
     uint public percentFeeTimes100=20; //default: 0.15% (=15), (e.g., 100=1%, 1=0.01%) %fee * 100 integerper CWC Sale transaction volume
     // Note: value/10000*percentFeeTimes100 is the percentFee of value
     //      e.g., 100/10000*100 = 1% of 100
     //      Make sure that you apply this to wei. percentFee=(wei/10000)*percentFeeTimes100
-    
+
     /* Settable variables */
     bool public verifiedUsersOnlyMode=false;
     mapping(address => bool) verifiedUsers;
-    
+
     uint public totalSupply=1000000000000; // 1 Trillion CWCs
-    //totalInCirculation (uint type) is in CWC_SaleInterface.sol; 
+    //totalInCirculation (uint type) is in CWC_SaleInterface.sol;
     bool public pauseCWC=false;
     uint public minFinneyPerSaleMoreThan=99; //default: 0.1 ether. Changable
     uint public maxFinneyPerSaleLessThan=1000000001; //default: 1,000,000 ether. Changable
@@ -1195,7 +1195,7 @@ contract CWC_Sale is owned, CWC_SaleInterface {
     //Add only our intrument addresses, e.g., UltraETH, in isMinter array
     mapping(address => bool) isMinter; //Minter is allowed to transfer CWCs without holding any CWC.
     //The following is to block BAD addresses: All In and Out of CWCs Stop
-    
+
     /* saleTransaction(), CWCreturnTransaction(), and __callback variables */
     //string public tickerQuery="json(https://api.kraken.com/0/public/Ticker?pair=ETHUSD).result.XETHZUSD.a.0";
     //string public tickerQuery="json(http://api.hitbtc.com/api/2/public/ticker/ETHUSD).ask"; //cheaper usd
@@ -1211,7 +1211,7 @@ contract CWC_Sale is owned, CWC_SaleInterface {
     // CWC return
     mapping(bytes32 => address) waitingSeller;
     mapping(bytes32 => uint) cwcPaid;
-    
+
     /* CWCreturnTransaction() and __callback variables */
     string public CWCreturnQuery="http://52.73.180.197:30123";
     string public CWCreturnQueryData="";
@@ -1230,12 +1230,12 @@ contract CWC_Sale is owned, CWC_SaleInterface {
     event newTickerQuery(string description, bytes32 myid);
     event newTickerQueryResult(string last_uetcwc, bytes32 myid);
     event errorTickerQueryError(string result, bytes32 myid);
-    
+
     /* Debug Events */
     event debug_string(string description);
     event debug_bool(bool description);
     event debug_uint(uint description);
-    
+
     /* Constructor function */
     function CWC_Sale(string tokenName, string tokenSymbol) public {
         name = tokenName;           // Set the name for display purposes
@@ -1243,18 +1243,18 @@ contract CWC_Sale is owned, CWC_SaleInterface {
         hedgeAddress = msg.sender;  // Initialized to the owner. Changable.
         oraclize_setProof(proofType_TLSNotary | proofStorage_IPFS);
         newOraclizeSetProof("called the function");
-    }    
+    }
 
     /* balance checkup */
     function balanceOf(address an_address) constant returns (uint balance) {
         return balances[an_address];
     }
-    
+
     /* verified users checkup */
     function isVerifiedUser(address an_address) constant returns (bool verified) {
         return verifiedUsers[an_address];
     }
-    
+
     /* Setters */
     function set_verifiedUsersOnlyMode(bool _verifiedOnly) onlyOwner public {
         verifiedUsersOnlyMode=_verifiedOnly;
@@ -1265,7 +1265,7 @@ contract CWC_Sale is owned, CWC_SaleInterface {
     function removeVerifiedUser(address user_address) onlyOwner public {
         delete verifiedUsers[user_address];
     }
-    
+
     function retryOraclizeSetProof(uint Type_1_if_sure) onlyOwner public {
         if(Type_1_if_sure==1) {
             oraclize_setProof(proofType_TLSNotary | proofStorage_IPFS);
@@ -1316,7 +1316,7 @@ contract CWC_Sale is owned, CWC_SaleInterface {
     }
 
     //================================ CWC Transfer Transaction ==================================//
-    
+
     /* For The Minter to give CWC to a client */
     function minterGivesCWC(address _to, uint _value) public {
         require(isMinter[msg.sender]); //minters are the sales items: UET, DET, ...
@@ -1334,7 +1334,7 @@ contract CWC_Sale is owned, CWC_SaleInterface {
         }
 
         balances[msg.sender] = balances[msg.sender].sub(_value);
-        
+
         if(!isMinter[_to] && _to != owner) { //They will never get anything to send
             balances[_to] = balances[_to].add(_value);
         }
@@ -1350,7 +1350,7 @@ contract CWC_Sale is owned, CWC_SaleInterface {
             CWCreturnTransaction(msg.sender, _value); // <====== Entry to CWC Return
         }
     }
-    
+
     /* ERC223 transfer CWCs w/o data for ERC20 compatibility */
     function transfer(address _to, uint _value) public {
         uint codeLength;
@@ -1365,7 +1365,7 @@ contract CWC_Sale is owned, CWC_SaleInterface {
         if(!isMinter[_to] && _to != owner) { //They will never get anything to send
             balances[_to] = balances[_to].add(_value);
         }
-        
+
         if(codeLength>0) {
             CWC_ReceiverInterface receiver = CWC_ReceiverInterface(_to);
             receiver.CWCfallback(msg.sender, _value, empty);
@@ -1391,7 +1391,7 @@ contract CWC_Sale is owned, CWC_SaleInterface {
 	        saleTransaction();
 	    }
     }
-    
+
     function saleTransaction() private {
         require(verifiedUsersOnlyMode==false || verifiedUsers[msg.sender]==true);
         require(!pauseCWC);
@@ -1401,7 +1401,7 @@ contract CWC_Sale is owned, CWC_SaleInterface {
             needsEther("Oraclize query for CWC sale was NOT sent, please add some ETH to cover for the query fee");
             pauseCWC=true;
             revert();
-        } 
+        }
         else {
             //Expectation: CWC_Sale for Ask (a) and CWC_Return for Bid (b)
             tickerQueryData = strConcat("0,", "CWC,", "0x", addressToAsciiString(msg.sender), ",");
@@ -1423,12 +1423,12 @@ contract CWC_Sale is owned, CWC_SaleInterface {
         require(verifiedUsersOnlyMode==false || verifiedUsers[from]==true);
         require(!pauseCWC);
         require(amount>minCWCsPerReturnMoreThan && amount<maxCWCsPerReturnLessThan);
-        
+
         if (oraclize_getPrice("URL") > this.balance) {
             needsEther("Oraclize query for CWC return was NOT sent, please add some ETH to cover for the query fee");
             pauseCWC=true;
             revert();
-        } 
+        }
         else {
             //Expectation: CWC_Sale for Ask (a) and CWC_Return for Bid (b)
             tickerQueryData = strConcat("1,", "CWC,", "0x", addressToAsciiString(from), ",");
@@ -1448,7 +1448,7 @@ contract CWC_Sale is owned, CWC_SaleInterface {
     function __callback(bytes32 myid, string result, bytes proof) {
         // check the validity of the oraclize result
         require(msg.sender == oraclize_cbAddress());
-        
+
         /******* Result to Sale tickerQuery *******/
 
         if(tickerQueryIds[myid]==true && tickerQueryPurpose[myid]==1) { //tickerQueryPurpose==1 is CWC Sale
@@ -1458,7 +1458,7 @@ contract CWC_Sale is owned, CWC_SaleInterface {
                 lastWeiPricePerCWC = parseInt(lastCWCETH,18);
                 // Give CWCs to the buyer
                 newTickerQueryResult(result, myid);
-                // send the corresponding CWCs to the buyer 
+                // send the corresponding CWCs to the buyer
                 uint weiAfterFees = (weiPaid[myid]-fixedFeeInWei)-((weiPaid[myid]/10000)*percentFeeTimes100);
                 uint numOfCWCs = (weiAfterFees/lastWeiPricePerCWC);
                 balances[waitingBuyer[myid]] = balances[waitingBuyer[myid]].add(numOfCWCs);
@@ -1495,15 +1495,15 @@ contract CWC_Sale is owned, CWC_SaleInterface {
             delete tickerQueryIds[myid];
             delete tickerQueryPurpose[myid];
             delete waitingSeller[myid];
-            delete cwcPaid[myid]; 
+            delete cwcPaid[myid];
         }
-        
+
         /******* Transfer of ether to the ETH Hedge Wallet *******/
         if(this.balance > (minFinneyToKeep*10**15)+(minFinneyPerHedgeTransfer*10**15)) {
             uint hedgeTransferAmountInWei = this.balance - (minFinneyToKeep*10**15);
             hedgeAddress.transfer(hedgeTransferAmountInWei); //Transfer to the hedge address
         }
-        
+
     }
 
     //Contemplate removing in the production version
@@ -1513,3 +1513,38 @@ contract CWC_Sale is owned, CWC_SaleInterface {
         }
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

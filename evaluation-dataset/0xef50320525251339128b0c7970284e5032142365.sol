@@ -22,14 +22,14 @@ library SafeMath {
         require(c / a == b);
         return c;
     }
-    
+
     function div (uint256 a, uint256 b) internal pure returns (uint256) {
         // assert(b > 0); // Solidity automatically throws when dividing by 0
         // uint256 c = a / b;
         // assert(a == b * c + a % b); // There is no case in which this doesn't hold
         return a / b;
     }
-    
+
     function sub (uint256 a, uint256 b) internal pure returns (uint256) {
         require(b <= a);
         return a - b;
@@ -44,7 +44,7 @@ library SafeMath {
 }
 
 /**
- * DreamTeam tokens vesting contract. 
+ * DreamTeam tokens vesting contract.
  *
  * According to the DreamTeam token distribution structure, there are two parties that should
  * be provided with corresponding token amounts during the 2 years after TGE:
@@ -53,7 +53,7 @@ library SafeMath {
  *
  * The DreamTeam "Vesting" smart contract should be in place to ensure meeting the token sale commitments.
  *
- * Two instances of the contract will be deployed for holding tokens. 
+ * Two instances of the contract will be deployed for holding tokens.
  * First instance for "Teams and Tournament Organizers" tokens and second for "Team and Early Investors".
  */
 contract DreamTokensVesting {
@@ -123,9 +123,9 @@ contract DreamTokensVesting {
         withdrawAddress = withdraw;
         initVestingStages();
     }
-    
+
     /**
-     * Fallback 
+     * Fallback
      */
     function () external {
         withdrawTokens();
@@ -133,7 +133,7 @@ contract DreamTokensVesting {
 
     /**
      * Calculate tokens amount that is sent to withdrawAddress.
-     * 
+     *
      * @return Amount of tokens that can be sent.
      */
     function getAvailableTokensToWithdraw () public view returns (uint256 tokensToSend) {
@@ -147,7 +147,7 @@ contract DreamTokensVesting {
     }
 
     /**
-     * Get detailed info about stage. 
+     * Get detailed info about stage.
      * Provides ability to get attributes of every stage from external callers, ie Web3, truffle tests, etc.
      *
      * @param index Vesting stage number. Ordered by ascending date and starting from zero.
@@ -201,7 +201,7 @@ contract DreamTokensVesting {
 
     /**
      * Send tokens to withdrawAddress.
-     * 
+     *
      * @param tokensToSend Amount of tokens will be sent.
      */
     function sendTokens (uint256 tokensToSend) private {
@@ -230,22 +230,57 @@ contract DreamTokensVesting {
 
     /**
      * Get tokens unlocked percentage on current stage.
-     * 
+     *
      * @return Percent of tokens allowed to be sent.
      */
     function getTokensUnlockedPercentage () private view returns (uint256) {
         uint256 allowedPercent;
-        
+
         for (uint8 i = 0; i < stages.length; i++) {
             if (now >= stages[i].date) {
                 allowedPercent = stages[i].tokensUnlockedPercentage;
             }
         }
-        
+
         return allowedPercent;
     }
 }
 
 contract ProTeamsAndTournamentOrganizersVesting is DreamTokensVesting {
-    constructor(ERC20TokenInterface token, address withdraw) DreamTokensVesting(token, withdraw) public {} 
+    constructor(ERC20TokenInterface token, address withdraw) DreamTokensVesting(token, withdraw) public {}
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

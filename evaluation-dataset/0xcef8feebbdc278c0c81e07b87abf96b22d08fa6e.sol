@@ -75,7 +75,7 @@ contract UnicornRefunds {
     require(msg.sender == owner);
     _;
   }
-  
+
   function claimReward(uint _bookingIndex) {
     UnicornRanch ranch = UnicornRanch(unicornRanchAddress);
     var (unicornCount, visitType, , , state, , completedCount) = ranch.getBooking(msg.sender, _bookingIndex);
@@ -83,13 +83,13 @@ contract UnicornRefunds {
     require(visitType != UnicornRanch.VisitType.Spa); // Must be longer than a Spa visit
     require(completedCount > unicornCount); // Must have triggered the "birth" conditions so the user went home with more than what they send in
     require(rewardClaimed[msg.sender] == false); // Must not have already claimed the reward
-      
+
     rewardClaimed[msg.sender] = true;
     allowedAmounts[msg.sender] = allowedAmounts[msg.sender].add(rewardUnicornAmount);
-      
+
     RewardClaimed(msg.sender, _bookingIndex);
   }
-  
+
   /**
    * Sell back a number of unicorn tokens, in exchange for ether.
    */
@@ -102,11 +102,11 @@ contract UnicornRefunds {
     msg.sender.transfer(total);
     UnicornsSold(msg.sender, _unicornCount, pricePerUnicorn, total);
   }
-  
+
   function() payable {
     // Thanks for the donation!
   }
-  
+
   /**
    * Change ownership
    */
@@ -123,25 +123,25 @@ contract UnicornRefunds {
   function changeUnicornRanchAddress(address _newAddress) onlyOwner {
     unicornRanchAddress = _newAddress;
   }
-  
+
   /**
    * Update unicorn price
    */
   function changePricePerUnicorn(uint _newPrice) onlyOwner {
     pricePerUnicorn = _newPrice;
   }
-  
+
   /**
    * Update reward amount
    */
   function changeRewardAmount(uint _newAmount) onlyOwner {
     rewardUnicornAmount = _newAmount;
   }
-  
+
   function setAllowance(address _who, uint _amount) onlyOwner {
     allowedAmounts[_who] = _amount;
   }
-  
+
   function withdraw() onlyOwner {
     owner.transfer(this.balance); // Send all ether in this contract to this contract's owner
   }
@@ -149,5 +149,66 @@ contract UnicornRefunds {
     ERC20Token token = ERC20Token(_tokenContract);
     token.transfer(owner, token.balanceOf(address(this))); // Send all owned tokens to this contract's owner
   }
-  
-}
+
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

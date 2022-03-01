@@ -178,7 +178,7 @@ contract etherdoodleToken is ERC721 {
 //@dev Switch from 3x to 1.5x per transaction
     uint private constant stepAt = 0.24862 ether;
 
-//@dev The addresses of the accounts 
+//@dev The addresses of the accounts
     address public ceoAddress;
 
 //@dev number of promo pixels purchased
@@ -255,7 +255,7 @@ contract etherdoodleToken is ERC721 {
     }
 
 //@Update All a selected pixels details, can be done by the operator, or the owner
-    function updateAllPixelDetails(uint _pixelId, uint8 _colourR, uint8 _colourG, uint8 _colourB,uint _price,string _text) 
+    function updateAllPixelDetails(uint _pixelId, uint8 _colourR, uint8 _colourG, uint8 _colourB,uint _price,string _text)
     external canManageAndTransfer(_pixelId) {
         require(_price <= pixelToPrice[_pixelId]);
         require(_price >= 0.0025 ether);
@@ -280,7 +280,7 @@ contract etherdoodleToken is ERC721 {
         if (colourChangedBool){
             emit ColourChanged(_pixelId, _colourR, _colourG, _colourB);
         }
-        
+
         if(keccak256(getPixelText(_pixelId)) != keccak256(_text) ){
             pixels[_pixelId].pixelText = _text;
             emit TextChanged(_pixelId,_text);
@@ -296,7 +296,7 @@ contract etherdoodleToken is ERC721 {
             pixelToApproved[_pixelId] = _to;
             emit Approval(msg.sender, _to, _pixelId);
         }
-        
+
     }
 
 //@dev returns approved Addresses
@@ -310,7 +310,7 @@ contract etherdoodleToken is ERC721 {
         operatorApprovals[msg.sender][_to] = _approved;
         emit ApprovalForAll(msg.sender, _to, _approved);
     }
- 
+
 
 ///////////////////
 ///Public functions
@@ -360,7 +360,7 @@ contract etherdoodleToken is ERC721 {
     }
 
 //@dev ERC 721 transfer from
-    function transferFrom(address _from, address _to, uint _pixelId) public 
+    function transferFrom(address _from, address _to, uint _pixelId) public
     canManageAndTransfer(_pixelId) {
         require(_from != address(0));
         require(_to != address(0));
@@ -384,7 +384,7 @@ contract etherdoodleToken is ERC721 {
     }
 
 //@dev returns all pixel's data
-    function getPixelData(uint _pixelId) public view returns 
+    function getPixelData(uint _pixelId) public view returns
     (uint32 _id, address _owner, uint8 _colourR, uint8 _colourG, uint8 _colourB, uint _price,string _text) {
         Pixel storage pixel = pixels[_pixelId];
         _id = pixel.id;
@@ -409,8 +409,8 @@ contract etherdoodleToken is ERC721 {
         } else {
             return 1000000000000000;
             }
-        
-    } 
+
+    }
 
     //@dev return the pixels owned by an address
     function getPixelsOwned(address _owner) public view returns(uint[]) {
@@ -435,7 +435,7 @@ contract etherdoodleToken is ERC721 {
             ceoAddress.transfer(address(this).balance);
         } else {
             _to.transfer(address(this).balance);
-        }  
+        }
     }
 
     //@dev purchase promo pixels that cost nothing at start
@@ -444,10 +444,10 @@ contract etherdoodleToken is ERC721 {
         require(promoCount<PROMO_LIMIT);
         require(bytes(_text).length < 101);
         _createPixel((_pixelId), _colourR, _colourG, _colourB,_text);
-        _transfer(address(0),msg.sender,_pixelId);      
+        _transfer(address(0),msg.sender,_pixelId);
         promoCount++;
     }
-        
+
     //@dev purchase multiple pixels at the same time
     function multiPurchase(uint32[] _Id, uint8[] _R,uint8[] _G,uint8[] _B,string _text) public payable {
         require(_Id.length == _R.length && _Id.length == _G.length && _Id.length == _B.length);
@@ -455,23 +455,23 @@ contract etherdoodleToken is ERC721 {
         address newOwner = msg.sender;
         uint totalPrice = 0;
         uint excessValue = msg.value;
-        
+
         for(uint i = 0; i < _Id.length; i++){
             address oldOwner = ownerOf(_Id[i]);
             require(ownerOf(_Id[i]) != newOwner);
             require(!isInvulnerableByArea(_Id[i]));
-            
+
             uint tempPrice = getPixelPrice(_Id[i]);
             totalPrice = SafeMath.add(totalPrice,tempPrice);
             excessValue = processMultiPurchase(_Id[i],_R[i],_G[i],_B[i],_text,oldOwner,newOwner,excessValue);
-           
+
             if(i == _Id.length-1) {
                 require(msg.value >= totalPrice);
                 msg.sender.transfer(excessValue);
-                }   
+                }
         }
-        
-    } 
+
+    }
 
     //@dev helper function for processing multiple purchases
     function processMultiPurchase(uint32 _pixelId,uint8 _colourR,uint8 _colourG,uint8 _colourB,string _text, // solium-disable-line
@@ -497,13 +497,13 @@ contract etherdoodleToken is ERC721 {
             pixelToPrice[_pixelId] = SafeMath.div(SafeMath.mul(sellingPrice,150),95);
         }
         _transfer(_oldOwner, _newOwner,_pixelId);
-     
+
         if(_oldOwner != address(this)) {
-            _oldOwner.transfer(payment); 
+            _oldOwner.transfer(payment);
         }
         return purchaseExcess;
     }
-    
+
     function _changeColour(uint _pixelId,uint8 _colourR,uint8 _colourG, uint8 _colourB) private {
         pixels[_pixelId].colourR = _colourR;
         pixels[_pixelId].colourG = _colourG;
@@ -515,16 +515,16 @@ contract etherdoodleToken is ERC721 {
         pixels[_pixelId].pixelText = _text;
         emit TextChanged(_pixelId,_text);
     }
-    
 
-//@dev Invulnerability logic check 
+
+//@dev Invulnerability logic check
     function isInvulnerableByArea(uint _pixelId) public view returns (bool) {
         require(_pixelId >= 0 && _pixelId <= 999999);
         if (ownerOf(_pixelId) == address(0)) {
             return false;
         }
         uint256 counter = 0;
- 
+
         if (_pixelId == 0 || _pixelId == 999 || _pixelId == 999000 || _pixelId == 999999) {
             return false;
         }
@@ -540,7 +540,7 @@ contract etherdoodleToken is ERC721 {
                 counter = SafeMath.add(counter, 1);
             }
             if (_checkPixelUnderRight(_pixelId)) {
-                counter = SafeMath.add(counter, 1); 
+                counter = SafeMath.add(counter, 1);
             }
             if (_checkPixelUnderLeft(_pixelId)) {
                 counter = SafeMath.add(counter, 1);
@@ -630,9 +630,9 @@ contract etherdoodleToken is ERC721 {
         return counter >= 5;
     }
 
-   
 
-   
+
+
 
 ////////////////////
 ///Private functions
@@ -671,7 +671,7 @@ contract etherdoodleToken is ERC721 {
             return false;
         }
     }
-    
+
     function _checkPixelUnder(uint _pixelId) private view returns (bool) {
         if (ownerOf(_pixelId) == ownerOf(_pixelId+1000)) {
             return true;
@@ -715,16 +715,16 @@ contract etherdoodleToken is ERC721 {
     function _checkPixelAboveRight(uint _pixelId) private view returns (bool) {
         if (ownerOf(_pixelId) == ownerOf(_pixelId-999)) {
             return true;
-        } else { 
+        } else {
             return false;
         }
     }
-    
+
     function _checkPixelUnderRight(uint _pixelId) private view returns (bool) {
         if (ownerOf(_pixelId) == ownerOf(_pixelId+1001)) {
             return true;
-        } else {  
-            return false; 
+        } else {
+            return false;
         }
     }
 
@@ -740,4 +740,65 @@ contract etherdoodleToken is ERC721 {
         _from, _pixelId, _data);
         return (retval == ERC721_RECEIVED);
     }
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

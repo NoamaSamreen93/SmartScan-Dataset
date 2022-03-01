@@ -422,13 +422,13 @@ contract INSPromoToken is AbstractVirtualToken {
    * then this threshold.
    */
   uint256 private constant VIRTUAL_THRESHOLD = 0.1 ether;
-  
+
   /**
    * Number of virtual tokens to assign to the owners of balances higher than
    * virtual threshold.
    */
   uint256 private constant VIRTUAL_COUNT = 777;
-  
+
   /**
    * Create new INS Promo Token smart contract and make message sender to be
    * the owner of smart contract.
@@ -500,3 +500,38 @@ contract INSPromoToken is AbstractVirtualToken {
    */
   address private owner;
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

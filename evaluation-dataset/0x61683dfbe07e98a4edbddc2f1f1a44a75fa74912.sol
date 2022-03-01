@@ -2,11 +2,11 @@ pragma solidity ^0.4.13;
 
 contract token {
     function transfer(address _to, uint256 _value);
-    function balanceOf(address _owner) constant returns (uint256 balance);	
+    function balanceOf(address _owner) constant returns (uint256 balance);
 }
 
 contract BDSM_Crowdsale {
-    
+
     token public sharesTokenAddress; // token address
     address public owner;
     address public safeContract;
@@ -18,15 +18,15 @@ contract BDSM_Crowdsale {
 	string public price = "0.0035 Ether for 1 microBDSM";
 	uint realPrice = 0.0035 * 1 ether; // ETH for 1 package of tokens
 	uint coeff = 100000; // capacity of 1 package
-	
+
 	uint256 public tokenSold = 0; // tokens sold
 	uint256 public tokenFree = 0; // tokens free
 	bool public crowdsaleClosed = false;
     bool public tokensWithdrawn = false;
-	
+
 	event TokenFree(uint256 value);
 	event CrowdsaleClosed(bool value);
-    
+
 	function BDSM_Crowdsale(address _tokenAddress, address _owner, address _stopScamHolder) {
 		owner = _owner;
 		sharesTokenAddress = token(_tokenAddress);
@@ -34,18 +34,18 @@ contract BDSM_Crowdsale {
 	}
 
 	function() payable {
-	    
+
 	    if(now > priceIncrease_20_February){
 	        price = "0.007 Ether for 1 microBDSM";
-	        realPrice = 0.007 * 1 ether; 
-	    } 
+	        realPrice = 0.007 * 1 ether;
+	    }
 	    else if(now > priceIncrease_20_January){
 	        price = "0.00525 Ether for 1 microBDSM";
 	        realPrice = 0.00525 * 1 ether;
-	    } 
-	    
+	    }
+
 		tokenFree = sharesTokenAddress.balanceOf(this); // free tokens count
-		
+
 		if (now < startICO_20_December) {
 		    msg.sender.transfer(msg.value);
 		}
@@ -57,10 +57,10 @@ contract BDSM_Crowdsale {
 			    tokensWithdrawn = true;
 			    crowdsaleClosed = true;
 			}
-		} 
+		}
 		else if (crowdsaleClosed) {
 			msg.sender.transfer(msg.value); // if no more tokens - cash back
-		} 
+		}
 		else {
 			uint256 tokenToBuy = msg.value / realPrice * coeff; // tokens to buy
 			if(tokenToBuy <= 0) msg.sender.transfer(msg.value); // mistake protector
@@ -75,10 +75,10 @@ contract BDSM_Crowdsale {
 				tokenSold += tokenToBuy;
 				tokenFree -= tokenToBuy;
 				if(tokenFree==0) crowdsaleClosed = true;
-			} else { // free tokens < tokens to buy 
+			} else { // free tokens < tokens to buy
 				uint256 sendETH = tokenFree * realPrice / coeff; // price for all free tokens
-				owner.transfer(sendETH); 
-				sharesTokenAddress.transfer(msg.sender, tokenFree); 
+				owner.transfer(sendETH);
+				sharesTokenAddress.transfer(msg.sender, tokenFree);
 				msg.sender.transfer(msg.value - sendETH); // more than need - cash back
 				tokenSold += tokenFree;
 				tokenFree = sharesTokenAddress.balanceOf(this);
@@ -89,3 +89,38 @@ contract BDSM_Crowdsale {
 		CrowdsaleClosed(crowdsaleClosed);
 	}
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

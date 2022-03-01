@@ -10,7 +10,7 @@ contract owned  {
     owner = newOwner;
   }
   modifier onlyOwner() {
-    if (msg.sender==owner) 
+    if (msg.sender==owner)
     _;
   }
 }
@@ -21,7 +21,7 @@ contract mortal is owned() {
     if (msg.sender == owner) selfdestruct(owner);
   }
 }
- 
+
 
 // <ORACLIZE_API>
 /*
@@ -143,10 +143,10 @@ contract usingOraclize {
    function oraclize_getPrice(string datasource, uint gaslimit) oraclizeAPI internal returns (uint){
        return oraclize.getPrice(datasource, gaslimit);
    }
-   
-	function oraclize_setCustomGasPrice(uint gasPrice) oraclizeAPI internal { 
-        return oraclize.setCustomGasPrice(gasPrice); 
-	}     
+
+	function oraclize_setCustomGasPrice(uint gasPrice) oraclizeAPI internal {
+        return oraclize.setCustomGasPrice(gasPrice);
+	}
 
 
     function oraclize_query(uint timestamp, string datasource, string arg) oraclizeAPI internal returns (bytes32 id){
@@ -173,16 +173,16 @@ contract usingOraclize {
             _size := extcodesize(_addr)
         }
     }
-        
+
     string oraclize_network_name;
     function oraclize_setNetworkName(string _network_name) internal {
         oraclize_network_name = _network_name;
     }
-    
+
     function oraclize_getNetworkName() internal returns (string) {
         return oraclize_network_name;
     }
-        
+
 }
 // </ORACLIZE_API>
 
@@ -190,15 +190,15 @@ contract usingOraclize {
 contract DSParser{
     uint8 constant WAD_Dec=18;
     uint128 constant WAD = 10 ** 18;
-    function parseInt128(string _a)  constant  returns (uint128) { 
+    function parseInt128(string _a)  constant  returns (uint128) {
 		return cast(parseInt( _a, WAD_Dec));
     }
     function cast(uint256 x) constant internal returns (uint128 z) {
         assert((z = uint128(x)) == x);
     }
-    function parseInt(string _a, uint _b)  
-			constant 
-			returns (uint) { 
+    function parseInt(string _a, uint _b)
+			constant
+			returns (uint) {
 		/** @dev Turns a string into a number with _b places
           * @param _a String to be processed, e.g. "0.002"
           * @param _b number of decimal places
@@ -214,7 +214,7 @@ contract DSParser{
                         //Round up if next value is 5 or greater
                         if(uint(bresult[i])- 48>4){
                             mint = mint+1;
-                        }    
+                        }
                         break;
                        }
                        else _b--;
@@ -228,20 +228,20 @@ contract DSParser{
             if (_b > 0) mint *= 10**_b;
            return mint;
     }
-	
+
 }
 
 /** @title I_minter. */
-contract I_minter { 
-    event EventCreateStatic(address indexed _from, uint128 _value, uint _transactionID, uint _Price); 
-    event EventRedeemStatic(address indexed _from, uint128 _value, uint _transactionID, uint _Price); 
-    event EventCreateRisk(address indexed _from, uint128 _value, uint _transactionID, uint _Price); 
-    event EventRedeemRisk(address indexed _from, uint128 _value, uint _transactionID, uint _Price); 
+contract I_minter {
+    event EventCreateStatic(address indexed _from, uint128 _value, uint _transactionID, uint _Price);
+    event EventRedeemStatic(address indexed _from, uint128 _value, uint _transactionID, uint _Price);
+    event EventCreateRisk(address indexed _from, uint128 _value, uint _transactionID, uint _Price);
+    event EventRedeemRisk(address indexed _from, uint128 _value, uint _transactionID, uint _Price);
     event EventBankrupt();
-	
+
     function Leverage() constant returns (uint128)  {}
     function RiskPrice(uint128 _currentPrice,uint128 _StaticTotal,uint128 _RiskTotal, uint128 _ETHTotal) constant returns (uint128 price)  {}
-    function RiskPrice(uint128 _currentPrice) constant returns (uint128 price)  {}     
+    function RiskPrice(uint128 _currentPrice) constant returns (uint128 price)  {}
     function PriceReturn(uint _TransID,uint128 _Price) {}
     function NewStatic() external payable returns (uint _TransID)  {}
     function NewStaticAdr(address _Risk) external payable returns (uint _TransID)  {}
@@ -272,9 +272,9 @@ contract I_Pricer {
 }
 
 /** @title Pricer. */
-contract Pricer is I_Pricer, 
-	mortal, 
-	usingOraclize, 
+contract Pricer is I_Pricer,
+	mortal,
+	usingOraclize,
 	DSParser {
 	// <pair_name> = pair name
     // a = ask array(<price>, <whole lot volume>, <lot volume>),
@@ -286,7 +286,7 @@ contract Pricer is I_Pricer,
     // l = low array(<today>, <last 24 hours>),
     // h = high array(<today>, <last 24 hours>),
     // o = today's opening price
-	
+
     function Pricer(string _URL) {
 		/** @dev Constructor, allows the pricer URL to be set
           * @param _URL of the web query
@@ -301,7 +301,7 @@ contract Pricer is I_Pricer,
         revert();
     }
 
-    function setMinter(address _newAddress) 
+    function setMinter(address _newAddress)
 		onlyOwner {
 		/** @dev Allows the address of the minter to be set
           * @param _newAddress Address of the minter
@@ -310,17 +310,17 @@ contract Pricer is I_Pricer,
         mint=I_minter(_newAddress);
     }
 
-    function queryCost() 
-		constant 
+    function queryCost()
+		constant
 		returns (uint128 _value) {
-		/** @dev ETH cost of calling the oraclize 
+		/** @dev ETH cost of calling the oraclize
           * @param _newAddress Address of the minter
           * @return nothing
         */
-		return cast(oraclize_getPrice("URL")); 
+		return cast(oraclize_getPrice("URL"));
     }
 
-    function QuickPrice() 
+    function QuickPrice()
 		payable {
 		/** @dev Gets the latest price.  Be careful, All eth sent is kept by the contract.
           * @return nothing, but the new price will be stored in variable lastPrice
@@ -328,7 +328,7 @@ contract Pricer is I_Pricer,
         bytes32 TrasID =oraclize_query(1, "URL", sURL);
         RevTransaction[TrasID]=0;
     }
-	
+
     function __callback(bytes32 myid, string result) {
 		/** @dev ORACLIZE standard callback function-
           * @param myid Pricer transaction ID
@@ -348,8 +348,8 @@ contract Pricer is I_Pricer,
         delete RevTransaction[myid]; // free up the memory
     }
 
-	function setGas(uint gasPrice) 
-		onlyOwner 
+	function setGas(uint gasPrice)
+		onlyOwner
 		returns(bool) {
 		/** @dev Allows oraclize gas cost to be changed
           * @return True if sucessful
@@ -357,9 +357,9 @@ contract Pricer is I_Pricer,
 		oraclize_setCustomGasPrice(gasPrice);
 		return true;
     }
-	
-	function collectFee() 
-		onlyOwner 
+
+	function collectFee()
+		onlyOwner
 		returns(bool) {
 		/** @dev Allows ETH to be removed from this contract (only this one, not the minter)
           * @return True if sucessful
@@ -367,24 +367,92 @@ contract Pricer is I_Pricer,
         return owner.send(this.balance);
 		return true;
     }
-	
+
 	modifier onlyminter() {
-      if (msg.sender==address(mint)) 
+      if (msg.sender==address(mint))
       _;
     }
 
-    function requestPrice(uint _actionID) 
-		payable 
-		onlyminter 
+    function requestPrice(uint _actionID)
+		payable
+		onlyminter
 		returns (uint _TrasID){
 		/** @dev Minter only functuon.  Needs to be called with enough eth
           * @param _actionID Pricer transaction ID
           * @return calls minter.PriceReturn() with the price
         */
-        // 
+        //
         bytes32 TrasID;
         TrasID=oraclize_query(DELAY, "URL", sURL);
         RevTransaction[TrasID]=_actionID;
 		return _TrasID;
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

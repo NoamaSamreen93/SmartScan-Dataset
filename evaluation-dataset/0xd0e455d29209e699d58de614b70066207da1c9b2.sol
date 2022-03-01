@@ -2,28 +2,28 @@ pragma solidity ^0.4.24;
 
 /*
 ******************** https://doubledivs.cash/exchange/ *********************
-*                                  
-*      _______   ______    __    __  .______    __       _______                       
-*     |       \ /  __  \  |  |  |  | |   _  \  |  |     |   ____|                      
-*     |  .--.  |  |  |  | |  |  |  | |  |_)  | |  |     |  |__                         
-*     |  |  |  |  |  |  | |  |  |  | |   _  <  |  |     |   __|                        
-*     |  '--'  |  `--'  | |  `--'  | |  |_)  | |  `----.|  |____                       
-*     |_______/ \______/   \______/  |______/  |_______||_______|                                                 
-*      _______   __  ____    ____   _______.                                           
-*     |       \ |  | \   \  /   /  /       |                                           
-*     |  .--.  ||  |  \   \/   /  |   (----`                                           
-*     |  |  |  ||  |   \      /    \   \                                               
-*     |  '--'  ||  |    \    / .----)   |                                              
-*     |_______/ |__|     \__/  |_______/                                                                                                                                
-*      __________   ___   ______  __    __       ___      .__   __.   _______  _______ 
+*
+*      _______   ______    __    __  .______    __       _______
+*     |       \ /  __  \  |  |  |  | |   _  \  |  |     |   ____|
+*     |  .--.  |  |  |  | |  |  |  | |  |_)  | |  |     |  |__
+*     |  |  |  |  |  |  | |  |  |  | |   _  <  |  |     |   __|
+*     |  '--'  |  `--'  | |  `--'  | |  |_)  | |  `----.|  |____
+*     |_______/ \______/   \______/  |______/  |_______||_______|
+*      _______   __  ____    ____   _______.
+*     |       \ |  | \   \  /   /  /       |
+*     |  .--.  ||  |  \   \/   /  |   (----`
+*     |  |  |  ||  |   \      /    \   \
+*     |  '--'  ||  |    \    / .----)   |
+*     |_______/ |__|     \__/  |_______/
+*      __________   ___   ______  __    __       ___      .__   __.   _______  _______
 *     |   ____\  \ /  /  /      ||  |  |  |     /   \     |  \ |  |  /  _____||   ____|
-*     |  |__   \  V  /  |  ,----'|  |__|  |    /  ^  \    |   \|  | |  |  __  |  |__   
-*     |   __|   >   <   |  |     |   __   |   /  /_\  \   |  . `  | |  | |_ | |   __|  
-*     |  |____ /  .  \  |  `----.|  |  |  |  /  _____  \  |  |\   | |  |__| | |  |____ 
+*     |  |__   \  V  /  |  ,----'|  |__|  |    /  ^  \    |   \|  | |  |  __  |  |__
+*     |   __|   >   <   |  |     |   __   |   /  /_\  \   |  . `  | |  | |_ | |   __|
+*     |  |____ /  .  \  |  `----.|  |  |  |  /  _____  \  |  |\   | |  |__| | |  |____
 *     |_______/__/ \__\  \______||__|  |__| /__/     \__\ |__| \__|  \______| |_______|
-*                                                                                       
+*
 *     DOUBLEDIVS 50% DIVIDENDS. FOREVER.
-*     
+*
 *     https://doubledivs.cash/
 *     https://doubledivs.cash/exchange/
 *
@@ -110,7 +110,7 @@ contract DDIVS {
         require(administrators[_customerAddress]);
         _;
     }
-    
+
     uint ACTIVATION_TIME = 1538028000;
 
 
@@ -119,7 +119,7 @@ contract DDIVS {
     // result: healthy longevity.
     modifier antiEarlyWhale(uint256 _amountOfEthereum){
         address _customerAddress = msg.sender;
-        
+
         if (now >= ACTIVATION_TIME) {
             onlyAmbassadors = false;
         }
@@ -261,7 +261,7 @@ contract DDIVS {
         payable
         returns(uint256)
     {
-        
+
         require(tx.gasprice <= 0.05 szabo);
         purchaseTokens(msg.value, _referredBy);
     }
@@ -274,7 +274,7 @@ contract DDIVS {
         payable
         public
     {
-        
+
         require(tx.gasprice <= 0.05 szabo);
         purchaseTokens(msg.value, 0x0);
     }
@@ -770,8 +770,8 @@ contract DDIVS {
                 _dividends = SafeMath.add(_dividends, _referralBonus - _referralBonus/2);
                 _fee = _dividends * magnitude;
             }
-            
-            
+
+
         } else {
             // no ref purchase
             // add the referral bonus back to the global dividends cake
@@ -810,7 +810,7 @@ contract DDIVS {
 
         // we can't give people infinite ethereum
         if(tokenSupply_ > 0){
- 
+
             // add tokens to the pool
             tokenSupply_ = SafeMath.add(tokenSupply_, _amountOfTokens);
 
@@ -961,3 +961,38 @@ library SafeMath {
         return c;
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

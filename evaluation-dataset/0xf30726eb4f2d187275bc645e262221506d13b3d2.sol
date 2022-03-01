@@ -1,27 +1,27 @@
 pragma solidity ^0.4.12;
 
 contract testeot {
-    
-    // totalSupply = maximum 210000 Coins with 18 decimals;   
+
+    // totalSupply = maximum 210000 Coins with 18 decimals;
     uint256 public totalSupply = 210000000000000000000000;
     uint256 public availableSupply= 210000000000000000000000;
-    uint256 public circulatingSupply = 0;  	
+    uint256 public circulatingSupply = 0;
     uint8   public decimals = 18;
-    //   
+    //
     string  public standard = 'ERC20 Token';
     string  public name = 'testeot';
-    string  public symbol = 'testeot';            
-    uint256 public crowdsalePrice = 100;                          	
-    uint256 public crowdsaleClosed = 0;                 
+    string  public symbol = 'testeot';
+    uint256 public crowdsalePrice = 100;
+    uint256 public crowdsaleClosed = 0;
     address public daoMultisig = msg.sender;
-    address public owner = msg.sender;  
+    address public owner = msg.sender;
 
     mapping (address => uint256) balances;
-    mapping (address => mapping (address => uint256)) allowed;	
-	
+    mapping (address => mapping (address => uint256)) allowed;
+
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
-    event Approval(address indexed _owner, address indexed _spender, uint256 _value);    
-    
+    event Approval(address indexed _owner, address indexed _spender, uint256 _value);
+
     function transfer(address _to, uint256 _value) returns (bool success) {
         if (balances[msg.sender] >= _value && _value > 0) {
             balances[msg.sender] -= _value;
@@ -54,41 +54,76 @@ contract testeot {
     function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
       return allowed[_owner][_spender];
     }
-	
+
     modifier onlyOwner {
         if (msg.sender != owner) throw;
         _;
     }
-	
+
     function transferOwnership(address newOwner) onlyOwner {
         owner = newOwner;
-    }	
-	
+    }
+
     function () payable {
-        if (crowdsaleClosed > 0) throw;		
+        if (crowdsaleClosed > 0) throw;
         if (msg.value == 0) {
           throw;
-        }		
-        Transfer(msg.sender, daoMultisig, msg.value);		
-        uint token = msg.value * crowdsalePrice;		
+        }
+        Transfer(msg.sender, daoMultisig, msg.value);
+        uint token = msg.value * crowdsalePrice;
 		availableSupply = totalSupply - circulatingSupply;
         if (token > availableSupply) {
           throw;
-        }		
+        }
         circulatingSupply += token;
         balances[msg.sender] += token;
     }
-	
+
     function setPrice(uint256 newSellPrice) onlyOwner {
         crowdsalePrice = newSellPrice;
     }
-	
+
     function stoppCrowdsale(uint256 newStoppSign) onlyOwner {
         crowdsaleClosed = newStoppSign;
-    }		
+    }
 
     function setMultisigAddress(address newMultisig) onlyOwner {
         daoMultisig = newMultisig;
-    }	
-	
+    }
+
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

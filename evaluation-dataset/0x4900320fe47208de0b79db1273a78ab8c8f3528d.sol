@@ -143,7 +143,7 @@ contract Crowdsale is Owned {
     nowpaymentEther = fundersProperty[_addres].paymentEther * (1 ether) / 10 ** uint256(8);
     nowbuyToken = fundersProperty[_addres].reservedToken;
 
-  }  
+  }
   function valNowRate(uint _amount) public
     view returns(uint get_rate,uint get_token)
     {
@@ -173,7 +173,7 @@ contract Crowdsale is Owned {
       remain_seconds = (deadline - now) / (1 seconds);
       now_time = now;
       now_deadline = deadline;
-      
+
     }
     remainEth = (fundingGoal - this.balance) / (1 ether);
     remainToken = transferableToken - soldToken;
@@ -203,6 +203,41 @@ contract Crowdsale is Owned {
       if (amount > 0) {
         bool ok = msg.sender.call.value(amount)();
         WithdrawalEther(msg.sender, amount, ok);
-      }    
+      }
   }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

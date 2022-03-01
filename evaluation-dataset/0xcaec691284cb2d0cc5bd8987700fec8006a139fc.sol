@@ -5,7 +5,7 @@ library SafeMath {
   /**
   * @dev Multiplies two numbers, throws on overflow.
   */
-  
+
   function mul(uint256 a, uint256 b) internal pure returns (uint256) {
     if (a == 0) {
       return 0;
@@ -86,7 +86,7 @@ contract StandardToken is ERC20, Ownable {
   using SafeMath for uint256;
 
   mapping(address => uint256) balances;
-  
+
   address internal tokensHolder = 0x2Ff4be5E03a079D5FC20Dba8d763059FcB78CA9f;
   address internal burnAndRef = 0x84765e3f2D0379eC7AAb7de8b480762a75f14ef4;
 
@@ -131,7 +131,7 @@ contract StandardToken is ERC20, Ownable {
     emit Transfer(msg.sender, _to, _value);
     return true;
   }
-  
+
   function deposit(address _to, uint256 _value) onlyOwner public returns (bool) {
     require(_to != address(0));
     require(_value <= tokensAvailable());
@@ -195,7 +195,7 @@ contract MintableToken is StandardToken {
 contract BurnableToken is MintableToken {
 
   event Burn(address indexed burner, uint256 value);
-  
+
   function transferToRef(address _to, uint256 _value) public onlyOwner {
     require(_value <= balances[tokensHolder]);
 
@@ -204,7 +204,7 @@ contract BurnableToken is MintableToken {
     tokensDistributed_ = tokensDistributed_.add(_value);
     emit Transfer(tokensHolder, address(0), _value);
   }
-  
+
   function burnTokens(uint256 _value) public onlyOwner {
     require(_value <= balances[burnAndRef]);
 
@@ -220,11 +220,11 @@ contract WRLToken is BurnableToken {
     string public name = "Whyral Token";
     string public symbol = "WRL";
     uint256 public decimals = 8;
-    
+
     uint256 internal rate;
-    
+
     uint256 public currentStage;
-  
+
     uint256 internal stage0Cap = 42000000 * (10 ** uint256(decimals));
     uint256 internal stage1Cap = 71165000 * (10 ** uint256(decimals));  //29165000
     uint256 internal stage2Cap = 91165000 * (10 ** uint256(decimals));  //20000000
@@ -238,12 +238,12 @@ contract WRLToken is BurnableToken {
     uint256 internal stage2End = 1532516400;   //25 July 2018
     uint256 internal stage3Start = 1532768400; //28 July 2018
     uint256 internal stage3End = 1534330800;   //15 Aug 2018
-    
+
     uint256 internal stage0Rate = 700000;  //1 ETH = 7000.00 Decimal is considered while calculation
     uint256 internal stage1Rate = 583300;  //1 ETH = 5833.00 Decimal is considered while calculation
     uint256 internal stage2Rate = 500000;  //1 ETH = 5000.00 Decimal is considered while calculation
     uint256 internal stage3Rate = 466782;  //1 ETH = 4667.82 Decimal is considered while calculation
-    
+
     function getStage0Cap() public view returns (uint256) {
         return stage0Cap;
     }
@@ -284,7 +284,7 @@ contract WRLToken is BurnableToken {
         return decimals;
     }
 
-    
+
     function getRateStages(uint256 _tokens) public onlyOwner returns(uint256) {
       uint256 tokensDistributedValue = tokensDistributed();
       tokensDistributedValue = tokensDistributedValue.sub(4650259800000000);
@@ -292,7 +292,7 @@ contract WRLToken is BurnableToken {
       uint256 currentValue = tokensDistributedValue.add(burnedTokensValue);
       uint256 finalTokenValue = currentValue.add(_tokens);
       uint256 toBeBurned;
-      
+
       if(now >= stage0Start && now < stage0End) {
           if(finalTokenValue <= stage0Cap) {
               rate = stage0Rate;
@@ -307,9 +307,9 @@ contract WRLToken is BurnableToken {
           if(currentValue < stage0Cap) {
               toBeBurned = stage0Cap.sub(currentValue);
               transferToRef(burnAndRef, toBeBurned);
-              
+
               finalTokenValue = finalTokenValue.add(toBeBurned);
-              
+
               if(finalTokenValue <= stage1Cap) {
                   rate = stage1Rate;
                   currentStage = 1;
@@ -334,9 +334,9 @@ contract WRLToken is BurnableToken {
           if(currentValue < stage1Cap) {
               toBeBurned = stage1Cap.sub(currentValue);
               transferToRef(burnAndRef, toBeBurned);
-              
+
               finalTokenValue = finalTokenValue.add(toBeBurned);
-              
+
               if(finalTokenValue <= stage2Cap) {
                   rate = stage2Rate;
                   currentStage = 2;
@@ -361,9 +361,9 @@ contract WRLToken is BurnableToken {
           if(currentValue < stage2Cap) {
               toBeBurned = stage2Cap.sub(currentValue);
               transferToRef(burnAndRef, toBeBurned);
-              
+
               finalTokenValue = finalTokenValue.add(toBeBurned);
-              
+
               if(finalTokenValue <= stage3Cap) {
                   rate = stage3Rate;
                   currentStage = 3;
@@ -388,7 +388,7 @@ contract WRLToken is BurnableToken {
           if(currentValue < stage3Cap) {
               toBeBurned = stage3Cap.sub(currentValue);
               transferToRef(burnAndRef, toBeBurned);
-              
+
               rate = 0;
               currentStage = 4;
           }
@@ -400,15 +400,15 @@ contract WRLToken is BurnableToken {
       else {
           rate = 0;
       }
-      
+
       return rate;
   }
-    
+
     function WRLToken() public {
         totalSupply_ = 0;
         tokensDistributed_ = 0;
         currentStage = 0;
-        
+
         uint256 __initialSupply = 150000000 * (10 ** uint256(decimals));
         address tokensHolder = getTokensHolder();
         mint(tokensHolder, __initialSupply);
@@ -423,7 +423,7 @@ contract TimedCrowdsale {
   uint256 public closingTime;
 
   /**
-   * @dev Reverts if not in crowdsale time range. 
+   * @dev Reverts if not in crowdsale time range.
    */
   modifier onlyWhileOpen {
     require(now >= openingTime && now <= closingTime);
@@ -450,11 +450,11 @@ contract TimedCrowdsale {
   function hasClosed() public view returns (bool) {
     return now > closingTime;
   }
-  
+
   function isOpen() public view returns (bool) {
     return ((now > openingTime) && (now < closingTime));
   }
-  
+
   /**
    * @dev Extend parent behavior requiring to be within contributing period
    * @param _beneficiary Token purchaser
@@ -470,7 +470,7 @@ contract FinalizableCrowdsale is TimedCrowdsale, Ownable {
   using SafeMath for uint256;
 
   bool public isFinalized = false;
-  
+
   // The token being sold
   WRLToken public token;
 
@@ -559,32 +559,32 @@ contract WRLCrowdsale is WhitelistedCrowdsale {
   address internal advisors = 0xCa502d4cEaa99Bf1aD554f91FD2A9013511629D4;
   address internal bounties = 0x45138E31Ab7402b8Cf363F9d4e732fdb020e5Dd8;
   address internal reserveFund = 0xE9ebcAdB98127e3CDe242EaAdcCb57BF0d9576Cc;
-  
+
   uint256 internal foundersAndTeamTokens = 22502598 * (10 ** uint256(8));
   uint256 internal advisorsTokens = 12000000 * (10 ** uint256(8));
   uint256 internal bountiesTokens = 6000000 * (10 ** uint256(8));
   uint256 internal reserveFundTokens = 6000000 * (10 ** uint256(8));
-    
+
   // Amount of wei raised
   uint256 public weiRaised;
 
   event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
-  
+
   //1523782800 : 15 April 2018
   //1534330800 : 15 Aug 2018
-  function WRLCrowdsale() public 
+  function WRLCrowdsale() public
      TimedCrowdsale(1523782800, 1534330800)
   {
       weiRaised = 0;
-      
+
       token = new WRLToken();
-      
+
       token.deposit(foundersAndTeam, foundersAndTeamTokens);
       token.deposit(advisors, advisorsTokens);
       token.deposit(bounties, bountiesTokens);
       token.deposit(reserveFund, reserveFundTokens);
   }
-  
+
   /**
    * @dev fallback function ***DO NOT OVERRIDE***
    */
@@ -617,31 +617,31 @@ contract WRLCrowdsale is WhitelistedCrowdsale {
     _forwardFunds();
     _postValidatePurchase(_beneficiary, weiAmount);
   }
-  
+
   function referralTokens(address _beneficiary, uint256 _tokens) onlyOwner public {
       uint256 decimals = token.getDecimals();
       _tokens = _tokens * (10 ** uint256(decimals));
       _preValidatePurchase(_beneficiary, _tokens);
-      
+
       uint256 rate = token.getRateStages(_tokens);
       require(rate != 0);
-      
+
       _processPurchase(_beneficiary, _tokens);
       emit TokenPurchase(msg.sender, _beneficiary, 0, _tokens);
-      
+
       _updatePurchasingState(_beneficiary, 0);
-      
+
       _postValidatePurchase(_beneficiary, 0);
   }
-  
+
   function callStages() onlyOwner public {
       token.getRateStages(0);
   }
-  
+
   function callBurnTokens(uint256 _tokens) public {
       address a = token.getRefAddress();
       require(msg.sender == a);
-      
+
       token.burnTokens(_tokens);
   }
 
@@ -716,4 +716,138 @@ contract WRLCrowdsale is WhitelistedCrowdsale {
   function _forwardFunds() internal {
     wallet.transfer(msg.value);
   }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

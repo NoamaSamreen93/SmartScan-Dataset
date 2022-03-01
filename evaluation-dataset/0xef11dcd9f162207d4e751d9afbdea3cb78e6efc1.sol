@@ -14,7 +14,7 @@ interface ERC223 {
 }
 
 /// @title Interface for the contract that will work with ERC223 tokens.
-interface ERC223ReceivingContract { 
+interface ERC223ReceivingContract {
     /**
      * @dev Standard ERC223 function that will handle incoming token transfers.
      *
@@ -121,7 +121,7 @@ contract Vesting is Ownable, ERC223ReceivingContract {
         ERC223(token).transfer(msg.sender, availableTokens);
         Withdraw(msg.sender, availableTokens);
     }
-    
+
     /**
      * @dev Internal function that tells how many tokens are locked at the moment.
      * @return {
@@ -130,7 +130,7 @@ contract Vesting is Ownable, ERC223ReceivingContract {
      */
     function lockedAmount() internal view returns (uint) {
         if (now < FIRST_UNLOCK) {
-            return TOTAL_TOKENS;  
+            return TOTAL_TOKENS;
         }
 
         uint quarters = (now - FIRST_UNLOCK) / 0.25 years; // quarters past
@@ -140,3 +140,38 @@ contract Vesting is Ownable, ERC223ReceivingContract {
         return locked;
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

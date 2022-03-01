@@ -91,7 +91,7 @@ library SafeMath {
 
 contract AdvisorsVesting {
     using SafeMath for uint256;
-    
+
     modifier onlyV12MultiSig {
         require(msg.sender == v12MultiSig, "not owner");
         _;
@@ -121,7 +121,7 @@ contract AdvisorsVesting {
     event ChangedMultisig(address multisig);
 
     ERC20 public token;
-    
+
     mapping (uint256 => Grant) public tokenGrants;
 
     address public v12MultiSig;
@@ -132,14 +132,14 @@ contract AdvisorsVesting {
         v12MultiSig = msg.sender;
         token = _token;
     }
-    
+
     function addTokenGrant(
         address _recipient,
         uint256 _startTime,
         uint256 _amount,
         uint256 _vestingDurationInDays,
-        uint256 _vestingCliffInDays    
-    ) 
+        uint256 _vestingCliffInDays
+    )
         external
         onlyV12MultiSig
         onlyValidAddress(_recipient)
@@ -147,7 +147,7 @@ contract AdvisorsVesting {
         require(_vestingCliffInDays <= 10*365, "more than 10 years");
         require(_vestingDurationInDays <= 25*365, "more than 25 years");
         require(_vestingDurationInDays >= _vestingCliffInDays, "Duration < Cliff");
-        
+
         uint256 amountVestedPerDay = _amount.div(_vestingDurationInDays);
         require(amountVestedPerDay > 0, "amountVestedPerDay > 0");
 
@@ -200,7 +200,7 @@ contract AdvisorsVesting {
         // Check cliff was reached
         uint elapsedTime = currentTime().sub(tokenGrant.startTime);
         uint elapsedDays = elapsedTime.div(SECONDS_PER_DAY);
-        
+
         if (elapsedDays < tokenGrant.vestingCliff) {
             return (elapsedDays, 0);
         }
@@ -228,7 +228,7 @@ contract AdvisorsVesting {
         Grant storage tokenGrant = tokenGrants[_grantId];
         tokenGrant.daysClaimed = tokenGrant.daysClaimed.add(daysVested);
         tokenGrant.totalClaimed = tokenGrant.totalClaimed.add(amountVested);
-        
+
         require(token.transfer(tokenGrant.recipient, amountVested), "no tokens");
         emit GrantTokensClaimed(tokenGrant.recipient, amountVested);
     }
@@ -237,8 +237,8 @@ contract AdvisorsVesting {
     /// and returning all non-vested tokens to the V12 MultiSig
     /// Secured to the V12 MultiSig only
     /// @param _grantId grantId of the token grant recipient
-    function removeTokenGrant(uint256 _grantId) 
-        external 
+    function removeTokenGrant(uint256 _grantId)
+        external
         onlyV12MultiSig
     {
         Grant storage tokenGrant = tokenGrants[_grantId];
@@ -274,8 +274,8 @@ contract AdvisorsVesting {
         return tokenGrant.amount.div(uint256(tokenGrant.vestingDuration));
     }
 
-    function changeMultiSig(address _newMultisig) 
-        external 
+    function changeMultiSig(address _newMultisig)
+        external
         onlyV12MultiSig
         onlyValidAddress(_newMultisig)
     {
@@ -284,3 +284,132 @@ contract AdvisorsVesting {
     }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

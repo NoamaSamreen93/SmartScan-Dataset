@@ -73,7 +73,7 @@ contract CryptoCupToken is ERC721 {
 	uint256 private quarterFinalWinnerPayments = 0;
 	uint256 private semiFinalWinnerPayments = 0;
 	bool private tournamentComplete = false;
-    
+
     /*****------- STORAGE -------******/
     mapping (uint256 => address) public teamOwners;
     mapping (address => uint256) private ownerTeamCount;
@@ -81,7 +81,7 @@ contract CryptoCupToken is ERC721 {
     mapping (uint256 => uint256) private teamPrices;
     address public contractModifierAddress;
     address public developerAddress;
-    
+
     /*****------- DATATYPES -------******/
     struct Team {
         string name;
@@ -101,7 +101,7 @@ contract CryptoCupToken is ERC721 {
     }
 
     Team[] private teams;
-    
+
     struct PayoutPrizes {
         uint256 LastSixteenWinner;
         bool LastSixteenTotalFixed;
@@ -111,7 +111,7 @@ contract CryptoCupToken is ERC721 {
         bool SemiFinalTotalFixed;
         uint256 TournamentWinner;
     }
-    
+
     PayoutPrizes private prizes;
 
     /*****------- MODIFIERS -------******/
@@ -119,7 +119,7 @@ contract CryptoCupToken is ERC721 {
         require(msg.sender == contractModifierAddress);
         _;
     }
-    
+
     /*****------- CONSTRUCTOR -------******/
     constructor() public {
         contractModifierAddress = msg.sender;
@@ -130,16 +130,16 @@ contract CryptoCupToken is ERC721 {
         prizes.QuarterFinalTotalFixed = false;
         prizes.SemiFinalTotalFixed = false;
     }
-    
+
     /*****------- PUBLIC FUNCTIONS -------******/
     function name() public pure returns (string) {
         return "CryptoCup";
     }
-  
+
     function symbol() public pure returns (string) {
         return "CryptoCupToken";
     }
-    
+
     function implementsERC721() public pure returns (bool) {
         return true;
     }
@@ -149,37 +149,37 @@ contract CryptoCupToken is ERC721 {
         require(owner != address(0));
         return owner;
     }
-    
+
     function takeOwnership(uint256 _tokenId) public {
         address to = msg.sender;
         address from = teamOwners[_tokenId];
-    
+
         require(_addressNotNull(to));
         require(_approved(to, _tokenId));
-    
+
         _transfer(from, to, _tokenId);
     }
-    
+
     function approve(address _to, uint256 _tokenId) public {
         require(_owns(msg.sender, _tokenId));
         teamToApproved[_tokenId] = _to;
         emit Approval(msg.sender, _to, _tokenId);
     }
-    
+
     function balanceOf(address _owner) public view returns (uint256 balance) {
         return ownerTeamCount[_owner];
     }
-    
+
     function totalSupply() public view returns (uint256 total) {
         return teams.length;
     }
-    
+
     function transfer(address _to, uint256 _tokenId) public {
         require(_owns(msg.sender, _tokenId));
         require(_addressNotNull(_to));
         _transfer(msg.sender, _to, _tokenId);
     }
-    
+
     function transferFrom(address _from, address _to, uint256 _tokenId) public {
         require(_owns(_from, _tokenId));
         require(_approved(_to, _tokenId));
@@ -195,7 +195,7 @@ contract CryptoCupToken is ERC721 {
         require(_newDeveloperAddress != address(0));
         developerAddress = _newDeveloperAddress;
     }
-    
+
     function createTeams() public onlyContractModifier {
         _createTeam("Russia", "RUS", startingPrice, developerAddress);
         _createTeam("Saudi Arabia", "KSA", startingPrice, developerAddress);
@@ -230,23 +230,23 @@ contract CryptoCupToken is ERC721 {
         _createTeam("Colombia", "COL", startingPrice, developerAddress);
         _createTeam("Japan", "JPN", startingPrice, developerAddress);
     }
-    
+
     function createTeam(string name, string code) public onlyContractModifier {
         _createTeam(name, code, startingPrice, developerAddress);
     }
-    
+
     function lockInLastSixteenPrize() public onlyContractModifier {
         prizes.LastSixteenTotalFixed = true;
     }
-    
+
     function payLastSixteenWinner(uint256 _tokenId) public onlyContractModifier {
         require(prizes.LastSixteenTotalFixed != false);
         require(lastSixteenWinnerPayments < 8);
         require(tournamentComplete != true);
-        
+
         Team storage team = teams[_tokenId];
         require(team.numPayouts == 0);
-        
+
         team.owner.transfer(prizes.LastSixteenWinner);
         emit PrizePaid("Last Sixteen", _tokenId, team.owner, prizes.LastSixteenWinner, uint256(now));
 
@@ -256,15 +256,15 @@ contract CryptoCupToken is ERC721 {
             to: team.owner,
             when: uint256(now)
         });
-        
+
         lastSixteenWinnerPayments++;
     }
-    
+
     function lockInQuarterFinalPrize() public onlyContractModifier {
         require(prizes.LastSixteenTotalFixed != false);
         prizes.QuarterFinalTotalFixed = true;
     }
-    
+
     function payQuarterFinalWinner(uint256 _tokenId) public onlyContractModifier {
         require(prizes.QuarterFinalTotalFixed != false);
         require(quarterFinalWinnerPayments < 4);
@@ -282,15 +282,15 @@ contract CryptoCupToken is ERC721 {
             to: team.owner,
             when: uint256(now)
         });
-        
+
         quarterFinalWinnerPayments++;
     }
-    
+
     function lockInSemiFinalPrize() public onlyContractModifier {
         require(prizes.QuarterFinalTotalFixed != false);
         prizes.SemiFinalTotalFixed = true;
     }
-        
+
     function paySemiFinalWinner(uint256 _tokenId) public onlyContractModifier {
         require(prizes.SemiFinalTotalFixed != false);
         require(semiFinalWinnerPayments < 2);
@@ -299,7 +299,7 @@ contract CryptoCupToken is ERC721 {
         require(team.numPayouts == 2);
         Payout storage payout = team.payouts[1];
         require(_compareStrings(payout.stage, "Quarter Final"));
-        
+
         team.owner.transfer(prizes.SemiFinalWinner);
         emit PrizePaid("Semi Final", _tokenId, team.owner, prizes.SemiFinalWinner, uint256(now));
         team.payouts[team.numPayouts++] = Payout({
@@ -308,10 +308,10 @@ contract CryptoCupToken is ERC721 {
             to: team.owner,
             when: uint256(now)
         });
-        
+
         semiFinalWinnerPayments++;
     }
-    
+
     function payTournamentWinner(uint256 _tokenId) public onlyContractModifier {
         require (tournamentComplete != true);
         Team storage team = teams[_tokenId];
@@ -327,7 +327,7 @@ contract CryptoCupToken is ERC721 {
             to: team.owner,
             when: uint256(now)
         });
-        
+
         tournamentComplete = true;
     }
 
@@ -348,7 +348,7 @@ contract CryptoCupToken is ERC721 {
         owner = team.owner;
         numPayouts = team.numPayouts;
     }
-        
+
     function getTeamPayouts(uint256 _tokenId, uint256 _payoutId) public view returns (uint256 id, string stage, uint256 amount, address to, uint256 when) {
         Team storage team = teams[_tokenId];
         Payout storage payout = team.payouts[_payoutId];
@@ -364,24 +364,24 @@ contract CryptoCupToken is ERC721 {
         address from = teamOwners[_tokenId];
         address to = msg.sender;
         uint256 price = teamPrices[_tokenId];
-        
+
 	    require(_addressNotNull(to));
         require(from != to);
         require(msg.value >= price);
-        
+
         Team storage team = teams[_tokenId];
-	    
+
         uint256 purchaseExcess = SafeMath.sub(msg.value, price);
         uint256 profit = SafeMath.sub(price, team.cost);
-        
+
 	    // get 15% - 5 goes to dev and 10 stays in prize fund that is split during knockout stages
 	    uint256 onePercent = SafeMath.div(profit, 100);
 	    uint256 developerAllocation = SafeMath.mul(onePercent, 5);
 	    uint256 saleProceeds = SafeMath.add(SafeMath.mul(onePercent, 85), team.cost);
 	    uint256 fundProceeds = SafeMath.mul(onePercent, 10);
-	    
+
 	    _transfer(from, to, _tokenId);
-	    
+
 	    // Pay previous owner if owner is not contract
         if (from != address(this)) {
 	        from.transfer(saleProceeds);
@@ -391,29 +391,29 @@ contract CryptoCupToken is ERC721 {
         if (developerAddress != address(this)) {
 	        developerAddress.transfer(developerAllocation);
         }
-        
+
         uint256 slice = 0;
-        
+
         // Increase prize fund totals
         if (!prizes.LastSixteenTotalFixed) {
             slice = SafeMath.div(fundProceeds, 4);
-            prizes.LastSixteenWinner += SafeMath.div(slice, 8);    
-            prizes.QuarterFinalWinner += SafeMath.div(slice, 4);    
-            prizes.SemiFinalWinner += SafeMath.div(slice, 2);    
-            prizes.TournamentWinner += slice;    
+            prizes.LastSixteenWinner += SafeMath.div(slice, 8);
+            prizes.QuarterFinalWinner += SafeMath.div(slice, 4);
+            prizes.SemiFinalWinner += SafeMath.div(slice, 2);
+            prizes.TournamentWinner += slice;
         } else if (!prizes.QuarterFinalTotalFixed) {
             slice = SafeMath.div(fundProceeds, 3);
-            prizes.QuarterFinalWinner += SafeMath.div(slice, 4);    
-            prizes.SemiFinalWinner += SafeMath.div(slice, 2);    
-            prizes.TournamentWinner += slice;   
+            prizes.QuarterFinalWinner += SafeMath.div(slice, 4);
+            prizes.SemiFinalWinner += SafeMath.div(slice, 2);
+            prizes.TournamentWinner += slice;
         } else if (!prizes.SemiFinalTotalFixed) {
             slice = SafeMath.div(fundProceeds, 2);
             prizes.SemiFinalWinner += SafeMath.div(slice, 2);
-            prizes.TournamentWinner += slice;   
+            prizes.TournamentWinner += slice;
         } else {
-            prizes.TournamentWinner += fundProceeds;   
+            prizes.TournamentWinner += fundProceeds;
         }
-	    
+
 		// Set new price for team
 	    uint256 newPrice = 0;
         if (price < doublePriceUntil) {
@@ -421,19 +421,19 @@ contract CryptoCupToken is ERC721 {
         } else {
             newPrice = SafeMath.div(SafeMath.mul(price, 115), 100);
         }
-		
+
 	    teamPrices[_tokenId] = newPrice;
 	    team.cost = price;
 	    team.price = newPrice;
-	    
+
 	    emit TeamSold(_tokenId, from, price, to, newPrice, uint256(now), address(this).balance, prizes.LastSixteenWinner, prizes.QuarterFinalWinner, prizes.SemiFinalWinner, prizes.TournamentWinner);
-	    
+
 	    msg.sender.transfer(purchaseExcess);
 	}
-	
+
     function getPrizeFund() public view returns (bool lastSixteenTotalFixed, uint256 lastSixteenWinner, bool quarterFinalTotalFixed, uint256 quarterFinalWinner, bool semiFinalTotalFixed, uint256 semiFinalWinner, uint256 tournamentWinner, uint256 total) {
         lastSixteenTotalFixed = prizes.LastSixteenTotalFixed;
-        lastSixteenWinner = prizes.LastSixteenWinner;   
+        lastSixteenWinner = prizes.LastSixteenWinner;
         quarterFinalTotalFixed = prizes.QuarterFinalTotalFixed;
         quarterFinalWinner = prizes.QuarterFinalWinner;
         semiFinalTotalFixed = prizes.SemiFinalTotalFixed;
@@ -445,8 +445,8 @@ contract CryptoCupToken is ERC721 {
     /********----------- PRIVATE FUNCTIONS ------------********/
     function _addressNotNull(address _to) private pure returns (bool) {
         return _to != address(0);
-    }   
-    
+    }
+
     function _createTeam(string _name, string _code, uint256 _price, address _owner) private {
         Team memory team = Team({
             name: _name,
@@ -459,34 +459,102 @@ contract CryptoCupToken is ERC721 {
 
         uint256 newTeamId = teams.push(team) - 1;
         teamPrices[newTeamId] = _price;
-        
+
         _transfer(address(0), _owner, newTeamId);
     }
-    
+
     function _approved(address _to, uint256 _tokenId) private view returns (bool) {
         return teamToApproved[_tokenId] == _to;
     }
-    
+
     function _transfer(address _from, address _to, uint256 _tokenId) private {
         ownerTeamCount[_to]++;
         teamOwners[_tokenId] = _to;
-        
+
         Team storage team = teams[_tokenId];
         team.owner = _to;
-        
+
         if (_from != address(0)) {
           ownerTeamCount[_from]--;
           delete teamToApproved[_tokenId];
         }
-        
+
         emit Transfer(_from, _to, _tokenId);
     }
-    
+
     function _owns(address _claimant, uint256 _tokenId) private view returns (bool) {
         return _claimant == teamOwners[_tokenId];
-    }    
-    
+    }
+
     function _compareStrings (string a, string b) private pure returns (bool){
         return keccak256(a) == keccak256(b);
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

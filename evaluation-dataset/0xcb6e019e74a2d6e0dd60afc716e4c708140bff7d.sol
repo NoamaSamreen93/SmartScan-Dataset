@@ -8,28 +8,28 @@ contract AutoChainTokenCandyInface{
     // 返回token总量，名称为totalSupply().
     function  totalSupply()  public constant returns (uint256 );
 
-    /// 获取账户_owner拥有token的数量 
+    /// 获取账户_owner拥有token的数量
     function  balanceOf(address _owner)  public constant returns (uint256 );
 
     //从消息发送者账户中往_to账户转数量为_value的token
     function  transfer(address _to, uint256 _value) public returns (bool );
 
     //从账户_from中往账户_to转数量为_value的token，与approve方法配合使用
-    function  transferFrom(address _from, address _to, uint256 _value) public returns   
+    function  transferFrom(address _from, address _to, uint256 _value) public returns
     (bool );
 
     //消息发送账户设置账户_spender能从发送账户中转出数量为_value的token
     function  approve(address _spender, uint256 _value) public returns (bool );
 
     //获取账户_spender可以从账户_owner中转出token的数量
-    function  allowance(address _owner, address _spender) public constant returns 
+    function  allowance(address _owner, address _spender) public constant returns
     (uint256 );
 
-    //发生转账时必须要触发的事件 
+    //发生转账时必须要触发的事件
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
 
     //当函数approve(address _spender, uint256 _value)成功执行时必须触发的事件
-    event Approval(address indexed _owner, address indexed _spender, uint256 
+    event Approval(address indexed _owner, address indexed _spender, uint256
     _value);
 }
 
@@ -54,7 +54,7 @@ contract AutoChainTokenCandy is AutoChainTokenCandyInface {
         _localname = 'AutoChainTokenCandy';                   // token名称
         _localdecimals = 4;           // 小数位数
         _localsymbol = 'ATCx';             // token简称
-        
+
     }
 
     function getOwner() constant public returns (address ){
@@ -85,7 +85,7 @@ contract AutoChainTokenCandy is AutoChainTokenCandyInface {
         emit Transfer(msg.sender, _to, _value);//触发转币交易事件
         return true;
     }
-    function  transferFrom(address _from, address _to, uint256 _value) public returns 
+    function  transferFrom(address _from, address _to, uint256 _value) public returns
     (bool ) {
         require(balances[_from] >= _value &&  balances[_to] + _value > balances[_to] && allowed[_from][msg.sender] >= _value);
         balances[_to] += _value;//接收账户增加token数量_value
@@ -97,7 +97,7 @@ contract AutoChainTokenCandy is AutoChainTokenCandyInface {
     function  balanceOf(address _owner) public constant returns (uint256 ) {
         return balances[_owner];
     }
-    function  approve(address _spender, uint256 _value) public returns (bool )   
+    function  approve(address _spender, uint256 _value) public returns (bool )
     {
         allowed[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
@@ -106,4 +106,138 @@ contract AutoChainTokenCandy is AutoChainTokenCandyInface {
     function  allowance(address _owner, address _spender) public constant returns (uint256 ) {
         return allowed[_owner][_spender];//允许_spender从_owner中转出的token数
     }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

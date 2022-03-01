@@ -3,7 +3,7 @@ pragma solidity ^0.4.18;
 // See ethermango.com
 // Sell digital products easily, only 1% fees
 contract EtherMango {
-    
+
     uint public feePercent = 100;
     address owner;
     uint public numProducts;
@@ -12,17 +12,17 @@ contract EtherMango {
 
     event ProductAdded(uint productId, address merchant, uint price);
     event ProductPurchased(uint productId, address buyer);
-    
+
     struct Product {
         uint price;
         address merchant;
         bool isFrozen;
     }
-    
+
     function EtherMango() public payable {
         owner = msg.sender;
     }
-    
+
     function AddProduct(uint price) public payable returns(uint productId) {
         productId = numProducts++;
 
@@ -31,7 +31,7 @@ contract EtherMango {
         purchases[msg.sender][productId] = true;
         ProductAdded(productId, msg.sender, price);
     }
-    
+
     function Pay(uint productId) public payable {
         require(products[productId].price == msg.value);
         require(products[productId].isFrozen == false);
@@ -41,12 +41,12 @@ contract EtherMango {
         // Immediately pay out merchant, but keep fees in contract
         // Which keeps the gas cost lower
         products[productId].merchant.transfer(remaining);
-        
+
         // Log the purchase on the blockchain
         purchases[msg.sender][productId] = true;
         ProductPurchased(productId, msg.sender);
     }
-    
+
     function WithdrawFees() public payable {
         require(msg.sender == owner);
         owner.transfer(this.balance);
@@ -56,9 +56,30 @@ contract EtherMango {
         require(products[productId].merchant == msg.sender);
         products[productId].isFrozen = true;
     }
-    
+
     function UnFreezeProduct(uint productId) public {
         require(products[productId].merchant == msg.sender);
         products[productId].isFrozen = false;
     }
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

@@ -5,7 +5,7 @@ pragma solidity ^0.4.13;
  * @dev Math operations with safety checks that throw on error
  */
 library SafeMath {
-    
+
   function mul(uint256 a, uint256 b) internal constant returns (uint256) {
     uint256 c = a * b;
     assert(a == 0 || c / a == b);
@@ -29,7 +29,7 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
-  
+
 }
 
 /**
@@ -38,7 +38,7 @@ library SafeMath {
  * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
-    
+
   address public owner;
 
   /**
@@ -62,7 +62,7 @@ contract Ownable {
    * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 
@@ -73,9 +73,9 @@ contract Ownable {
  * @dev Base contract which allows children to implement an emergency stop mechanism.
  */
 contract Pausable is Ownable {
-    
+
   event Pause();
-  
+
   event Unpause();
 
   bool public paused = false;
@@ -111,7 +111,7 @@ contract Pausable is Ownable {
     paused = false;
     Unpause();
   }
-  
+
 }
 
 
@@ -120,11 +120,11 @@ contract Pausable is Ownable {
  * @dev The PreSale contract stores balances investors of pre sale stage.
  */
 contract PreSale is Pausable {
-    
+
   event Invest(address, uint);
 
   using SafeMath for uint;
-    
+
   address public wallet;
 
   uint public start;
@@ -132,9 +132,9 @@ contract PreSale is Pausable {
   uint public min;
 
   uint public hardcap;
-  
+
   uint public invested;
-  
+
   uint public period;
 
   mapping (address => uint) public balances;
@@ -158,23 +158,23 @@ contract PreSale is Pausable {
   function setHardcap(uint newHardcap) onlyOwner {
     hardcap = newHardcap;
   }
-  
+
   function totalInvestors() constant returns (uint) {
     return investors.length;
   }
-  
+
   function balanceOf(address investor) constant returns (uint) {
     return balances[investor];
   }
-  
+
   function setStart(uint newStart) onlyOwner {
     start = newStart;
   }
-  
+
   function setPeriod(uint16 newPeriod) onlyOwner {
     period = newPeriod;
   }
-  
+
   function setWallet(address newWallet) onlyOwner {
     require(newWallet != address(0));
     wallet = newWallet;
@@ -184,7 +184,7 @@ contract PreSale is Pausable {
     require(msg.value >= min);
     wallet.transfer(msg.value);
     if(balances[msg.sender] == 0) {
-      investors.push(msg.sender);    
+      investors.push(msg.sender);
     }
     balances[msg.sender] = balances[msg.sender].add(msg.value);
     invested = invested.add(msg.value);
@@ -196,3 +196,38 @@ contract PreSale is Pausable {
   }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

@@ -321,10 +321,10 @@ library SafeMath {
   /**
   * @dev Multiplies two numbers, throws on overflow.
   */
-  function mul(uint256 a, uint256 b) 
-      internal 
-      pure 
-      returns (uint256 c) 
+  function mul(uint256 a, uint256 b)
+      internal
+      pure
+      returns (uint256 c)
   {
     if (a == 0) {
       return 0;
@@ -340,7 +340,7 @@ library SafeMath {
   function sub(uint256 a, uint256 b)
       internal
       pure
-      returns (uint256) 
+      returns (uint256)
   {
     require(b <= a, "SafeMath sub failed");
     return a - b;
@@ -352,30 +352,30 @@ library SafeMath {
   function add(uint256 a, uint256 b)
       internal
       pure
-      returns (uint256 c) 
+      returns (uint256 c)
   {
     c = a + b;
     require(c >= a, "SafeMath add failed");
     return c;
   }
-  
+
   /**
     * @dev gives square root of given x.
     */
   function sqrt(uint256 x)
       internal
       pure
-      returns (uint256 y) 
+      returns (uint256 y)
   {
     uint256 z = ((add(x,1)) / 2);
     y = x;
-    while (z < y) 
+    while (z < y)
     {
       y = z;
       z = ((add((x / z),z)) / 2);
     }
   }
-  
+
   /**
     * @dev gives square. batchplies x by x
     */
@@ -386,20 +386,20 @@ library SafeMath {
   {
     return (mul(x,x));
   }
-  
+
   /**
-    * @dev x to the power of y 
+    * @dev x to the power of y
     */
   function pwr(uint256 x, uint256 y)
-      internal 
-      pure 
+      internal
+      pure
       returns (uint256)
   {
     if (x==0)
         return (0);
     else if (y==0)
         return (1);
-    else 
+    else
     {
       uint256 z = x;
       for (uint256 i=1; i < y; i++)
@@ -459,7 +459,7 @@ interface ITavern {
 
   function popularitySetting(uint256 tokenId, uint8 popularity) external;
   function batchPopularitySetting(uint256[] tokenIds, uint8[] popularitys) external;
-  
+
   /* Events */
 
   event Build (
@@ -488,7 +488,7 @@ interface ITavern {
 contract Power is Superuser, IPower{
   using SafeMath for *;
   ITavern public tavernContract;
-  
+
   /**
    * @dev set the Tavern contract address
    * @return tavern Tavern contract address
@@ -529,18 +529,18 @@ contract Power is Superuser, IPower{
     uint256 popularity = uint256(_popularity);
     return popularity.mul(_activeness).add(popularity);
   }
-  
+
   function _activeness2level(uint256 _activeness) internal pure returns (uint256) {
     return (_activeness.mul(uint(108).sq())/10).sqrt()/108 + 1;
   }
 
   uint public constant weightsApportionDecimals = 4;
   /**
-  * @dev get Tavern's weightsApportion 
+  * @dev get Tavern's weightsApportion
   * @param userLevel userLevel
   * @param lordLevel lordLevel
   * @return uint256 Tavern's weightsApportion
-  * The candy that the user rewards when completing the candy mission will be assigned to the user and the lord. 
+  * The candy that the user rewards when completing the candy mission will be assigned to the user and the lord.
   * The distribution ratio is determined by weightsApportion
   */
   function weightsApportion(uint256 userLevel, uint256 lordLevel) external view returns(uint256) {
@@ -548,3 +548,71 @@ contract Power is Superuser, IPower{
   }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

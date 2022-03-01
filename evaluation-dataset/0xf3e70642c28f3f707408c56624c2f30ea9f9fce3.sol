@@ -103,7 +103,7 @@ contract ERC20Basic {
 
 contract BasicToken is ERC20Basic, Ownable {
   using SafeMath for uint256;
-    
+
   mapping (address => bool) public staff;
   mapping (address => uint256) balances;
   uint256 totalSupply_;
@@ -117,16 +117,16 @@ contract BasicToken is ERC20Basic, Ownable {
   bool public listing = false;
   bool public freezing = true;
   address public agentAddress;
-  
+
   function totalSupply() public view returns (uint256) {
     return totalSupply_;
   }
-  
+
   modifier afterListing() {
     require(listing == true || owner == msg.sender || agentAddress == msg.sender);
     _;
   }
-  
+
   function checkVesting(address sender) public view returns (uint256) {
     if (now >= launchTime.add(270 days)) {
         return balances[sender];
@@ -144,21 +144,21 @@ contract BasicToken is ERC20Basic, Ownable {
         return balances[sender].sub(uniqueTokens[sender].add(preSaleTokens[sender].mul(9).div(10)).add(crowdSaleTokens[sender].mul(8).div(10)));
     }
   }
-  
+
   function checkVestingWithFrozen(address sender) public view returns (uint256) {
     if (freezing) {
-        
+
       if (freezeTimeBlock[sender] <= now) {
           return checkVesting(sender);
       } else {
           return checkVesting(sender).sub(freezeTokens[sender]);
       }
-    
+
     } else {
         return checkVesting(sender);
     }
   }
-  
+
   /**
   * @dev transfer token for a specified address
   * @param _to The address to transfer to.
@@ -179,7 +179,7 @@ contract BasicToken is ERC20Basic, Ownable {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) public view returns (uint256 balance) {
@@ -261,7 +261,7 @@ contract StandardToken is ERC20, BurnableToken {
   function allowance(address _owner, address _spender) public view returns (uint256) {
     return allowed[_owner][_spender];
   }
-  
+
 }
 
 contract AlbosWallet is Ownable {
@@ -274,7 +274,7 @@ contract AlbosWallet is Ownable {
   address public reservedAddress;
 
   AlbosToken public albosAddress;
-  
+
   constructor(address _albosAddress, address _foundersAddress, address _reservedAddress) public {
     albosAddress = AlbosToken(_albosAddress);
     owner = albosAddress;
@@ -336,12 +336,12 @@ contract AlbosToken is StandardToken {
   string constant public name = "ALBOS Token";
   string constant public symbol = "ALB";
   uint256 public decimals = 18;
-  
+
   uint256 public INITIAL_SUPPLY = uint256(28710000000).mul(10 ** decimals); // 28,710,000,000 tokens
   uint256 public foundersSupply = uint256(4306500000).mul(10 ** decimals); // 4,306,500,000 tokens
   uint256 public reservedSupply = uint256(2871000000).mul(10 ** decimals); // 2,871,000,000 tokens
   AlbosWallet public albosWallet;
-  
+
   constructor() public {
     totalSupply_ = INITIAL_SUPPLY;
     balances[address(this)] = totalSupply_;
@@ -351,7 +351,7 @@ contract AlbosToken is StandardToken {
     staff[owner] = true;
     staff[agentAddress] = true;
   }
-  
+
   modifier onlyAgent() {
     require(msg.sender == agentAddress || msg.sender == owner);
     _;
@@ -374,15 +374,15 @@ contract AlbosToken is StandardToken {
 
   function addUniqueSaleTokens(address sender, uint256 amount) external onlyAgent {
     uniqueTokens[sender] = uniqueTokens[sender].add(amount);
-    
+
     balances[address(this)] = balances[address(this)].sub(amount);
     balances[sender] = balances[sender].add(amount);
     emit Transfer(address(this), sender, amount);
   }
-  
+
   function addUniqueSaleTokensMulti(address[] sender, uint256[] amount) external onlyAgent {
     require(sender.length > 0 && sender.length == amount.length);
-    
+
     for(uint i = 0; i < sender.length; i++) {
       uniqueTokens[sender[i]] = uniqueTokens[sender[i]].add(amount[i]);
       balances[address(this)] = balances[address(this)].sub(amount[i]);
@@ -390,34 +390,34 @@ contract AlbosToken is StandardToken {
       emit Transfer(address(this), sender[i], amount[i]);
     }
   }
-  
+
   function addPrivateSaleTokens(address sender, uint256 amount) external onlyAgent {
     balances[address(this)] = balances[address(this)].sub(amount);
     balances[sender] = balances[sender].add(amount);
     emit Transfer(address(this), sender, amount);
   }
-  
+
   function addPrivateSaleTokensMulti(address[] sender, uint256[] amount) external onlyAgent {
     require(sender.length > 0 && sender.length == amount.length);
-    
+
     for(uint i = 0; i < sender.length; i++) {
       balances[address(this)] = balances[address(this)].sub(amount[i]);
       balances[sender[i]] = balances[sender[i]].add(amount[i]);
       emit Transfer(address(this), sender[i], amount[i]);
     }
   }
-  
+
   function addPreSaleTokens(address sender, uint256 amount) external onlyAgent {
     preSaleTokens[sender] = preSaleTokens[sender].add(amount);
-    
+
     balances[address(this)] = balances[address(this)].sub(amount);
     balances[sender] = balances[sender].add(amount);
     emit Transfer(address(this), sender, amount);
   }
-  
+
   function addPreSaleTokensMulti(address[] sender, uint256[] amount) external onlyAgent {
     require(sender.length > 0 && sender.length == amount.length);
-    
+
     for(uint i = 0; i < sender.length; i++) {
       preSaleTokens[sender[i]] = preSaleTokens[sender[i]].add(amount[i]);
       balances[address(this)] = balances[address(this)].sub(amount[i]);
@@ -425,10 +425,10 @@ contract AlbosToken is StandardToken {
       emit Transfer(address(this), sender[i], amount[i]);
     }
   }
-  
+
   function addCrowdSaleTokens(address sender, uint256 amount) external onlyAgent {
     crowdSaleTokens[sender] = crowdSaleTokens[sender].add(amount);
-    
+
     balances[address(this)] = balances[address(this)].sub(amount);
     balances[sender] = balances[sender].add(amount);
     emit Transfer(address(this), sender, amount);
@@ -436,7 +436,7 @@ contract AlbosToken is StandardToken {
 
   function addCrowdSaleTokensMulti(address[] sender, uint256[] amount) external onlyAgent {
     require(sender.length > 0 && sender.length == amount.length);
-    
+
     for(uint i = 0; i < sender.length; i++) {
       crowdSaleTokens[sender[i]] = crowdSaleTokens[sender[i]].add(amount[i]);
       balances[address(this)] = balances[address(this)].sub(amount[i]);
@@ -444,7 +444,7 @@ contract AlbosToken is StandardToken {
       emit Transfer(address(this), sender[i], amount[i]);
     }
   }
-  
+
   function addFrostTokens(address sender, uint256 amount, uint256 blockTime) public onlyAgent {
 
     totalFreezeTokens = totalFreezeTokens.add(amount);
@@ -453,14 +453,14 @@ contract AlbosToken is StandardToken {
     freezeTokens[sender] = amount;
     freezeTimeBlock[sender] = blockTime;
   }
-  
+
   function transferAndFrostTokens(address sender, uint256 amount, uint256 blockTime) external onlyAgent {
     balances[address(this)] = balances[address(this)].sub(amount);
     balances[sender] = balances[sender].add(amount);
     emit Transfer(address(this), sender, amount);
     addFrostTokens(sender, amount, blockTime);
   }
-  
+
   function addFrostTokensMulti(address[] sender, uint256[] amount, uint256[] blockTime) external onlyAgent {
     require(sender.length > 0 && sender.length == amount.length && amount.length == blockTime.length);
 
@@ -471,7 +471,7 @@ contract AlbosToken is StandardToken {
     }
     require(totalFreezeTokens <= totalSupply_.mul(2).div(10));
   }
-  
+
   function transferAgent(address _agent) external onlyOwner {
     agentAddress = _agent;
   }
@@ -484,3 +484,38 @@ contract AlbosToken is StandardToken {
     freezing = false;
   }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

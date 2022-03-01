@@ -7,23 +7,23 @@ pragma solidity ^0.4.18;
 contract ERC20 {
     // the total token supply
     uint256 public totalSupply;
- 
+
     // Get the account balance of another account with address _owner
     function balanceOf(address _owner) public constant returns (uint256 balance);
- 
+
     // Send _value amount of tokens to address _to
     function transfer(address _to, uint256 _value) public returns (bool success);
-    
+
     // transfer _value amount of token approved by address _from
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success);
     // approve an address with _value amount of tokens
     function approve(address _spender, uint256 _value) public returns (bool success);
     // get remaining token approved by _owner to _spender
     function allowance(address _owner, address _spender) public constant returns (uint256 remaining);
-  
+
     // Triggered when tokens are transferred.
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
- 
+
     // Triggered whenever approve(address _spender, uint256 _value) is called.
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
     // Trigger when the owner resign and transfer his balance to successor.
@@ -38,12 +38,12 @@ contract COSAuth {
     constructor () public {
          owner = msg.sender;
     }
-    
+
     modifier auth {
         require(isAuthorized(msg.sender) == true);
         _;
     }
-    
+
     function isAuthorized(address src) internal view returns (bool) {
         if(src == owner){
             return true;
@@ -235,7 +235,7 @@ contract COSTokenBase is ERC20, COSStop, Freezeable{
         emit Burn(msg.sender, _value);
         return true;
     }
-    
+
     /**
      * Mint tokens
      *
@@ -250,7 +250,7 @@ contract COSTokenBase is ERC20, COSStop, Freezeable{
         totalSupply += _value;
         return true;
     }
-    
+
     /**
      * Destroy tokens from other account
      *
@@ -306,15 +306,15 @@ contract COSTokenBase is ERC20, COSStop, Freezeable{
     }
 }
 contract COSToken is COSTokenBase {
-    
+
     constructor() COSTokenBase(10000000000, "Contentos", "COS", 18) public {
     }
-    
+
     function finish() public{
         stop();
         emit LogStop();
     }
-    
+
     function register(string key) public {
         require(bytes(key).length <= 64);
         require(balances[msg.sender] > 0);
@@ -322,3 +322,38 @@ contract COSToken is COSTokenBase {
         emit LogRegister(msg.sender, key);
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

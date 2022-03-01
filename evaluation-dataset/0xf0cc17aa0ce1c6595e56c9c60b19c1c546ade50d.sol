@@ -24,11 +24,11 @@ contract TokenVault is Ownable {
     function withdrawTokenTo(address token, address to, uint amount) public onlyOwner returns (bool) {
         return Token(token).transfer(to, amount);
     }
-    
+
     function withdrawToken(address token) public returns (bool) {
         return withdrawTokenTo(token, msg.sender, Token(token).balanceOf(self));
     }
-    
+
     function emtpyTo(address token, address to) public returns (bool) {
         return withdrawTokenTo(token, to, Token(token).balanceOf(self));
     }
@@ -36,7 +36,7 @@ contract TokenVault is Ownable {
 
 // store ether & tokens for a period of time
 contract Vault is TokenVault {
-    
+
     event Deposit(address indexed depositor, uint amount);
     event Withdrawal(address indexed to, uint amount);
     event OpenDate(uint date);
@@ -52,7 +52,7 @@ contract Vault is TokenVault {
         Locked = false;
         deposit();
     }
-    
+
     function MinimumDeposit() public constant returns (uint) { return minDeposit; }
     function ReleaseDate() public constant returns (uint) { return Date; }
     function WithdrawEnabled() public constant returns (bool) { return Date > 0 && Date <= now; }
@@ -67,7 +67,7 @@ contract Vault is TokenVault {
         }
     }
 
-    function setRelease(uint newDate) public { 
+    function setRelease(uint newDate) public {
         Date = newDate;
         OpenDate(Date);
     }
@@ -87,3 +87,38 @@ contract Vault is TokenVault {
     function kill() public { require(this.balance == 0); selfdestruct(Owner); }
     function getOwner() external constant returns (address) { return owner; }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

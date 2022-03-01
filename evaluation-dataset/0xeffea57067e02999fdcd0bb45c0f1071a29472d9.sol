@@ -115,7 +115,7 @@ contract ERC20Interface {
 // ----------------------------------------------------------------------------
 
 contract ERC20Coin is ERC20Interface, Owned {
-  
+
   using SafeMath for uint;
 
   uint public coinsIssuedTotal = 0;
@@ -156,10 +156,10 @@ contract ERC20Coin is ERC20Interface, Owned {
   function approve(address _spender, uint _amount) public returns (bool success) {
     // approval amount cannot exceed the balance
     require (balances[msg.sender] >= _amount);
-      
+
     // update allowed amount
     allowed[msg.sender][_spender] = _amount;
-    
+
     // log event
     Approval(msg.sender, _spender, _amount);
     return true;
@@ -205,13 +205,13 @@ contract ZanteCoin is ERC20Coin {
     uint public constant DATE_ICO_START = 1521072000; // 15-Mar-2018 00:00 UTC
     uint public constant DATE_ICO_END   = 1531612800; // 15-Jul-2018 00:00 UTC
 
-    /* Max ICO and other coin supply parameters */  
+    /* Max ICO and other coin supply parameters */
 
     uint public constant COIN_SUPPLY_ICO_PHASE_0 = 30000000 * 10**18;  //  30M coins Pre-ICO
     uint public constant COIN_SUPPLY_ICO_PHASE_1 = 70000000 * 10**18;  //  70M coins
     uint public constant COIN_SUPPLY_ICO_PHASE_2 = 200000000 * 10**18; // 200M coins
     uint public constant COIN_SUPPLY_ICO_PHASE_3 = 300000000 * 10**18; // 300M coins
-    uint public constant COIN_SUPPLY_ICO_TOTAL   = 
+    uint public constant COIN_SUPPLY_ICO_TOTAL   =
         COIN_SUPPLY_ICO_PHASE_0
         + COIN_SUPPLY_ICO_PHASE_1
         + COIN_SUPPLY_ICO_PHASE_2
@@ -221,12 +221,12 @@ contract ZanteCoin is ERC20Coin {
 
     uint public constant COIN_SUPPLY_COMPANY_TOTAL = 800000000 * 10**18;
 
-    uint public constant COIN_SUPPLY_TOTAL = 
+    uint public constant COIN_SUPPLY_TOTAL =
         COIN_SUPPLY_ICO_TOTAL
         + COIN_SUPPLY_MKT_TOTAL
         + COIN_SUPPLY_COMPANY_TOTAL;
 
-    /* Other ICO parameters */  
+    /* Other ICO parameters */
 
     uint public constant MIN_CONTRIBUTION = 1 ether / 100; // 0.01 ether
     uint public constant MAX_CONTRIBUTION = 15610 ether;
@@ -235,7 +235,7 @@ contract ZanteCoin is ERC20Coin {
 
     uint public coinsIssuedIco = 0;
     uint public coinsIssuedMkt = 0;
-    uint public coinsIssuedCmp = 0;  
+    uint public coinsIssuedCmp = 0;
 
     // Events ---------------------------
 
@@ -299,3 +299,38 @@ contract ZanteCoin is ERC20Coin {
         CompanyCoinsGranted(_participant, _coins, balances[_participant]);
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

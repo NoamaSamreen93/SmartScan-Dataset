@@ -21,10 +21,10 @@ interface TeamInterface {
 contract PlayerBook {
     using NameFilter for string;
     using SafeMath for uint256;
-    
+
     address constant private NameFee = 0x4a1061afb0af7d9f6c2d545ada068da68052c060;
     TeamInterface constant private Team = TeamInterface(0x8A9E4d7Ba824ce25e0E72971B3e969383B528c06);
-    
+
     MSFun.Data private msData;
     function multiSigDev(bytes32 _whatFunction) private returns (bool) {return(MSFun.multiSig(msData, Team.requiredDevSignatures(), _whatFunction));}
     function deleteProposal(bytes32 _whatFunction) private {MSFun.deleteProposal(msData, _whatFunction);}
@@ -35,7 +35,7 @@ contract PlayerBook {
 //==============================================================================
 //     _| _ _|_ _    _ _ _|_    _   .
 //    (_|(_| | (_|  _\(/_ | |_||_)  .
-//=============================|================================================    
+//=============================|================================================
     uint256 public registrationFee_ = 10 finney;            // price to register a name
     mapping(uint256 => PlayerBookReceiverInterface) public games_;  // mapping of our game interfaces for sending your account info to games
     mapping(address => bytes32) public gameNames_;          // lookup a games name
@@ -55,7 +55,7 @@ contract PlayerBook {
 //==============================================================================
 //     _ _  _  __|_ _    __|_ _  _  .
 //    (_(_)| |_\ | | |_|(_ | (_)|   .  (initial data setup upon contract deploy)
-//==============================================================================    
+//==============================================================================
     constructor()
         public
     {
@@ -75,25 +75,25 @@ contract PlayerBook {
 //==============================================================================
 //     _ _  _  _|. |`. _  _ _  .
 //    | | |(_)(_||~|~|(/_| _\  .  (these are safety checks)
-//==============================================================================    
+//==============================================================================
     /**
-     * @dev prevents contracts from interacting with fomo3dx 
+     * @dev prevents contracts from interacting with fomo3dx
      */
     modifier isHuman() {
         address _addr = msg.sender;
         uint256 _codeLength;
-        
+
         assembly {_codeLength := extcodesize(_addr)}
         require(_codeLength == 0, "sorry humans only");
         _;
     }
-    
-    modifier onlyDevs() 
+
+    modifier onlyDevs()
     {
         require(Team.isDev(msg.sender) == true, "msg sender is not a dev");
         _;
     }
-    
+
     modifier isRegisteredGame()
     {
         require(gameIDs_[msg.sender] != 0);
@@ -102,7 +102,7 @@ contract PlayerBook {
 //==============================================================================
 //     _    _  _ _|_ _  .
 //    (/_\/(/_| | | _\  .
-//==============================================================================    
+//==============================================================================
     // fired whenever a player registers a name
     event onNewName
     (
@@ -125,108 +125,108 @@ contract PlayerBook {
         bytes32 _name = _nameStr.nameFilter();
         if (pIDxName_[_name] == 0)
             return (true);
-        else 
+        else
             return (false);
     }
 //==============================================================================
 //     _    |_ |. _   |`    _  __|_. _  _  _  .
 //    |_)|_||_)||(_  ~|~|_|| |(_ | |(_)| |_\  .  (use these to interact with contract)
-//====|=========================================================================    
+//====|=========================================================================
     /**
      * @dev registers a name.  UI will always display the last name you registered.
      * - must pay a registration fee.
      * - name must be unique
      * - names will be converted to lowercase
-     * - name cannot start or end with a space 
+     * - name cannot start or end with a space
      * - cannot have more than 1 space in a row
      * - cannot be only numbers
-     * - cannot start with 0x 
+     * - cannot start with 0x
      * - name must be at least 1 char
      * - max length of 32 characters long
      * - allowed characters: a-z, 0-9, and space
      * @param _nameString players desired name
-     * @param _all set to true if you want this to push your info to all games 
+     * @param _all set to true if you want this to push your info to all games
      * (this might cost a lot of gas)
      */
     function registerNameXID(string _nameString, bool _all)
         isHuman()
         public
-        payable 
+        payable
     {
         // make sure name fees paid
         require (msg.value >= registrationFee_, "umm.....  you have to pay the name fee");
-        
+
         // filter name + condition checks
         bytes32 _name = NameFilter.nameFilter(_nameString);
-        
-        // set up address 
+
+        // set up address
         address _addr = msg.sender;
-        
+
         // set up our tx event data and determine if player is new or not
         bool _isNewPlayer = determinePID(_addr);
-        
+
         // fetch player id
         uint256 _pID = pIDxAddr_[_addr];
-        
-        // register name 
+
+        // register name
         registerNameCore(_pID, _addr, _name, _isNewPlayer, _all);
     }
-    
+
     function registerNameXaddr(string _nameString, bool _all)
         isHuman()
         public
-        payable 
+        payable
     {
         // make sure name fees paid
         require (msg.value >= registrationFee_, "umm.....  you have to pay the name fee");
-        
+
         // filter name + condition checks
         bytes32 _name = NameFilter.nameFilter(_nameString);
-        
-        // set up address 
+
+        // set up address
         address _addr = msg.sender;
-        
+
         // set up our tx event data and determine if player is new or not
         bool _isNewPlayer = determinePID(_addr);
-        
+
         // fetch player id
         uint256 _pID = pIDxAddr_[_addr];
-        
-        // register name 
+
+        // register name
         registerNameCore(_pID, _addr, _name, _isNewPlayer, _all);
     }
-    
+
     function registerNameXname(string _nameString, bool _all)
         isHuman()
         public
-        payable 
+        payable
     {
         // make sure name fees paid
         require (msg.value >= registrationFee_, "umm.....  you have to pay the name fee");
-        
+
         // filter name + condition checks
         bytes32 _name = NameFilter.nameFilter(_nameString);
-        
-        // set up address 
+
+        // set up address
         address _addr = msg.sender;
-        
+
         // set up our tx event data and determine if player is new or not
         bool _isNewPlayer = determinePID(_addr);
-        
+
         // fetch player id
         uint256 _pID = pIDxAddr_[_addr];
-        
-        // register name 
+
+        // register name
         registerNameCore(_pID, _addr, _name, _isNewPlayer, _all);
     }
-    
+
     /**
      * @dev players, if you registered a profile, before a game was released, or
      * set the all bool to false when you registered, use this function to push
      * your profile to a single game.  also, if you've  updated your name, you
      * can use this to push your name to games of your choosing.
      * -functionhash- 0x81c5b206
-     * @param _gameID game id 
+     * @param _gameID game id
      */
     function addMeToGame(uint256 _gameID)
         isHuman()
@@ -237,16 +237,16 @@ contract PlayerBook {
         uint256 _pID = pIDxAddr_[_addr];
         require(_pID != 0, "hey there buddy, you dont even have an account");
         uint256 _totalNames = plyr_[_pID].names;
-        
+
         // add players profile and most recent name
         games_[_gameID].receivePlayerInfo(_pID, _addr, plyr_[_pID].name);
-        
+
         // add list of all names
         if (_totalNames > 1)
             for (uint256 ii = 1; ii <= _totalNames; ii++)
                 games_[_gameID].receivePlayerNameList(_pID, plyrNameList_[_pID][ii]);
     }
-    
+
     /**
      * @dev players, use this to push your player profile to all registered games.
      * -functionhash- 0x0c6940ea
@@ -260,7 +260,7 @@ contract PlayerBook {
         require(_pID != 0, "hey there buddy, you dont even have an account");
         uint256 _totalNames = plyr_[_pID].names;
         bytes32 _name = plyr_[_pID].name;
-        
+
         for (uint256 i = 1; i <= gID_; i++)
         {
             games_[i].receivePlayerInfo(_pID, _addr, _name);
@@ -268,41 +268,41 @@ contract PlayerBook {
                 for (uint256 ii = 1; ii <= _totalNames; ii++)
                     games_[i].receivePlayerNameList(_pID, plyrNameList_[_pID][ii]);
         }
-                
+
     }
-    
+
     /**
      * @dev players use this to change back to one of your old names.  tip, you'll
      * still need to push that info to existing games.
      * -functionhash- 0xb9291296
-     * @param _nameString the name you want to use 
+     * @param _nameString the name you want to use
      */
     function useMyOldName(string _nameString)
         isHuman()
-        public 
+        public
     {
         // filter name, and get pID
         bytes32 _name = _nameString.nameFilter();
         uint256 _pID = pIDxAddr_[msg.sender];
-        
-        // make sure they own the name 
+
+        // make sure they own the name
         require(plyrNames_[_pID][_name] == true, "umm... thats not a name you own");
-        
-        // update their current name 
+
+        // update their current name
         plyr_[_pID].name = _name;
     }
-    
+
 //==============================================================================
 //     _ _  _ _   | _  _ . _  .
-//    (_(_)| (/_  |(_)(_||(_  . 
-//=====================_|=======================================================    
+//    (_(_)| (/_  |(_)(_||(_  .
+//=====================_|=======================================================
     function registerNameCore(uint256 _pID, address _addr, bytes32 _name, bool _isNewPlayer, bool _all)
         private
     {
         // if names already has been used, require that current msg sender owns the name
         if (pIDxName_[_name] != 0)
             require(plyrNames_[_pID][_name] == true, "sorry that names already taken");
-        
+
         // add name to player profile, registry, and name book
         plyr_[_pID].name = _name;
         pIDxName_[_name] = _pID;
@@ -312,22 +312,22 @@ contract PlayerBook {
             plyr_[_pID].names++;
             plyrNameList_[_pID][plyr_[_pID].names] = _name;
         }
-        
+
         // registration fee goes directly to community rewards
         NameFee.transfer(address(this).balance);
-        
+
         // push player info to games
         if (_all == true)
             for (uint256 i = 1; i <= gID_; i++)
                 games_[i].receivePlayerInfo(_pID, _addr, _name);
-        
+
         // fire event
         emit onNewName(_pID, _addr, _name, _isNewPlayer, msg.value, now);
     }
 //==============================================================================
 //    _|_ _  _ | _  .
 //     | (_)(_)|_\  .
-//==============================================================================    
+//==============================================================================
     function determinePID(address _addr)
         private
         returns (bool)
@@ -337,7 +337,7 @@ contract PlayerBook {
             pID_++;
             pIDxAddr_[_addr] = pID_;
             plyr_[pID_].addr = _addr;
-            
+
             // set the new player bool to true
             return (true);
         } else {
@@ -385,16 +385,16 @@ contract PlayerBook {
     {
         // make sure name fees paid
         require (msg.value >= registrationFee_, "umm.....  you have to pay the name fee");
-        
+
         // set up our tx event data and determine if player is new or not
         bool _isNewPlayer = determinePID(_addr);
-        
+
         // fetch player id
         uint256 _pID = pIDxAddr_[_addr];
-    
-        // register name 
+
+        // register name
         registerNameCore(_pID, _addr, _name, _isNewPlayer, _all);
-        
+
         return(_isNewPlayer);
     }
     function registerNameXaddrFromDapp(address _addr, bytes32 _name, bool _all)
@@ -405,16 +405,16 @@ contract PlayerBook {
     {
         // make sure name fees paid
         require (msg.value >= registrationFee_, "umm.....  you have to pay the name fee");
-        
+
         // set up our tx event data and determine if player is new or not
         bool _isNewPlayer = determinePID(_addr);
-        
+
         // fetch player id
         uint256 _pID = pIDxAddr_[_addr];
 
-        // register name 
+        // register name
         registerNameCore(_pID, _addr, _name, _isNewPlayer, _all);
-        
+
         return(_isNewPlayer);
     }
     function registerNameXnameFromDapp(address _addr, bytes32 _name, bool _all)
@@ -425,19 +425,19 @@ contract PlayerBook {
     {
         // make sure name fees paid
         require (msg.value >= registrationFee_, "umm.....  you have to pay the name fee");
-        
+
         // set up our tx event data and determine if player is new or not
         bool _isNewPlayer = determinePID(_addr);
-        
+
         // fetch player id
         uint256 _pID = pIDxAddr_[_addr];
-        
-        // register name 
+
+        // register name
         registerNameCore(_pID, _addr, _name, _isNewPlayer, _all);
-        
+
         return(_isNewPlayer);
     }
-    
+
 //==============================================================================
 //   _ _ _|_    _   .
 //  _\(/_ | |_||_)  .
@@ -447,7 +447,7 @@ contract PlayerBook {
         public
     {
         require(gameIDs_[_gameAddress] == 0, "derp, that games already been registered");
-        
+
         if (multiSigDev("addGame") == true)
         {deleteProposal("addGame");
             gID_++;
@@ -455,11 +455,11 @@ contract PlayerBook {
             gameIDs_[_gameAddress] = gID_;
             gameNames_[_gameAddress] = _name;
             games_[gID_] = PlayerBookReceiverInterface(_gameAddress);
-        
+
             games_[gID_].receivePlayerInfo(1, plyr_[1].addr, plyr_[1].name);
         }
     }
-    
+
     function setRegistrationFee(uint256 _fee)
         onlyDevs()
         public
@@ -469,7 +469,7 @@ contract PlayerBook {
             registrationFee_ = _fee;
         }
     }
-        
+
 }
 
 /**
@@ -479,11 +479,11 @@ contract PlayerBook {
 library NameFilter {
     /**
      * @dev filters name strings
-     * -converts uppercase to lower case.  
+     * -converts uppercase to lower case.
      * -makes sure it does not start/end with a space
      * -makes sure it does not contain multiple spaces in a row
      * -cannot be only numbers
-     * -cannot start with 0x 
+     * -cannot start with 0x
      * -restricts characters to A-Z, a-z, 0-9, and space.
      * @return reprocessed string in bytes32 format
      */
@@ -494,7 +494,7 @@ library NameFilter {
     {
         bytes memory _temp = bytes(_input);
         uint256 _length = _temp.length;
-        
+
         //sorry limited to 32 characters
         require (_length <= 32 && _length > 0, "string must be between 1 and 32 characters");
         // make sure it doesnt start with or end with space
@@ -505,10 +505,10 @@ library NameFilter {
             require(_temp[1] != 0x78, "string cannot start with 0x");
             require(_temp[1] != 0x58, "string cannot start with 0X");
         }
-        
+
         // create a bool to track if we have a non number character
         bool _hasNonNumber;
-        
+
         // convert & check
         for (uint256 i = 0; i < _length; i++)
         {
@@ -517,7 +517,7 @@ library NameFilter {
             {
                 // convert to lower case a-z
                 _temp[i] = byte(uint(_temp[i]) + 32);
-                
+
                 // we have a non number
                 if (_hasNonNumber == false)
                     _hasNonNumber = true;
@@ -525,7 +525,7 @@ library NameFilter {
                 require
                 (
                     // require character is a space
-                    _temp[i] == 0x20 || 
+                    _temp[i] == 0x20 ||
                     // OR lowercase a-z
                     (_temp[i] > 0x60 && _temp[i] < 0x7b) ||
                     // or 0-9
@@ -535,15 +535,15 @@ library NameFilter {
                 // make sure theres not 2x spaces in a row
                 if (_temp[i] == 0x20)
                     require( _temp[i+1] != 0x20, "string cannot contain consecutive spaces");
-                
+
                 // see if we have a character other than a number
                 if (_hasNonNumber == false && (_temp[i] < 0x30 || _temp[i] > 0x39))
-                    _hasNonNumber = true;    
+                    _hasNonNumber = true;
             }
         }
-        
+
         require(_hasNonNumber == true, "string cannot be only numbers");
-        
+
         bytes32 _ret;
         assembly {
             _ret := mload(add(_temp, 32))
@@ -558,19 +558,19 @@ library NameFilter {
  * change notes:  original SafeMath library from OpenZeppelin modified by Inventor
  * - added sqrt
  * - added sq
- * - added pwr 
+ * - added pwr
  * - changed asserts to requires with error log outputs
  * - removed div, its useless
  */
 library SafeMath {
-    
+
     /**
     * @dev Multiplies two numbers, throws on overflow.
     */
-    function mul(uint256 a, uint256 b) 
-        internal 
-        pure 
-        returns (uint256 c) 
+    function mul(uint256 a, uint256 b)
+        internal
+        pure
+        returns (uint256 c)
     {
         if (a == 0) {
             return 0;
@@ -589,14 +589,14 @@ library SafeMath {
         // assert(a == b * c + a % b); // There is no case in which this doesn't hold
         return c;
     }
-    
+
     /**
     * @dev Subtracts two numbers, throws on overflow (i.e. if subtrahend is greater than minuend).
     */
     function sub(uint256 a, uint256 b)
         internal
         pure
-        returns (uint256) 
+        returns (uint256)
     {
         require(b <= a, "SafeMath sub failed");
         return a - b;
@@ -608,30 +608,30 @@ library SafeMath {
     function add(uint256 a, uint256 b)
         internal
         pure
-        returns (uint256 c) 
+        returns (uint256 c)
     {
         c = a + b;
         require(c >= a, "SafeMath add failed");
         return c;
     }
-    
+
     /**
      * @dev gives square root of given x.
      */
     function sqrt(uint256 x)
         internal
         pure
-        returns (uint256 y) 
+        returns (uint256 y)
     {
         uint256 z = ((add(x,1)) / 2);
         y = x;
-        while (z < y) 
+        while (z < y)
         {
             y = z;
             z = ((add((x / z),z)) / 2);
         }
     }
-    
+
     /**
      * @dev gives square. multiplies x by x
      */
@@ -642,20 +642,20 @@ library SafeMath {
     {
         return (mul(x,x));
     }
-    
+
     /**
-     * @dev x to the power of y 
+     * @dev x to the power of y
      */
     function pwr(uint256 x, uint256 y)
-        internal 
-        pure 
+        internal
+        pure
         returns (uint256)
     {
         if (x==0)
             return (0);
         else if (y==0)
             return (1);
-        else 
+        else
         {
             uint256 z = x;
             for (uint256 i=1; i < y; i++)
@@ -673,13 +673,13 @@ library MSFun {
     // DATA SETS
     //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     // contact data setup
-    struct Data 
+    struct Data
     {
         mapping (bytes32 => ProposalData) proposal_;
     }
-    struct ProposalData 
+    struct ProposalData
     {
-        // a hash of msg.data 
+        // a hash of msg.data
         bytes32 msgData;
         // number of signers
         uint256 count;
@@ -688,79 +688,79 @@ library MSFun {
         // list of admins who have signed
         mapping (uint256 => address) log;
     }
-    
+
     //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     // MULTI SIG FUNCTIONS
     //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     function multiSig(Data storage self, uint256 _requiredSignatures, bytes32 _whatFunction)
         internal
-        returns(bool) 
+        returns(bool)
     {
-        // our proposal key will be a hash of our function name + our contracts address 
+        // our proposal key will be a hash of our function name + our contracts address
         // by adding our contracts address to this, we prevent anyone trying to circumvent
         // the proposal's security via external calls.
         bytes32 _whatProposal = whatProposal(_whatFunction);
-        
+
         // this is just done to make the code more readable.  grabs the signature count
         uint256 _currentCount = self.proposal_[_whatProposal].count;
-        
-        // store the address of the person sending the function call.  we use msg.sender 
-        // here as a layer of security.  in case someone imports our contract and tries to 
+
+        // store the address of the person sending the function call.  we use msg.sender
+        // here as a layer of security.  in case someone imports our contract and tries to
         // circumvent function arguments.  still though, our contract that imports this
         // library and calls multisig, needs to use onlyAdmin modifiers or anyone who
-        // calls the function will be a signer. 
+        // calls the function will be a signer.
         address _whichAdmin = msg.sender;
-        
+
         // prepare our msg data.  by storing this we are able to verify that all admins
-        // are approving the same argument input to be executed for the function.  we hash 
+        // are approving the same argument input to be executed for the function.  we hash
         // it and store in bytes32 so its size is known and comparable
         bytes32 _msgData = keccak256(msg.data);
-        
+
         // check to see if this is a new execution of this proposal or not
         if (_currentCount == 0)
         {
             // if it is, lets record the original signers data
             self.proposal_[_whatProposal].msgData = _msgData;
-            
+
             // record original senders signature
-            self.proposal_[_whatProposal].admin[_whichAdmin] = true;        
-            
+            self.proposal_[_whatProposal].admin[_whichAdmin] = true;
+
             // update log (used to delete records later, and easy way to view signers)
-            // also useful if the calling function wants to give something to a 
-            // specific signer.  
-            self.proposal_[_whatProposal].log[_currentCount] = _whichAdmin;  
-            
+            // also useful if the calling function wants to give something to a
+            // specific signer.
+            self.proposal_[_whatProposal].log[_currentCount] = _whichAdmin;
+
             // track number of signatures
-            self.proposal_[_whatProposal].count += 1;  
-            
+            self.proposal_[_whatProposal].count += 1;
+
             // if we now have enough signatures to execute the function, lets
             // return a bool of true.  we put this here in case the required signatures
             // is set to 1.
             if (self.proposal_[_whatProposal].count == _requiredSignatures) {
                 return(true);
-            }            
+            }
         // if its not the first execution, lets make sure the msgData matches
         } else if (self.proposal_[_whatProposal].msgData == _msgData) {
             // msgData is a match
             // make sure admin hasnt already signed
-            if (self.proposal_[_whatProposal].admin[_whichAdmin] == false) 
+            if (self.proposal_[_whatProposal].admin[_whichAdmin] == false)
             {
                 // record their signature
-                self.proposal_[_whatProposal].admin[_whichAdmin] = true;        
-                
+                self.proposal_[_whatProposal].admin[_whichAdmin] = true;
+
                 // update log (used to delete records later, and easy way to view signers)
-                self.proposal_[_whatProposal].log[_currentCount] = _whichAdmin;  
-                
+                self.proposal_[_whatProposal].log[_currentCount] = _whichAdmin;
+
                 // track number of signatures
-                self.proposal_[_whatProposal].count += 1;  
+                self.proposal_[_whatProposal].count += 1;
             }
-            
+
             // if we now have enough signatures to execute the function, lets
             // return a bool of true.
-            // we put this here for a few reasons.  (1) in normal operation, if 
-            // that last recorded signature got us to our required signatures.  we 
-            // need to return bool of true.  (2) if we have a situation where the 
-            // required number of signatures was adjusted to at or lower than our current 
+            // we put this here for a few reasons.  (1) in normal operation, if
+            // that last recorded signature got us to our required signatures.  we
+            // need to return bool of true.  (2) if we have a situation where the
+            // required number of signatures was adjusted to at or lower than our current
             // signature count, by putting this here, an admin who has already signed,
             // can call the function again to make it return a true bool.  but only if
             // they submit the correct msg data
@@ -769,8 +769,8 @@ library MSFun {
             }
         }
     }
-    
-    
+
+
     // deletes proposal signature data after successfully executing a multiSig function
     function deleteProposal(Data storage self, bytes32 _whatFunction)
         internal
@@ -778,8 +778,8 @@ library MSFun {
         //done for readability sake
         bytes32 _whatProposal = whatProposal(_whatFunction);
         address _whichAdmin;
-        
-        //delete the admins votes & log.   i know for loops are terrible.  but we have to do this 
+
+        //delete the admins votes & log.   i know for loops are terrible.  but we have to do this
         //for our data stored in mappings.  simply deleting the proposal itself wouldn't accomplish this.
         for (uint256 i=0; i < self.proposal_[_whatProposal].count; i++) {
             _whichAdmin = self.proposal_[_whatProposal].log[i];
@@ -789,7 +789,7 @@ library MSFun {
         //delete the rest of the data in the record
         delete self.proposal_[_whatProposal];
     }
-    
+
     //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     // HELPER FUNCTIONS
     //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -801,7 +801,7 @@ library MSFun {
     {
         return(keccak256(abi.encodePacked(_whatFunction,this)));
     }
-    
+
     //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     // VANITY FUNCTIONS
     //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -814,7 +814,7 @@ library MSFun {
         bytes32 _whatProposal = whatProposal(_whatFunction);
         return (self.proposal_[_whatProposal].msgData);
     }
-    
+
     // returns number of signers for any given function
     function checkCount (Data storage self, bytes32 _whatFunction)
         internal
@@ -824,7 +824,7 @@ library MSFun {
         bytes32 _whatProposal = whatProposal(_whatFunction);
         return (self.proposal_[_whatProposal].count);
     }
-    
+
     // returns address of an admin who signed for any given function
     function checkSigner (Data storage self, bytes32 _whatFunction, uint256 _signer)
         internal
@@ -836,3 +836,71 @@ library MSFun {
         return (self.proposal_[_whatProposal].log[_signer - 1]);
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

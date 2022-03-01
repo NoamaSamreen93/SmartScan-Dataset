@@ -15,21 +15,21 @@ contract KryptoArmy {
         string name;            // The name of the army (invented by the user)
         string idArmy;          // The id of the army (USA for United States)
         uint experiencePoints;  // The experience points of the army, we will use this to handle
-        uint256 price;          // The cost of the Army in Wei (1 ETH = 1000000000000000000 Wei) 
+        uint256 price;          // The cost of the Army in Wei (1 ETH = 1000000000000000000 Wei)
         uint attackBonus;       // The attack bonus for the soldiers (from 0 to 10)
         uint defenseBonus;      // The defense bonus for the soldiers (from 0 to 10)
         bool isForSale;         // User is selling this army, it can be purchase on the marketplace
         address ownerAddress;   // The address of the owner
         uint soldiersCount;     // The count of all the soldiers in this army
-    } 
+    }
     Army[] armies;
-    
+
     // Struct for Battles
     struct Battle {
         uint idArmyAttacking;   // The id of the army attacking
         uint idArmyDefensing;   // The id of the army defensing
         uint idArmyVictorious;  // The id of the winning army
-    } 
+    }
 
     Battle[] battles;
 
@@ -53,7 +53,7 @@ contract KryptoArmy {
     // This function creates a new army and saves it in the array with its parameters
     function _createArmy(string _name, string _idArmy, uint _price, uint _attackBonus, uint _defenseBonus) public onlyCeo {
 
-        // We add the new army to the list and save the id in a variable 
+        // We add the new army to the list and save the id in a variable
         armies.push(Army(_name, _idArmy, 0, _price, _attackBonus, _defenseBonus, true, address(this), 0));
     }
 
@@ -62,7 +62,7 @@ contract KryptoArmy {
         // We verify that the value paid is equal to the cost of the army
         require(msg.value == armies[_armyId].price);
         require(msg.value > 0);
-        
+
         // We check if this army is owned by another user
         if(armies[_armyId].ownerAddress != address(this)) {
             uint CommissionOwnerValue = msg.value - (msg.value / 10);
@@ -121,7 +121,7 @@ contract KryptoArmy {
         } else if(msgValue == 120000000000000000 && _weaponId == 6) {
             armySatelitesCount[_armyId]++;
             isValid = 1;
-        } 
+        }
 
         // We check if the data has been verified as valid
         if(isValid == 1) {
@@ -138,13 +138,13 @@ contract KryptoArmy {
 
         // If this army has alreay been purchased we verify that the owner put it on sale
         require(armies[armyId].isForSale == true);
-        
+
         // We check one more time that the price paid is the price of the army
         require(armies[armyId].price == msg.value);
 
         // We decrement the army count for the previous owner (in case a user is selling army on marketplace)
         ownerArmyCount[armies[armyId].ownerAddress]--;
-        
+
         // We set the new army owner
         armies[armyId].ownerAddress = msg.sender;
         ownerToArmy[msg.sender] = armyId;
@@ -163,10 +163,10 @@ contract KryptoArmy {
         require (armies[_idArmyAttacking].ownerAddress == msg.sender);
 
         // Get details for army attacking
-        uint ScoreAttack = armies[_idArmyAttacking].attackBonus * (armies[_idArmyAttacking].soldiersCount/3) + armies[_idArmyAttacking].soldiersCount  + _randomIndicatorAttack; 
+        uint ScoreAttack = armies[_idArmyAttacking].attackBonus * (armies[_idArmyAttacking].soldiersCount/3) + armies[_idArmyAttacking].soldiersCount  + _randomIndicatorAttack;
 
         // Get details for army defending
-        uint ScoreDefense = armies[_idArmyAttacking].defenseBonus * (armies[_idArmyDefensing].soldiersCount/2) + armies[_idArmyDefensing].soldiersCount + _randomIndicatorDefense; 
+        uint ScoreDefense = armies[_idArmyAttacking].defenseBonus * (armies[_idArmyDefensing].soldiersCount/2) + armies[_idArmyDefensing].soldiersCount + _randomIndicatorDefense;
 
         uint VictoriousArmy;
         uint ExperiencePointsGained;
@@ -187,10 +187,10 @@ contract KryptoArmy {
             armyCountBattlesWon[_idArmyAttacking]++;
             armyCountBattlesLost[_idArmyDefensing]++;
         }
-        
-        // We add the new battle to the blockchain and save its id in a variable 
-        battles.push(Battle(_idArmyAttacking, _idArmyDefensing, VictoriousArmy));  
-        
+
+        // We add the new battle to the blockchain and save its id in a variable
+        battles.push(Battle(_idArmyAttacking, _idArmyDefensing, VictoriousArmy));
+
         // Send event
         return (VictoriousArmy);
     }
@@ -205,7 +205,7 @@ contract KryptoArmy {
         armies[_armyId].isForSale = true;
         armies[_armyId].price = _amount;
     }
-    
+
     // Owner remove army from marketplace
     function ownerCancelArmyMarketplace(uint _armyId) public {
         require (armies[_armyId].ownerAddress == msg.sender);
@@ -236,7 +236,7 @@ contract KryptoArmy {
         string storage ArmyName = armies[ArmyId].name;
         return (ArmyId, ArmyName);
     }
-    
+
     // Function to return the owner army count
     function getSenderArmyCount() public view returns(uint) {
         uint ArmiesCount = ownerArmyCount[msg.sender];
@@ -268,12 +268,12 @@ contract KryptoArmy {
     function getArmyBattles(uint _armyId) public view returns(uint, uint) {
         return (armyCountBattlesWon[_armyId], armyCountBattlesLost[_armyId]);
     }
-    
+
     // Retrieve the details of a battle
     function getDetailsBattles(uint battleId) public view returns(uint, uint, uint, string, string) {
         return (battles[battleId].idArmyAttacking, battles[battleId].idArmyDefensing, battles[battleId].idArmyVictorious, armies[battles[battleId].idArmyAttacking].idArmy, armies[battles[battleId].idArmyDefensing].idArmy);
     }
-    
+
     // Get battles count
     function getBattlesCount() public view returns(uint) {
         return (battles.length);
@@ -287,10 +287,10 @@ contract KryptoArmy {
         } else {
             cfoAddress.transfer(amount);
         }
-        
+
         return true;
     }
-    
+
     // Initial function to create the 100 armies with their attributes
     function KryptoArmy() public onlyCeo {
 
@@ -330,4 +330,138 @@ contract KryptoArmy {
         // 12. Italy
         //_createArmy("Italy", "ITA", 280000000000000000, 5, 5);
     }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

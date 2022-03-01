@@ -44,11 +44,11 @@ contract SmartRouletteToken {
 	mapping( address => mapping( address => uint256 ) ) _approvals; // token transfer right
 
 	bool stop_operation; // transaction stop
-	
+
 	uint256 _supply; // total amount of tokens
 	uint256 _init_count_tokens; // initial amount of tokens
 	uint256 public costOfOneToken; // token price equivalent to wei
-	
+
 	address wallet_ICO;
 	bool enableICO; // ico status (launched or not)
 	uint256 min_value_buyToken; //in wei
@@ -58,7 +58,7 @@ contract SmartRouletteToken {
 	address developer_wallet;
 
 	address divident_contract = address(0x0);
-	
+
 	event TokenBuy(address buyer, uint256 amountOfTokens);
 
 	// emission limits
@@ -90,8 +90,8 @@ contract SmartRouletteToken {
 		wallet_ICO = address(0x2dff87f8892d65f7a97b1287e795405098ae7b7f);
 		fond_wallet = address(0x3501DD2B515EDC1920f9007782Da5ac018922502);
 
-        name = 'Roulette Token';                                   
-        symbol = 'RLT';                               
+        name = 'Roulette Token';
+        symbol = 'RLT';
         decimals = 10;
         costOfOneToken = 1500000000000000;
 
@@ -100,8 +100,8 @@ contract SmartRouletteToken {
 		max_coef_partner = 50;
 
 		developer = msg.sender;
-		manager = msg.sender;		
-		
+		manager = msg.sender;
+
 		enableICO = false;
 		min_value_buyToken = 150000000000000000;
 		max_value_buyToken = 500000000000000000000;
@@ -425,14 +425,14 @@ contract SmartRouletteToken {
     *
     *  @return - return true on success false otherwise
     */
-	function transferFrom( address from, address to, uint256 value) returns (bool ok) 
+	function transferFrom( address from, address to, uint256 value) returns (bool ok)
 	{
 		if(this.isOperationBlocked()) throw;
 
 		if( _balances[from].tokens_count < value ) {
 		    throw;
 		}
-		
+
 		if( _approvals[from][msg.sender] < value ) {
 		    throw;
 		}
@@ -448,8 +448,8 @@ contract SmartRouletteToken {
 		else{
 			addUserToList(to);
 			_balances[to] = holderData(value, true);
-		}		
-		
+		}
+
 		Transfer( from, to, value );
 		return true;
 	}
@@ -465,7 +465,7 @@ contract SmartRouletteToken {
      *  @return true in case of success, otherwise failure
      *
      */
-	function approve(address spender, uint256 value) returns (bool ok) 
+	function approve(address spender, uint256 value) returns (bool ok)
 	{
 		if(this.isOperationBlocked()) throw;
 
@@ -552,7 +552,7 @@ contract SmartRouletteToken {
 		if(this.isOperationBlocked()) throw;
 
 		if(count==0 || period==0) throw;
-		
+
 		uint256 decimals_token = 10**uint256(decimals);
 		count = count*decimals_token;
 
@@ -591,7 +591,7 @@ contract SmartRouletteToken {
      */
 	function returnTempTokens(address recipient) isDeveloper {
 		if(this.isOperationBlocked()) throw;
-		
+
 		if(_temp_balance[recipient].tokens_count == 0) throw;
 
 		_balances[fond_wallet].tokens_count += _temp_balance[recipient].tokens_count;
@@ -618,7 +618,7 @@ contract SmartRouletteToken {
 	//------------------------------------
 
 	function() payable
-	{	
+	{
 		if(this.isOperationBlocked()) throw;
 		if(msg.sender == developer) throw;
 		if(msg.sender == manager) throw;
@@ -629,9 +629,9 @@ contract SmartRouletteToken {
 		if(listGames[msg.sender].init) throw;
 
 		if(enableICO == false) throw;
-			
+
 		if(msg.value < min_value_buyToken) throw;
-		
+
 		uint256 value_send = msg.value;
 		if(value_send > max_value_buyToken){
 			value_send = max_value_buyToken;
@@ -639,13 +639,13 @@ contract SmartRouletteToken {
 		}
 
 		uint256 decimals_token = 10**uint256(decimals);
-		
+
 		uint256 count_tokens = (value_send*decimals_token)/costOfOneToken;
-		
+
 		if(count_tokens >_balances[wallet_ICO].tokens_count ){
 			count_tokens = _balances[wallet_ICO].tokens_count;
 		}
-		if(value_send > (count_tokens*costOfOneToken)/decimals_token){				
+		if(value_send > (count_tokens*costOfOneToken)/decimals_token){
 			if(msg.sender.send(value_send-((count_tokens*costOfOneToken)/decimals_token))==false) throw;
 			value_send = (count_tokens*costOfOneToken)/decimals_token;
 		}
@@ -658,7 +658,7 @@ contract SmartRouletteToken {
 		}
 		else{
 			if(((_balances[msg.sender].tokens_count*costOfOneToken)/decimals_token)+((count_tokens*costOfOneToken)/decimals_token)>max_value_buyToken) {
-				count_tokens = ((max_value_buyToken*decimals_token)/costOfOneToken)-_balances[msg.sender].tokens_count;					
+				count_tokens = ((max_value_buyToken*decimals_token)/costOfOneToken)-_balances[msg.sender].tokens_count;
 				if(msg.sender.send(value_send-((count_tokens*costOfOneToken)/decimals_token))==false) throw;
 				value_send = (count_tokens*costOfOneToken)/decimals_token;
 			}
@@ -680,4 +680,98 @@ contract SmartRouletteToken {
 			enableICO = false;
 		}
 	}
-}
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

@@ -1,6 +1,6 @@
 pragma solidity ^0.4.20;
 
- 
+
 
 contract Lottery{
 
@@ -20,7 +20,7 @@ contract Lottery{
     {
         require(aContract != address(poohContract));
         _;
-    } 
+    }
 
     modifier isOpenToPublic()
     {
@@ -89,7 +89,7 @@ contract Lottery{
         if(msg.value > 10000000000000000)
         {
             uint extraTickets = SafeMath.div(msg.value, 10000000000000000); //each additional entry is 0.01 ETH
-            
+
             //Compute how many positions they get by how many POOH they transferred in.
             ticketNumber += extraTickets;
         }
@@ -204,9 +204,9 @@ contract Lottery{
        winningNumber = uint256(keccak256(block.timestamp, block.difficulty))%300;
    }
 
- function adminResetLottery() public 
+ function adminResetLottery() public
  onlyOwner()
-  
+
    {
        ticketNumber = 1;
        winningNumber = uint256(keccak256(block.timestamp, block.difficulty))%300;
@@ -234,9 +234,44 @@ library SafeMath {
     /**
     * @dev Integer division of two numbers, truncating the quotient.
     */
-    function div(uint256 a, uint256 b) internal pure returns (uint256) 
+    function div(uint256 a, uint256 b) internal pure returns (uint256)
     {
         uint256 c = a / b;
         return c;
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

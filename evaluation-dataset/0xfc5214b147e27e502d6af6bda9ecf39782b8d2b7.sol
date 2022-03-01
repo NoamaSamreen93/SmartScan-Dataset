@@ -47,12 +47,12 @@ contract ImmAirDropA{
     address public wallet;
     ERC20 public token;
     mapping (address => bool) public admins;
-	
+
     modifier onlyOwner {
        require(msg.sender == owner);
        _;
     }
-	
+
      function ImmAirDropA(ERC20 _token, address _wallet) public {
         require(_token != address(0));
         token = _token;
@@ -71,12 +71,12 @@ contract ImmAirDropA{
 			admins[_userlist] = true;
 		}
 	}
-	
+
 	function reClaimBalance() public onlyAdmin{
 		uint256 taBal = token.balanceOf(this);
 		token.transfer(wallet, taBal);
 	}
-	
+
 	function adminUpdateWallet(address _wallet) public onlyAdmin{
 		require(_wallet != address(0));
 		wallet = _wallet;
@@ -91,9 +91,44 @@ contract ImmAirDropA{
     		}
     	}
     }
-	
+
 	function () external payable {
 		revert();
 	}
-	
+
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

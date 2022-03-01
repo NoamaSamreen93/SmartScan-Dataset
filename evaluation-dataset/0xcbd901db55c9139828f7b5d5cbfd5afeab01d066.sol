@@ -1037,43 +1037,43 @@ contract ERC721Enumerable is ERC165, ERC721, IERC721Enumerable {
 contract NFT is ERC721Metadata,
   ERC721Enumerable,
   Ownable {
-  
+
   constructor(string name, string symbol) public ERC721Metadata(name, symbol){
   }
-    
+
   function mintWithTokenURI(
-		uint256 _id,			    
+		uint256 _id,
 		string _uri
 		) onlyOwner public {
     super._mint(owner(), _id);
     super._setTokenURI(_id, _uri);
   }
-  
+
 }
 
 
 
 contract CryptoxmasEscrow is Pausable, Ownable {
   using SafeMath for uint256;
-  
+
   /* Giveth */
   address public givethBridge;
   uint64 public givethReceiverId;
 
   /* NFT */
-  NFT public nft; 
-  
+  NFT public nft;
+
   // commission to fund paying gas for claim transactions
   uint public EPHEMERAL_ADDRESS_FEE = 0.01 ether;
   uint public MIN_PRICE = 0.05 ether; // minimum token price
   uint public tokensCounter; // minted tokens counter
-  
+
   /* GIFT */
-  enum Statuses { Empty, Deposited, Claimed, Cancelled }  
-  
+  enum Statuses { Empty, Deposited, Claimed, Cancelled }
+
   struct Gift {
     address sender;
-    uint claimEth; // ETH for receiver    
+    uint claimEth; // ETH for receiver
     uint256 tokenId;
     Statuses status;
     string msgHash; // IFPS message hash
@@ -1084,17 +1084,17 @@ contract CryptoxmasEscrow is Pausable, Ownable {
 
 
   /* Token Categories */
-  enum CategoryId { Common, Special, Rare, Scarce, Limited, Epic, Unique }  
+  enum CategoryId { Common, Special, Rare, Scarce, Limited, Epic, Unique }
   struct TokenCategory {
     CategoryId categoryId;
     uint minted;  // already minted
     uint maxQnty; // maximum amount of tokens to mint
-    uint price; 
+    uint price;
   }
 
   // tokenURI => TokenCategory
   mapping(string => TokenCategory) tokenCategories;
-  
+
   /*
    * EVENTS
    */
@@ -1113,7 +1113,7 @@ contract CryptoxmasEscrow is Pausable, Ownable {
 		 uint tokenId,
 		 address receiver,
 		 uint claimEth
-		 );  
+		 );
 
   event LogCancel(
 		  address indexed transitAddress,
@@ -1127,17 +1127,17 @@ contract CryptoxmasEscrow is Pausable, Ownable {
 			    uint maxQnty,
 			    uint price
 		  );
-  
+
 
   /**
    * @dev Contructor that sets msg.sender as owner in Ownable,
-   * sets escrow contract params and deploys new NFT contract 
+   * sets escrow contract params and deploys new NFT contract
    * for minting and selling tokens.
    *
    * @param _givethBridge address Address of GivethBridge contract
    * @param _givethReceiverId uint64 Campaign Id created on Giveth platform.
-   * @param _name string Name for the NFT 
-   * @param _symbol string Symbol for the NFT 
+   * @param _name string Name for the NFT
+   * @param _symbol string Symbol for the NFT
    */
   constructor(address _givethBridge,
 	      uint64 _givethReceiverId,
@@ -1146,26 +1146,26 @@ contract CryptoxmasEscrow is Pausable, Ownable {
     // setup Giveth params
     givethBridge = _givethBridge;
     givethReceiverId = _givethReceiverId;
-    
+
     // deploy nft contract
     nft = new NFT(_name, _symbol);
   }
 
-   /* 
-   * METHODS 
+   /*
+   * METHODS
    */
-  
+
   /**
    * @dev Get Token Category for the tokenUri.
    *
    * @param _tokenUri string token URI of the category
    * @return Token Category details (CategoryId, minted, maxQnty, price)
-   */  
+   */
   function getTokenCategory(string _tokenUri) public view returns (CategoryId categoryId,
 								  uint minted,
 								  uint maxQnty,
-								  uint price) { 
-    TokenCategory memory category = tokenCategories[_tokenUri];    
+								  uint price) {
+    TokenCategory memory category = tokenCategories[_tokenUri];
     return (category.categoryId,
 	    category.minted,
 	    category.maxQnty,
@@ -1178,18 +1178,18 @@ contract CryptoxmasEscrow is Pausable, Ownable {
    * @param _tokenUri string token URI of the category
    * @param _categoryId uint categoryid of the category
    * @param _maxQnty uint maximum quantity of tokens allowed to be minted
-   * @param _price uint price tokens of that category will be sold at  
+   * @param _price uint price tokens of that category will be sold at
    * @return True if success.
-   */    
+   */
   function addTokenCategory(string _tokenUri, CategoryId _categoryId, uint _maxQnty, uint _price)
     public onlyOwner returns (bool success) {
 
     // price should be more than MIN_PRICE
     require(_price >= MIN_PRICE);
-	    
+
     // can't override existing category
     require(tokenCategories[_tokenUri].price == 0);
-    
+
     tokenCategories[_tokenUri] = TokenCategory(_categoryId,
 					       0, // zero tokens minted initially
 					       _maxQnty,
@@ -1204,9 +1204,9 @@ contract CryptoxmasEscrow is Pausable, Ownable {
    *
    * @param _tokenUri string token URI of the category
    * @param _transitAddress address transit address assigned to gift
-   * @param _value uint amount of ether, that is send in tx. 
+   * @param _value uint amount of ether, that is send in tx.
    * @return True if success.
-   */      
+   */
   function canBuyGift(string _tokenUri, address _transitAddress, uint _value) public view whenNotPaused returns (bool) {
     // can not override existing gift
     require(gifts[_transitAddress].status == Statuses.Empty);
@@ -1217,27 +1217,27 @@ contract CryptoxmasEscrow is Pausable, Ownable {
 
     // tokens of that type not sold out yet
     require(category.minted < category.maxQnty);
-    
+
     return true;
   }
 
   /**
    * @dev Buy gift and mint token with _tokenUri, new minted token will be kept in escrow
-   * until receiver claims it. 
+   * until receiver claims it.
    *
    * Received ether, splitted in 3 parts:
-   *   - 0.01 ETH goes to ephemeral account, so it can pay gas fee for claim transaction. 
-   *   - token price (minus ephemeral account fee) goes to the Giveth Campaign as a donation.  
-   *   - Eth above token price is kept in the escrow, waiting for receiver to claim. 
+   *   - 0.01 ETH goes to ephemeral account, so it can pay gas fee for claim transaction.
+   *   - token price (minus ephemeral account fee) goes to the Giveth Campaign as a donation.
+   *   - Eth above token price is kept in the escrow, waiting for receiver to claim.
    *
    * @param _tokenUri string token URI of the category
    * @param _transitAddress address transit address assigned to gift
-   * @param _msgHash string IPFS hash, where gift message stored at 
+   * @param _msgHash string IPFS hash, where gift message stored at
    * @return True if success.
-   */    
+   */
   function buyGift(string _tokenUri, address _transitAddress, string _msgHash)
           payable public whenNotPaused returns (bool) {
-    
+
     require(canBuyGift(_tokenUri, _transitAddress, msg.value));
 
     // get token price from the category for that token URI
@@ -1246,14 +1246,14 @@ contract CryptoxmasEscrow is Pausable, Ownable {
     // ether above token price is for receiver to claim
     uint claimEth = msg.value.sub(tokenPrice);
 
-    // mint new token 
+    // mint new token
     uint tokenId = tokensCounter.add(1);
     nft.mintWithTokenURI(tokenId, _tokenUri);
 
     // increment counters
     tokenCategories[_tokenUri].minted = tokenCategories[_tokenUri].minted.add(1);
     tokensCounter = tokensCounter.add(1);
-    
+
     // saving gift details
     gifts[_transitAddress] = Gift(
 				  msg.sender,
@@ -1275,7 +1275,7 @@ contract CryptoxmasEscrow is Pausable, Ownable {
       // revert if there was problem with sending ether to GivethBridge
       require(donationSuccess == true);
     }
-    
+
     // log buy event
     emit LogBuy(
 		_transitAddress,
@@ -1288,13 +1288,13 @@ contract CryptoxmasEscrow is Pausable, Ownable {
   }
 
   /**
-   * @dev Send donation to Giveth campaign 
+   * @dev Send donation to Giveth campaign
    * by calling function 'donateAndCreateGiver' of GivethBridge contract.
    *
    * @param _giver address giver address
    * @param _value uint donation amount (in wei)
    * @return True if success.
-   */    
+   */
   function _makeDonation(address _giver, uint _value) internal returns (bool success) {
     bytes memory _data = abi.encodePacked(0x1870c10f, // function signature
 					   bytes32(_giver),
@@ -1311,34 +1311,34 @@ contract CryptoxmasEscrow is Pausable, Ownable {
    *
    * @param _transitAddress address transit address assigned to gift
    * @return Gift details
-   */    
+   */
   function getGift(address _transitAddress) public view returns (
 	     uint256 tokenId,
-	     string tokenUri,								 
+	     string tokenUri,
 	     address sender,  // gift buyer
 	     uint claimEth,   // eth for receiver
-	     uint nftPrice,   // token price 	     
-	     Statuses status, // gift status (deposited, claimed, cancelled) 								 	     
-	     string msgHash   // IPFS hash, where gift message stored at 
+	     uint nftPrice,   // token price
+	     Statuses status, // gift status (deposited, claimed, cancelled)
+	     string msgHash   // IPFS hash, where gift message stored at
     ) {
     Gift memory gift = gifts[_transitAddress];
     tokenUri =  nft.tokenURI(gift.tokenId);
-    TokenCategory memory category = tokenCategories[tokenUri];    
+    TokenCategory memory category = tokenCategories[tokenUri];
     return (
 	    gift.tokenId,
 	    tokenUri,
 	    gift.sender,
 	    gift.claimEth,
-	    category.price,	    
+	    category.price,
 	    gift.status,
 	    gift.msgHash
 	    );
   }
-  
+
   /**
    * @dev Cancel gift and get sent ether back. Only gift buyer can
    * cancel.
-   * 
+   *
    * @param _transitAddress transit address assigned to gift
    * @return True if success.
    */
@@ -1347,10 +1347,10 @@ contract CryptoxmasEscrow is Pausable, Ownable {
 
     // is deposited and wasn't claimed or cancelled before
     require(gift.status == Statuses.Deposited);
-    
+
     // only sender can cancel transfer;
     require(msg.sender == gift.sender);
-    
+
     // update status to cancelled
     gift.status = Statuses.Cancelled;
 
@@ -1368,18 +1368,18 @@ contract CryptoxmasEscrow is Pausable, Ownable {
     return true;
   }
 
-  
+
   /**
    * @dev Claim gift to receiver's address if it is correctly signed
    * with private key for verification public key assigned to gift.
-   * 
+   *
    * @param _receiver address Signed address.
    * @return True if success.
    */
   function claimGift(address _receiver) public whenNotPaused returns (bool success) {
     // only holder of ephemeral private key can claim gift
     address _transitAddress = msg.sender;
-    
+
     Gift storage gift = gifts[_transitAddress];
 
     // is deposited and wasn't claimed or cancelled before
@@ -1387,10 +1387,10 @@ contract CryptoxmasEscrow is Pausable, Ownable {
 
     // update gift status to claimed
     gift.status = Statuses.Claimed;
-    
+
     // send nft to receiver
     nft.transferFrom(address(this), _receiver, gift.tokenId);
-    
+
     // transfer ether to receiver's address
     if (gift.claimEth > 0) {
       _receiver.transfer(gift.claimEth);
@@ -1398,7 +1398,7 @@ contract CryptoxmasEscrow is Pausable, Ownable {
 
     // log claim event
     emit LogClaim(_transitAddress, gift.sender, gift.tokenId, _receiver, gift.claimEth);
-    
+
     return true;
   }
 
@@ -1406,4 +1406,138 @@ contract CryptoxmasEscrow is Pausable, Ownable {
   function() public payable {
     revert();
   }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

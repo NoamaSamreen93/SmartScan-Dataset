@@ -69,7 +69,7 @@ contract MultiOwners {
 
     event AccessGrant(address indexed owner);
     event AccessRevoke(address indexed owner);
-    
+
     mapping(address => bool) owners;
     address public publisher;
 
@@ -78,9 +78,9 @@ contract MultiOwners {
         publisher = msg.sender;
     }
 
-    modifier onlyOwner() { 
+    modifier onlyOwner() {
         require(owners[msg.sender] == true);
-        _; 
+        _;
     }
 
     function isOwner() public constant returns (bool) {
@@ -106,7 +106,7 @@ contract MultiOwners {
 }
 
 contract TokenRecipient {
-  function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public; 
+  function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public;
 }
 
 contract TokenInterface is ERC20 {
@@ -170,13 +170,13 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   }
 
 
-  //  ██████╗ ██████╗ ███╗   ██╗███████╗██╗███╗   ██╗ ██████╗ 
-  // ██╔════╝██╔═══██╗████╗  ██║██╔════╝██║████╗  ██║██╔════╝ 
+  //  ██████╗ ██████╗ ███╗   ██╗███████╗██╗███╗   ██╗ ██████╗
+  // ██╔════╝██╔═══██╗████╗  ██║██╔════╝██║████╗  ██║██╔════╝
   // ██║     ██║   ██║██╔██╗ ██║█████╗  ██║██╔██╗ ██║██║  ███╗
   // ██║     ██║   ██║██║╚██╗██║██╔══╝  ██║██║╚██╗██║██║   ██║
   // ╚██████╗╚██████╔╝██║ ╚████║██║     ██║██║ ╚████║╚██████╔╝
-  //  ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝     ╚═╝╚═╝  ╚═══╝ ╚═════╝ 
-                                                           
+  //  ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝     ╚═╝╚═╝  ╚═══╝ ╚═════╝
+
   bool public isWhitelisted;            // Should be whitelisted to buy tokens
   bool public isKnownOnly;              // Should be known user to buy tokens
   bool public isAmountBonus;            // Enable amount bonuses in crowdsale?
@@ -186,7 +186,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   bool public isDisableEther;           // Disable purchase with the Ether
   bool public isExtraDistribution;      // Should distribute extra tokens to special contract?
   bool public isTransferShipment;       // Will ship token via minting?
-  bool public isCappedInEther;          // Should be capped in Ether 
+  bool public isCappedInEther;          // Should be capped in Ether
   bool public isPersonalBonuses;        // Should check personal beneficiary bonus?
   bool public isAllowClaimBeforeFinalization;
                                         // Should allow to claim funds before finalization?
@@ -210,7 +210,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   uint[] public timeSlices;                    // Same as amount but key is seconds after start
   uint public timeSlicesCount;
 
-  mapping (address => PersonalBonusRecord) public personalBonuses; 
+  mapping (address => PersonalBonusRecord) public personalBonuses;
                                         // personal bonuses
   MintableTokenInterface public token;  // The token being sold
   uint public tokenDecimals;            // Token decimals
@@ -219,7 +219,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
                                         // allowed tokens list
   mapping (address => uint) public tokensValues;
                                         // TOKEN to ETH conversion rate (oraclized)
-  uint public startTime;                // start and end timestamps where 
+  uint public startTime;                // start and end timestamps where
   uint public endTime;                  // investments are allowed (both inclusive)
   address public wallet;                // address where funds are collected
   uint public price;                    // how many token (1 * 10 ** decimals) a buyer gets per wei
@@ -231,8 +231,8 @@ contract Crowdsale is MultiOwners, TokenRecipient {
 
   // ███████╗████████╗ █████╗ ████████╗███████╗
   // ██╔════╝╚══██╔══╝██╔══██╗╚══██╔══╝██╔════╝
-  // ███████╗   ██║   ███████║   ██║   █████╗  
-  // ╚════██║   ██║   ██╔══██║   ██║   ██╔══╝  
+  // ███████╗   ██║   ███████║   ██║   █████╗
+  // ╚════██║   ██║   ██╔══██║   ██║   ██╔══╝
   // ███████║   ██║   ██║  ██║   ██║   ███████╗
   // ╚══════╝   ╚═╝   ╚═╝  ╚═╝   ╚═╝   ╚══════╝
   // amount of raised money in wei
@@ -258,25 +258,25 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   // ██╔══╝  ╚██╗ ██╔╝██╔══╝  ██║╚██╗██║   ██║   ╚════██║
   // ███████╗ ╚████╔╝ ███████╗██║ ╚████║   ██║   ███████║
   // ╚══════╝  ╚═══╝  ╚══════╝╚═╝  ╚═══╝   ╚═╝   ╚══════╝
-  
+
   event EthBuy(
-    address indexed purchaser, 
-    address indexed beneficiary, 
-    uint value, 
+    address indexed purchaser,
+    address indexed beneficiary,
+    uint value,
     uint amount);
   event HashBuy(
-    address indexed beneficiary, 
-    uint value, 
-    uint amount, 
-    uint timestamp, 
+    address indexed beneficiary,
+    uint value,
+    uint amount,
+    uint timestamp,
     bytes32 indexed bitcoinHash);
   event AltBuy(
-    address indexed beneficiary, 
-    address indexed allowedToken, 
-    uint allowedTokenValue, 
-    uint ethValue, 
+    address indexed beneficiary,
+    address indexed allowedToken,
+    uint allowedTokenValue,
+    uint ethValue,
     uint shipAmount);
-    
+
   event ShipTokens(address indexed owner, uint amount);
 
   event Sanetize();
@@ -311,15 +311,15 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     bool _isDisableEther,
     // Should mint extra tokens for future distribution?
     bool _isExtraDistribution,
-    // Will ship token via minting? 
+    // Will ship token via minting?
     bool _isTransferShipment,
     // Should be capped in ether
     bool _isCappedInEther,
-    // Should beneficiaries pull their tokens? 
+    // Should beneficiaries pull their tokens?
     bool _isPersonalBonuses,
     // Should allow to claim funds before finalization?
     bool _isAllowClaimBeforeFinalization)
-    inState(State.Setup) onlyOwner public 
+    inState(State.Setup) onlyOwner public
   {
     isWhitelisted = _isWhitelisted;
     isKnownOnly = _isKnownOnly;
@@ -336,7 +336,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   }
 
   // ! Could be changed in process of sale (since 02.2018)
-  function setMinimum(uint _amount, bool _inToken) 
+  function setMinimum(uint _amount, bool _inToken)
     onlyOwner public
   {
     if (_amount == 0) {
@@ -364,7 +364,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   }
 
   function setTime(uint _start, uint _end)
-    inState(State.Setup) onlyOwner public 
+    inState(State.Setup) onlyOwner public
   {
     require(_start < _end);
     require(_end > block.timestamp);
@@ -372,28 +372,28 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     endTime = _end;
   }
 
-  function setToken(address _tokenAddress) 
+  function setToken(address _tokenAddress)
     inState(State.Setup) onlyOwner public
   {
     token = MintableTokenInterface(_tokenAddress);
     tokenDecimals = token.decimals();
   }
 
-  function setWallet(address _wallet) 
-    inState(State.Setup) onlyOwner public 
+  function setWallet(address _wallet)
+    inState(State.Setup) onlyOwner public
   {
     require(_wallet != address(0));
     wallet = _wallet;
   }
-  
-  function setRegistry(address _registry) 
-    inState(State.Setup) onlyOwner public 
+
+  function setRegistry(address _registry)
+    inState(State.Setup) onlyOwner public
   {
     require(_registry != address(0));
     userRegistry = UserRegistryInterface(_registry);
   }
 
-  function setExtraDistribution(address _holder, uint _extraPart) 
+  function setExtraDistribution(address _holder, uint _extraPart)
     inState(State.Setup) onlyOwner public
   {
     require(_holder != address(0));
@@ -401,8 +401,8 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     extraDistributionPart = _extraPart;
   }
 
-  function setAmountBonuses(uint[] _amountSlices, uint[] _bonuses) 
-    inState(State.Setup) onlyOwner public 
+  function setAmountBonuses(uint[] _amountSlices, uint[] _bonuses)
+    inState(State.Setup) onlyOwner public
   {
     require(_amountSlices.length > 1);
     require(_bonuses.length == _amountSlices.length);
@@ -417,11 +417,11 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     amountSlicesCount = amountSlices.length;
   }
 
-  function setTimeBonuses(uint[] _timeSlices, uint[] _bonuses) 
+  function setTimeBonuses(uint[] _timeSlices, uint[] _bonuses)
     // ! Not need to check state since changes at 02.2018
     // inState(State.Setup)
-    onlyOwner 
-    public 
+    onlyOwner
+    public
   {
     // Only once in life time
     // ! Time bonuses is changable after 02.2018
@@ -449,16 +449,16 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     }
     timeSlicesCount = timeSlices.length;
   }
-  
+
   function setTokenExcange(address _token, uint _value)
     inState(State.Setup) onlyOwner public
   {
     allowedTokens[_token] = TokenInterface(_token);
-    updateTokenValue(_token, _value); 
+    updateTokenValue(_token, _value);
   }
 
-  function saneIt() 
-    inState(State.Setup) onlyOwner public 
+  function saneIt()
+    inState(State.Setup) onlyOwner public
   {
     require(startTime < endTime);
     require(endTime > now);
@@ -508,8 +508,8 @@ contract Crowdsale is MultiOwners, TokenRecipient {
 
   // ███████╗██╗  ██╗███████╗ ██████╗██╗   ██╗████████╗███████╗
   // ██╔════╝╚██╗██╔╝██╔════╝██╔════╝██║   ██║╚══██╔══╝██╔════╝
-  // █████╗   ╚███╔╝ █████╗  ██║     ██║   ██║   ██║   █████╗  
-  // ██╔══╝   ██╔██╗ ██╔══╝  ██║     ██║   ██║   ██║   ██╔══╝  
+  // █████╗   ╚███╔╝ █████╗  ██║     ██║   ██║   ██║   █████╗
+  // ██╔══╝   ██╔██╗ ██╔══╝  ██║     ██║   ██║   ██║   ██╔══╝
   // ███████╗██╔╝ ██╗███████╗╚██████╗╚██████╔╝   ██║   ███████╗
   // ╚══════╝╚═╝  ╚═╝╚══════╝ ╚═════╝ ╚═════╝    ╚═╝   ╚══════╝
 
@@ -519,15 +519,15 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     uint _time,
     uint _totalSupply
   ) public constant returns(
-    uint calculatedTotal, 
-    uint calculatedBeneficiary, 
-    uint calculatedExtra, 
-    uint calculatedreferer, 
-    address refererAddress) 
+    uint calculatedTotal,
+    uint calculatedBeneficiary,
+    uint calculatedExtra,
+    uint calculatedreferer,
+    address refererAddress)
   {
     _totalSupply;
     uint bonus = 0;
-    
+
     if (isAmountBonus) {
       bonus = bonus.add(calculateAmountBonus(_weiAmount));
     }
@@ -549,9 +549,9 @@ contract Crowdsale is MultiOwners, TokenRecipient {
       calculatedExtra = calculatedBeneficiary.mul(extraDistributionPart).div(10000);
     }
 
-    if (isPersonalBonuses && 
-        personalBonuses[_beneficiary].refererAddress != address(0) && 
-        personalBonuses[_beneficiary].refererBonus > 0) 
+    if (isPersonalBonuses &&
+        personalBonuses[_beneficiary].refererAddress != address(0) &&
+        personalBonuses[_beneficiary].refererBonus > 0)
     {
       calculatedreferer = calculatedBeneficiary.mul(personalBonuses[_beneficiary].refererBonus).div(10000);
       refererAddress = personalBonuses[_beneficiary].refererAddress;
@@ -585,13 +585,13 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   }
 
   function validPurchase(
-    address _beneficiary, 
-    uint _weiAmount, 
+    address _beneficiary,
+    uint _weiAmount,
     uint _tokenAmount,
     uint _extraAmount,
     uint _totalAmount,
-    uint _time) 
-  public constant returns(bool) 
+    uint _time)
+  public constant returns(bool)
   {
     _tokenAmount;
     _extraAmount;
@@ -622,7 +622,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
 
     if (isWhitelisted) {
       WhitelistRecord storage record = whitelist[_beneficiary];
-      if (!record.allow || 
+      if (!record.allow ||
           record.min > finalBeneficiaryInvest ||
           record.max < finalBeneficiaryInvest) {
         return false;
@@ -642,18 +642,18 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     return true;
   }
 
-                                                                                        
+
   function updateTokenValue(address _token, uint _value) onlyOwner public {
     require(address(allowedTokens[_token]) != address(0x0));
     tokensValues[_token] = _value;
   }
 
-  // ██████╗ ███████╗ █████╗ ██████╗ 
+  // ██████╗ ███████╗ █████╗ ██████╗
   // ██╔══██╗██╔════╝██╔══██╗██╔══██╗
   // ██████╔╝█████╗  ███████║██║  ██║
   // ██╔══██╗██╔══╝  ██╔══██║██║  ██║
   // ██║  ██║███████╗██║  ██║██████╔╝
-  // ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═════╝ 
+  // ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═════╝
   function success() public constant returns(bool) {
     if (isCappedInEther) {
       return weiRaised >= softCap;
@@ -677,8 +677,8 @@ contract Crowdsale is MultiOwners, TokenRecipient {
 
   //  ██████╗ ██╗   ██╗████████╗███████╗██╗██████╗ ███████╗
   // ██╔═══██╗██║   ██║╚══██╔══╝██╔════╝██║██╔══██╗██╔════╝
-  // ██║   ██║██║   ██║   ██║   ███████╗██║██║  ██║█████╗  
-  // ██║   ██║██║   ██║   ██║   ╚════██║██║██║  ██║██╔══╝  
+  // ██║   ██║██║   ██║   ██║   ███████╗██║██║  ██║█████╗
+  // ██║   ██║██║   ██║   ██║   ╚════██║██║██║  ██║██╔══╝
   // ╚██████╔╝╚██████╔╝   ██║   ███████║██║██████╔╝███████╗
   //  ╚═════╝  ╚═════╝    ╚═╝   ╚══════╝╚═╝╚═════╝ ╚══════╝
   // fallback function can be used to buy tokens
@@ -693,19 +693,19 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     forwardEther();
   }
 
-  function buyWithHash(address _beneficiary, uint _value, uint _timestamp, bytes32 _hash) 
-    inState(State.Active) onlyOwner public 
+  function buyWithHash(address _beneficiary, uint _value, uint _timestamp, bytes32 _hash)
+    inState(State.Active) onlyOwner public
   {
     require(isAllowToIssue);
     uint shipAmount = sellTokens(_beneficiary, _value, _timestamp);
     require(shipAmount > 0);
     HashBuy(_beneficiary, _value, shipAmount, _timestamp, _hash);
   }
-  
-  function receiveApproval(address _from, 
-                           uint256 _value, 
-                           address _token, 
-                           bytes _extraData) public 
+
+  function receiveApproval(address _from,
+                           uint256 _value,
+                           address _token,
+                           bytes _extraData) public
   {
     if (_token == address(token)) {
       TokenInterface(_token).transferFrom(_from, address(this), _value);
@@ -713,7 +713,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     }
 
     require(isTokenExchange);
-    
+
     require(toUint(_extraData) == tokensValues[_token]);
     require(tokensValues[_token] > 0);
     require(forwardTokens(_from, _token, _value));
@@ -765,11 +765,11 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     whitelist[_beneficiary] = WhitelistRecord(true, _min, _max);
     Whitelisted(_beneficiary, _min, _max);
   }
-  
+
   function setPersonalBonus(
-    address _beneficiary, 
-    uint _bonus, 
-    address _refererAddress, 
+    address _beneficiary,
+    uint _bonus,
+    address _refererAddress,
     uint _refererBonus) onlyOwner public {
     personalBonuses[_beneficiary] = PersonalBonusRecord(
       _bonus,
@@ -787,7 +787,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
   // ██║██║ ╚████║   ██║   ███████╗██║  ██║██║ ╚████║██║  ██║███████╗███████║
   // ╚═╝╚═╝  ╚═══╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝╚══════╝
   // low level token purchase function
-  function sellTokens(address _beneficiary, uint _weiAmount, uint timestamp) 
+  function sellTokens(address _beneficiary, uint _weiAmount, uint timestamp)
     inState(State.Active) internal returns(uint)
   {
     uint beneficiaryTokens;
@@ -796,13 +796,13 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     uint refererTokens;
     address refererAddress;
     (totalTokens, beneficiaryTokens, extraTokens, refererTokens, refererAddress) = calculateEthAmount(
-      _beneficiary, 
-      _weiAmount, 
-      timestamp, 
+      _beneficiary,
+      _weiAmount,
+      timestamp,
       token.totalSupply());
 
     require(validPurchase(_beneficiary,   // Check if current purchase is valid
-                          _weiAmount, 
+                          _weiAmount,
                           beneficiaryTokens,
                           extraTokens,
                           totalTokens,
@@ -812,8 +812,8 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     beneficiaryInvest[_beneficiary] = beneficiaryInvest[_beneficiary].add(_weiAmount);
     shipTokens(_beneficiary, beneficiaryTokens);     // ship tokens to beneficiary
     EthBuy(msg.sender,             // Fire purchase event
-                  _beneficiary, 
-                  _weiAmount, 
+                  _beneficiary,
+                  _weiAmount,
                   beneficiaryTokens);
     ShipTokens(_beneficiary, beneficiaryTokens);
 
@@ -834,8 +834,8 @@ contract Crowdsale is MultiOwners, TokenRecipient {
     return beneficiaryTokens;
   }
 
-  function shipTokens(address _beneficiary, uint _amount) 
-    inState(State.Active) internal 
+  function shipTokens(address _beneficiary, uint _amount)
+    inState(State.Active) internal
   {
     if (isTransferShipment) {
       token.transfer(_beneficiary, _amount);
@@ -868,7 +868,7 @@ contract Crowdsale is MultiOwners, TokenRecipient {
       for (uint i = 0; i < 32; i++) {
           out |= uint(left[i]) << (31 * 8 - i * 8);
       }
-      
+
       return out;
   }
 }
@@ -893,7 +893,7 @@ contract BaseAltCrowdsale is Crowdsale {
       // Should be known user to buy tokens
       // _isKnownOnly,
       true,
-      // Enable amount bonuses in crowdsale? 
+      // Enable amount bonuses in crowdsale?
       // _isAmountBonus,
       true,
       // Enable early bird bonus in crowdsale?
@@ -911,7 +911,7 @@ contract BaseAltCrowdsale is Crowdsale {
       // Should mint extra tokens for future distribution?
       // _isExtraDistribution,
       true,
-      // Will ship token via minting? 
+      // Will ship token via minting?
       // _isTransferShipment,
       false,
       // Should be capped in ether
@@ -924,7 +924,7 @@ contract BaseAltCrowdsale is Crowdsale {
       false
     );
 
-    setToken(_token); 
+    setToken(_token);
     setTime(_start, _end);
     setRegistry(_registry);
     setWallet(_wallet);
@@ -960,18 +960,53 @@ contract AltCrowdsalePhaseOne is BaseAltCrowdsale {
     false,
 
     // price 1 ETH -> 100000 ALT
-    uint(1 ether).div(100000), 
+    uint(1 ether).div(100000),
 
     // start
     block.timestamp,
-    // end 
+    // end
     1527764400,
 
     // _softCap,
     2500 ether,
     // _hardCap
     7500 ether
-  ) 
+  )
   public {
-  } 
+  }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

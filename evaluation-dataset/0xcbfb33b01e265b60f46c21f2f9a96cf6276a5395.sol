@@ -6,7 +6,7 @@ library Percent {
     uint num;
     uint den;
   }
-  
+
   // storage
   function mul(percent storage p, uint a) internal view returns (uint) {
     if (a == 0) {
@@ -52,7 +52,7 @@ library SafeMath {
 
     return c;
   }
-  
+
   /**
     * @dev Subtracts two numbers, reverts on overflow (i.e. if subtrahend is greater than minuend).
     */
@@ -119,17 +119,17 @@ contract Ownable {
 contract FastLap is Ownable {
     using Percent for Percent.percent;
     using SafeMath for uint;
-    
+
     //Address for advertising and admins expences
     address constant public advertisingAddress = address(0xf86117De6539c6f48764b638412C99F3ADB19892); //рекламный
     address constant public adminsAddress = address(0x33a6c786Cf6D69CC62c475B5d69947af08bB6210); //тех поддержка и автоматизация выплат
-    
+
     //Percent for promo expences
     Percent.percent private m_adminsPercent = Percent.percent(3, 100);       //   3/100  *100% = 3%
     Percent.percent private m_advertisingPercent = Percent.percent(5, 100);// 5/100  *100% = 5%
     //How many percent for your deposit to be multiplied
     Percent.percent public MULTIPLIER = Percent.percent(120, 100); // 120/100 * 100% = 120%
-    
+
     uint public amountRaised = 0;
     //The deposit structure holds all the info about the deposit made
     struct Deposit {
@@ -142,11 +142,11 @@ contract FastLap is Ownable {
     Deposit[] private Queue;  //The queue for new investments
     // list of deposites for 1 user
     mapping(address => uint[]) private depositors;
-    
+
     uint public depositorsCount = 0;
-    
+
     uint private currentReceiverIndex = 0; //The index of the first depositor in the queue. The receiver of investments!
-    
+
     uint public minBalanceForDistribution = 3 ether; //минимально необходимый баланс
 
     //создаем депозит инвестора в основной очереди
@@ -161,7 +161,7 @@ contract FastLap is Ownable {
             amountRaised += msg.value;
             if (depositors[msg.sender].length == 0) depositorsCount += 1;
             depositors[msg.sender].push(Queue.length - 1);
-            
+
             advertisingAddress.send(m_advertisingPercent.mul(msg.value));
             adminsAddress.send(m_adminsPercent.mul(msg.value));
         } else { //выплаты инвесторам
@@ -172,7 +172,7 @@ contract FastLap is Ownable {
             uint maxIterations = 25;//максимум 25 итераций
             uint num = 0;
             uint i = 0;
-            
+
             while ((currentReceiverIndex < QueueLen) && (i < maxIterations) && (money >= toSend)) {
                 money = money.sub(toSend);
                 Queue[currentReceiverIndex].paymentTime = now;
@@ -189,13 +189,13 @@ contract FastLap is Ownable {
     function getNeedBalance() public view returns (uint) {
         uint money = address(this).balance;
         if (money >= minBalanceForDistribution){
-          return 0;  
+          return 0;
         } else {
             return minBalanceForDistribution - money;
         }
     }
-    
-    //данные о депозите по порядковому номеру 
+
+    //данные о депозите по порядковому номеру
     function getDeposit(uint idx) public view returns (address depositor, uint deposit, uint expect, uint paymentTime){
         Deposit storage dep = Queue[idx];
         return (dep.depositor, dep.deposit, dep.expects, dep.paymentTime);
@@ -214,7 +214,7 @@ contract FastLap is Ownable {
         lastPaymentTime = 0;
         payDepCount = 0;
         uint num = 0;
-        
+
         for(uint i=0; i<depCount; ++i){
             num = depositors[depositor][i];
             allDeps += Queue[num].deposit;
@@ -226,4 +226,138 @@ contract FastLap is Ownable {
         }
         return (depCount, allDeps, payDepCount, allPay, lastPaymentTime);
     }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

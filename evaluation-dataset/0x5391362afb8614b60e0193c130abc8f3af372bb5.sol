@@ -35,7 +35,7 @@ contract ERC20Token {
 
     function transfer(address _to, uint256 _value) public returns (bool success); //transfer function to let the contract move own tokens
     function balanceOf(address _owner) public constant returns (uint256 balance); //Function to check an address balance
-    
+
                 }
 
 contract PAXCHANGEICO {
@@ -142,17 +142,17 @@ contract PAXCHANGEICO {
         else {revert();}
 
         tokenReward.transfer(msg.sender, tokenBought);
-        
+
         LogFundingReceived(msg.sender, msg.value, totalRaised);
         LogContributorsPayout(msg.sender, tokenBought);
-        
+
         checkIfFundingCompleteOrExpired();
     }
     /**
     *@dev Function to check if ICO if finished
     */
     function checkIfFundingCompleteOrExpired() public {
-        
+
         if(now > preSaledeadline && now < ICOdeadline){
             state = State.ICO;
         }
@@ -160,7 +160,7 @@ contract PAXCHANGEICO {
             state = State.Successful;
             completedAt = now;
             LogFundingSuccessful(totalRaised);
-            finished();  
+            finished();
         }
     }
     /**
@@ -169,11 +169,11 @@ contract PAXCHANGEICO {
     */
     function finished() public {
         require(state == State.Successful);
-        
+
         uint remanent;
         remanent =  tokenReward.balanceOf(this);
         currentBalance = 0;
-        
+
         tokenReward.transfer(creator,remanent);
         require(creator.send(this.balance));
 
@@ -191,3 +191,38 @@ contract PAXCHANGEICO {
         contribute();
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

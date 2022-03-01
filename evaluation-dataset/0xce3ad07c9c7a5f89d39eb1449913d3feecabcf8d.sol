@@ -326,8 +326,8 @@ contract EOSContractInterface
     function balanceOf( address who ) constant returns (uint value);
 }
 
-// EOSclassic smart contract 
-contract EOSclassic is StandardToken, HasNoEther 
+// EOSclassic smart contract
+contract EOSclassic is StandardToken, HasNoEther
 {
     // Welcome to EOSclassic
     string public constant name = "EOSclassic";
@@ -336,17 +336,17 @@ contract EOSclassic is StandardToken, HasNoEther
 
     // Total amount minted
     uint public constant TOTAL_SUPPLY = 1000000000 * (10 ** uint(decimals));
-    
+
     // Amount given to founders
-    uint public constant foundersAllocation = 100000000 * (10 ** uint(decimals));   
+    uint public constant foundersAllocation = 100000000 * (10 ** uint(decimals));
 
     // Contract address of the original EOS contracts
     address public constant eosTokenAddress = 0x86Fa049857E0209aa7D9e616F7eb3b3B78ECfdb0;
     address public constant eosCrowdsaleAddress = 0xd0a6E6C54DbC68Db5db3A091B171A77407Ff7ccf;
-    
+
     // Map EOS keys; if not empty it should be favored over the original crowdsale address
     mapping (address => string) public keys;
-    
+
     // Keep track of EOS->EOSclassic claims
     mapping (address => bool) public eosClassicClaimed;
 
@@ -359,7 +359,7 @@ contract EOSclassic is StandardToken, HasNoEther
     // ************************************************************
     // Constructor; mints all tokens, assigns founder's allocation
     // ************************************************************
-    constructor() public 
+    constructor() public
     {
         // Define total supply
         totalSupply_ = TOTAL_SUPPLY;
@@ -367,7 +367,7 @@ contract EOSclassic is StandardToken, HasNoEther
         balances[address(this)] = TOTAL_SUPPLY;
         // Announce initial allocation
         emit Transfer(0x0, address(this), TOTAL_SUPPLY);
-        
+
         // Transfer founder's allocation
         balances[address(this)] = balances[address(this)].sub(foundersAllocation);
         balances[msg.sender] = balances[msg.sender].add(foundersAllocation);
@@ -376,7 +376,7 @@ contract EOSclassic is StandardToken, HasNoEther
     }
 
     // Function that checks the original EOS token for a balance
-    function queryEOSTokenBalance(address _address) view public returns (uint) 
+    function queryEOSTokenBalance(address _address) view public returns (uint)
     {
         //return ERC20Basic(eosCrowdsaleAddress).balanceOf(_address);
         EOSContractInterface eosTokenContract = EOSContractInterface(eosTokenAddress);
@@ -384,19 +384,19 @@ contract EOSclassic is StandardToken, HasNoEther
     }
 
     // Function that returns any registered EOS address from the original EOS crowdsale
-    function queryEOSCrowdsaleKey(address _address) view public returns (string) 
+    function queryEOSCrowdsaleKey(address _address) view public returns (string)
     {
         EOSContractInterface eosCrowdsaleContract = EOSContractInterface(eosCrowdsaleAddress);
         return eosCrowdsaleContract.keys(_address);
     }
 
     // Use to claim EOS Classic from the calling address
-    function claimEOSclassic() external returns (bool) 
+    function claimEOSclassic() external returns (bool)
     {
         return claimEOSclassicFor(msg.sender);
     }
 
-    // Use to claim EOSclassic for any Ethereum address 
+    // Use to claim EOSclassic for any Ethereum address
     function claimEOSclassicFor(address _toAddress) public returns (bool)
     {
         // Ensure that an address has been passed
@@ -406,43 +406,43 @@ contract EOSclassic is StandardToken, HasNoEther
         // Ensure this address has not already been claimed
         require (isClaimed(_toAddress) == false);
 
-        
+
         // Query the original EOS Crowdsale for address balance
         uint _eosContractBalance = queryEOSTokenBalance(_toAddress);
-        
+
         // Ensure that address had some balance in the crowdsale
         require (_eosContractBalance > 0);
-        
+
         // Sanity check: ensure we have enough tokens to send
         require (_eosContractBalance <= balances[address(this)]);
 
         // Mark address as claimed
         eosClassicClaimed[_toAddress] = true;
-        
+
         // Convert equivalent amount of EOS to EOSclassic
         // Transfer EOS Classic tokens from this contract to claiming address
         balances[address(this)] = balances[address(this)].sub(_eosContractBalance);
         balances[_toAddress] = balances[_toAddress].add(_eosContractBalance);
-        
-        // Broadcast transfer 
+
+        // Broadcast transfer
         emit Transfer(address(this), _toAddress, _eosContractBalance);
-        
+
         // Broadcast claim
         emit LogClaim(_toAddress, _eosContractBalance);
-        
+
         // Success!
         return true;
     }
 
     // Check any address to see if its EOSclassic has already been claimed
-    function isClaimed(address _address) public view returns (bool) 
+    function isClaimed(address _address) public view returns (bool)
     {
         return eosClassicClaimed[_address];
     }
 
     // Returns the latest EOS key registered.
-    // EOS token holders that never registered their EOS public key 
-    // can do so using the 'register' function in EOSclassic and then request restitution 
+    // EOS token holders that never registered their EOS public key
+    // can do so using the 'register' function in EOSclassic and then request restitution
     // via the EOS mainnet arbitration process.
     // EOS holders that previously registered can update their keys here;
     // This contract could be used in future key snapshots for future EOS forks.
@@ -485,4 +485,65 @@ contract EOSclassic is StandardToken, HasNoEther
         emit LogRegister(msg.sender, key);
     }
 
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

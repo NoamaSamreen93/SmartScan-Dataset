@@ -8,24 +8,24 @@ Reinvest dividends will increase investments.
 50% dividends per day.
 */
 contract WaitOrReinvest{
-    
+
     using SafeMath for uint256;
 
     mapping(address => uint256) investments;
     mapping(address => uint256) joined;
     mapping(address => address) referrer;
-	
+
     uint256 public stepUp = 50; //50% per day
     address public ownerWallet;
 
     event Invest(address investor, uint256 amount);
     event Withdraw(address investor, uint256 amount);
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
-    
+
     /**
-     * @dev Сonstructor Sets the original roles of the contract 
+     * @dev Сonstructor Sets the original roles of the contract
      */
-     
+
     constructor() public {
         ownerWallet = msg.sender;
     }
@@ -33,7 +33,7 @@ contract WaitOrReinvest{
     /**
      * @dev Modifiers
      */
-     
+
     modifier onlyOwner() {
         require(msg.sender == ownerWallet);
         _;
@@ -52,53 +52,53 @@ contract WaitOrReinvest{
     /**
      * @dev Investments
      */
-	 
+
     function () public payable {
 		invest(address(0));
 	}
-	
+
     function invest(address _ref) public payable {
         require(msg.value >= 0);
         if (investments[msg.sender] > 0){
-            reinvest(); 
+            reinvest();
         }
         investments[msg.sender] = investments[msg.sender].add(msg.value);
         joined[msg.sender] = now;
-		
+
 		uint256 dfFee = msg.value.div(100).mul(5); //dev or ref fee
         ownerWallet.transfer(dfFee);
-		
-		
+
+
 		if (referrer[msg.sender] == address(0) && address(_ref) > 0 && address(_ref) != msg.sender)
 			referrer[msg.sender] = _ref;
-		
-		address ref = referrer[msg.sender];	
-        if (ref > 0 ) 
+
+		address ref = referrer[msg.sender];
+        if (ref > 0 )
 			ref.transfer(dfFee); // bounty program
-			
+
         emit Invest(msg.sender, msg.value);
     }
-	
+
     function reinvest() public {
 		require(investments[msg.sender] > 0);
 		require((now - joined[msg.sender]) > 5);
-		
+
 		uint256 balance = getDivsBalance(msg.sender);
-		
+
 		uint256 dfFee = balance.div(100).mul(5); //dev or ref fee
-		
+
 		if (address(this).balance > dfFee) {
-			address ref = referrer[msg.sender];	 
+			address ref = referrer[msg.sender];
 			if (ref != address(0))
 				ref.transfer(dfFee); // bounty program
-			else 
+			else
 				ownerWallet.transfer(dfFee); // or dev fee
-			balance = balance.sub(dfFee); 
+			balance = balance.sub(dfFee);
 		}
-			
+
 		investments[msg.sender] += balance;
 		joined[msg.sender] = now;
-	}	
+	}
 
     /**
     * @dev Evaluate current balance
@@ -122,12 +122,12 @@ contract WaitOrReinvest{
             if (balance > 0){
 				joined[msg.sender]=now;
                 msg.sender.transfer(balance);
-				
+
 				if (investments[msg.sender] > balance)
 					investments[msg.sender] = SafeMath.sub(investments[msg.sender],balance);
-				else 
+				else
 					investments[msg.sender] = 0;
-					
+
                 emit Withdraw(msg.sender, balance);
             }
             return true;
@@ -135,7 +135,7 @@ contract WaitOrReinvest{
             return false;
         }
     }
-    
+
 
     /**
     * @dev Gets balance of the sender address.
@@ -155,7 +155,7 @@ contract WaitOrReinvest{
         return investments[_investor];
     }
 
-    
+
 }
 
 /**
@@ -190,3 +190,38 @@ library SafeMath {
         return c;
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

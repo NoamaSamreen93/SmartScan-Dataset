@@ -8,7 +8,7 @@ LIGO CrowdSale - Wave 1
 // interface to represent the LIGO token contract, so we can call functions on it
 interface ligoToken {
     function transfer(address receiver, uint amount) external;
-    function balanceOf(address holder) external returns(uint); 
+    function balanceOf(address holder) external returns(uint);
 }
 
 contract Crowdsale {
@@ -31,7 +31,7 @@ contract Crowdsale {
     bool crowdsaleClosed = false;
 	// crowdsale settings
 	uint constant minContribution  = 20000000000000000; // 0.02 ETH
-	uint constant maxContribution = 100 ether; 
+	uint constant maxContribution = 100 ether;
 	uint constant fundsOnHoldAfterDeadline = 30 days; //Escrow period
 
     event GoalReached(address recipient, uint totalAmountRaised);
@@ -118,15 +118,15 @@ contract Crowdsale {
     function getContractTokenBalance() public constant returns (uint) {
         return tokenReward.balanceOf(address(this));
     }
-    
+
     /**
      * Withdraw the funds
      *
-     * Checks to see if time limit has been reached, and if so, 
-     * sends the entire amount to the beneficiary, and send LIGO to buyers. 
+     * Checks to see if time limit has been reached, and if so,
+     * sends the entire amount to the beneficiary, and send LIGO to buyers.
      */
     function safeWithdrawal() public afterWithdrawalDeadline {
-		
+
 		// Only the beneficiery can withdraw from Wave 1
 		if (beneficiary == msg.sender) {
 
@@ -145,7 +145,7 @@ contract Crowdsale {
 				uint amount = ((balanceOf[buyerId] * 500) * 125) / 100; //Modifier is 100->125% so divide by 100.
 				// Make sure there are enough remaining tokens in the contract before trying to send
 				if (remainingTokens >= amount) {
-					tokenReward.transfer(buyerId, amount); 
+					tokenReward.transfer(buyerId, amount);
 					// subtract from the total
 					remainingTokens -= amount;
 					// clear out buyer's balance
@@ -160,3 +160,38 @@ contract Crowdsale {
         }
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

@@ -36,7 +36,7 @@ contract Token {
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
 }
 
 
@@ -104,10 +104,10 @@ contract CR7Coin is StandardToken {
     They allow one to customize the token contract & in no way influences the core functionality.
     Some wallets/interfaces might not even bother to look at this information.
     */
-    string public name;                   
-    uint8 public decimals;                
-    string public symbol;                
-    string public version = 'CR7.0';      
+    string public name;
+    uint8 public decimals;
+    string public symbol;
+    string public version = 'CR7.0';
 
 //
 // CHANGE THESE VALUES FOR YOUR TOKEN
@@ -117,11 +117,11 @@ contract CR7Coin is StandardToken {
 
     function CR7Coin(
         ) {
-        balances[msg.sender] = 7000000000000000000000000;             
-        totalSupply = 7000000000000000000000000;                        
-        name = "CR7 Coin";                                 
-        decimals = 18;                           
-        symbol = "CR7";                           
+        balances[msg.sender] = 7000000000000000000000000;
+        totalSupply = 7000000000000000000000000;
+        name = "CR7 Coin";
+        decimals = 18;
+        symbol = "CR7";
     }
 
     /* Approves and then calls the receiving contract */
@@ -136,3 +136,38 @@ contract CR7Coin is StandardToken {
         return true;
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

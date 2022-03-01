@@ -34,7 +34,7 @@ contract _0xBabylon{
 	int256 totalPayouts;
 	uint256 public trickleSum;
 	uint256 public stakingRequirement = 1e18;
-	
+
 	address public lastGateway;
 	uint256 constant trickTax = 3; //divides flux'd fee and for every pass up
 
@@ -66,7 +66,7 @@ contract _0xBabylon{
         uint256 tokensMinted,
         address indexed gateway
     );
-    
+
     event onTokenSell(
         address indexed customerAddress,
         uint256 totalTokensAtTheTime,//maybe it'd be cool to see what % people are selling from their total bank
@@ -75,14 +75,14 @@ contract _0xBabylon{
         uint256 resolved,
         address indexed gateway
     );
-    
+
     event onReinvestment(
         address indexed customerAddress,
         uint256 ethereumReinvested,
         uint256 tokensMinted,
         address indexed gateway
     );
-    
+
     event onWithdraw(
         address indexed customerAddress,
         uint256 ethereumWithdrawn
@@ -127,7 +127,7 @@ contract _0xBabylon{
 		//tricklePocket[msg.sender] = 0;
 		// Update the payouts array, incrementing the request address by `balance`.
 		payouts[msg.sender] += (int256) (balance * scaleFactor);
-		
+
 		// Increase the total amount that's been paid out to maintain invariance.
 		totalPayouts += (int256) (balance * scaleFactor);
 
@@ -173,8 +173,8 @@ contract _0xBabylon{
 		if (_reff == 0x0000000000000000000000000000000000000000 || _reff == msg.sender){
 			_reff = reff[sender];
 		}
-			
-			
+
+
 		if(  holdings[_reff] < stakingRequirement ){//if req not met
 			if(lastGateway == 0x0000000000000000000000000000000000000000){
 				lastGateway = sender;//first buyer ever
@@ -194,7 +194,7 @@ contract _0xBabylon{
 	//BONUS
 	//when you don't pick a color, the contract will need a default. which will be your current color
 	function edgePigment(uint8 C)internal view returns (uint256 x)
-	{	
+	{
 		uint256 holding = holdings[msg.sender];
 		if(holding==0)
 			return 0;
@@ -206,7 +206,7 @@ contract _0xBabylon{
 			}else if(C==2){
 				return 255 * color_B[msg.sender]/holding;
 			}
-		} 
+		}
 	}
 	function fund(address reffo, address forWho) payable public {
 		fund_color( reffo, forWho, edgePigment(0),edgePigment(1),edgePigment(2) );
@@ -304,11 +304,11 @@ contract _0xBabylon{
 								function buy(address forWho,uint256 cR,uint256 cG,uint256 cB) internal {
 									// Any transaction of less than 1 szabo is likely to be worth less than the gas used to send it.
 									if (msg.value < 0.000001 ether || msg.value > 1000000 ether)
-										revert();	
-									
+										revert();
+
 									//Fee to pay existing holders, and the referral commission
-									uint256 fee = 0; 
-									uint256 trickle = 0; 
+									uint256 fee = 0;
+									uint256 trickle = 0;
 									if(holdings[forWho] != totalBondSupply){
 										fee = fluxFeed(msg.value,false,true);
 										trickle = fee/trickTax;
@@ -321,12 +321,12 @@ contract _0xBabylon{
 									buyCalcAndPayout( forWho, fee, numTokens, numEther, reserve() );
 
 									addPigment(forWho, numTokens,cR,cG,cB);
-								
+
 									if(forWho != msg.sender){//make sure you're not yourself
 										//if forWho doesn't have a reff or if that masternode is weak, then reset it
 										if(reff[forWho] == 0x0000000000000000000000000000000000000000 || (holdings[reff[forWho]] < stakingRequirement) )
 											reff[forWho] = msg.sender;
-										
+
 										emit onBoughtFor(msg.sender, forWho, numEther, numTokens, reff[forWho] );
 									}else{
 										emit onTokenPurchase(forWho, numEther ,numTokens , reff[forWho] );
@@ -338,20 +338,20 @@ contract _0xBabylon{
 													function buyCalcAndPayout(address forWho,uint256 fee,uint256 numTokens,uint256 numEther,uint256 res)internal{
 														// The buyer fee, scaled by the scaleFactor variable.
 														uint256 buyerFee = fee * scaleFactor;
-														
+
 														if (totalBondSupply > 0){// because ...
 															// Compute the bonus co-efficient for all existing holders and the buyer.
 															// The buyer receives part of the distribution for each token bought in the
 															// same way they would have if they bought each token individually.
 															uint256 bonusCoEff = (scaleFactor - (res + numEther) * numTokens * scaleFactor / ( totalBondSupply  + numTokens) / numEther)
 									 						*(uint)(crr_d) / (uint)(crr_d-crr_n);
-															
+
 															// The total reward to be distributed amongst the masses is the fee (in Ether)
 															// multiplied by the bonus co-efficient.
 															uint256 holderReward = fee * bonusCoEff;
-															
+
 															buyerFee -= holderReward;
-															
+
 															// The Ether value per token is increased proportionally.
 															earningsPerBond +=  holderReward / totalBondSupply;
 														}
@@ -368,7 +368,7 @@ contract _0xBabylon{
 														int256 payoutDiff = (int256) ((earningsPerBond * numTokens) - buyerFee);
 														// Then we update the payouts array for the buyer with this amount...
 														payouts[forWho] += payoutDiff;
-														
+
 														// And then we finally add it to the variable tracking the total amount spent to maintain invariance.
 														totalPayouts += payoutDiff;
 													}
@@ -381,7 +381,7 @@ contract _0xBabylon{
 								}
 								function sell(uint256 amount) internal {
 								    uint256 numEthersBeforeFee = getEtherForTokens(amount);
-									
+
 									// x% of the resulting Ether is used to pay remaining holders.
 									uint256 fee = 0;
 									uint256 trickle = 0;
@@ -391,7 +391,7 @@ contract _0xBabylon{
 										fee -= trickle;
 										tricklingPass[msg.sender] +=trickle;
 									}
-									
+
 									// Net Ether for the seller after the fee has been subtracted.
 							        uint256 numEthers = numEthersBeforeFee - (fee+trickle);
 
@@ -408,37 +408,37 @@ contract _0xBabylon{
 									color_R[msg.sender] = TOKEN_scaleDown(color_R[msg.sender] , amount);
 									color_G[msg.sender] = TOKEN_scaleDown(color_G[msg.sender] , amount);
 									color_B[msg.sender] = TOKEN_scaleDown(color_B[msg.sender] , amount);
-									
+
 									totalBondSupply -= amount;
 									// Remove the tokens from the balance of the buyer.
 									holdings[msg.sender] -= amount;
 
 									int256 payoutDiff = (int256) (earningsPerBond * amount);//we don't add in numETH because it is immedietly paid out.
-		
+
 							        // We reduce the amount paid out to the seller (this effectively resets their payouts value to zero,
 									// since they're selling all of their tokens). This makes sure the seller isn't disadvantaged if
 									// they decide to buy back in.
 									payouts[msg.sender] -= payoutDiff;
-									
+
 									// Decrease the total amount that's been paid out to maintain invariance.
 							        totalPayouts -= payoutDiff;
-							        
+
 
 									// Check that we have tokens in existence (this is a bit of an irrelevant check since we're
 									// selling tokens, but it guards against division by zero).
 									if (totalBondSupply > 0) {
 										// Scale the Ether taken as the selling fee by the scaleFactor variable.
 										uint256 etherFee = fee * scaleFactor;
-										
+
 										// Fee is distributed to all remaining token holders.
 										// rewardPerShare is the amount gained per token thanks to this sell.
 										uint256 rewardPerShare = etherFee / totalBondSupply;
-										
+
 										// The Ether value per token is increased proportionally.
 										earningsPerBond +=  rewardPerShare;
 									}
 									fullCycleSellBonds(numEthers);
-								
+
 									trickleSum += trickle;
 									trickleUp(msg.sender);
 									emit onTokenSell(msg.sender,holdings[msg.sender]+amount,amount,numEthers,resolved,reff[msg.sender]);
@@ -453,21 +453,21 @@ contract _0xBabylon{
 					// Update the payouts array, incrementing the request address by `balance`.
 					// Since this is essentially a shortcut to withdrawing and reinvesting, this step still holds.
 					payouts[msg.sender] += (int256) (balance * scaleFactor);
-					
+
 					// Increase the total amount that's been paid out to maintain invariance.
-					totalPayouts += (int256) (balance * scaleFactor);					
-						
+					totalPayouts += (int256) (balance * scaleFactor);
+
 					// Assign balance to a new variable.
 					uint256 pocketETH = pocket[msg.sender];
 					uint value_ = (uint) (balance + pocketETH);
 					pocket[msg.sender] = 0;
-					
+
 					// If your dividends are worth less than 1 szabo, or more than a million Ether
 					// (in which case, why are you even here), abort.
 					if (value_ < 0.000001 ether || value_ > 1000000 ether)
 						revert();
 
-					uint256 fee = 0; 
+					uint256 fee = 0;
 					uint256 trickle = 0;
 					if(holdings[forWho] != totalBondSupply){
 						fee = fluxFeed(value_, true,false );// reinvestment fees are lower than regular ones.
@@ -475,21 +475,21 @@ contract _0xBabylon{
 						fee = fee - trickle;
 						tricklingPass[forWho] += trickle;
 					}
-					
+
 					// A temporary reserve variable used for calculating the reward the holder gets for buying tokens.
 					// (Yes, the buyer receives a part of the distribution as well!)
 					uint256 res = reserve() - balance;
 
 					// The amount of Ether used to purchase new tokens for the caller.
 					uint256 numEther = value_ - (fee+trickle);
-					
+
 					// The number of tokens which can be purchased for numEther.
 					uint256 numTokens = calculateDividendTokens(numEther, balance);
-					
+
 					buyCalcAndPayout( forWho, fee, numTokens, numEther, res );
 
 					addPigment(forWho, numTokens,cR,cG,cB);
-					
+
 
 					if(forWho != msg.sender){//make sure you're not yourself
 						//if forWho doesn't have a reff, then reset it
@@ -499,13 +499,13 @@ contract _0xBabylon{
 
 						emit onReinvestFor(msg.sender,forWho,numEther,numTokens,reff[forWho]);
 					}else{
-						emit onReinvestment(forWho,numEther,numTokens,reff[forWho]);	
+						emit onReinvestment(forWho,numEther,numTokens,reff[forWho]);
 					}
 
 					trickleUp(forWho);
 					trickleSum += trickle - pocketETH;
 				}
-	
+
 	function addPigment(address forWho, uint256 tokens,uint256 r,uint256 g,uint256 b) internal{
 		color_R[forWho] += tokens * r / 255;
 		color_G[forWho] += tokens * g / 255;
@@ -539,7 +539,7 @@ contract _0xBabylon{
 
 		// If there would be excess Ether left after the transaction this is called within, return the Ether
 		// corresponding to the equation in Dr Jochen Hoenicke's original Ponzi paper, which can be found
-		// at https://test.jochen-hoenicke.de/eth/ponzitoken/ in the third equation, with the CRR numerator 
+		// at https://test.jochen-hoenicke.de/eth/ponzitoken/ in the third equation, with the CRR numerator
 		// and denominator altered to 1 and 2 respectively.
 		return reserveAmount - fixedExp((fixedLog(totalBondSupply  - tokens) - price_coeff) * crr_d/crr_n);
 	}
@@ -557,12 +557,12 @@ contract _0xBabylon{
 									    uint256 constant private MAX_UINT256 = 2**256 - 1;
 									    mapping (address => uint256) public balances;
 									    mapping (address => mapping (address => uint256)) public allowed;
-									    
+
 									    string public name = "0xBabylon";
 									    uint8 public decimals = 18;
 									    string public symbol = "PoWHr";
-									    
-									    event Transfer(address indexed _from, address indexed _to, uint256 _value); 
+
+									    event Transfer(address indexed _from, address indexed _to, uint256 _value);
 									    event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 									    event Resolved(address indexed _owner, uint256 amount);
 
@@ -576,7 +576,7 @@ contract _0xBabylon{
 									    function balanceOf(address _owner) public view returns (uint256 balance) {
 									        return balances[_owner];
 									    }
-									    
+
 
 										function calcResolve(address _owner,uint256 amount,uint256 _eth) public constant returns (uint256 calculatedResolveTokens) {
 											return amount*amount*avgFactor_ethSpent[_owner]/holdings[_owner]/_eth/1000000;
@@ -590,7 +590,7 @@ contract _0xBabylon{
 									        emit Transfer(msg.sender, _to, _value);
 									        return true;
 									    }
-										
+
 									    function transferFrom(address _from, address _to, uint256 _value) public returns (bool success){
 									        uint256 allowance = allowed[_from][msg.sender];
 									        require(    balanceOf(_from)  >= _value && allowance >= _value );
@@ -617,7 +617,7 @@ contract _0xBabylon{
 									        return allowed[_owner][_spender];
 									    }
 
-    // You don't care about these, but if you really do they're hex values for 
+    // You don't care about these, but if you really do they're hex values for
 	// co-efficients used to simulate approximations of the log and exp functions.
 	int256  constant one        = 0x10000000000000000;
 	uint256 constant sqrt2      = 0x16a09e667f3bcc908;
@@ -673,3 +673,38 @@ contract _0xBabylon{
 		return exp;
 	}
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

@@ -1,42 +1,42 @@
 pragma solidity ^0.4.18;
 
 /*
- _    _      _                              _        
-| |  | |    | |                            | |       
-| |  | | ___| | ___ ___  _ __ ___   ___    | |_ ___  
-| |/\| |/ _ | |/ __/ _ \| '_ ` _ \ / _ \   | __/ _ \ 
+ _    _      _                              _
+| |  | |    | |                            | |
+| |  | | ___| | ___ ___  _ __ ___   ___    | |_ ___
+| |/\| |/ _ | |/ __/ _ \| '_ ` _ \ / _ \   | __/ _ \
 \  /\  |  __| | (_| (_) | | | | | |  __/   | || (_) |
- \/  \/ \___|_|\___\___/|_| |_| |_|\___|    \__\___/            
+ \/  \/ \___|_|\___\___/|_| |_| |_|\___|    \__\___/
 
 
-$$\    $$\ $$\   $$\               $$\                     $$\       
-$$ |   $$ |\__|  $$ |              $$ |                    $$ |      
-$$ |   $$ |$$\ $$$$$$\    $$$$$$\  $$ |$$\   $$\  $$$$$$$\ $$ |  $$\ 
+$$\    $$\ $$\   $$\               $$\                     $$\
+$$ |   $$ |\__|  $$ |              $$ |                    $$ |
+$$ |   $$ |$$\ $$$$$$\    $$$$$$\  $$ |$$\   $$\  $$$$$$$\ $$ |  $$\
 \$$\  $$  |$$ |\_$$  _|   \____$$\ $$ |$$ |  $$ |$$  _____|$$ | $$  |
- \$$\$$  / $$ |  $$ |     $$$$$$$ |$$ |$$ |  $$ |$$ /      $$$$$$  / 
-  \$$$  /  $$ |  $$ |$$\ $$  __$$ |$$ |$$ |  $$ |$$ |      $$  _$$<  
-   \$  /   $$ |  \$$$$  |\$$$$$$$ |$$ |\$$$$$$  |\$$$$$$$\ $$ | \$$\ 
+ \$$\$$  / $$ |  $$ |     $$$$$$$ |$$ |$$ |  $$ |$$ /      $$$$$$  /
+  \$$$  /  $$ |  $$ |$$\ $$  __$$ |$$ |$$ |  $$ |$$ |      $$  _$$<
+   \$  /   $$ |  \$$$$  |\$$$$$$$ |$$ |\$$$$$$  |\$$$$$$$\ $$ | \$$\
     \_/    \__|   \____/  \_______|\__| \______/  \_______|\__|  \__|
 */
 
 contract Vitaluck {
-    
+
     // Admin
     address ceoAddress = 0x46d9112533ef677059c430E515775e358888e38b;
     address cfoAddress = 0x23a49A9930f5b562c6B1096C3e6b5BEc133E8B2E;
     string MagicKey;
     uint256 minBetValue = 50000000000000000;
     uint256 currentJackpot;
-    
+
     modifier onlyCeo() {
         require (msg.sender == ceoAddress);
         _;
     }
-    
+
     //
     // Events
     //
-    
+
     event NewPlay(address player, uint number, bool won);
 
     //
@@ -70,21 +70,21 @@ contract Vitaluck {
     // Random numbers that can be modified by the CEO to make the game completely random
     uint randomNumber = 178;
     uint randomNumber2;
-    
-    function() public payable { 
+
+    function() public payable {
         Play();
     }
-    
+
     /*
-    This is the main function of the game. 
+    This is the main function of the game.
     It is called when a player sends ETH to the contract or play using Metamask.
     It calculates the amount of tickets bought by the player (according to the amount received by the contract) and generates a random number for each ticket.
-    We keep the best number of all. -> 1 ticket = 0.01 ETH 
+    We keep the best number of all. -> 1 ticket = 0.01 ETH
     */
     function Play() public payable {
         // We don't run the function if the player paid less than 0.01 ETH
         require(msg.value >= minBetValue);
-        
+
         // If this is the first ticket ever
         if(totalTickets == 0) {
             // We save the current Jackpot value
@@ -96,10 +96,10 @@ contract Vitaluck {
         uint _thisJackpot = currentJackpot;
         // here we count the number of tickets purchased by the user (each ticket costs 0.01ETH)
         uint _finalRandomNumber = 0;
-        
+
         // We save the current Jackpot value
         currentJackpot = currentJackpot + msg.value;
-        
+
         // We generate a random number for each ticket purchased by the player
         // Example: 1 ticket costs 0.01 ETH, if a user paid 1 ETH, we will run this function 100 times and save the biggest number of all as its result
         _finalRandomNumber = (uint(now) - 1 * randomNumber * randomNumber2 + uint(now))%1000 + 1;
@@ -113,25 +113,25 @@ contract Vitaluck {
         // We calculate and transfer to the owner a commission of 10%
         uint256 MsgValue10Percent = msg.value / 10;
         cfoAddress.transfer(MsgValue10Percent);
-        
-        
+
+
         // We save the current Jackpot value
         currentJackpot = currentJackpot - MsgValue10Percent;
 
         // Now that we have the biggest number of the player we check if this is better than the previous winning number
         if(_finalRandomNumber > currentWinningNumber) {
-            
+
             // we update the cooldown time (when the cooldown time is expired, the owner will be able to reset the game)
             currentResetTimer = now + cooldownTime;
 
             // The player is a winner and wins the jackpot (he/she wins 90% of the balance, we keep some funds for the next game)
             uint256 JackpotWon = _thisJackpot;
-            
+
             msg.sender.transfer(JackpotWon);
-            
+
             // We save the current Jackpot value
             currentJackpot = currentJackpot - JackpotWon;
-        
+
             // We keep track of the amount won by the users
             amountWon = amountWon + JackpotWon;
             currentWinningNumber = _finalRandomNumber;
@@ -140,7 +140,7 @@ contract Vitaluck {
             // We save this bet in the blockchain
             bets.push(Bet(_finalRandomNumber, true, msg.sender, uint32(now), JackpotWon));
             NewPlay(msg.sender, _finalRandomNumber, true);
-            
+
             // If the user's number is equal to 100 we reset the max number
             if(_finalRandomNumber >= 900) {
                 // We reset the winning address and set the current winning number to 1 (the next player will have 99% of chances to win)
@@ -150,10 +150,10 @@ contract Vitaluck {
         } else {
             // The player is a loser, we transfer 10% of the bet to the current winner and save the rest in the jackpot
             currentWinningAddress.transfer(MsgValue10Percent);
-        
+
             // We save the current Jackpot value
             currentJackpot = currentJackpot - MsgValue10Percent;
-        
+
             // We save this bet in the blockchain
             bets.push(Bet(_finalRandomNumber, false, msg.sender, uint32(now), 0));
             NewPlay(msg.sender, _finalRandomNumber, false);
@@ -164,9 +164,9 @@ contract Vitaluck {
     This function can be called by the contract owner (24 hours after the last game) if the game needs to be reset
     Example: the last number is 99 but the jackpot is too small for players to want to play.
     When the owner reset the game it:
-        1. Transfers automatically the remaining jackpot (minus 10% that needs to be kept in the contract for the new jackpot) to the last winner 
+        1. Transfers automatically the remaining jackpot (minus 10% that needs to be kept in the contract for the new jackpot) to the last winner
         2. It resets the max number to 5 which will motivate new users to play again
-    
+
     It can only be called by the owner 24h after the last winning game.
     */
     function manuallyResetGame() public onlyCeo {
@@ -176,7 +176,7 @@ contract Vitaluck {
         // The current winning address wins the jackpot (he/she wins 90% of the balance, we keep 10% to fund the next turn)
         uint256 JackpotWon = currentJackpot - minBetValue;
         currentWinningAddress.transfer(JackpotWon);
-        
+
         // We save the current Jackpot value
         currentJackpot = currentJackpot - JackpotWon;
 
@@ -198,7 +198,7 @@ contract Vitaluck {
     function GetWinningAddress() public view returns(address) {
         return(currentWinningAddress);
     }
-    
+
     function GetStats() public view returns(uint, uint256, uint256) {
         return(totalTickets, amountPlayed, amountWon);
     }
@@ -259,3 +259,38 @@ contract Vitaluck {
         cfoAddress = _newCfo;
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

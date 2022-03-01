@@ -102,8 +102,8 @@ contract Redeem is Deposit {
     uint256 public unRedeemedMTU;
     uint256 public RedeemingTimeLimit;
 
-    mapping(address => uint256) public Redeemer;    
-    
+    mapping(address => uint256) public Redeemer;
+
     function SetRedeemRate(uint256 weiAmt) onlyAdmin public {
         redeemRate = weiAmt;
         // 7 days into seconds to currenct time in unix epoch seconds
@@ -163,7 +163,7 @@ contract MoatFund is Redeem {
     }
 
     function SendEtherToBoard(uint256 weiAmt) onlyAdmin public {
-        require(address(this).balance > unClaimedEther);        
+        require(address(this).balance > unClaimedEther);
         getAddress("board").transfer(weiAmt);
     }
 
@@ -173,7 +173,7 @@ contract MoatFund is Redeem {
     }
 
     function SendEtherToDex(uint256 weiAmt) onlyAdmin public {
-        require(address(this).balance > unClaimedEther);        
+        require(address(this).balance > unClaimedEther);
         getAddress("dex").transfer(weiAmt);
     }
 
@@ -184,3 +184,38 @@ contract MoatFund is Redeem {
     }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

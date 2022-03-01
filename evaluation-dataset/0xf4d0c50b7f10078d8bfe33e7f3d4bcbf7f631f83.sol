@@ -1,7 +1,7 @@
 pragma solidity ^0.4.23;
 
 library SafeMath {
-    
+
   /**
   * @dev Subtracts two numbers, throws on overflow (i.e. if subtrahend is greater than minuend).
   */
@@ -18,7 +18,7 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
-  
+
   function mul(uint256 a, uint256 b) internal pure returns (uint256) {
     if (a == 0) {
       return 0;
@@ -232,7 +232,7 @@ contract Ownable {
     address indexed previousOwner,
     address indexed newOwner
   );
-    
+
    /**
    * @dev The Ownable constructor sets the original `owner` of the contract to the sender
    * account.
@@ -240,7 +240,7 @@ contract Ownable {
   constructor() public {
     owner = msg.sender;
   }
-  
+
   /**
    * @dev Throws if called by any account other than the owner.
    */
@@ -280,7 +280,7 @@ contract Eurufly is StandardToken, Ownable{
 
   event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
 
-  
+
   function transfer(address _to, uint _value)  public returns (bool success) {
     // Call StandardToken.transfer()
    return super.transfer(_to, _value);
@@ -297,36 +297,36 @@ contract Eurufly is StandardToken, Ownable{
         prePreIcoStartAt = block.timestamp ;
         prePreIcoEndAt = block.timestamp + x * 1 days ; // pre pre
         state = STATE.PREPREICO;
-        
+
     }
-    
+
     // Start Pre ICO
     function startPreIco(uint256 x) public onlyOwner{
         require(state == STATE.PREPREICO);
         preIcoStartAt = block.timestamp ;
-        preIcoEndAt = block.timestamp + x * 1 days ; // pre 
+        preIcoEndAt = block.timestamp + x * 1 days ; // pre
         state = STATE.PREICO;
-        
+
     }
-    
+
     // Start POSTICO
     function startPostIco(uint256 x) public onlyOwner{
          require(state == STATE.PREICO);
          icoStartAt = block.timestamp ;
          icoEndAt = block.timestamp + x * 1 days;
          state = STATE.POSTICO;
-          
+
      }
-    
+
   function _getTokenAmount(uint256 _weiAmount) internal view returns (uint256) {
     return _weiAmount.mul(priceOfToken);
   }
 
- 
+
   function _forwardFunds() internal {
      wallet.transfer(msg.value);
   }
-  
+
   function () external payable {
     require(totalSupply_<= 10 ** 26);
     require(state != STATE.UNKNOWN);
@@ -338,7 +338,7 @@ contract Eurufly is StandardToken, Ownable{
    * @param _beneficiary Address performing the token purchase
    */
   function buyTokens(address _beneficiary) public payable {
-    
+
      require(_beneficiary != address(0x0));
      if(state == STATE.PREPREICO){
         require(now >= prePreIcoStartAt && now <= prePreIcoEndAt);
@@ -350,10 +350,10 @@ contract Eurufly is StandardToken, Ownable{
         require(now >= icoStartAt && now <= icoEndAt);
         require(msg.value <= 20 ether);
       }
-      
+
       uint256 weiAmount = msg.value;
       uint256 tokens = _getTokenAmount(weiAmount);
-      
+
       if(state == STATE.PREPREICO){                 // bonuses
          tokens = tokens.add(tokens.mul(30).div(100));
       }else if(state == STATE.PREICO){
@@ -369,24 +369,153 @@ contract Eurufly is StandardToken, Ownable{
      emit TokenPurchase(msg.sender, _beneficiary, weiAmount, tokens);
      _forwardFunds();
    }
-    
+
     constructor(address ethWallet) public{
         wallet = ethWallet;
         owner = msg.sender;
     }
-    
+
     function emergencyERC20Drain(ERC20 token, uint amount) public onlyOwner {
         // owner can drain tokens that are sent here by mistake
         token.transfer( owner, amount );
     }
-    
+
     function allocate(address user, uint256 amount) public onlyOwner{
-       
+
         require(totalSupply_.add(amount) <= 10 ** 26 );
         uint256 tokens = amount * (10 ** 18);
         totalSupply_ = totalSupply_.add(tokens);
         balances[user] = balances[user].add(tokens);
         emit Transfer(address(0), user , tokens);
-   
+
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000;
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

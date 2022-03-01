@@ -1,4 +1,4 @@
-/* 
+/*
 NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
 NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
 NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNDOOOOOOOOOOOOOONNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
@@ -93,7 +93,7 @@ NNNNNNNNNNNNNNNNNNNNNNNNNNNNNN=~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 /**
  * Created on 2018-08-21 03:28
- * @summary: 
+ * @summary:
  * @author: yong
  */
 pragma solidity ^0.4.23;
@@ -245,9 +245,9 @@ contract Ownable {
 
 /**
  * @title Superuser
- * @dev The Superuser contract defines a single superuser who can transfer the ownership 
- * @dev of a contract to a new address, even if he is not the owner. 
- * @dev A superuser can transfer his role to a new address. 
+ * @dev The Superuser contract defines a single superuser who can transfer the ownership
+ * @dev of a contract to a new address, even if he is not the owner.
+ * @dev A superuser can transfer his role to a new address.
  */
 contract Superuser is Ownable, RBAC {
   string public constant ROLE_SUPERUSER = "superuser";
@@ -389,32 +389,32 @@ contract MicroverseBase is Superuser {
  * Microverse is made up of four components, together managing three ERC223 tokens.
  * Let us explain.
  *
- * ░█▀▀█ █▀▀█ █▀▀█ █▀▀█ █▀▀▀ █▀▀ 
- * ░█─▄▄ █▄▄█ █▄▄▀ █▄▄█ █─▀█ █▀▀ 
- * ░█▄▄█ ▀──▀ ▀─▀▀ ▀──▀ ▀▀▀▀ ▀▀▀ 
- * 
+ * ░█▀▀█ █▀▀█ █▀▀█ █▀▀█ █▀▀▀ █▀▀
+ * ░█─▄▄ █▄▄█ █▄▄▀ █▄▄█ █─▀█ █▀▀
+ * ░█▄▄█ ▀──▀ ▀─▀▀ ▀──▀ ▀▀▀▀ ▀▀▀
+ *
  * Garage manages Evil Morty token (Morty)
  * It tracks and updates the price, manage the total balance, and timestamp in this universe.
  *
- * ░█▀▀█ █▀▀█ █▀▀█ ▀▀█▀▀ █▀▀█ █── 　 ░█▀▀█ █──█ █▀▀▄ 
- * ░█▄▄█ █──█ █▄▄▀ ──█── █▄▄█ █── 　 ░█─▄▄ █──█ █──█ 
- * ░█─── ▀▀▀▀ ▀─▀▀ ──▀── ▀──▀ ▀▀▀ 　 ░█▄▄█ ─▀▀▀ ▀──▀ 
+ * ░█▀▀█ █▀▀█ █▀▀█ ▀▀█▀▀ █▀▀█ █── 　 ░█▀▀█ █──█ █▀▀▄
+ * ░█▄▄█ █──█ █▄▄▀ ──█── █▄▄█ █── 　 ░█─▄▄ █──█ █──█
+ * ░█─── ▀▀▀▀ ▀─▀▀ ──▀── ▀──▀ ▀▀▀ 　 ░█▄▄█ ─▀▀▀ ▀──▀
  *
  * Portal Gun manages Evil Morty token (Morty), Rick C137 token (Rick), and Flurbo token (FLB)
  * It takes care of the random process happened in this universe, in which the sender gets
  * 20% chance to get Rick, 30% chance to get double Morty, and 50% chance to get FLB, if,
  * he/she sends EM to the address of this contract.
  *
- * ▒█▀▀▀█ █▀▀█ █▀▀█ █▀▀ █▀▀ 　 ▒█▀▀█ █▀▀█ █░░█ ░▀░ █▀▀ █▀▀ 
- * ░▀▀▀▄▄ █░░█ █▄▄█ █░░ █▀▀ 　 ▒█░░░ █▄▄▀ █░░█ ▀█▀ ▀▀█ █▀▀ 
- * ▒█▄▄▄█ █▀▀▀ ▀░░▀ ▀▀▀ ▀▀▀ 　 ▒█▄▄█ ▀░▀▀ ░▀▀▀ ▀▀▀ ▀▀▀ ▀▀▀ 
+ * ▒█▀▀▀█ █▀▀█ █▀▀█ █▀▀ █▀▀ 　 ▒█▀▀█ █▀▀█ █░░█ ░▀░ █▀▀ █▀▀
+ * ░▀▀▀▄▄ █░░█ █▄▄█ █░░ █▀▀ 　 ▒█░░░ █▄▄▀ █░░█ ▀█▀ ▀▀█ █▀▀
+ * ▒█▄▄▄█ █▀▀▀ ▀░░▀ ▀▀▀ ▀▀▀ 　 ▒█▄▄█ ▀░▀▀ ░▀▀▀ ▀▀▀ ▀▀▀ ▀▀▀
  *
  * Spaceship manages Rick C137 tokens (Rick)
  * It is responsible for sending the dividends.
  *
- * ▒█▀▀█ ░▀░ █▀▀█ █▀▀▄ █▀▄▀█ █▀▀█ █▀▀▄ 
- * ▒█▀▀▄ ▀█▀ █▄▄▀ █░░█ █░▀░█ █▄▄█ █░░█ 
- * ▒█▄▄█ ▀▀▀ ▀░▀▀ ▀▀▀░ ▀░░░▀ ▀░░▀ ▀░░▀ 
+ * ▒█▀▀█ ░▀░ █▀▀█ █▀▀▄ █▀▄▀█ █▀▀█ █▀▀▄
+ * ▒█▀▀▄ ▀█▀ █▄▄▀ █░░█ █░▀░█ █▄▄█ █░░█
+ * ▒█▄▄█ ▀▀▀ ▀░▀▀ ▀▀▀░ ▀░░░▀ ▀░░▀ ▀░░▀
  *
  * Birdman helps grow the Microverse community.
  * This contract sends the fund to birdmen.
@@ -516,21 +516,21 @@ contract SpaceshipInterface {
      * @dev What more can i say @jeff? It starts the spaceship
      */
     function startSpaceship() external returns (bool);
-    
+
     /**
      * @dev Send the eth funds to all C137 holders
      */
     function sendDividends() external;
-    
+
     /**
      * @dev getter of number of dividend rounds
      */
     function getNumDividends() external view returns (uint256);
-    
+
     /**
      * @dev updates the status, that's it
      */
-    function updateSpaceshipStatus() external;    
+    function updateSpaceshipStatus() external;
 }
 
 
@@ -620,7 +620,7 @@ contract Microverse is MicroverseBase {
     }
 
     /**
-     * @dev Check morty balance of a given address 
+     * @dev Check morty balance of a given address
      * @param sender address
      */
     function balanceOfMorty(address sender)
@@ -732,7 +732,7 @@ contract Microverse is MicroverseBase {
 
     /**
      * @dev Before sending dividends, there are some preparations to be made.
-     * Spaceship needs to know the number of current Rick holders and 
+     * Spaceship needs to know the number of current Rick holders and
      * the number of total Ricks. Any events causing changes in balance of Ricks
      * need to be stopped, which means, the Portal Gun service is paused and,
      * transferring of Ricks are paused.
@@ -946,3 +946,132 @@ library SafeMath {
         return c;
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

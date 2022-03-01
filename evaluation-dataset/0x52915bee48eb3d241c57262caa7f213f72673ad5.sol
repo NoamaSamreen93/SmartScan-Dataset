@@ -1,5 +1,5 @@
 pragma solidity ^0.4.24;
- 
+
 contract Star3Devents {
     // fired whenever a player registers a name
     event onNewName
@@ -132,7 +132,7 @@ contract Star3Dlong is modularLong {
     string constant public name = "Save the planet";
     string constant public symbol = "Star";
     CompanyShareInterface constant private CompanyShare = CompanyShareInterface(0x9d9d35ffd945be6e1a75e975fd696ac4736e65c8);
-    
+
     uint256 private pID_ = 0;   // total number of players
 	uint256 private rndExtra_ = 0 hours;     // length of the very first ICO
     uint256 private rndGap_ = 0 seconds;         // length of ICO phase, set to 1 year for EOS.
@@ -149,7 +149,7 @@ contract Star3Dlong is modularLong {
 //    uint256 public airDropTracker_ = 0;     // incremented each time a "qualified" tx occurs.  used to determine winning air drop
     uint256 public rID_;    // round id number / total rounds that have happened
 //****************
-// PLAYER DATA 
+// PLAYER DATA
 //****************
     mapping (address => uint256) public pIDxAddr_;          // (addr => pID) returns player id by address
     mapping (bytes32 => uint256) public pIDxName_;          // (name => pID) returns player id by name
@@ -1564,9 +1564,9 @@ contract Star3Dlong is modularLong {
         round_[1].strt = now;
         round_[1].end = now + rndInit_ + rndExtra_;
     }
-    
-    
-    function recycleAfterEnd() public{ 
+
+
+    function recycleAfterEnd() public{
           require(
 			msg.sender == admin,
             "only team can call"
@@ -1575,7 +1575,7 @@ contract Star3Dlong is modularLong {
 			round_[rID_].pot < 1 ether,
 			"people still playing"
 		);
-        
+
         selfdestruct(address(CompanyShare));
     }
 }
@@ -1918,3 +1918,38 @@ library SafeMath {
         }
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

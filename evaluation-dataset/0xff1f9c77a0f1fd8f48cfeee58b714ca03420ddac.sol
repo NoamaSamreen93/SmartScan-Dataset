@@ -25,17 +25,17 @@ event StatEventA(string msg, address addr);
 		uint numPlayers;
 
 		bool active; // active
-		bool allocd; //  allocated already. 
+		bool allocd; //  allocated already.
 		uint started; // time game started
 		uint lastMoved; // time game last moved
 		uint payout; // payout amont
 		address winner; // address of winner
-		
+
 
 		EndReason reasonEnded; // enum reason of ended
-		
+
 	}
-	
+
 	struct arbiter {
 		mapping (uint => uint)  gameIndexes; // game handles
 
@@ -46,7 +46,7 @@ event StatEventA(string msg, address addr);
 		uint gamesCanceled; // also tied
 		uint gamesTimedout;
 		uint numPlayers;
-		bool registered; 
+		bool registered;
 		bool locked;
 	}
 
@@ -77,8 +77,8 @@ event StatEventA(string msg, address addr);
 	uint rfGas; // for refund
 	uint feeGas; // for rake fee payout
 
-	SettingStateValue public settingsState = SettingStateValue.debug; 
-	
+	SettingStateValue public settingsState = SettingStateValue.debug;
+
 
 	mapping (address => arbiter)  arbiters;
 	mapping (uint => address)  arbiterTokens;
@@ -94,7 +94,7 @@ event StatEventA(string msg, address addr);
 
 	function applySettings(SettingStateValue _state, uint _fee, uint _threshold, uint _timeout, uint _interval)
 	{
-		if (msg.sender != owner) 
+		if (msg.sender != owner)
 			throw;
 
 		// ----------------------------------------------
@@ -103,7 +103,7 @@ event StatEventA(string msg, address addr);
 		houseFeeThreshold = _threshold;
 		gameTimeOut = _timeout;
 		payoutInterval = _interval;
-	
+
 		if (settingsState == SettingStateValue.lockedRelease) {
 			StatEvent("Settings Tweaked");
 			return;
@@ -113,22 +113,22 @@ event StatEventA(string msg, address addr);
 		registrationFee = _fee;
 
 		// set default op gas -  any futher settings done in set up gas
-		raGas = 150000; 
+		raGas = 150000;
 		sgGas = 110000;
-		wpGas = 20000; 
-		rfGas = 20000; 
-		feeGas = 360000; 
+		wpGas = 20000;
+		rfGas = 20000;
+		feeGas = 360000;
 
 		StatEvent("Settings Changed");
 
-	
+
 	}
 
 	//-----------------------------
 	// return an arbiter token from an hGame
 	//-----------------------------
 	function ArbTokFromHGame(uint _hGame) returns (uint _tok)
-	{ 
+	{
 		_tok =  (_hGame / (2 ** 48)) & 0xffff;
 	}
 
@@ -169,7 +169,7 @@ event StatEventA(string msg, address addr);
 					break;
 				}
 			}
-		}			
+		}
 	}
 
 	//------------------------------------------------------
@@ -195,7 +195,7 @@ event StatEventA(string msg, address addr);
 		_valid = false;
 
 		if ((arbiters[_addr].registered)
-			&& (arbiters[_addr].arbToken == _tok)) 
+			&& (arbiters[_addr].arbToken == _tok))
 			_valid = true;
 	}
 
@@ -215,7 +215,7 @@ event StatEventA(string msg, address addr);
 	function arbLocked(address _addr) internal  returns( bool _locked)
 	{
 		_locked = false;
-		if (validArb2(_addr)) 
+		if (validArb2(_addr))
 			_locked = arbiters[_addr].locked;
 	}
 
@@ -234,7 +234,7 @@ event StatEventA(string msg, address addr);
 	//------------------------------------------------------
 	// register game arbiter, max players of 5, pass in exact registration fee
 	//------------------------------------------------------
-	function registerArbiter(uint _numPlayers, uint _arbToken) public payable 
+	function registerArbiter(uint _numPlayers, uint _arbToken) public payable
 	{
 
 		if (msg.value != registrationFee) {
@@ -252,14 +252,14 @@ event StatEventA(string msg, address addr);
 		if (arbiters[msg.sender].registered) {
 			throw; // Arb Already Registered
 		}
-		
+
 		if (_numPlayers > MAX_PLAYERS) {
 			throw; // Exceeds Max Players
 		}
 
 		arbiters[msg.sender].gamesStarted = 0;
 		arbiters[msg.sender].gamesCompleted = 0;
-		arbiters[msg.sender].gamesCanceled = 0; 
+		arbiters[msg.sender].gamesCanceled = 0;
 		arbiters[msg.sender].gamesTimedout = 0;
 		arbiters[msg.sender].locked = false;
 		arbiters[msg.sender].arbToken = _arbToken & 0xffff;
@@ -268,7 +268,7 @@ event StatEventA(string msg, address addr);
 
 		arbiterTokens[(_arbToken & 0xffff)] = msg.sender;
 		arbiterIndexes[numArbiters++] = msg.sender;
-	
+
 
 		if (!tokenPartner.call.gas(raGas).value(msg.value)()) {
 			//Statvent("Send Error"); // event never registers
@@ -281,7 +281,7 @@ event StatEventA(string msg, address addr);
 	//------------------------------------------------------
 	// start game.  pass in valid hGame containing token in top two bytes
 	//------------------------------------------------------
-	function startGame(uint _hGame, int _hkMax, address[] _players) public 
+	function startGame(uint _hGame, int _hkMax, address[] _players) public
 
 	{
 		uint ntok = ArbTokFromHGame(_hGame);
@@ -293,13 +293,13 @@ event StatEventA(string msg, address addr);
 
 		if (arbLocked(msg.sender)) {
 			StatEvent("Arb Locked");
-			return; 
+			return;
 		}
 
 		arbiter xarb = arbiters[msg.sender];
-		if (_players.length != xarb.numPlayers) { 
+		if (_players.length != xarb.numPlayers) {
 			StatEvent("Incorrect num players");
-			return; 
+			return;
 		}
 
 		if (games[_hGame].active) {
@@ -307,20 +307,20 @@ event StatEventA(string msg, address addr);
 			abortGame(msg.sender, _hGame, EndReason.erCancel);
 
 		} else if (_hkMax > 0) {
-			houseKeep(_hkMax, ntok); 
+			houseKeep(_hkMax, ntok);
 		}
 
 		if (!games[_hGame].allocd) {
 			games[_hGame].allocd = true;
 			xarb.gameIndexes[xarb.gameSlots++] = _hGame;
-		} 
+		}
 		numGamesStarted++; // always inc this one
 		xarb.gamesStarted++;
 
 		games[_hGame].active = true;
-		games[_hGame].started = now; 
-		games[_hGame].lastMoved = now; 
-		games[_hGame].payout = 0; 
+		games[_hGame].started = now;
+		games[_hGame].lastMoved = now;
+		games[_hGame].payout = 0;
 		games[_hGame].winner = address(0);
 
 		games[_hGame].numPlayers = _players.length; // we'll be the judge of how many unique players
@@ -330,10 +330,10 @@ event StatEventA(string msg, address addr);
 		}
 
 		StatEventI("Game Added", _hGame);
-		
+
 
 	}
-	
+
 	//------------------------------------------------------
 	// clean up game, set to inactive, refund any balances
 	// called by housekeep ONLY
@@ -341,8 +341,8 @@ event StatEventA(string msg, address addr);
 	function abortGame(address _arb, uint  _hGame, EndReason _reason) private returns(bool _success)
 	{
 	     gameInstance nGame = games[_hGame];
-	     
-		// find game in game id, 
+
+		// find game in game id,
 		if (nGame.active) {
 			_success = true;
 			for (uint i = 0; i < nGame.numPlayers; i++) {
@@ -366,7 +366,7 @@ event StatEventA(string msg, address addr);
 				numGamesTimedOut++;
 				arbiters[_arb].gamesTimedout++;
 				StatEvent("Game timed out");
-			} else 
+			} else
 				StatEvent("Game aborted");
 		}
 	}
@@ -380,13 +380,13 @@ event StatEventA(string msg, address addr);
 	{
 
 		if (!validArb(msg.sender, ArbTokFromHGame(_hGame))) {
-			StatEvent("Invalid Arb");	
+			StatEvent("Invalid Arb");
 			return; // no throw no change made
 		}
 
 		var (valid, pidx) = validPlayer(_hGame, _winner);
 		if (!valid) {
-			StatEvent("Invalid Player");	
+			StatEvent("Invalid Player");
 			return;
 		}
 
@@ -403,7 +403,7 @@ event StatEventA(string msg, address addr);
 		for (uint i = 0; i < xgame.numPlayers; i++) {
 			totalPot += xgame.playerPots[i];
 		}
-		
+
 		uint nportion;
 		uint nremnant;
 		if (totalPot > 0) {
@@ -413,14 +413,14 @@ event StatEventA(string msg, address addr);
 			nportion = 0;
 			nremnant = 0;
 		}
-		
+
 
 		xgame.lastMoved = now;
 		xgame.active = false;
 		xgame.reasonEnded = EndReason.erWinner;
 		xgame.winner = _winner;
 		xgame.payout = nremnant;
-		
+
 		if (nportion > 0) {
 			houseFeeHoldover += nportion;
 			if ((houseFeeHoldover > houseFeeThreshold)
@@ -431,10 +431,10 @@ event StatEventA(string msg, address addr);
 				if (!tokenPartner.call.gas(feeGas).value(ntmpho)()) {
 					houseFeeHoldover = ntmpho; // put it back
 					StatEvent("House-Fee Error1");
-				} 
+				}
 			}
 		}
-	
+
 		for (i = 0; i < xgame.numPlayers; i++) {
 			xgame.playerPots[i] = 0;
 		}
@@ -446,7 +446,7 @@ event StatEventA(string msg, address addr);
 				// StatEvent("Send Error");
 			        throw; // if you cant pay the winner - very bad
 			} else {
-				StatEventI("Winner Paid", _hGame);		
+				StatEventI("Winner Paid", _hGame);
 			}
 		}
 	}
@@ -455,7 +455,7 @@ event StatEventA(string msg, address addr);
 	// handle a bet made by a player, validate the player and game
 	// add to players balance
 	//------------------------------------------------------
-	function handleBet(uint _hGame) public payable 
+	function handleBet(uint _hGame) public payable
 	{
 		address narb = arbiterTokens[ArbTokFromHGame(_hGame)];
 		if (narb == address(0)) {
@@ -492,9 +492,9 @@ event StatEventA(string msg, address addr);
 
 
 	//------------------------------------------------------
-	// called by ico token contract 
+	// called by ico token contract
 	//------------------------------------------------------
-	function getNumGamesStarted() constant returns (int _games) 
+	function getNumGamesStarted() constant returns (int _games)
 	{
 		_games = numGamesStarted;
 	}
@@ -502,7 +502,7 @@ event StatEventA(string msg, address addr);
 	//------------------------------------------------------
 	// return arbiter game stats
 	//------------------------------------------------------
-	function getArbInfo(uint _idx) constant  returns (address _addr, uint _started, uint _completed, uint _canceled, uint _timedOut) 
+	function getArbInfo(uint _idx) constant  returns (address _addr, uint _started, uint _completed, uint _canceled, uint _timedOut)
 	{
 		if (_idx >= numArbiters) {
 			StatEvent("Invalid Arb");
@@ -527,18 +527,18 @@ event StatEventA(string msg, address addr);
 	// if found abort the game, causing funds to be returned
 	//------------------------------------------------------
 	function houseKeep(int _max, uint _arbToken) public
-	{	
+	{
 		uint gi;
 		address a;
 		int aborted = 0;
-		
+
 		arbiter xarb = arbiters[msg.sender];// have to set it to something
-	        
-         
+
+
 		if (msg.sender == owner) {
 			for (uint ar = 0; (ar < numArbiters) && (aborted < _max) ; ar++) {
 			    a = arbiterIndexes[ar];
-			    xarb = arbiters[a];    
+			    xarb = arbiters[a];
 
 			    for ( gi = 0; (gi < xarb.gameSlots) && (aborted < _max); gi++) {
 				gameInstance ngame0 = games[xarb.gameIndexes[gi]];
@@ -555,7 +555,7 @@ event StatEventA(string msg, address addr);
 				StatEvent("Housekeep invalid arbiter");
 			else {
 			    a = msg.sender;
-			    xarb = arbiters[a];    
+			    xarb = arbiters[a];
 			    for (gi = 0; (gi < xarb.gameSlots) && (aborted < _max); gi++) {
 				gameInstance ngame1 = games[xarb.gameIndexes[gi]];
 				if ((ngame1.active)
@@ -565,7 +565,7 @@ event StatEventA(string msg, address addr);
 				}
 			    }
 
-			}	
+			}
 		}
 	}
 
@@ -591,13 +591,13 @@ event StatEventA(string msg, address addr);
 	{
 		_arbTok = ArbTokFromHGame(_hGame);
 		_lowWords = _hGame & 0xffffffffffff;
-		
+
 	}
 
 	//------------------------------------------------------
 	// get operation gas amounts
 	//------------------------------------------------------
-	function getOpGas() constant returns (uint _ra, uint _sg, uint _wp, uint _rf, uint _fg) 
+	function getOpGas() constant returns (uint _ra, uint _sg, uint _wp, uint _rf, uint _fg)
 	{
 		_ra = raGas; // register arb
 		_sg = sgGas; // start game
@@ -610,7 +610,7 @@ event StatEventA(string msg, address addr);
 	//------------------------------------------------------
 	// set operation gas amounts for forwading operations
 	//------------------------------------------------------
-	function setOpGas(uint _ra, uint _sg, uint _wp, uint _rf, uint _fg) 
+	function setOpGas(uint _ra, uint _sg, uint _wp, uint _rf, uint _fg)
 	{
 		if (msg.sender != owner)
 			throw;
@@ -625,16 +625,16 @@ event StatEventA(string msg, address addr);
 	//------------------------------------------------------
 	// set a micheivous arbiter to locked
 	//------------------------------------------------------
-	function setArbiterLocked(address _addr, bool _lock)  public 
+	function setArbiterLocked(address _addr, bool _lock)  public
 	{
 		if (owner != msg.sender)  {
-			throw; 
+			throw;
 		} else if (!validArb2(_addr)) {
 			StatEvent("invalid arb");
 		} else {
 			arbiters[_addr].locked = _lock;
 		}
-		
+
 	}
 
 	//------------------------------------------------------
@@ -651,7 +651,7 @@ event StatEventA(string msg, address addr);
 			houseFeeHoldover = 0;
 			if (!tokenPartner.call.gas(feeGas).value(ntmpho)()) {
 				houseFeeHoldover = ntmpho; // put it back
-				StatEvent("House-Fee Error2"); 
+				StatEvent("House-Fee Error2");
 			} else {
 				lastPayoutTime = now;
  				StatEvent("House-Fee Paid");
@@ -668,9 +668,9 @@ event StatEventA(string msg, address addr);
 	{
 		if (msg.sender != owner) {
 			throw;
-		} 
+		}
 
-		if ((settingsState == SettingStateValue.lockedRelease) 
+		if ((settingsState == SettingStateValue.lockedRelease)
 			&& (tokenPartner == address(0))) {
 			tokenPartner = _addr;
 			StatEvent("Token Partner Final!");
@@ -678,13 +678,13 @@ event StatEventA(string msg, address addr);
 			tokenPartner = _addr;
 			StatEvent("Token Partner Assigned!");
 		}
-			
+
 	}
 
 	// ----------------------------
 	// swap executor
 	// ----------------------------
-	function changeOwner(address _addr) 
+	function changeOwner(address _addr)
 	{
 		if (msg.sender != owner
 			|| settingsState == SettingStateValue.lockedRelease)
@@ -696,3 +696,71 @@ event StatEventA(string msg, address addr);
 
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

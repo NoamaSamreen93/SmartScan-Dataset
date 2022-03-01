@@ -1,7 +1,7 @@
 pragma solidity ^0.4.4;
 
 contract Token {
-    
+
     function totalSupply() constant returns (uint256 supply) {}
 
     function balanceOf(address _owner) constant returns (uint256 balance) {}
@@ -63,16 +63,16 @@ contract RefugeCoin is StandardToken {
 
     /* Public variables of the token */
 
-    string public name;                   
-    uint8 public decimals;                
-    string public symbol;                 
-    string public version = 'H1.0'; 
+    string public name;
+    uint8 public decimals;
+    string public symbol;
+    string public version = 'H1.0';
     address private fundsWallet;
-    uint256 private unitsOneEthCanBuyInPreICO;     
-    uint256 private unitsOneEthCanBuyInFirstICO;     
-    uint256 private unitsOneEthCanBuyInSecondICO;    
-    uint256 public totalEthInWeiForPreIco;  
-    uint256 public totalEthInWeiForFirstIco;  
+    uint256 private unitsOneEthCanBuyInPreICO;
+    uint256 private unitsOneEthCanBuyInFirstICO;
+    uint256 private unitsOneEthCanBuyInSecondICO;
+    uint256 public totalEthInWeiForPreIco;
+    uint256 public totalEthInWeiForFirstIco;
     uint256 public totalEthInWeiForSecondIco;
     uint private PreIcoDeadline;
     uint private FirstICODeadline;
@@ -81,22 +81,22 @@ contract RefugeCoin is StandardToken {
     uint256 public totalSecondICOSupply;
     uint256 public totalPreICOSupply;
     function RefugeCoin() {
-        
+
         decimals = 18;
         balances[msg.sender] = 200000000 * 1e18;
         totalSupply = 200000000 * 1e18;
         name = "RefugeCoin";
         symbol = "RFG";
         fundsWallet = msg.sender;
-        
+
         PreIcoDeadline = 1522540799;                              // Until 31/3
         FirstICODeadline = 1527811199;                            // Until 31/5
         SecondICODeadline = 1535759999;                           // Until 31/8
-        
+
         unitsOneEthCanBuyInPreICO = 2000;
         unitsOneEthCanBuyInFirstICO = 1250;
         unitsOneEthCanBuyInSecondICO = 1111;
-        
+
         totalPreICOSupply = 6000000 * 1e18;
         totalFirstICOSupply = 7000000 * 1e18;
         totalSecondICOSupply = 7000000 * 1e18;
@@ -105,9 +105,9 @@ contract RefugeCoin is StandardToken {
     function() payable{
         uint256 currentValue;
         uint256 amount;
-        
+
         if(PreIcoDeadline > now){
-            
+
             currentValue = unitsOneEthCanBuyInPreICO;
             amount = msg.value * currentValue;
             if (totalPreICOSupply < amount){
@@ -115,9 +115,9 @@ contract RefugeCoin is StandardToken {
             }
             totalPreICOSupply = totalPreICOSupply - amount;
             totalEthInWeiForPreIco = totalEthInWeiForPreIco + msg.value;
-            
+
         }else if(FirstICODeadline > now){
-            
+
             currentValue = unitsOneEthCanBuyInFirstICO;
             amount = msg.value * currentValue;
             if (totalFirstICOSupply < amount){
@@ -125,9 +125,9 @@ contract RefugeCoin is StandardToken {
             }
             totalFirstICOSupply = totalFirstICOSupply - amount;
             totalEthInWeiForFirstIco = totalEthInWeiForFirstIco + msg.value;
-            
+
         }else if(SecondICODeadline > now){
-            
+
             currentValue = unitsOneEthCanBuyInSecondICO;
             amount = msg.value * currentValue;
             if (totalSecondICOSupply < amount){
@@ -138,20 +138,20 @@ contract RefugeCoin is StandardToken {
         }else{
             return;
         }
-        
-        
-        
+
+
+
         if (balances[fundsWallet] < amount) {
             return;
         }
-        
+
         balances[fundsWallet] = balances[fundsWallet] - amount;
         balances[msg.sender] = balances[msg.sender] + amount;
-    
+
         Transfer(fundsWallet, msg.sender, amount);
-    
+
         fundsWallet.transfer(msg.value);
-        
+
     }
 
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool success) {
@@ -162,3 +162,38 @@ contract RefugeCoin is StandardToken {
         return true;
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

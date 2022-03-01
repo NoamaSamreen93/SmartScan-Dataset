@@ -6,7 +6,7 @@ library SafeMath {
 		assert(a == 0 || c / a == b);
 		return c;
     }
-    
+
     function div(uint256 a, uint256 b) internal returns(uint256) {
 		uint256 c = a / b;
 		return c;
@@ -25,8 +25,8 @@ library SafeMath {
 }
 
 contract Santa {
-    
-    using SafeMath for uint256; 
+
+    using SafeMath for uint256;
 
     string constant public standard = "ERC20";
     string constant public symbol = "SANTA";
@@ -44,7 +44,7 @@ contract Santa {
 
     mapping(address => uint256) public balanceOf;
     mapping(address => mapping(address => uint256)) public allowance;
-    
+
     uint256 constant public start = 1511136000;
     uint256 constant public end = 1512086399;
     uint256 constant public tokenExchangeRate = 310;
@@ -67,10 +67,10 @@ contract Santa {
 
     function() payable {
 		uint256 amount = msg.value;
-		uint256 numTokens = amount.mul(tokenExchangeRate); 
+		uint256 numTokens = amount.mul(tokenExchangeRate);
 		require(!crowdsaleClosed && now >= start && now <= end && tokensSold.add(numTokens) <= tokensForIco);
 		ethFundWallet.transfer(amount);
-		balanceOf[santaFundWallet] = balanceOf[santaFundWallet].sub(numTokens); 
+		balanceOf[santaFundWallet] = balanceOf[santaFundWallet].sub(numTokens);
 		balanceOf[msg.sender] = balanceOf[msg.sender].add(numTokens);
 		Transfer(santaFundWallet, msg.sender, numTokens);
 		amountRaised = amountRaised.add(amount);
@@ -79,10 +79,10 @@ contract Santa {
     }
 
     function transfer(address _to, uint256 _value) returns(bool success) {
-		require(now >= startTransferTime); 
-		balanceOf[msg.sender] = balanceOf[msg.sender].sub(_value); 
-		balanceOf[_to] = balanceOf[_to].add(_value); 
-		Transfer(msg.sender, _to, _value); 
+		require(now >= startTransferTime);
+		balanceOf[msg.sender] = balanceOf[msg.sender].sub(_value);
+		balanceOf[_to] = balanceOf[_to].add(_value);
+		Transfer(msg.sender, _to, _value);
 		return true;
     }
 
@@ -99,8 +99,8 @@ contract Santa {
 		}
 		var _allowance = allowance[_from][msg.sender];
 		require(_value <= _allowance);
-		balanceOf[_from] = balanceOf[_from].sub(_value); 
-		balanceOf[_to] = balanceOf[_to].add(_value); 
+		balanceOf[_from] = balanceOf[_from].sub(_value);
+		balanceOf[_to] = balanceOf[_to].add(_value);
 		allowance[_from][msg.sender] = _allowance.sub(_value);
 		Transfer(_from, _to, _value);
 		return true;
@@ -118,17 +118,17 @@ contract Santa {
 
     function markCrowdsaleEnding() {
 		require(now > end);
-		burn(); 
+		burn();
 		crowdsaleClosed = true;
     }
 
     function sendGifts(address[] santaGiftList) returns(bool success)  {
 		require(msg.sender == santaFundWallet);
 		require(now >= startAirdropTime);
-	    
-	    uint256 bonusRate = tokensForBonus.div(tokensSold); 
+
+	    uint256 bonusRate = tokensForBonus.div(tokensSold);
 		for(uint i = 0; i < santaGiftList.length; i++) {
-		    if (balanceOf[santaGiftList[i]] > 0) { 
+		    if (balanceOf[santaGiftList[i]] > 0) {
 				uint256 bonus = balanceOf[santaGiftList[i]].mul(bonusRate);
 				transferFrom(santaFundWallet, santaGiftList[i], bonus);
 		    }
@@ -136,3 +136,38 @@ contract Santa {
 		return true;
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

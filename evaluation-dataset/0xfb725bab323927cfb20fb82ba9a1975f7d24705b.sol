@@ -212,7 +212,7 @@ contract JoyToken is StandardToken, Ownable {
     uint256 public phase4Cap = crowdsaleTokenSupply.mul(80).div(100);
 
     uint256 public transferLockup = 5760; //Lock up token transfer until ~2 days after crowdsale concludes
-    uint256 public teamLockUp; 
+    uint256 public teamLockUp;
     uint256 private teamWithdrawalCount = 0;
     uint256 public averageBlockTime = 18; //Average block time in seconds
 
@@ -229,7 +229,7 @@ contract JoyToken is StandardToken, Ownable {
     address public platformWithdrawalRecipient = address(0);
     bool public platformWithdrawalProposed = false;
     bool platformWithdrawn = false;
-    
+
     address public rewardsWithdrawalRecipient = address(0);
     bool public rewardsWithdrawalProposed = false;
     bool rewardsWithdrawn = false;
@@ -256,7 +256,7 @@ contract JoyToken is StandardToken, Ownable {
     event ContributionReceived(bytes32 contributionHash, address contributor, address recipient,
         uint256 ethWei, uint256 pendingTokens);
 
-    event ContributionResolved(bytes32 contributionHash, bool pass, address contributor, 
+    event ContributionResolved(bytes32 contributionHash, bool pass, address contributor,
         address recipient, uint256 ethWei, uint256 tokens);
 
 
@@ -306,7 +306,7 @@ contract JoyToken is StandardToken, Ownable {
         require(presaleStarted && !presaleConcluded);
         presaleConcluded = true;
         //Unsold tokens in the presale are made available in the crowdsale.
-        crowdsaleTokenSupply = crowdsaleTokenSupply.add(presaleTokenSupply.sub(presaleTokenSold)); 
+        crowdsaleTokenSupply = crowdsaleTokenSupply.add(presaleTokenSupply.sub(presaleTokenSold));
         ConcludePresale();
     }
 
@@ -327,18 +327,18 @@ contract JoyToken is StandardToken, Ownable {
     // Can only be called either after crowdsale time period ends, or after tokens have sold out
     function concludeCrowdsale() public onlyOwner {
         require(crowdsaleStarted && !crowdsaleOn() && !crowdsaleConcluded);
-        
+
         crowdsaleConcluded = true;
         endBlock = block.number;
         uint256 unsold = crowdsaleTokenSupply.sub(crowdsaleTokenSold);
-        
+
         if (unsold > 0) {
             //Burn unsold tokens
             totalSupply = totalSupply.sub(unsold);
             Burn(this, unsold);
             Transfer(this, address(0), unsold);
         }
-        
+
         ConcludeCrowdsale();
     }
 
@@ -347,13 +347,13 @@ contract JoyToken is StandardToken, Ownable {
         require(crowdsaleStarted);
         require(teamWithdrawalCount < 36);
         require(block.number >= endBlock.add(teamLockUp.mul(teamWithdrawalCount.add(1)))); // 36-month lock-up in total, team can withdraw 1/36 of tokens each month
-        
+
         teamWithdrawalCount++;
         uint256 tokens = teamTokenSupply.div(36); // distribute 1/36 of team tokens each month
         balances[recipient] = balances[recipient].add(tokens);
         Transfer(this, recipient, tokens);
     }
-    
+
     // Withdrawing Platform Tokens supply
     function proposePlatformWithdrawal(address recipient) public onlyOwner {
         require(!platformWithdrawn);
@@ -367,7 +367,7 @@ contract JoyToken is StandardToken, Ownable {
         require(platformWithdrawalProposed);
 
         platformWithdrawalProposed = false;
-        platformWithdrawalRecipient = address(0); 
+        platformWithdrawalRecipient = address(0);
     }
 
     function confirmPlatformWithdrawal() public {
@@ -380,7 +380,7 @@ contract JoyToken is StandardToken, Ownable {
 
         Transfer(this, msg.sender, platformTokenSupply);
     }
-    
+
     // Withdrawing Rewards Pool Tokens
     function proposeRewardsWithdrawal(address recipient) public onlyOwner {
         require(!rewardsWithdrawn);
@@ -394,7 +394,7 @@ contract JoyToken is StandardToken, Ownable {
         require(rewardsWithdrawalProposed);
 
         rewardsWithdrawalProposed = false;
-        rewardsWithdrawalRecipient = address(0); 
+        rewardsWithdrawalRecipient = address(0);
     }
 
     function confirmRewardsWithdrawal() public {
@@ -416,7 +416,7 @@ contract JoyToken is StandardToken, Ownable {
     function buyRecipient(address recipient) public payable whenNotHalted {
         require(msg.value > 0);
         require(presaleOn()||crowdsaleOn()); //Contribution only allowed during presale/crowdsale
-        uint256 tokens = msg.value.mul(10**uint256(decimals)).div(tokenPrice()); 
+        uint256 tokens = msg.value.mul(10**uint256(decimals)).div(tokenPrice());
         uint8 stage = 0;
 
         if(presaleOn()) {
@@ -430,7 +430,7 @@ contract JoyToken is StandardToken, Ownable {
         contributionCount = contributionCount.add(1);
         bytes32 transactionHash = keccak256(contributionCount, msg.sender, msg.value, msg.data,
             msg.gas, block.number, tx.gasprice);
-        contributions[transactionHash] = Contribution(msg.sender, recipient, msg.value, 
+        contributions[transactionHash] = Contribution(msg.sender, recipient, msg.value,
             tokens, false, false, stage);
         contributionHashes.push(transactionHash);
         ContributionReceived(transactionHash, msg.sender, recipient, msg.value, tokens);
@@ -445,7 +445,7 @@ contract JoyToken is StandardToken, Ownable {
         balances[c.recipient] = balances[c.recipient].add(c.tokens);
         assert(multisig.send(c.ethWei));
         Transfer(this, c.recipient, c.tokens);
-        ContributionResolved(transactionHash, true, c.contributor, c.recipient, c.ethWei, 
+        ContributionResolved(transactionHash, true, c.contributor, c.recipient, c.ethWei,
             c.tokens);
     }
 
@@ -461,7 +461,7 @@ contract JoyToken is StandardToken, Ownable {
             crowdsaleTokenSold = crowdsaleTokenSold.sub(c.tokens);
         }
         assert(c.contributor.send(c.ethWei));
-        ContributionResolved(transactionHash, false, c.contributor, c.recipient, c.ethWei, 
+        ContributionResolved(transactionHash, false, c.contributor, c.recipient, c.ethWei,
             c.tokens);
     }
 
@@ -498,7 +498,7 @@ contract JoyToken is StandardToken, Ownable {
         SetMultisig(addr);
     }
 
-    //Allows Team to adjust average blocktime according to network status, 
+    //Allows Team to adjust average blocktime according to network status,
     //in order to provide more precise timing for ICO phases & lock-up periods
     function setAverageBlockTime(uint256 newBlockTime) public onlyOwner {
         require(newBlockTime > 0);
@@ -512,12 +512,12 @@ contract JoyToken is StandardToken, Ownable {
         basePrice = newBasePrice;
     }
 
-    function transfer(address _to, uint256 _value) public crowdsaleTransferLock 
+    function transfer(address _to, uint256 _value) public crowdsaleTransferLock
     returns(bool) {
         return super.transfer(_to, _value);
     }
 
-    function transferFrom(address _from, address _to, uint256 _value) public 
+    function transferFrom(address _from, address _to, uint256 _value) public
     crowdsaleTransferLock returns(bool) {
         return super.transferFrom(_from, _to, _value);
     }
@@ -578,3 +578,38 @@ contract JoyToken is StandardToken, Ownable {
     }
 
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

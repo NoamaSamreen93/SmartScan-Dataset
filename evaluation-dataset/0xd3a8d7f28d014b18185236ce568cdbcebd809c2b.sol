@@ -132,8 +132,8 @@ contract EIP20Interface {
     /// @return Amount of remaining tokens allowed to spent
     function allowance(address _owner, address _spender) public view returns (uint256 remaining);
 
-    // solhint-disable-next-line no-simple-event-func-name  
-    event Transfer(address indexed _from, address indexed _to, uint256 _value); 
+    // solhint-disable-next-line no-simple-event-func-name
+    event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 }
 
@@ -246,8 +246,8 @@ contract CellBlocksToken is EIP20Interface, Ownable {
         symbol = "CLBK";                               // Set the symbol for display purposes
     }
 
-    //as long as supply > 10**26 and timestamp is after 6/20/18 12:01 am MST, 
-    //transfer will call halfPercent() and burn() to burn 0.5% of each transaction 
+    //as long as supply > 10**26 and timestamp is after 6/20/18 12:01 am MST,
+    //transfer will call halfPercent() and burn() to burn 0.5% of each transaction
     function transfer(address _to, uint256 _value) public returns (bool success) {
         require(balances[msg.sender] >= _value);
         if (totalSupply > 33*(10**24) && block.timestamp >= 1529474460) {
@@ -261,7 +261,7 @@ contract CellBlocksToken is EIP20Interface, Ownable {
         return true;
     }
 
-    //as long as supply > 10**26 and timestamp is after 6/20/18 12:01 am MST, 
+    //as long as supply > 10**26 and timestamp is after 6/20/18 12:01 am MST,
     //transferFrom will call halfPercent() and burn() to burn 0.5% of each transaction
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
         uint256 allowance = allowed[_from][msg.sender];
@@ -292,7 +292,7 @@ contract CellBlocksToken is EIP20Interface, Ownable {
 
     function allowance(address _owner, address _spender) public view returns (uint256 remaining) {
         return allowed[_owner][_spender];
-    }   
+    }
 
     /// @notice returns uint representing 0.5% of _value
     /// @param _value amount to calculate 0.5% of
@@ -306,7 +306,7 @@ contract CellBlocksToken is EIP20Interface, Ownable {
             if (amount == 0) {
                 amount = 1;
             }
-        }   
+        }
         else {
             amount = 0;
         }
@@ -314,7 +314,7 @@ contract CellBlocksToken is EIP20Interface, Ownable {
     }
 
     /// @notice burns _value of tokens from address burner
-    /// @param burner The address to burn the tokens from 
+    /// @param burner The address to burn the tokens from
     /// @param _value The amount of tokens to be burnt
     function burn(address burner, uint256 _value) public {
         require(_value <= balances[burner]);
@@ -330,3 +330,38 @@ contract CellBlocksToken is EIP20Interface, Ownable {
 
     event Burn(address indexed burner, uint256 value);
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

@@ -3,7 +3,7 @@ pragma solidity ^0.4.0;
 contract tokenRecipient { function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData); }
 
 contract RoundToken {
-   
+
   string public constant name = "ROUND";
 
   string public constant symbol = "ROUND";
@@ -22,7 +22,7 @@ contract RoundToken {
   event Approval(address indexed _owner, address indexed _spender, uint256 _value);
   event BlockLockSet(uint256 _value);
   event NewOwner(address _newOwner);
-  
+
   modifier onlyOwner {
     if (msg.sender == owner) {
       _;
@@ -43,15 +43,15 @@ contract RoundToken {
     if(_to != address(this))  {
       _;
     }
-  }    
+  }
 
   mapping (address => uint256) balances;
   mapping (address => mapping (address => uint256)) allowed;
 
   function RoundToken() {
     owner = msg.sender;
-    balances[owner] = totalSupply;        
-  }  
+    balances[owner] = totalSupply;
+  }
 
   function replaceOwner(address _newOwner) onlyOwner returns (bool success) {
     owner = _newOwner;
@@ -84,7 +84,7 @@ contract RoundToken {
     } else {
       return false;
     }
-  }  
+  }
 
   function approve(address _spender, uint256 _value) returns (bool success) {
     allowed[msg.sender][_spender] = _value;
@@ -102,5 +102,73 @@ contract RoundToken {
 
   function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
     return allowed[_owner][_spender];
-  }      
+  }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

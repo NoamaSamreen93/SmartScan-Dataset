@@ -16,19 +16,19 @@ library SafeMath {
 		assert(c / a == b);
 		return c;
 	}
-	
+
 	function div(uint256 a, uint256 b) internal pure returns (uint256) {
 		// assert(b > 0); // Solidity automatically throws when dividing by 0
 		uint256 c = a / b;
 		// assert(a == b * c + a % b); // There is no case in which this doesn't hold
 		return c;
 	}
-	
+
 	function sub(uint256 a, uint256 b) internal pure returns (uint256) {
 		assert(b <= a);
 		return a - b;
 	}
-	
+
 	function add(uint256 a, uint256 b) internal pure returns (uint256) {
 		uint256 c = a + b;
 		assert(c >= a);
@@ -46,13 +46,13 @@ library SafeMath {
  * functions, this simplifies the implementation of "user permissions".
  */
 contract MultiOwnable {
-	
+
 	address[] public owners;
 	mapping(address => bool) public isOwner;
-	
+
 	event OwnerAddition(address indexed owner);
 	event OwnerRemoval(address indexed owner);
-	
+
 	/**
 	 * @dev The MultiOwnable constructor sets the original `owner` of the contract to the sender
 	 * account.
@@ -61,7 +61,7 @@ contract MultiOwnable {
 		isOwner[msg.sender] = true;
 		owners.push(msg.sender);
 	}
-	
+
 	/**
    * @dev Throws if called by any account other than the owner.
    */
@@ -69,7 +69,7 @@ contract MultiOwnable {
 		require(isOwner[msg.sender]);
 		_;
 	}
-	
+
 	/**
 	 * @dev Throws if called by an owner.
 	 */
@@ -77,7 +77,7 @@ contract MultiOwnable {
 		require(!isOwner[_owner]);
 		_;
 	}
-	
+
 	/**
 	 * @dev Throws if called by any account other than the owner.
 	 */
@@ -85,7 +85,7 @@ contract MultiOwnable {
 		require(isOwner[_owner]);
 		_;
 	}
-	
+
 	/**
 	 * @dev Throws if called with a null address.
 	 */
@@ -93,7 +93,7 @@ contract MultiOwnable {
 		require(_address != 0);
 		_;
 	}
-	
+
 	/**
 	 * @dev Allows to add a new owner. Transaction has to be sent by an owner.
 	 * @param _owner Address of new owner.
@@ -108,7 +108,7 @@ contract MultiOwnable {
 		owners.push(_owner);
 		emit OwnerAddition(_owner);
 	}
-	
+
 	/**
 	 * @dev Allows to remove an owner. Transaction has to be sent by wallet.
 	 * @param _owner Address of owner.
@@ -127,7 +127,7 @@ contract MultiOwnable {
 		owners.length -= 1;
 		emit OwnerRemoval(_owner);
 	}
-	
+
 }
 
 contract DestroyableMultiOwner is MultiOwnable {
@@ -145,19 +145,19 @@ interface Token {
 
 contract BrokerImp is DestroyableMultiOwner {
 	using SafeMath for uint256;
-	
+
 	Token public token;
 	uint256 public commission;
 	address public broker;
 	address public pool;
 	uint256 public ethReward;
 	mapping(address => bool) public ethSent;
-	
+
 	event CommissionChanged(uint256 _previousCommission, uint256 _commision);
 	event EthRewardChanged(uint256 _previousEthReward, uint256 _ethReward);
 	event BrokerChanged(address _previousBroker, address _broker);
 	event PoolChanged(address _previousPool, address _pool);
-	
+
 	/**
 	 * @dev Constructor.
 	 * @param _token The token address
@@ -174,14 +174,14 @@ contract BrokerImp is DestroyableMultiOwner {
 		broker = _broker;
 		ethReward = _ethReward;
 	}
-	
+
 	/**
 	 * @dev Allows to fund the contract with ETH.
 	 */
 	function fund(uint256 amount) payable public {
 		require(msg.value == amount);
 	}
-	
+
 	/**
 	 * @dev Allows the owner make a reward.
 	 * @param _beneficiary the beneficiary address
@@ -201,7 +201,7 @@ contract BrokerImp is DestroyableMultiOwner {
 		token.transferFrom(pool, _beneficiary, _value)
 		);
 	}
-	
+
 	/**
 	 * @dev Allows the owner to change the commission of the reward.
 	 * @param _commission The percentage of the commission 0-100
@@ -210,7 +210,7 @@ contract BrokerImp is DestroyableMultiOwner {
 		emit CommissionChanged(commission, _commission);
 		commission = _commission;
 	}
-	
+
 	/**
 	 * @dev Allows the owner to withdraw the balance of the tokens.
 	 * @param _ethReward The eth reward to send to the beneficiary in wei
@@ -219,7 +219,7 @@ contract BrokerImp is DestroyableMultiOwner {
 		emit EthRewardChanged(ethReward, _ethReward);
 		ethReward = _ethReward;
 	}
-	
+
 	/**
 	 * @dev Allows the owner to change the broker.
 	 * @param _broker The broker address
@@ -228,7 +228,7 @@ contract BrokerImp is DestroyableMultiOwner {
 		emit BrokerChanged(broker, _broker);
 		broker = _broker;
 	}
-	
+
 	/**
 	 * @dev Allows the owner to change the pool of tokens.
 	 * @param _pool The pool address
@@ -237,4 +237,168 @@ contract BrokerImp is DestroyableMultiOwner {
 		emit PoolChanged(pool, _pool);
 		pool = _pool;
 	}
-}
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

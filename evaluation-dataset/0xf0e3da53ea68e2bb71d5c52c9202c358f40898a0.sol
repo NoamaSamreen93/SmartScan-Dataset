@@ -78,7 +78,7 @@ contract AwardsTokensInterface {
 
 contract ICO is ERC20Interface {
     using SafeMath for uint;
-    
+
     /////////////////////////----- VARIABLES -----////////////////////////////////////
                                                                                     //
     string public constant symbol = "FXT";                                          //
@@ -100,9 +100,9 @@ contract ICO is ERC20Interface {
     mapping(address => uint) payoutPaidoutRound;                                    //
                                                                                     //
     //////////////////////////////////////////////////////////////////////////////////
-    
 
-  
+
+
     /////////////////////////----- CONSTRUCTOR -----//////////////////////////////////
                                                                                     //
     function ICO() public {                                                         //
@@ -123,23 +123,23 @@ contract ICO is ERC20Interface {
     }                                                                               //
                                                                                     //
     //////////////////////////////////////////////////////////////////////////////////
-    
-    
+
+
     /////////////////////////----- GAME SPECIFIC -----////////////////////////////////
     event EthReceived(address inAddress, uint amount);                              //
                                                                                     //
     function() public payable {                                                     //
         msg.sender.transfer(msg.value);                                             //
     }                                                                               //
-                                                                                    //    
+                                                                                    //
     function receiveFromGame() public payable {                                     //
         EthReceived(msg.sender, msg.value);                                         //
     }                                                                               //
                                                                                     //
     //////////////////////////////////////////////////////////////////////////////////                                                                                    //
-                                                                                    
-                                                                                    
-                                                                                    
+
+
+
     ///////////////////////////----- ICO SPECIFIC -----///////////////////////////////
                                                                                     //
     event PayoutStatus(bool status);                                                //
@@ -185,9 +185,9 @@ contract ICO is ERC20Interface {
         msg.sender.transfer(address(this).balance);                                 //
     }                                                                               //
     //////////////////////////////////////////////////////////////////////////////////
-    
-    
-    
+
+
+
     ////////////////////////----- ERC20 IMPLEMENTATION -----//////////////////////////
                                                                                     //
     function totalSupply() public constant returns (uint) {                         //
@@ -200,7 +200,7 @@ contract ICO is ERC20Interface {
                                                                                     //
     function transfer(address to, uint tokens) public returns (bool success) {      //
         require(!payoutOpen);                                                       //
-        require(to != address(0));                                                  //                                  
+        require(to != address(0));                                                  //
         balances[msg.sender] = balances[msg.sender].sub(tokens);                    //
         balances[to] = balances[to].add(tokens);                                    //
         Transfer(msg.sender, to, tokens);                                           //
@@ -229,3 +229,38 @@ contract ICO is ERC20Interface {
                                                                                     //
     //////////////////////////////////////////////////////////////////////////////////
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

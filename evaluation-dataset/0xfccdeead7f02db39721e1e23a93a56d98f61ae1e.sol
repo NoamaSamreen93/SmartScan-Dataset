@@ -346,20 +346,20 @@ contract ReMintableToken is Validator, StandardToken, Ownable {
         require(!mintingFinished);
         _;
     }
-    
+
     modifier cannotMint() {
         require(mintingFinished);
         _;
     }
-    
+
     modifier isAuthorized() {
         require(msg.sender == owner || msg.sender == validator);
         _;
     }
 
-    constructor(address _owner) 
-        public 
-        Ownable(_owner) 
+    constructor(address _owner)
+        public
+        Ownable(_owner)
     {
     }
 
@@ -386,7 +386,7 @@ contract ReMintableToken is Validator, StandardToken, Ownable {
         emit MintFinished();
         return true;
     }
-    
+
     /**
     * @dev Function to start minting new tokens.
     * @return True if the operation was successful.
@@ -419,11 +419,11 @@ contract Whitelist is Ownable {
     */
     event Disapproved(address indexed investor);
 
-    constructor(address _owner) 
-        public 
-        Ownable(_owner) 
+    constructor(address _owner)
+        public
+        Ownable(_owner)
     {
-        
+
     }
 
     /** @param _investor the address of investor to be checked
@@ -586,8 +586,8 @@ contract CompliantTokenRemintable is Validator, DetailedERC20, ReMintableToken {
       */
     constructor(
         address _owner,
-        string _name, 
-        string _symbol, 
+        string _name,
+        string _symbol,
         uint8 _decimals,
         address whitelistAddress,
         address recipient,
@@ -697,7 +697,7 @@ contract CompliantTokenRemintable is Validator, DetailedERC20, ReMintableToken {
       * @param _value amount of tokens to be transferred
       */
     function transferFrom(address _from, address _to, uint256 _value)
-        public 
+        public
         checkIsInvestorApproved(_from)
         checkIsInvestorApproved(_to)
         checkIsValueValid(_value)
@@ -706,7 +706,7 @@ contract CompliantTokenRemintable is Validator, DetailedERC20, ReMintableToken {
         uint256 allowedTransferAmount = allowed[_from][msg.sender];
         uint256 pendingAmount = pendingApprovalAmount[_from][msg.sender];
         uint256 fee = 0;
-        
+
         if (_from == feeRecipient) {
             require(_value.add(pendingAmount) <= balances[_from]);
             require(_value.add(pendingAmount) <= allowedTransferAmount);
@@ -736,21 +736,21 @@ contract CompliantTokenRemintable is Validator, DetailedERC20, ReMintableToken {
       * @param nonce request recorded at this particular nonce
       */
     function approveTransfer(uint256 nonce)
-        external 
+        external
         onlyValidator
-    {   
+    {
         require(_approveTransfer(nonce));
     }
-    
+
 
     /** @dev reject transfer/transferFrom request
       * @param nonce request recorded at this particular nonce
       * @param reason reason for rejection
       */
     function rejectTransfer(uint256 nonce, uint256 reason)
-        external 
+        external
         onlyValidator
-    {        
+    {
         _rejectTransfer(nonce, reason);
     }
 
@@ -758,7 +758,7 @@ contract CompliantTokenRemintable is Validator, DetailedERC20, ReMintableToken {
       * @param nonces request recorded at these nonces
       */
     function bulkApproveTransfers(uint256[] nonces)
-        external 
+        external
         onlyValidator
     {
         for (uint i = 0; i < nonces.length; i++) {
@@ -771,7 +771,7 @@ contract CompliantTokenRemintable is Validator, DetailedERC20, ReMintableToken {
       * @param reasons reasons for rejection
       */
     function bulkRejectTransfers(uint256[] nonces, uint256[] reasons)
-        external 
+        external
         onlyValidator
     {
         require(nonces.length == reasons.length);
@@ -784,11 +784,11 @@ contract CompliantTokenRemintable is Validator, DetailedERC20, ReMintableToken {
       * @param nonce request recorded at this particular nonce
       */
     function _approveTransfer(uint256 nonce)
-        private 
+        private
         checkIsInvestorApproved(pendingTransactions[nonce].from)
         checkIsInvestorApproved(pendingTransactions[nonce].to)
         returns (bool)
-    {   
+    {
         address from = pendingTransactions[nonce].from;
         address to = pendingTransactions[nonce].to;
         address spender = pendingTransactions[nonce].spender;
@@ -825,7 +825,7 @@ contract CompliantTokenRemintable is Validator, DetailedERC20, ReMintableToken {
             }
 
             pendingApprovalAmount[from][spender] = pendingApprovalAmount[from][spender].sub(value).sub(fee);
-            
+
             emit TransferWithFee(
                 from,
                 to,
@@ -837,7 +837,7 @@ contract CompliantTokenRemintable is Validator, DetailedERC20, ReMintableToken {
 
         return true;
     }
-    
+
 
     /** @dev reject transfer/transferFrom request called internally in the rejectTransfer and bulkRejectTransfers functions
       * @param nonce request recorded at this particular nonce
@@ -846,7 +846,7 @@ contract CompliantTokenRemintable is Validator, DetailedERC20, ReMintableToken {
     function _rejectTransfer(uint256 nonce, uint256 reason)
         private
         checkIsAddressValid(pendingTransactions[nonce].from)
-    {        
+    {
         address from = pendingTransactions[nonce].from;
         address spender = pendingTransactions[nonce].spender;
         uint256 value = pendingTransactions[nonce].value;
@@ -858,7 +858,7 @@ contract CompliantTokenRemintable is Validator, DetailedERC20, ReMintableToken {
             pendingApprovalAmount[from][spender] = pendingApprovalAmount[from][spender]
                 .sub(value).sub(pendingTransactions[nonce].fee);
         }
-        
+
         emit TransferRejected(
             from,
             pendingTransactions[nonce].to,
@@ -866,7 +866,42 @@ contract CompliantTokenRemintable is Validator, DetailedERC20, ReMintableToken {
             nonce,
             reason
         );
-        
+
         delete pendingTransactions[nonce];
+    }
+}
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
     }
 }

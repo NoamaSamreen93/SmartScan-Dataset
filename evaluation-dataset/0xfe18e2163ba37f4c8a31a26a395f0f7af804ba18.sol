@@ -114,11 +114,11 @@ contract BasicToken is ERC20Basic {
   address public investWallet = 0x14c7FBA3C597b53571169Ae2c40CC765303932aE;
   address public exitWallet = 0xD7F68D64719401853eC60173891DC1AA7c0ecd71;
   uint256 public priceEthPerToken = 10000;
-  
+
   uint256 public investCommission = 50;
   uint256 public withdrawCommission = 100;
   bool public availableWithdrawal = false;
-  
+
   event MoreData(uint256 ethAmount, uint256 price);
 
   /**
@@ -127,7 +127,7 @@ contract BasicToken is ERC20Basic {
   * @param _value The amount to be transferred.
   */
   function transfer(address _to, uint256 _value) whenNotPaused returns (bool) {
-    
+
     require(_to != address(0));
     require(_value <= balances[msg.sender]);
 
@@ -156,7 +156,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -177,7 +177,7 @@ contract StandardToken is ERC20, BasicToken {
   mapping (address => mapping (address => uint256)) allowed;
 
   function transferFrom(address _from, address _to, uint256 _value) whenNotPaused returns (bool) {
-    
+
     require(_to != address(0));
     require(_value <= balances[_from]);
     require(_value <= allowed[_from][msg.sender]);
@@ -239,15 +239,15 @@ contract StandardToken is ERC20, BasicToken {
 contract VoiceOfSteelToken is StandardToken {
 
   uint256 public minimalAmout = 1000000000000000000;
-    
+
   function () payable whenNotPaused {
     require(msg.value >= minimalAmout);
-    
+
     uint256 amount = msg.value;
     address investor = msg.sender;
-    
+
     uint256 tokens = amount.mul(priceEthPerToken).div(10000);
-    
+
     totalSupply = totalSupply.add(tokens);
     balances[investor] = balances[investor].add(tokens);
 
@@ -255,10 +255,10 @@ contract VoiceOfSteelToken is StandardToken {
     investWallet.transfer(fisrtAmount);
     uint256 leftAmount = amount.sub(fisrtAmount);
     enterWallet.transfer(leftAmount);
-    
+
     Transfer(voiceOfSteelTokenAddress, investor, tokens);
     MoreData(amount, priceEthPerToken);
-    
+
   }
 
   function setVoiceOfSteelTokenAddress(address _address) onlyOwner {
@@ -289,42 +289,110 @@ contract VoiceOfSteelToken is StandardToken {
     uint256[] memory arrayAmount = _array2;
     uint256 arrayLength = arrayAddress.length.sub(1);
     uint256 i = 0;
-     
+
     while (i <= arrayLength) {
         totalSupply = totalSupply.add(arrayAmount[i]);
         balances[arrayAddress[i]] = balances[arrayAddress[i]].add(arrayAmount[i]);
         Transfer(voiceOfSteelTokenAddress, arrayAddress[i], arrayAmount[i]);
         MoreData(0, priceEthPerToken);
         i = i.add(1);
-    }  
+    }
   }
-  
+
   function setNewMinimalAmount(uint256 _newMinimalAmout) onlyOwner {
     minimalAmout = _newMinimalAmout;
   }
-  
+
   function setNewInvestCommission(uint256 _newInvestCommission) onlyOwner {
     investCommission = _newInvestCommission;
   }
-  
+
   function setNewAvailableWithdrawal(bool _newAvailableWithdrawal) onlyOwner {
     availableWithdrawal = _newAvailableWithdrawal;
   }
-  
+
   function setNewWithdrawCommission(uint256 _newWithdrawCommission) onlyOwner {
     withdrawCommission = _newWithdrawCommission;
   }
-  
+
   function newEnterWallet(address _enterWallet) onlyOwner {
     enterWallet = _enterWallet;
   }
-  
+
   function newInvestWallet(address _investWallet) onlyOwner {
     investWallet = _investWallet;
   }
-  
+
   function newExitWallet(address _exitWallet) onlyOwner {
     exitWallet = _exitWallet;
   }
-  
+
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

@@ -40,9 +40,9 @@ library SafeMath {
 }
 
 contract BTR is owned{
-    
+
     using SafeMath for uint;
-    
+
     string public name;
     string public symbol;
     uint8 public decimals;
@@ -58,15 +58,15 @@ contract BTR is owned{
 
     /* This notifies clients about the amount burnt */
     event Burn(address indexed from, uint256 value);
-	
+
 	/* This notifies clients about the amount frozen */
     event Freeze(address indexed from, uint256 value);
-	
+
 	/* This notifies clients about the amount unfrozen */
     event Unfreeze(address indexed from, uint256 value);
 
     /* Initializes contract with initial supply tokens to the creator of the contract */
-    constructor(string tokenName,string tokenSymbol,address tokenOwner) public {           
+    constructor(string tokenName,string tokenSymbol,address tokenOwner) public {
         decimals = 18; // Amount of decimals for display purposes
         totalSupply = 1000000000 * 10 ** uint(decimals); // Update total supply
         balanceOf[tokenOwner] = totalSupply;// Give the creator all initial tokens
@@ -78,7 +78,7 @@ contract BTR is owned{
     /* Send coins */
     function transfer(address _to, uint256 _value) public {
         require (_to != address(0));                               // Prevent transfer to 0x0 address. Use burn() instead
-		require (_value > 0); 
+		require (_value > 0);
         require (balanceOf[msg.sender] >= _value);           // Check if the sender has enough
         require (balanceOf[_to] + _value >= balanceOf[_to]); // Check for overflows
         balanceOf[msg.sender] = balanceOf[msg.sender].sub(_value);                     // Subtract from the sender
@@ -94,12 +94,12 @@ contract BTR is owned{
         allowance[msg.sender][_spender] = _value;
         return true;
     }
-       
+
 
     /* A contract attempts to get the coins */
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
         require (_to != address(0));                                // Prevent transfer to 0x0 address. Use burn() instead
-		require (_value > 0); 
+		require (_value > 0);
         require (balanceOf[_from] >= _value);                 // Check if the sender has enough
         require (balanceOf[_to] + _value >= balanceOf[_to]);  // Check for overflows
         require (_value <= allowance[_from][msg.sender]);     // Check allowance
@@ -112,37 +112,166 @@ contract BTR is owned{
 
     function burn(uint256 _value) public returns (bool success) {
         require (balanceOf[msg.sender] >= _value);            // Check if the sender has enough
-		require (_value > 0); 
+		require (_value > 0);
         balanceOf[msg.sender] = balanceOf[msg.sender].sub(_value);                      // Subtract from the sender
         totalSupply = totalSupply.sub(_value);                                // Updates totalSupply
         emit Burn(msg.sender, _value);
         return true;
     }
-	
+
 	function freeze(uint256 _value) public returns (bool success) {
         require (balanceOf[msg.sender] >= _value);            // Check if the sender has enough
-		require (_value > 0); 
+		require (_value > 0);
         balanceOf[msg.sender] = balanceOf[msg.sender].sub(_value);                      // Subtract from the sender
         freezeOf[msg.sender] = freezeOf[msg.sender].add(_value);                                // Updates totalSupply
         emit Freeze(msg.sender, _value);
         return true;
     }
-	
+
 	function unfreeze(uint256 _value) public returns (bool success) {
         require (freezeOf[msg.sender] >= _value);            // Check if the sender has enough
-		require (_value > 0); 
+		require (_value > 0);
         freezeOf[msg.sender] = freezeOf[msg.sender].sub(_value);                      // Subtract from the sender
 		balanceOf[msg.sender] = balanceOf[msg.sender].add(_value);
         emit Unfreeze(msg.sender, _value);
         return true;
     }
-	
+
 	// transfer balance to owner
 	function withdrawEther(uint256 amount) onlyOwner public {
 	    msg.sender.transfer(amount);
 	}
-	
+
 	// can accept ether
 	function() external payable {
     }
-}
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

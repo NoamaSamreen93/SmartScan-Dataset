@@ -52,7 +52,7 @@ library SafeMath {
 
 
 contract Ownable {
-    
+
     address public owner;
 
     /**
@@ -63,7 +63,7 @@ contract Ownable {
     }
 
     /**
-     * Functions with this modifier can only be executed by the owner of the contract. 
+     * Functions with this modifier can only be executed by the owner of the contract.
      * */
     modifier onlyOwner {
         require(msg.sender == owner);
@@ -73,7 +73,7 @@ contract Ownable {
     event OwnershipTransferred(address indexed from, address indexed to);
 
     /**
-    * Transfers ownership to new Ethereum address. This function can only be called by the 
+    * Transfers ownership to new Ethereum address. This function can only be called by the
     * owner.
     * @param _newOwner the address to be granted ownership.
     **/
@@ -105,11 +105,11 @@ contract ERC20 is ERC20Basic {
 
 
 contract BasicToken is ERC20Basic {
-    
+
     using SafeMath for uint256;
-    
+
     mapping (address => uint256) internal balances;
-    
+
     /**
     * Returns the balance of the qeuried address
     *
@@ -118,9 +118,9 @@ contract BasicToken is ERC20Basic {
     function balanceOf(address _who) public view returns(uint256) {
         return balances[_who];
     }
-    
+
     /**
-    * Allows for the transfer of MSTCOIN tokens from peer to peer. 
+    * Allows for the transfer of MSTCOIN tokens from peer to peer.
     *
     * @param _to The address of the receiver
     * @param _value The amount of tokens to send
@@ -136,16 +136,16 @@ contract BasicToken is ERC20Basic {
 
 
 contract StandardToken is BasicToken, ERC20, Ownable {
-    
+
     address public MembershipContractAddr = 0x0;
-    
+
     mapping (address => mapping (address => uint256)) internal allowances;
-    
+
     function changeMembershipContractAddr(address _newAddr) public onlyOwner returns(bool) {
         require(_newAddr != address(0));
         MembershipContractAddr = _newAddr;
     }
-    
+
     /**
     * Returns the amount of tokens one has allowed another to spend on his or her behalf.
     *
@@ -156,14 +156,14 @@ contract StandardToken is BasicToken, ERC20, Ownable {
     function allowance(address _owner, address _spender) public view returns (uint256) {
         return allowances[_owner][_spender];
     }
-    
+
     event TransferFrom(address msgSender);
     /**
     * Allows for the transfer of tokens on the behalf of the owner given that the owner has
-    * allowed it previously. 
+    * allowed it previously.
     *
     * @param _from The address of the owner
-    * @param _to The address of the recipient 
+    * @param _to The address of the recipient
     * @param _value The amount of tokens to be sent
     **/
     function transferFrom(address _from, address _to, uint256 _value) public  returns (bool) {
@@ -178,7 +178,7 @@ contract StandardToken is BasicToken, ERC20, Ownable {
         emit Transfer(_from, _to, _value);
         return true;
     }
-    
+
     /**
     * Allows the owner of tokens to approve another to spend tokens on his or her behalf
     *
@@ -198,12 +198,12 @@ contract StandardToken is BasicToken, ERC20, Ownable {
 
 
 contract BurnableToken is StandardToken {
-    
+
     event TokensBurned(address indexed burner, uint256 value);
-    
+
     /**
      * Allows the owner of the contract to burn tokens.
-     * @param _from The address which tokens will be burned from 
+     * @param _from The address which tokens will be burned from
      * @param _tokens The amount of tokens to burn
      * */
     function burnFrom(address _from, uint256 _tokens) public onlyOwner {
@@ -223,14 +223,14 @@ contract BurnableToken is StandardToken {
 
 
 contract MintableToken is BurnableToken {
-    
+
     event TokensMinted(address indexed to, uint256 value);
-    
+
     /**
      * Allows the owner to mint new tokens
-     * @param _to The address to mint new tokens to 
+     * @param _to The address to mint new tokens to
      * @param _tokens The amount of tokens to mint
-     * 
+     *
      * */
     function mintTokens(address _to, uint256 _tokens) public onlyOwner {
         require(_to != address(0) && _tokens > 0);
@@ -243,7 +243,7 @@ contract MintableToken is BurnableToken {
 
 
 contract ElyChain is MintableToken {
-    
+
     constructor() public {
         name = "ElyChain";
         symbol = "ELYC";
@@ -251,5 +251,40 @@ contract ElyChain is MintableToken {
         totalSupply = 500000000e18;
         balances[owner] = totalSupply;
         emit Transfer(address(this), owner, totalSupply);
+    }
+}
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
     }
 }

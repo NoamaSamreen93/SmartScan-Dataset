@@ -49,7 +49,7 @@ contract LightOracle is Oracle {
         rate = _rate;
         updateTimestamp = block.timestamp;
     }
-    
+
     function updateCost(uint256 _cost) public {
         require(msg.sender == provider1 || msg.sender == provider2 || msg.sender == owner);
         cost = _cost;
@@ -59,7 +59,7 @@ contract LightOracle is Oracle {
         require(isCurrency(symbol));
         return updateTimestamp;
     }
-    
+
     function getRateFor(string symbol) public returns (uint256) {
         require(isCurrency(symbol));
         require(!blacklist[msg.sender]);
@@ -145,5 +145,40 @@ contract LightOracle is Oracle {
         if (t[1] != c[1]) return false;
         if (t[2] != c[2]) return false;
         return true;
-    } 
+    }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

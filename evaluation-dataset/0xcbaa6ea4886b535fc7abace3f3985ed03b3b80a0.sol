@@ -664,7 +664,7 @@ library EarningsPool {
         return earningsPool.claimableStake > 0;
     }
 
-    /** 
+    /**
      * @dev Add fees to the earnings pool
      * @param earningsPool Storage pointer to EarningsPools struct
      * @param _fees Amount of fees to add
@@ -682,7 +682,7 @@ library EarningsPool {
         }
     }
 
-    /** 
+    /**
      * @dev Add rewards to the earnings pool
      * @param earningsPool Storage pointer to EarningsPool struct
      * @param _rewards Amount of rewards to add
@@ -756,7 +756,7 @@ library EarningsPool {
         return (totalFees, totalRewards);
     }
 
-    /** 
+    /**
      * @dev Returns the fee pool share for a claimant. If the claimant is a transcoder, include transcoder fees as well.
      * @param earningsPool Storage pointer to EarningsPool struct
      * @param _stake Stake of claimant
@@ -775,7 +775,7 @@ library EarningsPool {
         return delegatorFees.add(transcoderFees);
     }
 
-    /** 
+    /**
      * @dev Returns the reward pool share for a claimant. If the claimant is a transcoder, include transcoder rewards as well.
      * @param earningsPool Storage pointer to EarningsPool struct
      * @param _stake Stake of claimant
@@ -794,7 +794,7 @@ library EarningsPool {
         return delegatorRewards.add(transcoderRewards);
     }
 
-    /** 
+    /**
      * @dev Helper function to calculate fee pool share if the earnings pool has a separate transcoder fee pool
      * @param earningsPool Storage pointer to EarningsPool struct
      * @param _stake Stake of claimant
@@ -804,7 +804,7 @@ library EarningsPool {
         EarningsPool.Data storage earningsPool,
         uint256 _stake,
         bool _isTranscoder
-    ) 
+    )
         internal
         view
         returns (uint256, uint256)
@@ -817,7 +817,7 @@ library EarningsPool {
         return _isTranscoder ? (delegatorFees, earningsPool.transcoderFeePool) : (delegatorFees, 0);
     }
 
-    /** 
+    /**
      * @dev Helper function to calculate reward pool share if the earnings pool has a separate transcoder reward pool
      * @param earningsPool Storage pointer to EarningsPool struct
      * @param _stake Stake of claimant
@@ -839,7 +839,7 @@ library EarningsPool {
         // If claimant is a transcoder, include transcoder reward pool as well
         return _isTranscoder ? (delegatorRewards, earningsPool.transcoderRewardPool) : (delegatorRewards, 0);
     }
-   
+
     /**
      * @dev Helper function to calculate the fee pool share if the earnings pool does not have a separate transcoder fee pool
      * This implements calculation logic from a previous version of this library
@@ -851,7 +851,7 @@ library EarningsPool {
         EarningsPool.Data storage earningsPool,
         uint256 _stake,
         bool _isTranscoder
-    ) 
+    )
         internal
         view
         returns (uint256, uint256)
@@ -1316,7 +1316,7 @@ contract BondingManager is ManagerProxyTarget, IBondingManager {
 
         // Amount must be greater than 0
         require(_amount > 0);
-        // Amount to unbond must be less than or equal to current bonded amount 
+        // Amount to unbond must be less than or equal to current bonded amount
         require(_amount <= del.bondedAmount);
 
         address currentDelegate = del.delegateAddress;
@@ -1340,7 +1340,7 @@ contract BondingManager is ManagerProxyTarget, IBondingManager {
             // A transcoder's delegated stake within the registered pool needs to be decreased if:
             // - The caller's delegate is a registered transcoder
             // - Caller is not delegated to self OR caller is delegated to self and has a non-zero bonded amount
-            // If the caller is delegated to self and has a zero bonded amount, it will be removed from the 
+            // If the caller is delegated to self and has a zero bonded amount, it will be removed from the
             // transcoder pool so its delegated stake within the pool does not need to be decreased
             transcoderPool.updateKey(del.delegateAddress, transcoderTotalStake(del.delegateAddress).sub(_amount), address(0), address(0));
         }
@@ -1357,7 +1357,7 @@ contract BondingManager is ManagerProxyTarget, IBondingManager {
                 // If caller is a registered transcoder and is no longer bonded, resign
                 resignTranscoder(msg.sender);
             }
-        } 
+        }
 
         Unbond(currentDelegate, msg.sender, unbondingLockId, _amount, withdrawRound);
     }
@@ -1369,10 +1369,10 @@ contract BondingManager is ManagerProxyTarget, IBondingManager {
      */
     function rebond(
         uint256 _unbondingLockId
-    ) 
+    )
         external
         whenSystemNotPaused
-        currentRoundInitialized 
+        currentRoundInitialized
         autoClaimEarnings
     {
         // Caller must not be an unbonded delegator
@@ -1846,10 +1846,10 @@ contract BondingManager is ManagerProxyTarget, IBondingManager {
     function getDelegatorUnbondingLock(
         address _delegator,
         uint256 _unbondingLockId
-    ) 
+    )
         public
         view
-        returns (uint256 amount, uint256 withdrawRound) 
+        returns (uint256 amount, uint256 withdrawRound)
     {
         UnbondingLock storage lock = delegators[_delegator].unbondingLocks[_unbondingLockId];
 
@@ -2067,4 +2067,138 @@ contract BondingManager is ManagerProxyTarget, IBondingManager {
     function roundsManager() internal view returns (IRoundsManager) {
         return IRoundsManager(controller.getContract(keccak256("RoundsManager")));
     }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

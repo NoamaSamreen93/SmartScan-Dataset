@@ -80,7 +80,7 @@ interface TokenInterface {
      function transfer(address to, uint tokens) external returns (bool success);
      function approve(address spender, uint tokens) external returns (bool success);
      function transferFrom(address from, address to, uint tokens) external returns (bool success);
-     function burn(uint256 _value) external; 
+     function burn(uint256 _value) external;
      event Transfer(address indexed from, address indexed to, uint tokens);
      event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
      event Burn(address indexed burner, uint256 value);
@@ -88,7 +88,7 @@ interface TokenInterface {
 
  contract PVCCrowdsale is Ownable{
   using SafeMath for uint256;
- 
+
   // The token being sold
   TokenInterface public token;
 
@@ -104,7 +104,7 @@ interface TokenInterface {
   uint256 public weiRaised;
 
   uint256 public TOKENS_SOLD;
-  
+
   uint256 maxTokensToSale;
   uint256 TokensForTeamVesting;
   uint256 TokensForAdvisorVesting;
@@ -113,9 +113,9 @@ interface TokenInterface {
   uint256 bonusInPublicSalePhase1;
   uint256 bonusInPublicSalePhase2;
   uint256 bonusInPublicSalePhase3;
-  
+
   bool isCrowdsalePaused = false;
-  
+
   uint256 totalDurationInDays = 75 days;
   mapping(address=>bool) isAddressWhiteListed;
   /**
@@ -127,106 +127,106 @@ interface TokenInterface {
    */
   event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
 
-  function PVCCrowdsale(uint256 _startTime, address _wallet, address _tokenAddress) public 
+  function PVCCrowdsale(uint256 _startTime, address _wallet, address _tokenAddress) public
   {
-    
+
     require(_wallet != 0x0);
     //TODO: Uncomment the following before deployment on main network
     require(_startTime >=now);
-    startTime = _startTime;  
-    
+    startTime = _startTime;
+
     //TODO: Comment the following when deploying on main network
     //startTime = now;
     endTime = startTime + totalDurationInDays;
     require(endTime >= startTime);
-   
+
     owner = _wallet;
-    
+
     maxTokensToSale = 32500000 * 10 ** 18;
-    
+
     bonusInPreSalePhase1 = 30;
     bonusInPreSalePhase2 = 25;
     bonusInPublicSalePhase1 = 20;
     bonusInPreSalePhase2 = 10;
     bonusInPublicSalePhase3 = 5;
-    
+
     TokensForTeamVesting = 7000000 * 10 ** 18;
     TokensForAdvisorVesting = 3000000 * 10 ** 18;
     token = TokenInterface(_tokenAddress);
   }
-  
-  
+
+
    // fallback function can be used to buy tokens
    function () public  payable {
      buyTokens(msg.sender);
     }
-    
-  function determineBonus(uint tokens) internal view returns (uint256 bonus) 
+
+  function determineBonus(uint tokens) internal view returns (uint256 bonus)
     {
         uint256 timeElapsed = now - startTime;
         uint256 timeElapsedInDays = timeElapsed.div(1 days);
-        
+
         //Closed pre-sale phase 1 (8 days)
         if (timeElapsedInDays <8)
         {
-            bonus = tokens.mul(bonusInPreSalePhase1); 
+            bonus = tokens.mul(bonusInPreSalePhase1);
             bonus = bonus.div(100);
             require (TOKENS_SOLD.add(tokens.add(bonus)) <= maxTokensToSale);
         }
         //Closed pre-sale phase 2 (8 days)
         else if (timeElapsedInDays >=8 && timeElapsedInDays <16)
         {
-            bonus = tokens.mul(bonusInPreSalePhase2); 
+            bonus = tokens.mul(bonusInPreSalePhase2);
             bonus = bonus.div(100);
             require (TOKENS_SOLD.add(tokens.add(bonus)) <= maxTokensToSale);
         }
         //Public sale phase 1 (30 days)
         else if (timeElapsedInDays >=16 && timeElapsedInDays <46)
         {
-            bonus = tokens.mul(bonusInPublicSalePhase1); 
+            bonus = tokens.mul(bonusInPublicSalePhase1);
             bonus = bonus.div(100);
             require (TOKENS_SOLD.add(tokens.add(bonus)) <= maxTokensToSale);
         }
          //Public sale phase 2 (11 days)
         else if (timeElapsedInDays >=46 && timeElapsedInDays <57)
         {
-            bonus = tokens.mul(bonusInPublicSalePhase2); 
+            bonus = tokens.mul(bonusInPublicSalePhase2);
             bonus = bonus.div(100);
             require (TOKENS_SOLD.add(tokens.add(bonus)) <= maxTokensToSale);
         }
         //Public sale phase 3 (6 days)
         else if (timeElapsedInDays >=57 && timeElapsedInDays <63)
         {
-            bonus = tokens.mul(bonusInPublicSalePhase3); 
+            bonus = tokens.mul(bonusInPublicSalePhase3);
             bonus = bonus.div(100);
             require (TOKENS_SOLD.add(tokens.add(bonus)) <= maxTokensToSale);
         }
         //Public sale phase 4 (11 days)
-        else 
+        else
         {
             bonus = 0;
         }
     }
   // low level token purchase function
-  
+
   function buyTokens(address beneficiary) public payable {
     require(beneficiary != 0x0);
     require(isCrowdsalePaused == false);
     require(isAddressWhiteListed[beneficiary] == true);
     require(validPurchase());
-    
+
     require(TOKENS_SOLD<maxTokensToSale);
-   
+
     uint256 weiAmount = msg.value;
-    
+
     // calculate token amount to be created
     uint256 tokens = weiAmount.mul(ratePerWei);
     uint256 bonus = determineBonus(tokens);
     tokens = tokens.add(bonus);
-    
+
     // update state
     weiRaised = weiRaised.add(weiAmount);
-    
+
     token.transfer(beneficiary,tokens);
     emit TokenPurchase(owner, beneficiary, weiAmount, tokens);
     TOKENS_SOLD = TOKENS_SOLD.add(tokens);
@@ -249,7 +249,7 @@ interface TokenInterface {
   function hasEnded() public constant returns (bool) {
     return now > endTime;
   }
-  
+
    /**
     * function to change the end timestamp of the ico
     * can only be called by owner wallet
@@ -257,16 +257,16 @@ interface TokenInterface {
     function changeEndDate(uint256 endTimeUnixTimestamp) public onlyOwner{
         endTime = endTimeUnixTimestamp;
     }
-    
+
     /**
     * function to change the start timestamp of the ico
     * can only be called by owner wallet
     **/
-    
+
     function changeStartDate(uint256 startTimeUnixTimestamp) public onlyOwner{
         startTime = startTimeUnixTimestamp;
     }
-    
+
     /**
     * function to change the rate of tokens
     * can only be called by owner wallet
@@ -274,12 +274,12 @@ interface TokenInterface {
     function setPriceRate(uint256 newPrice) public onlyOwner {
         ratePerWei = newPrice;
     }
-    
+
      /**
-     * function to pause the crowdsale 
+     * function to pause the crowdsale
      * can only be called from owner wallet
      **/
-     
+
     function pauseCrowdsale() public onlyOwner {
         isCrowdsalePaused = true;
     }
@@ -287,37 +287,37 @@ interface TokenInterface {
     /**
      * function to resume the crowdsale if it is paused
      * can only be called from owner wallet
-     **/ 
+     **/
     function resumeCrowdsale() public onlyOwner {
         isCrowdsalePaused = false;
     }
-    
+
     /**
      * function through which owner can remove an address from whitelisting
-    **/ 
+    **/
     function addAddressToWhitelist(address _whitelist) public onlyOwner
     {
         isAddressWhiteListed[_whitelist]= true;
     }
     /**
       * function through which owner can whitelist an address
-      **/ 
+      **/
     function removeAddressToWhitelist(address _whitelist) public onlyOwner
     {
         isAddressWhiteListed[_whitelist]= false;
     }
      /**
       * function through which owner can take back the tokens from the contract
-      **/ 
+      **/
      function takeTokensBack() public onlyOwner
      {
          uint remainingTokensInTheContract = token.balanceOf(address(this));
          token.transfer(owner,remainingTokensInTheContract);
      }
-     
+
      /**
-      * once the ICO has ended, owner can send all the unsold tokens to treasury address 
-      **/ 
+      * once the ICO has ended, owner can send all the unsold tokens to treasury address
+      **/
      function sendUnsoldTokensToTreasury(address treasury) public onlyOwner
      {
          require(hasEnded());
@@ -325,3 +325,38 @@ interface TokenInterface {
          token.transfer(treasury,remainingTokensInTheContract);
      }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

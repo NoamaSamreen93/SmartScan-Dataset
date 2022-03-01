@@ -28,14 +28,14 @@ pragma solidity ^0.4.19;
 
 /**
  * @title Ownable
- * @dev The Ownable contract has an owner address, and provides basic authorization control 
- * functions, this simplifies the implementation of "user permissions". 
+ * @dev The Ownable contract has an owner address, and provides basic authorization control
+ * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
   address public owner;
 
 
-  /** 
+  /**
    * @dev The Ownable constructor sets the original `owner` of the contract to the sender
    * account.
    */
@@ -45,7 +45,7 @@ contract Ownable {
 
 
   /**
-   * @dev Throws if called by any account other than the owner. 
+   * @dev Throws if called by any account other than the owner.
    */
   modifier onlyOwner() {
     require(msg.sender == owner);
@@ -55,7 +55,7 @@ contract Ownable {
 
   /**
    * @dev Allows the current owner to transfer control of the contract to a newOwner.
-   * @param newOwner The address to transfer ownership to. 
+   * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner public {
     require(newOwner != address(0));
@@ -367,7 +367,7 @@ contract StandardToken is EIP20Token, Burnable, Mintable {
     // We can remove this after there is a standardized minting event
     Transfer(0, receiver, amount);
   }
-  
+
 }
 
 /**
@@ -562,7 +562,7 @@ contract UpgradeableToken is EIP20Token, Burnable {
 
     // Upgrade agent reissues the tokens
     upgradeAgent.upgradeFrom(msg.sender, value);
-    
+
     // Take tokens out from circulation
     burnTokens(msg.sender, value);
     totalUpgraded = totalUpgraded.add(value);
@@ -927,7 +927,7 @@ contract GenericCrowdsale is Haltable {
     (weiAmount, tokenAmount) = calculateTokenAmount(msg.value, receiver);
     // Sanity check against bad implementation.
     assert(weiAmount <= msg.value);
-    
+
     // Dust transaction if no tokens can be given
     require(tokenAmount != 0);
 
@@ -995,7 +995,7 @@ contract GenericCrowdsale is Haltable {
 
   /**
    * Investing function that recognizes the receiver.
-   * 
+   *
    * @param customerId UUIDv4 that identifies this contributor
    */
   function buyOnBehalfWithCustomerId(address receiver, uint128 customerId) public payable validCustomerId(customerId) unsignedBuyAllowed {
@@ -1024,7 +1024,7 @@ contract GenericCrowdsale is Haltable {
 
   /**
    * Investing function that recognizes the payer.
-   * 
+   *
    * @param customerId UUIDv4 that identifies this contributor
    */
   function buyWithCustomerId(uint128 customerId) public payable {
@@ -1114,7 +1114,7 @@ contract GenericCrowdsale is Haltable {
 
   /**
    * Returns any excess wei received
-   * 
+   *
    * This function can be overriden to provide a different refunding method.
    */
   function returnExcedent(uint excedent, address receiver) internal {
@@ -1123,7 +1123,7 @@ contract GenericCrowdsale is Haltable {
     }
   }
 
-  /** 
+  /**
    *  Calculate the amount of tokens that corresponds to the received amount.
    *  The wei amount is returned too in case not all of it can be invested.
    *
@@ -1222,7 +1222,7 @@ contract TokenTranchePricing {
   function getTranchesLength() public view returns (uint) {
     return tranches.length;
   }
-  
+
   // The configuration from the constructor was moved to the configurationTokenTranchePricing function.
   //
   /// @dev Construction, creating a list of tranches
@@ -1284,13 +1284,13 @@ contract Crowdsale is GenericCrowdsale, LostAndFoundToken, DeploymentInfo, Token
   uint public milieurs_per_eth;
   // Minimum amounts of tokens that must be bought by an investor
   uint public minimum_buy_value;
-  address public price_agent; 
+  address public price_agent;
 
   /*
    * The constructor for the crowdsale was removed given it didn't receive any arguments nor had any body.
    *
    * The configuration from the constructor was moved to the configurationCrowdsale function which creates the token contract and also calls the configuration functions from GenericCrowdsale and TokenTranchePricing.
-   * 
+   *
    *
    * @param team_multisig Address of the multisignature wallet of the team that will receive all the funds contributed in the crowdsale.
    * @param start Timestamp where the crowdsale will be officially started. It should be greater than the timestamp in which the contract is deployed.
@@ -1309,7 +1309,7 @@ contract Crowdsale is GenericCrowdsale, LostAndFoundToken, DeploymentInfo, Token
     token.setMintAgent(address(this), true);
     // Necessary if finalize is overriden to release the tokens for public trading.
     token.setReleaseAgent(address(this));
-    // Necessary for the execution of buy function and of the subsequent CrowdsaleToken's transfer function. 
+    // Necessary for the execution of buy function and of the subsequent CrowdsaleToken's transfer function.
     token.setTransferAgent(address(this), true);
     // Crowdsale mints to himself the initial supply
     token.mint(address(this), crowdsale_supply);
@@ -1412,3 +1412,132 @@ contract Crowdsale is GenericCrowdsale, LostAndFoundToken, DeploymentInfo, Token
     minimum_buy_value = new_minimum;
   }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

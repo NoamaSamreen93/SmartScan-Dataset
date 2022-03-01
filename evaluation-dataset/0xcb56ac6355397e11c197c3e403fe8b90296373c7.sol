@@ -77,9 +77,9 @@ contract MonsterAccessControl {
 
      // The addresses of the accounts (or contracts) that can execute actions within each roles.
     address public adminAddress;
-    
 
-  
+
+
 
     /// @dev Access modifier for CEO-only functionality
     modifier onlyAdmin() {
@@ -87,9 +87,9 @@ contract MonsterAccessControl {
         _;
     }
 
-  
 
-    
+
+
 }
 
 // This contract stores all data on the blockchain
@@ -99,8 +99,8 @@ contract MonsterAccessControl {
 // that no one including us can change(!)
 contract MonstersData {
 
-    address coreContract; // 
-    
+    address coreContract; //
+
 
 
     struct Monster {
@@ -112,13 +112,13 @@ contract MonstersData {
         // special attributes and stats
        // uint16 generation;
 
-        uint16 hp; // health points 
+        uint16 hp; // health points
         uint16 attack; // attack points
         uint16 defense; // defense points
         uint16 spAttack; // special attack
         uint16 spDefense; // special defense
         uint16 speed; // speed responsible of who attacks first(!)
-        
+
 
         uint16 typeOne;
         uint16 typeTwo;
@@ -126,11 +126,11 @@ contract MonstersData {
         uint16 mID; // this id (from 1 to 151) is responsible for everything visually like showing the real deal!
         bool tradeable;
         //uint16 uID; // unique id
-        
+
         // These attributes are handled by mappings since they would overflow the maximum stack
         //bool female
         // string nickname
-        
+
 
     }
 
@@ -142,15 +142,15 @@ contract MonstersData {
         uint16 spAttack;
         uint16 spDefense;
         uint16 speed;
-        
+
     }
 
     // lomonsterion struct used for travelling around the "world"
-    // 
+    //
     struct Area {
         // areaID used in-engine to determine world position
-       
-             
+
+
         // minimum level to enter this area...
         uint16 minLevel;
     }
@@ -158,37 +158,37 @@ contract MonstersData {
     struct Trainer {
         // timestamp of block when this player/trainer was created
         uint64 birthTime;
-        
+
         // add username
         string username;
-       
-        
+
+
         // current area in the "world"
         uint16 currArea;
-        
+
         address owner;
-        
-       
-        
+
+
+
     }
 
 
-   
+
 
 
     // take timestamp of block this game was created on the blockchain
     uint64 creationBlock = uint64(now);
-   
-   
-
-   
-  
-    
 
 
-    
-  
-        
+
+
+
+
+
+
+
+
+
 
 
 }
@@ -214,16 +214,16 @@ contract MonstersBase is MonsterAccessControl, MonstersData {
         require(!lockedMonsterCreator);
         MonsterCreatorInterface candidateContract = MonsterCreatorInterface(_address);
 
-       
+
 
         monsterCreator = candidateContract;
         lockedMonsterCreator = true;
 
     }
-    
+
     // An approximation of currently how many seconds are in between blocks.
     uint256 public secondsPerBlock = 15;
-  
+
 
     // array containing all monsters in existence
     Monster[] monsters;
@@ -231,11 +231,11 @@ contract MonstersBase is MonsterAccessControl, MonstersData {
     uint8[] areas;
 
     uint8 areaIndex = 0;
-    
+
 
 
       mapping(address => Trainer) public addressToTrainer;
-    
+
 
     /// @dev A mapping from monster IDs to the address that owns them. All monster have
     ///  some valid owner address, even gen0 monster are created with a non-zero owner.
@@ -247,30 +247,30 @@ contract MonstersBase is MonsterAccessControl, MonstersData {
 
 
     mapping (uint256 => address) public monsterIndexToApproved;
-    
+
     mapping (uint256 => string) public monsterIdToNickname;
-    
+
     mapping (uint256 => bool) public monsterIdToTradeable;
-    
+
     mapping (uint256 => uint256) public monsterIdToGeneration;
 
 
      mapping (uint256 => MonsterBaseStats) public baseStats;
 
      mapping (uint256 => uint8[7]) public monsterIdToIVs;
-    
 
 
-    // adds new area to world 
+
+    // adds new area to world
     function _createArea() internal {
-            
+
             areaIndex++;
             areas.push(areaIndex);
-            
-            
+
+
         }
 
-    
+
 
 
     function _createMonster(
@@ -286,12 +286,12 @@ contract MonstersBase is MonsterAccessControl, MonstersData {
         address _owner,
         uint256 _mID,
         bool tradeable
-        
+
     )
         internal
         returns (uint)
         {
-           
+
 
             Monster memory _monster = Monster({
                 birthTime: uint64(now),
@@ -305,20 +305,20 @@ contract MonstersBase is MonsterAccessControl, MonstersData {
                 typeTwo: uint16(_typeTwo),
                 mID: uint16(_mID),
                 tradeable: tradeable
-                
+
 
 
             });
             uint256 newMonsterId = monsters.push(_monster) - 1;
             monsterIdToTradeable[newMonsterId] = tradeable;
             monsterIdToGeneration[newMonsterId] = _generation;
-           
+
 
             require(newMonsterId == uint256(uint32(newMonsterId)));
-            
-           
-          
-            
+
+
+
+
              monsterIdToNickname[newMonsterId] = "";
 
             _transfer(0, _owner, newMonsterId);
@@ -327,51 +327,51 @@ contract MonstersBase is MonsterAccessControl, MonstersData {
 
 
         }
-    
+
     function _createTrainer(string _username, uint16 _starterId, address _owner)
         internal
         returns (uint mon)
         {
-            
-           
+
+
             Trainer memory _trainer = Trainer({
-               
+
                 birthTime: uint64(now),
                 username: string(_username),
                 currArea: uint16(1), // sets to first area!,
                 owner: address(_owner)
-                
+
             });
             addressToTrainer[_owner] = _trainer;
-            
+
             // starter stats are hardcoded!
             if (_starterId == 1) {
                 uint8[8] memory Stats = uint8[8](monsterCreator.getMonsterStats(1));
                 mon = _createMonster(0, Stats[0], Stats[1], Stats[2], Stats[3], Stats[4], Stats[5], Stats[6], Stats[7], _owner, 1, false);
-               
+
             } else if (_starterId == 2) {
                 uint8[8] memory Stats2 = uint8[8](monsterCreator.getMonsterStats(4));
                 mon = _createMonster(0, Stats2[0], Stats2[1], Stats2[2], Stats2[3], Stats2[4], Stats2[5], Stats2[6], Stats2[7], _owner, 4, false);
-                
+
             } else if (_starterId == 3) {
                 uint8[8] memory Stats3 = uint8[8](monsterCreator.getMonsterStats(7));
                 mon = _createMonster(0, Stats3[0], Stats3[1], Stats3[2], Stats3[3], Stats3[4], Stats3[5], Stats3[6], Stats3[7], _owner, 7, false);
-                
+
             }
-            
+
         }
 
 
     function _moveToArea(uint16 _newArea, address player) internal {
-            
-            addressToTrainer[player].currArea = _newArea;
-          
-        }   
-        
-    
-     
 
-    
+            addressToTrainer[player].currArea = _newArea;
+
+        }
+
+
+
+
+
     // assigns ownership of monster to address
     function _transfer(address _from, address _to, uint256 _tokenId) internal {
         ownershipTokenCount[_to]++;
@@ -396,7 +396,7 @@ contract MonstersBase is MonsterAccessControl, MonstersData {
     }
 
 
-    
+
 
 
 }
@@ -470,12 +470,12 @@ contract MonsterOwnership is MonstersBase, ERC721 {
     function _owns(address _claimant, uint256 _tokenId) internal view returns (bool) {
         return monsterIndexToOwner[_tokenId] == _claimant;
     }
-    
+
     function _isTradeable(uint256 _tokenId) external view returns (bool) {
         return monsterIdToTradeable[_tokenId];
     }
-    
-    
+
+
     /// @dev Checks if a given address currently has transferApproval for a particular monster.
     /// @param _claimant the address we are confirming monster is approved for.
     /// @param _tokenId monster id, only valid when > 0
@@ -491,8 +491,8 @@ contract MonsterOwnership is MonstersBase, ERC721 {
     function _approve(uint256 _tokenId, address _approved) internal {
         monsterIndexToApproved[_tokenId] = _approved;
     }
-    
-    
+
+
     function balanceOf(address _owner) public view returns (uint256 count) {
         return ownershipTokenCount[_owner];
     }
@@ -505,7 +505,7 @@ contract MonsterOwnership is MonstersBase, ERC721 {
         // The contract should never own any monsters (except very briefly
         // after a gen0 monster is created and before it goes on auction).
         require(_to != address(this));
-        
+
 
         // You can only send your own monster.
         require(_owns(msg.sender, _tokenId));
@@ -514,8 +514,8 @@ contract MonsterOwnership is MonstersBase, ERC721 {
         _transfer(msg.sender, _to, _tokenId);
     }
 
-    
-    
+
+
 
 /// @notice Grant another address the right to transfer a specific monster via
     ///  transferFrom(). This is the preferred flow for transfering NFTs to contracts.
@@ -582,7 +582,7 @@ contract MonsterOwnership is MonstersBase, ERC721 {
             uint256 totalMonsters = totalSupply();
             uint256 resultIndex = 0;
 
-            
+
             uint256 monsterId;
 
             for (monsterId = 0; monsterId <= totalMonsters; monsterId++) {
@@ -597,7 +597,7 @@ contract MonsterOwnership is MonstersBase, ERC721 {
     }
 
 
-   
+
 
     /// @dev Adapted from memcpy() by @arachnid (Nick Johnson <arachnid@notdot.net>)
     ///  This method is licenced under the Apache License.
@@ -654,12 +654,12 @@ contract MonsterOwnership is MonstersBase, ERC721 {
 }
 
 contract MonsterAuctionBase {
-    
-    
+
+
     // Reference to contract tracking NFT ownership
     ERC721 public nonFungibleContract;
     ChainMonstersCore public core;
-    
+
     struct Auction {
 
         // current owner
@@ -674,7 +674,7 @@ contract MonsterAuctionBase {
         uint256 id;
     }
 
-  
+
 
     // Cut owner takes on each auction, measured in basis points (1/100 of a percent).
     // Values 0-10,000 map to 0%-100%
@@ -684,7 +684,7 @@ contract MonsterAuctionBase {
     mapping(uint256 => Auction) tokenIdToAuction;
 
     mapping(uint256 => address) public auctionIdToSeller;
-    
+
     mapping (address => uint256) public ownershipAuctionCount;
 
 
@@ -700,7 +700,7 @@ contract MonsterAuctionBase {
 
 
     function _addAuction(uint256 _tokenId, Auction _auction) internal {
-        
+
         tokenIdToAuction[_tokenId] = _auction;
 
         AuctionCreated(
@@ -709,20 +709,20 @@ contract MonsterAuctionBase {
             uint256(_auction.id),
             address(_auction.seller)
         );
-       
+
     }
 
 
     function _cancelAuction(uint256 _tokenId, address _seller) internal {
-        
+
         Auction storage _auction = tokenIdToAuction[_tokenId];
 
         uint256 uID = _auction.id;
-        
+
         _removeAuction(_tokenId);
         ownershipAuctionCount[_seller]--;
         _transfer(_seller, _tokenId);
-        
+
         AuctionCancelled(_tokenId, uID);
     }
 
@@ -732,7 +732,7 @@ contract MonsterAuctionBase {
         returns (uint256)
         {
             Auction storage auction = tokenIdToAuction[_tokenId];
-        
+
 
         require(_isOnAuction(auction));
 
@@ -800,7 +800,7 @@ contract MonsterAuctionBase {
         return _price * ownerCut / 10000;
     }
 
-    
+
 
 }
 
@@ -821,69 +821,69 @@ contract MonsterAuction is  MonsterAuctionBase, Ownable {
         ownerCut = _cut;
 
         ERC721 candidateContract = ERC721(_nftAddress);
-        
+
         nonFungibleContract = candidateContract;
         ChainMonstersCore candidateCoreContract = ChainMonstersCore(_nftAddress);
         core = candidateCoreContract;
 
-        
+
     }
-    
+
     // only possible to decrease ownerCut!
     function setOwnerCut(uint256 _cut) external onlyOwner {
         require(_cut <= ownerCut);
         ownerCut = _cut;
     }
-    
-    
+
+
     function _owns(address _claimant, uint256 _tokenId) internal view returns (bool) {
         return (nonFungibleContract.ownerOf(_tokenId) == _claimant);
     }
-    
+
     function _escrow(address _owner, uint256 _tokenId) internal {
         // it will throw if transfer fails
         nonFungibleContract.transferFrom(_owner, this, _tokenId);
     }
 
     function withdrawBalance() external onlyOwner {
-       
-       
+
+
        uint256 balance = this.balance;
-       
-       
+
+
         owner.transfer(balance);
 
-        
-       
+
+
     }
 
-    
+
     function tokensInAuctionsOfOwner(address _owner) external view returns(uint256[] auctionTokens) {
-        
+
            uint256 numAuctions = ownershipAuctionCount[_owner];
 
-            
-        
+
+
             uint256[] memory result = new uint256[](numAuctions);
             uint256 totalAuctions = core.totalSupply();
             uint256 resultIndex = 0;
 
-            
+
             uint256 auctionId;
 
             for (auctionId = 0; auctionId <= totalAuctions; auctionId++) {
-                
+
                 Auction storage auction = tokenIdToAuction[auctionId];
                 if (auction.seller == _owner) {
-                    
+
                     result[resultIndex] = auctionId;
                     resultIndex++;
                 }
             }
 
             return result;
-        
-        
+
+
     }
 
 
@@ -895,9 +895,9 @@ contract MonsterAuction is  MonsterAuctionBase, Ownable {
              require(_owns(msg.sender, _tokenId));
              _escrow(msg.sender, _tokenId);
 
-            
 
-            
+
+
              Auction memory auction = Auction(
                  _seller,
                  uint256(_price),
@@ -907,7 +907,7 @@ contract MonsterAuction is  MonsterAuctionBase, Ownable {
 
             auctionIdToSeller[auctionIndex] = _seller;
             ownershipAuctionCount[_seller]++;
-            
+
              auctionIndex++;
              _addAuction(_tokenId, auction);
         }
@@ -917,23 +917,23 @@ contract MonsterAuction is  MonsterAuctionBase, Ownable {
             // buy will throw if the bid or funds transfer fails
             _buy (_tokenId, msg.value);
             _transfer(msg.sender, _tokenId);
-            
-            
+
+
         }
 
-    
+
     function cancelAuction(uint256 _tokenId) external {
             Auction storage auction = tokenIdToAuction[_tokenId];
             require(_isOnAuction(auction));
 
             address seller = auction.seller;
             require(msg.sender == seller);
-            
-            
+
+
             _cancelAuction(_tokenId, seller);
         }
 
-    
+
     function getAuction(uint256 _tokenId)
         external
         view
@@ -968,7 +968,7 @@ contract MonsterAuction is  MonsterAuctionBase, Ownable {
 
 contract ChainMonstersAuction is MonsterOwnership {
 
-  
+
 
 
     function setMonsterAuctionAddress(address _address) external onlyAdmin {
@@ -990,30 +990,30 @@ contract ChainMonstersAuction is MonsterOwnership {
     uint256 public gen0CreatedCount;
 
 
-    
+
     // its stats are completely dependent on the spawn alghorithm
     function createPromoMonster(uint256 _mId, address _owner) external onlyAdmin {
-       
+
 
        // during generation we have to keep in mind that we have only 10,000 tokens available
        // which have to be divided by 151 monsters, some rarer than others
        // see WhitePaper for gen0/promo monster plan
-        
+
         require(promoCreatedCount < PROMO_CREATION_LIMIT);
 
         promoCreatedCount++;
         uint8[8] memory Stats = uint8[8](monsterCreator.getMonsterStats(uint256(_mId)));
         uint8[7] memory IVs = uint8[7](monsterCreator.getGen0IVs());
-        
+
         uint256 monsterId = _createMonster(0, Stats[0], Stats[1], Stats[2], Stats[3], Stats[4], Stats[5], Stats[6], Stats[7], _owner, _mId, true);
         monsterIdToTradeable[monsterId] = true;
 
         monsterIdToIVs[monsterId] = IVs;
-        
-       
+
+
     }
 
-   
+
 
 
     function createGen0Auction(uint256 _mId, uint256 price) external onlyAdmin {
@@ -1030,10 +1030,10 @@ contract ChainMonstersAuction is MonsterOwnership {
 
 
         gen0CreatedCount++;
-        
+
     }
 
-    
+
 }
 
 
@@ -1044,113 +1044,113 @@ contract ChainMonstersAuction is MonsterOwnership {
 contract MonsterChampionship is Ownable {
 
     bool public isMonsterChampionship = true;
-    
+
     ChainMonstersCore core;
-    
-    // list of top ten 
+
+    // list of top ten
     address[10] topTen;
 
     // holds the address current "world" champion
     address public currChampion;
-    
-    
+
+
     mapping (address => uint256) public addressToPowerlevel;
     mapping (uint256 => address) public rankToAddress;
-    
 
-   
-    
-    
+
+
+
+
      // try to beat every other player in the top10 with your strongest monster!
-    // effectively looping through all top10 players, beating them one by one 
+    // effectively looping through all top10 players, beating them one by one
     // and if strong enough placing your in the top10 as well
     function contestChampion(uint256 _tokenId) external {
             uint maxIndex = 9;
-            
-           
-            
-           
-            
+
+
+
+
+
             // fail tx if player is already champion!
             // in theory players could increase their powerlevel by contesting themselves but
             // this check stops that from happening so other players have the chance to
             // become the temporary champion!
             if (currChampion == msg.sender)
                 revert();
-                
-            
-           require(core.isTrainer(msg.sender));        
+
+
+           require(core.isTrainer(msg.sender));
            require(core.monsterIndexToOwner(_tokenId) == msg.sender);
-            
-           
+
+
            uint myPowerlevel = core.getMonsterPowerLevel(_tokenId);
 
-           
+
            // checks if this transaction is useless
            // since we can't fight against ourself!
            // also stops reentrancy attacks
            require(myPowerlevel > addressToPowerlevel[msg.sender]);
-           
-          
+
+
            uint myRank = 0;
-            
+
             for (uint i=0; i<=maxIndex; i++) {
                 //if (addres)
                 if ( myPowerlevel > addressToPowerlevel[topTen[i]] ) {
                     // you have beaten this one so increase temporary rank
                     myRank = i;
-                    
+
                     if (myRank == maxIndex) {
                         currChampion = msg.sender;
                     }
-                    
-                    
-                    
-                    
+
+
+
+
                 }
-               
-                
-                
-               
-               
+
+
+
+
+
             }
-            
+
             addressToPowerlevel[msg.sender] = myPowerlevel;
-            
+
             address[10] storage newTopTen = topTen;
-            
+
             if (currChampion == msg.sender) {
                 for (uint j=0; j<maxIndex; j++) {
-                    // remove ourselves from this list in case 
+                    // remove ourselves from this list in case
                     if (newTopTen[j] == msg.sender) {
                         newTopTen[j] = 0x0;
                         break;
                     }
-                    
+
                 }
             }
-            
-            
+
+
             for (uint x=0; x<=myRank; x++) {
                 if (x == myRank) {
-                    
-                   
+
+
                     newTopTen[x] = msg.sender;
                 } else {
                     if (x < maxIndex)
-                        newTopTen[x] = topTen[x+1];    
+                        newTopTen[x] = topTen[x+1];
                 }
-                
-                
+
+
             }
-            
-            
+
+
             topTen = newTopTen;
-            
+
         }
-    
-    
-    
+
+
+
     function getTopPlayers()
         external
         view
@@ -1159,25 +1159,25 @@ contract MonsterChampionship is Ownable {
         ) {
             players = topTen;
         }
-    
 
 
 
-    
-    
-    
-    
+
+
+
+
+
     function MonsterChampionship(address coreContract) public {
        core = ChainMonstersCore(coreContract);
     }
-    
+
     function withdrawBalance() external onlyOwner {
-       
+
         uint256 balance = this.balance;
-       
-       
+
+
         owner.transfer(balance);
-        
+
     }
 
 
@@ -1195,30 +1195,30 @@ contract MonsterCreatorInterface is Ownable {
     function rand(uint8 min, uint8 max) public returns (uint8) {
         nonce++;
         uint8 result = (uint8(sha3(block.blockhash(block.number-1), nonce ))%max);
-        
+
         if (result < min)
         {
             result = result+min;
         }
         return result;
     }
-    
-    
+
+
 
 
     function shinyRand(uint16 min, uint16 max) public returns (uint16) {
         nonce++;
         uint16 result = (uint16(sha3(block.blockhash(block.number-1), nonce ))%max);
-        
+
         if (result < min)
         {
             result = result+min;
         }
         return result;
     }
-    
-    
-    
+
+
+
     mapping(uint256 => uint8[8]) public baseStats;
 
     function addBaseStats(uint256 _mId, uint8[8] data) external onlyOwner {
@@ -1229,21 +1229,21 @@ contract MonsterCreatorInterface is Ownable {
         require(baseStats[_mId][0] == 0);
         baseStats[_mId] = data;
     }
-    
+
     function _addBaseStats(uint256 _mId, uint8[8] data) internal {
-        
-        
+
+
         baseStats[_mId] = data;
         lockedMonsterStatsCount++;
     }
 
 
-    
 
 
-    
+
+
     function MonsterCreatorInterface() public {
-        
+
        // these monsters are already down and "locked" down stats/design wise
         _addBaseStats(1, [45, 49, 49, 65, 65, 45, 12, 4]);
         _addBaseStats(2, [60, 62, 63, 80, 80, 60, 12, 4]);
@@ -1255,13 +1255,13 @@ contract MonsterCreatorInterface is Ownable {
         _addBaseStats(8, [59, 63, 80, 65, 80, 58, 11, 14]);
         _addBaseStats(9, [79, 83, 100, 85, 105, 78, 11, 14]);
         _addBaseStats(10, [40, 35, 30, 20, 20, 50, 7, 4]);
-        
+
         _addBaseStats(149, [55, 50, 45, 135, 95, 120, 8, 14]);
         _addBaseStats(150, [91, 134, 95, 100, 100, 80, 2, 5]);
         _addBaseStats(151, [100, 100, 100, 100, 100, 100, 5, 19]);
     }
-    
-    // this serves as a lookup for new monsters to be generated since all monsters 
+
+    // this serves as a lookup for new monsters to be generated since all monsters
     // of the same id share the base stats
     function getMonsterStats( uint256 _mID) external constant returns(uint8[8] stats) {
            stats[0] = baseStats[_mID][0];
@@ -1272,8 +1272,8 @@ contract MonsterCreatorInterface is Ownable {
            stats[5] = baseStats[_mID][5];
            stats[6] = baseStats[_mID][6];
            stats[7] = baseStats[_mID][7];
-           
-          
+
+
 
         }
 
@@ -1298,7 +1298,7 @@ contract MonsterCreatorInterface is Ownable {
                 ivs[4] = uint8(rand(10, 31));
                 ivs[5] = uint8(rand(10, 31));
                 ivs[6] = 1;
-                
+
             } else {
                 ivs[0] = uint8(rand(0, 31));
                 ivs[1] = uint8(rand(0, 31));
@@ -1309,7 +1309,7 @@ contract MonsterCreatorInterface is Ownable {
                 ivs[6] = 0;
             }
 
-            
+
 
         }
 
@@ -1317,7 +1317,7 @@ contract MonsterCreatorInterface is Ownable {
         // gen0 monsters profit from shiny boost while shiny gen0s have potentially even higher IVs!
         // further increasing the rarity by also doubling the shiny chance!
         function getGen0IVs() external returns (uint8[7] ivs) {
-            
+
             bool shiny = false;
 
             uint16 chance = shinyRand(1, 4096);
@@ -1325,7 +1325,7 @@ contract MonsterCreatorInterface is Ownable {
             if (chance == 42) {
                 shiny = true;
             }
-            
+
             if (shiny) {
                  ivs[0] = uint8(rand(15, 31));
                 ivs[1] = uint8(rand(15, 31));
@@ -1334,7 +1334,7 @@ contract MonsterCreatorInterface is Ownable {
                 ivs[4] = uint8(rand(15, 31));
                 ivs[5] = uint8(rand(15, 31));
                 ivs[6] = 1;
-                
+
             } else {
                 ivs[0] = uint8(rand(10, 31));
                 ivs[1] = uint8(rand(10, 31));
@@ -1344,57 +1344,57 @@ contract MonsterCreatorInterface is Ownable {
                 ivs[5] = uint8(rand(10, 31));
                 ivs[6] = 0;
             }
-            
+
         }
-        
+
         function withdrawBalance() external onlyOwner {
-       
+
         uint256 balance = this.balance;
-       
-       
+
+
         owner.transfer(balance);
-        
+
     }
 }
 
 contract GameLogicContract {
-    
+
     bool public isGameLogicContract = true;
-    
+
     function GameLogicContract() public {
-        
+
     }
 }
 
 contract ChainMonstersCore is ChainMonstersAuction, Ownable {
 
 
-   // using a bool to enable us to prepare the game 
+   // using a bool to enable us to prepare the game
    bool hasLaunched = false;
 
 
     // this address will hold future gamelogic in place
     address gameContract;
-    
+
 
     function ChainMonstersCore() public {
 
         adminAddress = msg.sender;
-        
+
 
         _createArea(); // area 1
         _createArea(); // area 2
-        
-    
 
-        
+
+
+
     }
-    
+
     // we don't know the exact interfaces yet so use the lockedMonsterStats value to determine if the game is "ready"
     // see WhitePaper for explaination for our upgrade and development roadmap
     function setGameLogicContract(address _candidateContract) external onlyOwner {
         require(monsterCreator.lockedMonsterStatsCount() == 151);
-        
+
         require(GameLogicContract(_candidateContract).isGameLogicContract());
         gameContract = _candidateContract;
     }
@@ -1404,79 +1404,79 @@ contract ChainMonstersCore is ChainMonstersAuction, Ownable {
     // contract as well we have to prepare this core for our future updates where
     // players can freely roam the world and hunt ChainMonsters thus generating more
     function spawnMonster(uint256 _mId, address _owner) external {
-         
+
         require(msg.sender == gameContract);
-        
+
         uint8[8] memory Stats = uint8[8](monsterCreator.getMonsterStats(uint256(_mId)));
         uint8[7] memory IVs = uint8[7](monsterCreator.getMonsterIVs());
-        
-        // important to note that the IV generators do not use Gen0 methods and are Generation 1 
+
+        // important to note that the IV generators do not use Gen0 methods and are Generation 1
         // this means there won't be more than the 10,000 Gen0 monsters sold during the development through the marketplace
         uint256 monsterId = _createMonster(1, Stats[0], Stats[1], Stats[2], Stats[3], Stats[4], Stats[5], Stats[6], Stats[7], _owner, _mId, true);
         monsterIdToTradeable[monsterId] = true;
 
         monsterIdToIVs[monsterId] = IVs;
     }
-    
-    
-    // used to add playable content to the game 
+
+
+    // used to add playable content to the game
     // monsters will only spawn in certain areas so some are locked on release
     // due to the game being in active development on "launch"
     // each monster has a maximum number of 3 areas where it can appear
-    // 
+    //
      function createArea() public onlyAdmin {
             _createArea();
         }
 
     function createTrainer(string _username, uint16 _starterId) public {
-            
+
             require(hasLaunched);
 
             // only one trainer/account per ethereum address
             require(addressToTrainer[msg.sender].owner == 0);
-           
+
            // valid input check
             require(_starterId == 1 || _starterId == 2 || _starterId == 3 );
-            
+
             uint256 mon = _createTrainer(_username, _starterId, msg.sender);
-            
+
             // due to stack limitations we have to assign the IVs here:
             uint8[7] memory IVs = uint8[7](monsterCreator.getMonsterIVs());
             monsterIdToIVs[mon] = IVs;
-            
+
         }
-        
-        
+
+
     function changeUsername(string _name) public {
             require(addressToTrainer[msg.sender].owner == msg.sender);
-            
-            
+
+
             addressToTrainer[msg.sender].username = _name;
         }
-        
+
     function changeMonsterNickname(uint256 _tokenId, string _name) public {
             // users won't be able to rename a monster that is part of an auction
             require(_owns(msg.sender, _tokenId));
-            
-            
+
+
             // some string checks...?
             monsterIdToNickname[_tokenId] = _name;
         }
 
     function moveToArea(uint16 _newArea) public {
-           
+
             // never allow anyone to move to area 0 or below since this is used
             // to determine if a trainer profile exists in another method!
             require(_newArea > 0);
-            
+
             // make sure that this area exists yet!
             require(areas.length >= _newArea);
-             
+
             // when player is not stuck doing something else he can move freely!
             _moveToArea(_newArea, msg.sender);
         }
 
-    
+
     // to be changed to retrieve current stats!
     function getMonster(uint256 _id) external view returns (
         uint256 birthTime,
@@ -1489,13 +1489,13 @@ contract ChainMonstersCore is ChainMonstersAuction, Ownable {
         uint256 speed,
         uint256 typeOne,
         uint256 typeTwo,
-        
+
         uint256 mID,
-        bool tradeable, 
+        bool tradeable,
         uint256 uID
-        
-            
-        ) {    
+
+
+        ) {
        Monster storage mon = monsters[_id];
         birthTime = uint256(mon.birthTime);
         generation = 0; // hardcoding due to stack too deep error
@@ -1509,12 +1509,12 @@ contract ChainMonstersCore is ChainMonstersAuction, Ownable {
         typeTwo = uint256(mon.typeTwo);
         mID = uint256(mon.mID);
         tradeable = bool(mon.tradeable);
-        
+
         // hack to overcome solidity's stack limitation in monster struct....
         uID = _id;
-            
+
         }
-        
+
         // this method only returns the "base" powerlevel of a monster which will be used
         // in more advanced fighting calculations later on
     function getMonsterPowerLevel(uint256 _tokenId) external view returns (
@@ -1523,18 +1523,18 @@ contract ChainMonstersCore is ChainMonstersAuction, Ownable {
             Monster storage mon = monsters[_tokenId];
             uint8[7] storage IVs = monsterIdToIVs[_tokenId];
 
-            
+
             powerlevel = mon.hp + IVs[0] + mon.attack + IVs[1] + mon.defense + IVs[2] + mon.spAttack + IVs[3] + mon.spDefense + IVs[4] + mon.speed + IVs[5];
         }
-        
-        
-        
 
-   
-    
+
+
+
+
+
     function isTrainer(address _check)
-    external 
-    view 
+    external
+    view
     returns (
         bool isTrainer
     ) {
@@ -1545,18 +1545,18 @@ contract ChainMonstersCore is ChainMonstersAuction, Ownable {
         else
             return false;
     }
-   
 
-    
-   
-   
+
+
+
+
     function withdrawBalance() external onlyOwner {
-       
+
         uint256 balance = this.balance;
-       
-       
+
+
         owner.transfer(balance);
-        
+
     }
 
     // after we have setup everything we can unlock the game
@@ -1564,4 +1564,138 @@ contract ChainMonstersCore is ChainMonstersAuction, Ownable {
     function launchGame() external onlyOwner {
         hasLaunched = true;
     }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

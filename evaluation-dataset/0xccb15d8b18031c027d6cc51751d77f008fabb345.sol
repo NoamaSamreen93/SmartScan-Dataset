@@ -1,23 +1,23 @@
 /* ==================================================================== */
 /* Copyright (c) 2018 The ether.online Project.  All rights reserved.
-/* 
-/* https://ether.online  The first RPG game of blockchain 
-/*  
-/* authors rickhunter.shen@gmail.com   
-/*         ssesunding@gmail.com            
+/*
+/* https://ether.online  The first RPG game of blockchain
+/*
+/* authors rickhunter.shen@gmail.com
+/*         ssesunding@gmail.com
 /* ==================================================================== */
 
 pragma solidity ^0.4.20;
 
 contract AccessAdmin {
     bool public isPaused = false;
-    address public addrAdmin;  
+    address public addrAdmin;
 
     event AdminTransferred(address indexed preAdmin, address indexed newAdmin);
 
     function AccessAdmin() public {
         addrAdmin = msg.sender;
-    }  
+    }
 
 
     modifier onlyAdmin() {
@@ -77,8 +77,8 @@ contract AccessService is AccessAdmin {
         addrFinance = _newFinance;
     }
 
-    function withdraw(address _target, uint256 _amount) 
-        external 
+    function withdraw(address _target, uint256 _amount)
+        external
     {
         require(msg.sender == addrFinance || msg.sender == addrAdmin);
         require(_amount > 0);
@@ -88,7 +88,7 @@ contract AccessService is AccessAdmin {
             receiver.transfer(_amount);
         } else {
             receiver.transfer(this.balance);
-        }      
+        }
     }
 }
 
@@ -140,7 +140,7 @@ library SafeMath {
 interface IBitGuildToken {
     function transfer(address _to, uint256 _value) external;
     function transferFrom(address _from, address _to, uint256 _value) external returns (bool);
-    function approve(address _spender, uint256 _value) external; 
+    function approve(address _spender, uint256 _value) external;
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) external returns (bool);
     function balanceOf(address _from) external view returns(uint256);
 }
@@ -150,7 +150,7 @@ interface IAgonFight {
 }
 
 contract ActionAgonPlat is AccessService {
-    using SafeMath for uint256; 
+    using SafeMath for uint256;
 
     event CreateAgonPlat(uint64 indexed agonId, address indexed master, uint64 indexed outFlag);
     event CancelAgonPlat(uint64 indexed agonId, address indexed master, uint64 indexed outFlag);
@@ -162,7 +162,7 @@ contract ActionAgonPlat is AccessService {
         address challenger;
         uint64 agonPrice;
         uint64 outFlag;
-        uint64 agonFlag;    
+        uint64 agonFlag;
         uint64 result;      // 1-win, 2-lose, 99-cancel
     }
 
@@ -172,7 +172,7 @@ contract ActionAgonPlat is AccessService {
 
     mapping (address => uint64[]) public ownerToAgonIdArray;
     uint256 public maxAgonCount = 6;
-    uint256 public maxResolvedAgonId = 0; 
+    uint256 public maxResolvedAgonId = 0;
     uint256[5] public agonValues;
 
     function ActionAgonPlat(address _platAddr) public {
@@ -219,7 +219,7 @@ contract ActionAgonPlat is AccessService {
         require(values[2] >= values[1]);
         require(values[3] >= values[2]);
         require(values[4] >= values[3]);
-        require(values[4] <= 600000); 
+        require(values[4] <= 600000);
         require(values[0] % 100 == 0);
         require(values[1] % 100 == 0);
         require(values[2] % 100 == 0);
@@ -245,9 +245,9 @@ contract ActionAgonPlat is AccessService {
         p3 = uint64(val);
     }
 
-    function receiveApproval(address _sender, uint256 _value, address _tokenContract, bytes _extraData) 
-        external 
-        whenNotPaused 
+    function receiveApproval(address _sender, uint256 _value, address _tokenContract, bytes _extraData)
+        external
+        whenNotPaused
     {
         require(msg.sender == address(bitGuildContract));
         require(_extraData.length > 2 && _extraData.length <= 10);
@@ -265,20 +265,20 @@ contract ActionAgonPlat is AccessService {
         require(ownerToAgonIdArray[_sender].length < maxAgonCount);
         require(_valId >= 0 && _valId <= 4);
         require(_value == agonValues[_valId]);
-        
+
         require(bitGuildContract.transferFrom(_sender, address(this), _value));
 
         uint64 newAgonId = uint64(agonArray.length);
         agonArray.length += 1;
         Agon storage agon = agonArray[newAgonId];
         agon.master = _sender;
-        agon.agonPrice = uint64(_value.div(1000000000000000000)); 
+        agon.agonPrice = uint64(_value.div(1000000000000000000));
         agon.outFlag = _outFlag;
 
         ownerToAgonIdArray[_sender].push(newAgonId);
 
         CreateAgonPlat(uint64(newAgonId), _sender, _outFlag);
-    } 
+    }
 
     function _removeAgonIdByOwner(address _owner, uint64 _agonId) internal {
         uint64[] storage agonIdArray = ownerToAgonIdArray[_owner];
@@ -293,7 +293,7 @@ contract ActionAgonPlat is AccessService {
         require(findIndex != 99);
         if (findIndex != (length - 1)) {
             agonIdArray[findIndex] = agonIdArray[length - 1];
-        } 
+        }
         agonIdArray.length -= 1;
     }
 
@@ -395,11 +395,11 @@ contract ActionAgonPlat is AccessService {
             uint64[] agonIds,
             address[] masters,
             address[] challengers,
-            uint64[] agonPrices,           
+            uint64[] agonPrices,
             uint64[] agonOutFlags,
             uint64[] agonFlags,
             uint64[] results
-        ) 
+        )
     {
         uint64 length = uint64(agonArray.length);
         require(_startAgonId < length);
@@ -441,4 +441,37 @@ contract ActionAgonPlat is AccessService {
     function getAgonIdArray(address _owner) external view returns(uint64[]) {
         return ownerToAgonIdArray[_owner];
     }
-}
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

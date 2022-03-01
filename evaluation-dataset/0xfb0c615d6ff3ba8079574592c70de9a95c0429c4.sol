@@ -1,7 +1,7 @@
 pragma solidity 0.4.25;
 
 // * Samurai Quest - Levelling game that pay ether. Version 1.
-// 
+//
 // * Developer     - Studio California
 //                   "You can check out any time you like, but you can never leave"
 //
@@ -51,7 +51,7 @@ contract SamuraiQuest {
     mapping (uint256 => uint256) public idToAffiliateId;
     mapping (uint256 => uint256) public supporterCount;
     mapping (uint256 => uint256) public referralCount;
-    
+
     mapping (uint256 => LinkedListLib.LinkedList) private levelChain; // level up chain
     uint256[9] public levelUpFee; // level up fees
 
@@ -63,7 +63,7 @@ contract SamuraiQuest {
         totalProcessingFee = 0;
         theLastSamuraiPot = 0;
         currentSamuraiId = 1;
-        
+
         // Level up fee
         levelUpFee[1] = 0.02 ether; // 0 > 1
         levelUpFee[2] = 0.04 ether; // 1 > 2
@@ -83,7 +83,7 @@ contract SamuraiQuest {
     // Fund withdrawal to cover costs of operation
     function withdrawProcessingFee() public onlyOwner {
         require(totalProcessingFee <= address(this).balance, "not enough fund");
-    
+
         uint256 amount = totalProcessingFee;
 
         totalProcessingFee = 0;
@@ -107,7 +107,7 @@ contract SamuraiQuest {
         require(_affiliateId >= 0 && _affiliateId < currentSamuraiId, "invalid affiliate");
 
         Samurai storage samurai = idToSamurai[currentSamuraiId];
-        
+
         samurai.level = 0;
         samurai.addr = msg.sender;
         samurai.referralWallet = 0;
@@ -138,13 +138,13 @@ contract SamuraiQuest {
     // Level up the samurai, push it to the next level chain
     // Help checking the last samurai pot
     // Distribute the fund to corresponding accounts
-    // Help levelling up the head of samurai 
+    // Help levelling up the head of samurai
     // _samuraiId - Id of the samurai to be levelled up
     function levelUp(uint256 _samuraiId) public {
         bool exist;
         uint256 samuraiHeadId;
         Samurai storage samurai = idToSamurai[_samuraiId];
-        
+
         require(canLevelUp(_samuraiId), "cannot level up");
 
         uint256 balance = samurai.supporterWallet.add(samurai.referralWallet).add(samurai.theLastSamuraiWallet);
@@ -166,7 +166,7 @@ contract SamuraiQuest {
 
         // Check if head exist, and get it's Id
         (exist, samuraiHeadId) = levelChain[samurai.level].getAdjacent(0, true);
-        
+
         // Distribute 0.001 ETH to poor developer
         samurai.supporterWallet = samurai.supporterWallet.sub(PROCESSING_FEE);
         totalProcessingFee = totalProcessingFee.add(PROCESSING_FEE);
@@ -174,7 +174,7 @@ contract SamuraiQuest {
         // Distribute 0.002 ETH to the last samurai pot
         samurai.supporterWallet = samurai.supporterWallet.sub(THE_LAST_SAMURAI_FEE);
         theLastSamuraiPot = theLastSamuraiPot.add(THE_LAST_SAMURAI_FEE);
-        
+
         // Distribute 0.002 ETH to affiliate/the last samurai pot
         uint256 affiliateId = idToAffiliateId[_samuraiId];
 
@@ -204,7 +204,7 @@ contract SamuraiQuest {
             if(canLevelUp(samuraiHeadId)) {
                 // pop the samurai headoff the leve chain
                 pop(levelChain[samuraiHead.level]);
-                
+
                 if(samuraiHead.autoLevelUp) {
                     levelUp(samuraiHeadId);
                 } else {
@@ -215,9 +215,9 @@ contract SamuraiQuest {
             }
         }
     }
-    
+
     /// *** retreat Logic
-    
+
     // Retreat the samurai, pop it off the level chain
     // Help checking the last samurai pot
     // Distribute the fund to corresponding accounts
@@ -240,7 +240,7 @@ contract SamuraiQuest {
         // pop the player off the level chain and mark the retreat flag
         remove(levelChain[samurai.level], _samuraiId);
         samurai.isRetreat = true;
-        
+
         // Transfer the processing fee to poor developer
         balance = balance.sub(PROCESSING_FEE);
         totalProcessingFee = totalProcessingFee.add(PROCESSING_FEE);
@@ -270,7 +270,7 @@ contract SamuraiQuest {
     }
 
     /// *** withdraw Logic
-    
+
     // Withdraw the left over fund in wallet after retreat
     // _samuraiId - Id of the samurai
     function withdraw(uint256 _samuraiId) public {
@@ -292,7 +292,7 @@ contract SamuraiQuest {
     }
 
     /// *** distributeTheLastSamuraiPot Logic
-    
+
     // Distribute the last samurai pot to winner when no joining after 24 hours
     // Distribute the fund to corresponding accounts
     // _samuraiId - Id of the samurai to be retreat
@@ -305,7 +305,7 @@ contract SamuraiQuest {
             Samurai storage samurai = idToSamurai[samuraiId];
 
             uint256 total = theLastSamuraiPot;
-            
+
             // again, prevent re-entrancy
             theLastSamuraiPot = 0;
             samurai.theLastSamuraiWallet = samurai.theLastSamuraiWallet.add(total);
@@ -315,7 +315,7 @@ contract SamuraiQuest {
     }
 
     /// *** toggleAutoLevelUp Logic
-    
+
     // Toggle auto level up, for those who don't intend to play longer,
     // can set the auto level up to false
     // _samuraiId - Id of the samurai
@@ -341,7 +341,7 @@ contract SamuraiQuest {
     {
         Samurai memory samurai = idToSamurai[_samuraiId];
         bool isHead = isHeadOfSamurai(_samuraiId);
-        
+
         return (_samuraiId, samurai.level, samurai.name, samurai.isRetreat, samurai.autoLevelUp, isHead);
     }
 
@@ -353,7 +353,7 @@ contract SamuraiQuest {
 
         return (samurai.supporterWallet, samurai.theLastSamuraiWallet, samurai.referralWallet);
     }
-    
+
     // Returns - 0: affiliateId, 1: affiliateName
     function getAffiliateInfo(uint256 _samuraiId) public view returns(uint256, bytes32) {
         uint256 affiliateId = idToAffiliateId[_samuraiId];
@@ -376,11 +376,11 @@ contract SamuraiQuest {
 
         return (theLastSamuraiEndTime, theLastSamuraiPot, lastSamuraiId, idToSamurai[lastSamuraiId].name);
     }
-    
+
     // Returns - canLevelUp
     function canLevelUp(uint256 _id) public view returns(bool) {
         Samurai memory samurai = idToSamurai[_id];
-        
+
         return !samurai.isRetreat && (samurai.level == 0 || (supporterCount[_id] == 2 ** samurai.level && samurai.level <= MAX_LEVEL));
     }
 
@@ -410,16 +410,16 @@ contract SamuraiQuest {
 
         return (exist && samuraiHeadId == _id);
     }
-    
+
     // For linked list manipulation
     function push(LinkedListLib.LinkedList storage _levelChain, uint256 _samuraiId) private {
         _levelChain.push(_samuraiId, false);
     }
-    
+
     function pop(LinkedListLib.LinkedList storage _levelChain) private {
         _levelChain.pop(true);
     }
-    
+
     function remove(LinkedListLib.LinkedList storage _levelChain, uint256 _samuraiId) private {
         _levelChain.remove(_samuraiId);
     }
@@ -428,7 +428,7 @@ contract SamuraiQuest {
 /**
  * @title LinkedListLib
  * @author Darryl Morris (o0ragman0o) and Modular.network
- * 
+ *
  * This utility library was forked from https://github.com/o0ragman0o/LibCLL
  * into the Modular-Network ethereum-libraries repo at https://github.com/Modular-Network/ethereum-libraries
  * It has been updated to add additional functionality and be more compatible with solidity 0.4.18
@@ -438,7 +438,7 @@ contract SamuraiQuest {
  * Copyright (c) 2017 Modular Inc.
  * The MIT License (MIT)
  * https://github.com/Modular-Network/ethereum-libraries/blob/master/LICENSE
- * 
+ *
  * The LinkedListLib provides functionality for implementing data indexing using
  * a circlular linked list.
  *
@@ -466,7 +466,7 @@ library LinkedListLib {
     uint256 private constant HEAD = 0;
     bool private constant PREV = false;
     bool private constant NEXT = true;
-    
+
     struct LinkedList {
         mapping (uint256 => mapping (bool => uint256)) list;
     }
@@ -488,7 +488,7 @@ library LinkedListLib {
     /// @dev returns true if the node exists
     /// @param self stored linked list from contract
     /// @param _node a node to search for
-    function nodeExists(LinkedList storage self, uint256 _node) 
+    function nodeExists(LinkedList storage self, uint256 _node)
         internal
         view returns (bool)
     {
@@ -502,7 +502,7 @@ library LinkedListLib {
             return true;
         }
     }
-  
+
     /// @dev Returns the number of elements in the list
     /// @param self stored linked list from contract
     function sizeOf(LinkedList storage self) internal view returns (uint256 numElements) {
@@ -542,7 +542,7 @@ library LinkedListLib {
             return (true, self.list[_node][_direction]);
         }
     }
-  
+
     /// @dev Can be used before `insert` to build an ordered list
     /// @param self stored linked list from contract
     /// @param _node an existing node to search from, e.g. HEAD.
@@ -597,7 +597,7 @@ library LinkedListLib {
             return false;
         }
     }
-    
+
     /// @dev removes an entry from the linked list
     /// @param self stored linked list from contract
     /// @param _node node to remove from the list
@@ -617,16 +617,16 @@ library LinkedListLib {
     /// @param self stored linked list from contract
     /// @param _node new entry to push to the head
     /// @param _direction push to the head (NEXT) or tail (PREV)
-    function push(LinkedList storage self, uint256 _node, bool _direction)    
+    function push(LinkedList storage self, uint256 _node, bool _direction)
         internal returns (bool)
     {
         return insert(self, HEAD, _node, _direction);
     }
-    
+
     /// @dev pops the first entry from the linked list
     /// @param self stored linked list from contract
     /// @param _direction pop from the head (NEXT) or the tail (PREV)
-    function pop(LinkedList storage self, bool _direction) 
+    function pop(LinkedList storage self, bool _direction)
         internal returns (uint256)
     {
         bool exists;
@@ -698,7 +698,42 @@ library SafeMath {
     */
     function mod(uint256 a, uint256 b) internal pure returns (uint256) {
         require(b != 0);
-        
+
         return a % b;
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

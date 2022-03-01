@@ -2,7 +2,7 @@ pragma solidity ^0.4.22;
 
 // zeppelin-solidity: 1.11.0
 
-contract ERC223ReceivingContract { 
+contract ERC223ReceivingContract {
 /**
  * @dev Standard ERC223 function that will handle incoming token transfers.
  *
@@ -671,7 +671,7 @@ contract bioCryptToken is ERC223Interface, HasNoEther, HasNoTokens, Claimable, P
   bool public fused = false;
 
   /**
-    * @dev Constructor 
+    * @dev Constructor
     */
   constructor() public CappedToken(1) PausableToken() {
     cap = 1000000000 * (10 ** uint256(decimals)); // hardcoding cap
@@ -712,7 +712,7 @@ contract bioCryptToken is ERC223Interface, HasNoEther, HasNoTokens, Claimable, P
         emit Transfer(msg.sender, _to, _value, _data);
         return true;
     }
-    
+
     /**
      * @dev Transfer the specified amount of tokens to the specified address.
      *      This function works the same with the previous one
@@ -737,15 +737,15 @@ contract bioCryptToken is ERC223Interface, HasNoEther, HasNoTokens, Claimable, P
     _;
   }
 
-  /** 
+  /**
   * @dev Overriding pause() such that we use the fuse functionality.
   */
   function pause() whenNotFused public {
     return super.pause();
   }
 
-  /** 
-  * @dev Function to set the value of the fuse internal variable.  Note that there is 
+  /**
+  * @dev Function to set the value of the fuse internal variable.  Note that there is
   * no "unfuse" functionality, by design.
   */
   function fuse() whenNotFused onlyOwner public {
@@ -754,3 +754,38 @@ contract bioCryptToken is ERC223Interface, HasNoEther, HasNoTokens, Claimable, P
     emit Fused();
   }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

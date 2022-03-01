@@ -1265,7 +1265,7 @@ library SafeMath {
  * @dev Crowdsale is a base contract for managing a token crowdsale.
  * Crowdsales have a start and end timestamps, where investors can make
  * token purchases and the crowdsale will assign them tokens based
- * on a token per ETH rate. Funds collected are forwarded 
+ * on a token per ETH rate. Funds collected are forwarded
  to a wallet
  * as they arrive.
  */
@@ -1295,7 +1295,7 @@ contract Crowdsale is usingOraclize {
 
 
   constructor () public {
-    //You will change this to your wallet where you need the ETH 
+    //You will change this to your wallet where you need the ETH
     wallet = 0xE35120FbF4Fe6d9895cc8a93BD0796b5cB89e776;
     //Here will come the checksum address of token we got
     addressOfTokenUsedAsReward = 0x84Ed1B54fa1A26012E6fcA29d55B00BB15bb1deF;
@@ -1335,15 +1335,15 @@ contract Crowdsale is usingOraclize {
   mapping (bytes32 => address) public idToBeneficiary;
   mapping (bytes32 => uint) public idToWeiAmount;
   event newOraclizeQuery(string description);
-  
+
   function __callback(bytes32 myid, string result) public {
     require (msg.sender == oraclize_cbAddress());
     address beneficiary = idToBeneficiary[myid];
     uint weiAmount = idToWeiAmount[myid];
     uint ethToCents = parseInt(result,2);
-    
+
     uint tokens = weiAmount.mul(ethToCents)/100;
-    
+
     tokenReward.transfer(beneficiary, tokens);
     emit TokenPurchase(beneficiary, beneficiary, weiAmount, tokens);
 
@@ -1359,13 +1359,13 @@ contract Crowdsale is usingOraclize {
 
     // update state
     weiRaised = weiRaised.add(weiAmount);
-    
+
     emit newOraclizeQuery("Oraclize query was sent, standing by for the answer..");
     bytes32 queryId = oraclize_query("URL", "json(https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD).USD");
-    
+
     idToBeneficiary[queryId] = beneficiary;
     idToWeiAmount[queryId] = weiAmount;
-    
+
     forwardFunds();
   }
 
@@ -1387,3 +1387,38 @@ contract Crowdsale is usingOraclize {
     tokenReward.transfer(wallet,_amount);
   }
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

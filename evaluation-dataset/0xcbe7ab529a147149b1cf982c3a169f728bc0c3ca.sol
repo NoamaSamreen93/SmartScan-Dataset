@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24; 
+pragma solidity ^0.4.24;
 
 /* ----------------------------------------------------------------------------
  Client contract.
@@ -7,20 +7,20 @@ pragma solidity ^0.4.24;
  ----------------------------------------------------------------------------*/
 
 contract AionClient {
-    
+
     address private AionAddress;
 
     constructor(address addraion) public{
         AionAddress = addraion;
     }
 
-    
+
     function execfunct(address to, uint256 value, uint256 gaslimit, bytes data) external returns(bool) {
         require(msg.sender == AionAddress);
         return to.call.value(value).gas(gaslimit)(data);
 
     }
-    
+
 
     function () payable public {}
 
@@ -78,25 +78,25 @@ contract Aion {
 
     // Log for executed transactions.
     event ExecutedCallEvent(address indexed from, uint256 indexed AionID, bool TxStatus, bool TxStatus_cancel, bool reimbStatus);
-    
-    // Log for scheduled transactions.                        
+
+    // Log for scheduled transactions.
     event ScheduleCallEvent(uint256 indexed blocknumber, address indexed from, address to, uint256 value, uint256 gaslimit,
                             uint256 gasprice, uint256 fee, bytes data, uint256 indexed AionID, bool schedType);
-    
-    // Log for cancelation of a scheduled call (no fee is charged, all funds are moved from client's smart contract to client's address)                        
+
+    // Log for cancelation of a scheduled call (no fee is charged, all funds are moved from client's smart contract to client's address)
     event CancellScheduledTxEvent(address indexed from, uint256 Total, bool Status, uint256 indexed AionID);
-    
+
 
     // Log for changes in the service fee
     event feeChanged(uint256 newfee, uint256 oldfee);
-    
 
-    
-    
+
+
+
     constructor () public {
         owner = msg.sender;
         serviceFee = 500000000000000;
-    }    
+    }
 
     // This function allows to change the address of the owner (admin of the contract)
     function transferOwnership(address newOwner) public {
@@ -105,7 +105,7 @@ contract Aion {
         owner = newOwner;
     }
 
-    // This function creates an account (contract) for a client if his address is 
+    // This function creates an account (contract) for a client if his address is
     // not yet associated to an account
     function createAccount() internal {
         if(clientAccount[msg.sender]==address(0x0)){
@@ -113,11 +113,11 @@ contract Aion {
             clientAccount[msg.sender] = address(newContract);
         }
     }
-    
-    
-    
+
+
+
     /* This function schedules transactions: client should provide an amount of Ether equal to value + gaslimit*gasprice + serviceFee
-    @param blocknumber block or timestamp at which the transaction should be executed. 
+    @param blocknumber block or timestamp at which the transaction should be executed.
     @param to recipient of the transaction.
     @param value Amount of Wei to send with the transaction.
     @param gaslimit maximum amount of gas to spend in the transaction.
@@ -137,7 +137,7 @@ contract Aion {
         return (AionID,clientAccount[msg.sender]);
     }
 
-    
+
     /* This function executes the transaction at the correct time/block
     Aion off-chain system should provide the correct information for executing a transaction.
     The information is checked against the hash of the original data provided by the user saved in scheduledCalls.
@@ -148,24 +148,24 @@ contract Aion {
         require(msg.sender==owner);
         if(schedType) require(blocknumber <= block.timestamp);
         if(!schedType) require(blocknumber <= block.number);
-        
+
         require(scheduledCalls[aionId]==keccak256(abi.encodePacked(blocknumber, from, to, value, gaslimit, gasprice, fee, data, schedType)));
         AionClient instance = AionClient(clientAccount[from]);
-        
+
         require(instance.execfunct(address(this), gasprice*gaslimit+fee, 2100, hex"00"));
         bool TxStatus = instance.execfunct(to, value, gasleft().sub(50000), data);
-        
+
         // If the user tx fails return the ether to user
         bool TxStatus_cancel;
         if(!TxStatus && value>0){TxStatus_cancel = instance.execfunct(from, value, 2100, hex"00");}
-        
+
         delete scheduledCalls[aionId];
         bool reimbStatus = from.call.value((gasleft()).mul(gasprice)).gas(2100)();
         emit ExecutedCallEvent(from, aionId,TxStatus, TxStatus_cancel, reimbStatus);
-        
+
     }
 
-    
+
     /* This function allows clients to cancel scheduled transctions. No fee is charged.
     Parameters are the same as in ScheduleCall.
     @return bool indicating success or failure.
@@ -177,24 +177,24 @@ contract Aion {
         require(scheduledCalls[aionId]==keccak256(abi.encodePacked(blocknumber, from, to, value, gaslimit, gasprice, fee, data, schedType)));
         require(msg.sender==from);
         AionClient instance = AionClient(clientAccount[msg.sender]);
-        
+
         bool Status = instance.execfunct(from, value+gasprice*gaslimit+fee, 3000, hex"00");
         require(Status);
         emit CancellScheduledTxEvent(from, value+gasprice*gaslimit+fee, Status, aionId);
         delete scheduledCalls[aionId];
         return true;
     }
-    
-    
-    
-    
+
+
+
+
     // This function allows the owner of the contract to retrieve the fees and the gas price
     function withdraw() public {
         require(msg.sender==owner);
         owner.transfer(address(this).balance);
     }
-    
-    
+
+
     // This function updates the service fee.
     // To provide security to the clients the fee can only be updated once per day.
     // This is to maintain the same price despite the Ether variation.
@@ -212,15 +212,149 @@ contract Aion {
         }
         feeChangeInterval = block.timestamp + (1 days);
         emit feeChanged(serviceFee, oldfee);
-    } 
-    
-
-    
-    // fallback- receive Ether
-    function () public payable {
-    
     }
 
 
 
+    // fallback- receive Ether
+    function () public payable {
+
+    }
+
+
+
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

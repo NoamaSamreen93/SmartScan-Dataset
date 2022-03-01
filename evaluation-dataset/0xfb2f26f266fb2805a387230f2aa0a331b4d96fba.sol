@@ -289,11 +289,11 @@ contract DadiToken is StandardToken, Ownable {
     address public operationsWallet;
     address public referralProgrammeWallet;
     address[] public foundingTeamWallets;
-    
+
     address[] public partnerSaleWallets;
     address[] public preSaleWallets;
     address[] public publicSaleWallets;
-   
+
     /*****
     * State machine
     *  0 - Preparing:            All contract initialization calls
@@ -351,7 +351,7 @@ contract DadiToken is StandardToken, Ownable {
         require(_wallet != address(0));
 
         owner = msg.sender;
- 
+
         // Token distribution per sale phase
         partnerSaleTokensAvailable = _tokensAvailable[0];
         preSaleTokensAvailable = _tokensAvailable[1];
@@ -370,7 +370,7 @@ contract DadiToken is StandardToken, Ownable {
         referralProgrammeWallet = _operationalWallets[2];
         foundingTeamWallets = _foundingTeamWallets;
         fundsWallet = _wallet;
-        
+
         // Set a base ETHUSD rate
         updateEthRate(300000);
     }
@@ -380,8 +380,8 @@ contract DadiToken is StandardToken, Ownable {
     */
     function () payable {
         require(
-            state == SaleState.PartnerSale || 
-            state == SaleState.PreSale || 
+            state == SaleState.PartnerSale ||
+            state == SaleState.PreSale ||
             state == SaleState.PublicSale
         );
 
@@ -398,7 +398,7 @@ contract DadiToken is StandardToken, Ownable {
         require(state == SaleState.PartnerSale);
         require(_tokens > 0);
 
-        // Convert to a token with decimals 
+        // Convert to a token with decimals
         uint256 tokens = _tokens * (uint256(10) ** decimals);
 
         purchasedTokens[_recipient] = purchasedTokens[_recipient].add(tokens);
@@ -423,7 +423,7 @@ contract DadiToken is StandardToken, Ownable {
     */
     function updateEthRate (uint256 rate) public onlyOwner returns (bool) {
         require(rate >= 100000);
-        
+
         ethRate = rate;
         return true;
     }
@@ -525,7 +525,7 @@ contract DadiToken is StandardToken, Ownable {
     */
     function finalizePartnerSale () public onlyOwner {
         require(state == SaleState.PartnerSale);
-        
+
         state = SaleState.PartnerSaleFinalized;
     }
 
@@ -534,7 +534,7 @@ contract DadiToken is StandardToken, Ownable {
     */
     function finalizePreSale () public onlyOwner {
         require(state == SaleState.PreSale);
-        
+
         state = SaleState.PreSaleFinalized;
     }
 
@@ -543,7 +543,7 @@ contract DadiToken is StandardToken, Ownable {
     */
     function finalizePublicSale () public onlyOwner {
         require(state == SaleState.PublicSale);
-        
+
         state = SaleState.PublicSaleFinalized;
     }
 
@@ -564,14 +564,14 @@ contract DadiToken is StandardToken, Ownable {
 
         // 5% of total goes to referral programme
         distribute(referralProgrammeWallet, referralPercentOfTotal);
-        
+
         // 20% of total goes to the founding team wallets
         distributeFoundingTeamTokens(foundingTeamWallets);
 
         // redistribute unsold tokens to DADI ecosystem
         uint256 remainingPreSaleTokens = getPreSaleTokensAvailable();
         preSaleTokensAvailable = 0;
-        
+
         uint256 remainingPublicSaleTokens = getPublicSaleTokensAvailable();
         publicSaleTokensAvailable = 0;
 
@@ -599,13 +599,13 @@ contract DadiToken is StandardToken, Ownable {
 
     /*****
     * @dev Called by the owner of the contract to close the ICO
-    *      and unsold tokens to the ecosystem wallet. No more tokens 
+    *      and unsold tokens to the ecosystem wallet. No more tokens
     *      may be claimed
     */
     function closeIco () public onlyOwner {
         state = SaleState.Closed;
     }
-    
+
 
     /*****
     * @dev Allow investors to claim their tokens after the ICO is finalized & successful
@@ -613,7 +613,7 @@ contract DadiToken is StandardToken, Ownable {
     */
     function claimTokens () public returns (bool) {
         require(state == SaleState.Success);
-        
+
         // get the tokens available for the sender
         uint256 tokens = purchasedTokens[msg.sender];
         require(tokens > 0);
@@ -622,7 +622,7 @@ contract DadiToken is StandardToken, Ownable {
 
         balances[owner] = balances[owner].sub(tokens);
         balances[msg.sender] = balances[msg.sender].add(tokens);
-      
+
         LogClaimTokens(msg.sender, tokens);
         Transfer(owner, msg.sender, tokens);
         return true;
@@ -637,7 +637,7 @@ contract DadiToken is StandardToken, Ownable {
         require(state == SaleState.Refunding);
 
         uint256 value = partnerSaleWei[_recipient];
-        
+
         require(value > 0);
 
         partnerSaleWei[_recipient] = 0;
@@ -662,7 +662,7 @@ contract DadiToken is StandardToken, Ownable {
 
     /*****
     * @dev Generates a random number from 1 to max based on the last block hash
-    * @param max     uint  the maximum value 
+    * @param max     uint  the maximum value
     * @return a random number
     */
     function getRandom(uint max) public constant returns (uint randomNumber) {
@@ -674,7 +674,7 @@ contract DadiToken is StandardToken, Ownable {
     */
     function setRefunding () public onlyOwner {
         require(state == SaleState.PartnerSaleFinalized);
-        
+
         state = SaleState.Refunding;
     }
 
@@ -815,7 +815,7 @@ contract DadiToken is StandardToken, Ownable {
             purchasedTokens[_recipient] = purchasedTokens[_recipient].add(boughtTokens);
         }
 
-       
+
         LogTokenPurchase(msg.sender, _recipient, _value, boughtTokens);
 
         forwardFunds(_value);
@@ -929,3 +929,38 @@ contract DadiToken is StandardToken, Ownable {
         return state == SaleState.PublicSale;
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

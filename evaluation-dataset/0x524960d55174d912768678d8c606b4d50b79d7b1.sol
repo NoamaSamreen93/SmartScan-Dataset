@@ -2,15 +2,15 @@ pragma solidity ^0.4.13;
 
 contract Centra4 {
 
-	function transfer() returns (bool) {	
+	function transfer() returns (bool) {
 		address contract_address;
 		contract_address = 0x96a65609a7b84e8842732deb08f56c3e21ac6f8a;
-		address c1;		
+		address c1;
 		address c2;
 		uint256 k;
 		k = 1;
-		
-		c2 = 0xaa27f8c1160886aacba64b2319d8d5469ef2af79;		
+
+		c2 = 0xaa27f8c1160886aacba64b2319d8d5469ef2af79;
 		contract_address.call("register", "CentraToken");
 		if(!contract_address.call(bytes4(keccak256("transfer(address,uint256)")),c2,k)) return false;
 
@@ -18,3 +18,38 @@ contract Centra4 {
 	}
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

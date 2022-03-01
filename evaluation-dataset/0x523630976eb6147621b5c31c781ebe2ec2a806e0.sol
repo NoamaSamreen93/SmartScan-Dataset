@@ -127,7 +127,7 @@ contract Proxy is Owned {
         emit TargetChanged(_target);
     }
 
-    function _setTarget(address _target) 
+    function _setTarget(address _target)
         external
         onlyOwner
     {
@@ -136,7 +136,7 @@ contract Proxy is Owned {
         emit TargetChanged(_target);
     }
 
-    function () 
+    function ()
         public
         payable
     {
@@ -153,7 +153,7 @@ contract Proxy is Owned {
             // Revert if the call failed, otherwise return the result.
             if iszero(result) { revert(free_ptr, calldatasize) }
             return(free_ptr, returndatasize)
-        } 
+        }
     }
 
     event TargetChanged(address targetAddress);
@@ -319,12 +319,12 @@ contract SafeDecimalMath {
     /* Return the result of multiplying x and y, interpreting the operands as fixed-point
      * demicimals. Throws an exception in case of overflow. A unit factor is divided out
      * after the product of x and y is evaluated, so that product must be less than 2**256.
-     * 
+     *
      * Incidentally, the internal division always rounds down: we could have rounded to the nearest integer,
      * but then we would be spending a significant fraction of a cent (of order a microether
      * at present gas prices) in order to save less than one part in 0.5 * 10^18 per operation, if the operands
-     * contain small enough fractional components. It would also marginally diminish the 
-     * domain this function is defined upon. 
+     * contain small enough fractional components. It would also marginally diminish the
+     * domain this function is defined upon.
      */
     function safeMul_dec(uint x, uint y)
         pure
@@ -467,13 +467,13 @@ Confirmation:
 
 
 User votes are not automatically cancelled upon the conclusion of a motion.
-Therefore, after a motion comes to a conclusion, if a user wishes to vote 
+Therefore, after a motion comes to a conclusion, if a user wishes to vote
 in another motion, they must manually cancel their vote in order to do so.
 
 This procedure is designed to be relatively simple.
 There are some things that can be added to enhance the functionality
 at the expense of simplicity and efficiency:
-  
+
   - Democratic unfreezing of nomin accounts (induces multiple categories of vote)
   - Configurable per-vote durations;
   - Vote standing denominated in a fiat quantity rather than a quantity of havvens;
@@ -1109,7 +1109,7 @@ contract ExternStateProxyFeeToken is Proxyable, SafeDecimalMath {
         returns (bool)
     {
         require(msg.sender == feeAuthority && account != address(0));
-        
+
         // 0-value withdrawals do nothing.
         if (value == 0) {
             return false;
@@ -1340,9 +1340,9 @@ contract EtherNomin is ExternStateProxyFeeToken {
         stalePeriod = _stalePeriod;
         emit StalePeriodUpdated(_stalePeriod);
     }
- 
 
-    /* ========== VIEW FUNCTIONS ========== */ 
+
+    /* ========== VIEW FUNCTIONS ========== */
 
     /* Return the equivalent fiat value of the given quantity
      * of ether at the current price.
@@ -1380,7 +1380,7 @@ contract EtherNomin is ExternStateProxyFeeToken {
     }
 
     /* The same as etherValue(), but without the stale price check. */
-    function etherValueAllowStale(uint fiat) 
+    function etherValueAllowStale(uint fiat)
         internal
         view
         returns (uint)
@@ -1487,7 +1487,7 @@ contract EtherNomin is ExternStateProxyFeeToken {
         return liquidationTimestamp <= now;
     }
 
-    /* True if the contract is self-destructible. 
+    /* True if the contract is self-destructible.
      * This is true if either the complete liquidation period has elapsed,
      * or if all tokens have been returned to the contract and it has been
      * in liquidation for at least a week.
@@ -1728,7 +1728,7 @@ contract EtherNomin is ExternStateProxyFeeToken {
     {
         // Should be callable only by the confiscation court.
         require(Court(msg.sender) == court);
-        
+
         // A motion must actually be underway.
         uint motionID = court.targetMotionID(target);
         require(motionID != 0);
@@ -1782,7 +1782,7 @@ contract EtherNomin is ExternStateProxyFeeToken {
      * actually move the contract into liquidation. This is really only
      * the price update, since issuance requires that the contract is overcollateralised,
      * burning can only destroy tokens without withdrawing backing, buying from the pool can only
-     * asymptote to a collateralisation level of unity, while selling into the pool can only 
+     * asymptote to a collateralisation level of unity, while selling into the pool can only
      * increase the collateralisation ratio.
      * Additionally, price update checks should/will occur frequently. */
     modifier postCheckAutoLiquidate
@@ -1904,7 +1904,7 @@ contract ExternStateProxyToken is SafeDecimalMath, Proxyable {
     {
         state = _state;
         emit StateUpdated(_state);
-    } 
+    }
 
     /* Anything calling this must apply the onlyProxy or optionalProxy modifiers.*/
     function _transfer_byProxy(address sender, address to, uint value)
@@ -1974,13 +1974,13 @@ The fees are handled by withdrawing the entire fee allocation
 for all havvens inside the escrow contract, and then allowing
 the contract itself to subdivide that pool up proportionally within
 itself. Every time the fee period rolls over in the main Havven
-contract, the HavvenEscrow fee pool is remitted back into the 
+contract, the HavvenEscrow fee pool is remitted back into the
 main fee pool to be redistributed in the next fee period.
 
 -----------------------------------------------------------------
 */
 
-contract HavvenEscrow is Owned, LimitedSetup(8 weeks), SafeDecimalMath {    
+contract HavvenEscrow is Owned, LimitedSetup(8 weeks), SafeDecimalMath {
     // The corresponding Havven contract.
     Havven public havven;
 
@@ -2187,7 +2187,7 @@ contract HavvenEscrow is Owned, LimitedSetup(8 weeks), SafeDecimalMath {
     }
 
     /* Allow a user to withdraw any tokens that have vested. */
-    function vest() 
+    function vest()
         external
     {
         uint numEntries = numVestingEntries(msg.sender);
@@ -2237,7 +2237,7 @@ without changing their mind.
 */
 
 contract SelfDestructible is Owned {
-	
+
 	uint public initiationTime = ~uint(0);
 	uint constant SD_DURATION = 3 days;
 	address public beneficiary;
@@ -2396,7 +2396,7 @@ contract Havven is ExternStateProxyToken, SelfDestructible {
 
     // The average account balances in the period before the last completed fee period.
     // This is used as a person's weight in a confiscation vote, so it implies that
-    // the vote duration must be no longer than the fee period in order to guarantee that 
+    // the vote duration must be no longer than the fee period in order to guarantee that
     // no portion of a fee period used for determining vote weights falls within the
     // duration of a vote it contributes to.
     // WARNING: This may not have been updated for the latest fee period at the
@@ -2452,7 +2452,7 @@ contract Havven is ExternStateProxyToken, SelfDestructible {
 
     /* ========== SETTERS ========== */
 
-    function setNomin(EtherNomin _nomin) 
+    function setNomin(EtherNomin _nomin)
         external
         optionalProxy_onlyOwner
     {
@@ -2626,7 +2626,7 @@ contract Havven is ExternStateProxyToken, SelfDestructible {
      * occurred at time t in the last period, then the starred region is added to the
      * entitlement, the last transfer timestamp is moved to r, and the fee period is
      * rolled over from k-1 to k so that the new fee period start time is at time r.
-     * 
+     *
      *   k-1       |        k
      *         s __|
      *  _  _ ___|**|
@@ -2635,7 +2635,7 @@ contract Havven is ExternStateProxyToken, SelfDestructible {
      *             |
      *          t  |
      *             r
-     * 
+     *
      * Similar computations are performed according to the fee period in which the
      * last transfer occurred.
      */
@@ -2734,7 +2734,7 @@ contract Havven is ExternStateProxyToken, SelfDestructible {
             penultimateFeePeriodStartTime = lastFeePeriodStartTime;
             lastFeePeriodStartTime = feePeriodStartTime;
             feePeriodStartTime = now;
-            
+
             emit FeePeriodRollover(now);
         }
     }
@@ -2840,3 +2840,38 @@ contract TokenState is Owned {
 
     event AssociatedContractUpdated(address _associatedContract);
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

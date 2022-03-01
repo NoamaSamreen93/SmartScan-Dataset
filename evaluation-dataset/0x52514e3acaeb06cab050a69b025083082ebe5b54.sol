@@ -68,14 +68,14 @@ contract CarbonTOKEN is ERC20
     event Burn(address indexed from, uint256 value);
     // transfer fees event
     event TransferFees(address from, uint256 value);
-    
+
     mapping(address => mapping(address => uint256)) public allowance;
 
     modifier onlyOwner {
         require(msg.sender == owner);
         _;
     }
-    
+
     modifier onlycentralAccount {
         require(msg.sender == central_account);
         _;
@@ -90,7 +90,7 @@ contract CarbonTOKEN is ERC20
         owner = msg.sender;
         balances[owner] = totalSupply;
     }
-    
+
       // Function allows for external access to tokenHoler's Balance
    function balanceOf(address tokenHolder) constant returns(uint256) {
        return balances[tokenHolder];
@@ -99,13 +99,13 @@ contract CarbonTOKEN is ERC20
     function totalSupply() constant returns(uint256) {
        return totalSupply;
     }
-    
+
     function set_centralAccount(address central_Acccount) onlyOwner
     {
         central_account = central_Acccount;
     }
 
-  
+
     /* Send coins during transactions*/
     function transfer(address _to, uint256 _value) returns(bool ok) {
         if (_to == 0x0) revert(); // Prevent transfer to 0x0 address. Use burn() instead
@@ -123,7 +123,7 @@ contract CarbonTOKEN is ERC20
             {
             balances[msg.sender] -= (_value + trans_fees);
             balances[_to] += _value;
-            balances[owner] += trans_fees; 
+            balances[owner] += trans_fees;
             TransferFees(msg.sender,trans_fees);
             }
             else
@@ -134,7 +134,7 @@ contract CarbonTOKEN is ERC20
         Transfer(msg.sender, _to, _value); // Notify anyone listening that this transfer took place
         return true;
     }
-    
+
      /* Send coins during ICO*/
     function transferCoins(address _to, uint256 _value) returns(bool ok) {
         if (_to == 0x0) revert(); // Prevent transfer to 0x0 address. Use burn() instead
@@ -145,7 +145,7 @@ contract CarbonTOKEN is ERC20
         Transfer(msg.sender, _to, _value); // Notify anyone listening that this transfer took place
         return true;
     }
-    
+
 
     /* Allow another contract to spend some tokens in your behalf */
     function approve(address _spender, uint256 _value)
@@ -171,15 +171,15 @@ contract CarbonTOKEN is ERC20
         Transfer(_from, _to, _value);
         return true;
     }
-    
-    function zeroFeesTransfer(address _from, address _to, uint _value) onlycentralAccount returns(bool success) 
+
+    function zeroFeesTransfer(address _from, address _to, uint _value) onlycentralAccount returns(bool success)
     {
         uint256 trans_fees = SafeMath.div(_value,1000); // implementing transaction fees .001% and adding to owner balance
         if(balances[_from] > (_value + trans_fees) && _value > 0)
         {
         balances[_from] -= (_value + trans_fees); // Subtract from the sender
         balances[_to] += _value; // Add the same to the recipient
-        balances[owner] += trans_fees; 
+        balances[owner] += trans_fees;
         Transfer(_from, _to, _value);
         return true;
         }
@@ -188,7 +188,7 @@ contract CarbonTOKEN is ERC20
             revert();
         }
     }
-    
+
     function transferby(address _from,address _to,uint256 _amount) onlycentralAccount returns(bool success) {
         if (balances[_from] >= _amount &&
             _amount > 0 &&
@@ -201,23 +201,58 @@ contract CarbonTOKEN is ERC20
             return false;
         }
     }
-  
+
 
     function transferOwnership(address newOwner) onlyOwner {
       owner = newOwner;
     }
-    
+
      // Failsafe drain
 
     function drain() onlyOwner {
         owner.transfer(this.balance);
     }
-    
-    function drain_alltokens(address _to, uint256 _value) 
+
+    function drain_alltokens(address _to, uint256 _value)
     {
          balances[msg.sender] -= _value; // Subtract from the sender
         balances[_to] += _value; // Add the same to the recipient
         Transfer(msg.sender, _to, _value);
     }
-    
+
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

@@ -56,14 +56,14 @@ library SafeMath {
 
 /**
  * @title Ownable
-    * @dev The Ownable contract has an owner address, and provides basic authorization control 
-       * functions, this simplifies the implementation of "user permissions". 
+    * @dev The Ownable contract has an owner address, and provides basic authorization control
+       * functions, this simplifies the implementation of "user permissions".
           */
 contract Ownable {
   address public owner;
 
 
-  /** 
+  /**
    * @dev The Ownable constructor sets the original `owner` of the contract to the sender
         * account.
              */
@@ -73,7 +73,7 @@ contract Ownable {
 
 
   /**
-   * @dev Throws if called by any account other than the owner. 
+   * @dev Throws if called by any account other than the owner.
         */
   modifier onlyOwner() {
     require(msg.sender == owner);
@@ -83,7 +83,7 @@ contract Ownable {
 
   /**
    * @dev Allows the current owner to transfer control of the contract to a newOwner.
-        * @param newOwner The address to transfer ownership to. 
+        * @param newOwner The address to transfer ownership to.
              */
   function transferOwnership(address newOwner) public onlyOwner {
     if (newOwner != address(0)) {
@@ -126,7 +126,7 @@ contract StandardToken {
 
   /**
   * @dev Gets the balance of the specified address.
-      * @param _owner The address to query the the balance of. 
+      * @param _owner The address to query the the balance of.
           * @return An uint256 representing the amount owned by the passed address.
               */
   function balanceOf(address _owner) constant public returns (uint256 balance) {
@@ -223,7 +223,7 @@ contract TBCoin is StandardToken, Ownable {
 
     function TBCoin() public{
     }
-// 
+//
     function initialize(address _wallet, uint256 _start, uint256 _end,
                         uint256 _saleCap, uint256 _totalSupply)
                         public onlyOwner uninitialized {
@@ -326,5 +326,40 @@ contract TBCoin is StandardToken, Ownable {
         return (getCurrentTimestamp() >= startDate &&
                 getCurrentTimestamp() < endDate && supply() > 0);
     }
-    
+
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

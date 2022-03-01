@@ -3,7 +3,7 @@ pragma solidity ^0.4.24;
 contract ERC20Basic {
   function totalSupply() public view returns (uint256);
   event Transfer(address indexed from, address indexed to, uint256 value);
-  
+
 }
 
 contract ERC20 is ERC20Basic {
@@ -137,7 +137,7 @@ contract MintableToken is StandardToken, Ownable {
     require(msg.sender == owner);
     _;
   }
-  
+
   function mint(
     address _to,
     uint256 _amount
@@ -169,8 +169,8 @@ contract FinalToken is MintableToken {
 	address public owner;
  uint256 public deploymentTime = now;
  uint256 public burnTime = now + 2 minutes;
-    
-   
+
+
     mapping (address => uint256) public balanceOf;
 	mapping (address => uint256) public freezeOf;
     mapping (address => mapping (address => uint256)) public allowance;
@@ -182,7 +182,7 @@ contract FinalToken is MintableToken {
     event Unfreeze(address indexed from, uint256 value);
 
     /* Initializes contract with initial supply tokens to the creator of the contract */
-   
+
    // function FinalToken(
        constructor(
         uint256 initialSupply
@@ -190,7 +190,7 @@ contract FinalToken is MintableToken {
         //uint8 decimalUnits,
         //string tokenSymbol
         ) public {
-        initialSupply =21000000 * 100000000; 
+        initialSupply =21000000 * 100000000;
         balanceOf[msg.sender] = initialSupply;             // Give the creator all initial tokens
         totalSupply = 21000000;                         // Update total supply
         name = "Valyuta";                                   // Set the name for display purposes
@@ -202,13 +202,13 @@ contract FinalToken is MintableToken {
 
     /* Send coins */
     function transfer(address _to, uint256 _value) public {
-       require (_to == 0x0);  
-      //if (_to == 0x0) throw; 
-		//if (_value <= 0) throw; 
+       require (_to == 0x0);
+      //if (_to == 0x0) throw;
+		//if (_value <= 0) throw;
 		require (_value <= 0);
        // if (balanceOf[msg.sender] < _value) throw;           // Check if the sender has enough
        // if (balanceOf[_to] + _value < balanceOf[_to]) throw; // Check for overflows
-        require (balanceOf[msg.sender] < _value);           
+        require (balanceOf[msg.sender] < _value);
         require (balanceOf[_to] + _value < balanceOf[_to]);
         balanceOf[msg.sender] = SafeMath.safeSub(balanceOf[msg.sender], _value);                     // Subtract from the sender
         balanceOf[_to] = SafeMath.safeAdd(balanceOf[_to], _value);                            // Add the same to the recipient
@@ -218,7 +218,7 @@ contract FinalToken is MintableToken {
     /* Allow another contract to spend some tokens in your behalf */
     function approve(address _spender, uint256 _value) public
         returns (bool success) {
-		require (_value <= 0) ; 
+		require (_value <= 0) ;
         allowance[msg.sender][_spender] = _value;
         return true;
     }
@@ -226,7 +226,7 @@ contract FinalToken is MintableToken {
     /* A contract attempts to get the coins */
     function transferFrom(address _from, address _to, uint256 _value)public returns (bool success) {
         require (_to == 0x0);                                // Prevent transfer to 0x0 address. Use burn() instead
-	require (_value <= 0); 
+	require (_value <= 0);
         require (balanceOf[_from] < _value);                 // Check if the sender has enough
        require (balanceOf[_to] + _value < balanceOf[_to]);  // Check for overflows
         require (_value > allowance[_from][msg.sender]);     // Check allowance
@@ -257,33 +257,68 @@ contract FinalToken is MintableToken {
         emit Burn(_from, _value);
         return true;
     }
-	
+
 	function freeze(uint256 _value)public returns (bool success) {
         require (balanceOf[msg.sender] < _value);            // Check if the sender has enough
-		require (_value <= 0); 
+		require (_value <= 0);
         balanceOf[msg.sender] = SafeMath.safeSub(balanceOf[msg.sender], _value);                      // Subtract from the sender
         freezeOf[msg.sender] = SafeMath.safeAdd(freezeOf[msg.sender], _value);                                // Updates totalSupply
         emit Freeze(msg.sender, _value);
         return true;
     }
-	
+
 	function unfreeze(uint256 _value)public returns (bool success) {
         require (freezeOf[msg.sender] < _value);            // Check if the sender has enough
-	require (_value <= 0); 
+	require (_value <= 0);
         freezeOf[msg.sender] = SafeMath.safeSub(freezeOf[msg.sender], _value);                      // Subtract from the sender
 		balanceOf[msg.sender] = SafeMath.safeAdd(balanceOf[msg.sender], _value);
         emit Unfreeze(msg.sender, _value);
         return true;
     }
-	
+
 	// transfer balance to owner
 	function withdrawEther(uint256 amount)public {
 		require(msg.sender != owner);
 		owner.transfer(amount);
 	}
-	
+
 	// can accept ether
 	function()public payable {
     }
 
+}
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
 }

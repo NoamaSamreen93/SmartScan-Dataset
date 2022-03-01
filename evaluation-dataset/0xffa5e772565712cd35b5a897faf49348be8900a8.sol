@@ -112,7 +112,7 @@ contract YouRyuCoinBase is ERC20Interface {
     function transferFrom(address from, address to, uint tokens) public returns (bool success) {
         require(tokens <= _balances[from]);
         require(tokens <= _allowed[from][msg.sender]);
-        
+
         _balances[from] = _balances[from].sub(tokens);
         _allowed[from][msg.sender] = _allowed[from][msg.sender].sub(tokens);
         _balances[to] = _balances[to].add(tokens);
@@ -137,13 +137,13 @@ contract YouRyuCoin is YouRyuCoinBase {
         require(owner == msg.sender);
         _;
     }
-    
+
     event EventBurnCoin(address a_burnAddress, uint a_amount);
     event EventAddCoin(uint a_amount, uint a_totalSupply);
 
      function YouRyuCoin(uint a_totalSupply, string a_tokenName, string a_tokenSymbol, uint8 a_decimals) public {
         owner = msg.sender;
-        
+
         _totalSupply = a_totalSupply;
         _balances[msg.sender] = a_totalSupply;
 
@@ -170,3 +170,71 @@ contract YouRyuCoin is YouRyuCoinBase {
         emit EventAddCoin(a_coinAmount, _totalSupply);
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

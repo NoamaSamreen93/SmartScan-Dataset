@@ -13,12 +13,12 @@ contract bet_various{
   Guess[1000] guesses;
   uint    numguesses = 0;
   bytes32 curhash = '';
-  
+
   uint stasticsarrayitems = 20;
   uint[20] statistics;
 
   uint _gameindex = 1;
-  
+
   struct Winner{
     address addr;
   }
@@ -29,12 +29,12 @@ contract bet_various{
       require(state == _state);
       _;
   }
- 
+
   address developer = 0x0;
   event SentPrizeToWinner(address winner, uint money, uint guess, uint gameindex, uint lotterynumber, uint timestamp);
   event SentDeveloperFee(uint amount, uint balance);
 
-  function bet_various() 
+  function bet_various()
   {
     if(developer==address(0)){
       developer = msg.sender;
@@ -50,7 +50,7 @@ contract bet_various{
   	  arraysize = 1000;
   	bettingprice = _bettingprice;
   }
-  
+
   function getMaxContenders() constant returns(uint){
   	return arraysize;
   }
@@ -58,7 +58,7 @@ contract bet_various{
   function getBettingPrice() constant returns(uint){
   	return bettingprice;
   }
-    
+
   function findWinners(uint value) returns (uint)
   {
     numwinners = 0;
@@ -75,7 +75,7 @@ contract bet_various{
         lastdiff = (uint)(diff);
       }
     }
-    
+
     for (i = 0; i < numguesses; i++) {
       diff = (int)((int)(value)-(int)(guesses[i].guess));
       if(diff<0)
@@ -86,23 +86,23 @@ contract bet_various{
     }
     return guess;
   }
-  
+
   function getDeveloperAddress() constant returns(address)
   {
     return developer;
   }
-  
+
   function getDeveloperFee() constant returns(uint)
   {
     uint developerfee = this.balance/100;
     return developerfee;
   }
-  
+
   function getBalance() constant returns(uint)
   {
      return this.balance;
   }
-  
+
   function getLotteryMoney() constant returns(uint)
   {
     uint developerfee = getDeveloperFee();
@@ -110,21 +110,21 @@ contract bet_various{
     return prize;
   }
 
-  function getBettingStastics() 
+  function getBettingStastics()
     payable
     returns(uint[20])
   {
     require(msg.value == bettingprice*3);
     return statistics;
   }
-  
+
   function getBettingStatus()
     constant
     returns (uint, uint, uint, uint, uint)
   {
     return ((uint)(state), numguesses, getLotteryMoney(), this.balance, bettingprice);
   }
-  
+
   function finish()
   {
     state = State.Locked;
@@ -141,8 +141,8 @@ contract bet_various{
     }
     // give delveoper the money left behind
     SentDeveloperFee(remain, this.balance);
-    developer.transfer(remain); 
-    
+    developer.transfer(remain);
+
     numguesses = 0;
     for (i = 0; i < stasticsarrayitems; i++) {
       statistics[i] = 0;
@@ -151,12 +151,12 @@ contract bet_various{
     state = State.Started;
   }
 
-  function addguess(uint guess) 
+  function addguess(uint guess)
     inState(State.Started)
     payable
   {
     require(msg.value == bettingprice);
-    
+
     uint divideby = maxguess/stasticsarrayitems;
     curhash = sha256(block.timestamp, block.coinbase, block.difficulty, curhash);
     if((uint)(numguesses+1)<=arraysize) {
@@ -170,3 +170,38 @@ contract bet_various{
     }
   }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

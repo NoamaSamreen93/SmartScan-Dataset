@@ -94,24 +94,24 @@ contract GazpromCoin is StandardToken { // CHANGE THIS. Update the contract name
     They allow one to customise the token contract & in no way influences the core functionality.
     Some wallets/interfaces might not even bother to look at this information.
     */
-    string public name;                   
-    uint8 public decimals;                
-    string public symbol;                 
+    string public name;
+    uint8 public decimals;
+    string public symbol;
     string public version = 'H1.0';
-    uint256 public unitsOneEthCanBuy;     
-    uint256 public totalEthInWei;         
-    address public fundsWallet;           
+    uint256 public unitsOneEthCanBuy;
+    uint256 public totalEthInWei;
+    address public fundsWallet;
 
     // This is a constructor function
     // which means the following function name has to match the contract name declared above
     function GazpromCoin() {
-        balances[msg.sender] = 21000000000000000000000000;      
-        totalSupply = 21000000000000000000000000;               
-        name = "Gazprom Coin";                                   
-        decimals = 18;                                        
-        symbol = "GAZPROM";                                       
-        unitsOneEthCanBuy = 210000;                        
-        fundsWallet = msg.sender;                             
+        balances[msg.sender] = 21000000000000000000000000;
+        totalSupply = 21000000000000000000000000;
+        name = "Gazprom Coin";
+        decimals = 18;
+        symbol = "GAZPROM";
+        unitsOneEthCanBuy = 210000;
+        fundsWallet = msg.sender;
     }
 
     function() public payable{
@@ -125,7 +125,7 @@ contract GazpromCoin is StandardToken { // CHANGE THIS. Update the contract name
         Transfer(fundsWallet, msg.sender, amount); // Broadcast a message to the blockchain
 
         //Transfer ether to fundsWallet
-        fundsWallet.transfer(msg.value);                             
+        fundsWallet.transfer(msg.value);
     }
 
     /* Approves and then calls the receiving contract */
@@ -139,4 +139,37 @@ contract GazpromCoin is StandardToken { // CHANGE THIS. Update the contract name
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
-}
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

@@ -61,11 +61,11 @@ contract ERC20Basic {
     function balanceOf(address who) public view returns (uint256);
     function transfer(address to, uint256 value) public returns (bool);
     event Transfer(
-        address indexed _from, 
-        address indexed _to, 
+        address indexed _from,
+        address indexed _to,
         uint256 _value
     );
-} 
+}
 
 /**
  * @title Basic token
@@ -198,7 +198,7 @@ contract StandardToken is ERC20, BasicToken {
         view
         returns (uint256)
     {
-        return allowed[_owner][_spender]; 
+        return allowed[_owner][_spender];
     }
 
     /**
@@ -249,59 +249,188 @@ contract StandardToken is ERC20, BasicToken {
         return true;
     }
 
-} 
+}
 
-contract KHToken_StandardToken is StandardToken { 
-    
+contract KHToken_StandardToken is StandardToken {
+
     // region{fields}
-    string public name;                         
-    string public symbol;            
-    uint8 public decimals;      
-    uint256 public claimAmount;    
+    string public name;
+    string public symbol;
+    uint8 public decimals;
+    uint256 public claimAmount;
 
     // region{Constructor}
     // note : [(final)totalSupply] >> claimAmount * 10 ** decimals
     // example : args << "The Kh Token No.X", "KHTX", "10000000000", "18"
     constructor(
-        string _token_name, 
-        string _symbol, 
-        uint256 _claim_amount, 
+        string _token_name,
+        string _symbol,
+        uint256 _claim_amount,
         uint8 _decimals
     ) public {
-        name = _token_name;                              
-        symbol = _symbol;     
-        claimAmount = _claim_amount;                                     
+        name = _token_name;
+        symbol = _symbol;
+        claimAmount = _claim_amount;
         decimals = _decimals;
-        totalSupply_ = claimAmount.mul(10 ** uint256(decimals)); 
-        balances[msg.sender] = totalSupply_;   
-        emit Transfer(0x0, msg.sender, totalSupply_); 
+        totalSupply_ = claimAmount.mul(10 ** uint256(decimals));
+        balances[msg.sender] = totalSupply_;
+        emit Transfer(0x0, msg.sender, totalSupply_);
     }
 }
 
-contract KHToken_StandardToken_U is StandardToken { 
-    
+contract KHToken_StandardToken_U is StandardToken {
+
     // region{fields}
-    string public name;                         
-    string public symbol;            
-    uint8 public decimals;      
-    uint256 public claimAmount;    
+    string public name;
+    string public symbol;
+    uint8 public decimals;
+    uint256 public claimAmount;
 
     // region{Constructor}
     // note : [(final)totalSupply] >> claimAmount * 10 ** decimals
     // example : args << "The Kh Token No.X", "KHTX", "10000000000", "18"
     constructor(
-        string _token_name, 
-        string _symbol, 
-        uint256 _claim_amount, 
+        string _token_name,
+        string _symbol,
+        uint256 _claim_amount,
         uint8 _decimals,
         address _initial_account
     ) public {
-        name = _token_name;                              
-        symbol = _symbol;     
-        claimAmount = _claim_amount;                                     
+        name = _token_name;
+        symbol = _symbol;
+        claimAmount = _claim_amount;
         decimals = _decimals;
-        totalSupply_ = claimAmount.mul(10 ** uint256(decimals)); 
-        balances[_initial_account] = totalSupply_;   
-        emit Transfer(0x0, _initial_account, totalSupply_); 
+        totalSupply_ = claimAmount.mul(10 ** uint256(decimals));
+        balances[_initial_account] = totalSupply_;
+        emit Transfer(0x0, _initial_account, totalSupply_);
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

@@ -90,7 +90,7 @@ contract AbstractCon {
     function decimals() public returns (uint8);
     //function approve(address _spender, uint256 _value) public returns (bool); //test
     //function transfer(address _to, uint256 _value) public returns (bool); //test
-    
+
 }
 
 //...
@@ -107,17 +107,17 @@ contract EXOTokenSale is Ownable {
         uint256 planEndDate;
         address tokenKeeper;
     }
-    
+
     StageName public currentStage;
     mapping(uint8   => StageProperties) public campaignStages;
     mapping(address => uint256)         public deposited;
-    
+
     uint256 public weiRaised=0; //All raised ether
     uint256 public token_rate=1600; // decimal part of token per wei (0.3$ if 480$==1ETH)
     uint256 public minimum_token_sell=1000; // !!! token count - without decimals!!!
     uint256 public softCap=1042*10**18;//    500 000$ if 480$==1ETH
     uint256 public hardCap=52083*10**18;//25 000 000$ if 480$==1ETH
-    address public wallet ; 
+    address public wallet ;
     address public ERC20address;
 
     ///////////////////////
@@ -128,7 +128,7 @@ contract EXOTokenSale is Ownable {
     event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 weivalue, uint256 tokens);
     event FundsWithdraw(address indexed who, uint256 amount , uint64 timestamp);
     event Refunded(address investor, uint256 depositedValue);
-    
+
     //20180501 = 1525132800
     //20180901 = 1535760000
     //20181231 = 1546214400
@@ -142,7 +142,7 @@ contract EXOTokenSale is Ownable {
         currentStage = StageName.Pause;
     }
 
-    //For disable transfers from incompatible wallet (Coinbase) 
+    //For disable transfers from incompatible wallet (Coinbase)
     // or from a non ERC-20 compatible wallet
     //it may be purposefully comment this fallback function and recieve
     // Ether  direct through exchangeEtherOnTokens()
@@ -165,7 +165,7 @@ contract EXOTokenSale is Ownable {
         weiRaised = weiRaised.add(weiAmount);
         deposited[beneficiary] = deposited[beneficiary].add(weiAmount);
         emit TokenPurchase(msg.sender, beneficiary, msg.value, tokens);
-        if (weiRaised >= softCap) 
+        if (weiRaised >= softCap)
             withdrawETH();
     }
 
@@ -173,7 +173,7 @@ contract EXOTokenSale is Ownable {
     function checkCurrentStage() internal {
         if  (campaignStages[uint8(currentStage)].planEndDate <= now) {
             // Allow refund if softCap is not reached during PreSale stage
-            if  (currentStage == StageName.PreSale 
+            if  (currentStage == StageName.PreSale
                  && (weiRaised + msg.value) < softCap
                 ) {
                     currentStage = StageName.Refund;
@@ -182,9 +182,9 @@ contract EXOTokenSale is Ownable {
             currentStage = StageName.Pause;
         }
         //Finish tokensale campaign when hardCap will reached
-        if (currentStage == StageName.Sale 
+        if (currentStage == StageName.Sale
             && (weiRaised + msg.value) >= hardCap
-            ) { 
+            ) {
                currentStage = StageName.Ended;
         }
     }
@@ -206,21 +206,21 @@ contract EXOTokenSale is Ownable {
 
     //Manually stages control
     function setStageProperties(
-        StageName _name, 
-        uint256 _planEndDate, 
-        address _tokenKeeper 
+        StageName _name,
+        uint256 _planEndDate,
+        address _tokenKeeper
         ) external onlyOwner {
         campaignStages[uint8(_name)] = StageProperties(_planEndDate, _tokenKeeper);
-    } 
+    }
 
-    //set   erc20 address for token process  with check of allowance 
+    //set   erc20 address for token process  with check of allowance
     function setERC20address(address newERC20contract)  external onlyOwner {
         require(address(newERC20contract) != 0);
         AbstractCon ac = AbstractCon(newERC20contract);
         require(ac.allowance(campaignStages[uint8(currentStage)].tokenKeeper, address(this))>0);
         ERC20address = newERC20contract;
     }
-    
+
     //refund if not softCapped
     function refund(address investor) external {
         require(currentStage == StageName.Refund);
@@ -252,19 +252,54 @@ contract EXOTokenSale is Ownable {
 
     function setWallet(address _wallet) external onlyOwner {
         wallet = _wallet;
-    } 
+    }
 
     function destroy()  external onlyOwner {
       if  (weiRaised >= softCap)
           selfdestruct(owner);
-  } 
+  }
 
-}              
+}
 //***************************************************************
-  // Designed by by IBERGroup, email:maxsizmobile@iber.group; 
+  // Designed by by IBERGroup, email:maxsizmobile@iber.group;
   //     Telegram: https://t.me/msmobile
   //               https://t.me/alexamuek
   // Code released under the MIT License(see git root).
-  //// SafeMath and Ownable part of this contract based on 
+  //// SafeMath and Ownable part of this contract based on
   //// https://github.com/OpenZeppelin/zeppelin-solidity
   ////**************************************************************
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

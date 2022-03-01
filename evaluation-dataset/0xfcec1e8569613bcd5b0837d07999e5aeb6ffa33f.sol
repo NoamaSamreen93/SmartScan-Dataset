@@ -292,7 +292,7 @@ contract StockPortfolio is Ownable {
      * @return stock Stock name
      * @return quantity Quantity of shares held
      * @return avgPrice Average price paid for shares
-     */  
+     */
     function getPositionFromHolding
     (
         uint _index
@@ -301,7 +301,7 @@ contract StockPortfolio is Ownable {
         view
         returns
         (
-            bytes6 market, 
+            bytes6 market,
             bytes6 symbol,
             uint32 quantity,
             uint32 avgPrice
@@ -348,7 +348,7 @@ contract StockPortfolio is Ownable {
             key := mload(add(combined, 32))
         }
     }
-    
+
     /**
      * @dev Splits a unique key for a stock and returns the market and symbol
      * @param _key Unique stock key
@@ -443,4 +443,39 @@ contract StockPortfolio is Ownable {
         emit Bought(market, _symbol, _quantity, _price, now);
     }
 
+}
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
 }

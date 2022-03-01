@@ -2,7 +2,7 @@ pragma solidity ^0.4.4;
 
 contract Token {
 
-    
+
     function totalSupply() constant returns (uint256 supply) {}
     function balanceOf(address _owner) constant returns (uint256 balance) {}
     function transfer(address _to, uint256 _value) returns (bool success) {}
@@ -12,7 +12,7 @@ contract Token {
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
 }
 
 
@@ -65,22 +65,22 @@ contract Redchain is StandardToken {
         throw;
     }
 
-    string public name = "Redchain";                   
-    uint8 public decimals = 0;                
-    string public symbol = "RCH";                 
-    string public version = 'H1.0';       
+    string public name = "Redchain";
+    uint8 public decimals = 0;
+    string public symbol = "RCH";
+    string public version = 'H1.0';
 
 
     function Redchain(
         ) {
-        balances[msg.sender] = 32000000;               
-        totalSupply = 32000000;                        
-        name = "Redchain";                                   
-        decimals = 0;                           
-        symbol = "RCH";                               
+        balances[msg.sender] = 32000000;
+        totalSupply = 32000000;
+        name = "Redchain";
+        decimals = 0;
+        symbol = "RCH";
     }
 
-    
+
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool success) {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
@@ -89,3 +89,38 @@ contract Redchain is StandardToken {
         return true;
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

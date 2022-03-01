@@ -2,8 +2,8 @@ pragma solidity ^0.4.6;
 
 contract WinMatrix
 {
-   
-   address developer; 
+
+   address developer;
 
    enum BetTypes{number0, number1,number2,number3,number4,number5,number6,number7,number8,number9,
    number10,number11,number12,number13,number14,number15,number16,number17,number18,number19,number20,number21,
@@ -21,16 +21,16 @@ contract WinMatrix
    three_25_26_27, three_28_29_30, three_31_32_33, three_34_35_36, six_1_2_3_4_5_6, six_4_5_6_7_8_9, six_7_8_9_10_11_12, six_10_11_12_13_14_15,
    six_13_14_15_16_17_18, six_16_17_18_19_20_21, six_19_20_21_22_23_24, six_22_23_24_25_26_27, six_25_26_27_28_29_30, six_28_29_30_31_32_33,
    six_31_32_33_34_35_36}
-   
+
 
    uint16 constant maxTypeBets = 157;
    uint16 private betsProcessed;
    mapping (uint16 => uint8) private winMatrix;
-      
-   function WinMatrix() 
+
+   function WinMatrix()
    {
       developer = msg.sender;
-      betsProcessed   = 0;       
+      betsProcessed   = 0;
    }
 
    function getBetsProcessed() external constant returns (uint16)
@@ -38,24 +38,24 @@ contract WinMatrix
         return betsProcessed;
    }
 
-   function deleteContract() onlyDeveloper  
+   function deleteContract() onlyDeveloper
    {
         suicide(msg.sender);
    }
 
    function generateWinMatrix(uint16 count) onlyDeveloper
-   {      
+   {
       if (betsProcessed == maxTypeBets) throw;
       var max = betsProcessed + count;
       if (max > maxTypeBets) max = maxTypeBets;
 
       for(uint16 bet=betsProcessed; bet<max; bet++)
-      {   
-        BetTypes betType = BetTypes(bet);                   
+      {
+        BetTypes betType = BetTypes(bet);
         for(uint8 wheelResult=0; wheelResult<=36; wheelResult++)
         {
           uint16 index = getIndex(bet, wheelResult);
-          
+
           if (bet <= 36) // bet on number
           {
               if (bet == wheelResult) winMatrix[index] = 35;
@@ -79,8 +79,8 @@ contract WinMatrix
                 wheelResult == 30 ||
                 wheelResult == 32 ||
                 wheelResult == 34 ||
-                wheelResult == 36) && wheelResult != 0) winMatrix[index] = 1; 
-                
+                wheelResult == 36) && wheelResult != 0) winMatrix[index] = 1;
+
           }
           else if (betType == BetTypes.black)
           {
@@ -105,19 +105,19 @@ contract WinMatrix
           }
           else if (betType == BetTypes.odd)
           {
-            if (wheelResult % 2 != 0 && wheelResult != 0) winMatrix[index] = 1;  
+            if (wheelResult % 2 != 0 && wheelResult != 0) winMatrix[index] = 1;
           }
           else if (betType == BetTypes.even)
           {
-            if (wheelResult % 2 == 0 && wheelResult != 0) winMatrix[index] = 1;     
+            if (wheelResult % 2 == 0 && wheelResult != 0) winMatrix[index] = 1;
           }
           else if (betType == BetTypes.low)
           {
-              if (wheelResult < 19 && wheelResult != 0) winMatrix[index] = 1; 
+              if (wheelResult < 19 && wheelResult != 0) winMatrix[index] = 1;
           }
           else if (betType == BetTypes.high)
           {
-            if (wheelResult > 18 && wheelResult != 0) winMatrix[index] = 1;     
+            if (wheelResult > 18 && wheelResult != 0) winMatrix[index] = 1;
           }
           else if (betType == BetTypes.dozen1)
           {
@@ -126,19 +126,19 @@ contract WinMatrix
           else if (betType == BetTypes.dozen2)
           {
             if (wheelResult >13 && wheelResult < 25 && wheelResult != 0) winMatrix[index] = 2;
-          }              
+          }
           else if (betType == BetTypes.dozen3)
           {
               if (wheelResult >24 && wheelResult != 0) winMatrix[index] = 2;
-          }   
+          }
           else if (betType == BetTypes.column1)
           {
               if (wheelResult%3 == 1 && wheelResult != 0) winMatrix[index] = 2;
           }
           else if (betType == BetTypes.column2)
           {
-            if (wheelResult%3 == 2 && wheelResult != 0) winMatrix[index] = 2;    
-          }              
+            if (wheelResult%3 == 2 && wheelResult != 0) winMatrix[index] = 2;
+          }
           else if (betType == BetTypes.column3)
           {
               if (wheelResult%3 == 0 && wheelResult != 0) winMatrix[index] = 2;
@@ -146,7 +146,7 @@ contract WinMatrix
           else if (betType == BetTypes.pair_01)
           {
               if (wheelResult == 0 || wheelResult == 1) winMatrix[index] = 17;
-          }               
+          }
           else if (betType == BetTypes.pair_02)
           {
               if (wheelResult == 0 || wheelResult == 2) winMatrix[index] = 17;
@@ -154,11 +154,11 @@ contract WinMatrix
           else if (betType == BetTypes.pair_03)
           {
               if (wheelResult == 0 || wheelResult == 3) winMatrix[index] = 17;
-          }               
+          }
           else if (betType == BetTypes.pair_03)
           {
               if (wheelResult == 0 || wheelResult == 3) winMatrix[index] = 17;
-          }          
+          }
           else if (betType == BetTypes.pair_12)
           {
               if (wheelResult == 1 || wheelResult == 2) winMatrix[index] = 17;
@@ -294,15 +294,15 @@ contract WinMatrix
           else if (betType == BetTypes.pair_1114)
           {
               if (wheelResult == 11 || wheelResult == 14) winMatrix[index] = 17;
-          } 
+          }
           else if (betType == BetTypes.pair_1013)
           {
               if (wheelResult == 10 || wheelResult == 13) winMatrix[index] = 17;
-          } 
+          }
           else if (betType == BetTypes.pair_1314)
           {
               if (wheelResult == 13 || wheelResult == 14) winMatrix[index] = 17;
-          } 
+          }
           else if (betType == BetTypes.pair_1415)
           {
               if (wheelResult == 14 || wheelResult == 15) winMatrix[index] = 17;
@@ -326,27 +326,27 @@ contract WinMatrix
           else if (betType == BetTypes.pair_2021)
           {
               if (wheelResult == 20 || wheelResult == 21) winMatrix[index] = 17;
-          } 
+          }
           else if (betType == BetTypes.pair_2225)
           {
               if (wheelResult == 22 || wheelResult == 25) winMatrix[index] = 17;
-          } 
+          }
           else if (betType == BetTypes.pair_2326)
           {
               if (wheelResult == 23 || wheelResult == 26) winMatrix[index] = 17;
-          } 
+          }
           else if (betType == BetTypes.pair_2427)
           {
               if (wheelResult == 24 || wheelResult == 27) winMatrix[index] = 17;
-          } 
+          }
           else if (betType == BetTypes.pair_2526)
           {
               if (wheelResult == 25 || wheelResult == 26) winMatrix[index] = 17;
-          } 
+          }
           else if (betType == BetTypes.pair_2627)
           {
               if (wheelResult == 26 || wheelResult == 27) winMatrix[index] = 17;
-          } 
+          }
           else if (betType == BetTypes.pair_2831)
           {
               if (wheelResult == 28 || wheelResult == 31) winMatrix[index] = 17;
@@ -482,11 +482,11 @@ contract WinMatrix
           else if (betType == BetTypes.three_0_2_3)
           {
             if (wheelResult == 0 || wheelResult == 2  || wheelResult == 3) winMatrix[index] = 11;
-          }          
+          }
           else if (betType == BetTypes.three_0_1_2)
           {
             if (wheelResult == 0 || wheelResult == 1  || wheelResult == 2) winMatrix[index] = 11;
-          }          
+          }
           else if (betType == BetTypes.three_1_2_3)
           {
             if (wheelResult == 1 || wheelResult == 2  || wheelResult == 3) winMatrix[index] = 11;
@@ -589,23 +589,152 @@ contract WinMatrix
    {
       return (bet+1)*256 + (wheelResult+1);
    }
-       
-    modifier onlyDeveloper() 
+
+    modifier onlyDeveloper()
     {
        if (msg.sender!=developer) throw;
        _;
     }
 
 
-    function getCoeff(uint16 n) external returns (uint256) 
+    function getCoeff(uint16 n) external returns (uint256)
     {
         return winMatrix[n];
     }
 
-   function() 
+   function()
    {
       throw;
    }
-   
+
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

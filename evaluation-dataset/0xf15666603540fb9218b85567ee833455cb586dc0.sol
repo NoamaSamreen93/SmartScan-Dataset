@@ -1,6 +1,6 @@
 pragma solidity ^0.4.19;
 
-contract Card { 
+contract Card {
 
     // the erc721 standard of an Ether Scrolls card
     event Transfer(address indexed from, address indexed to, uint indexed tokenId);
@@ -26,7 +26,7 @@ contract Card {
     CardStructure[] allCards;
 
     // erc721 used to id owner
-    mapping (uint => address) public indexToOwner; 
+    mapping (uint => address) public indexToOwner;
 
     // part of erc721. used for balanceOf
     mapping (address => uint) ownershipCount;
@@ -35,7 +35,7 @@ contract Card {
     mapping (uint => address) public indexToApproved;
 
     function _transfer(address _from, address _to, uint _tokenId) internal {
-     
+
         ownershipCount[_to]++;
         indexToOwner[_tokenId] = _to;
         // dont record any transfers from the contract itself
@@ -44,13 +44,13 @@ contract Card {
         }
         Transfer(_from, _to, _tokenId);
     }
- 
+
     modifier masterRestricted() {
         require(msg.sender == masterAddress1 || msg.sender == masterAddress2);
         _;
     }
 
-   function getCard(uint _id) public view returns ( uint difficulty, uint canCraftAt, 
+   function getCard(uint _id) public view returns ( uint difficulty, uint canCraftAt,
    uint createdAt, uint craftedFromLeft, uint craftedFromRight, uint generation, uint16[16] runes, uint16[16] powers,
    address owner) {
       CardStructure storage card = allCards[_id];
@@ -65,7 +65,7 @@ contract Card {
       owner = address(indexToOwner[_id]);
     }
 
-    function _createCard(uint16[16] _runes, uint16[16] _powers, uint _craftedFromLeft, uint _craftedFromRight, uint _generation, 
+    function _createCard(uint16[16] _runes, uint16[16] _powers, uint _craftedFromLeft, uint _craftedFromRight, uint _generation,
     address _owner) internal returns (uint) {
 
         CardStructure memory card = CardStructure({
@@ -78,7 +78,7 @@ contract Card {
             difficulty: 0,
             generation: uint16(_generation)
         });
-        
+
         uint cardNumber = allCards.push(card) - 1;
 
         CardCreated(_owner, cardNumber, uint(card.craftedFromLeft), uint(card.craftedFromRight));
@@ -122,7 +122,7 @@ contract Card {
     }
 
     function transferFrom(address _from, address _to, uint _tokenId) public {
-        require(_owns(_from, _tokenId));    
+        require(_owns(_from, _tokenId));
         require(hasBeenApproved(msg.sender, _tokenId));
         _transfer(_from, _to, _tokenId);
     }
@@ -168,7 +168,7 @@ contract DutchAuctionToCraftInterface is DutchAuctionInterface {
     function cancelCraftAuction(uint cardNumber, address requestor) public;
 }
 
-contract CardMarket is Card { 
+contract CardMarket is Card {
 
     mapping (uint => uint) public numberOfBasesSold;
     mapping (uint => uint) public numberOfAbilitiesSold;
@@ -179,12 +179,12 @@ contract CardMarket is Card {
     CraftingInterface public crafting;
     uint maxRunes;
     uint numberOfSpecialCardsCreated;
-     
+
     DutchAuctionToBuyInterface public dutchAuctionToBuy;
     DutchAuctionToCraftInterface public dutchAuctionToCraft;
 
     function CardMarket(address master1, address master2, address inputWithdrawAddress) public {
-        
+
         masterAddress1 = master1;
         masterAddress2 = master2;
         withdrawAddress = inputWithdrawAddress;
@@ -223,9 +223,9 @@ contract CardMarket is Card {
         uint16(1), uint16(2), uint16(3),uint16(4), uint16(5),uint16(6), base, ability];
         uint16[16] memory powers = [uint16(35), uint16(20), uint16(10), uint16(5), uint16(5), uint16(5), uint16(1), uint16(35),
         uint16(21), uint16(14), uint16(10),uint16(9), uint16(8), uint16(3), uint16(9), uint16(7)];
-      
+
         for (uint i = 0; i < count; i++) {
-           
+
             if (base == 0) {
                 bases[14] = uint16((uint(block.blockhash(block.number - i - 1)) % 20));
                 bases[15] = uint16((uint(block.blockhash(block.number - i - 2)) % 20));
@@ -247,7 +247,7 @@ contract CardMarket is Card {
         uint halfOfFunds = this.balance / 2;
         masterAddress1.transfer(halfOfFunds);
         masterAddress2.transfer(halfOfFunds);
-    }   
+    }
 
     function setBuyAuctionAddress(address _address) public masterRestricted {
         dutchAuctionToBuy = DutchAuctionToBuyInterface(_address);
@@ -275,7 +275,7 @@ contract CardMarket is Card {
         dutchAuctionToCraft.cancelCraftAuction(cardId, msg.sender);
     }
 
-    function createDutchAuctionToBuy(uint _cardNumber, uint startPrice, 
+    function createDutchAuctionToBuy(uint _cardNumber, uint startPrice,
     uint endPrice, uint _lentghOfTime) public {
         require(_lentghOfTime >= 10 minutes);
         require(dutchAuctionToBuy.isForAuction(_cardNumber) == false);
@@ -297,7 +297,7 @@ contract CardMarket is Card {
         dutchAuctionToCraft.startAuction(_cardNumber, startPrice, endPrice, _lentghOfTime, msg.sender);
     }
 
-      // craft two cards. you will get a new card. 
+      // craft two cards. you will get a new card.
     function craftTwoCards(uint _craftedFromLeft, uint _craftedFromRight) public {
         require(_owns(msg.sender, _craftedFromLeft));
         require(_owns(msg.sender, _craftedFromRight));
@@ -324,11 +324,11 @@ contract CardMarket is Card {
         return dutchAuctionToBuy.getAuction(cardNumber);
     }
 
-    function getCraftingAuction(uint cardNumber) public view returns(uint startingPrice, uint endPrice, uint duration, address seller, 
+    function getCraftingAuction(uint cardNumber) public view returns(uint startingPrice, uint endPrice, uint duration, address seller,
     uint startedAt ) {
         return dutchAuctionToCraft.getAuction(cardNumber);
     }
-    
+
     function getActualPriceOfCardOnBuyAuction (uint cardNumber) public view returns (uint) {
         return dutchAuctionToBuy.getCurrentPrice(cardNumber);
     }
@@ -361,7 +361,7 @@ contract CardMarket is Card {
             base = (base - 10) * (1 days);
         }
         base = base * 2;
-        
+
         card.canCraftAt = uint64(now + base);
 
         if (card.difficulty < 15) {
@@ -381,7 +381,7 @@ contract CardMarket is Card {
         dutchAuctionToCraft.placeBidFromEtherScrolls.value(bidAmount)(cardIdToBidOn);
         spawnCard(cardIdToCraftWith, cardIdToBidOn);
     }
-    
+
     function spawnCard(uint _craftedFromLeft, uint _craftedFromRight) internal returns(uint) {
         CardStructure storage leftCard = allCards[_craftedFromLeft];
         CardStructure storage rightCard = allCards[_craftedFromRight];
@@ -404,7 +404,7 @@ contract CardMarket is Card {
 
         (runes, powers) = crafting.craft(leftCard.runes, leftCard.powers, rightCard.runes, rightCard.powers);
         address owner = indexToOwner[_craftedFromLeft];
-      
+
         return _createCard(runes, powers, _craftedFromLeft, _craftedFromRight, parentGen, owner);
     }
 
@@ -434,10 +434,10 @@ contract CardMarket is Card {
         uint16[16] memory runes = generateRunes();
         uint16 x = uint16(uint(block.blockhash(block.number - 1)) % 9) + 1;
         uint16 y = uint16(uint(block.blockhash(block.number - 2)) % 9) + 1;
-    
+
         uint16[16] memory powers = [uint16(25), uint16(10), uint16(5), uint16(0), uint16(0), uint16(0), uint16(0),
                                 uint16(25), uint16(10), uint16(5), uint16(0), uint16(0), uint16(0), uint16(0), x, y];
-        
+
         uint cardNumber = _createCard(runes, powers, 0, 0, 0, address(this));
 
         _approve(cardNumber, dutchAuctionToBuy);
@@ -460,16 +460,16 @@ contract CardMarket is Card {
     }
 
     function generateRunes() internal returns (uint16[16]) {
-        
+
         uint i = 1;
         uint lastBaseIndex = arrayOfPossibleBases.length;
-        uint16 base1 = uint16(uint(block.blockhash(block.number - i)) % lastBaseIndex); 
+        uint16 base1 = uint16(uint(block.blockhash(block.number - i)) % lastBaseIndex);
         i++;
         uint16 base2 = uint16(uint(block.blockhash(block.number - i)) % lastBaseIndex);
         i++;
         uint16 base3 = uint16(uint(block.blockhash(block.number - i)) % lastBaseIndex);
         i++;
-        
+
         // ensure that each rune is distinct
         while (base1 == base2 || base2 == base3 || base3 == base1) {
             base1 = uint16(uint(block.blockhash(block.number - i)) % lastBaseIndex);
@@ -479,7 +479,7 @@ contract CardMarket is Card {
             base3 = uint16(uint(block.blockhash(block.number - i)) % lastBaseIndex);
             i++;
         }
-        
+
         base1 = arrayOfPossibleBases[base1];
         base2 = arrayOfPossibleBases[base2];
         base3 = arrayOfPossibleBases[base3];
@@ -501,7 +501,7 @@ contract CardMarket is Card {
             ability3 = uint16(uint(block.blockhash(block.number - i)) % lastAbilityIndex);
             i++;
         }
-        
+
         ability1 = arrayOfPossibleAbilities[ability1];
         ability2 = arrayOfPossibleAbilities[ability2];
         ability3 = arrayOfPossibleAbilities[ability3];
@@ -536,13 +536,48 @@ contract CardMarket is Card {
             }
         }
 
-        return [base1, base2, base3, uint16(0), uint16(0), uint16(0), uint16(0), 
+        return [base1, base2, base3, uint16(0), uint16(0), uint16(0), uint16(0),
                 ability1, ability2, ability3, uint16(0), uint16(0), uint16(0), uint16(0),  base1, ability1];
     }
 }
 
 contract EtherScrolls is CardMarket {
-    
+
     function EtherScrolls(address master1, address master2, address withdrawAddress) public CardMarket(master1, master2, withdrawAddress) {}
 
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

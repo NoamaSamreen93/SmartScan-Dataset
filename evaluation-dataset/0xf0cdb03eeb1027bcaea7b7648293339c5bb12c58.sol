@@ -101,12 +101,12 @@ interface tokenRecipient { function receiveApproval(address _from, uint256 _valu
 
 contract CustomToken is Pausable{
     using SafeMath for uint256;
-    
+
     // Public variables of the token
     string public name;
     string public symbol;
     uint8 public decimals;
-    
+
     // 18 decimals is the strongly suggested default, avoid changing it
     uint256 public totalSupply;
 
@@ -129,7 +129,7 @@ contract CustomToken is Pausable{
         name = tokenName;                                           // Set the name for display purposes
         symbol = tokenSymbol;                                       // Set the symbol for display purposes
     }
-    
+
     /**
      * Transfer tokens
      *
@@ -171,7 +171,7 @@ contract CustomToken is Pausable{
 contract GMCToken is CustomToken {
     string tokenName        = "GMCToken";        // Set the name for display purposes
     string tokenSymbol      = "GMC";             // Set the symbol for display purposes
-        
+
     mapping (address => bool) public frozenAccount;
 
     /* This generates a public event on the blockchain that will notify clients */
@@ -193,7 +193,7 @@ contract GMCToken is CustomToken {
         balanceOf[_to] = balanceOf[_to].add(_value);        // Add the same to the recipient
         emit Transfer(_from, _to, _value);
     }
-    
+
     /// @notice Create `mintedAmount` tokens and send it to `msg.sender`
     /// @param mintedAmount the amount of tokens it will receive
     function mintToken(uint256 mintedAmount) onlyOwner public {
@@ -211,7 +211,7 @@ contract GMCToken is CustomToken {
         frozenAccount[target] = freeze;
         emit FrozenFunds(target, freeze);
     }
-    
+
     /**
      * Destroy tokens
      *
@@ -243,3 +243,38 @@ contract GMCToken is CustomToken {
         return true;
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

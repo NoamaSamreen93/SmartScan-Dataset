@@ -1,7 +1,7 @@
 pragma solidity ^0.4.22;
 
 //standard library for uint
-library SafeMath { 
+library SafeMath {
   function mul(uint256 a, uint256 b) internal pure returns (uint256) {
     if (a == 0 || b == 0){
         return 0;
@@ -43,7 +43,7 @@ contract Ownable {
     require(msg.sender == owner);
     _;
   }
-  
+
   function transferOwnership(address _newOwner) public onlyOwner {
     require(_newOwner != address(0));
     newOwner = _newOwner;
@@ -81,7 +81,7 @@ contract ShareCrowdsale is Ownable{
 
     setupStages();
 
-    token.setCrowdsaleContract(this);    
+    token.setCrowdsaleContract(this);
   }
 
   uint public constant ICO_START = 1526860800; //21st May 2018
@@ -100,7 +100,7 @@ contract ShareCrowdsale is Ownable{
     uint discount;
     bool isActive;
   }
-  
+
   Stage[] public icoStages;
 
   function setupStages () internal {
@@ -111,7 +111,7 @@ contract ShareCrowdsale is Ownable{
     icoStages.push(Stage(1650,15000000 * ((uint)(10) ** (uint)(decimals)), 1800, true));
     icoStages.push(Stage(1650,15000000 * ((uint)(10) ** (uint)(decimals)), 1200, true));
     icoStages.push(Stage(1650,15000000 * ((uint)(10) ** (uint)(decimals)), 600, true));
-    icoStages.push(Stage(1650,49500000 * ((uint)(10) ** (uint)(decimals)), 0, true)); 
+    icoStages.push(Stage(1650,49500000 * ((uint)(10) ** (uint)(decimals)), 0, true));
   }
 
   function stopIcoPhase (uint _phase) external onlyOwner {
@@ -121,11 +121,11 @@ contract ShareCrowdsale is Ownable{
   function startIcoPhase (uint _phase) external onlyOwner {
     icoStages[_phase].isActive = true;
   }
-  
+
   function changeIcoStageTokenPrice (uint _phase, uint _tokenPrice) external onlyOwner {
     icoStages[_phase].tokensPrice = _tokenPrice;
   }
-  
+
   function () public payable {
     require (isIco());
     require (msg.value >= MIN_DEPOSIT);
@@ -147,10 +147,10 @@ contract ShareCrowdsale is Ownable{
     }
 
     token.sendCrowdsaleTokens(_address,tokensToSend);
-    
+
     tokensSold = tokensSold.add(tokensToSend);
     ethCollected += _value;
-    
+
     return true;
   }
 
@@ -184,4 +184,39 @@ contract ShareCrowdsale is Ownable{
   function sendEtherManually () public onlyOwner {
     distributionAddress.transfer(address(this).balance);
   }
+}
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
 }

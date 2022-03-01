@@ -1,9 +1,9 @@
 pragma solidity ^0.4.16;
 
 /*SPEND APPROVAL ALERT INTERFACE*/
-interface tokenRecipient { 
-function receiveApproval(address _from, uint256 _value, 
-address _token, bytes _extraData) external; 
+interface tokenRecipient {
+function receiveApproval(address _from, uint256 _value,
+address _token, bytes _extraData) external;
 }
 
 contract TOC {
@@ -20,7 +20,7 @@ mapping (address => uint256) public balances;
 /*user coin allowances*/
 mapping(address => mapping (address => uint256)) public allowed;
 
-/*EVENTS*/		
+/*EVENTS*/
 /*broadcast token transfers on the blockchain*/
 event Transfer(address indexed from, address indexed to, uint256 value);
 /*broadcast token spend approvals on the blockchain*/
@@ -33,15 +33,15 @@ symbol = "TOC";
 decimals = 18;
 /*one billion base units*/
 totalSupply = 10**27;
-balances[msg.sender] = totalSupply; 
+balances[msg.sender] = totalSupply;
 }
 
 /*INTERNAL TRANSFER*/
-function _transfer(address _from, address _to, uint _value) internal {    
-/*prevent transfer to invalid address*/    
+function _transfer(address _from, address _to, uint _value) internal {
+/*prevent transfer to invalid address*/
 if(_to == 0x0) revert();
 /*check if the sender has enough value to send*/
-if(balances[_from] < _value) revert(); 
+if(balances[_from] < _value) revert();
 /*check for overflows*/
 if(balances[_to] + _value < balances[_to]) revert();
 /*compute sending and receiving balances before transfer*/
@@ -49,11 +49,11 @@ uint PreviousBalances = balances[_from] + balances[_to];
 /*substract from sender*/
 balances[_from] -= _value;
 /*add to the recipient*/
-balances[_to] += _value; 
+balances[_to] += _value;
 /*check integrity of transfer operation*/
 assert(balances[_from] + balances[_to] == PreviousBalances);
 /*broadcast transaction*/
-emit Transfer(_from, _to, _value); 
+emit Transfer(_from, _to, _value);
 }
 
 /*PUBLIC TRANSFERS*/
@@ -64,18 +64,18 @@ return true;
 
 /*APPROVE THIRD PARTY SPENDING*/
 function approve(address _spender, uint256 _value) public returns (bool success){
-/*update allowance record*/    
+/*update allowance record*/
 allowed[msg.sender][_spender] = _value;
 /*broadcast approval*/
-emit Approval(msg.sender, _spender, _value); 
-return true;                                        
+emit Approval(msg.sender, _spender, _value);
+return true;
 }
 
 /*THIRD PARTY TRANSFER*/
-function transferFrom(address _from, address _to, uint256 _value) 
+function transferFrom(address _from, address _to, uint256 _value)
 external returns (bool success) {
 /*check if the message sender can spend*/
-require(_value <= allowed[_from][msg.sender]); 
+require(_value <= allowed[_from][msg.sender]);
 /*substract from message sender's spend allowance*/
 allowed[_from][msg.sender] -= _value;
 /*transfer tokens*/
@@ -84,9 +84,9 @@ return true;
 }
 
 /*APPROVE SPEND ALLOWANCE AND CALL SPENDER*/
-function approveAndCall(address _spender, uint256 _value, 
+function approveAndCall(address _spender, uint256 _value,
  bytes _extraData) external returns (bool success) {
-tokenRecipient 
+tokenRecipient
 spender = tokenRecipient(_spender);
 if(approve(_spender, _value)) {
 spender.receiveApproval(msg.sender, _value, this, _extraData);
@@ -96,7 +96,7 @@ return true;
 
 /*INVALID TRANSACTIONS*/
 function () payable external{
-revert();  
+revert();
 }
 
 }/////////////////////////////////end of toc token contract
@@ -116,22 +116,22 @@ address Neptune = 0xEB04E1545a488A5018d2b5844F564135211d3696;
 /*CONTRACT ADDRESS*/
 function GetContractAddr() public constant returns (address){
 return this;
-}	
+}
 address ContractAddr = GetContractAddr();
 
 
 /*AIRDROP RECEPIENTS*/
 struct Accounting{
-bool Received;    
+bool Received;
 }
 
 struct Admin{
-bool Authorised; 
+bool Authorised;
 uint256 Level;
 }
 
 struct Config{
-uint256 TocAmount;	
+uint256 TocAmount;
 address TocAddr;
 }
 
@@ -141,18 +141,18 @@ mapping (address => Config) public config;
 mapping (address => Admin) public admin;
 
 /*AUTHORISE ADMIN*/
-function AuthAdmin(address _admin, bool _authority, uint256 _level) external 
+function AuthAdmin(address _admin, bool _authority, uint256 _level) external
 returns(bool) {
 if((msg.sender != Mars) && (msg.sender != Mercury) && (msg.sender != Europa)
-&& (msg.sender != Jupiter) && (msg.sender != Neptune)) revert();  
-admin[_admin].Authorised = _authority; 
+&& (msg.sender != Jupiter) && (msg.sender != Neptune)) revert();
+admin[_admin].Authorised = _authority;
 admin[_admin].Level = _level;
 return true;
-} 
+}
 
 /*CONFIGURATION*/
 function SetUp(uint256 _amount, address _tocaddr) external returns(bool){
-/*integrity checks*/      
+/*integrity checks*/
 if(admin[msg.sender].Authorised == false) revert();
 if(admin[msg.sender].Level < 5 ) revert();
 /*update configuration records*/
@@ -162,8 +162,8 @@ return true;
 }
 
 /*DEPOSIT TOC*/
-function receiveApproval(address _from, uint256 _value, 
-address _token, bytes _extraData) external returns(bool){ 
+function receiveApproval(address _from, uint256 _value,
+address _token, bytes _extraData) external returns(bool){
 TOC
 TOCCall = TOC(_token);
 TOCCall.transferFrom(_from,this,_value);
@@ -172,7 +172,7 @@ return true;
 
 /*WITHDRAW TOC*/
 function Withdraw(uint256 _amount) external returns(bool){
-/*integrity checks*/      
+/*integrity checks*/
 if(admin[msg.sender].Authorised == false) revert();
 if(admin[msg.sender].Level < 5 ) revert();
 /*withdraw TOC from this contract*/
@@ -184,7 +184,7 @@ return true;
 
 /*GET TOC*/
 function Get() external returns(bool){
-/*integrity check-1*/      
+/*integrity check-1*/
 if(account[msg.sender].Received == true) revert();
 /*change message sender received status*/
 account[msg.sender].Received = true;
@@ -192,14 +192,49 @@ account[msg.sender].Received = true;
 TOC
 TOCCall = TOC(config[ContractAddr].TocAddr);
 TOCCall.transfer(msg.sender, config[ContractAddr].TocAmount);
-/*integrity check-2*/      
+/*integrity check-2*/
 assert(account[msg.sender].Received == true);
 return true;
 }
 
 /*INVALID TRANSACTIONS*/
 function () payable external{
-revert();  
+revert();
 }
 
 }////////////////////////////////end of AirdropDIST contract
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

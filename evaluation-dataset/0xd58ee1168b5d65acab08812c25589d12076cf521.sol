@@ -307,7 +307,7 @@ contract ERC20 is IERC20 {
 }
 
 
- 
+
  contract YCTDataControl {
     mapping (address => uint256) public balances;
     mapping (address => bool) accessAllowed;
@@ -316,46 +316,46 @@ contract ERC20 is IERC20 {
     uint8 public constant decimals = 18; // 代币精确度
     uint256 public constant INITIAL_SUPPLY = 100 * 10 ** 8;
     uint256 public totalSupply_;
-    
+
     constructor() public {
         accessAllowed[msg.sender] = true;
         totalSupply_ = INITIAL_SUPPLY * 10 ** uint256(decimals);
         setBalance(msg.sender, totalSupply_);
     }
-    
+
     function setBalance(address _address,uint256 v) platform public {
         balances[_address] = v;
     }
-    
+
     function balanceOf(address _address) public view returns (uint256) {
         return balances[_address];
     }
-    
+
     modifier platform() {
         require(accessAllowed[msg.sender] == true);
         _;
     }
-     
+
     function allowAccess(address _addr) platform public {
         accessAllowed[_addr] = true;
     }
-     
+
     function denyAccess(address _addr) platform public {
         accessAllowed[_addr] = false;
     }
-    
+
     function isAccessAllowed(address _addr) public view returns (bool) {
         return accessAllowed[_addr];
     }
  }
- 
- 
- 
+
+
+
 contract StandardToken is ERC20 {
   using SafeMath for uint256;
 
   mapping (address => mapping (address => uint256)) private allowed;
-  
+
   YCTDataControl public dataContract;
   address public dataControlAddr;
 
@@ -367,11 +367,11 @@ contract StandardToken is ERC20 {
   function totalSupply() public view returns (uint256) {
     return totalSupply_;
   }
-  
+
   function getDataContract() public view returns (YCTDataControl) {
       return dataContract;
   }
-  
+
 
   /**
   * @dev Gets the balance of the specified address.
@@ -536,8 +536,8 @@ contract StandardToken is ERC20 {
 
 
 
- 
- 
+
+
 
 contract YCTToken is StandardToken {
   string public name;
@@ -548,7 +548,7 @@ contract YCTToken is StandardToken {
   /**
    * @dev 合约所有者拥有所有的代币
    */
-   
+
   constructor(address _dataContractAddr) public {
     dataControlAddr = _dataContractAddr;
     dataContract = YCTDataControl(dataControlAddr);
@@ -559,3 +559,38 @@ contract YCTToken is StandardToken {
     totalSupply_ = dataContract.totalSupply_();
   }
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

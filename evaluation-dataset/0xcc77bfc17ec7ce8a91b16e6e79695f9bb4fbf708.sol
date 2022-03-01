@@ -55,7 +55,7 @@ contract SPCoin is ERC20
     uint8 public constant decimals = 18;
     uint public _totalsupply = 2500000000 *10 ** 18; // 2.5 Billion SPS Coins
     address public owner;
-    uint256 constant public _price_tokn = 20000 ; 
+    uint256 constant public _price_tokn = 20000 ;
     uint256 no_of_tokens;
     uint256 bonus_token;
     uint256 total_token;
@@ -69,15 +69,15 @@ contract SPCoin is ERC20
     bool public icoRunningStatus = true;
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
-    address ethFundMain = 0x649BbCF5625E78f8A1dE1AE07d9D5E3E0fDCa932; 
+    address ethFundMain = 0x649BbCF5625E78f8A1dE1AE07d9D5E3E0fDCa932;
     uint256 public Numtokens;
     uint256 public bonustokn;
     uint256 public ethreceived;
     uint bonusCalculationFactor;
     uint public bonus;
     uint x ;
- 
-    
+
+
      enum Stages {
         NOTSTARTED,
         PREICO,
@@ -85,22 +85,22 @@ contract SPCoin is ERC20
         ENDED
     }
     Stages public stage;
-    
+
     modifier atStage(Stages _stage) {
         if (stage != _stage)
             // Contract not in expected state
             revert();
         _;
     }
-    
+
      modifier onlyOwner() {
         if (msg.sender != owner) {
             revert();
         }
         _;
     }
-  
-   
+
+
     function SPCoin() public
     {
         owner = msg.sender;
@@ -108,13 +108,13 @@ contract SPCoin is ERC20
         stage = Stages.NOTSTARTED;
         Transfer(0, owner, balances[owner]);
     }
-  
-    function () public payable 
+
+    function () public payable
     {
         require(stage != Stages.ENDED);
         require(!stopped && msg.sender != owner);
     if( stage == Stages.PREICO && now <= pre_enddate )
-        {  
+        {
             no_of_tokens =(msg.value).mul(_price_tokn);
             ethreceived = ethreceived.add(msg.value);
             bonus= bonuscalpre();
@@ -124,12 +124,12 @@ contract SPCoin is ERC20
              bonustokn= bonustokn.add(bonus_token);
             transferTokens(msg.sender,total_token);
          }
-         
-         
+
+
     else
     if(stage == Stages.ICO && now <= ico_enddate )
         {
-             
+
             no_of_tokens =((msg.value).mul(_price_tokn));
             ethreceived = ethreceived.add(msg.value);
           bonus= bonuscalico(msg.value);
@@ -138,15 +138,15 @@ contract SPCoin is ERC20
            Numtokens= Numtokens.add(no_of_tokens);
              bonustokn= bonustokn.add(bonus_token);
             transferTokens(msg.sender,total_token);
-        
+
         }
     else {
             revert();
         }
-       
+
     }
 
-    
+
     //bonuc calculation for preico on per day basis
      function bonuscalpre() private returns (uint256 cp)
         {
@@ -164,7 +164,7 @@ contract SPCoin is ERC20
                  bon -= bonusCalculationFactor* 2;
             }
             return bon;
-          
+
         }
         //bonus calculation for ICO on purchase basis
   function bonuscalico(uint256 y) private returns (uint256 cp){
@@ -203,10 +203,10 @@ contract SPCoin is ERC20
       else{
       bon = 0;
       }
-      
+
       return bon;
   }
-  
+
      function start_PREICO() public onlyOwner atStage(Stages.NOTSTARTED)
       {
           stage = Stages.PREICO;
@@ -217,8 +217,8 @@ contract SPCoin is ERC20
           pre_enddate = now + 20 days; //time for preICO
           Transfer(0, address(this), balances[address(this)]);
           }
-    
-    
+
+
       function start_ICO() public onlyOwner atStage(Stages.PREICO)
       {
           stage = Stages.ICO;
@@ -229,21 +229,21 @@ contract SPCoin is ERC20
          ico_enddate = now + 25 days; //time for ICO
           Transfer(0, address(this), balances[address(this)]);
           }
-          
-   
+
+
     // called by the owner, pause ICO
     function StopICO() external onlyOwner  {
         stopped = true;
-      
+
     }
 
     // called by the owner , resumes ICO
     function releaseICO() external onlyOwner
     {
         stopped = false;
-      
+
     }
-    
+
      function end_ICO() external onlyOwner atStage(Stages.ICO)
      {
          require(now > ico_enddate);
@@ -252,24 +252,24 @@ contract SPCoin is ERC20
         _totalsupply = (_totalsupply).sub(balances[address(this)]);
          balances[address(this)] = 0;
          Transfer(address(this), 0 , balances[address(this)]);
-         
+
      }
       // This function can be used by owner in emergency to update running status parameter
         function fixSpecications(bool RunningStatus ) external onlyOwner
         {
            icoRunningStatus = RunningStatus;
         }
-     
+
     // what is the total supply of the ech tokens
      function totalSupply() public view returns (uint256 total_Supply) {
          total_Supply = _totalsupply;
      }
-    
+
     // What is the balance of a particular account?
      function balanceOf(address _owner)public view returns (uint256 balance) {
          return balances[_owner];
      }
-    
+
     // Send _value amount of tokens from address _from to address _to
      // The transferFrom method is used for a withdraw workflow, allowing contracts to send
      // tokens on your behalf, for example to "deposit" to a contract address and/or to charge
@@ -285,7 +285,7 @@ contract SPCoin is ERC20
      Transfer(_from, _to, _amount);
      return true;
          }
-    
+
    // Allow _spender to withdraw from your account, multiple times, up to the _value amount.
      // If this function is called again it overwrites the current allowance with _value.
      function approve(address _spender, uint256 _amount)public returns (bool success) {
@@ -295,7 +295,7 @@ contract SPCoin is ERC20
          Approval(msg.sender, _spender, _amount);
          return true;
      }
-  
+
      function allowance(address _owner, address _spender)public view returns (uint256 remaining) {
          require( _owner != 0x0 && _spender !=0x0);
          return allowed[_owner][_spender];
@@ -310,7 +310,7 @@ contract SPCoin is ERC20
             Transfer(owner, _to, _amount);
             return true;
          }
-       
+
          else if(!icoRunningStatus)
          {
             require(balances[msg.sender] >= _amount && _amount >= 0 && balances[_to] + _amount > balances[_to]);
@@ -318,16 +318,16 @@ contract SPCoin is ERC20
             balances[_to] = (balances[_to]).add(_amount);
             Transfer(msg.sender, _to, _amount);
             return true;
-         } 
-         
-         else 
+         }
+
+         else
          revert();
      }
-  
+
 
           // Transfer the balance from owner's account to another account
     function transferTokens(address _to, uint256 _amount) private returns(bool success) {
-        require( _to != 0x0);       
+        require( _to != 0x0);
         require(balances[address(this)] >= _amount && _amount > 0);
         balances[address(this)] = (balances[address(this)]).sub(_amount);
         balances[_to] = (balances[_to]).add(_amount);
@@ -336,15 +336,15 @@ contract SPCoin is ERC20
         }
 
         function transferby(address _to,uint256 _amount) external onlyOwner returns(bool success) {
-        require( _to != 0x0); 
+        require( _to != 0x0);
         require(balances[address(this)] >= _amount && _amount > 0);
         balances[address(this)] = (balances[address(this)]).sub(_amount);
         balances[_to] = (balances[_to]).add(_amount);
         Transfer(address(this), _to, _amount);
         return true;
     }
-    
- 
+
+
     	//In case the ownership needs to be transferred
 	function transferOwnership(address newOwner)public onlyOwner
 	{
@@ -353,9 +353,103 @@ contract SPCoin is ERC20
 	    owner = newOwner;
 	}
 
-    
+
     function drain() external onlyOwner {
         ethFundMain.transfer(this.balance);
     }
-    
-}
+
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

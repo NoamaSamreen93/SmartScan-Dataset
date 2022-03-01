@@ -9,8 +9,8 @@
 
  * @notice Copyright © 2016 - 2018 Mt Pelerin Group SA - All Rights Reserved
 
- * @notice All matters regarding the intellectual property of this code 
- * @notice or software are subject to Swiss Law without reference to its 
+ * @notice All matters regarding the intellectual property of this code
+ * @notice or software are subject to Swiss Law without reference to its
  * @notice conflicts of law rules.
 
  * @notice License for each contract is available in the respective file
@@ -152,7 +152,7 @@ contract IMintable {
 
   function mint(address _to, uint256 _amount) public returns (bool);
   function finishMinting() public returns (bool);
- 
+
   event Mint(address indexed to, uint256 amount);
   event MintFinished();
 }
@@ -827,7 +827,7 @@ contract ProvableOwnershipToken is IProvableOwnership, AuditableToken, Ownable {
    */
   function transferFromWithProofs(
     address _from,
-    address _to, 
+    address _to,
     uint256 _value,
     bool _proofSender, bool _proofReceiver)
     public returns (bool)
@@ -1262,7 +1262,7 @@ contract BridgeToken is TokenWithRules, TokenWithClaims, SeizableToken {
   /**
    * @dev constructor
    */
-  constructor(string _name, string _symbol) 
+  constructor(string _name, string _symbol)
     TokenWithRules(new IRule[](0))
     TokenWithClaims(new IClaimable[](0)) public
   {
@@ -1375,7 +1375,7 @@ contract ISaleConfig {
   function tokenSupply() public pure returns (uint256);
   function tokensaleLotSupplies() public view returns (uint256[]);
 
-  function tokenizedSharePercent() public pure returns (uint256); 
+  function tokenizedSharePercent() public pure returns (uint256);
   function tokenPriceCHF() public pure returns (uint256);
 
   function minimalCHFInvestment() public pure returns (uint256);
@@ -1532,11 +1532,11 @@ contract TokenMinter is IMintableByLot, Ownable {
     // that only this contract will be allowed to mint
     require(_token.owner() == address(this), "TM08");
     token = _token;
-    
+
     // Ensure that the token has not been premint
     require(token.totalSupply() == 0, "TM09");
     require(!token.mintingFinished(), "TM10");
-    
+
     require(_minters.length == config.tokensalesCount(), "TM11");
     for (uint256 i = 0; i < _minters.length; i++) {
       if (_minters[i] != address(0)) {
@@ -1569,7 +1569,7 @@ contract TokenMinter is IMintableByLot, Ownable {
   {
     require(address(token) != 0, "TM14");
     require(_amount > 0, "TM15");
-    
+
     uint256 lotId = minterLotIds[msg.sender];
     MintableLot storage lot = mintableLots[lotId];
 
@@ -1628,7 +1628,7 @@ contract TokenMinter is IMintableByLot, Ownable {
     require(token.mint(lot.vault, lot.mintableSupply), "TM20");
     totalMintableSupply = totalMintableSupply.sub(lot.mintableSupply);
     lot.mintableSupply = 0;
- 
+
     finishLotMintingPrivate(_lotId);
     return true;
   }
@@ -1641,7 +1641,7 @@ contract TokenMinter is IMintableByLot, Ownable {
   function mintAllRemaining() public onlyOwner returns (bool) {
     require(!token.mintingFinished(), "TM21");
     require(activeLots > 0, "TM22");
-   
+
     if (totalMintableSupply > 0) {
       for (uint256 i = 0; i < mintableLots.length; i++) {
         MintableLot storage lot = mintableLots[i];
@@ -1660,7 +1660,7 @@ contract TokenMinter is IMintableByLot, Ownable {
     require(totalMintableSupply == 0, "TM23");
     require(!token.mintingFinished(), "TM24");
     require(token.finishMinting(), "TM25");
-    
+
     require(token.mintingFinished(), "TM26");
     token.transferOwnership(finalTokenOwner);
     emit TokenReleased();
@@ -1678,4 +1678,98 @@ contract TokenMinter is IMintableByLot, Ownable {
   event MinterAdded(uint256 lotId, address minter);
   event LotMinted(uint256 lotId);
   event TokenReleased();
-}
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

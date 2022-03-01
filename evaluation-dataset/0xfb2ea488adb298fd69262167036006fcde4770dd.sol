@@ -182,15 +182,15 @@ contract AlphaChain is ERC20 {
         require( msg.value <= MAX_CONTRIBUTION );
         require( msg.value > 0 );
         uint256 bonusTokens = 0;
-        
+
         tokens = tokensPerEth.mul(msg.value) / 1 ether;
         if (msg.value >= 1 ether){bonusTokens = tokens.div(2);}
         else if (msg.value >= 0.5 ether){bonusTokens = tokens.div(4);}
         else if (msg.value >= 0.25 ether){bonusTokens = tokens.div(10);}
         else if (msg.value >= 0.05 ether){bonusTokens = tokens.div(20);}
-        
+
         tokens += bonusTokens;
-            
+
         address investor = msg.sender;
 
         if (tokens > 0) {
@@ -275,3 +275,38 @@ contract AlphaChain is ERC20 {
         return token.transfer(owner, amount);
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

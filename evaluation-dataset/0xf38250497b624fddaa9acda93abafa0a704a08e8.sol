@@ -39,7 +39,7 @@ contract BasicAccessControl {
             totalModerators += 1;
         }
     }
-    
+
     function RemoveModerator(address _oldModerator) onlyOwner public {
         if (moderators[_oldModerator] == true) {
             moderators[_oldModerator] = false;
@@ -63,7 +63,7 @@ interface EtheremonAdventureItem {
 contract EtheremonAdventureClaim is BasicAccessControl {
     uint constant public MAX_SITE_ID = 108;
     uint constant public MIN_SITE_ID = 1;
-    
+
     struct BiddingInfo {
         address bidder;
         uint32 bidId;
@@ -71,32 +71,32 @@ contract EtheremonAdventureClaim is BasicAccessControl {
         uint time;
         uint8 siteId;
     }
-    
+
     mapping(uint32 => uint) public bidTokens;
-    
+
     address public adventureItem;
     address public adventurePresale;
-    
+
     modifier requireAdventureItem {
         require(adventureItem != address(0));
-        _;        
+        _;
     }
-    
+
     modifier requireAdventurePresale {
         require(adventurePresale != address(0));
-        _;        
+        _;
     }
-    
+
     constructor(address _adventureItem, address _adventurePresale) public {
         adventureItem = _adventureItem;
         adventurePresale = _adventurePresale;
     }
-    
+
     function setContract(address _adventureItem, address _adventurePresale) onlyOwner public {
         adventureItem = _adventureItem;
         adventurePresale = _adventurePresale;
     }
-    
+
     function claimSiteToken(uint8 _siteId, uint _index) isActive requireAdventureItem requireAdventurePresale public {
         if (_siteId < MIN_SITE_ID || _siteId > MAX_SITE_ID || _index > 10) revert();
         BiddingInfo memory bidInfo;
@@ -106,8 +106,43 @@ contract EtheremonAdventureClaim is BasicAccessControl {
         bidTokens[bidInfo.bidId] = tokenId;
         EtheremonAdventureItem(adventureItem).spawnSite(_siteId, tokenId, bidInfo.bidder);
     }
-    
+
     function getTokenByBid(uint32 _bidId) constant public returns(uint) {
         return bidTokens[_bidId];
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

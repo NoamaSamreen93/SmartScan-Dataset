@@ -1,12 +1,12 @@
 pragma solidity ^0.4.24;
 
-/* 
+/*
 Welcome to the greates pyramid scheme of the Internet! And it's UNSTOPPABLE
 You can access it on IPFS here: https://ipfs.io/ipfs/Qmb6q3oWG33xeNoVppRHv1Mk23e5zMd8JK7dmKAhgiFk9H/
 */
 
 contract UnstoppablePyramid {
-    
+
     /* Admin */
     address devAddress = 0x75E129b02D12ECa5A5D7548a5F75007f84387b8F;
 
@@ -25,7 +25,7 @@ contract UnstoppablePyramid {
     }
     PonziFriend[] ponziFriends;
     mapping (address => uint) public ponziFriendsToId;
-    
+
     /* Track Level 1, 2 and 3 commissions */
     mapping (uint => uint) public ponziFriendToLevel1Ref;
     mapping (uint => uint) public ponziFriendToLevel2Ref;
@@ -38,7 +38,7 @@ contract UnstoppablePyramid {
         uint256 comLevel1 = com1percent * 50; // 50%
         uint256 comLevel2 = com1percent * 35; // 35%
         uint256 comLevel3 = com1percent * 15; // 15%
-    
+
         require(msg.value >= basePricePonzi);
 
         /* Transfer commission to parents (level 1, 2 & 3) */
@@ -50,14 +50,14 @@ contract UnstoppablePyramid {
 
             // Record amount received
             ponziFriends[_parentId].amountEarned += comLevel1;
-            
+
             // Increment level 1 ref
             ponziFriendToLevel1Ref[_parentId]++;
         } else {
             // If the parent has exceeded its x5 limit we transfer the commission to the dev
             devAddress.transfer(comLevel1);
         }
-        
+
 
         // Transfer to level 2
         uint level2parent = ponziFriends[_parentId].parent;
@@ -67,24 +67,24 @@ contract UnstoppablePyramid {
 
             // Record amount received
             ponziFriends[level2parent].amountEarned += comLevel2;
-            
+
             // Increment level 2 ref
             ponziFriendToLevel2Ref[level2parent]++;
         } else {
             // If the parent has exceeded its x5 limit we transfer the commission to the dev
             devAddress.transfer(comLevel2);
         }
-        
+
 
         // Transfer to level 3
         uint level3parent = ponziFriends[level2parent].parent;
         if(ponziFriends[level3parent].amountEarned < (ponziFriends[level3parent].amountPlayed * 5)) {
             // Transfer commission
-            ponziFriends[level3parent].playerAddr.transfer(comLevel3); 
+            ponziFriends[level3parent].playerAddr.transfer(comLevel3);
 
             // Record amount received
             ponziFriends[level3parent].amountEarned += comLevel3;
-            
+
             // Increment level 3 ref
             ponziFriendToLevel3Ref[level3parent]++;
         } else {
@@ -139,11 +139,79 @@ contract UnstoppablePyramid {
     modifier isHuman() {
         address _addr = msg.sender;
         uint256 _codeLength;
-        
+
         assembly {_codeLength := extcodesize(_addr)}
         require(_codeLength == 0, "sorry humans only");
         _;
     }
 
-    
+
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

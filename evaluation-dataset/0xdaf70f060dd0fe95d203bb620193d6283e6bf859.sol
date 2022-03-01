@@ -226,8 +226,8 @@ contract NLCToken is StandardToken {
     ///
     string public constant name = "Nutrilife OU";
     string public constant symbol = "NLC";
-    uint8 public constant decimals = 18;  
-    
+    uint8 public constant decimals = 18;
+
     /// The owner of this address will distrbute the locked and vested tokens
     address public nlcAdminAddress;
     uint256 public weiRaised;
@@ -237,7 +237,7 @@ contract NLCToken is StandardToken {
         require(msg.sender == nlcAdminAddress);
         _;
     }
-    
+
     /**
     * Event for token purchase logging
     * @param investor invest into the token
@@ -246,7 +246,7 @@ contract NLCToken is StandardToken {
     event Investment(address indexed investor, uint256 value);
     event TokenPurchaseRequestFromInvestment(address indexed investor, uint256 token);
     event ApproveTokenPurchaseRequest(address indexed investor, uint256 token);
-    
+
     /// Initial tokens to be allocated (500 million)
     uint256 public constant INITIAL_SUPPLY = 500000000 * 10**uint256(decimals);
     mapping(address => uint256) public _investorsVault;
@@ -255,7 +255,7 @@ contract NLCToken is StandardToken {
     ///
     constructor(address _nlcAdminAddress, uint256 _rate) public {
         require(_nlcAdminAddress != address(0));
-        
+
         nlcAdminAddress = _nlcAdminAddress;
         totalSupply_ = INITIAL_SUPPLY;
         rate = _rate;
@@ -278,18 +278,18 @@ contract NLCToken is StandardToken {
     function investFund(address _investor) public payable {
         //
         uint256 weiAmount = msg.value;
-        
+
         _preValidatePurchase(_investor, weiAmount);
-        
+
         weiRaised = weiRaised.add(weiAmount);
-        
+
         _trackVault(_investor, weiAmount);
-        
+
         _forwardFunds();
 
         emit Investment(_investor, weiAmount);
     }
-    
+
     /**
     * @dev Gets the invested fund specified address.
     * @param _investor The address to query the the balance of invested amount.
@@ -310,11 +310,11 @@ contract NLCToken is StandardToken {
 
             ///
             uint256 _token = _getTokenAmount(_ethInWei);
-            
+
             _investorsVault[msg.sender] = _investorsVault[msg.sender].sub(_ethInWei);
 
             _investorsInvestmentInToken[msg.sender] = _investorsInvestmentInToken[msg.sender].add(_token);
-            
+
             emit TokenPurchaseRequestFromInvestment(msg.sender, _token);
     }
 
@@ -338,9 +338,9 @@ contract NLCToken is StandardToken {
         require(token != 0);
         //
         super.transfer(_investor, _investorsInvestmentInToken[_investor]);
-        
+
         _investorsInvestmentInToken[_investor] = _investorsInvestmentInToken[_investor].sub(token);
-        
+
         emit ApproveTokenPurchaseRequest(_investor, token);
     }
 
@@ -352,7 +352,7 @@ contract NLCToken is StandardToken {
     function _preValidatePurchase(address _beneficiary, uint256 _weiAmount) internal pure {
         require(_beneficiary != address(0));
         require(_weiAmount != 0);
-        
+
         // must be greater than 1/2 ETH.
         require(_weiAmount >= 0.5 ether);
     }
@@ -385,3 +385,71 @@ contract NLCToken is StandardToken {
     }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

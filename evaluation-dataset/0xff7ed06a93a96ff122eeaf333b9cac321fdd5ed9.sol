@@ -33,7 +33,7 @@ contract ERC20 is ERC20Basic {
   string  public  name = "zeosX";
   string  public  symbol;
   uint256  public  decimals = 18; // standard token precision. override to customize
-    
+
   function allowance(address owner, address spender) public view returns (uint256);
   function transferFrom(address from, address to, uint256 value) public returns (bool);
   function approve(address spender, uint256 value) public returns (bool);
@@ -47,7 +47,7 @@ contract ERC20 is ERC20Basic {
  * @title SafeMath
  * @dev Math operations with safety checks that throw on error
  */
- 
+
 library SafeMath {
   function mul(uint256 a, uint256 b) internal pure returns (uint256) {
     if (a == 0) {
@@ -91,7 +91,7 @@ contract BasicToken is ERC20Basic {
     return totalSupply_;
   }
 
-  
+
 
   /**
   * @dev Gets the balance of the specified address.
@@ -218,11 +218,11 @@ contract BurnableToken is StandardToken {
 
 
 contract KYCVerification is Owned{
-    
+
     mapping(address => bool) public kycAddress;
-    
+
     event LogKYCVerification(address _kycAddress,bool _status);
-    
+
     constructor () public {
         owner = msg.sender;
     }
@@ -234,22 +234,22 @@ contract KYCVerification is Owned{
             kycAddress[_kycAddress[tmpIndex]] = _status;
             emit LogKYCVerification(_kycAddress[tmpIndex],_status);
         }
-        
+
         return true;
     }
-    
+
     function updateVerifcation(address _kycAddress,bool _status) onlyOwner public returns(bool)
     {
         kycAddress[_kycAddress] = _status;
-        
+
         emit LogKYCVerification(_kycAddress,_status);
-        
+
         return true;
     }
-    
+
     function isVerified(address _user) view public returns(bool)
     {
-        return kycAddress[_user] == true; 
+        return kycAddress[_user] == true;
     }
 }
 
@@ -260,12 +260,12 @@ contract ST20Token is Owned, BurnableToken {
     string public name = "SUREBANQA PERSONAL e-SHARE";
     string public symbol = "ST20";
     uint8 public decimals = 2;
-    
+
     uint256 public initialSupply = 1000000 * (10 ** uint256(decimals));
     uint256 public totalSupply = 1000000 * (10 ** uint256(decimals));
     uint256 public externalAuthorizePurchase = 0;
 
-    
+
     /* in timestamp  */
     mapping (address => uint) public userLockinPeriod;
 
@@ -274,18 +274,18 @@ contract ST20Token is Owned, BurnableToken {
 
     mapping (address => bool) public frozenAccount;
     mapping(address => uint8) authorizedCaller;
-    
+
     bool public kycEnabled = true;
     bool public authorizedTransferOnly = true; /* to Enable authorized user for transfer*/
-    
-    
+
+
     mapping(address => mapping(bytes32 => bool)) private transferRequestStatus;
-    
+
     struct fundReceiver{
         address _to;
         uint _value;
     }
-    
+
     mapping(address => mapping(bytes32 => fundReceiver)) private transferRequestReceiver;
 
     KYCVerification public kycVerification;
@@ -295,23 +295,23 @@ contract ST20Token is Owned, BurnableToken {
 
     /* This generates a public event on the blockchain that will notify clients */
     event FrozenFunds(address target, bool frozen);
-    
+
     /* Events */
     event AuthorizedCaller(address caller);
     event DeAuthorizedCaller(address caller);
 
     event LockinPeriodUpdated(address _guy,uint _userLockinPeriodType, uint _userLockinPeriod);
-    
+
     event TransferAuthorizationOverride(bool _authorize);
     event TransferRequested(address _from, address _to, uint _value,bytes32 _signature);
     event TransferRequestFulfilled(address _from, address _to, uint _value,bytes32 _signature);
-    
-    
+
+
     modifier onlyAuthCaller(){
         require(authorizedCaller[msg.sender] == 1 || msg.sender == owner);
         _;
     }
-    
+
     modifier kycVerified(address _guy) {
       if(kycEnabled == true){
           if(kycVerification.isVerified(_guy) == false)
@@ -321,7 +321,7 @@ contract ST20Token is Owned, BurnableToken {
       }
       _;
     }
-    
+
     modifier frozenVerified(address _guy) {
         if(frozenAccount[_guy] == true)
         {
@@ -329,9 +329,9 @@ contract ST20Token is Owned, BurnableToken {
         }
         _;
     }
-    
+
     modifier transferAuthorized(address _guy) {
-        
+
         if(authorizedTransferOnly == true)
         {
             if(authorizedCaller[msg.sender] == 0 || msg.sender != owner)
@@ -347,11 +347,11 @@ contract ST20Token is Owned, BurnableToken {
     constructor() public {
         owner = msg.sender;
         balances[0xBcd5B67aaeBb9765beE438e4Ce137B9aE2181898] = totalSupply;
-        
+
         authorizedCaller[msg.sender] = 1;
         emit AuthorizedCaller(msg.sender);
     }
-     
+
     function updateKycContractAddress(KYCVerification _kycAddress) public onlyOwner returns(bool)
     {
       kycVerification = _kycAddress;
@@ -376,33 +376,33 @@ contract ST20Token is Owned, BurnableToken {
 
         emit LockinPeriodUpdated(_guy,_userLockinPeriodType, _userLockinPeriod);
     }
-    
+
     function overrideTransferAuthorization(bool _authorize) public onlyAuthCaller
     {
         authorizedTransferOnly = _authorize;
         emit TransferAuthorizationOverride(_authorize);
     }
-        
+
     /* authorize caller */
-    function authorizeCaller(address _caller) public onlyOwner returns(bool) 
+    function authorizeCaller(address _caller) public onlyOwner returns(bool)
     {
         authorizedCaller[_caller] = 1;
         emit AuthorizedCaller(_caller);
         return true;
     }
-    
+
     /* deauthorize caller */
-    function deAuthorizeCaller(address _caller) public onlyOwner returns(bool) 
+    function deAuthorizeCaller(address _caller) public onlyOwner returns(bool)
     {
         authorizedCaller[_caller] = 0;
         emit DeAuthorizedCaller(_caller);
         return true;
     }
-    
+
     function () payable public {
         revert();
     }
-    
+
 
     /* Internal transfer, only can be called by this contract */
     function _transfer(address _from, address _to, uint _value) internal transferAuthorized(msg.sender) {
@@ -436,7 +436,7 @@ contract ST20Token is Owned, BurnableToken {
     function purchaseToken(address _receiver, uint _tokens, uint _userLockinPeriod, uint _userLockinPeriodType) onlyAuthCaller public  {
         require(_tokens > 0);
         require(initialSupply > _tokens);
-        
+
         initialSupply = initialSupply.sub(_tokens);
         _transfer(owner, _receiver, _tokens);              // makes the transfers
         externalAuthorizePurchase = externalAuthorizePurchase.add(_tokens);
@@ -452,7 +452,7 @@ contract ST20Token is Owned, BurnableToken {
     }
 
     /**
-      * @dev transfer token for a specified address sender and receiver must be KYC verified 
+      * @dev transfer token for a specified address sender and receiver must be KYC verified
       * @param _to The address to transfer to.
       * @param _value The amount to be transferred.
     */
@@ -470,14 +470,14 @@ contract ST20Token is Owned, BurnableToken {
         _transfer(msg.sender,_to,_value);
         return true;
     }
-    
+
     /*
-        Please make sure before calling this function from UI, Sender has sufficient balance for 
+        Please make sure before calling this function from UI, Sender has sufficient balance for
         All transfers and receiver qty max 25 and KYC verified
     */
     function multiTransfer(address[] _to,uint[] _value) public kycVerified(msg.sender) frozenVerified(msg.sender) returns (bool) {
         require(_to.length == _value.length, "Length of Destination should be equal to value");
-        require(_to.length <= 25, "Max 25 Senders allowed" );        
+        require(_to.length <= 25, "Max 25 Senders allowed" );
 
         for(uint _interator = 0;_interator < _to.length; _interator++ )
         {
@@ -496,19 +496,19 @@ contract ST20Token is Owned, BurnableToken {
         {
             _transfer(msg.sender,_to[_interator],_value[_interator]);
         }
-        
-        return true;    
+
+        return true;
     }
-    
+
     function requestTransfer(address _to, uint _value, bytes32 _signature) public returns(bool)
     {
         require(transferRequestStatus[msg.sender][_signature] == false,"Signature already processed");
         require (balances[msg.sender] > _value,"Insufficient Sender Balance");
-        
+
         transferRequestReceiver[msg.sender][_signature] = fundReceiver(_to,_value);
-        
+
         emit TransferRequested(msg.sender, _to, _value,_signature);
-        
+
         return true;
     }
 
@@ -516,71 +516,139 @@ contract ST20Token is Owned, BurnableToken {
     {
         require(_to.length == _value.length ,"Length for to, value should be equal");
         require(_to.length == _signature.length ,"Length for to, signature should be equal");
-        
+
 
         for(uint _interator = 0; _interator < _to.length ; _interator++)
         {
             require(transferRequestStatus[msg.sender][_signature[_interator]] == false,"Signature already processed");
-            
+
             transferRequestReceiver[msg.sender][_signature[_interator]] = fundReceiver(_to[_interator],_value[_interator]);
-            
+
             emit TransferRequested(msg.sender, _to[_interator], _value[_interator],_signature[_interator]);
         }
 
-        
-        
+
+
         return true;
     }
-    
-    function fullTransferRequest(address _from, bytes32 _signature) public onlyAuthCaller returns(bool) 
+
+    function fullTransferRequest(address _from, bytes32 _signature) public onlyAuthCaller returns(bool)
     {
         require(transferRequestStatus[_from][_signature] == false);
-        
+
         fundReceiver memory _tmpHolder = transferRequestReceiver[_from][_signature];
 
         _transfer(_from,_tmpHolder._to,_tmpHolder._value);
-        
+
         transferRequestStatus[_from][_signature] == true;
-        
+
         emit TransferRequestFulfilled(_from, _tmpHolder._to, _tmpHolder._value,_signature);
-        
+
         return true;
     }
 
-    function batchFullTransferRequest(address[] _from, bytes32[] _signature) public onlyAuthCaller returns(bool) 
+    function batchFullTransferRequest(address[] _from, bytes32[] _signature) public onlyAuthCaller returns(bool)
     {
 
         /* Check if Any Signature is previously used */
         for(uint _interator = 0; _interator < _from.length ; _interator++)
         {
             require(transferRequestStatus[_from[_interator]][_signature[_interator]] == false);
-            
+
             fundReceiver memory _tmpHolder = transferRequestReceiver[_from[_interator]][_signature[_interator]];
-        
+
             /* Check Balance */
             require (_tmpHolder._value < balances[_from[_interator]],"Insufficient Sender Balance");
-            
+
             _transfer(_from[_interator],_tmpHolder._to,_tmpHolder._value);
-            
+
             transferRequestStatus[_from[_interator]][_signature[_interator]] == true;
-            
+
             emit TransferRequestFulfilled(_from[_interator], _tmpHolder._to, _tmpHolder._value,_signature[_interator]);
         }
-        
-        
+
+
         return true;
     }
-    
+
     function getTransferRequestStatus(address _from, bytes32 _signature) public view returns(bool _status)
     {
         return  transferRequestStatus[_from][_signature];
-        
+
     }
-    
+
     function getTransferRequestReceiver(address _from, bytes32 _signature) public view returns(address _to, uint _value)
     {
         fundReceiver memory _tmpHolder = transferRequestReceiver[_from][_signature];
-        
+
         return (_tmpHolder._to, _tmpHolder._value);
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

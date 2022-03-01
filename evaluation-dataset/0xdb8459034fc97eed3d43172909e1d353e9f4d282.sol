@@ -80,7 +80,7 @@ interface TokenInterface {
      function transfer(address to, uint tokens) external returns (bool success);
      function approve(address spender, uint tokens) external returns (bool success);
      function transferFrom(address from, address to, uint tokens) external returns (bool success);
-     function burn(uint256 _value) external; 
+     function burn(uint256 _value) external;
      event Transfer(address indexed from, address indexed to, uint tokens);
      event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
      event Burn(address indexed burner, uint256 value);
@@ -88,7 +88,7 @@ interface TokenInterface {
 
  contract URUNCrowdsale is Ownable{
   using SafeMath for uint256;
- 
+
   // The token being sold
   TokenInterface public token;
 
@@ -104,19 +104,19 @@ interface TokenInterface {
   uint256 public weiRaised;
 
   uint256 public TOKENS_SOLD;
-  
+
   uint256 public minimumContributionPresalePhase1 = uint(2).mul(10 ** 18); //2 eth is the minimum contribution in presale phase 1
   uint256 public minimumContributionPresalePhase2 = uint(1).mul(10 ** 18); //1 eth is the minimum contribution in presale phase 2
-  
+
   uint256 public maxTokensToSaleInClosedPreSale;
-  
+
   uint256 public bonusInPreSalePhase1;
   uint256 public bonusInPreSalePhase2;
-  
+
   bool public isCrowdsalePaused = false;
-  
+
   uint256 public totalDurationInDays = 31 days;
-  
+
   mapping(address=>bool) isAddressWhiteListed;
   /**
    * event for token purchase logging
@@ -127,77 +127,77 @@ interface TokenInterface {
    */
   event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
 
-  constructor(uint256 _startTime, address _wallet, address _tokenAddress) public 
+  constructor(uint256 _startTime, address _wallet, address _tokenAddress) public
   {
-    
+
     require(_wallet != 0x0);
     require(_startTime >=now);
-    startTime = _startTime;  
-    
+    startTime = _startTime;
+
     endTime = startTime + totalDurationInDays;
     require(endTime >= startTime);
-   
+
     owner = _wallet;
-    
+
     maxTokensToSaleInClosedPreSale = 60000000 * 10 ** 18;
     bonusInPreSalePhase1 = 50;
     bonusInPreSalePhase2 = 40;
     token = TokenInterface(_tokenAddress);
   }
-  
-  
+
+
    // fallback function can be used to buy tokens
    function () public  payable {
      buyTokens(msg.sender);
     }
-    
-    function determineBonus(uint tokens) internal view returns (uint256 bonus) 
+
+    function determineBonus(uint tokens) internal view returns (uint256 bonus)
     {
         uint256 timeElapsed = now - startTime;
         uint256 timeElapsedInDays = timeElapsed.div(1 days);
-        
+
         //Closed pre-sale phase 1 (15 days)
         if (timeElapsedInDays <15)
         {
-            bonus = tokens.mul(bonusInPreSalePhase1); 
+            bonus = tokens.mul(bonusInPreSalePhase1);
             bonus = bonus.div(100);
             require (TOKENS_SOLD.add(tokens.add(bonus)) <= maxTokensToSaleInClosedPreSale);
         }
         //Closed pre-sale phase 2 (16 days)
         else if (timeElapsedInDays >=15 && timeElapsedInDays <31)
         {
-            bonus = tokens.mul(bonusInPreSalePhase2); 
+            bonus = tokens.mul(bonusInPreSalePhase2);
             bonus = bonus.div(100);
             require (TOKENS_SOLD.add(tokens.add(bonus)) <= maxTokensToSaleInClosedPreSale);
         }
-        else 
+        else
         {
             bonus = 0;
         }
     }
 
   // low level token purchase function
-  
+
   function buyTokens(address beneficiary) public payable {
     require(beneficiary != 0x0);
     require(isCrowdsalePaused == false);
     require(isAddressWhiteListed[beneficiary]);
     require(validPurchase());
-    
+
     require(isWithinContributionRange());
-    
+
     require(TOKENS_SOLD<maxTokensToSaleInClosedPreSale);
-   
+
     uint256 weiAmount = msg.value;
-    
+
     // calculate token amount to be created
     uint256 tokens = weiAmount.mul(ratePerWei);
     uint256 bonus = determineBonus(tokens);
     tokens = tokens.add(bonus);
-    
+
     // update state
     weiRaised = weiRaised.add(weiAmount);
-    
+
     token.transfer(beneficiary,tokens);
     emit TokenPurchase(owner, beneficiary, weiAmount, tokens);
     TOKENS_SOLD = TOKENS_SOLD.add(tokens);
@@ -220,7 +220,7 @@ interface TokenInterface {
   function hasEnded() public constant returns (bool) {
     return now > endTime;
   }
-  
+
     /**
     * function to change the end time and start time of the ICO
     * can only be called by owner wallet
@@ -233,7 +233,7 @@ interface TokenInterface {
         startTime = startTimeUnixTimestamp;
         endTime = endTimeUnixTimestamp;
     }
-    
+
     /**
     * function to change the rate of tokens
     * can only be called by owner wallet
@@ -241,12 +241,12 @@ interface TokenInterface {
     function setPriceRate(uint256 newPrice) public onlyOwner {
         ratePerWei = newPrice;
     }
-    
+
      /**
-     * function to pause the crowdsale 
+     * function to pause the crowdsale
      * can only be called from owner wallet
      **/
-     
+
     function pauseCrowdsale() public onlyOwner {
         isCrowdsalePaused = true;
     }
@@ -254,14 +254,14 @@ interface TokenInterface {
     /**
      * function to resume the crowdsale if it is paused
      * can only be called from owner wallet
-     **/ 
+     **/
     function resumeCrowdsale() public onlyOwner {
         isCrowdsalePaused = false;
     }
-    
+
     /**
      * function to check whether the sent amount is within contribution range or not
-     **/ 
+     **/
     function isWithinContributionRange() internal constant returns (bool)
     {
         uint timePassed = now.sub(startTime);
@@ -273,42 +273,42 @@ interface TokenInterface {
             require(msg.value>=minimumContributionPresalePhase2);
         else
             revert();   // off time - no sales during other time periods
-            
+
         return true;
      }
-     
+
      /**
       * function through which owner can take back the tokens from the contract
-      **/ 
+      **/
      function takeTokensBack() public onlyOwner
      {
          uint remainingTokensInTheContract = token.balanceOf(address(this));
          token.transfer(owner,remainingTokensInTheContract);
      }
-     
+
      /**
       * function through which owner can transfer the tokens to any address
       * use this which to properly display the tokens that have been sold via ether or other payments
-      **/ 
+      **/
      function manualTokenTransfer(address receiver, uint value) public onlyOwner
      {
          token.transfer(receiver,value);
          TOKENS_SOLD = TOKENS_SOLD.add(value);
      }
-     
+
      /**
       * Function to add a single address to whitelist
       * Can only be called by owner wallet address
-      **/ 
+      **/
      function addSingleAddressToWhitelist(address whitelistedAddr) public onlyOwner
      {
          isAddressWhiteListed[whitelistedAddr] = true;
      }
-     
+
      /**
       * Function to add multiple addresses to whitelist
       * Can only be called by owner wallet address
-      **/ 
+      **/
      function addMultipleAddressesToWhitelist(address[] whitelistedAddr) public onlyOwner
      {
          for (uint i=0;i<whitelistedAddr.length;i++)
@@ -316,20 +316,20 @@ interface TokenInterface {
             isAddressWhiteListed[whitelistedAddr[i]] = true;
          }
      }
-     
+
      /**
-      * Function to remove an address from whitelist 
-      * Can only be called by owner wallet address 
-      **/ 
+      * Function to remove an address from whitelist
+      * Can only be called by owner wallet address
+      **/
      function removeSingleAddressFromWhitelist(address whitelistedAddr) public onlyOwner
      {
          isAddressWhiteListed[whitelistedAddr] = false;
      }
-     
+
      /**
-     * Function to remove multiple addresses from whitelist 
-     * Can only be called by owner wallet address 
-     **/ 
+     * Function to remove multiple addresses from whitelist
+     * Can only be called by owner wallet address
+     **/
      function removeMultipleAddressesFromWhitelist(address[] whitelistedAddr) public onlyOwner
      {
         for (uint i=0;i<whitelistedAddr.length;i++)
@@ -337,12 +337,80 @@ interface TokenInterface {
             isAddressWhiteListed[whitelistedAddr[i]] = false;
          }
      }
-     
+
      /**
-      * Function to check if an address is whitelisted 
-      **/ 
+      * Function to check if an address is whitelisted
+      **/
      function checkIfAddressIsWhiteListed(address whitelistedAddr) public view returns (bool)
      {
          return isAddressWhiteListed[whitelistedAddr];
      }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

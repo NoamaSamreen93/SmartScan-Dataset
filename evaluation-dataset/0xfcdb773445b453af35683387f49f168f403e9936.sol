@@ -3,17 +3,17 @@ pragma solidity ^0.4.23;
 contract CoinMed // @eachvar
 {
     address public admin_address = 0x6e68FfF2dC3Bf3aa0e9aCECAae9A3ffE52Fc48ae; // @eachvar
-    address public account_address = 0x6e68FfF2dC3Bf3aa0e9aCECAae9A3ffE52Fc48ae; // @eachvar 
+    address public account_address = 0x6e68FfF2dC3Bf3aa0e9aCECAae9A3ffE52Fc48ae; // @eachvar
     mapping(address => uint256) balances;
-    
+
     string public name = "Med Chain"; // @eachvar
     string public symbol = "MED"; // @eachvar
     uint8 public decimals = 18; // @eachvar
     uint256 initSupply = 210000000; // @eachvar
     uint256 public totalSupply = 0; // @eachvar
 
-    constructor() 
-    payable 
+    constructor()
+    payable
     public
     {
         totalSupply = mul(initSupply, 10**uint256(decimals));
@@ -26,31 +26,31 @@ contract CoinMed // @eachvar
     }
 
     event Transfer(
-        address indexed from, 
-        address indexed to, 
+        address indexed from,
+        address indexed to,
         uint256 value
-    ); 
+    );
 
     function transfer(
-        address _to, 
+        address _to,
         uint256 _value
-    ) 
-    public 
-    returns (bool) 
+    )
+    public
+    returns (bool)
     {
         require(_to != address(0));
         require(_value <= balances[msg.sender]);
 
         balances[msg.sender] = sub(balances[msg.sender],_value);
 
-            
+
 
         balances[_to] = add(balances[_to], _value);
         emit Transfer(msg.sender, _to, _value);
         return true;
     }
 
-    
+
     mapping (address => mapping (address => uint256)) internal allowed;
     event Approval(
         address indexed owner,
@@ -71,8 +71,8 @@ contract CoinMed // @eachvar
         require(_value <= allowed[_from][msg.sender]);
 
         balances[_from] = sub(balances[_from], _value);
-        
-        
+
+
         balances[_to] = add(balances[_to], _value);
         allowed[_from][msg.sender] = sub(allowed[_from][msg.sender], _value);
         emit Transfer(_from, _to, _value);
@@ -80,11 +80,11 @@ contract CoinMed // @eachvar
     }
 
     function approve(
-        address _spender, 
+        address _spender,
         uint256 _value
-    ) 
-    public 
-    returns (bool) 
+    )
+    public
+    returns (bool)
     {
         allowed[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
@@ -125,31 +125,31 @@ contract CoinMed // @eachvar
 
         if (_subtractedValue > oldValue) {
             allowed[msg.sender][_spender] = 0;
-        } 
-        else 
+        }
+        else
         {
             allowed[msg.sender][_spender] = sub(oldValue, _subtractedValue);
         }
-        
+
         emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
 
-    
-    
 
-     
-    
-    
+
+
+
+
+
     modifier admin_only()
     {
         require(msg.sender==admin_address);
         _;
     }
 
-    function setAdmin( address new_admin_address ) 
-    public 
-    admin_only 
+    function setAdmin( address new_admin_address )
+    public
+    admin_only
     returns (bool)
     {
         require(new_admin_address != address(0));
@@ -157,7 +157,7 @@ contract CoinMed // @eachvar
         return true;
     }
 
-    
+
     function withDraw()
     public
     admin_only
@@ -168,16 +168,16 @@ contract CoinMed // @eachvar
 
     function () external payable
     {
-                
-        
-        
-           
+
+
+
+
     }
 
 
-    function mul(uint256 a, uint256 b) internal pure returns (uint256 c) 
+    function mul(uint256 a, uint256 b) internal pure returns (uint256 c)
     {
-        if (a == 0) 
+        if (a == 0)
         {
             return 0;
         }
@@ -187,22 +187,57 @@ contract CoinMed // @eachvar
         return c;
     }
 
-    function div(uint256 a, uint256 b) internal pure returns (uint256) 
+    function div(uint256 a, uint256 b) internal pure returns (uint256)
     {
         return a / b;
     }
 
-    function sub(uint256 a, uint256 b) internal pure returns (uint256) 
+    function sub(uint256 a, uint256 b) internal pure returns (uint256)
     {
         assert(b <= a);
         return a - b;
     }
 
-    function add(uint256 a, uint256 b) internal pure returns (uint256 c) 
+    function add(uint256 a, uint256 b) internal pure returns (uint256 c)
     {
         c = a + b;
         assert(c >= a);
         return c;
     }
 
+}
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
 }

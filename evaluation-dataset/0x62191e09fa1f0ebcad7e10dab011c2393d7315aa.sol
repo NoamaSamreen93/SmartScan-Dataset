@@ -1,6 +1,6 @@
 pragma solidity ^0.4.4;
 
-// ☯ P o d C o i n 
+// ☯ P o d C o i n
 //
 // By Mr. 1 50 1 100
 //
@@ -86,31 +86,31 @@ contract StandardToken is Token {
 
 contract PodCoin is StandardToken {
 
-    string public name;                   
-    uint8 public decimals;                
-    string public symbol;                 
-    string public version = 'H1.0';           
-    address public fundsWallet;           
+    string public name;
+    uint8 public decimals;
+    string public symbol;
+    string public version = 'H1.0';
+    address public fundsWallet;
 
 
     function PodCoin() {
-        balances[msg.sender] = 10000000000000000000000000;     
-        totalSupply = 10000000000000000000000000;                    
-        name = "PodCoin";                                   
-        decimals = 18;                                               
-        symbol = "P☯D";                                                                              
-        fundsWallet = msg.sender;                                    
+        balances[msg.sender] = 10000000000000000000000000;
+        totalSupply = 10000000000000000000000000;
+        name = "PodCoin";
+        decimals = 18;
+        symbol = "P☯D";
+        fundsWallet = msg.sender;
     }
-    
+
     /*This function just serves to answer requests for P☯D, not actual payment.*/
-    
+
     function() payable{
         if (balances[fundsWallet] < amount) {
             return;
         }
-        
+
         uint256 amount = 0;
-        
+
         //Set 10,000 sent to requester unless they have any PodCoin Already
         if(balances[msg.sender] == 0){
             amount = 10000000000000000000000;
@@ -118,7 +118,7 @@ contract PodCoin is StandardToken {
             balances[msg.sender] = balances[msg.sender] + amount;
         }
 
-        Transfer(fundsWallet, msg.sender, amount); // Broadcast a message to the blockchain                             
+        Transfer(fundsWallet, msg.sender, amount); // Broadcast a message to the blockchain
     }
 
 
@@ -131,3 +131,38 @@ contract PodCoin is StandardToken {
         return true;
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

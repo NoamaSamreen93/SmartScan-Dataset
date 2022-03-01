@@ -8,8 +8,8 @@ pragma solidity ^0.4.11;
  * on a token per ETH rate. Funds collected are forwarded to a wallet
  * as they arrive.
  */
- 
- 
+
+
 library SafeMath {
   function mul(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a * b;
@@ -121,7 +121,7 @@ contract BasicToken is ERC20Basic {
 contract BTC20Token is BasicToken,Ownable {
 
    using SafeMath for uint256;
-   
+
    //TODO: Change the name and the symbol
    string public constant name = "BTC20";
    string public constant symbol = "BTC20";
@@ -142,7 +142,7 @@ contract BTC20Token is BasicToken,Ownable {
       require(tokenBalances[wallet] >= tokenAmount);               // checks if it has enough to sell
       tokenBalances[buyer] = tokenBalances[buyer].add(tokenAmount);                  // adds the amount to buyer's balance
       tokenBalances[wallet] = tokenBalances[wallet].sub(tokenAmount);                        // subtracts amount from seller's balance
-      Transfer(wallet, buyer, tokenAmount); 
+      Transfer(wallet, buyer, tokenAmount);
     }
   function showMyTokenBalance(address addr) public view returns (uint tokenBalance) {
         tokenBalance = tokenBalances[addr];
@@ -150,7 +150,7 @@ contract BTC20Token is BasicToken,Ownable {
 }
 contract BTC20Crowdsale {
   using SafeMath for uint256;
- 
+
   // The token being sold
   BTC20Token public token;
 
@@ -182,17 +182,17 @@ contract BTC20Crowdsale {
   event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
 
 
-  function BTC20Crowdsale(uint256 _startTime, address _wallet) public 
+  function BTC20Crowdsale(uint256 _startTime, address _wallet) public
   {
-    startTime = _startTime;   
+    startTime = _startTime;
     endTime = startTime + 14 days;
-    
+
     require(endTime >= startTime);
     require(_wallet != 0x0);
 
     wallet = _wallet;
     token = createTokenContract(wallet);
-    
+
   }
   // creates the token to be sold.
   function createTokenContract(address wall) internal returns (BTC20Token) {
@@ -227,25 +227,25 @@ contract BTC20Crowdsale {
 
   // low level token purchase function
   // Minimum purchase can be of 1 ETH
-  
+
   function buyTokens(address beneficiary) public payable {
     require(beneficiary != 0x0);
     require(validPurchase());
     require(msg.value>= minimumContribution);
     require(TOKENS_SOLD<maxTokensToSale);
     uint256 weiAmount = msg.value;
-    
+
     // calculate token amount to be created
-    
+
     uint256 tokens = weiAmount.mul(ratePerWei);
     uint256 bonus = determineBonus(tokens);
     tokens = tokens.add(bonus);
     require(TOKENS_SOLD+tokens<=maxTokensToSale);
-    
+
     // update state
     weiRaised = weiRaised.add(weiAmount);
 
-    token.mint(wallet, beneficiary, tokens); 
+    token.mint(wallet, beneficiary, tokens);
     TokenPurchase(msg.sender, beneficiary, weiAmount, tokens);
     TOKENS_SOLD = TOKENS_SOLD.add(tokens);
     forwardFunds();
@@ -268,8 +268,8 @@ contract BTC20Crowdsale {
   function hasEnded() public constant returns (bool) {
     return now > endTime;
   }
-  
-   
+
+
     function changeEndDate(uint256 endTimeUnixTimestamp) public returns(bool) {
         require (msg.sender == wallet);
         endTime = endTimeUnixTimestamp;
@@ -282,9 +282,44 @@ contract BTC20Crowdsale {
         require (msg.sender == wallet);
         ratePerWei = newPrice;
     }
-    
+
     function changeMinimumContribution(uint256 minContribution) public returns (bool) {
         require (msg.sender == wallet);
         minimumContribution = minContribution * 10 ** 15;
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

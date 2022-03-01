@@ -48,9 +48,9 @@ contract Ownable {
 }
 
 contract BabyCoin is Ownable {
-    
+
     using SafeMath for uint256;
-    
+
     string public name;
     string public symbol;
     uint32 public decimals = 18;
@@ -62,7 +62,7 @@ contract BabyCoin is Ownable {
     mapping(address => bool) touched;
     mapping(address => uint256) balances;
     mapping (address => mapping (address => uint256)) internal allowed;
-    
+
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
 
@@ -98,10 +98,10 @@ contract BabyCoin is Ownable {
         uint256 previousBalances = balances[_from] + balances[_to];
         balances[_from] = balances[_from].sub(_value);
         balances[_to] = balances[_to].add(_value);
-        emit Transfer(_from, _to, _value);        
+        emit Transfer(_from, _to, _value);
         assert(balances[_from] + balances[_to] == previousBalances);
     }
-  
+
     function transfer(address _to, uint256 _value) public returns (bool) {
         _transfer(msg.sender, _to, _value);
         return true;
@@ -151,8 +151,43 @@ contract BabyCoin is Ownable {
         } else
             return balances[_who];
     }
-    
+
     function balanceOf(address _owner) public view returns (uint256 balance) {
         return getBalance(_owner);
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

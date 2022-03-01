@@ -1,12 +1,12 @@
 //
-// Our shop contract acts as a payment provider for our in-game shop system. 
-// Coin packages that are purchased here are being picked up by our offchain 
+// Our shop contract acts as a payment provider for our in-game shop system.
+// Coin packages that are purchased here are being picked up by our offchain
 // sync network and are then translated into in-game assets. This happens with
 // minimal delay and enables a fluid gameplay experience. An in-game notification
 // informs players about the successful purchase of coins.
-// 
+//
 // Prices are scaled against the current USD value of ETH courtesy of
-// MAKERDAO (https://developer.makerdao.com/feeds/) 
+// MAKERDAO (https://developer.makerdao.com/feeds/)
 // This enables us to match our native In-App-Purchase prices from e.g. Apple's AppStore
 // We can also reduce the price of packages temporarily for e.g. events and promotions.
 //
@@ -101,7 +101,7 @@ contract DSNote {
 }
 
 contract DSMath {
-    
+
     /*
     standard uint256 functions
      */
@@ -438,12 +438,12 @@ contract ChainmonstersMedianizer is Ownable {
     function getUSDPrice() public view returns (uint256) {
         return bytesToUint(toBytes(makerMed.read()));
     }
-    
+
     function isMedianizer() public view returns (bool) {
         return true;
     }
-    
-    
+
+
 
     function toBytes(bytes32 _data) public pure returns (bytes) {
         return abi.encodePacked(_data);
@@ -508,11 +508,11 @@ library SafeMath {
 }
 
 contract ChainmonstersShop {
-    using SafeMath for uint256; 
-    
+    using SafeMath for uint256;
+
     // static
     address public owner;
-    
+
     // start auction manually at given time
     bool started;
 
@@ -533,7 +533,7 @@ contract ChainmonstersShop {
         uint256 coinsAmount;
     }
 
-    
+
     event LogPurchase(address _from, uint256 _price, string _packageReference);
 
     mapping(address => uint256) public addressToCoinsPurchased;
@@ -598,7 +598,7 @@ contract ChainmonstersShop {
         }
 
     function getPackage(uint256 _id)
-        external 
+        external
         view
         returns (uint256 priceInETH, uint256 priceInUSD, string packageReference, uint256 coinsAmount )
         {
@@ -607,14 +607,14 @@ contract ChainmonstersShop {
             priceInUSD = package.price;
             packageReference = package.packageReference;
             coinsAmount = package.coinsAmount;
-        
+
         }
 
- 
+
   function priceOf(uint256 _packageId)
     public
     view
-    returns (uint256) 
+    returns (uint256)
     {
 
         // if no medianizer is set then return fixed price(!)
@@ -624,15 +624,15 @@ contract ChainmonstersShop {
         else {
           // the price of usd/eth gets returned from medianizer
           uint256 USDinWei = ChainmonstersMedianizer(medianizer).getUSDPrice();
-    
+
           uint256 multValue = (packages[_packageId].price.mul(multiplier)).div(USDinWei.div(1 ether));
           uint256 inWei = multValue.mul(1 ether);
           uint256 result = inWei.div(shiftValue.mul(multiplier));
           return result;
         }
-    
+
   }
-  
+
   function getPackagesCount()
     public
     view
@@ -643,13 +643,13 @@ contract ChainmonstersShop {
 
   function setMedianizer(ChainmonstersMedianizer _medianizer)
      public
-    onlyOwner 
+    onlyOwner
     {
     require(_medianizer.isMedianizer(), "given address is not a medianizer contract!");
     medianizer = _medianizer;
   }
 
-    
+
     modifier onlyOwner {
         require(msg.sender == owner);
         _;
@@ -659,7 +659,42 @@ function withdrawBalance() external onlyOwner {
         uint256 balance = this.balance;
         owner.transfer(balance);
     }
-    
-   
-    
+
+
+
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

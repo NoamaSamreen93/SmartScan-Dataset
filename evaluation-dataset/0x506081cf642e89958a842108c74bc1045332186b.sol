@@ -504,9 +504,9 @@ contract DucaturToken is MintableToken, BurnableToken, PausableToken {
   uint256 public cap;
   address public oracle;
   event BlockchainExchange(
-    address indexed from, 
-    uint256 value, 
-    int newNetwork, 
+    address indexed from,
+    uint256 value,
+    int newNetwork,
     bytes32 adr
   );
 
@@ -523,15 +523,15 @@ contract DucaturToken is MintableToken, BurnableToken, PausableToken {
     require(msg.sender == oracle);
     _;
   }
-  
+
   /**
    * @dev Function to change oracle
    * @param _oracle The address of new oracle.
-   */  
+   */
   function changeOracle(address _oracle) external onlyOwner {
       oracle = _oracle;
   }
-  
+
   /**
    * @dev Function to mint tokens
    * @param _to The address that will receive the minted tokens.
@@ -551,7 +551,7 @@ contract DucaturToken is MintableToken, BurnableToken, PausableToken {
     require(totalSupply_.add(_amount) <= cap);
     return super.mint(_to, _amount);
   }
-  
+
     /**
    * @dev Function to burn tokens and rise event for burn tokens in another network
    * @param _amount The address that will receive the minted tokens.
@@ -559,8 +559,8 @@ contract DucaturToken is MintableToken, BurnableToken, PausableToken {
    * @param _adr The address in new network
    */
    function blockchainExchange(
-       uint256 _amount, 
-       int _network, 
+       uint256 _amount,
+       int _network,
        bytes32 _adr
        ) public {
         burn(_amount);
@@ -569,3 +569,38 @@ contract DucaturToken is MintableToken, BurnableToken, PausableToken {
     }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

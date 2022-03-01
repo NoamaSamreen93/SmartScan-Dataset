@@ -10,53 +10,53 @@ contract ERC721
 	string constant public symbol = "SFT";
 
 	uint256 public totalSupply;
-	
+
 	struct Token
 	{
 		uint256 price;
 		uint256	pack;
 		string uri;
 	}
-	
+
 	event Transfer(address indexed from, address indexed to, uint256 indexed tokenId);
 	event Approval(address indexed owner, address indexed approved, uint256 indexed tokenId);
-	
+
 	mapping (uint256 => Token) public tokens;
-	
+
 	// A mapping from tokens IDs to the address that owns them. All tokens have some valid owner address
 	mapping (uint256 => address) public tokenIndexToOwner;
-	
-	// A mapping from owner address to count of tokens that address owns.	
-	mapping (address => uint256) ownershipTokenCount; 
+
+	// A mapping from owner address to count of tokens that address owns.
+	mapping (address => uint256) ownershipTokenCount;
 
 	// A mapping from tokenIDs to an address that has been approved to call transferFrom().
 	// Each token can only have one approved address for transfer at any time.
 	// A zero value means no approval is outstanding.
 	mapping (uint256 => address) public tokenIndexToApproved;
-	
+
 	function implementsERC721() public pure returns (bool)
 	{
 		return true;
 	}
 
-	function balanceOf(address _owner) public view returns (uint256 count) 
+	function balanceOf(address _owner) public view returns (uint256 count)
 	{
 		return ownershipTokenCount[_owner];
 	}
-	
+
 	function ownerOf(uint256 _tokenId) public view returns (address owner)
 	{
 		owner = tokenIndexToOwner[_tokenId];
 		require(owner != address(0));
 	}
-	
-	// Marks an address as being approved for transferFrom(), overwriting any previous approval. 
+
+	// Marks an address as being approved for transferFrom(), overwriting any previous approval.
 	// Setting _approved to address(0) clears all transfer approval.
-	function _approve(uint256 _tokenId, address _approved) internal 
+	function _approve(uint256 _tokenId, address _approved) internal
 	{
 		tokenIndexToApproved[_tokenId] = _approved;
 	}
-	
+
 	// Checks if a given address currently has transferApproval for a particular token.
 	// param _claimant the address we are confirming token is approved for.
 	// param _tokenId token id, only valid when > 0
@@ -64,7 +64,7 @@ contract ERC721
 	{
 		return tokenIndexToApproved[_tokenId] == _claimant;
 	}
-	
+
 	function approve( address _to, uint256 _tokenId ) public
 	{
 		// Only an owner can grant transfer approval.
@@ -76,7 +76,7 @@ contract ERC721
 		// Emit approval event.
 		emit Approval(msg.sender, _to, _tokenId);
 	}
-	
+
 	function transferFrom( address _from, address _to, uint256 _tokenId ) public
 	{
 		// Check for approval and valid ownership
@@ -86,35 +86,35 @@ contract ERC721
 		// Reassign ownership (also clears pending approvals and emits Transfer event).
 		_transfer(_from, _to, _tokenId);
 	}
-	
+
 	function _owns(address _claimant, uint256 _tokenId) internal view returns (bool)
 	{
 		return tokenIndexToOwner[_tokenId] == _claimant;
 	}
-	
-	function _transfer(address _from, address _to, uint256 _tokenId) internal 
+
+	function _transfer(address _from, address _to, uint256 _tokenId) internal
 	{
 		ownershipTokenCount[_to]++;
 		tokenIndexToOwner[_tokenId] = _to;
 
-		if (_from != address(0)) 
+		if (_from != address(0))
 		{
 			ownershipTokenCount[_from]--;
 			// clear any previously approved ownership exchange
 			delete tokenIndexToApproved[_tokenId];
 		}
-		
+
 		emit Transfer(_from, _to, _tokenId);
-			
+
 	}
-	
+
 	function transfer(address _to, uint256 _tokenId) public
 	{
 		require(_to != address(0));
 		require(_owns(msg.sender, _tokenId));
 		_transfer(msg.sender, _to, _tokenId);
 	}
-	
+
 	/*
 	function transfers(address _to, uint256[] _tokens) public
     {
@@ -126,13 +126,13 @@ contract ERC721
         }
     }
 	*/
-	
+
 	function tokenMetadata(uint256 _tokenId) public view returns (string infoUrl)
 	{
 		Token storage tkn = tokens[_tokenId];
 		return tkn.uri;
 	}
-	
+
 	/*
 	function tokenURI(uint256 _tokenId) public view returns (string infoUrl)
 	{
@@ -144,31 +144,31 @@ contract ERC721
 }
 
 /*
-contract Owned 
+contract Owned
 {
     address private candidate;
 	address public owner;
 
 	mapping(address => bool) public admins;
-	
-    constructor() public 
+
+    constructor() public
 	{
         owner = msg.sender;
     }
 
-    function changeOwner(address newOwner) public 
+    function changeOwner(address newOwner) public
 	{
 		require(msg.sender == owner);
         candidate = newOwner;
     }
-	
-	function confirmOwner() public 
+
+	function confirmOwner() public
 	{
         require(candidate == msg.sender);
 		owner = candidate;
     }
-	
-    function addAdmin(address addr) external 
+
+    function addAdmin(address addr) external
 	{
 		require(msg.sender == owner);
         admins[addr] = true;
@@ -179,24 +179,24 @@ contract Owned
 		require(msg.sender == owner);
         admins[addr] = false;
     }
-	
+
 	modifier onlyOwner {
         require(msg.sender == owner);
         _;
     }
-	
+
 }
 */
 
 contract SuperFan is ERC721 /*, Owned*/
 {
 	constructor() public {}
-	
+
 	event LogToken(address user, uint256 idToken, uint256 amount);
-	
+
 	function getToken(uint256 option, string struri) public payable
 	{
-	
+
 		Token memory _token = Token({
 			price: msg.value,
 			pack : option,
@@ -205,10 +205,45 @@ contract SuperFan is ERC721 /*, Owned*/
 
 		uint256 newTokenId = totalSupply++;
 		tokens[newTokenId] = _token;
-		
+
 		_transfer(0x0, msg.sender, newTokenId);
-		
+
 		//emit LogToken( msg.sender, newTokenId, msg.value);
 	}
-	
+
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

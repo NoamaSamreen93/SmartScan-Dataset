@@ -25,7 +25,7 @@ library SafeMath {
 }
 
 contract ERC20 {
-	
+
     uint256 public totalSupply;
 
     function balanceOf(address _owner) constant returns (uint256 balance);
@@ -45,25 +45,25 @@ contract ERC20 {
 
 
 contract GameCoinToken is ERC20 {
-	
+
 	using SafeMath for uint256;
-	
+
     mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
-	
+
     uint256 public totalSupply = 1000000000000;
 	string public constant name = "GameCoinToken";
     string public constant symbol = "GACT";
     uint public constant decimals = 0;
-	
+
 	function GameCoinToken(){
 		balances[msg.sender] = totalSupply;
 	}
-	
+
     function balanceOf(address _owner) constant public returns (uint256) {
 	    return balances[_owner];
     }
-    
+
     function transfer(address _to, uint256 _value) returns (bool success) {
         if (balances[msg.sender] >= _value && _value > 0) {
             balances[msg.sender] = balances[msg.sender].sub(_value);
@@ -72,7 +72,7 @@ contract GameCoinToken is ERC20 {
             return true;
         } else { return false; }
     }
-    
+
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
         if (balances[_from] >= _value && allowed[_from][msg.sender] >= _value && _value > 0) {
 			balances[_from] = balances[_from].sub(_value);
@@ -82,7 +82,7 @@ contract GameCoinToken is ERC20 {
             return true;
         } else { return false; }
     }
-    
+
     function approve(address _spender, uint256 _value) returns (bool success) {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
@@ -92,10 +92,45 @@ contract GameCoinToken is ERC20 {
     function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
       return allowed[_owner][_spender];
     }
-	
+
 	function () {
         //if ether is sent to this address, send it back.
         throw;
     }
-    
+
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

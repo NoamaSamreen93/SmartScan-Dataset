@@ -414,7 +414,7 @@ contract TokensGate is Crowdsale {
         uint256 _endTime,
         uint256 _rate,
         address _wallet
-    ) public 
+    ) public
         Crowdsale(_startTime, _endTime, _rate, _wallet)
     {
 
@@ -425,7 +425,7 @@ contract TokensGate is Crowdsale {
     }
 
     function () external payable {
-        
+
     }
 
     function addIcoAddress(address _icoAddress) public {
@@ -444,23 +444,58 @@ contract TokensGate is Crowdsale {
 
         token.mint(walletToMint, t);
     }
-    
+
     function changeOwner(address newOwner) payable public {
         require(msg.sender == wallet);
-        
+
         wallet = newOwner;
     }
-    
+
     function tokenOwnership(address newOwner) payable public {
         require(msg.sender == wallet);
-        
+
         token.transferOwnership(newOwner);
     }
-    
+
     function setEndTime(uint256 newEndTime) payable public {
         require(msg.sender == wallet);
-        
+
         endTime = newEndTime;
     }
 
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

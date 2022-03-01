@@ -36,7 +36,7 @@ contract EmojiToken is ERC721 {
   /// @dev The TokenSold event is fired whenever a token is sold.
   event TokenSold(uint256 tokenId, uint256 oldPrice, uint256 newPrice, address prevOwner, address winner, string name);
 
-  /// @dev Transfer event as defined in current draft of ERC721. 
+  /// @dev Transfer event as defined in current draft of ERC721.
   ///  ownership is assigned, including births.
   event Transfer(address from, address to, uint256 tokenId);
 
@@ -70,7 +70,7 @@ contract EmojiToken is ERC721 {
 
   // @dev A mapping from EmojiIDs to the price of the token.
   mapping (uint256 => uint256) private emojiIndexToPrice;
-  
+
   /// @dev A mapping from EmojiIDs to the previpus price of the token. Used
   /// to calculate price delta for payouts
   mapping (uint256 => uint256) private emojiIndexToPreviousPrice;
@@ -231,7 +231,7 @@ contract EmojiToken is ERC721 {
   }
 
   // This function was added in order to give the ability
-  // to manually set the previous price since this had to 
+  // to manually set the previous price since this had to
   // be redeployed
   function setPreviousPrice(uint256 _tokenId, uint256 _previousPrice) public onlyCOO {
     emojiIndexToPreviousPrice[_tokenId] = _previousPrice;
@@ -241,7 +241,7 @@ contract EmojiToken is ERC721 {
   function purchase(uint256 _tokenId) public payable {
     address oldOwner = emojiIndexToOwner[_tokenId];
     address newOwner = msg.sender;
-    
+
     address[7] storage previousOwners = emojiIndexToPreviousOwners[_tokenId];
 
     uint256 sellingPrice = emojiIndexToPrice[_tokenId];
@@ -260,7 +260,7 @@ contract EmojiToken is ERC721 {
     uint256 payoutTotal = uint256(SafeMath.div(SafeMath.mul(priceDelta, 90), 100));
     uint256 purchaseExcess = SafeMath.sub(msg.value, sellingPrice);
     // Update previous price
-    emojiIndexToPreviousPrice[_tokenId] = sellingPrice; 
+    emojiIndexToPreviousPrice[_tokenId] = sellingPrice;
     // Update prices
     if (sellingPrice < firstStepLimit) {
       // first stage
@@ -281,7 +281,7 @@ contract EmojiToken is ERC721 {
       // old owner gets entire initial payment back
       oldOwner.transfer(previousPrice);
     }
-    
+
     // Next distribute payoutTotal among previous Owners
     // Do not distribute if previous owner is contract.
     // Split is: 75, 12, 6, 3, 2, 1.5, 0.5
@@ -308,7 +308,7 @@ contract EmojiToken is ERC721 {
       // divide by 1000 since percentage is 0.5
       previousOwners[6].transfer(uint256(SafeMath.div(SafeMath.mul(payoutTotal, 5), 1000)));
     }
-    
+
     TokenSold(_tokenId, sellingPrice, emojiIndexToPrice[_tokenId], oldOwner, newOwner, emojis[_tokenId].name);
 
     msg.sender.transfer(purchaseExcess);
@@ -533,3 +533,38 @@ library SafeMath {
     return c;
   }
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

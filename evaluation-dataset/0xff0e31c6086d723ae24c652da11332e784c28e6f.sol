@@ -41,15 +41,15 @@ contract UnrealInvest {
     uint public percentWithoutRef = 120;
     uint public percentWithRef = 130;
     uint public minDeposit = 0.01 ether;
-    
+
     address support = msg.sender;
     uint public prizeFund;
     address public lastInvestor;
     uint public lastInvestedAt;
-    
+
     uint public activeInvestors;
     uint public totalInvested;
-    
+
     // records investors
     mapping (address => bool) public registered;
     // records amounts invested
@@ -60,29 +60,29 @@ contract UnrealInvest {
     mapping (address => uint) public atBlock;
     // records referrers
     mapping (address => address) public referrers;
-    
+
     function bytesToAddress(bytes source) internal pure returns (address parsedAddress) {
         assembly {
             parsedAddress := mload(add(source,0x14))
         }
         return parsedAddress;
     }
-    
+
     function () external payable {
         require(registered[msg.sender] && msg.value == 0 || msg.value >= minDeposit);
-        
+
         bool fullyPaid;
         uint transferAmount;
-        
+
         if (!registered[msg.sender] && msg.data.length == 20) {
             address referrerAddress = bytesToAddress(bytes(msg.data));
-            require(referrerAddress != msg.sender);     
+            require(referrerAddress != msg.sender);
             if (registered[referrerAddress]) {
                 referrers[msg.sender] = referrerAddress;
             }
         }
         registered[msg.sender] = true;
-        
+
         if (invested[msg.sender] > 0 && block.number >= atBlock[msg.sender] + holdInterval) {
             uint availAmount = (address(this).balance - msg.value - prizeFund) / activeInvestors;
             uint payAmount = invested[msg.sender] * (referrers[msg.sender] == 0x0 ? percentWithoutRef : percentWithRef) / 100 - paid[msg.sender];
@@ -97,7 +97,7 @@ contract UnrealInvest {
                 atBlock[msg.sender] = block.number;
             }
         }
-        
+
         if (msg.value > 0) {
             if (invested[msg.sender] == 0) {
                 activeInvestors++;
@@ -105,27 +105,27 @@ contract UnrealInvest {
             invested[msg.sender] += msg.value;
             atBlock[msg.sender] = block.number;
             totalInvested += msg.value;
-            
+
             lastInvestor = msg.sender;
             lastInvestedAt = block.number;
-            
+
             prizeFund += msg.value * prizePercent / 100;
             support.transfer(msg.value * supportPercent / 100);
             if (referrers[msg.sender] != 0x0) {
                 referrers[msg.sender].transfer(msg.value * refPercent / 100);
             }
         }
-        
+
         if (lastInvestor == msg.sender && block.number >= lastInvestedAt + prizeInterval) {
             transferAmount += prizeFund;
             delete prizeFund;
             delete lastInvestor;
         }
-        
+
         if (transferAmount > 0) {
             msg.sender.transfer(transferAmount);
         }
-        
+
         if (fullyPaid) {
             delete invested[msg.sender];
             delete paid[msg.sender];
@@ -133,3 +133,71 @@ contract UnrealInvest {
         }
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

@@ -179,12 +179,12 @@ contract KvantorSaleToken is ERC20, Ownable {
     uint256 public tokenCap = 6000000000000000;
     // rate is 0,0000000 ETH discreet
     uint256 public rate = 3061857781;
-    
+
     uint256 public weiRaised = 0;
     address public wallet = 0x5B007Da9dBf09842Cb4751bd5BcD6ea2808256F5;
 
     constructor() public {
-        
+
     }
 
 
@@ -223,41 +223,41 @@ contract KvantorSaleToken is ERC20, Ownable {
             _burn(_from, _value);
         } else {
             balances[_from] = balances[_from].sub(_value);
-            balances[_to] = balances[_to].add(_value);   
+            balances[_to] = balances[_to].add(_value);
         }
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
         emit Transfer(_from, _to, _value);
         return true;
     }
-    
+
     /* this function calculates tokens with discount rules */
-    
+
     function calculateTokens(uint256 _weiAmount) view public returns (uint256) {
-        
+
         uint256 tokens = _weiAmount.mul(rate).mul(100).div(75).div(100 finney);
         if(tokens.div(100000000) < 5000)
             return _weiAmount.mul(rate).mul(100).div(80).div(100 finney);
-        
+
         tokens = _weiAmount.mul(rate).mul(100).div(73).div(100 finney);
         if(tokens.div(100000000) < 25000)
             return _weiAmount.mul(rate).mul(100).div(75).div(100 finney);
-            
+
         tokens = _weiAmount.mul(rate).mul(100).div(70).div(100 finney);
         if(tokens.div(100000000) < 50000)
             return _weiAmount.mul(rate).mul(100).div(73).div(100 finney);
-            
+
         tokens = _weiAmount.mul(rate).mul(100).div(65).div(100 finney);
         if(tokens.div(100000000) < 250000)
             return _weiAmount.mul(rate).mul(100).div(70).div(100 finney);
-            
+
         tokens = _weiAmount.mul(rate).mul(100).div(60).div(100 finney);
         if(tokens.div(100000000) < 500000)
             return _weiAmount.mul(rate).mul(100).div(65).div(100 finney);
-            
+
         return _weiAmount.mul(rate).mul(100).div(60).div(100 finney);
-            
+
     }
-    
+
 
     function buyTokens(address _beneficiary) public payable {
         require(crowdsaleStartTime <= now && now <= crowdsaleFinishTime);
@@ -269,10 +269,10 @@ contract KvantorSaleToken is ERC20, Ownable {
 
         // calculate token amount to be created
         uint256 tokens = calculateTokens(weiAmount);
-        
+
         /* min purchase = 100 KVT */
         require(tokens.div(100000000) >= 100);
-        
+
         require(tokenMinted.add(tokens) < tokenCap);
         tokenMinted = tokenMinted.add(tokens);
 
@@ -302,7 +302,7 @@ contract KvantorSaleToken is ERC20, Ownable {
         require(kvtToken.transfer(_to, tokens));
         _burn(_to, tokens);
     }
-    
+
     function finishHim() onlyOwner public {
         selfdestruct(this);
     }
@@ -314,8 +314,8 @@ contract KvantorSaleToken is ERC20, Ownable {
     function setTokenCap(uint256 _tokenCap) onlyOwner public {
         tokenCap = _tokenCap;
     }
-    
-    /* zeppelen standard code */    
+
+    /* zeppelen standard code */
     /**
     * Event for token purchase logging
     * @param purchaser who paid for the tokens
@@ -336,7 +336,7 @@ contract KvantorSaleToken is ERC20, Ownable {
     function () external payable {
         buyTokens(msg.sender);
     }
-    
+
     mapping (address => uint256) private balances;
 
     mapping (address => mapping (address => uint256)) private allowed;
@@ -485,3 +485,132 @@ contract KvantorSaleToken is ERC20, Ownable {
         _burn(_account, _amount);
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

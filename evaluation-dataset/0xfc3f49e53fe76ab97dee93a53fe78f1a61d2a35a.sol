@@ -50,7 +50,7 @@ contract Ownable {
         require(msg.sender == owner);
         _;
     }
-  
+
     function transferOwnership(address newOwner) public onlyOwner {
         require(newOwner != address(0));
         emit OwnershipTransferred(owner, newOwner);
@@ -60,7 +60,7 @@ contract Ownable {
 
 interface token {
     function transfer(address receiver, uint amount) external;
-    function freezeAccount(address target, bool freeze, uint startTime, uint endTime) external; 
+    function freezeAccount(address target, bool freeze, uint startTime, uint endTime) external;
 }
 
 interface marketPrice {
@@ -75,7 +75,7 @@ contract BaseCrowdsale{
     address public wallet;
     uint256 public weiRaised;
 
-    event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);    
+    event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
 
     function init(address _wallet, address _token) internal {
         require(_wallet != address(0));
@@ -83,7 +83,7 @@ contract BaseCrowdsale{
 
         wallet = _wallet;
         ctrtToken = token(_token);
-    }        
+    }
 
     function () external payable {
         buyTokens(msg.sender);
@@ -117,13 +117,13 @@ contract BaseCrowdsale{
     }
 
     function _updatePurchasingState(address _beneficiary, uint _weiAmount, uint256 _tokenAmount) internal {}
-    
+
     function _preValidatePurchase(address _beneficiary, uint _weiAmount, uint256 _tokenAmount)  internal {
         require(_beneficiary != address(0));
         require(_weiAmount != 0);
     }
 
-    function _postValidatePurchase(address _beneficiary, uint _weiAmount, uint256 _tokenAmount) internal {        
+    function _postValidatePurchase(address _beneficiary, uint _weiAmount, uint256 _tokenAmount) internal {
     }
 
     function _deliverTokens(address _beneficiary, uint256 _tokenAmount) internal {
@@ -153,8 +153,8 @@ contract AdvanceCrowdsale is BaseCrowdsale, Ownable{
 
     uint256 public price;              //USD cent per token
     uint public tokenPerEth;
-    uint public minFundInEther = 0;    
-    uint public usdPerEth = 0;          //USD cent    
+    uint public minFundInEther = 0;
+    uint public usdPerEth = 0;          //USD cent
     marketPrice public ctrtMarketPrice;
 
     bool[MAX_FUND_SIZE] public isLockUpSale;
@@ -170,7 +170,7 @@ contract AdvanceCrowdsale is BaseCrowdsale, Ownable{
         address _marketPriceContract,
         uint _usdPerEth,
         uint _price
-    ) public         
+    ) public
     {
         super.init(_wallet, _token);
         price = _price;
@@ -178,9 +178,9 @@ contract AdvanceCrowdsale is BaseCrowdsale, Ownable{
         ctrtMarketPrice = marketPrice(_marketPriceContract);
         setUSDPerETH(_usdPerEth);
     }
-    
+
     function setFunding(
-        uint pos, uint256 _fundingGoalInToken, uint _rate, uint _openingTime, 
+        uint pos, uint256 _fundingGoalInToken, uint _rate, uint _openingTime,
         uint _closingTime, bool _isLockUpSale, uint _lockDurationTime)
     public onlyOwner
     {
@@ -193,7 +193,7 @@ contract AdvanceCrowdsale is BaseCrowdsale, Ownable{
 
         isLockUpSale[pos] = _isLockUpSale;
         lockDurationTime[pos] = _lockDurationTime.mul(1 minutes);
-        
+
         emit Refunding(pos, _fundingGoalInToken, _rate, _openingTime, _closingTime, _isLockUpSale, _lockDurationTime);
     }
 
@@ -248,20 +248,20 @@ contract AdvanceCrowdsale is BaseCrowdsale, Ownable{
     }
 
     function _preValidatePurchase(address _beneficiary, uint _weiAmount, uint256 _tokenAmount)  internal {
-        super._preValidatePurchase(_beneficiary, _weiAmount, _tokenAmount);       
-        
+        super._preValidatePurchase(_beneficiary, _weiAmount, _tokenAmount);
+
         require(hasClosed() == false);
         uint pos = fundPos();
 
-        require(fundingGoalInToken[pos] >= amountRaisedInToken[pos].add(_tokenAmount));        
-        require(minFundInEther <= msg.value);        
+        require(fundingGoalInToken[pos] >= amountRaisedInToken[pos].add(_tokenAmount));
+        require(minFundInEther <= msg.value);
     }
-     
+
     function _getTokenAmount(uint256 _tokenAmount) internal view returns (uint256) {
         if(ctrtMarketPrice != address(0))
-        {           
+        {
             uint256 usd = ctrtMarketPrice.getUSDEth();
-    
+
             if(usd != usdPerEth) {
                 SetUSDPerETH_byContract(usd);
             }
@@ -269,7 +269,7 @@ contract AdvanceCrowdsale is BaseCrowdsale, Ownable{
         require(usdPerEth != 0);
 
         uint256 Amount = _tokenAmount.mul(tokenPerEth).div(1 ether);
-        
+
         require(hasClosed() == false);
         uint pos = fundPos();
 
@@ -277,7 +277,7 @@ contract AdvanceCrowdsale is BaseCrowdsale, Ownable{
         return Amount;
     }
 
-    function _updatePurchasingState(address _beneficiary, uint _weiAmount, uint256 _tokenAmount) internal {        
+    function _updatePurchasingState(address _beneficiary, uint _weiAmount, uint256 _tokenAmount) internal {
         balanceOf[msg.sender] = balanceOf[msg.sender].add(msg.value);
         require(hasClosed() == false);
         uint pos = fundPos();
@@ -290,3 +290,38 @@ contract AdvanceCrowdsale is BaseCrowdsale, Ownable{
             newLockUpAddress(msg.sender);
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

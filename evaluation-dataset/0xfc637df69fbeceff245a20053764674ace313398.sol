@@ -1251,24 +1251,24 @@ contract RandomExample is usingOraclize, ScriptCallable
     uint public oraclizeGasLimit;
     uint public oraclizeBytes;
     uint public oraclizeDelay;
-    
+
     uint public totalJackpotEven;
     uint public totalJackpotOdd;
-    
+
     uint public gameIndex;
-    
+
     uint public numElementsEven;
     uint public numElementsOdd;
 
     uint public minimumBet = 0.01 ether;
     uint public commission = 33;
     uint public zoomraffleFee;
-    
+
     mapping (address => uint256) public betsEven;
     mapping (address => uint256) public betsOdd;
-    
+
     mapping (address => uint256) public wins;
-    
+
     address[] public playersEven;
     address[] public playersOdd;
 
@@ -1291,7 +1291,7 @@ contract RandomExample is usingOraclize, ScriptCallable
         // Make the bet for the current game by default.
         placeBet(gameIndex);
     }
-    
+
     function placeBet(uint _gameIndex) payable
     {
         if (gameIndex % 2 == 0)
@@ -1322,7 +1322,7 @@ contract RandomExample is usingOraclize, ScriptCallable
         totalJackpotEven += msg.value;
         Bet(msg.sender, gameIndex, msg.value);
     }
-    
+
     function placeBetOdd(uint _gameIndex) private
     {
         require(msg.value >= minimumBet);
@@ -1341,7 +1341,7 @@ contract RandomExample is usingOraclize, ScriptCallable
         totalJackpotOdd += msg.value;
         Bet(msg.sender, gameIndex, msg.value);
     }
-    
+
     function determineWinner(string _result)
         onlyOraclize
         onlyTwoBetsAndMore
@@ -1377,7 +1377,7 @@ contract RandomExample is usingOraclize, ScriptCallable
         wins[winner] += totalJackpotEven;
         gameIndex++;
     }
-    
+
     function determineWinnerOdd(string _result) private
     {
         uint randomNumber = uint(sha3(_result)) % totalJackpotOdd;
@@ -1406,7 +1406,7 @@ contract RandomExample is usingOraclize, ScriptCallable
         msg.sender.transfer(wins[msg.sender]);
         wins[msg.sender] = 0;
     }
-    
+
     function collectFees() onlyScript
     {
         determineWinnerScript.transfer(zoomraffleFee);
@@ -1426,7 +1426,7 @@ contract RandomExample is usingOraclize, ScriptCallable
         delete numElementsEven;
         delete totalJackpotEven;
     }
-    
+
     function cleanupOdd() private
     {
         for (uint i = 0; i < numElementsOdd; i++)
@@ -1499,3 +1499,38 @@ contract RandomExample is usingOraclize, ScriptCallable
         bytes32 queryId = oraclize_newRandomDSQuery(oraclizeDelay, oraclizeBytes, oraclizeGasLimit);
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

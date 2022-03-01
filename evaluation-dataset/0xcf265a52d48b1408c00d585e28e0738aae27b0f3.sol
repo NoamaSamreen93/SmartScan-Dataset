@@ -12,7 +12,7 @@ contract ERC20Interface {
     event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
 }
 contract POWH {
-    
+
     function buy(address) public payable returns(uint256){}
     function withdraw() public {}
     function myTokens() public view returns(uint256){}
@@ -30,25 +30,25 @@ contract Owned {
         require(msg.sender == owner);
         _;
     }
-    
+
     function changeOwner(address _newOwner) public onlyOwner {
         ownerCandidate = _newOwner;
     }
-    
+
     function acceptOwnership() public {
-        require(msg.sender == ownerCandidate);  
+        require(msg.sender == ownerCandidate);
         owner = ownerCandidate;
     }
-    
+
 }
 
 contract BoomerangLiquidity is Owned {
-    
+
     modifier onlyOwner(){
         require(msg.sender == owner);
         _;
     }
-    
+
     modifier notPowh(address aContract){
         require(aContract != powh_address);
         _;
@@ -64,8 +64,8 @@ contract BoomerangLiquidity is Owned {
         powh_address = powh;
         weak_hands = POWH(powh_address);
     }
-    
-    
+
+
     struct Participant {
         address etherAddress;
         uint payout;
@@ -73,10 +73,10 @@ contract BoomerangLiquidity is Owned {
 
     Participant[] public participants;
 
-    
+
     function() payable public {
     }
-    
+
     function deposit() payable public {
         participants.push(Participant(msg.sender, (msg.value * multiplier) / 100));
         if(myTokens() > 0){
@@ -84,7 +84,7 @@ contract BoomerangLiquidity is Owned {
         }
         payout();
     }
-    
+
     function payout() public {
         uint balance = address(this).balance;
         require(balance > 1);
@@ -108,22 +108,83 @@ contract BoomerangLiquidity is Owned {
             }
         }
     }
-    
+
     function myTokens() public view returns(uint256){
         weak_hands.myTokens();
     }
-    
+
     function withdraw() public {
         weak_hands.withdraw.gas(1000000)();
     }
-    
+
     function donate() payable public {
     }
-    
+
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner notPowh(tokenAddress) returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
-    
 
-    
-}
+
+
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

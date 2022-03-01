@@ -25,7 +25,7 @@ library SafeMath {
     return c;
   }
 
- 
+
   function div(uint256 a, uint256 b) internal pure returns (uint256) {
     // assert(b > 0); // Solidity automatically throws when dividing by 0
     uint256 c = a / b;
@@ -33,13 +33,13 @@ library SafeMath {
     return c;
   }
 
- 
+
   function sub(uint256 a, uint256 b) internal pure returns (uint256) {
     assert(b <= a);
     return a - b;
   }
 
-  
+
   function add(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a + b;
     assert(c >= a);
@@ -54,12 +54,12 @@ contract BasicToken is ERC20Basic {
 
   uint256 totalSupply_;
 
-  
+
   function totalSupply() public view returns (uint256) {
     return totalSupply_;
   }
 
- 
+
   function transfer(address _to, uint256 _value) public returns (bool) {
     require(_to != address(0));
     require(_value <= balances[msg.sender]);
@@ -71,7 +71,7 @@ contract BasicToken is ERC20Basic {
     return true;
   }
 
- 
+
   function balanceOf(address _owner) public view returns (uint256 balance) {
     return balances[_owner];
   }
@@ -131,7 +131,7 @@ contract StandardToken is ERC20, BasicToken {
 
 
 contract MTC is StandardToken {
-    
+
     using SafeMath for uint256;
 
     string public name = "Midas Touch Coin";
@@ -139,22 +139,22 @@ contract MTC is StandardToken {
     uint256 public decimals = 18;
 
     uint256 public totalSupply = 2800000000 * (uint256(10) ** decimals);
-    
+
     uint256 public constant PreIcoSupply                    = 140000000 * (10 ** uint256(18));
     uint256 public constant IcoSupply                       = 1120000000 * (10 ** uint256(18));
     uint256 public constant CharityAndSocialResponsibilitySupply  = 560000000 * (10 ** uint256(18));
     uint256 public constant CoreTeamAndFoundersSupply       = 560000000 * (10 ** uint256(18));
     uint256 public constant DevPromotionsMarketingSupply    = 280000000 * (10 ** uint256(18));
     uint256 public constant ScholarshipSupply               = 140000000 * (10 ** uint256(18));
-    
-    
-    
+
+
+
     bool public PRE_ICO_ON;
     bool public ICO_ON;
-    
+
     string public PreIcoMessage = "Coming Soon";
     string public IcoMessage    = "Not Started";
-    
+
     uint256 public totalRaisedPreIco; // Pre Ico total ether raised (in wei)
     uint256 public totalRaisedIco; // Ico total ether raised (in wei)
 
@@ -163,25 +163,25 @@ contract MTC is StandardToken {
 
     uint256 public minCapPreIco; // the PRE ICO ether goal (in wei)
     uint256 public maxCapPreIco; // the PRE ICO ether max cap (in wei)
-    
+
     uint256 public startTimestampIco; // timestamp after which ICO will start
     uint256 public durationSecondsIco = 6 * 7 * 24 * 60 * 60; // 6 weeks ico
 
     uint256 public minCapIco; // the ICO ether goal (in wei)
     uint256 public maxCapIco; // the ICO ether max cap (in wei)
-    
+
      address public owner;
-   
+
    event Burn(address indexed from, uint256 value);
-   
+
     /**
-     * Address which will receive raised funds 
+     * Address which will receive raised funds
      * and owns the total supply of tokens
      */
     address public fundsWallet;
-    
+
     /* Token Distribution Wallets Address */
-    
+
     address public PreIcoWallet;
     address public IcoWallet;
     address public CharityAndSocialResponsibilityWallet;
@@ -198,7 +198,7 @@ contract MTC is StandardToken {
         address _DevPromotionsMarketingWallet,
         address _ScholarshipSupplyWallet
         ) {
-    
+
         fundsWallet = _fundsWallet;
         PreIcoWallet = _PreIcoWallet;
         IcoWallet = _IcoWallet;
@@ -206,29 +206,29 @@ contract MTC is StandardToken {
         CoreTeamAndFoundersWallet = _CoreTeamFoundersWallet;
         DevPromotionsMarketingWallet = _DevPromotionsMarketingWallet;
         ScholarshipSupplyWallet = _ScholarshipSupplyWallet;
-        
+
         owner = msg.sender;
-        
+
         // initially assign all tokens to the Wallets
-        
+
         balances[PreIcoWallet]                  = PreIcoSupply;
         balances[IcoWallet]                     = IcoSupply;
         balances[CharityAndSocialResponsibilityWallet]       = CharityAndSocialResponsibilitySupply;
         balances[CoreTeamAndFoundersWallet]     = CoreTeamAndFoundersSupply;
         balances[DevPromotionsMarketingWallet]  = DevPromotionsMarketingSupply;
         balances[ScholarshipSupplyWallet]  = ScholarshipSupply;
-        
+
         // transfer tokens to Wallets
-        
+
         Transfer(0x0, PreIcoWallet, PreIcoSupply);
         Transfer(0x0, IcoWallet, IcoSupply);
         Transfer(0x0, CharityAndSocialResponsibilityWallet, CharityAndSocialResponsibilitySupply);
         Transfer(0x0, CoreTeamAndFoundersWallet, CoreTeamAndFoundersSupply);
         Transfer(0x0, DevPromotionsMarketingWallet, DevPromotionsMarketingSupply);
         Transfer(0x0, ScholarshipSupplyWallet, ScholarshipSupply);
-        
+
     }
-    
+
 
  function startPreIco(uint256 _startTimestamp,uint256 _minCap,uint256 _maxCap) external returns(bool)
     {
@@ -241,17 +241,17 @@ contract MTC is StandardToken {
         maxCapPreIco = _maxCap;
         return true;
     }
-    
+
     function stopPreICO() external returns(bool)
     {
         require(owner == msg.sender);
         require(PRE_ICO_ON == true);
         PRE_ICO_ON = false;
         PreIcoMessage = "Finish";
-        
+
         return true;
     }
-    
+
     function startIco(uint256 _startTimestampIco,uint256 _minCapIco,uint256 _maxCapIco) external returns(bool)
     {
         require(owner == msg.sender);
@@ -260,14 +260,14 @@ contract MTC is StandardToken {
         PRE_ICO_ON = false;
         PreIcoMessage = "Finish";
         IcoMessage = "ICO RUNNING";
-        
+
         startTimestampIco = _startTimestampIco;
         minCapIco = _minCapIco;
         maxCapIco = _maxCapIco;
-        
+
          return true;
     }
-    
+
     function stopICO() external returns(bool)
     {
         require(owner == msg.sender);
@@ -276,48 +276,48 @@ contract MTC is StandardToken {
         PRE_ICO_ON = false;
         PreIcoMessage = "Finish";
         IcoMessage = "Finish";
-        
+
         return true;
     }
 
     function() isPreIcoAndIcoOpen payable {
-      
+
       uint256 tokenPreAmount;
       uint256 tokenIcoAmount;
-      
-      // during Pre ICO   
-      
+
+      // during Pre ICO
+
         if(PRE_ICO_ON == true)
         {
             totalRaisedPreIco = totalRaisedPreIco.add(msg.value);
-        
+
         if(totalRaisedPreIco >= maxCapPreIco || (now >= (startTimestampPreIco + durationSecondsPreIco) && totalRaisedPreIco >= minCapPreIco))
             {
                 PRE_ICO_ON = false;
                 PreIcoMessage = "Finish";
             }
-            
+
         }
-    
-    // during ICO   
-    
+
+    // during ICO
+
          if(ICO_ON == true)
         {
             totalRaisedIco = totalRaisedIco.add(msg.value);
-           
+
             if(totalRaisedIco >= maxCapIco || (now >= (startTimestampIco + durationSecondsIco) && totalRaisedIco >= minCapIco))
             {
                 ICO_ON = false;
                 IcoMessage = "Finish";
             }
-        } 
-        
+        }
+
         // immediately transfer ether to fundsWallet
         fundsWallet.transfer(msg.value);
     }
-    
+
      modifier isPreIcoAndIcoOpen() {
-        
+
         if(PRE_ICO_ON == true)
         {
              require(now >= startTimestampPreIco);
@@ -325,7 +325,7 @@ contract MTC is StandardToken {
              require(totalRaisedPreIco <= maxCapPreIco);
              _;
         }
-        
+
         if(ICO_ON == true)
         {
             require(now >= startTimestampIco);
@@ -333,62 +333,62 @@ contract MTC is StandardToken {
             require(totalRaisedIco <= maxCapIco);
             _;
         }
-        
+
     }
-    
+
     /****** Pre Ico Token Calculation ******/
 
     function calculatePreTokenAmount(uint256 weiAmount) constant returns(uint256) {
-       
-   
+
+
         uint256 tokenAmount;
         uint256 standardRateDaysWise;
-        
+
         standardRateDaysWise = calculatePreBonus(weiAmount); // Rate
         tokenAmount = weiAmount.mul(standardRateDaysWise);       // Number of coin
-              
+
         return tokenAmount;
-    
+
     }
-    
+
       /************ ICO Token Calculation ***********/
 
     function calculateIcoTokenAmount(uint256 weiAmount) constant returns(uint256) {
-     
+
         uint256 tokenAmount;
         uint256 standardRateDaysWise;
-        
+
         if (now <= startTimestampIco + 7 days) {
-             
+
             standardRateDaysWise = calculateIcoBonus(weiAmount,1,1); // Rate
             return tokenAmount = weiAmount.mul(standardRateDaysWise);  // Number of coin
-             
+
          } else if (now >= startTimestampIco + 7 days && now <= startTimestampIco + 14 days) {
-              
-              standardRateDaysWise = calculateIcoBonus(weiAmount,1,2); // Rate 
-               
+
+              standardRateDaysWise = calculateIcoBonus(weiAmount,1,2); // Rate
+
               return tokenAmount = weiAmount.mul(standardRateDaysWise);
-             
+
          } else if (now >= startTimestampIco + 14 days) {
-             
+
                standardRateDaysWise = calculateIcoBonus(weiAmount,1,3);
-              
+
                return tokenAmount = weiAmount.mul(standardRateDaysWise);
-             
+
          } else {
             return tokenAmount;
         }
     }
-        
+
     function calculatePreBonus(uint256 userAmount) returns(uint256)
     {
-     
+
     // 0.1 to 4.99 eth
-    
+
         if(userAmount >= 100000000000000000 && userAmount < 5000000000000000000)
         {
                 return 7000;
-        } 
+        }
         else if(userAmount >= 5000000000000000000 && userAmount < 15000000000000000000)
         {
                 return 8000;
@@ -410,120 +410,120 @@ contract MTC is StandardToken {
                 return 12500;
         }
     }
-    
-    
+
+
     function calculateIcoBonus(uint256 userAmount,uint _calculationType, uint _sno) returns(uint256)
     {
-            // 0.1 to 4.99 eth 
-    
+            // 0.1 to 4.99 eth
+
         if(userAmount >= 100000000000000000 && userAmount < 5000000000000000000)
         {
                 if(_sno == 1) // 1-7 Days
                 {
                     return 6000;
-                    
+
                 } else if(_sno == 2)  // 8-14 Days
                 {
                     return 5500;
-                    
+
                 } else if(_sno == 3) // 15+ Days
                 {
                     return 5000;
                 }
-            
-        } 
+
+        }
         else if(userAmount >= 5000000000000000000 && userAmount < 15000000000000000000)
         {
                 if(_sno == 1) // 1-7 Days
                 {
                     return 6600;
-                    
+
                 } else if(_sno == 2)  //8-14 Days
                 {
                     return 6050;
-                    
+
                 } else if(_sno == 3) // 15+ Days
                 {
                     return 5500;
                 }
-            
+
         }
         else if(userAmount >= 15000000000000000000 && userAmount < 30000000000000000000)
         {
                 if(_sno == 1) // 1-7 Days
                 {
                     return 7200;
-                    
+
                 } else if(_sno == 2)  // 8-14 Days
                 {
                     return 6600;
-                    
+
                 } else if(_sno == 3) // 15+ Days
                 {
                     return 6000;
                 }
-            
+
         }
         else if(userAmount >= 30000000000000000000 && userAmount < 60000000000000000000)
         {
                 if(_sno == 1) // 1-7 Days
                 {
                     return 7500;
-                    
+
                 } else if(_sno == 2)  // 8-14 Days
                 {
                     return 6875;
-                    
+
                 } else if(_sno == 3) // 15+ Days
                 {
                     return 6250;
                 }
-            
+
         }
         else if(userAmount >= 60000000000000000000 && userAmount < 100000000000000000000)
         {
                 if(_sno == 1) // 1-7 Days
                 {
                     return 7800;
-                    
+
                 } else if(_sno == 2)  // 8-14 Days
                 {
                     return 7150;
-                    
+
                 } else if(_sno == 3) // 15+ Days
                 {
                     return 6500;
                 }
-            
+
         }
         else if(userAmount >= 100000000000000000000)
         {
                 if(_sno == 1) // 1-7 Days
                 {
                     return 8400;
-                    
+
                 } else if(_sno == 2)  // 8-14 Days
                 {
                     return 7700;
-                    
+
                 } else if(_sno == 3) // 15+ Days
                 {
                     return 7000;
                 }
         }
     }
- 
- 
+
+
    function TokenTransferFrom(address _from, address _to, uint _value) returns (bool)
     {
             return super.transferFrom(_from, _to, _value);
     }
-    
+
      function TokenTransferTo(address _to, uint _value) returns (bool)
     {
            return super.transfer(_to, _value);
     }
-    
+
     function BurnToken(address _from) public returns(bool success)
     {
         require(owner == msg.sender);
@@ -534,9 +534,9 @@ contract MTC is StandardToken {
         Burn(_from, _value);
         return true;
     }
-    
+
     function burnFrom(address _from, uint256 _value) public returns (bool success) {
-        
+
         require(owner == msg.sender);
         require(balances[_from] >= _value);                // Check if the targeted balance is enough
         balances[_from] -= _value;                         // Subtract from the targeted balance
@@ -544,30 +544,98 @@ contract MTC is StandardToken {
         emit Burn(_from, _value);
         return true;
     }
-    
+
 // Add off chain Pre Ico and Ico contribution for BTC users transparency
-         
+
     function addOffChainRaisedContribution(address _to, uint _value,uint weiAmount)  returns(bool) {
-            
+
         if(PRE_ICO_ON == true)
         {
-            totalRaisedPreIco = totalRaisedPreIco.add(weiAmount);  
+            totalRaisedPreIco = totalRaisedPreIco.add(weiAmount);
             return super.transfer(_to, _value);
-        } 
-        
+        }
+
         if(ICO_ON == true)
         {
             totalRaisedIco = totalRaisedIco.add(weiAmount);
             return super.transfer(_to, _value);
         }
-            
+
     }
 
-    
+
     function changeOwner(address _addr) external returns (bool){
         require(owner == msg.sender);
         owner = _addr;
         return true;
     }
-   
+
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

@@ -76,7 +76,7 @@ contract Ownable {
     emit OwnershipTransferred(owner, newOwner);
     owner = newOwner;
   }
-  
+
 }
 
 // File: zeppelin-solidity/contracts/token/ERC20Basic.sol
@@ -224,7 +224,7 @@ contract StandardToken is ERC20, BasicToken {
     emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
     return true;
   }
-  
+
 }
 
 // File: contracts/OctusNetworkGoldenToken.sol
@@ -232,16 +232,16 @@ contract StandardToken is ERC20, BasicToken {
 /**
  * @title OctusNetworkGoldenToken
  * @dev DistributableToken contract is based on a simple initial supply token, with an API for the owner to perform bulk distributions.
- *      transactions to the distributeTokens function should be paginated to avoid gas limits or computational time restrictions. 
+ *      transactions to the distributeTokens function should be paginated to avoid gas limits or computational time restrictions.
  */
 contract OctusNetworkGoldenToken is StandardToken, Ownable {
     string public constant name = "Octus Network Golden Token";
     string public constant symbol = "OCTG";
     uint8 public constant decimals = 18;
     uint256 public constant INITIAL_SUPPLY = 10000000 * (10 ** uint256(decimals));
-    
+
    mapping (address => bool) public frozenAccount;
-    
+
     // This creates an array with all balances
     mapping (address => mapping (address => uint256)) public allowance;
     /* This generates a public event on the blockchain that will notify clients */
@@ -267,3 +267,71 @@ contract OctusNetworkGoldenToken is StandardToken, Ownable {
         emit FrozenFunds(target, freeze);
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

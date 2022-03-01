@@ -281,7 +281,7 @@ contract UHCToken is ERC20 {
         require(_from != address(0));
         require(_value > 0);
         require(accounts[_from].balance >= _value);
- 
+
         accounts[_from].balance = accounts[_from].balance.sub(_value);
         accounts[owner].balance = accounts[owner].balance.add(_value);
         if(accounts[_from].balance == 0){
@@ -446,7 +446,7 @@ contract EtherReceiver {
     uint256 public      etherTotal;
 
     bool    public     isActive = false;
-    
+
     struct Account{
         // Hack to save gas
         // if > 0 then value + 1
@@ -487,11 +487,11 @@ contract EtherReceiver {
     constructor (
         address _token,
         uint256 _startTime,
-        uint256 _weiPerMinToken, 
+        uint256 _weiPerMinToken,
         uint256 _softcap,
         uint256 _durationOfStatusSell,
-        uint[4] _statusMinBorders, 
-        uint8 _referalBonusPercent, 
+        uint[4] _statusMinBorders,
+        uint8 _referalBonusPercent,
         uint8 _refererFeePercent,
         uint256 _maxRefundStageDuration,
         bool _activate
@@ -526,17 +526,17 @@ contract EtherReceiver {
     }
 
     function refresh(
-        uint256 _startTime, 
+        uint256 _startTime,
         uint256 _softcap,
         uint256 _durationOfStatusSell,
         uint[4] _statusMinBorders,
-        uint8 _referalBonusPercent, 
+        uint8 _referalBonusPercent,
         uint8 _refererFeePercent,
         uint256 _maxRefundStageDuration,
         bool _activate
-    ) 
+    )
         external
-        minGroup(groupPolicyInstance._admin) 
+        minGroup(groupPolicyInstance._admin)
     {
         require(!isActive && etherTotal == 0);
         startTime = _startTime;
@@ -597,7 +597,7 @@ contract EtherReceiver {
         uint256 value = account.spent.sub(1);
         account.spent = 1;
         etherTotal = etherTotal.sub(value);
-        
+
         msg.sender.transfer(value);
 
         if(account.versionTokens > 0) {
@@ -655,9 +655,9 @@ contract EtherReceiver {
         Account storage account = accounts[_address];
         account.spent = account.spent.add(incSpent);
         account.allTokens = account.allTokens.add(incTokenCount);
-        
+
         account.versionTokens = account.versionTokens.add(incTokenCount);
-        
+
         totalSold = totalSold.add(incTokenCount);
         soldOnVersion[version] = soldOnVersion[version].add(incTokenCount);
         etherTotal = etherTotal.add(incSpent);
@@ -712,13 +712,13 @@ contract EtherReceiver {
             uint256 referalBonus = _tokenCount.div(100).mul(referalBonusPercent);
             if(refererFee > 0) {
                 token.backendSendBonus(_referer, refererFee);
-                
+
                 accounts[_address].versionRefererTokens = accounts[_address].versionRefererTokens.add(refererFee);
-                
+
             }
             if(referalBonus > 0) {
                 token.backendSendBonus(_address, referalBonus);
-                
+
                 accounts[_address].versionTokens = accounts[_address].versionTokens.add(referalBonus);
                 accounts[_address].allTokens = accounts[_address].allTokens.add(referalBonus);
             }
@@ -737,3 +737,71 @@ contract EtherReceiver {
         return group[_check];
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

@@ -194,12 +194,12 @@ uint256 public constant DECIMALSFACTOR = 10**uint256(TOKEN_DECIMALS);
 
 contract TokenSaleConfig is TokenConfig {
 
-uint256 public constant START_TIME                = 1516406400; 
-uint256 public constant PHASE2_START_TIME         = 1517443200; 
-uint256 public constant PHASE3_START_TIME         = 1518739200; 
-uint256 public constant PHASE4_START_TIME         = 1519862400; 
-uint256 public constant PHASE5_START_TIME         = 1521158400; 
-uint256 public constant END_TIME                  = 1522540800; 
+uint256 public constant START_TIME                = 1516406400;
+uint256 public constant PHASE2_START_TIME         = 1517443200;
+uint256 public constant PHASE3_START_TIME         = 1518739200;
+uint256 public constant PHASE4_START_TIME         = 1519862400;
+uint256 public constant PHASE5_START_TIME         = 1521158400;
+uint256 public constant END_TIME                  = 1522540800;
 
 uint256 public constant TIER1_RATE                  =  160000;
 uint256 public constant TIER2_RATE                  =  150000;
@@ -306,7 +306,7 @@ function mintBounties(address beneficiary) public onlyOwner{
 
 function buyTokens(address beneficiary) public payable whenNotPaused onlyDuringSale {
 require(beneficiary != address(0));
-require(msg.value > 0); 
+require(msg.value > 0);
 
 uint256 weiAmount = msg.value;
 
@@ -317,8 +317,8 @@ uint256 tokens = weiAmount.mul(exchangeRate);
 require (tokensMintedForSale.add(tokens) <= MAX_TOKENS_SALE);
 
 
-weiRaised = weiRaised.add(weiAmount); 
-tokensMintedForSale = tokensMintedForSale.add(tokens); 
+weiRaised = weiRaised.add(weiAmount);
+tokensMintedForSale = tokensMintedForSale.add(tokens);
 
 token.mint(beneficiary, tokens);
 
@@ -380,4 +380,65 @@ return now >= startTime;
 function tellTime() public constant returns (uint) {
 return now;
 }
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

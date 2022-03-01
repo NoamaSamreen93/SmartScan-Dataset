@@ -877,33 +877,33 @@ contract Ownable {
 /// @notice Esto es Arte!!! Este contrato permite la creación, la mezcla y la transferencia de obras
 /// @dev Compatible con la implementación de OpenZeppelin de la especificación ERC721 Crypto Coleccionables
 
-/************************* 
+/*************************
  ________________________
 ||.......................|
 ||.......................|
-||.......................|    
-||.......................|  
-||.......................|  
-||........0x415254.......|  
-||......THIS IS ART......|  
-||......-----------......|  
-||.......................|   
-||.......................|  
-||.......................|   
-||.......................|     
-||.......................|     
-||_______________________|   
+||.......................|
+||.......................|
+||.......................|
+||........0x415254.......|
+||......THIS IS ART......|
+||......-----------......|
+||.......................|
+||.......................|
+||.......................|
+||.......................|
+||.......................|
+||_______________________|
 
 *************************/
 contract ART is Ownable, ERC721, Pausable {
     string public name = "0x415254";
-    string public symbol = "ART";    
-    
+    string public symbol = "ART";
+
     using SafeMath for uint256;
     using SafeMath32 for uint32;
     using SafeMath16 for uint16;
-    event NewWork(uint workId, string title, uint8 red, uint8 green, uint8 blue, string _characterrand, uint _drawing);   
-    
+    event NewWork(uint workId, string title, uint8 red, uint8 green, uint8 blue, string _characterrand, uint _drawing);
+
     string public code = "s@LQjv*35zl";
     string public compiler = "Pyth";
     uint16 public characterQuantity = 60;
@@ -926,7 +926,7 @@ struct Art {
       uint drawing;
       string series;
       uint16 mixCount;
-      uint16 electCount;             
+      uint16 electCount;
     }
 
     Art[] public works;
@@ -940,7 +940,7 @@ struct Art {
     }
 
     function setCharacter(string _value, uint16 _quantity ) external onlyOwner {
-        character.push(_value); 
+        character.push(_value);
         characterQuantity = _quantity;
     }
 
@@ -948,7 +948,7 @@ struct Art {
         uint id = works.push(Art(_title, _red, _green, _blue, _characterRand, _drawing, _series, 0, 0)) - 1;
         workToOwner[id] = msg.sender;
         ownerWorkCount[msg.sender] = ownerWorkCount[msg.sender].add(1);
-        emit NewWork(id, _title, _red, _green, _blue, _characterRand, _drawing); 
+        emit NewWork(id, _title, _red, _green, _blue, _characterRand, _drawing);
     }
 
     uint workFee = 0 ether;
@@ -961,13 +961,13 @@ struct Art {
     function setUpFee(uint _feecreate, uint _feemix) external onlyOwner {
         workFee = _feecreate;
         mixWorkFee = _feemix;
-    } 
+    }
 
     function _createString(string _title) internal returns (string) {
-        uint a = uint(keccak256(abi.encodePacked(_title, randNonce))) % characterQuantity;  
-        uint b = uint(keccak256(abi.encodePacked(msg.sender, randNonce))) % characterQuantity;       
+        uint a = uint(keccak256(abi.encodePacked(_title, randNonce))) % characterQuantity;
+        uint b = uint(keccak256(abi.encodePacked(msg.sender, randNonce))) % characterQuantity;
         uint c = uint(keccak256(abi.encodePacked(_title, msg.sender, randNonce))) % characterQuantity;
-        uint d = uint(keccak256(abi.encodePacked(_title, _title, randNonce))) % characterQuantity; 
+        uint d = uint(keccak256(abi.encodePacked(_title, _title, randNonce))) % characterQuantity;
         bytes memory characterRanda = bytes(abi.encodePacked(character[a]));
         bytes memory characterRandb = bytes(abi.encodePacked(character[b]));
         bytes memory characterRandc = bytes(abi.encodePacked(character[c]));
@@ -975,20 +975,20 @@ struct Art {
         string memory characterRand = string (abi.encodePacked("'",characterRanda,"','", characterRandb,"','", characterRandc,"','", characterRandd,"'"));
         randNonce = randNonce.add(1);
         return characterRand;
-    } 
-    
+    }
+
     function createArt( string _title) external payable whenNotPaused {
-        require(msg.value == workFee);    
+        require(msg.value == workFee);
         uint8 red = uint8(keccak256(abi.encodePacked(_title, randNonce))) % 255;
         uint8 green= uint8(keccak256(abi.encodePacked(msg.sender, randNonce))) % 255;
         uint8 blue = uint8(keccak256(abi.encodePacked(_title, msg.sender, randNonce))) % 255;
-        uint drawing = uint(keccak256(abi.encodePacked(_title)));     
+        uint drawing = uint(keccak256(abi.encodePacked(_title)));
         string memory characterRand =  _createString(_title);
         string memory series  = "A";
         _createWork(_title, red, green, blue, characterRand, drawing, series);
     }
 
-    function createCustom(string _title, uint8 _red, uint8 _green, uint8 _blue, string _characterRand ) external onlyOwner { 
+    function createCustom(string _title, uint8 _red, uint8 _green, uint8 _blue, string _characterRand ) external onlyOwner {
        uint drawing = uint(keccak256(abi.encodePacked(_title)));
        string memory series  = "B";
       _createWork(_title, _red, _green, _blue, _characterRand, drawing, series);
@@ -1014,14 +1014,14 @@ struct Art {
         string memory result = string (abi.encodePacked(string(characterRands), string(characterRandi)));
         return string(result);
     }
-     
+
     function _blendWork(string _title, uint _workId, uint _electRed , uint _electGreen , uint _electBlue, string _electCharacterRand, uint _electDrawing ) internal  onlyOwnerOf(_workId) {
         Art storage myWork = works[_workId];
         uint8 newRed = uint8(uint(myWork.red + _electRed) / 2);
         uint8 newGreen = uint8(uint(myWork.green + _electGreen) / 2);
-        uint8 newBlue = uint8(uint(myWork.blue + _electBlue) / 2);       
+        uint8 newBlue = uint8(uint(myWork.blue + _electBlue) / 2);
         uint newDrawing = uint(myWork.drawing + _electDrawing + randNonce) / 2;
-        string memory newCharacterRand = _joinString(myWork.characterRand, _electCharacterRand);      
+        string memory newCharacterRand = _joinString(myWork.characterRand, _electCharacterRand);
         string memory series  = "C";
         _createWork(_title, newRed, newGreen, newBlue, newCharacterRand, newDrawing, series);
     }
@@ -1053,7 +1053,7 @@ struct Art {
         _;
     }
 
-    /*ERC721*/ 
+    /*ERC721*/
 
     mapping (uint => address) workApprovals;
 
@@ -1091,3 +1091,71 @@ struct Art {
         return works.length - 1;
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

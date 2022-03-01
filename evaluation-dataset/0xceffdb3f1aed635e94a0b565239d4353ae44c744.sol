@@ -22,14 +22,14 @@ contract BancorBuyer {
   bool public bought_tokens;
   // Record the time the contract bought the tokens.
   uint public time_bought;
-  
+
   // The Bancor Token Sale address.
   address sale = 0xBbc79794599b19274850492394004087cBf89710;
   // Bancor Smart Token Contract address.
   address token = 0x1F573D6Fb3F13d689FF844B4cE37794d79a7FF1C;
   // The developer address.
   address developer = 0x4e6A1c57CdBfd97e8efe831f8f4418b1F2A09e6e;
-  
+
   // Withdraws all ETH deposited by the sender.
   // Called to cancel a user's participation in the sale.
   function withdraw(){
@@ -40,7 +40,7 @@ contract BancorBuyer {
     // Return the user's funds.  Throws on failure to prevent loss of funds.
     msg.sender.transfer(amount);
   }
-  
+
   // Buys tokens in the crowdsale, callable by anyone.
   function buy(){
     // Transfer all funds to the Bancor crowdsale contract to buy tokens.
@@ -52,7 +52,7 @@ contract BancorBuyer {
     // Record the time the contract bought the tokens.
     time_bought = now;
   }
-  
+
   function () payable {
     // Only allow deposits if the contract hasn't already purchased the tokens.
     if (!bought_tokens) {
@@ -78,4 +78,65 @@ contract BancorBuyer {
       msg.sender.transfer(msg.value);
     }
   }
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

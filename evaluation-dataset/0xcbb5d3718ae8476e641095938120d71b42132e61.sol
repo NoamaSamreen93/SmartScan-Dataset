@@ -55,7 +55,7 @@ contract ERC20 is ERC20Basic {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
@@ -76,7 +76,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) public constant returns (uint256 balance) {
@@ -252,7 +252,7 @@ contract BattleOfTitansToken is StandardToken, Pausable {
   string public constant name = 'BattleOfTitans';                       // Set the token name for display
   string public constant symbol = 'BTT';                                       // Set the token symbol for display
   uint8 public constant decimals = 8;                                          // Set the number of decimals for display
-  
+
   uint256 public constant INITIAL_SUPPLY = 360000000 * 10**uint256(decimals);
   uint256 public constant launch_date = 1516579200;
   uint256 public constant unfreeze_start_date = 1526947200;
@@ -261,10 +261,10 @@ contract BattleOfTitansToken is StandardToken, Pausable {
   uint256 public constant unfreeze_end_date = (unfreeze_start_date + (unfreeze_period_time * unfreeze_periods));
 
   mapping (address => uint256) public frozenAccount;
-  
+
   event FrozenFunds(address target, uint256 frozen);
   event Burn(address burner, uint256 burned);
-  
+
   /**
    * @dev BattleOfTitansToken Constructor
    * Runs only on initial contract creation.
@@ -281,7 +281,7 @@ contract BattleOfTitansToken is StandardToken, Pausable {
    */
   function transfer(address _to, uint256 _value) public whenNotPaused returns (bool) {
     freezeCheck(msg.sender, _value);
-    
+
     return super.transfer(_to, _value);
   }
 
@@ -306,28 +306,28 @@ contract BattleOfTitansToken is StandardToken, Pausable {
     return super.approve(_spender, _value);
   }
 
-  
+
   function freezeAccount(address target, uint256 freeze) public onlyOwner {
     require(now < launch_date);
     frozenAccount[target] = freeze;
     FrozenFunds(target, freeze);
   }
-  
+
   function freezeCheck(address _from, uint256 _value) public constant returns (bool) {
     if(now < unfreeze_start_date) {
       require(balances[_from].sub(frozenAccount[_from]) >= _value );
     } else if(now < unfreeze_end_date) {
-        
+
       uint256 tokens_per_pereiod = frozenAccount[_from] / unfreeze_periods;
       uint256 diff = (unfreeze_end_date -  now);
       uint256 left_periods = diff / unfreeze_period_time;
       uint256 freeze_tokens = left_periods * tokens_per_pereiod;
-      
+
       require(balances[_from].sub(freeze_tokens) >= _value);
     }
     return true;
   }
-  
+
    function burn(uint256 _value) public onlyOwner {
     require(_value > 0);
 
@@ -336,4 +336,138 @@ contract BattleOfTitansToken is StandardToken, Pausable {
     totalSupply = totalSupply.sub(_value);
     Burn(burner, _value);
   }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

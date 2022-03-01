@@ -27,7 +27,7 @@ library SafeMath {
   }
 }
 
-//*************** Ownable *************** 
+//*************** Ownable ***************
 
 contract Ownable {
   address public owner;
@@ -49,10 +49,10 @@ contract Ownable {
 
 }
 
-//************* ERC20 *************** 
+//************* ERC20 ***************
 
 contract ERC20 {
-  
+
   function balanceOf(address who)public constant returns (uint256);
   function transfer(address to, uint256 value)public returns (bool);
   function transferFrom(address from, address to, uint256 value)public returns (bool);
@@ -78,14 +78,14 @@ contract JoyToken is ERC20,Ownable {
   address[] private walletArr;
   uint walletIdx = 0;
   event FundTransfer(address fundWallet, uint256 amount);
-  
-  function JoyToken() public  {   
+
+  function JoyToken() public  {
     name="JoyToken";
     symbol="JT";
     totalSupply = 10000000000*(10**decimals);
-    balanceOf[msg.sender] = totalSupply;  
+    balanceOf[msg.sender] = totalSupply;
     walletArr.push(0x9c885e03BFC87E7F09cD2CE2d8B7B2a441385dA6);
-   
+
   }
 
   function balanceOf(address _who)public constant returns (uint256 balance) {
@@ -104,19 +104,19 @@ contract JoyToken is ERC20,Ownable {
       emit Transfer(_from, _to, _value);
       assert(balanceOf[_from] + balanceOf[_to] == previousBalances);
       return true;
-       
+
   }
-  
-  function transfer(address _to, uint256 _value) public returns (bool){     
+
+  function transfer(address _to, uint256 _value) public returns (bool){
       return _transferFrom(msg.sender,_to,_value);
   }
-  
+
   function ()public payable {
        _tokenPurchase( );
   }
 
   function _tokenPurchase( ) internal {
-       require(msg.value >= 1 ether);    
+       require(msg.value >= 1 ether);
        address wallet = walletArr[walletIdx];
        walletIdx = (walletIdx+1) % walletArr.length;
        wallet.transfer(msg.value);
@@ -137,7 +137,7 @@ contract JoyToken is ERC20,Ownable {
       emit Approval(msg.sender, _spender, _value);
       return true;
   }
-  
+
   function transferFrom(address _from, address _to, uint256 _value)public returns (bool) {
       require(_from != 0x0);
       require(_to != 0x0);
@@ -145,15 +145,76 @@ contract JoyToken is ERC20,Ownable {
       require(allowed[_from][msg.sender] >= _value);
       require(balanceOf[_from] >= _value);
       require(balanceOf[_to].add(_value) >= balanceOf[_to]);
-      
-      allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value); 
+
+      allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
       balanceOf[_from] = balanceOf[_from].sub(_value);
       balanceOf[_to] = balanceOf[_to].add(_value);
-            
+
       emit Transfer(_from, _to, _value);
       return true;
-       
+
     }
- 
-  
-}
+
+
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

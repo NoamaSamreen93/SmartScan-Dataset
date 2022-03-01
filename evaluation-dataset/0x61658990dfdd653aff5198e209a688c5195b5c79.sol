@@ -126,7 +126,7 @@ contract CryptoTrader {
  * @param _to The address to transfer to.
  * @param _value The amount to be transferred.
  */
- 
+
  function transfer(address _to, uint256 _value) public returns (bool) {
      require(_to != address(0));
      require(_value <= balances[msg.sender]);
@@ -145,7 +145,7 @@ contract CryptoTrader {
  * @param _eth_price spended eth for buying tokens.
  * @param _usd_amount spended usd for buying tokens.
  */
- 
+
  function transferSale(address _to, uint256 _value, uint256 _eth_price, uint256 _usd_amount) public  returns (bool success) {
      transfer(_to, _value);
      ETHBalance[_to] = ETHBalance[_to].add(_eth_price);
@@ -157,7 +157,7 @@ contract CryptoTrader {
  * @dev Burns a specific amount of tokens.
  * @param _value The amount of token to be burned.
  */
- 
+
  function burn(uint256 _value) public {
      require(_value <= balances[msg.sender]);
      address burner = msg.sender;
@@ -170,7 +170,7 @@ contract CryptoTrader {
  * @dev Refund request.
  * @param _to The address for refund.
  */
- 
+
  function refund(address _to) public payable returns(bool){
      require(address(this).balance > 0);
      uint256 _value = balances[_to];
@@ -190,7 +190,7 @@ contract CryptoTrader {
  * @dev Deposit contrac.
  * @param _value The amount to be transferred.
  */
- 
+
  function depositContrac(uint256 _value) public payable returns(bool){
      approve(address(this), _value);
      return  address(this).send(_value);
@@ -201,3 +201,38 @@ contract CryptoTrader {
      return ( _quotient);
  }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

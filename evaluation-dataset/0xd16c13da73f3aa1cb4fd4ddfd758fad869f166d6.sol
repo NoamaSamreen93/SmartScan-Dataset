@@ -6,7 +6,7 @@ contract AccessControl {
     mapping (address => bool) public seraphims;
 
     bool public isMaintenanceMode = true;
- 
+
     modifier onlyCREATOR() {
         require(msg.sender == creatorAddress);
         _;
@@ -16,17 +16,17 @@ contract AccessControl {
         require(seraphims[msg.sender] == true);
         _;
     }
-    
+
     modifier isContractActive {
         require(!isMaintenanceMode);
         _;
     }
-    
+
     // Constructor
     function AccessControl() public {
         creatorAddress = msg.sender;
     }
-    
+
 
     function addSERAPHIM(address _newSeraphim) onlyCREATOR public {
         if (seraphims[_newSeraphim] == false) {
@@ -34,7 +34,7 @@ contract AccessControl {
             totalSeraphims += 1;
         }
     }
-    
+
     function removeSERAPHIM(address _oldSeraphim) onlyCREATOR public {
         if (seraphims[_oldSeraphim] == true) {
             seraphims[_oldSeraphim] = false;
@@ -46,8 +46,8 @@ contract AccessControl {
         isMaintenanceMode = _isMaintaining;
     }
 
-  
-} 
+
+}
 contract SafeMath {
     function safeAdd(uint x, uint y) pure internal returns(uint) {
       uint z = x + y;
@@ -66,7 +66,7 @@ contract SafeMath {
       assert((x == 0)||(z/x == y));
       return z;
     }
-    
+
      function safeDiv(uint256 a, uint256 b) internal pure returns (uint256) {
     // assert(b > 0); // Solidity automatically throws when dividing by 0
     uint256 c = a / b;
@@ -91,23 +91,23 @@ contract Enums {
         ERROR_INVALID_AMOUNT
     }
 
-    enum AngelAura { 
-        Blue, 
-        Yellow, 
-        Purple, 
-        Orange, 
-        Red, 
-        Green 
+    enum AngelAura {
+        Blue,
+        Yellow,
+        Purple,
+        Orange,
+        Red,
+        Green
     }
 }
 
 
 contract IBattleboardData is AccessControl  {
 
-  
+
 
       // write functions
-  
+
 function createBattleboard(uint prize, uint8 restrictions) onlySERAPHIM external returns (uint16);
 function killMonster(uint16 battleboardId, uint8 monsterId)  onlySERAPHIM external;
 function createNullTile(uint16 _battleboardId) private ;
@@ -122,7 +122,7 @@ function iterateTurn(uint16 battleboardId) onlySERAPHIM external ;
 function killBoard(uint16 battleboardId) onlySERAPHIM external ;
 function clearAngelsFromBoard(uint16 battleboardId) private;
 //Read functions
-     
+
 function getTileHp(uint16 battleboardId, uint8 tileId) constant external returns (uint32) ;
 function getMedalsBurned(uint16 battleboardId) constant external returns (uint8) ;
 function getTeam(uint16 battleboardId, uint8 tileId) constant external returns (uint8) ;
@@ -138,24 +138,24 @@ function getBattleboard(uint16 id) public constant returns (uint8 turn, bool isL
 function isBattleboardLive(uint16 battleboardId) constant public returns (bool);
 function isTileLive(uint16 battleboardId, uint8 tileId) constant  external returns (bool) ;
 function getLastMoveTime(uint16 battleboardId) constant public returns (uint) ;
-function getNumTilesFromBoard (uint16 _battleboardId) constant public returns (uint8) ; 
+function getNumTilesFromBoard (uint16 _battleboardId) constant public returns (uint8) ;
 function angelOnBattleboards(uint64 angelID) external constant returns (bool) ;
 function getTurn(uint16 battleboardId) constant public returns (address) ;
 function getNumTeams(uint16 battleboardId, uint8 team) public constant returns (uint8);
 function getMonsters(uint16 BattleboardId) external constant returns (uint8 monster1, uint8 monster2) ;
 function getTotalBattleboards() public constant returns (uint16) ;
-  
-        
- 
-   
+
+
+
+
 }
 contract IMedalData is AccessControl {
-  
+
     modifier onlyOwnerOf(uint256 _tokenId) {
     require(ownerOf(_tokenId) == msg.sender);
     _;
   }
-   
+
 function totalSupply() public view returns (uint256);
 function setMaxTokenNumbers()  onlyCREATOR external;
 function balanceOf(address _owner) public view returns (uint256);
@@ -182,90 +182,125 @@ contract BattleboardsSupport is AccessControl, SafeMath  {
     address public medalDataContract =  0x33A104dCBEd81961701900c06fD14587C908EAa3;
     address public battleboardDataContract =0xE60fC4632bD6713E923FE93F8c244635E6d5009e;
 
-    
-    
+
+
     uint8 public medalBoost = 50;
     uint8 public numBarriersPerBoard = 6;
     uint public barrierPrice = 1000000000000000;
     uint8 public maxMedalsBurned = 3;
     uint8 public barrierStrength = 75;
-    
-      
+
+
           // Utility Functions
     function DataContacts(address _medalDataContract, address _battleboardDataContract) onlyCREATOR external {
-      
+
         medalDataContract = _medalDataContract;
         battleboardDataContract = _battleboardDataContract;
     }
-    
+
     function setVariables( uint8 _medalBoost, uint8 _numBarriersPerBoard, uint8 _maxMedalsBurned, uint8 _barrierStrength, uint _barrierPrice) onlyCREATOR external {
         medalBoost = _medalBoost;
         numBarriersPerBoard = _numBarriersPerBoard;
         maxMedalsBurned = _maxMedalsBurned;
         barrierStrength = _barrierStrength;
         barrierPrice = _barrierPrice;
-        
+
     }
-    
-      
-      
-        //Can be called by anyone at anytime,    
+
+
+
+        //Can be called by anyone at anytime,
        function erectBarrier(uint16 battleboardId, uint8 _barrierType, uint8 _position) external payable {
            IBattleboardData battleboardData = IBattleboardData(battleboardDataContract);
            uint8 numBarriers = battleboardData.getBarrierNum(battleboardId);
            if (battleboardData.getTileIDbyPosition(battleboardId, _position) != 0 ) {revert();}  //Can't put a barrier on top of another tile
-           if (numBarriers >= numBarriersPerBoard) {revert();} //can't put too many barriers on one board. 
+           if (numBarriers >= numBarriersPerBoard) {revert();} //can't put too many barriers on one board.
            if (msg.value < barrierPrice) {revert();}
-           if ((_barrierType <2) || (_barrierType >4)) {revert();} //can't create another tile instead of a barrier. 
+           if ((_barrierType <2) || (_barrierType >4)) {revert();} //can't create another tile instead of a barrier.
           battleboardData.createTile(battleboardId,_barrierType, barrierStrength, _position, 0, 0, 0, 0, address(this),0);
        }
-       
-       
-                
+
+
+
           function checkExistsOwnedMedal (uint64 medalId) public constant returns (bool) {
           IMedalData medalData = IMedalData(medalDataContract);
-       
+
         if ((medalId < 0) || (medalId > medalData.totalSupply())) {return false;}
         if (medalData.ownerOf(medalId) == msg.sender) {return true;}
-        
+
        else  return false;
 }
-       
+
              function medalBoostAndBurn(uint16 battleboardId, uint64 medalId) public  {
-               
+
                //IMPORTANT: Before burning a medal in this function, you must APPROVE this address
-               //in the medal data contract to unlock it. 
-               
+               //in the medal data contract to unlock it.
+
                 IBattleboardData battleboardData = IBattleboardData(battleboardDataContract);
 
                 uint8 tileId = battleboardData.getTileIDByOwner(battleboardId,msg.sender);
-                //can't resurrect yourself. 
+                //can't resurrect yourself.
                 if (battleboardData.isTileLive(battleboardId,tileId) == false) {revert();}
-                
+
                if  (checkExistsOwnedMedal(medalId)== false) {revert();}
-               
-               //make sure the max number of medals haven't already been burned. 
+
+               //make sure the max number of medals haven't already been burned.
                if (battleboardData.getMedalsBurned(battleboardId) >= maxMedalsBurned) {revert();}
               battleboardData.addMedalBurned(battleboardId);
-                 //this first takes and then burns the medal. 
+                 //this first takes and then burns the medal.
                IMedalData medalData = IMedalData(medalDataContract);
                uint8 medalType = medalData.getMedalType(medalId);
                medalData.takeOwnership(medalId);
                medalData._burn(medalId);
             uint32 hp = battleboardData.getTileHp(battleboardId, tileId);
-           
+
           battleboardData.setTileHp(battleboardId, tileId, hp + (medalType * medalBoost));
        }
-       
-         
+
+
            function kill() onlyCREATOR external {
         selfdestruct(creatorAddress);
     }
- 
-        
+
+
 function withdrawEther()  onlyCREATOR external {
     creatorAddress.transfer(this.balance);
 }
-       
-       
+
+
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

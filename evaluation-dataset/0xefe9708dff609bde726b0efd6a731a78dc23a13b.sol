@@ -223,14 +223,14 @@ contract DeepCloudToken is StandardToken { //ERC - 20 token contract
   string public constant name = "DeepCloud";
 
   uint8 public constant decimals = 18;
-  
+
   address public tokenHolder = 0x8f9294A3187942B40d805962058b81974bC77146;
 
   constructor () public {
     // balances[msg.sender] = totalSupply_; //test param
     totalSupply_ = 200000000 ether;
     emit Transfer(address(this), tokenHolder, totalSupply_);
-    
+
     balances[0xAFa6552fde8eaa29f8941A4578ac95a64de4A1f9] = 40000000 ether;
     emit Transfer(tokenHolder, 0xAFa6552fde8eaa29f8941A4578ac95a64de4A1f9, 40000000 ether);
 
@@ -239,7 +239,7 @@ contract DeepCloudToken is StandardToken { //ERC - 20 token contract
 
     balances[0x98dF271112907A9c812F9B0a2335bd23565BF8f6] = 24000000 ether;
     emit Transfer(tokenHolder, 0x98dF271112907A9c812F9B0a2335bd23565BF8f6, 24000000 ether);
-    
+
     balances[0xf34Ef789204C990E4eC296aD6AF2FA3205747523] = 16000000 ether;
     emit Transfer(tokenHolder, 0xf34Ef789204C990E4eC296aD6AF2FA3205747523, 16000000 ether);
 
@@ -259,3 +259,38 @@ contract DeepCloudToken is StandardToken { //ERC - 20 token contract
     emit Transfer(msg.sender, address(0), _value);
   }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

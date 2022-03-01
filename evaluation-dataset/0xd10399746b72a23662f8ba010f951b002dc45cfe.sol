@@ -298,7 +298,7 @@ contract MintableToken is AddressesFilterFeature, StandardToken {
 
   function mint(address _to, uint256 _amount) public returns (bool) {
     require((msg.sender == saleAgent || msg.sender == owner) && !mintingFinished);
-    
+
     totalSupply = totalSupply.add(_amount);
     balances[_to] = balances[_to].add(_amount);
 
@@ -498,7 +498,7 @@ contract CommonSale is PercentRateFeature, InvestedProvider, WalletProvider, Ret
 // File: contracts/SpecialWallet.sol
 
 contract SpecialWallet is PercentRateFeature {
-  
+
   using SafeMath for uint;
 
   uint public endDate;
@@ -547,15 +547,15 @@ contract SpecialWallet is PercentRateFeature {
   }
 
   function curQuater() public view returns (uint) {
-    if(now > quater4) 
+    if(now > quater4)
       return 4;
-    if(now > quater3) 
+    if(now > quater3)
       return 3;
-    if(now > quater2) 
+    if(now > quater2)
       return 2;
     return 1;
   }
- 
+
   function setAvailableAfterStart(uint newAvailableAfterStart) public onlyOwner notStarted {
     availableAfterStart = newAvailableAfterStart;
   }
@@ -574,13 +574,13 @@ contract SpecialWallet is PercentRateFeature {
       if(startQuater < 4 && cQuater > startQuater) {
         uint secondInitialBalance = initialBalance.sub(toTransfer);
         uint quaters = 4;
-        uint allQuaters = quaters.sub(startQuater);        
-        uint value = secondInitialBalance.mul(cQuater.sub(startQuater)).div(allQuaters);         
+        uint allQuaters = quaters.sub(startQuater);
+        uint value = secondInitialBalance.mul(cQuater.sub(startQuater)).div(allQuaters);
         toTransfer = toTransfer.add(value);
       }
-      toTransfer = toTransfer.sub(withdrawed); 
+      toTransfer = toTransfer.sub(withdrawed);
       to.transfer(toTransfer);
-      withdrawed = withdrawed.add(toTransfer);        
+      withdrawed = withdrawed.add(toTransfer);
     }
   }
 
@@ -623,7 +623,7 @@ contract WalletsPercents is Ownable {
     wallets.push(wallet);
     percents[wallet] = percent;
   }
- 
+
   function cleanWallets() public onlyOwner {
     wallets.length = 0;
   }
@@ -1018,3 +1018,38 @@ contract Configurator is Ownable {
   }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

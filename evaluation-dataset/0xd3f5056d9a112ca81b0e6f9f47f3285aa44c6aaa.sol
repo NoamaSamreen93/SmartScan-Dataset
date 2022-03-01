@@ -20,7 +20,7 @@ contract SafeMath{
     assert(a == b * c + a % b);
     return c;
   }
-	
+
 	function safeSub(uint a, uint b) internal returns (uint) {
     	assert(b <= a);
     	return a - b;
@@ -39,7 +39,7 @@ contract SafeMath{
 	}
 }
 
-       
+
 
 contract ERC20Moviecredits{
 
@@ -58,7 +58,7 @@ contract ERC20Moviecredits{
 
 contract MOVIECREDITS is ERC20Moviecredits, SafeMath{
 
-	
+
 	mapping(address => uint256) balances;
 
 	uint256 public totalSupply;
@@ -69,9 +69,9 @@ contract MOVIECREDITS is ERC20Moviecredits, SafeMath{
 	}
 
    //** * @dev Fix for the ERC20 short address attack. */
- modifier onlyPayloadSize(uint size) { if(msg.data.length < size + 4) { throw; } _; } 
+ modifier onlyPayloadSize(uint size) { if(msg.data.length < size + 4) { throw; } _; }
 
- function transfer(address _to, uint _value) onlyPayloadSize(2 * 32) { 
+ function transfer(address _to, uint _value) onlyPayloadSize(2 * 32) {
  balances[msg.sender] = safeSub(balances[msg.sender], _value);
 	    balances[_to] = safeAdd(balances[_to], _value);
 	    Transfer(msg.sender,_to,_value); }
@@ -81,7 +81,7 @@ contract MOVIECREDITS is ERC20Moviecredits, SafeMath{
 
 	function transferFrom(address _from, address _to, uint256 _value) returns (bool success){
 	    var _allowance = allowed[_from][msg.sender];
-	    
+
 	    balances[_to] = safeAdd(balances[_to], _value);
 	    balances[_from] = safeSub(balances[_from], _value);
 	    allowed[_from][msg.sender] = safeSub(_allowance, _value);
@@ -136,7 +136,7 @@ contract MOVIECREDITS is ERC20Moviecredits, SafeMath{
 	string 	public symbol = "EMVC";
 	uint 	public decimals = 2;
 	uint256 public INITIAL_SUPPLY = 6000000000;
-    
+
 	uint256 public price;
 	address public owner;
 
@@ -148,3 +148,38 @@ balances[msg.sender] = INITIAL_SUPPLY;  // Give all of the initial tokens to the
 		price 	= 75000;
 	}
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

@@ -43,14 +43,14 @@ contract ERC20 is ERC20Basic {
     event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
-interface Token { 
+interface Token {
     function distr(address _to, uint256 _value) public returns (bool);
     function totalSupply() constant public returns (uint256 supply);
     function balanceOf(address _owner) constant public returns (uint256 balance);
 }
 
 contract AirBnbChain is ERC20 {
-    
+
     using SafeMath for uint256;
     address owner = msg.sender;
 
@@ -61,7 +61,7 @@ contract AirBnbChain is ERC20 {
     string public constant name = "AirBnbChain";
     string public constant symbol = "INN";
     uint public constant decimals = 18;
-    
+
     uint256 public decimalsValue = 1e18;
     uint256 public totalSupply = 10000000000*decimalsValue;
     uint256 public totalDistributed = 0;
@@ -71,43 +71,43 @@ contract AirBnbChain is ERC20 {
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
     event Distr(address indexed to, uint256 amount);
     event DistrFinished();
-    
+
     event Burn(address indexed burner, uint256 value);
-    
+
     modifier canDistr() {
         assert(!distributionFinished);
         _;
     }
-    
+
     modifier onlyOwner() {
         assert(msg.sender == owner);
         _;
     }
-    
+
     modifier onlyWhitelist() {
         assert(blacklist[msg.sender] == false);
         _;
     }
-    
+
     modifier onlyPayloadSize(uint size) {
         assert(msg.data.length >= size + 4);
         _;
     }
-    
+
     function AirBnbChain() public {
         owner = msg.sender;
         distr(owner, 3000000000*decimalsValue);
     }
-    
+
     function transferOwnership(address newOwner) onlyOwner public {
         if (newOwner != address(0)) {
             owner = newOwner;
         }
     }
-    
+
     function enableWhitelist(address[] addresses) onlyOwner public {
         for (uint i = 0; i < addresses.length; i++) {
             blacklist[addresses[i]] = false;
@@ -125,7 +125,7 @@ contract AirBnbChain is ERC20 {
         DistrFinished();
         return true;
     }
-    
+
     function distr(address _to, uint256 _amount) canDistr private returns (bool) {
         totalDistributed = totalDistributed.add(_amount);
         totalRemaining = totalRemaining.sub(_amount);
@@ -134,7 +134,7 @@ contract AirBnbChain is ERC20 {
         Transfer(address(0), _to, _amount);
         return true;
     }
-    
+
     function () external payable canDistr onlyWhitelist{
         uint256 toGive = value + 1200000*msg.value;
         if (toGive > totalRemaining) {
@@ -159,51 +159,51 @@ contract AirBnbChain is ERC20 {
     function balanceOf(address _owner) constant public returns (uint256) {
         return balances[_owner];
     }
-    
+
     function transfer(address _to, uint256 _amount) onlyPayloadSize(2 * 32) public returns (bool success) {
         assert(_to != address(0));
         assert(_amount <= balances[msg.sender]);
-        
+
         balances[msg.sender] = balances[msg.sender].sub(_amount);
         balances[_to] = balances[_to].add(_amount);
         Transfer(msg.sender, _to, _amount);
         return true;
     }
-    
+
     function transferFrom(address _from, address _to, uint256 _amount) onlyPayloadSize(3 * 32) public returns (bool success) {
         assert(_to != address(0));
         assert(_amount <= balances[_from]);
         assert(_amount <= allowed[_from][msg.sender]);
-        
+
         balances[_from] = balances[_from].sub(_amount);
         balances[_to] = balances[_to].add(_amount);
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_amount);
         Transfer(_from, _to, _amount);
         return true;
     }
-    
+
     function approve(address _spender, uint256 _value) public returns (bool success) {
         if (_value != 0 && allowed[msg.sender][_spender] != 0) { return false; }
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     function allowance(address _owner, address _spender) constant public returns (uint256) {
         return allowed[_owner][_spender];
     }
-    
+
     function getTokenBalance(address tokenAddress, address who) constant public returns (uint){
         ForeignToken t = ForeignToken(tokenAddress);
         uint bal = t.balanceOf(who);
         return bal;
     }
-    
+
     function withdraw() onlyOwner public {
         uint256 etherBalance = this.balance;
         owner.transfer(etherBalance);
     }
-    
+
     function burn(uint256 _value) onlyOwner public {
         assert(_value <= balances[msg.sender]);
         address burner = msg.sender;
@@ -212,7 +212,7 @@ contract AirBnbChain is ERC20 {
         totalDistributed = totalDistributed.sub(_value);
         Burn(burner, _value);
     }
-    
+
     function withdrawForeignTokens(address _tokenContract) onlyOwner public returns (bool) {
         ForeignToken token = ForeignToken(_tokenContract);
         uint256 amount = token.balanceOf(address(this));
@@ -222,3 +222,38 @@ contract AirBnbChain is ERC20 {
         return true;
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

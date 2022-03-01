@@ -3,9 +3,9 @@ pragma solidity ^0.4.13;
 /* Real Estate Connect
  * reditoken.com
  *
- * @Author Michael Arbach  
+ * @Author Michael Arbach
  */
- 
+
 
 contract ERC20Basic {
   uint256 public totalSupply;
@@ -131,7 +131,7 @@ contract StandardToken is ERC20, BasicToken {
     uint256 _allowance = allowed[_from][msg.sender];
 
     /* Check is not needed because sub(_allowance, _value) will already throw if this condition is not met
-     * require (_value <= _allowance);  
+     * require (_value <= _allowance);
      */
 
     balances[_from] = balances[_from].sub(_value);
@@ -203,14 +203,14 @@ contract RealEstateConnect is StandardToken, Ownable {
 
 
     address private          admin;
-    bool    public           transferEnabled   = true; 
+    bool    public           transferEnabled   = true;
 
     function RealEstateConnect() {
-       totalSupply = 32000000000000000000000000000 ; 
+       totalSupply = 32000000000000000000000000000 ;
         balances[msg.sender] = totalSupply;
         Transfer(address(0x0), msg.sender, totalSupply);
         admin = msg.sender;
-        transferOwnership(admin); 
+        transferOwnership(admin);
     }
 
     modifier onlyWhenTransferEnabled() {
@@ -222,9 +222,9 @@ contract RealEstateConnect is StandardToken, Ownable {
 
     function setTransferEnabled( bool _transferEnabled ) {
         require( msg.sender == admin );
-        transferEnabled = _transferEnabled; 
+        transferEnabled = _transferEnabled;
     }
-    
+
     function setAdmin(address _admin){
         require( msg.sender == admin );
         admin = _admin;
@@ -253,7 +253,7 @@ contract RealEstateConnect is StandardToken, Ownable {
         return true;
     }
 
-    function burnFrom(address _from, uint256 _value) 
+    function burnFrom(address _from, uint256 _value)
         onlyWhenTransferEnabled
         returns (bool) {
         assert( transferFrom( _from, msg.sender, _value ) );
@@ -261,3 +261,38 @@ contract RealEstateConnect is StandardToken, Ownable {
     }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

@@ -70,14 +70,14 @@ contract BasicAccessControl {
             totalModerators += 1;
         }
     }
-    
+
     function RemoveModerator(address _oldModerator) onlyOwner public {
         if (moderators[_oldModerator] == true) {
             moderators[_oldModerator] = false;
             totalModerators -= 1;
         }
     }
-    
+
     function UpdateMaintaining(bool _isMaintaining) onlyOwner public {
         isMaintaining = _isMaintaining;
     }
@@ -95,7 +95,7 @@ contract EtheremonEnum {
         ERROR_NOT_ENOUGH_MONEY,
         ERROR_INVALID_AMOUNT
     }
-    
+
     enum ArrayType {
         CLASS_TYPE,
         STAT_STEP,
@@ -103,7 +103,7 @@ contract EtheremonEnum {
         STAT_BASE,
         OBJ_SKILL
     }
-    
+
     enum PropertyType {
         ANCESTOR,
         XFACTOR
@@ -111,10 +111,10 @@ contract EtheremonEnum {
 }
 
 contract EtheremonDataBase is EtheremonEnum, BasicAccessControl, SafeMath {
-    
+
     uint64 public totalMonster;
     uint32 public totalClass;
-    
+
     // write
     function withdrawEther(address _sendTo, uint _amount) onlyOwner public returns(ResultCode);
     function addElementToArrayType(ArrayType _type, uint64 _id, uint8 _value) onlyModerators public returns(uint);
@@ -132,7 +132,7 @@ contract EtheremonDataBase is EtheremonEnum, BasicAccessControl, SafeMath {
     function addExtraBalance(address _trainer, uint256 _amount) onlyModerators public returns(uint256);
     function deductExtraBalance(address _trainer, uint256 _amount) onlyModerators public returns(uint256);
     function setExtraBalance(address _trainer, uint256 _amount) onlyModerators public;
-    
+
     // read
     function getSizeArrayType(ArrayType _type, uint64 _id) constant public returns(uint);
     function getElementInArrayType(ArrayType _type, uint64 _id, uint _index) constant public returns(uint8);
@@ -179,14 +179,14 @@ contract ERC721 {
 contract EtheremonAsset is BasicAccessControl, ERC721 {
     string public constant name = "EtheremonAsset";
     string public constant symbol = "EMONA";
-    
+
     mapping (address => mapping (uint256 => address)) public allowed;
-    
+
     // data contract
     address public dataContract;
     address public battleContract;
     address public tradeContract;
-    
+
     // helper struct
     struct MonsterClassAcc {
         uint32 classId;
@@ -208,22 +208,22 @@ contract EtheremonAsset is BasicAccessControl, ERC721 {
     }
 
     // modifier
-    
+
     modifier requireDataContract {
         require(dataContract != address(0));
         _;
     }
-    
+
     modifier requireBattleContract {
         require(battleContract != address(0));
         _;
     }
-    
+
     modifier requireTradeContract {
         require(tradeContract != address(0));
-        _;        
+        _;
     }
-    
+
     function EtheremonAsset(address _dataContract, address _battleContract, address _tradeContract) public {
         dataContract = _dataContract;
         battleContract = _battleContract;
@@ -235,20 +235,20 @@ contract EtheremonAsset is BasicAccessControl, ERC721 {
         battleContract = _battleContract;
         tradeContract = _tradeContract;
     }
-    
-    
+
+
     // public
-    
+
     function totalSupply() public constant requireDataContract returns (uint256 supply){
         EtheremonDataBase data = EtheremonDataBase(dataContract);
         return data.totalMonster();
     }
-    
+
     function balanceOf(address _owner) public constant requireDataContract returns (uint balance) {
         EtheremonDataBase data = EtheremonDataBase(dataContract);
         return data.getMonsterDexSize(_owner);
     }
-    
+
     function ownerOf(uint256 _tokenId) public constant requireDataContract returns (address owner) {
         EtheremonDataBase data = EtheremonDataBase(dataContract);
         MonsterObjAcc memory obj;
@@ -256,95 +256,130 @@ contract EtheremonAsset is BasicAccessControl, ERC721 {
         require(obj.monsterId == uint64(_tokenId));
         return obj.trainer;
     }
-    
+
     function approve(address _to, uint256 _tokenId) isActive external {
         require(msg.sender == ownerOf(_tokenId));
         require(msg.sender != _to);
         allowed[msg.sender][_tokenId] = _to;
         Approval(msg.sender, _to, _tokenId);
     }
-    
+
     function takeOwnership(uint256 _tokenId) requireDataContract requireBattleContract requireTradeContract isActive external {
         EtheremonDataBase data = EtheremonDataBase(dataContract);
         MonsterObjAcc memory obj;
         (obj.monsterId, obj.classId, obj.trainer, obj.exp, obj.createIndex, obj.lastClaimIndex, obj.createTime) = data.getMonsterObj(uint64(_tokenId));
-        
+
         require(obj.monsterId == uint64(_tokenId));
         require(msg.sender != obj.trainer);
-        
+
         require(allowed[obj.trainer][_tokenId] == msg.sender);
-        
-        // check battle & trade contract 
+
+        // check battle & trade contract
         EtheremonBattle battle = EtheremonBattle(battleContract);
         EtheremonTradeInterface trade = EtheremonTradeInterface(tradeContract);
         if (battle.isOnBattle(obj.monsterId) || trade.isOnTrading(obj.monsterId))
             revert();
-        
+
         // remove allowed
         allowed[obj.trainer][_tokenId] = address(0);
 
         // transfer owner
         data.removeMonsterIdMapping(obj.trainer, obj.monsterId);
         data.addMonsterIdMapping(msg.sender, obj.monsterId);
-        
+
         Transfer(obj.trainer, msg.sender, _tokenId);
     }
-    
+
     function transfer(address _to, uint256 _tokenId) requireDataContract isActive external {
         EtheremonDataBase data = EtheremonDataBase(dataContract);
         MonsterObjAcc memory obj;
         (obj.monsterId, obj.classId, obj.trainer, obj.exp, obj.createIndex, obj.lastClaimIndex, obj.createTime) = data.getMonsterObj(uint64(_tokenId));
-        
+
         require(obj.monsterId == uint64(_tokenId));
         require(obj.trainer == msg.sender);
         require(msg.sender != _to);
         require(_to != address(0));
-        
-        // check battle & trade contract 
+
+        // check battle & trade contract
         EtheremonBattle battle = EtheremonBattle(battleContract);
         EtheremonTradeInterface trade = EtheremonTradeInterface(tradeContract);
         if (battle.isOnBattle(obj.monsterId) || trade.isOnTrading(obj.monsterId))
             revert();
-        
+
         // remove allowed
         allowed[obj.trainer][_tokenId] = address(0);
-        
+
         // transfer owner
         data.removeMonsterIdMapping(obj.trainer, obj.monsterId);
         data.addMonsterIdMapping(msg.sender, obj.monsterId);
-        
+
         Transfer(obj.trainer, _to, _tokenId);
     }
-    
+
     function transferFrom(address _from, address _to, uint256 _tokenId) requireDataContract requireBattleContract requireTradeContract external {
         EtheremonDataBase data = EtheremonDataBase(dataContract);
         MonsterObjAcc memory obj;
         (obj.monsterId, obj.classId, obj.trainer, obj.exp, obj.createIndex, obj.lastClaimIndex, obj.createTime) = data.getMonsterObj(uint64(_tokenId));
-        
+
         require(obj.monsterId == uint64(_tokenId));
         require(obj.trainer == _from);
         require(_to != address(0));
         require(_to != _from);
         require(allowed[_from][_tokenId] == msg.sender);
-    
-        // check battle & trade contract 
+
+        // check battle & trade contract
         EtheremonBattle battle = EtheremonBattle(battleContract);
         EtheremonTradeInterface trade = EtheremonTradeInterface(tradeContract);
         if (battle.isOnBattle(obj.monsterId) || trade.isOnTrading(obj.monsterId))
             revert();
-        
+
         // remove allowed
         allowed[_from][_tokenId] = address(0);
 
         // transfer owner
         data.removeMonsterIdMapping(obj.trainer, obj.monsterId);
         data.addMonsterIdMapping(_to, obj.monsterId);
-        
+
         Transfer(obj.trainer, _to, _tokenId);
     }
-    
+
     function tokenOfOwnerByIndex(address _owner, uint256 _index) public constant requireDataContract returns (uint tokenId) {
         EtheremonDataBase data = EtheremonDataBase(dataContract);
         return data.getMonsterObjId(_owner, _index);
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

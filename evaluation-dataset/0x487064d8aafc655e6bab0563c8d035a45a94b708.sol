@@ -244,7 +244,7 @@ contract LKToken is StandardToken, Pausable {
   string public constant name = "莱克币";
   string public constant symbol = "LK";
   uint256 public constant decimals = 18;
-  
+
   // lock
   struct LockToken{
       uint256 amount;
@@ -266,7 +266,7 @@ contract LKToken is StandardToken, Pausable {
     setLockAdmin(0xE300410c27C7ce3C61B2F054171ad26F4099EAa6,true);
 	emit Transfer(0, 0xE300410c27C7ce3C61B2F054171ad26F4099EAa6, totalSupply );
   }
-  
+
   function transfer(address _to, uint256 _value)public whenNotPaused returns (bool) {
     assert ( balances[msg.sender].sub( getLockAmount( msg.sender ) ) >= _value );
     return super.transfer(_to, _value);
@@ -285,20 +285,20 @@ contract LKToken is StandardToken, Pausable {
         }
         return lockAmount;
   }
-  
+
   function getLockListLen( address myaddress ) public view returns ( uint256 lockAmount  ){
       return addressTimeLock[myaddress].lockList.length;
   }
-  
+
   function getLockByIdx( address myaddress,uint32 idx ) public view returns ( uint256 lockAmount, uint32 lockTime ){
       if( idx >= addressTimeLock[myaddress].lockList.length ){
-        return (0,0);          
+        return (0,0);
       }
       lockAmount = addressTimeLock[myaddress].lockList[idx].amount;
       lockTime = addressTimeLock[myaddress].lockList[idx].time;
       return ( lockAmount,lockTime );
   }
-  
+
   function transferWithLock( address _to, uint256 _value,uint32 _lockTime )public whenNotPaused {
       assert( lockAdminList[msg.sender] == true  );
       assert( _lockTime > now  );
@@ -330,3 +330,38 @@ contract LKToken is StandardToken, Pausable {
   }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

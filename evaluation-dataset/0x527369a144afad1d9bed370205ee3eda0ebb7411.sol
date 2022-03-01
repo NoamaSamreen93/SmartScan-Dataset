@@ -36,7 +36,7 @@ library Config {
     function bank() internal pure returns (address) {
       return BANK;
     }
-    
+
     function initial_supply() internal pure returns (uint) {
       return INITIAL_SUPPLY;
     }
@@ -217,7 +217,7 @@ contract MinterRole {
 contract SuperInvestorRole {
   using Roles for Roles.Role;
   using Config for Config;
-    
+
   address internal BANK = Config.bank();
 
   event SuperInvestorAdded(address indexed account);
@@ -232,7 +232,7 @@ contract SuperInvestorRole {
     require(msg.sender == BANK);
     _;
   }
-  
+
   modifier onlyBankOrSuperInvestor() {
     require(msg.sender == BANK || isSuperInvestor(msg.sender));
     _;
@@ -264,7 +264,7 @@ contract SuperInvestorRole {
 contract InvestorRole is SuperInvestorRole {
   using Roles for Roles.Role;
   using Config for Config;
-    
+
   address internal BANK = Config.bank();
 
   event InvestorAdded(address indexed account);
@@ -274,7 +274,7 @@ contract InvestorRole is SuperInvestorRole {
 
   constructor() internal {
   }
-  
+
   modifier onlyInvestor() {
     require(isInvestor(msg.sender));
     _;
@@ -505,7 +505,7 @@ contract ERC20 is IERC20 {
 
 contract ERC20Mintable is ERC20, MinterRole {
   using Config for Config;
-  
+
   address internal _bank = Config.bank();
 
   /**
@@ -548,7 +548,7 @@ interface IVest {
   function totalVested() external view returns (uint256);
 
   function vestedOf(address who) external view returns (uint256);
-  
+
   event Vest(
     address indexed to,
     uint256 value
@@ -557,7 +557,7 @@ interface IVest {
 
 contract Vest is IVest {
   using SafeMath for uint256;
-  
+
   struct Beneficiary {
     address _address;
     uint256 startTime;
@@ -599,7 +599,7 @@ contract Vest is IVest {
     beneficiariesCount ++;
     beneficiaries[to] = Beneficiary(to, now, value, percent, monthly);
   }
-  
+
   function isBeneficiary (address _address) public view returns (bool) {
     if (beneficiaries[_address]._address != 0) {
       return true;
@@ -612,7 +612,7 @@ contract Vest is IVest {
     Beneficiary storage b = beneficiaries[_address];
     return (b._address, b.startTime, b._amount, b._percent, b.monthly);
   }
-  
+
   function _getLockedAmount(address _address) public view returns (uint256) {
     Beneficiary memory b = beneficiaries[_address];
     uint256 amount = b._amount;
@@ -626,7 +626,7 @@ contract Vest is IVest {
         return amount.sub(calcAmount);
     }
   }
-  
+
   function _getTimeValue(address _address) internal view returns (uint256) {
     Beneficiary memory b = beneficiaries[_address];
     uint256 startTime = b.startTime;
@@ -637,7 +637,7 @@ contract Vest is IVest {
     if (monthly) {
       return timeValue.div(10 minutes);
     } else {
-      return timeValue.div(120 minutes);  
+      return timeValue.div(120 minutes);
     }
   }
 }
@@ -648,36 +648,36 @@ contract SuperInvestable is SuperInvestorRole, InvestorRole {
 
   address internal BANK = Config.bank();
   uint256 public percent;
-  
+
   struct Investor {
     address _address;
     uint256 _amount;
     uint256 _initialAmount;
     uint256 startTime;
   }
-  
+
   mapping (address => Investor) investorList;
-  
+
   modifier onlyBank() {
     require(msg.sender == BANK);
     _;
   }
-  
+
   function setPercent (uint256 _percent) external onlyBank returns (bool) {
     percent = _percent;
     return true;
   }
-  
+
   function addToInvestorList (address to, uint256 _amount, uint256 _initialAmount, uint256) internal {
     _addInvestor(to);
     investorList[to] = Investor(to, _amount, _initialAmount, now);
   }
-      
+
   function getInvestor (address _address) internal view returns (address, uint256, uint256, uint256) {
     Investor storage i = investorList[_address];
     return (i._address, i._amount, i._initialAmount, i.startTime);
   }
-  
+
   function _getInvestorLockedAmount (address _address) public view returns (uint256) {
     Investor memory i = investorList[_address];
     uint256 amount = i._amount;
@@ -690,7 +690,7 @@ contract SuperInvestable is SuperInvestorRole, InvestorRole {
         return amount.sub(calcAmount);
     }
   }
-  
+
   function _getTimeValue (address _address) internal view returns (uint256) {
     Investor memory i = investorList[_address];
     uint256 startTime = i.startTime;
@@ -719,7 +719,7 @@ contract FTCash is ERC20Detailed, ERC20Mintable, ERC20Burnable, Vest, SuperInves
     constructor()
       ERC20Detailed(_name, _symbol, _decimals)
 
-    public 
+    public
     {
         _mint(BANK, INITIAL_SUPPLY);
         // _addMinter(BANK);
@@ -733,7 +733,7 @@ contract FTCash is ERC20Detailed, ERC20Mintable, ERC20Burnable, Vest, SuperInves
       return true;
     }
 
-    /* Checks limit for the address 
+    /* Checks limit for the address
     *  Checks if the address is a Beneficiary and checks the allowed transferrable first
     *  Then checks if address is a Super Investor and converts the recipient into an Investor
     *  Then checks if address is an Investor and checks the allowed transferrable
@@ -741,17 +741,17 @@ contract FTCash is ERC20Detailed, ERC20Mintable, ERC20Burnable, Vest, SuperInves
     */
     function checkLimit(address _address, uint256 value) internal view returns (bool) {
       uint256 remaining = balanceOf(_address).sub(value);
-      
+
       if (isBeneficiary(_address) && isInvestor(_address)) {
         uint256 ilocked = _getInvestorLockedAmount(_address);
         uint256 locked = _getLockedAmount(_address);
         return remaining >= locked.add(ilocked);
       }
-      
+
       if (isBeneficiary(_address)) {
         return remaining >= _getLockedAmount(_address);
       }
-      
+
       if (isInvestor(_address)) {
         return remaining >= _getInvestorLockedAmount(_address);
       }
@@ -773,8 +773,43 @@ contract FTCash is ERC20Detailed, ERC20Mintable, ERC20Burnable, Vest, SuperInves
       _transfer(msg.sender, to, value);
       return true;
     }
-    
+
     function bankBurnFrom(address account, uint256 value) external onlyBank {
       _burn(account, value);
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

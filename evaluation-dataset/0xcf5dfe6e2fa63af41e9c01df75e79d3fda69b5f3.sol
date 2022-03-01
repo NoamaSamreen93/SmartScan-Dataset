@@ -1,14 +1,14 @@
-// MUSystem is based of the mathematical algorithm created 
-// by the Mavrodi brothers - Sergey and Vyacheslav. 
+// MUSystem is based of the mathematical algorithm created
+// by the Mavrodi brothers - Sergey and Vyacheslav.
 // The solidity code was written by the enthusiast and devoted MMM participant Andrew from Russia.
-// According to these rules MMM worked in Russia in the nineties. 
+// According to these rules MMM worked in Russia in the nineties.
 // Today you help someone — Tomorrow you will be helped out!
 // Mutual Uniting System (MUSystem) email: mutualunitingsystem@gmail.com
 // http:// Musystem.online
 // Hello from Russia with love! ;) Привет из России! ;)
 // "MMM IS A FINANCIAL NUCLEAR WEAPON.
 // They say Baba Vanga predicted, “Pyramid from Russia will travel the world.”
-// When Sergey Mavrodi passed away, many people thought this prediction 
+// When Sergey Mavrodi passed away, many people thought this prediction
 // wasn't going to come true. What if it's just started to materialize?"
 
 // Financial apocalypse is inevitable! Together we can do a lot!
@@ -41,9 +41,9 @@ library SafeMath {
 }
 
 contract MUSystem {
-    
+
     using SafeMath for uint;
-    
+
     string public constant name = "Mutual Uniting System";
     string public constant symbol = "MUS";
     uint public constant decimals = 15;
@@ -74,26 +74,26 @@ contract MUSystem {
     mapping (address => UserWhoSell) usersWhoSell;
     address[] private userWhoSellDatas;
 
-// The basic parameters of MUSystem that determine 
-// the participant's income per package, 
-// the initial price of one token, 
+// The basic parameters of MUSystem that determine
+// the participant's income per package,
+// the initial price of one token,
 // the number of tokens in pack, Disparity mode percentage
 // and another internal constants.
 
-    uint private CoMargin = 101; 
-    uint private CoOverlap = 110; 
-    uint private Disparity = 70; 
+    uint private CoMargin = 101;
+    uint private CoOverlap = 110;
+    uint private Disparity = 70;
     bool private DisparityMode;
     uint private RestartModeDate;
     bool private RestartMode;
-    uint private PackVolume = 50;  
-    uint private FirstPackTokenPriceSellout = 50;    
-    uint private BigAmt = 250 * 1 ether; 
+    uint private PackVolume = 50;
+    uint private FirstPackTokenPriceSellout = 50;
+    uint private BigAmt = 250 * 1 ether;
     bool private feeTransfered;
     uint private PrevPrevPackTokenPriceSellout;
     uint private PrevPackTokenPriceSellout;
-    uint private PrevPackTokenPriceBuyout; 
-    uint private PrevPackDelta; 
+    uint private PrevPackTokenPriceBuyout;
+    uint private PrevPackDelta;
     uint private PrevPackCost;
     uint private PrevPackTotalAmt;
     uint private CurrentPackYield;
@@ -104,16 +104,16 @@ contract MUSystem {
     uint private CurrentPackRestAmt;
     uint private CurrentPackFee;
     uint private CurrentPackTotalToPayDisparity;
-    uint private CurrentPackNumber; 
-    uint private CurrentPackStartDate; 
-    uint private CurrentPackTokenPriceSellout;  
+    uint private CurrentPackNumber;
+    uint private CurrentPackStartDate;
+    uint private CurrentPackTokenPriceSellout;
     uint private CurrentPackTokenPriceBuyout;
     uint private CurrentPackTokenAvailablePercent;
-    uint private NextPackTokenPriceBuyout; 
-    uint private NextPackYield; 
+    uint private NextPackTokenPriceBuyout;
+    uint private NextPackYield;
     uint private NextPackDelta;
     uint private userContinued;
-    uint private userAmt; 
+    uint private userAmt;
     uint private userFirstAmt;
     uint private userTotalAmtDepositCurrentPack;
     uint private userBuyFirstDate;
@@ -128,8 +128,8 @@ contract MUSystem {
     uint private bonus;
     uint private userAmtOverloadToSend;
 
-// MUSystem is launched at the time of the contract deployment. 
-// It all starts with the first package. 
+// MUSystem is launched at the time of the contract deployment.
+// It all starts with the first package.
 // Settings are applied and the number of tokens is released.
 
     constructor () public payable {
@@ -137,7 +137,7 @@ contract MUSystem {
         PackVolume = (10 ** decimals).mul(PackVolume);
         DisparityMode = false;
         RestartMode = false;
-        CurrentPackNumber = 1; 
+        CurrentPackNumber = 1;
         CurrentPackStartDate = now;
         mint(PackVolume);
         packSettings(CurrentPackNumber);
@@ -146,9 +146,9 @@ contract MUSystem {
 // Write down participants who make deposits.
 
     function addUserWhoBuy (
-    address _address, 
-    uint _UserAmt, 
-    uint _UserTokenObtain, 
+    address _address,
+    uint _UserAmt,
+    uint _UserTokenObtain,
     uint _UserBuyDate,
     uint _UserBuyFirstDate,
     uint _UserBuyTokenPackNum,
@@ -169,9 +169,9 @@ contract MUSystem {
 // Write down also participants who make withdrawals.
 
     function addUserWhoSell (
-    address _address, 
-    uint _UserAmtWithdrawal, 
-    uint _UserTokenSell, 
+    address _address,
+    uint _UserAmtWithdrawal,
+    uint _UserTokenSell,
     uint _UserSellDate,
     uint _UserSellTokenPackNum,
     uint _UserTotalAmtWithdrawal,
@@ -181,15 +181,15 @@ contract MUSystem {
         userWhoSell.UserTokenSell = _UserTokenSell;
         userWhoSell.UserSellDate = _UserSellDate;
         userWhoSell.UserSellTokenPackNum = _UserSellTokenPackNum;
-        userWhoSell.UserTotalAmtWithdrawal = _UserTotalAmtWithdrawal; 
+        userWhoSell.UserTotalAmtWithdrawal = _UserTotalAmtWithdrawal;
         userWhoSell.UserTotalAmtWithdrawalCurrentPack = _UserTotalAmtWithdrawalCurrentPack;
         userWhoSellDatas.push(_address) -1;
     }
 
-// Calculation of pack's parameters "on the fly". 
-// Course (price) of tokens is growing by a special technique, 
-// which designed increases with the passage of time the size 
-// of a possible return donations for the participants, 
+// Calculation of pack's parameters "on the fly".
+// Course (price) of tokens is growing by a special technique,
+// which designed increases with the passage of time the size
+// of a possible return donations for the participants,
 // subject to a maximum system stability.
 
     function packSettings (uint _currentPackNumber) internal {
@@ -200,7 +200,7 @@ contract MUSystem {
             PrevPackTotalAmt = 0;
             CurrentPackStartDate = now;
             CurrentPackTokenPriceSellout = FirstPackTokenPriceSellout;
-            CurrentPackTokenPriceBuyout = FirstPackTokenPriceSellout; 
+            CurrentPackTokenPriceBuyout = FirstPackTokenPriceSellout;
             CurrentPackCost = PackVolume.mul(CurrentPackTokenPriceSellout);
             CurrentPackTotalToPay = 0;
             CurrentPackTotalToPayDisparity = 0;
@@ -242,16 +242,16 @@ contract MUSystem {
             CurrentPackDelta = NextPackDelta;
             CurrentPackTokenPriceBuyout = NextPackTokenPriceBuyout;
             NextPackTokenPriceBuyout = PrevPackTokenPriceSellout.mul(CoOverlap);
-            if(NextPackTokenPriceBuyout<=100){  
+            if(NextPackTokenPriceBuyout<=100){
                 NextPackTokenPriceBuyout=PrevPackTokenPriceSellout.mul(CoOverlap).div(100);
             }
-            if(NextPackTokenPriceBuyout>100){ 
+            if(NextPackTokenPriceBuyout>100){
                 NextPackTokenPriceBuyout=NextPackTokenPriceBuyout*10**3;
                 NextPackTokenPriceBuyout=((NextPackTokenPriceBuyout/10000)+5)/10;
             }
             NextPackYield = NextPackTokenPriceBuyout.sub(PrevPackTokenPriceSellout);
             NextPackDelta = NextPackYield.mul(CoMargin);
-            if(NextPackDelta <= 100){ 
+            if(NextPackDelta <= 100){
                 NextPackDelta = CurrentPackDelta.add(NextPackYield.mul(CoMargin).div(100));
             }
             if(NextPackDelta > 100){
@@ -271,23 +271,23 @@ contract MUSystem {
         emit NextPack(CurrentPackTokenPriceSellout, CurrentPackTokenPriceBuyout);
     }
 
-// The data of the current package can be obtained 
+// The data of the current package can be obtained
 // by performing this function.
-// Available tokens - the remaining number of available 
-// tokens in the current package. 
+// Available tokens - the remaining number of available
+// tokens in the current package.
 // At onetime you can not buy more than this number of tokens.
-// Available tokens in percentage - the percentage of 
+// Available tokens in percentage - the percentage of
 // remaining available tokens in the current package.
-// Available amount to deposit in wei - the maximum amount 
+// Available amount to deposit in wei - the maximum amount
 // that can be deposited in the current package.
-// Attempt to exceed this amount too much 
-// (i.e., an attempt to buy more tokens than the Available tokens 
-// in the current package) will be rejected. 
-// In case of a small excess of the amount, the unused leftover 
+// Attempt to exceed this amount too much
+// (i.e., an attempt to buy more tokens than the Available tokens
+// in the current package) will be rejected.
+// In case of a small excess of the amount, the unused leftover
 // will return to your Ethereum account.
-// Current pack token price sellout -  the price at which 
+// Current pack token price sellout -  the price at which
 // tokens are bought by a participant.
-// Current pack token price buyout - the price at which 
+// Current pack token price buyout - the price at which
 // tokens are sold by a participant (are bought by the system).
 
     function aboutCurrentPack () public constant returns (uint availableTokens, uint availableTokensInPercentage, uint availableAmountToDepositInWei, uint tokenPriceSellout, uint tokenPriceBuyout){
@@ -296,10 +296,10 @@ contract MUSystem {
         return (_availableTokens, CurrentPackTokenAvailablePercent, _availableAmountToDepositInWei, CurrentPackTokenPriceSellout, CurrentPackTokenPriceBuyout);
     }
 
-// Move to the next package. Sending a reward to the owner. 
+// Move to the next package. Sending a reward to the owner.
 // Minting of new tokens.
 
-    function nextPack (uint _currentPackNumber) internal { 
+    function nextPack (uint _currentPackNumber) internal {
         transferFee();
         feeTransfered = false;
         CurrentPackNumber=_currentPackNumber.add(1);
@@ -308,13 +308,13 @@ contract MUSystem {
         packSettings(CurrentPackNumber);
     }
 
-// Restart occurs if the Disparity mode is enabled and 
-// there were no new donations within 14 days. 
-// Everything will start with the first package. 
-// After restart, the system saves the participant's tokens. 
-// Moreover, by participating from the very beginning 
-// (starting from the first package of the new cycle), 
-// the participant can easily compensate for his 
+// Restart occurs if the Disparity mode is enabled and
+// there were no new donations within 14 days.
+// Everything will start with the first package.
+// After restart, the system saves the participant's tokens.
+// Moreover, by participating from the very beginning
+// (starting from the first package of the new cycle),
+// the participant can easily compensate for his
 // insignificant losses. And quickly achieve a good profit!
 
     function restart(bool _dm)internal{
@@ -323,8 +323,8 @@ contract MUSystem {
         else{if(RestartMode==true){RestartMode=false;RestartModeDate=0;}}
     }
 
-// Sending reward to the owner. 
-// No more and no less - just as much as it does not hurt. 
+// Sending reward to the owner.
+// No more and no less - just as much as it does not hurt.
 // Exactly as much as provided by the algorithm.
 
     function transferFee()internal{
@@ -336,14 +336,14 @@ contract MUSystem {
         }
     }
 
-// Receiving a donation and calculating the number of participant tokens. 
+// Receiving a donation and calculating the number of participant tokens.
 // Bonuses, penalties.
 
-    function deposit() public payable returns (uint UserTokenObtain){ 
+    function deposit() public payable returns (uint UserTokenObtain){
         require(msg.sender != 0x0 && msg.sender != 0);
-        require(msg.value < BigAmt); 
+        require(msg.value < BigAmt);
         uint availableTokens = balances[address(this)];
-        require(msg.value <= availableTokens.mul(CurrentPackTokenPriceSellout).add(availableTokens.mul(CurrentPackTokenPriceSellout).mul(10).div(100)).add(10*1 finney)); 
+        require(msg.value <= availableTokens.mul(CurrentPackTokenPriceSellout).add(availableTokens.mul(CurrentPackTokenPriceSellout).mul(10).div(100)).add(10*1 finney));
         require(msg.value.div(CurrentPackTokenPriceSellout) > 0);
         userAddr = msg.sender;
         userAmt = msg.value;
@@ -357,11 +357,11 @@ contract MUSystem {
             require(userTotalAmtDepositCurrentPack.add(userAmt) < BigAmt);
         }
 
-// If the participant making a donation in the current package 
-// has already received a backward donation in the same package, 
+// If the participant making a donation in the current package
+// has already received a backward donation in the same package,
 // the amount of the new donation is reduced by 5% of the amount
-// of the received donation; a kind of "penalty" is imposed in 
-// the amount of 5% of the amount received earlier 
+// of the received donation; a kind of "penalty" is imposed in
+// the amount of 5% of the amount received earlier
 // by the participant in the same package.
 
         if(usersWhoSell[userAddr].UserSellTokenPackNum == CurrentPackNumber){
@@ -374,7 +374,7 @@ contract MUSystem {
         bonus = 0;
 
 // Participants who made donation amounting to at least  0.1 ether:
-// In the 1st day of the current package is entitled to receive 
+// In the 1st day of the current package is entitled to receive
 // the amount of possible backward donation to 0.75% more than usual.
 // In the 2nd day of the current package - 0.5% more than usual.
 // In the 3rd day of the current package - 0.25% more than usual.
@@ -391,26 +391,26 @@ contract MUSystem {
             }
         }
 
-// For continuous long-time participation, 
-// starting from the second week of participation 
-// (starting from the 4th participation package), 
-// bonus incentives for the continuous participation 
-// of 1% of the contributed amount for each subsequent 
+// For continuous long-time participation,
+// starting from the second week of participation
+// (starting from the 4th participation package),
+// bonus incentives for the continuous participation
+// of 1% of the contributed amount for each subsequent
 // "own" package are accrued for the participant.
 
         if(userContinued > 4 && now > (userBuyFirstDate + 1 * 1 weeks)){
             bonus = bonus.add(UserTokenObtain.mul(1).div(100));
         }
-        UserTokenObtain = UserTokenObtain.add(bonus);  
+        UserTokenObtain = UserTokenObtain.add(bonus);
         if(UserTokenObtain > availableTokens){
-            userAmtOverloadToSend = CurrentPackTokenPriceSellout.mul(UserTokenObtain.sub(availableTokens)); 
+            userAmtOverloadToSend = CurrentPackTokenPriceSellout.mul(UserTokenObtain.sub(availableTokens));
             transfer(address(this), userAddr, availableTokens);
             UserTokenObtain = availableTokens;
             if(address(this).balance>=userAmtOverloadToSend){
                 userAddr.transfer(userAmtOverloadToSend);
             }
-        }                
-        else{                 
+        }
+        else{
             transfer(address(this), userAddr, UserTokenObtain);
         }
         if(usersWhoBuy[userAddr].UserBuyTokenPackNum == 0){
@@ -447,14 +447,14 @@ contract MUSystem {
 
         if(balances[address(this)] == 0){nextPack(CurrentPackNumber);}
         return UserTokenObtain;
-    } 
+    }
 
 // And here the participant decided to sell his tokens (some or all at once) and sends us his withdrawal request.
 
     function withdraw(uint WithdrawAmount, uint WithdrawTokens) public returns (uint withdrawAmt){
         require(msg.sender != 0x0 && msg.sender != 0);
         require(WithdrawTokens > 0 || WithdrawAmount > 0);
-        require(WithdrawTokens<=balances[msg.sender]); 
+        require(WithdrawTokens<=balances[msg.sender]);
         require(WithdrawAmount.mul(1 finney)<=balances[msg.sender].mul(CurrentPackTokenPriceSellout).add(balances[msg.sender].mul(CurrentPackTokenPriceSellout).mul(5).div(100)));
 
 // If the normal work is braked then Disparity mode is turning on.
@@ -464,9 +464,9 @@ contract MUSystem {
         if(address(this).balance<=CurrentPackTotalToPayDisparity){
             DisparityMode=true;}else{DisparityMode=false;}
 
-// The participant can apply at any time for the selling 
+// The participant can apply at any time for the selling
 // his tokens at the buyout price of the last realized (current) package.
-// Let calculate how much tokens are returned in the current package, 
+// Let calculate how much tokens are returned in the current package,
 // and how much was purchased earlier.
 
         userTotalAmtWithdrawal = usersWhoSell[msg.sender].UserTotalAmtWithdrawal;
@@ -480,17 +480,17 @@ contract MUSystem {
             returnTokenInCurrentPack = true;
             withdrawAmtToCurrentPack = usersWhoBuy[msg.sender].UserTotalAmtDepositCurrentPack.sub(userTotalAmtWithdrawalCurrentPack);
         }
-        else{ 
+        else{
             returnTokenInCurrentPack = false;
         }
         if(WithdrawAmount > 0){
             withdrawAmt = WithdrawAmount.mul(1 finney);
             if(returnTokenInCurrentPack == true){
                 UserTokensReturnToCurrentPack = withdrawAmtToCurrentPack.div(CurrentPackTokenPriceSellout);
-                if(withdrawAmt>withdrawAmtToCurrentPack){ 
+                if(withdrawAmt>withdrawAmtToCurrentPack){
                     withdrawAmtAboveCurrentPack = withdrawAmt.sub(withdrawAmtToCurrentPack);
                     UserTokensReturnAboveCurrentPack = withdrawAmtAboveCurrentPack.div(CurrentPackTokenPriceBuyout);
-                } 
+                }
                 else{
                     withdrawAmtToCurrentPack = withdrawAmt;
                     UserTokensReturnToCurrentPack = withdrawAmtToCurrentPack.div(CurrentPackTokenPriceSellout);
@@ -525,24 +525,24 @@ contract MUSystem {
                 UserTokensReturnToCurrentPack = 0;
                 UserTokensReturnAboveCurrentPack = UserTokensReturn;
                 withdrawAmtAboveCurrentPack = UserTokensReturnAboveCurrentPack.mul(CurrentPackTokenPriceBuyout);
-            }    
+            }
         }
         withdrawAmt = withdrawAmtToCurrentPack.add(withdrawAmtAboveCurrentPack);
 
-// When applying for a donation, if the remaining number 
-// of available tokens of the current package is less than 10%, 
+// When applying for a donation, if the remaining number
+// of available tokens of the current package is less than 10%,
 // participants are entitled to withdraw of 1% more than usual.
 
         if(balances[address(this)]<=(PackVolume.mul(10).div(100))){
             withdrawAmtAboveCurrentPack = withdrawAmtAboveCurrentPack.add(withdrawAmt.mul(1).div(100));
         }
 
-// With each withdrawal, the system checks the total balance 
-// and if the system is on the verge, when it can pay to each participant 
+// With each withdrawal, the system checks the total balance
+// and if the system is on the verge, when it can pay to each participant
 // 70% of his initial donation, the protection mode called "Disparity mode" is activated.
-// In disparity mode: participant who made a donation in the current package 
+// In disparity mode: participant who made a donation in the current package
 // can withdraw up to 100% of his initial donation amount,
-// participant who made a donation earlier (in previous packs) 
+// participant who made a donation earlier (in previous packs)
 // can withdraw up to 70% of his initial donation amount.
 
         if(address(this).balance<CurrentPackTotalToPayDisparity || withdrawAmt > address(this).balance || DisparityMode == true){
@@ -568,7 +568,7 @@ contract MUSystem {
         }
         withdrawAmt = withdrawAmtToCurrentPack.add(withdrawAmtAboveCurrentPack);
         UserTokensReturn = UserTokensReturnToCurrentPack.add(UserTokensReturnAboveCurrentPack);
-        require(UserTokensReturn<=balances[msg.sender]); 
+        require(UserTokensReturn<=balances[msg.sender]);
         transfer(msg.sender, address(this), UserTokensReturn);
         msg.sender.transfer(withdrawAmt);
         userTotalAmtWithdrawal = userTotalAmtWithdrawal.add(withdrawAmt);
@@ -582,14 +582,14 @@ contract MUSystem {
         return withdrawAmt;
     }
 
-// If tokens purchased in the current package are returned, 
+// If tokens purchased in the current package are returned,
 // they are again available for purchase by other participants.
-// If tokens purchased in previous packages are returned, 
+// If tokens purchased in previous packages are returned,
 // then such tokens are no longer available to anyone.
 
     function transfer(address _from, address _to, uint _value) internal returns (bool success) {
-        balances[_from] = balances[_from].sub(_value); 
-        if(_to == address(this)){ 
+        balances[_from] = balances[_from].sub(_value);
+        if(_to == address(this)){
             if(returnTokenInCurrentPack == true){
                 balances[_to] = balances[_to].add(UserTokensReturnToCurrentPack);
             }
@@ -601,9 +601,9 @@ contract MUSystem {
         else{
             balances[_to] = balances[_to].add(_value);
         }
-        emit Transfer(_from, _to, _value); 
+        emit Transfer(_from, _to, _value);
         return true;
-    }  
+    }
 
 // BalanceOf — get balance of tokens.
 
@@ -621,4 +621,65 @@ contract MUSystem {
 
     event Transfer(address indexed _from, address indexed _to, uint _value);
     event NextPack(uint indexed CurrentPackTokenPriceSellout, uint indexed CurrentPackTokenPriceBuyout);
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

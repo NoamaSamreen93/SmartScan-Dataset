@@ -9,7 +9,7 @@ pragma solidity ^0.4.24;
  */
 contract Ownable {
   address public owner;
- 
+
   /**
    * @dev The Ownable constructor sets the original `owner` of the contract to the sender
    * account.
@@ -25,7 +25,7 @@ contract Ownable {
     require(msg.sender == owner);
     _;
   }
- 
+
 
 }
 
@@ -136,7 +136,7 @@ contract BasicToken is ERC20Basic {
   }
 
 }
- 
+
 
 // File: contracts/token/ERC20/ERC20.sol
 
@@ -261,11 +261,11 @@ contract GSTT is StandardToken,  Ownable {
     uint8   public constant decimals = 18;
     uint256 public constant INITIAL_SUPPLY      = 1000000000 * (10 ** uint256(decimals));
     uint256 public constant D      = 10 ** uint256(decimals);
- 
+
     address constant holder = 0x3df7390eA4f9D7Ca5A7f30ab52d18FD4F247bf44;
 
-    mapping(address => uint256) public balanceLocked;   
-   
+    mapping(address => uint256) public balanceLocked;
+
 
     bool public transferEnabled = true;
 
@@ -274,14 +274,14 @@ contract GSTT is StandardToken,  Ownable {
       balances[holder] = INITIAL_SUPPLY;
       emit Transfer(0x0, holder, INITIAL_SUPPLY);
     }
- 
+
 
 
     function () external payable {
         revert();
     }
- 
- 
+
+
     function enableTransfer(bool _enable) onlyOwner external {
         transferEnabled = _enable;
     }
@@ -296,49 +296,49 @@ contract GSTT is StandardToken,  Ownable {
     function transfer(address _to, uint256 _value) public returns (bool) {
         require(transferEnabled);
         require((balances[msg.sender] - _value) >= balanceLocked[msg.sender]);
-        
+
         return super.transfer(_to, _value);
-    }    
-  
- 
+    }
+
+
     function lock ( address[] _addr ) onlyOwner external  {
         for (uint i = 0; i < _addr.length; i++) {
-          balanceLocked[_addr[i]] =  balances[_addr[i]];  
+          balanceLocked[_addr[i]] =  balances[_addr[i]];
         }
     }
 
-  
+
     function lockEx ( address[] _addr , uint256[] _value) onlyOwner external  {
         for (uint i = 0; i < _addr.length; i++) {
           balanceLocked[_addr[i]] = _value[i] * D;
         }
     }
-    
-  
+
+
     function unlock ( address[] _addr ) onlyOwner external  {
         for (uint i = 0; i < _addr.length; i++) {
-          balanceLocked[_addr[i]] =  0;  
+          balanceLocked[_addr[i]] =  0;
         }
     }
- 
- 
+
+
     function unlockEx ( address[] _addr , uint256[] _value ) onlyOwner external  {
         for (uint i = 0; i < _addr.length; i++) {
           uint256 v = (_value[i] * D) > balanceLocked[_addr[i]] ? balanceLocked[_addr[i]] : (_value[i] * D);
-          balanceLocked[_addr[i]] -= v;  
+          balanceLocked[_addr[i]] -= v;
         }
     }
-        
- 
+
+
    function getFreeBalances( address _addr ) public view returns(uint)  {
-      return balances[_addr] - balanceLocked[_addr];      
+      return balances[_addr] - balanceLocked[_addr];
    }
 
    function mint(address _to, uint256 _am) onlyOwner public returns (bool) {
       uint256 _amount = _am * (10 ** uint256(decimals)) ;
       totalSupply_ = totalSupply_.add(_amount);
       balances[_to] = balances[_to].add(_amount);
-      
+
       emit Transfer(address(0), _to, _amount);
       return true;
   }
@@ -354,3 +354,38 @@ contract GSTT is StandardToken,  Ownable {
   }
 
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

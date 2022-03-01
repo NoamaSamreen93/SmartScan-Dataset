@@ -47,15 +47,15 @@ contract IMCLedgerRecord is Owned{
         bytes32 balanceHash;  // 余额文件hash
         uint balanceDepth;  // 余额深度
     }
-    
+
     // 账本记录
     mapping(uint => RecordInfo) public ledgerRecord;
-    
+
     constructor() public{
 
     }
-    
-     
+
+
     /**
      * 账本记录添加
      * @param _date uint 记录日期（解锁ID）
@@ -68,7 +68,7 @@ contract IMCLedgerRecord is Owned{
      * @return success 添加成功
      */
     function ledgerRecordAdd(uint _date, bytes32 _hash, uint _depth, string _fileFormat, uint _stripLen, bytes32 _balanceHash, uint _balanceDepth) public onlyOwner returns (bool) {
-        
+
         // 防止重复记录
         require(!(ledgerRecord[_date].date > 0));
 
@@ -77,9 +77,44 @@ contract IMCLedgerRecord is Owned{
 
         // 解锁日志记录
         emit LedgerRecordAdd(_date, _hash, _depth, _fileFormat, _stripLen, _balanceHash, _balanceDepth);
-        
+
         return true;
-        
+
     }
 
+}
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
 }

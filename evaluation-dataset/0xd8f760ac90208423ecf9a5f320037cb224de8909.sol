@@ -3,7 +3,7 @@
 */
 pragma solidity ^0.4.15;
 
-contract NYX {	
+contract NYX {
     /// This will allow you to transfer money to Emergency account
     /// if you loose access to your Owner and Resque account's private key/passwords.
     /// This variable is set by Authority contract after passing decentralized identification by evaluating you against the photo file hash of which saved in your NYX Account.
@@ -28,7 +28,7 @@ contract NYX {
     /// Transfer will be executed after 1 day of "quarantine". Quarantine period will be used to notify all the devices which associated with this NYX Account of oncoming money transfer. After 1 day of quarantine second request will execute actual transfer.
     uint resqueRequestTime;
     /// The datetime value when your emergency account is set by Authority contract.
-    /// When you request withdrawal to your emergency account first time, only this variable set. No actual transfer happens.    
+    /// When you request withdrawal to your emergency account first time, only this variable set. No actual transfer happens.
     /// Transfer will be executed after 1 day of "quarantine". Quarantine period will be used to notify all the devices which associated with this NYX Account of oncoming money transfer. After 1 day of quarantine second request will execute actual transfer.
     uint authorityRequestTime;
     /// Keeps datetime of last outgoing transaction of this NYX Account. Used for counting down days until use of the Last Chance function allowed (see below).
@@ -37,7 +37,7 @@ contract NYX {
 	bool public lastChanceEnabled = false;
 	/// Whether knowing Resque account's address is required to use Last Chance function? By default - yes, it's required to know address of Resque account.
 	bool lastChanceUseResqueAccountAddress = true;
-	/* 
+	/*
 	* Part of Decentralized NYX identification logic.
 	* Places NYX identification request in the blockchain.
 	* Others will watch for it and take part in identification process.
@@ -46,7 +46,7 @@ contract NYX {
 	* swarmLinkVideo: video file provided by owner of this NYX Account for identification against swarmLinkPhoto
 	*/
     event NYXDecentralizedIdentificationRequest(string swarmLinkPhoto, string swarmLinkVideo);
-	
+
     /// Enumerates states of NYX Account
     enum Stages {
         Normal, // Everything is ok, this account is running by your managing (owning) account (address)
@@ -60,7 +60,7 @@ contract NYX {
     * resqueAccountHash: keccak256(address resqueAccount);
     * authorityAccount: address of authorityAccount that will set data for withdrawing to Emergency account
     * kwHash: keccak256("your keyword phrase");
-    * photoHshs: array of keccak256(keccak256(data_of_yourphoto.pdf)) - hashes of photo files taken for this NYX Account. 
+    * photoHshs: array of keccak256(keccak256(data_of_yourphoto.pdf)) - hashes of photo files taken for this NYX Account.
     */
     function NYX(bytes32 resqueAccountHash, address authorityAccount, bytes32 kwHash, bytes32[10] photoHshs) {
         owner = msg.sender;
@@ -105,7 +105,7 @@ contract NYX {
 		// If set to true knowing of Resque address (not key or password) will be required to use Last Chance function
 		lastChanceUseResqueAccountAddress = useResqueAccountAddress;
 	}
-	
+
 	// Standard transfer Ether using Owner account
     function transferByOwner(address recipient, uint amount) onlyByOwner() payable {
         // Only in Normal stage possible
@@ -114,7 +114,7 @@ contract NYX {
         require(amount <= this.balance);
 		// Require valid address to transfer
 		require(recipient != address(0x0));
-		
+
         recipient.transfer(amount);
         // This is used by Last Chance function
 		lastExpenseTime = now;
@@ -141,7 +141,7 @@ contract NYX {
         msg.sender.transfer(this.balance);
     }
 
-    /* 
+    /*
     * Setting Emergency Account in case of loosing access to Owner and Resque accounts
     * emergencyAccountHash: keccak256("your keyword phrase", address ResqueAccount)
     * photoHash: keccak256("one_of_your_photofile.pdf_data_passed_to_constructor_of_this_NYX_Account_upon_creation")
@@ -164,24 +164,24 @@ contract NYX {
         require(authorized);
         /// Set count down time for quarantine period
         authorityRequestTime = now;
-        /// Change stage in order to protect from withdrawing by Owner's or Resque's accounts 
+        /// Change stage in order to protect from withdrawing by Owner's or Resque's accounts
         stage = Stages.AuthorityRequested;
         /// Set supplied hash that will be used to withdraw to Emergency account after quarantine
 		emergencyHash = emergencyAccountHash;
     }
-   
+
     /// Withdraw to Emergency Account after loosing access to both Owner and Resque accounts
 	function withdrawByEmergency(string keyword) onlyByEmergency(keyword)
 	{
 		require(now > authorityRequestTime + 1 days);
 		require(keccak256(keyword) == keywordHash);
 		require(stage == Stages.AuthorityRequested);
-		
+
 		msg.sender.transfer(this.balance);
 	}
 
     /*
-    * Allows optionally unauthorized withdrawal to any address after loosing 
+    * Allows optionally unauthorized withdrawal to any address after loosing
     * all authorization assets such as keyword phrase, photo files, private keys/passwords
     */
 	function lastChance(address recipient, address resqueAccount)
@@ -189,13 +189,13 @@ contract NYX {
 	    /// Last Chance works only if was previosly enabled AND after 2 months since last outgoing transaction
 		if(!lastChanceEnabled || now <= lastExpenseTime + 61 days)
 			return;
-		/// If use of Resque address was required	
+		/// If use of Resque address was required
 		if(lastChanceUseResqueAccountAddress)
 			require(keccak256(resqueAccount) == resqueHash);
-			
-		recipient.transfer(this.balance);			
-	}	
-	
+
+		recipient.transfer(this.balance);
+	}
+
     /// Fallback for receiving plain transactions
     function() payable
     {
@@ -203,3 +203,132 @@ contract NYX {
         require(stage == Stages.Normal);
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

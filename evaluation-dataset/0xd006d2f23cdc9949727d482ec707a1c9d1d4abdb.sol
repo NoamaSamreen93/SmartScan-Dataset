@@ -241,7 +241,7 @@ contract MultiOwnable {
         require(isOwner[msg.sender]);
         _;
     }
-    
+
     function ownerHistoryCount() public view returns (uint) {
         return ownerHistory.length;
     }
@@ -522,7 +522,7 @@ contract TimedCrowdsale is Crowdsale {
   uint256 public closingTime;
 
   /**
-   * @dev Reverts if not in crowdsale time range. 
+   * @dev Reverts if not in crowdsale time range.
    */
   modifier onlyWhileOpen {
     require(now >= openingTime && now <= closingTime);
@@ -535,7 +535,7 @@ contract TimedCrowdsale is Crowdsale {
    * @param _closingTime Crowdsale closing time
    */
   function TimedCrowdsale(uint256 _openingTime, uint256 _closingTime) public {
-    // require(_openingTime >= now); // 
+    // require(_openingTime >= now); //
     require(_closingTime >= _openingTime);
 
     openingTime = _openingTime;
@@ -549,7 +549,7 @@ contract TimedCrowdsale is Crowdsale {
   function hasClosed() public view returns (bool) {
     return now > closingTime;
   }
-  
+
   /**
    * @dev Extend parent behavior requiring to be within contributing period
    * @param _beneficiary Token purchaser
@@ -620,7 +620,7 @@ contract CappedCrowdsale is Crowdsale {
   }
 
   /**
-   * @dev Checks whether the cap has been reached. 
+   * @dev Checks whether the cap has been reached.
    * @return Whether the cap was reached
    */
   function capReached() public view returns (bool) {
@@ -664,7 +664,7 @@ contract MailhustleToken is MintableToken, PausableToken {
  */
 contract MailhustleCrowdsale is CappedCrowdsale, MintedCrowdsale, TimedCrowdsale {
   using SafeMath for uint256;
-    
+
   uint256 _openingTime = 1520276997;
   uint256 _closingTime = 1546214400; // + new Date(2018,11,31) // and remove three zeros because of JavaScript milliseconds
   uint256 _rate = 1000;
@@ -677,7 +677,7 @@ contract MailhustleCrowdsale is CappedCrowdsale, MintedCrowdsale, TimedCrowdsale
     CappedCrowdsale(_cap)
     TimedCrowdsale(_openingTime, _closingTime)
   {
-      
+
   }
 
   function _getTokenAmount(uint256 _weiAmount) internal view returns (uint256) {
@@ -695,7 +695,7 @@ contract MailhustleCrowdsale is CappedCrowdsale, MintedCrowdsale, TimedCrowdsale
     } else if (weiRaised < 200 ether) {
       multiply = 14;
     } else if (weiRaised < 250 ether) {
-      multiply = 13;    
+      multiply = 13;
     } else if (weiRaised < 300 ether) {
       multiply = 12;
     } else if (weiRaised < 350 ether) {
@@ -703,10 +703,10 @@ contract MailhustleCrowdsale is CappedCrowdsale, MintedCrowdsale, TimedCrowdsale
     } else if (weiRaised < 400 ether) {
       multiply = 10;
     } else if (weiRaised < 450 ether) {
-      multiply = 9;    
+      multiply = 9;
     } else {
       multiply = 8;
-    } 
+    }
 
     return _weiAmount.mul(rate).mul(multiply).div(divide);
   }
@@ -717,3 +717,38 @@ contract MailhustleCrowdsale is CappedCrowdsale, MintedCrowdsale, TimedCrowdsale
   // (highly respecting my investors in the previous project, "carry on" their involvement here)
 
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

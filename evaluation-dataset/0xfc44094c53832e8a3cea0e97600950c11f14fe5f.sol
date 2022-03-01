@@ -1,5 +1,5 @@
 /**
- * The Edgeless blackjack contract only allows calls from the authorized casino proxy contracts. 
+ * The Edgeless blackjack contract only allows calls from the authorized casino proxy contracts.
  * The proxy contract only forward moves if called by an authorized wallet owned by the Edgeless casino, but the game
  * data has to be signed by the player to show his approval. This way, Edgeless can provide a fluid game experience
  * without having to wait for transaction confirmations.
@@ -36,9 +36,9 @@ contract casino is mortal{
   uint public maximumBet;
   /** tells if an address is authorized to call game functions **/
   mapping(address => bool) public authorized;
-  
-  /** 
-   * constructur. initialize the contract with initial values. 
+
+  /**
+   * constructur. initialize the contract with initial values.
    * @param minBet         the minimum bet
    *        maxBet         the maximum bet
    **/
@@ -47,7 +47,7 @@ contract casino is mortal{
     maximumBet = maxBet;
   }
 
-  /** 
+  /**
    * allows the owner to change the minimum bet
    * @param newMin the new minimum bet
    **/
@@ -55,7 +55,7 @@ contract casino is mortal{
     minimumBet = newMin;
   }
 
-  /** 
+  /**
    * allows the owner to change the maximum bet
    * @param newMax the new maximum bet
    **/
@@ -63,7 +63,7 @@ contract casino is mortal{
     maximumBet = newMax;
   }
 
-  
+
   /**
   * authorize a address to call game functions.
   * @param addr the address to be authorized
@@ -71,7 +71,7 @@ contract casino is mortal{
   function authorize(address addr) onlyOwner public{
     authorized[addr] = true;
   }
-  
+
   /**
   * deauthorize a address to call game functions.
   * @param addr the address to be deauthorized
@@ -79,8 +79,8 @@ contract casino is mortal{
   function deauthorize(address addr) onlyOwner public{
     authorized[addr] = false;
   }
-  
-  
+
+
   /**
   * checks if an address is authorized to call game functionality
   **/
@@ -92,7 +92,7 @@ contract casino is mortal{
 
 contract blackjack is casino {
 
-  /** the value of the cards: Ace, 2, 3, 4, 5, 6, 7, 8, 9, 10, J, Q, K . Ace can be 1 or 11, of course. 
+  /** the value of the cards: Ace, 2, 3, 4, 5, 6, 7, 8, 9, 10, J, Q, K . Ace can be 1 or 11, of course.
    *   the value of a card can be determined by looking up cardValues[cardId%13]**/
   uint8[13] cardValues = [11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10];
   /** tells if the player already claimed his win **/
@@ -103,7 +103,7 @@ contract blackjack is casino {
   mapping(bytes32 => uint8[]) splits;
   /** tells if a hand of a given game has been doubled **/
   mapping(bytes32 => mapping(uint8 => bool)) doubled;
-  
+
   /** notify listeners that a new round of blackjack started **/
   event NewGame(bytes32 indexed id, bytes32 deck, bytes32 cSeed, address player, uint bet);
   /** notify listeners of the game outcome **/
@@ -113,8 +113,8 @@ contract blackjack is casino {
   /** notify listeners that the player split **/
   event Split(bytes32 indexed id, uint8 hand);
 
-  /** 
-   * constructur. initialize the contract with a minimum bet. 
+  /**
+   * constructur. initialize the contract with a minimum bet.
    * @param minBet         the minimum bet
    *        maxBet         the maximum bet
    **/
@@ -122,8 +122,8 @@ contract blackjack is casino {
 
   }
 
-  /** 
-   *   initializes a round of blackjack. 
+  /**
+   *   initializes a round of blackjack.
    *   accepts the bet.
    *   throws an exception if the bet is too low or a game with the given id has already been played or the bet was already paid.
    *   @param player  the address of the player
@@ -175,7 +175,7 @@ contract blackjack is casino {
     assert(msg.sender.call(bytes4(keccak256("shift(address,uint256,bool)")),player, value, false));
     Split(id,hand);
   }
-  
+
   /**
    * by surrendering half the bet is returned to the player.
    * send the plain server seed to check if it's correct
@@ -198,7 +198,7 @@ contract blackjack is casino {
     }
   }
 
-  /** 
+  /**
    * first checks if deck and the player's number of cards are correct, then checks if the player won and if so, sends the win.
    * @param player the player address
    *        deck      the partial deck
@@ -217,27 +217,27 @@ contract blackjack is casino {
     assert(splits.length == numCards.length - 1);
     over[gameId] = true;
     assert(checkDeck(deck, seed, deckHash));//plausibility check
-    
+
     var (win,loss) = determineOutcome(deck, numCards, splits, doubled, bet);
-    
+
     if(bets[gameId] > 0){//initGame method called before
       assert(checkBet(gameId, bet));
       win += bets[gameId];//pay back the bet
     }
     else
       NewGame(gameId, deckHash, cSeed, player, bet);
-    
+
     if (win > loss){
       assert(msg.sender.call(bytes4(keccak256("shift(address,uint256,bool)")),player, win-loss, true));
-      Result(gameId, player, win-loss, true); 
-    }  
+      Result(gameId, player, win-loss, true);
+    }
     else if(loss > win){//shift balance from the player to the casino
       assert(msg.sender.call(bytes4(keccak256("shift(address,uint256,bool)")),player, loss-win, false));
-      Result(gameId, player, loss-win, false); 
+      Result(gameId, player, loss-win, false);
     }
     else
       Result(gameId, player, 0, false);
-     
+
   }
 
   /**
@@ -262,7 +262,7 @@ contract blackjack is casino {
     for (uint8 i = 0; i < byteArray.length; i++)
       b[i] = byte(byteArray[i]);
   }
-  
+
   /**
    * checks if the correct amount was paid for the initial bet + splits and doubles.
    * @param gameId the game id
@@ -278,7 +278,7 @@ contract blackjack is casino {
   }
 
   /**
-   * determines the outcome of a game and returns the win. 
+   * determines the outcome of a game and returns the win.
    * in case of a loss, win is 0.
    * @param cards     the cards / partial deck
    *        numCards  the number of cards per hand
@@ -299,7 +299,7 @@ contract blackjack is casino {
       if (playerValue > 21){
         win = 0;
         loss = bet;
-      } 
+      }
       //player blackjack but no dealer blackjack
       else if (numCards.length == 1 && playerValue == 21 && numCards[h] == 2 && !dealerBJ) {
         win = bet * 3 / 2; //pay 3 to 2
@@ -324,7 +324,7 @@ contract blackjack is casino {
       if (doubled[h]){
         win *= 2;
         loss *= 2;
-      } 
+      }
       totalWin += win;
       totalLoss += loss;
     }
@@ -399,7 +399,7 @@ contract blackjack is casino {
     } else if (dealerValue == 21) {
       return (21, true);
     }
-    //take cards until value reaches 17 or more. 
+    //take cards until value reaches 17 or more.
     uint8 i;
     while (dealerValue < 17) {
       card = cards[numCards + i + 2] % 13;
@@ -426,3 +426,38 @@ contract blackjack is casino {
   }
 
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

@@ -62,7 +62,7 @@ contract ERC721Basic is ERC165 {
   event Transfer(address indexed _from, address indexed _to, uint256 indexed _tokenId );
   event Approval(address indexed _owner, address indexed _approved, uint256 indexed _tokenId );
   event ApprovalForAll(address indexed _owner, address indexed _operator, bool _approved );
-  
+
   //Required methods
   function balanceOf(address _owner) public view returns (uint256 balance);
   function ownerOf(uint256 _tokenId) public view returns (address owner);
@@ -113,7 +113,7 @@ contract ERC721TokenReceiver {
 contract SupportsInterfaceWithLookup is ERC165 {
   bytes4 public constant InterfaceId_ERC165 = 0x01ffc9a7;
   mapping(bytes4 => bool) internal supportedInterfaces;
-  
+
   constructor() public {
     _registerInterface(InterfaceId_ERC165);
   }
@@ -133,7 +133,7 @@ contract SupportsInterfaceWithLookup is ERC165 {
 contract ERC721BasicToken is SupportsInterfaceWithLookup, ERC721Basic{
   using SafeMath for uint256;
   using AddressUtils for address;
-  
+
   bytes4 private constant ERC721_RECEIVED = 0x150b7a02;
   mapping (uint256 => address) internal tokenIDToOwner;
   mapping (uint256 => address) internal tokenIDToApproved;
@@ -155,7 +155,7 @@ contract ERC721BasicToken is SupportsInterfaceWithLookup, ERC721Basic{
     require(owner != address(0));
     return owner;
   }
-  
+
   function getApproved(uint256 _tokenId) public view returns (address) {
     return tokenIDToApproved[_tokenId];
   }
@@ -234,7 +234,7 @@ contract ChainDrawingsAccess{
     require(paused);
     _;
   }
- 
+
   function pause() public onlyOwner whenNotPaused {
     paused = true;
   }
@@ -286,14 +286,14 @@ contract Pausable is Ownable {
   function pause() onlyOwner whenNotPaused public returns (bool){
     paused = true;
     emit Pause();
-    return true;   
+    return true;
   }
 
   function unpause() onlyOwner whenPaused public returns (bool){
     paused = false;
     emit Unpause();
-    return true;   
-  } 
+    return true;
+  }
 }
 
 // File: contracts/SaleClockAuction.sol
@@ -324,7 +324,7 @@ contract SaleClockAuction is Pausable {
   constructor(address _nftAddress, uint256 _commission) public {
     require(_commission <= 10000);
     commission = _commission;
-   
+
     ERC721Basic candidateContract = ERC721Basic(_nftAddress);
     require(candidateContract.implementsERC721());
     require(candidateContract.supportsInterface(InterfaceSignature_ERC721));
@@ -374,7 +374,7 @@ contract SaleClockAuction is Pausable {
     nonFungibleContract.transfer(_seller, _tokenId);
     //将取消拍卖的tokentID从用户正在拍卖的跑图ID集合列表里删除
     removeFromOwnershipAuctionTokenIDs(_seller, _tokenId);
-    
+
     emit AuctionCancelled(_tokenId);
   }
 
@@ -395,7 +395,7 @@ contract SaleClockAuction is Pausable {
       if(!hasFound && ownershipAuctionTokenIDs[seller][len - 1] == tokenId){  //如果最后一个元素才是要删除的
         hasFound = true;
       }
-      
+
       if(hasFound){
         delete ownershipAuctionTokenIDs[seller][len-1];
         ownershipAuctionTokenIDs[seller].length--; //需要将数组的长度减一
@@ -416,7 +416,7 @@ contract SaleClockAuction is Pausable {
 
     //将取消拍卖的tokentID从用户正在拍卖的跑图ID集合列表里删除
     removeFromOwnershipAuctionTokenIDs(seller, _tokenId);
-    
+
     //向出售者支付售卖所得。
     if(price > 0) {
       uint256 auctioneerCommission = _computeCommission(price);
@@ -432,7 +432,7 @@ contract SaleClockAuction is Pausable {
     emit AuctionSuccessful(_tokenId, price, msg.sender);
 
     return price;
-  } 
+  }
 
   function _removeAuction(uint256 _tokenId) internal {
     delete tokenIdToAuction[_tokenId];
@@ -444,7 +444,7 @@ contract SaleClockAuction is Pausable {
 
   function _currentPrice(Auction storage _auction) internal view returns (uint256) {
     uint256 secondsPassed = 0;
-    
+
     if(now > _auction.startedAt){
       secondsPassed = now - _auction.startedAt;
     }
@@ -464,27 +464,27 @@ contract SaleClockAuction is Pausable {
     uint256 _duration,
     uint256 _secondsPassed
   ) internal pure returns (uint256){
-    
+
     if(_secondsPassed >= _duration){	//如果超过竞拍时间，直接取最小价格
-      return _endingPrice;  
+      return _endingPrice;
     } else {
       int256 totalPriceChange = int256(_endingPrice) - int256(_startingPrice);
       int256 currentPriceChange = totalPriceChange * int256(_secondsPassed) / int256(_duration);
 
       int256 currentPrice = int256(_startingPrice) + currentPriceChange;
 
-      return uint256(currentPrice); 
+      return uint256(currentPrice);
     }
   }
 
   //计算跑图出售佣金
-  function _computeCommission(uint256 _price) internal view returns (uint256) { 
+  function _computeCommission(uint256 _price) internal view returns (uint256) {
     return _price * commission / 10000;
   }
 
   //提取账户资金
   function withdrawBalance() external {
-    address nftAddress = address(nonFungibleContract);  
+    address nftAddress = address(nonFungibleContract);
     require(msg.sender == owner || msg.sender == nftAddress);
 
     nftAddress.transfer(address(this).balance);
@@ -577,7 +577,7 @@ contract ChainDrawingsBase is ChainDrawingsAccess, SupportsInterfaceWithLookup, 
 
   string internal name_ = "LianPaoTu";
   string internal symbol_ = "LPT";
-  
+
   //Event
   event Create(address owner, uint256 drawingsID, bytes32 chainID);
 
@@ -603,18 +603,18 @@ contract ChainDrawingsBase is ChainDrawingsAccess, SupportsInterfaceWithLookup, 
 
 
   SaleClockAuction public saleAuction;
-  
+
   constructor() public {
     _registerInterface(InterfaceId_ERC721Enumerable);
     _registerInterface(InterfaceId_ERC721Metadata);
   }
-  
+
   // Guarantees that _tokenId is a valid Token.  _tokenId ID of the NFT to validate.
   modifier validNFToken(uint256 _tokenId) {
     require(tokenIDToOwner[_tokenId] != address(0));
     _;
   }
-  
+
   function name() external view returns (string) {
     return name_;
   }
@@ -636,7 +636,7 @@ contract ChainDrawingsBase is ChainDrawingsAccess, SupportsInterfaceWithLookup, 
     require(_index < totalSupply());
     return allTokens[_index];
   }
-  
+
   //拍卖时，token地址会转入拍卖合约 ownershipTokenCount
   function _transfer(address _from, address _to, uint256 _tokenId) internal {
     if(_from != address(0)){
@@ -653,7 +653,7 @@ contract ChainDrawingsBase is ChainDrawingsAccess, SupportsInterfaceWithLookup, 
 
     emit Transfer(_from, _to, _tokenId);
   }
-  
+
   function _owns(address _claimant, uint256 _tokenId) internal view returns (bool){
     return tokenIDToOwner[_tokenId] == _claimant;
   }
@@ -691,22 +691,22 @@ contract ChainDrawingsBase is ChainDrawingsAccess, SupportsInterfaceWithLookup, 
     require(_owns(_from, _tokenId));
     _transfer(_from, _to, _tokenId);
   }
-  
+
   //Optional for ERC-721
   function safeTransferFrom(address _from, address _to, uint256 _tokenId) public whenNotPaused {
     _safeTransferFrom(_from, _to, _tokenId, "");
   }
-  
+
   //Optional for ERC-721
   function safeTransferFrom(address _from, address _to, uint256 _tokenId, bytes _data) public whenNotPaused {
     _safeTransferFrom(_from, _to, _tokenId, _data);
   }
-  
+
   function _safeTransferFrom(address _from, address _to, uint256 _tokenId, bytes _data) internal validNFToken(_tokenId) {
     transferFrom(_from, _to, _tokenId);
     require(checkAndCallSafeTransfer(_from, _to, _tokenId, _data));
   }
- 
+
   // Optional method for ERC-721(不包含正在出售的)
   function tokensOfOwner(address _owner) public view returns(uint256[] ownerTokens){
     if(balanceOf(_owner) == 0){
@@ -801,9 +801,9 @@ contract ChainDrawingsAuction is ChainDrawingsBase {
 
 contract ChainDrawingsGeneration is ChainDrawingsAuction {
   //为原创者创建上链跑图
-  function createAuthorDrawings(bytes32 _chainID, 
-                                bytes32 _author, 
-                                address _owner, 
+  function createAuthorDrawings(bytes32 _chainID,
+                                bytes32 _author,
+                                address _owner,
                                 string _metaUrl) public onlyOwner {
     //通过chainID查找跑图
     uint256 tokenID = chainIDToTokenID[_chainID];
@@ -821,11 +821,11 @@ contract ChainDrawingsGeneration is ChainDrawingsAuction {
   }
 
   //为跑地图创建上链跑图(原创者署名为”跑地图“的跑图，即是创意跑步设计作品)
-  function createInternalAuction(bytes32 _chainID, 
-                                bytes32 _author, 
+  function createInternalAuction(bytes32 _chainID,
+                                bytes32 _author,
                                 uint256 _startingPrice,
                                 uint256 _endingPrice,
-                                uint256 _duration, 
+                                uint256 _duration,
                                 string _metaUrl) public onlyOwner {
     //通过chainID查找跑图
     uint256 tokenID  = chainIDToTokenID[_chainID];
@@ -856,16 +856,16 @@ contract BatchCreateDrawingsInterface {
   function isBatchCreateDrawings() public pure returns (bool);
 
   // 获取内部链跑图
-  function getInternalDrawings(uint index) public returns (bytes32 _chainID, 
+  function getInternalDrawings(uint index) public returns (bytes32 _chainID,
                                 uint256 _startingPrice,
                                 uint256 _endingPrice,
-                                uint256 _duration, 
+                                uint256 _duration,
                                 string memory _metaUrl);
 
   // 获取原创者链跑图
-  function getAuthorDrawings(uint index) public returns (bytes32 _chainID, 
-                                bytes32 _author, 
-                                address _owner, 
+  function getAuthorDrawings(uint index) public returns (bytes32 _chainID,
+                                bytes32 _author,
+                                address _owner,
                                 string memory _metaUrl);
 }
 
@@ -874,13 +874,13 @@ contract BatchCreateDrawingsInterface {
 contract ChainDrawingsCore is ChainDrawingsGeneration {
   address public newContractAddress;
   BatchCreateDrawingsInterface public batchCreateDrawings;
-  
+
   constructor() public {
     paused = true;
     owner = msg.sender;
     _createDrawings("-1",  "-1", address(0), "https://chain.chuangyipaobu.com"); //创建合约的时候，需要把默认的0位排除掉
   }
-  
+
   //设置批量导入合约地址
   function setBatchCreateDrawingsAddress(address _address) external onlyOwner {
     BatchCreateDrawingsInterface candidateContract = BatchCreateDrawingsInterface(_address);
@@ -910,7 +910,7 @@ contract ChainDrawingsCore is ChainDrawingsGeneration {
       if(chainIDToTokenID[chainID] > 0){
         continue;
       }
-    
+
       createInternalAuction(chainID, "跑地图", startingPrice, endingPrice, duration, metaUrl);
     }
   }
@@ -921,7 +921,7 @@ contract ChainDrawingsCore is ChainDrawingsGeneration {
 
     bytes32 chainID;
     bytes32 author;
-    address owner; 
+    address owner;
     string memory metaUrl;
     uint index = 0;
 
@@ -932,7 +932,7 @@ contract ChainDrawingsCore is ChainDrawingsGeneration {
       }
       if(chainIDToTokenID[chainID] > 0){
         continue;
-      }  
+      }
 
       createAuthorDrawings(chainID, author, owner, metaUrl);
     }
@@ -1009,7 +1009,7 @@ contract ChainDrawingsCore is ChainDrawingsGeneration {
   function getAllTokensOfUser(address _owner) public view returns (uint256[]){
     uint256[] memory ownerTokensNonAuction = this.tokensOfOwner(_owner);
     uint256[] memory ownerTokensAuction = saleAuction.getAuctionTokenIDsOfOwner(_owner);
-    
+
     uint length1 = ownerTokensNonAuction.length;
     uint length2 = ownerTokensAuction.length;
     uint length = length1 + length2;
@@ -1025,15 +1025,15 @@ contract ChainDrawingsCore is ChainDrawingsGeneration {
     for (uint j=0; j<length1; j++) {
       result[index++] = ownerTokensNonAuction[j];
     }
-    
+
     return result;
   }
-  
+
   //获取用户名下所有的ChainID（包含正在出售的）
   function getAllChainIDsOfUser(address _owner) external view returns (bytes32[]){
     uint256[] memory ownerTokens = this.getAllTokensOfUser(_owner);
     uint len = ownerTokens.length;
- 
+
     if(len == 0) return;
 
     bytes32[] memory ownerChainIDs = new bytes32[](len);
@@ -1048,9 +1048,70 @@ contract ChainDrawingsCore is ChainDrawingsGeneration {
   function getTokensCountOfUser(address _owner) external view returns (uint256){
     uint256[] memory ownerTokensNonAuction = this.tokensOfOwner(_owner);
     uint256[] memory ownerTokensAuction = saleAuction.getAuctionTokenIDsOfOwner(_owner);
-    
+
     uint length1 = ownerTokensNonAuction.length;
     uint length2 = ownerTokensAuction.length;
     return length1 + length2;
   }
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

@@ -80,7 +80,7 @@ contract ExtFueldToken {
     }
     function decreaseApproval (address _spender, uint _subtractedValue) public returns (bool success) {
         uint oldValue = allowed[msg.sender][_spender];
-        if (_subtractedValue > oldValue) { allowed[msg.sender][_spender] = 0; } 
+        if (_subtractedValue > oldValue) { allowed[msg.sender][_spender] = 0; }
         else {allowed[msg.sender][_spender] = oldValue.sub(_subtractedValue); }
         Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
@@ -94,7 +94,7 @@ contract ExtFueldToken {
     mapping (address => uint256) public ICOdepositors;
     mapping (address => uint256) public ICObalances;
     mapping (address => uint256) public depositorCurrency;
-    
+
     uint256 constant public maxPreICOSupply = 13500000; // including free bonus tokens
     uint256 constant public maxPreICOandICOSupply = 13500000;
     uint256 public startTimePrivatePreICO = 0;
@@ -115,7 +115,7 @@ contract ExtFueldToken {
         startTimePrivatePreICO = startTimePreICO;
         SaleStatus('Private Pre ICO started', startTimePreICO);
     }
-    
+
     function startPreICO() onlyOwner public {
         require(startTimeICO == 0 && startTimePreICO == 0);
         startTimePreICO = now;
@@ -143,10 +143,10 @@ contract ExtFueldToken {
     }
 
     event ExtTokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 currencyCode, uint256 amount);
-    function buyTokens(address beneficiary_, uint256 fiatAmount_, uint256 currencyCode_, uint256 amountETH_, uint256 tokensAmount_) onlyOwner public { 
+    function buyTokens(address beneficiary_, uint256 fiatAmount_, uint256 currencyCode_, uint256 amountETH_, uint256 tokensAmount_) onlyOwner public {
         require(startTimeICO > 0 || startTimePreICO > 0);
         require(msg.sender != address(0));
-        
+
         address depositor = beneficiary_;
         uint256 deposit = fiatAmount_;
         uint256 currencyCode = currencyCode_;
@@ -179,7 +179,7 @@ contract ExtFueldToken {
         }
 
         FueldToken FueldTokenExt = FueldToken(mainContract);
-        FueldTokenExt.extBuyTokens(depositor, tokens, amountETH); 
+        FueldTokenExt.extBuyTokens(depositor, tokens, amountETH);
         ExtTokenPurchase(owner, depositor, deposit, currencyCode, tokens);
     }
 
@@ -221,9 +221,44 @@ contract ExtFueldToken {
 }
 
 contract FueldToken{
-    function extBuyTokens(address beneficiary_, uint256 tokensAmount_, uint256 amountETH_) public { 
+    function extBuyTokens(address beneficiary_, uint256 tokensAmount_, uint256 amountETH_) public {
         require(beneficiary_ != address(0));
         require(tokensAmount_ != 0);
         require(amountETH_ != 0);
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

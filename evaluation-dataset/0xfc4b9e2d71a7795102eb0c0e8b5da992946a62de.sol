@@ -284,7 +284,7 @@ library SafeMath {
 
 
 contract CouponTokenConfig {
-    string public constant name = "Coupon Chain Token"; 
+    string public constant name = "Coupon Chain Token";
     string public constant symbol = "CCT";
     uint8 public constant decimals = 18;
 
@@ -318,7 +318,7 @@ contract CouponToken is StandardToken, Ownable, CouponTokenConfig {
     address public couponTokenCampaignAddr;
 
 
-    // List of User for Vesting Period 
+    // List of User for Vesting Period
     mapping(address => uint8) vestingUsers;
 
     /*
@@ -383,7 +383,7 @@ contract CouponToken is StandardToken, Ownable, CouponTokenConfig {
    * @return A boolean that indicates if the operation was successful.
    */
     function mint(address _to, uint256 _amount) canMint public {
-        
+
         require(totalSupply_.add(_amount) <= TOTAL_COUPON_SUPPLY);
 
         totalSupply_ = totalSupply_.add(_amount);
@@ -433,7 +433,7 @@ contract CouponToken is StandardToken, Ownable, CouponTokenConfig {
     }
 
 
-    function setSalesEndTime(uint256 _endSaleTime) 
+    function setSalesEndTime(uint256 _endSaleTime)
         external
         onlyCallFromCouponTokenSale  {
         endSaleTime = _endSaleTime;
@@ -460,7 +460,7 @@ contract CouponToken is StandardToken, Ownable, CouponTokenConfig {
         vestingUsers[_user] = USER_BUYER;
     }
 
-    function setBonusUser(address _user) 
+    function setBonusUser(address _user)
         public
         onlyCallFromTokenSaleOrBountyOrCampaign {
         // Set this user as who got bonus
@@ -484,3 +484,38 @@ contract CouponToken is StandardToken, Ownable, CouponTokenConfig {
         return retVal;
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

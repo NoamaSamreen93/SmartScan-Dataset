@@ -52,7 +52,7 @@ contract ERC20TokenInterface {
 }
 
 contract Crowdsale is ReentrancyHandlingContract, Owned {
-    
+
     enum state { pendingStart, crowdsale, crowdsaleEnded }
     struct ContributorData {
         uint contributionAmount;
@@ -67,10 +67,10 @@ contract Crowdsale is ReentrancyHandlingContract, Owned {
     mapping (address => uint) public verifiedAddresses;
     mapping(uint => Tier) public tierList;
     uint public nextFreeTier = 1;
-    
+
 
     state public crowdsaleState = state.pendingStart;
-    
+
     address public multisigAddress;
 
     uint public crowdsaleStartBlock;
@@ -96,7 +96,7 @@ contract Crowdsale is ReentrancyHandlingContract, Owned {
     function() noReentrancy payable public {
         require(crowdsaleState != state.crowdsaleEnded);
         require(isAddressVerified(msg.sender));
-        
+
         bool stateChanged = checkCrowdsaleState();
 
         if (crowdsaleState == state.crowdsale) {
@@ -136,22 +136,22 @@ contract Crowdsale is ReentrancyHandlingContract, Owned {
             revert();
         }
     }
-    
+
     function setEthToTokenConversion(uint _ratio) onlyOwner public {
         require(crowdsaleState == state.pendingStart);
         ethToTokenConversion = _ratio;
     }
-    
+
     function setMaxCap(uint _maxCap) onlyOwner public {
         require(crowdsaleState == state.pendingStart);
         maxCap = _maxCap;
     }
-    
+
     function calculateEthToToken(uint _eth, uint _bonus) constant public returns(uint) {
         uint bonusTokens;
         if (_bonus != 0) {
             bonusTokens = ((_eth * ethToTokenConversion) * _bonus) / 100;
-        } 
+        }
         return (_eth * ethToTokenConversion) + bonusTokens;
     }
 
@@ -171,7 +171,7 @@ contract Crowdsale is ReentrancyHandlingContract, Owned {
         uint minContribution;
         uint maxContribution;
         uint bonus;
-        (contributorTier, minContribution, maxContribution, bonus) = getContributorData(_contributor); 
+        (contributorTier, minContribution, maxContribution, bonus) = getContributorData(_contributor);
 
         if (block.number >= crowdsaleStartBlock && block.number < crowdsaleStartBlock + blocksInADay){
             require(_amount >= minContribution);
@@ -240,7 +240,7 @@ contract Crowdsale is ReentrancyHandlingContract, Owned {
         }
         if (returnAmount != 0) {
             _contributor.transfer(returnAmount);
-        } 
+        }
     }
 
     function salvageTokensFromContract(address _tokenAddress, address _to, uint _amount) onlyOwner public {
@@ -267,7 +267,7 @@ contract Crowdsale is ReentrancyHandlingContract, Owned {
         require(crowdsaleState == state.pendingStart);
         crowdsaleEndedBlock = _block;
     }
-    
+
     function isAddressVerified(address _address) public view returns (bool) {
         if (verifiedAddresses[_address] == 0){
             return false;
@@ -280,19 +280,19 @@ contract Crowdsale is ReentrancyHandlingContract, Owned {
         uint contributorTier = verifiedAddresses[_contributor];
         return (contributorTier, tierList[contributorTier].minContribution, tierList[contributorTier].maxContribution, tierList[contributorTier].bonus);
     }
-    
+
     function addAddress(address _newAddress, uint _tier) public onlyOwner {
         require(verifiedAddresses[_newAddress] == 0);
-        
+
         verifiedAddresses[_newAddress] = _tier;
     }
-    
+
     function removeAddress(address _oldAddress) public onlyOwner {
         require(verifiedAddresses[_oldAddress] != 0);
-        
+
         verifiedAddresses[_oldAddress] = 0;
     }
-    
+
     function batchAddAddresses(address[] _addresses, uint[] _tiers) public onlyOwner {
         require(_addresses.length == _tiers.length);
         for (uint cnt = 0; cnt < _addresses.length; cnt++) {
@@ -303,7 +303,7 @@ contract Crowdsale is ReentrancyHandlingContract, Owned {
 }
 
 contract MoneyRebelCrowdsaleContract is Crowdsale {
-  
+
     constructor() public {
 
         crowdsaleStartBlock = 5578000;
@@ -317,14 +317,49 @@ contract MoneyRebelCrowdsaleContract is Crowdsale {
         blocksInADay = 5760;
 
         multisigAddress = 0x352C30f3092556CD42fE39cbCF585f33CE1C20bc;
- 
+
         tierList[1] = Tier(2*10**17,35*10**18,10, true);
         tierList[2] = Tier(2*10**17,35*10**18,10, true);
         tierList[3] = Tier(2*10**17,25*10**18,0, true);
         tierList[4] = Tier(2*10**17,100000*10**18,0, true);
         tierList[5] = Tier(2*10**17,100000*10**18,8, true);
-        tierList[6] = Tier(2*10**17,100000*10**18,10, true); 
+        tierList[6] = Tier(2*10**17,100000*10**18,10, true);
         tierList[7] = Tier(2*10**17,100000*10**18,12, true);
         tierList[8] = Tier(2*10**17,100000*10**18,15, true);
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

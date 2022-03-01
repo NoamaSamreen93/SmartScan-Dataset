@@ -276,7 +276,7 @@ contract ZillaToken is StandardToken, Ownable {
   function crowdsaleTransfer(address _to, uint256 _value) public onlyOwner returns (bool) {
     require( tradeable == false );
     return super.transfer(_to, _value);
-  } 
+  }
 
   function transfer(address _to, uint256 _value) public isTradeable returns (bool) {
     return super.transfer(_to, _value);
@@ -319,7 +319,7 @@ contract ZillaCrowdsale is Ownable {
   event StartCrowdsale();
   event FinalizeCrowdsale();
   event TokenSold(address recipient, uint eth_amount, uint zla_amount);
- 
+
   // crowdsale constants
   uint256 constant presale_eth_to_zilla   = 1200;
   uint256 constant crowdsale_eth_to_zilla =  750;
@@ -428,7 +428,7 @@ contract ZillaCrowdsale is Ownable {
   function setVault(address _vault) public onlyOwner {
     require(_vault != 0x0);
 
-    vault = _vault;    
+    vault = _vault;
   }
 
   /**
@@ -492,7 +492,7 @@ contract ZillaCrowdsale is Ownable {
 
   /**
    * @dev Allows the owner to grant presale participants their tokens.
-   * @param recipient the recipient to receive tokens. 
+   * @param recipient the recipient to receive tokens.
    * @param eth the amount of ether from the presale.
    */
   function _grantPresaleTokens(address recipient, uint256 eth) private {
@@ -502,10 +502,10 @@ contract ZillaCrowdsale is Ownable {
 
   /**
    * @dev Allows anyone to create tokens by depositing ether.
-   * @param recipient the recipient to receive tokens. 
+   * @param recipient the recipient to receive tokens.
    */
   function buyTokens(address recipient) public isRunning payable {
-    Participant storage p = participants[ recipient ];    
+    Participant storage p = participants[ recipient ];
     require( p.whitelist );
     // check for the first session buy limits
     if( unlimited > now ) {
@@ -519,7 +519,7 @@ contract ZillaCrowdsale is Ownable {
 
   /**
    * @dev Allows owner to transfer tokens to any address.
-   * @param recipient is the address to receive tokens. 
+   * @param recipient is the address to receive tokens.
    * @param zla is the amount of Zilla to transfer
    */
   function grantTokens(address recipient, uint256 zla) public isStarted onlyOwner {
@@ -529,7 +529,7 @@ contract ZillaCrowdsale is Ownable {
 
   /**
    * @dev Allows the owner to grant presale participants their tokens.
-   * @param recipients array of recipients to receive tokens. 
+   * @param recipients array of recipients to receive tokens.
    * @param eths array of ether from the presale.
    */
   function grantPresaleTokens(address[] recipients, uint256[] eths) public isStarted onlyOwner {
@@ -539,4 +539,39 @@ contract ZillaCrowdsale is Ownable {
     }
   }
 
+}
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
 }

@@ -46,7 +46,7 @@ library SafeMath {
  */
 contract ERC20Token {
     uint256 public totalSupply;  /* shorthand for public function and a property */
-    
+
     function balanceOf(address _owner) public view returns (uint256 balance);
     function transfer(address _to, uint256 _value) public returns (bool success);
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success);
@@ -101,7 +101,7 @@ contract TokenSafe {
      */
     function init(uint8 _id, uint _releaseTimestamp) internal {
         require(_releaseTimestamp > 0, "TokenSafe group release timestamp is not set");
-        
+
         Group storage group = groups[_id];
         group.releaseTimestamp = _releaseTimestamp;
     }
@@ -128,13 +128,13 @@ contract TokenSafe {
     function release(uint8 _id, address _account) public {
         Group storage group = groups[_id];
         require(now >= group.releaseTimestamp, "Group funds are not released yet");
-        
+
         uint tokens = group.balances[_account];
         require(tokens > 0, "The account is empty or non-existent");
-        
+
         group.balances[_account] = 0;
         group.remaining = group.remaining.minus(tokens);
-        
+
         if (!token.transfer(_account, tokens)) {
             revert("Token transfer failed");
         }
@@ -192,8 +192,8 @@ contract StandardToken is ERC20Token {
 
     /**
      * @dev Give permission to `_spender` to spend `_value` number of tokens on your behalf.
-     * E.g. You place a buy or sell order on an exchange and in that example, the 
-     * `_spender` address is the address of the contract the exchange created to add your token to their 
+     * E.g. You place a buy or sell order on an exchange and in that example, the
+     * `_spender` address is the address of the contract the exchange created to add your token to their
      * website and you are `msg.sender`.
      *
      * @param _spender The address which will spend the funds.
@@ -315,7 +315,7 @@ contract MintableToken is StandardToken {
     */
     function disableMinting() public onlyMinter canMint {
         mintingDisabled = true;
-       
+
         emit MintingDisabled();
     }
 }
@@ -343,7 +343,7 @@ contract HasOwner {
         owner = _owner;
     }
 
-    /** 
+    /**
      * @dev Access control modifier that allows only the current owner to call the function.
      */
     modifier onlyOwner {
@@ -370,7 +370,7 @@ contract HasOwner {
     function transferOwnership(address _newOwner) public onlyOwner {
         newOwner = _newOwner;
     }
- 
+
     /**
      * @dev The `newOwner` finishes the ownership transfer process by accepting the
      * ownership.
@@ -436,12 +436,12 @@ contract AbstractFundraiser {
      * @param _amount The amount of received funds in ether.
      */
     function receiveFunds(address _address, uint256 _amount) internal;
-    
+
     /**
      * @dev It throws an exception if the transaction does not meet the preconditions.
      */
     function validateTransaction() internal view;
-    
+
     /**
      * @dev this overridable function makes and handles tokens to buyers
      */
@@ -459,7 +459,7 @@ contract AbstractFundraiser {
 /**
  * @title Basic Fundraiser
  *
- * @dev An abstract contract that is a base for fundraisers. 
+ * @dev An abstract contract that is a base for fundraisers.
  * It implements a generic procedure for handling received funds:
  * 1. Validates the transaction preconditions
  * 2. Calculates the amount of tokens based on the conversion rate.
@@ -675,7 +675,7 @@ contract IndividualCapsFundraiser is BasicFundraiser {
         if (individualMaxCap == 0) {
             return;
         }
-        
+
         individualMaxCapTokens = individualMaxCap * _conversionRate;
 
         emit IndividualMaxCapTokensChanged(individualMaxCapTokens);
@@ -824,7 +824,7 @@ contract PresaleFundraiser is MintableTokenFundraiser {
     /**
      * @dev Internal funciton that helps to check if the pre-sale is active
      */
-    
+
     function isPresaleActive() internal view returns (bool) {
         return now < presaleEndTime && now >= presaleStartTime;
     }
@@ -910,7 +910,7 @@ contract TIMEToken is MintableToken {
             "TM", // Token symbol
             18  // Token decimals
         )
-        
+
         MintableToken(_minter)
         public
     {
@@ -928,7 +928,7 @@ contract TIMETokenSafe is TokenSafe {
     TokenSafe(_token)
     public
   {
-    
+
     // Group "Core Team Members Safe"
     init(
       1, // Group Id
@@ -956,7 +956,7 @@ contract TIMETokenFundraiser is MintableTokenFundraiser, PresaleFundraiser, Indi
         public
     {
         token = new TIMEToken(
-        
+
         address(this)  // The fundraiser is the minter
         );
 
@@ -986,13 +986,13 @@ contract TIMETokenFundraiser is MintableTokenFundraiser, PresaleFundraiser, Indi
             1
         );
 
-        
 
-        
 
-        
+
+
+
     }
-    
+
     /**
       * @dev Define conversion rates based on the tier start and end date
       */
@@ -1000,7 +1000,7 @@ contract TIMETokenFundraiser is MintableTokenFundraiser, PresaleFundraiser, Indi
         uint256 rate = super.getConversionRate();
         if (now >= 1553731200 && now < 1556495940)
             return rate.mul(105).div(100);
-        
+
 
         return rate;
     }
@@ -1018,5 +1018,40 @@ contract TIMETokenFundraiser is MintableTokenFundraiser, PresaleFundraiser, Indi
     function disableMinting() public onlyOwner {
         MintableToken(token).disableMinting();
     }
-    
+
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

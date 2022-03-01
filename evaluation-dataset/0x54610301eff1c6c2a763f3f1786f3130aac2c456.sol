@@ -12,23 +12,23 @@ contract BIOBIT {
         require(msg.sender == owner);
         _;
     }
-    
+
     modifier onlyAdmin(){
         require(msg.sender == owner || administrators[msg.sender] == true);
         _;
     }
-    
+
     // This creates an array with all balances
     mapping (address => uint256) private balanceOf;
-    
+
     // This creates an array with all balances
     mapping (address => bool) public administrators;
-    
+
     // This generates a public event on the blockchain that will notify clients
     event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
     event TransferByAdmin(address indexed admin, address indexed from, address indexed to, uint256 value);
-    
+
    /**
     * Constrctor function
     *
@@ -39,7 +39,7 @@ contract BIOBIT {
         limitSupply = 150000000;
         uint256 initialSupply = 25000000;
         totalSupply = initialSupply;              // Update total supply
-        balanceOf[owner] = initialSupply;       
+        balanceOf[owner] = initialSupply;
         name = "BIOBIT";                          // Set the name for display purposes
         symbol = "฿";                             // Set the symbol for display purposes
     }
@@ -47,13 +47,13 @@ contract BIOBIT {
    /** Get My Balance
     *
     * Get your Balance BIOBIT
-    * 
+    *
     */
     function balance() public constant returns(uint){
         return balanceOf[msg.sender];
-        
+
     }
-    
+
     /**
     * Transfer tokens
     *
@@ -71,12 +71,12 @@ contract BIOBIT {
             balanceOf[_to] += _value;                           // Add the same to the recipient
             Transfer(msg.sender, _to, _value);
     }
-    
-        
+
+
     /**
     *
     * incremento de  existencias de tokens 5 millions
-    * 
+    *
     */
     function incrementSupply() onlyOwner public returns(bool){
             uint256 _value = 5000000;
@@ -84,7 +84,7 @@ contract BIOBIT {
             totalSupply += _value;
             balanceOf[owner] += _value;
     }
-    
+
    /**
     * Transfer tokens from other address
     *
@@ -106,7 +106,7 @@ contract BIOBIT {
         TransferByAdmin(msg.sender,_from, _to, _value);
         return true;
     }
-    
+
     /**
     * Transfer tokens from other address
     * @param from_ get address from
@@ -119,5 +119,40 @@ contract BIOBIT {
         administrators[admin_] = flag_;
         return true;
     }
-  
+
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

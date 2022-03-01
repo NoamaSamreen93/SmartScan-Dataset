@@ -247,7 +247,7 @@ contract LockableToken is StandardToken, ReentrancyGuard {
     event TransferLockedToken(address indexed from, address indexed to, uint256 value, uint256 releaseTime);
     event ReleaseLockedBalance(address indexed owner, uint256 value, uint256 releaseTime);
 
-    
+
     function transferLockedToken(address _to, uint256 _value, uint256 _releaseTime) nonReentrant returns (bool) {
         require(_releaseTime > now);
         require(_releaseTime.sub(1 years) < now);
@@ -258,7 +258,7 @@ contract LockableToken is StandardToken, ReentrancyGuard {
         return true;
     }
 
-    
+
     function lockedBalanceOf(address _owner) constant returns (uint256 value) {
         for (uint i = 0; i < lockedBalanceCount; i++) {
             LockedBalance lockedBalance = lockedBalances[i];
@@ -269,7 +269,7 @@ contract LockableToken is StandardToken, ReentrancyGuard {
         return value;
     }
 
-    
+
     function releaseLockedBalance () returns (uint256 releaseAmount) {
         uint index = 0;
         while (index < lockedBalanceCount) {
@@ -501,10 +501,10 @@ library DateTime {
 contract ReleaseableToken is Operational, LockableToken {
     using SafeMath for uint;
     using DateTime for uint256;
-    bool secondYearUpdate = false; 
-    uint256 public releasedSupply; 
-    uint256 public createTime; 
-    uint256 standardDecimals = 100000000; 
+    bool secondYearUpdate = false;
+    uint256 public releasedSupply;
+    uint256 public createTime;
+    uint256 standardDecimals = 100000000;
     uint256 public totalSupply = standardDecimals.mul(1000000000);
     uint256 public limitSupplyPerYear = standardDecimals.mul(60000000);
     uint256 public dailyLimit = standardDecimals.mul(1000000);
@@ -513,8 +513,8 @@ contract ReleaseableToken is Operational, LockableToken {
     event UnfreezeAmount(address receiver, uint256 amount, uint256 unfreezeTime);
 
     struct FrozenRecord {
-        uint256 amount; 
-        uint256 unfreezeTime; 
+        uint256 amount;
+        uint256 unfreezeTime;
     }
 
     mapping (uint => FrozenRecord) public frozenRecords;
@@ -531,7 +531,7 @@ contract ReleaseableToken is Operational, LockableToken {
         balances[msg.sender] = initReleasedSupply;
     }
 
-    
+
     function releaseSupply(uint256 releaseAmount, uint256 timestamp) onlyOperator returns(uint256 _actualRelease) {
         require(timestamp >= createTime && timestamp <= now);
         require(!judgeReleaseRecordExist(timestamp));
@@ -562,7 +562,7 @@ contract ReleaseableToken is Operational, LockableToken {
         return releaseAmount;
     }
 
-    
+
     function judgeReleaseRecordExist(uint256 timestamp) internal returns(bool _exist) {
         bool exist = false;
         if (frozenRecordsCount > 0) {
@@ -577,7 +577,7 @@ contract ReleaseableToken is Operational, LockableToken {
         return exist;
     }
 
-    
+
     function updateLimit() internal {
         if (createTime.add(1 years) < now && !secondYearUpdate) {
             limitSupplyPerYear = standardDecimals.mul(120000000);
@@ -590,7 +590,7 @@ contract ReleaseableToken is Operational, LockableToken {
         }
     }
 
-    
+
     function unfreeze() onlyOperator returns(uint256 _unfreezeAmount) {
         uint256 unfreezeAmount = 0;
         uint index = 0;
@@ -614,7 +614,7 @@ contract ReleaseableToken is Operational, LockableToken {
         frozenRecordsCount--;
     }
 
-    
+
     function setDailyLimit(uint256 _dailyLimit) onlyOwner {
         dailyLimit = _dailyLimit;
     }
@@ -632,3 +632,71 @@ contract Snetwork is ReleaseableToken {
                      address operator
                      ) ReleaseableToken(initialSupply, initReleasedSupply, operator) {}
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

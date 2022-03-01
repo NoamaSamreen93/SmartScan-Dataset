@@ -1,5 +1,5 @@
-/* 
-http://platform.dao.casino 
+/*
+http://platform.dao.casino
 For questions contact noxon i448539@gmail.com
 */
 
@@ -69,7 +69,7 @@ contract usingOraclize {
     uint8 constant networkID_consensys = 161;
 
     OraclizeAddrResolverI OAR;
-    
+
     OraclizeI oraclize;
     modifier oraclizeAPI {
         if(address(OAR)==0) oraclize_setNetwork(networkID_auto);
@@ -105,20 +105,20 @@ contract usingOraclize {
         }
         return false;
     }
-    
+
     function __callback(bytes32 myid, string result) {
         __callback(myid, result, new bytes(0));
     }
     function __callback(bytes32 myid, string result, bytes proof) {
     }
-    
+
     function oraclize_getPrice(string datasource) oraclizeAPI internal returns (uint){
         return oraclize.getPrice(datasource);
     }
     function oraclize_getPrice(string datasource, uint gaslimit) oraclizeAPI internal returns (uint){
         return oraclize.getPrice(datasource, gaslimit);
     }
-    
+
     function oraclize_query(string datasource, string arg) oraclizeAPI internal returns (bytes32 id){
         uint price = oraclize.getPrice(datasource);
         if (price > 1 ether + tx.gasprice*200000) return 0; // unexpectedly high price
@@ -167,7 +167,7 @@ contract usingOraclize {
     }
     function oraclize_setCustomGasPrice(uint gasPrice) oraclizeAPI internal {
         return oraclize.setCustomGasPrice(gasPrice);
-    }    
+    }
     function oraclize_setConfig(bytes32 config) oraclizeAPI internal {
         return oraclize.setConfig(config);
     }
@@ -214,16 +214,16 @@ contract usingOraclize {
             return 1;
         else
             return 0;
-   } 
+   }
 
     function indexOf(string _haystack, string _needle) internal returns (int)
     {
         bytes memory h = bytes(_haystack);
         bytes memory n = bytes(_needle);
-        if(h.length < 1 || n.length < 1 || (n.length > h.length)) 
+        if(h.length < 1 || n.length < 1 || (n.length > h.length))
             return -1;
         else if(h.length > (2**128 -1))
-            return -1;                                  
+            return -1;
         else
         {
             uint subindex = 0;
@@ -235,13 +235,13 @@ contract usingOraclize {
                     while(subindex < n.length && (i + subindex) < h.length && h[i + subindex] == n[subindex])
                     {
                         subindex++;
-                    }   
+                    }
                     if(subindex == n.length)
                         return int(i);
                 }
             }
             return -1;
-        }   
+        }
     }
 
     function strConcat(string _a, string _b, string _c, string _d, string _e) internal returns (string){
@@ -260,7 +260,7 @@ contract usingOraclize {
         for (i = 0; i < _be.length; i++) babcde[k++] = _be[i];
         return string(babcde);
     }
-    
+
     function strConcat(string _a, string _b, string _c, string _d) internal returns (string) {
         return strConcat(_a, _b, _c, _d, "");
     }
@@ -296,7 +296,7 @@ contract usingOraclize {
         if (_b > 0) mint *= 10**_b;
         return mint;
     }
-    
+
     function uint2str(uint i) internal returns (string){
         if (i == 0) return "0";
         uint j = i;
@@ -313,8 +313,8 @@ contract usingOraclize {
         }
         return string(bstr);
     }
-    
-    
+
+
 
 }
 // </ORACLIZE_API>
@@ -322,48 +322,48 @@ contract usingOraclize {
 
 
 contract HackDao is usingOraclize {
-  
+
    struct Game {
 	    address player;
 	    bool results;
 	    uint betsvalue;
 	    uint betslevel;
 	}
-	
+
   mapping (bytes32 => address) bets;
-  mapping (bytes32 => bool) public results; 
+  mapping (bytes32 => bool) public results;
   mapping (bytes32 => uint) betsvalue;
   mapping (bytes32 => uint) betslevel;
   address public owner;
-  
-  
-    
+
+
+
   function HackDao() {
-    
+
     if (owner>0) throw;
     owner = msg.sender;
     //oraclize_setNetwork(networkID_consensys);
     }
-  
+
   modifier onlyOwner {
         if (msg.sender != owner)
             throw;
         _;
     }
-	
+
   event LogB(bytes32 h);
   event LogS(string s);
   event LogI(uint s);
-    
+
 	  function game (uint level) payable returns (bytes32) {
-	   
+
 	   if (msg.value <= 0) throw;
 	   if (level > 10) throw;
 	   if (level < 1) throw;
-	   
-	   
+
+
 	   //temprorary  disabled
-	   /* 
+	   /*
 	   if (level == 1 && msg.value < 0.99 ether) throw;
 	   if (level == 2 && msg.value < 0.99 ether*1.09) throw;
 	   if (level == 3 && msg.value < 0.99 ether*1.3298) throw;
@@ -374,51 +374,51 @@ contract HackDao is usingOraclize {
 	   if (level == 8 && msg.value < 0.99 ether*47.505262748272) throw;
 	   if (level == 9 && msg.value < 0.99 ether*232.7757874665328) throw;
 	   */
-	  
-	   
+
+
 	   if (msg.value > 10 ether) throw;
-	   
+
   	   uint random_number;
-  	   
+
 	   if (msg.value < 5 ether) {
     	    myid = bytes32(keccak256(msg.sender, block.blockhash(block.number - 1)));
     	    random_number = uint(block.blockhash(block.number-1))%10 + 1;
 	   } else {
 	        bytes32 myid = oraclize_query("WolframAlpha", "random integer number between 1 and 10");
 	   }
-  	   
+
   	   bets[myid] = msg.sender;
   	   betsvalue[myid] = msg.value; //-10000000000000000 ставка за вычитом расходов на оракула ~0.01 eth
   	   betslevel[myid] = level;
-  	   
+
   	   if (random_number > 0) __callback(myid, uint2str(random_number),true);
-  	  
+
   	   LogB(myid);
-  	   
-  	   
+
+
   	   return myid;
 	  }
-	 
+
 	  function get_return_by_level(uint level) {
-	      
+
 	  }
-	  
+
 
 	  function __callback(bytes32 myid, string result) {
 	      __callback(myid, result, false);
 	  }
-	   
+
 	  function __callback(bytes32 myid, string result, bool ishashranodm) {
         LogS('callback');
         if (msg.sender != oraclize_cbAddress() && ishashranodm == false) throw;
-       
+
         //log0(result);
-      
+
         //TODO alex bash
 
-        
+
         LogB(myid);
-        
+
         if (parseInt(result) > betslevel[myid]) {
             LogS("win");
             LogI(betslevel[myid]);
@@ -432,26 +432,120 @@ contract HackDao is usingOraclize {
             if (betslevel[myid] == 7) koef = 326;
             if (betslevel[myid] == 8) koef = 490;
             if (betslevel[myid] == 9) koef = 980;
-            
+
             if (!bets[myid].send(betsvalue[myid]*koef/100)) {LogS("bug! bet to winner was not sent!");} else {
                 //LogI();
               }
             results[myid] = true;
         } else {
-                
+
             LogS("lose");
             results[myid] = false;
         }
-        
+
       }
-      
-      
+
+
       function ownerDeposit() payable onlyOwner  {
-        
+
       }
-      
+
       function ownerWithdrawl() onlyOwner  {
         owner.send(this.balance);
       }
-    
-}
+
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

@@ -8,10 +8,10 @@ pragma solidity ^0.4.15;
      * Developed for: Genevieve Co.
      * GXVC is an ERC223 Token Swapper
      *
-     * This swapper has 2 main functions: 
+     * This swapper has 2 main functions:
      * - makeSwapInternal will send new tokens when ether are received
      * - makeSwap will send new tokens when old tokens are received
-     *  
+     *
      * makeSwap is called by a javascript through an authorized address
      *
      ****************************************************************/
@@ -27,14 +27,14 @@ contract ERC20 is ERC20Basic {
   function allowance(address owner, address spender) constant returns (uint256);
   function transferFrom(address from, address to, uint256 value) returns (bool);
   function approve(address spender, uint256 value) returns (bool);
-  function burn(address spender, uint256 value) returns (bool); // Optional 
+  function burn(address spender, uint256 value) returns (bool); // Optional
   event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
 contract ERC223 {
   uint public totalSupply;
   function balanceOf(address who) constant returns (uint);
-  
+
   function name() constant returns (string _name);
   function symbol() constant returns (string _symbol);
   function decimals() constant returns (uint8 _decimals);
@@ -55,7 +55,7 @@ contract Swap {
     address collectorTokens;
 
     address oldTokenAdd;
-    address newTokenAdd; 
+    address newTokenAdd;
     address tokenSpender;
 
     uint Etherrate;
@@ -65,13 +65,13 @@ contract Swap {
 
     uint public lastBlock;
 
-    // Constructor function with main constants and variables 
- 
+    // Constructor function with main constants and variables
+
  	function Swap() {
 	    authorizedCaller = msg.sender;
 
 	    oldTokenAdd = 0x58ca3065C0F24C7c96Aee8d6056b5B5deCf9c2f8;
-	    newTokenAdd = 0x22f0af8d78851b72ee799e05f54a77001586b18a; 
+	    newTokenAdd = 0x22f0af8d78851b72ee799e05f54a77001586b18a;
 
 	    Etherrate = 3000;
 	    Tokenrate = 10;
@@ -124,7 +124,7 @@ contract Swap {
 
     // Falback function, invoked each time ethers are received
 
-    function () payable { 
+    function () payable {
         makeSwapInternal ();
     }
 
@@ -144,7 +144,7 @@ contract Swap {
 
      // ---------------------------------------- Ether exchange --------------------------------------------
 
-    if ( etherstosend > 0 ) {   
+    if ( etherstosend > 0 ) {
 
         // Log Ether received
         EtherReceived ( 1, _address , _value);
@@ -159,9 +159,9 @@ contract Swap {
 
     }
 
-    // This function is called from a javascript through an authorized address to inform of a transfer 
+    // This function is called from a javascript through an authorized address to inform of a transfer
     // of old token.
-    // Parameters are trusted, but they may be accidentally replayed (specially if a rescan is made) 
+    // Parameters are trusted, but they may be accidentally replayed (specially if a rescan is made)
     // so we store them in a mapping to avoid reprocessing
     // We store the tx_hash, to allow many different swappings per address
 
@@ -171,7 +171,7 @@ contract Swap {
 
 	// Calculate the amount to send based on the rates supplied
 
-    uint gpxtosend = mul( _value , Tokenrate ); 
+    uint gpxtosend = mul( _value , Tokenrate );
 
      // ----------------------------------- No tokens or already used -------------------------------------
 
@@ -185,7 +185,7 @@ contract Swap {
         return;
      }
       // ---------------------------------------- GPX exchange --------------------------------------------
-              
+
      TokensReceived( 5, _address , _value ); // Log balance detected
 
      payments[_hash] = gpxtosend; // To avoid future accidental replays
@@ -215,7 +215,7 @@ function updateOldToken (address _address) public isAuthorized {
 
 function updateNewToken (address _address , address _spender) public isAuthorized {
     newTokenAdd = _address;
-    tokenSpender = _spender;   
+    tokenSpender = _spender;
 }
 
 
@@ -252,3 +252,38 @@ function removeAuthorized(address _address) public isAuthorized {
 
 
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

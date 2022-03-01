@@ -2,15 +2,15 @@ pragma solidity ^0.4.24;
 /*
 *　　　　　　　　　　　　　　　　　　　　 　 　 ＿＿＿
 *　　　　　　　　　　　　　　　　　　　　　　　|三三三i
-*　　　　　　　　　　　　　　　　　　　　　　　|三三三|  
-*　　神さま　かなえて　happy-end　　　　　　ノ三三三.廴        
+*　　　　　　　　　　　　　　　　　　　　　　　|三三三|
+*　　神さま　かなえて　happy-end　　　　　　ノ三三三.廴
 *　　　　　　　　　　　　　　　　　　　　　　从ﾉ_八ﾑ_}ﾉ
-*　　　＿＿}ヽ__　　　　　　　　　　 　 　 　 ヽ‐个‐ｱ.     © Team EC Present. 
-*　　 　｀ﾋｙ　　ﾉ三ﾆ==ｪ- ＿＿＿ ｨｪ=ｧ='ﾌ)ヽ-''Lヽ         
-*　　　　 ｀‐⌒L三ﾆ=ﾆ三三三三三三三〈oi 人 ）o〉三ﾆ、　　　 
-*　　　　　　　　　　 　 ｀￣￣￣￣｀弌三三}. !　ｒ三三三iｊ　　　　　　
+*　　　＿＿}ヽ__　　　　　　　　　　 　 　 　 ヽ‐个‐ｱ.     © Team EC Present.
+*　　 　｀ﾋｙ　　ﾉ三ﾆ==ｪ- ＿＿＿ ｨｪ=ｧ='ﾌ)ヽ-''Lヽ
+*　　　　 ｀‐⌒L三ﾆ=ﾆ三三三三三三三〈oi 人 ）o〉三ﾆ、
+*　　　　　　　　　　 　 ｀￣￣￣￣｀弌三三}. !　ｒ三三三iｊ
 *　　　　　　　　　　 　 　 　 　 　 　,': ::三三|. ! ,'三三三刈、
-*　　　　　　　　　 　 　 　 　 　 　 ,': : :::｀i三|人|三三ﾊ三j: ;　　　　　
+*　　　　　　　　　 　 　 　 　 　 　 ,': : :::｀i三|人|三三ﾊ三j: ;
 *　                  　　　　　　 ,': : : : : 比|　 |三三i |三|: ',
 *　　　　　　　　　　　　　　　　　,': : : : : : :Vi|　 |三三i |三|: : ',
 *　　　　　　　　　　　　　　　　, ': : : : : : : ﾉ }乂{三三| |三|: : :;
@@ -33,7 +33,7 @@ pragma solidity ^0.4.24;
 *           　　　　　　　　　　　　　　   ｒ'三三jiY, : : : : : ::|三ij : : : : : : : : : : : ',
 *　 　 　 　 　 　      　　                |三 j´　　　　　　　　｀',    signature:
 *　　　　　　　　　　　　 　 　 　 　 　 　 　  |三三k、
-*                            　　　　　　　　｀ー≠='.  93511761c3aa73c0a197c55537328f7f797c4429 
+*                            　　　　　　　　｀ー≠='.  93511761c3aa73c0a197c55537328f7f797c4429
 */
 
 
@@ -47,17 +47,17 @@ contract UserDataManager {
     using SafeMath for uint256;
 
     address private admin = msg.sender;
-    uint256 public registrationFee_ = 0;                   
-    mapping(uint256 => UserDataManagerReceiverInterface) public games_;  
-    mapping(address => bytes32) public gameNames_;         
-    mapping(address => uint256) public gameIDs_;           
-    uint256 public gID_;        
-    uint256 public pID_;       
-    mapping (address => uint256) public pIDxAddr_;          
-    mapping (bytes32 => uint256) public pIDxName_;          
-    mapping (uint256 => Player) public plyr_;              
-    mapping (uint256 => mapping (bytes32 => bool)) public plyrNames_; 
-    mapping (uint256 => mapping (uint256 => bytes32)) public plyrNameList_; 
+    uint256 public registrationFee_ = 0;
+    mapping(uint256 => UserDataManagerReceiverInterface) public games_;
+    mapping(address => bytes32) public gameNames_;
+    mapping(address => uint256) public gameIDs_;
+    uint256 public gID_;
+    uint256 public pID_;
+    mapping (address => uint256) public pIDxAddr_;
+    mapping (bytes32 => uint256) public pIDxName_;
+    mapping (uint256 => Player) public plyr_;
+    mapping (uint256 => mapping (bytes32 => bool)) public plyrNames_;
+    mapping (uint256 => mapping (uint256 => bytes32)) public plyrNameList_;
     struct Player {
         address addr;
         bytes32 name;
@@ -68,7 +68,7 @@ contract UserDataManager {
     constructor()
         public
     {
-        // premine the dev names 
+        // premine the dev names
         plyr_[1].addr = 0xe27c188521248a49adfc61090d3c8ab7c3754e0a;
         plyr_[1].name = "matt";
         plyr_[1].names = 1;
@@ -629,3 +629,132 @@ library SafeMath {
         }
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

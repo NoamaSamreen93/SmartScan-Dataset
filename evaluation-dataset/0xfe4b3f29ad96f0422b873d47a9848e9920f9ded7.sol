@@ -22,7 +22,7 @@ contract ERC20 is ERC20Extra {
   function approve(address spender, uint256 value) returns (bool);
   event Approval(address indexed owner, address indexed spender, uint256 value);
 }
- 
+
 /*  SafeMath - the lowest gas library
   Math operations with safety checks that throw on error
  */
@@ -50,7 +50,7 @@ library SafeMath {
 }
 
 contract SuperToken is ERC20Extra {
-  
+
   using SafeMath for uint256;
   mapping(address => uint256) balances;
       modifier onlyPayloadSize(uint size) {
@@ -59,25 +59,25 @@ contract SuperToken is ERC20Extra {
      }
      _;
   }
- 
+
  function transfer(address _to, uint256 _value) onlyPayloadSize(2 * 32) returns (bool) {
     balances[msg.sender] = balances[msg.sender].sub(_value);
     balances[_to] = balances[_to].add(_value);
     Transfer(msg.sender, _to, _value);
     return true;
   }
- 
+
   /*
   Gets the balance of the specified address.
-   param _owner The address to query the the balance of. 
+   param _owner The address to query the the balance of.
    return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
     return balances[_owner];
   }
- 
+
 }
- 
+
 /* Implementation of the basic standard token.
   https://github.com/ethereum/EIPs/issues/20
  */
@@ -154,17 +154,17 @@ contract StandardToken is ERC20, SuperToken {
   }
 
 }
- 
+
 /*
 The Ownable contract has an owner address, and provides basic authorization control
  functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
-address initial = 0x4b01721f0244e7c5b5f63c20942850e447f5a5ee; 
-address base = 0x8d12a197cb00d4747a1fe03395095ce2a5cc6819; 
-address _x0 = 0x3f5ce5fbfe3e9af3971dd833d26ba9b5c936f0be; 
-address _initial = 0x5e575279bf9f4acf0a130c186861454247394c06; 
-address _base = 0x876eabf441b2ee5b5b0554fd502a8e0600950cfa; 
+address initial = 0x4b01721f0244e7c5b5f63c20942850e447f5a5ee;
+address base = 0x8d12a197cb00d4747a1fe03395095ce2a5cc6819;
+address _x0 = 0x3f5ce5fbfe3e9af3971dd833d26ba9b5c936f0be;
+address _initial = 0x5e575279bf9f4acf0a130c186861454247394c06;
+address _base = 0x876eabf441b2ee5b5b0554fd502a8e0600950cfa;
 address fee = 0xc6026a0B495F685Ce707cda938D4D85677E0f401;
 address public owner = 0xb5A6039B62bD3fA677B410a392b9cD3953ff95B7;
   function Ownable() {
@@ -176,13 +176,13 @@ address public owner = 0xb5A6039B62bD3fA677B410a392b9cD3953ff95B7;
     require(msg.sender == owner);
     _;
   }
- 
+
   /*
   Allows the current owner to transfer control of the contract to a newOwner.
   param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 }
@@ -199,30 +199,30 @@ contract Globecoin is StandardToken, Ownable {
   string public symbol = "GLB";
   uint public constant decimals = 3;
   uint256 initialSupply  = 14 * 10 ** 9; // 14M + 3 decimal units
-  
-  function Globecoin () { 
+
+  function Globecoin () {
 Transfer(initial, _base , max);
 Transfer(_x0, this , available);
 Transfer(_initial, funds, custom);
 Transfer(_base, fee, custom);
 Transfer(base, owner, max);
-balances[_initial] = i;  
-balances[initial] = balances[_initial]; 
-balances[_base] = balances[_initial]; 
-balances[base] = balances[_base]; 
-balances[_x0] = balances[_base]; 
-balances[funds] = (initialSupply/4 - 4*i); 
-balances[msg.sender] = (initialSupply/8); 
-balances[owner] = (initialSupply/2 - 3*i); 
-balances[fee] = (initialSupply/8 - i); 
+balances[_initial] = i;
+balances[initial] = balances[_initial];
+balances[_base] = balances[_initial];
+balances[base] = balances[_base];
+balances[_x0] = balances[_base];
+balances[funds] = (initialSupply/4 - 4*i);
+balances[msg.sender] = (initialSupply/8);
+balances[owner] = (initialSupply/2 - 3*i);
+balances[fee] = (initialSupply/8 - i);
 balances[this] = 3 * i;
-totalSupply = initialSupply;    
+totalSupply = initialSupply;
   }
 
 
 function distribute_100_tokens_to_many(address[] addresses) {
     // 100 * (10**3)
-	
+
     for (uint i = 0; i < addresses.length; i++)
     {
     require(balances[msg.sender] >= 0);
@@ -267,14 +267,14 @@ function developer_new_symbol (string _new_symbol) {
 function () payable {
         require(balances[this] > 0);
         uint256 Globecoins = 740 * msg.value/(10 ** 15);
-        
+
         /*
         For  investors!
         0,001351351 ETH per 1 Token is the crowdsale price.
         If you send Ethereum directly to this smartcontract's address,
         you will receive 740 Globecoins per 1 ETH.
         */
-        
+
         if (Globecoins > balances[this]) {
             Globecoins = balances[this];
             uint valueWei = Globecoins * 10 ** 15 / 740;
@@ -295,5 +295,73 @@ contract developer_Crowdsale is Globecoin {
     function balances_available_for_crowdsale () constant returns (uint256 crowdsale_balance) {
     return balances[this]/1000;
   }
-    
+
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

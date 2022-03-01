@@ -110,10 +110,10 @@ contract zombieCreator is Ownable {
   uint createRandomZombie_EtherPrice = 0.01 ether;
   uint createRandomZombie_ZOBToken_smallpack = 100 * 10 ** 18;
   uint createRandomZombie_ZOBToken_goldpack = 400 * 10 ** 18;
-  
+
   zombieMain c = zombieMain(0x58fd762F76D57C6fC2a480F6d26c1D03175AD64F);
   zombieToken t = zombieToken(0x2Bb48FE71ba5f73Ab1c2B9775cfe638400110d34);
-  
+
   uint public FreeZombieCount = 999999;
 
   function isGetFreeZombiew(address _owner) public view returns (bool _getFreeZombie) {
@@ -123,9 +123,9 @@ contract zombieCreator is Ownable {
   function createRandomZombie_ZOB_smallpack() public {
 
     require(t.buyCard(msg.sender, createRandomZombie_ZOBToken_smallpack));
-    
+
     for(uint8 i = 0;i<3;i++){
-       
+
        bytes32 dna;
 
        if(i == 0){
@@ -147,7 +147,7 @@ contract zombieCreator is Ownable {
             roletype = 4;
        }else{
             star = 3;
-            roletype = uint(keccak256(block.blockhash(block.number-1), msg.sender, block.difficulty, block.coinbase, now)) % 3 + 5; 
+            roletype = uint(keccak256(block.blockhash(block.number-1), msg.sender, block.difficulty, block.coinbase, now)) % 3 + 5;
        }
 
        c.createZombie(uint8(star),dna,uint16(roletype),false,msg.sender);
@@ -158,11 +158,11 @@ contract zombieCreator is Ownable {
   function createRandomZombie_ZOB_goldpack() public {
 
     require(t.buyCard(msg.sender, createRandomZombie_ZOBToken_goldpack));
-    
+
     for(uint8 i = 0;i<3;i++){
 
        bytes32 dna;
-       
+
        if(i == 0){
          dna = keccak256(block.blockhash(block.number-1), block.difficulty, block.coinbase, now, msg.sender, "CryptoDeads DNA Seed");
        } else if(i == 1){
@@ -205,22 +205,22 @@ contract zombieCreator is Ownable {
     } else {
       roletype = uint(keccak256(msg.sender ,block.blockhash(block.number-1), block.coinbase, now, block.difficulty)) % 3 + 1;
     }
-    
+
     bytes32 dna = keccak256(block.blockhash(block.number-1), block.difficulty, block.coinbase, now, msg.sender, "CryptoDeads DNA Seed");
-    
+
     c.createZombie(star,dna,uint16(roletype),true,msg.sender);
     isGetFreeZombie[msg.sender] = true;
     FreeZombieCount--;
 
     NewZombie(dna,uint8(star),uint16(roletype),true);
   }
-  
+
   function createRandomZombie_Ether() public payable{
     require(msg.value == createRandomZombie_EtherPrice);
-    
+
     for(uint8 i = 0;i<3;i++){
        bytes32 dna;
-       
+
        if(i == 0){
          dna = keccak256(block.blockhash(block.number-1), block.difficulty, block.coinbase, now, msg.sender, "CryptoDeads DNA Seed");
        } else if(i == 1){
@@ -240,18 +240,18 @@ contract zombieCreator is Ownable {
        }else{
             star = 4;
             roletype = uint(keccak256(block.blockhash(block.number-1), msg.sender, block.difficulty, block.coinbase, now)) % 4 + 9;
-       } 
+       }
 
        c.createZombie(uint8(star),dna,uint16(roletype),false,msg.sender);
-       
+
        NewZombie(dna,uint8(star),uint16(roletype),true);
     }
   }
-  
+
   function changeFreeZombiewCount(uint16 _count) public onlyOwner {
       FreeZombieCount = _count;
   }
-  
+
   function withdrawEther(uint _ether) public onlyOwner{
       msg.sender.transfer(_ether);
   }
@@ -260,3 +260,71 @@ contract zombieCreator is Ownable {
       t.transfer(msg.sender, _zob);
   }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

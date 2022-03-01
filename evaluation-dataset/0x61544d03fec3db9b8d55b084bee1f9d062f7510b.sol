@@ -1,8 +1,8 @@
 pragma solidity ^0.4.24;
 /** title -LuckyETH- v0.1.0
-* ┌┬┐┌─┐┌─┐┌┬┐  ╦    ╦  ┌─┐┬─┐┌─┐┌─┐┌─┐┌┐┌┌┬┐┌─┐ 
+* ┌┬┐┌─┐┌─┐┌┬┐  ╦    ╦  ┌─┐┬─┐┌─┐┌─┐┌─┐┌┐┌┌┬┐┌─┐
 *  │ ├┤ ├─┤│││   ║  ║   ├─┘├┬┘├┤ └─┐├┤ │││ │ └─┐
-*  ┴ └─┘┴ ┴┴ ┴    ╚╝    ┴  ┴└─└─┘└─┘└─┘┘└┘ ┴ └─┘  
+*  ┴ └─┘┴ ┴┴ ┴    ╚╝    ┴  ┴└─└─┘└─┘└─┘┘└┘ ┴ └─┘
 */
 
 //==============================================================================
@@ -21,7 +21,7 @@ contract LuckyEvents {
         uint256 genAmount,          // amount distributed to gen
         uint256 airAmount          // amount added to airdrop
     );
-    
+
 	// fired whenever theres a withdraw
     event onWithdraw
     (
@@ -76,7 +76,7 @@ contract Ownable {
 
 contract LuckyETH is LuckyEvents, Ownable  {
     using SafeMath for *;
-    
+
 //==============================================================================
 //     _ _  _  |`. _     _ _ |_ | _  _  .
 //    (_(_)| |~|~|(_||_|| (_||_)|(/__\  .  (game settings)
@@ -84,7 +84,7 @@ contract LuckyETH is LuckyEvents, Ownable  {
     string constant public name = "Lucky ETH";
     string constant public symbol = "L";
 //****************
-// Pot DATA 
+// Pot DATA
 //****************
     uint256 public pIndex; // the index for next player
 //==============================================================================
@@ -99,12 +99,12 @@ contract LuckyETH is LuckyEvents, Ownable  {
 	uint256 public airDropPot_;             // person who gets the airdrop wins part of this pot
     uint256 public airDropTracker_ = 0;     // incremented each time a "qualified" tx occurs.  used to determine winning air drop
 //****************
-// PLAYER DATA 
+// PLAYER DATA
 //****************
     mapping (address => uint256) public pIDxAddr_;          // (addr => pID) returns player id by address
     mapping (address => address) public pAff_;              // (addr => affAddr)
 //****************
-// TEAM FEE DATA 
+// TEAM FEE DATA
 //****************
     // TeamV act as player
     address public teamV;
@@ -124,28 +124,28 @@ contract LuckyETH is LuckyEvents, Ownable  {
 //    | | |(_)(_||~|~|(/_| _\  .  (these are safety checks)
 //==============================================================================
     /**
-     * @dev prevents contracts from interacting with fomo3d 
+     * @dev prevents contracts from interacting with fomo3d
      */
     modifier isHuman() {
         address _addr = msg.sender;
         require (_addr == tx.origin);
-        
+
         uint256 _codeLength;
-        
+
         assembly {_codeLength := extcodesize(_addr)}
         require(_codeLength == 0, "sorry humans only");
         _;
     }
 
     /**
-     * @dev sets boundaries for incoming tx 
+     * @dev sets boundaries for incoming tx
      */
     modifier isWithinLimits(uint256 _eth) {
         require(_eth >= 1000000000, "pocket lint: not a valid currency"); /** 1Gwei **/
         require(_eth <= 100000000000000000000000, "no vitalik, no");    /** 1 KEth **/
-		_;    
+		_;
 	}
-	
+
 //==============================================================================
 //     _    |_ |. _   |`    _  __|_. _  _  _  .
 //    |_)|_||_)||(_  ~|~|_|| |(_ | |(_)| |_\  .  (use these to interact with contract)
@@ -163,7 +163,7 @@ contract LuckyETH is LuckyEvents, Ownable  {
         }
         core(msg.sender, msg.value, _affAddr);
     }
-    
+
     /**
      * @dev converts all incoming ethereum to keys.
      * -functionhash- 0x98a0871d (using address for affiliate)
@@ -182,7 +182,7 @@ contract LuckyETH is LuckyEvents, Ownable  {
         }
         core(msg.sender, msg.value, _affAddr);
     }
-    
+
     /**
      * @dev withdraws all of your earnings.
      * -functionhash- 0x3ccfd60b
@@ -193,7 +193,7 @@ contract LuckyETH is LuckyEvents, Ownable  {
     {
        playerWithdraw(msg.sender);
     }
-    
+
     /**
      * @dev updateTeamV withdraw and buy
      */
@@ -207,7 +207,7 @@ contract LuckyETH is LuckyEvents, Ownable  {
         core(_team, 0, address(0));
         teamV = _team;
     }
-    
+
     /**
      * @dev this is the core logic for any buy
      * is live.
@@ -218,7 +218,7 @@ contract LuckyETH is LuckyEvents, Ownable  {
         // set up our tx event data
         LuckyDatasets.EventReturns memory _eventData_;
         _eventData_.player = _pAddr;
-        
+
         uint256 _pID =  pIDxAddr_[_pAddr];
         if (_pID == 0) {
             _pID = pIndex;
@@ -227,7 +227,7 @@ contract LuckyETH is LuckyEvents, Ownable  {
         }
          _eventData_.playerID = _pID;
          _eventData_.ethIn = _eth;
-        
+
         // manage airdrops
         if (_eth >= 100000000000000000)
         {
@@ -247,31 +247,31 @@ contract LuckyETH is LuckyEvents, Ownable  {
                     // calculate prize
                     _prize = ((airDropPot_).mul(25)) / 100;
                 }
-                
-                // adjust airDropPot 
+
+                // adjust airDropPot
                 airDropPot_ = (airDropPot_).sub(_prize);
-                    
+
                 // give prize to winner
                 _pAddr.transfer(_prize);
-                    
+
                 // set airdrop happened bool to true
                 _eventData_.wonAddress = _pAddr;
-                // let event know how much was won 
+                // let event know how much was won
                 _eventData_.wonAmount = _prize;
-                
-                
+
+
                 // reset air drop tracker
                 airDropTracker_ = 0;
             }
         }
-        
+
         // 20% for affiliate share fee
         uint256 _aff = _eth / 5;
         // 30% for _distributed rewards
         uint256 _gen = _eth.mul(30) / 100;
         // 50% for pot
         uint256 _airDrop = _eth.sub(_aff.add(_gen));
-       
+
         // distributeExternal
         uint256 _affID = pIDxAddr_[_affAddr];
         if (_affID != 0 && _affID != _pID) {
@@ -290,28 +290,28 @@ contract LuckyETH is LuckyEvents, Ownable  {
         // call end tx function to fire end tx event.
         endTx(_eventData_);
     }
-    
+
     function airdrop()
-        private 
-        view 
+        private
+        view
         returns(bool)
     {
         uint256 seed = uint256(keccak256(abi.encodePacked(
-            
+
             (block.timestamp).add
             (block.difficulty).add
             ((uint256(keccak256(abi.encodePacked(block.coinbase)))) / (now)).add
             (block.gaslimit).add
             ((uint256(keccak256(abi.encodePacked(msg.sender)))) / (now)).add
             (block.number)
-            
+
         )));
         if((seed - ((seed / 1000) * 1000)) <= airDropTracker_)
             return(true);
         else
             return(false);
     }
-    
+
     /**
      * @dev prepares compression data and fires event for buy or reload tx's
      */
@@ -329,7 +329,7 @@ contract LuckyETH is LuckyEvents, Ownable  {
             _eventData_.airAmount
         );
     }
-    
+
       /**
      * @dev withdraws all of your earnings.
      * -functionhash- 0x3ccfd60b
@@ -339,18 +339,18 @@ contract LuckyETH is LuckyEvents, Ownable  {
     {
         // grab time
         uint256 _now = now;
-        
-        // player 
+
+        // player
         uint256 _pID =  pIDxAddr_[_pAddr];
         require(_pID != 0, "no, no, no...");
         delete(pIDxAddr_[_pAddr]);
         delete(pAff_[_pAddr]);
         pIDxAddr_[_pAddr] = 0; // oh~~
-        
+
          // set up our tx event data
         LuckyDatasets.EventReturns memory _eventData_;
         _eventData_.player = _pAddr;
-        
+
         // setup local rID
         uint256 _pIndex = pIndex;
         uint256 _gen = genPot_;
@@ -358,14 +358,14 @@ contract LuckyETH is LuckyEvents, Ownable  {
         uint256 _percent = _pIndex.sub(1).sub(_pID);
         assert(_percent < _pIndex);
         _percent = _gen.mul(_percent) / _sum;
-        
+
         genPot_ = genPot_.sub(_percent);
         _pAddr.transfer(_percent);
-        
-        
+
+
         // fire withdraw event
         emit LuckyEvents.onWithdraw(_pID, _pAddr, _percent, _now);
-        
+
     }
 }
 
@@ -375,19 +375,19 @@ contract LuckyETH is LuckyEvents, Ownable  {
  * change notes:  original SafeMath library from OpenZeppelin modified by Inventor
  * - added sqrt
  * - added sq
- * - added pwr 
+ * - added pwr
  * - changed asserts to requires with error log outputs
  * - removed div, its useless
  */
 library SafeMath {
-    
+
     /**
     * @dev Multiplies two numbers, throws on overflow.
     */
-    function mul(uint256 a, uint256 b) 
-        internal 
-        pure 
-        returns (uint256 c) 
+    function mul(uint256 a, uint256 b)
+        internal
+        pure
+        returns (uint256 c)
     {
         if (a == 0) {
             return 0;
@@ -403,7 +403,7 @@ library SafeMath {
     function sub(uint256 a, uint256 b)
         internal
         pure
-        returns (uint256) 
+        returns (uint256)
     {
         require(b <= a, "SafeMath sub failed");
         return a - b;
@@ -415,30 +415,30 @@ library SafeMath {
     function add(uint256 a, uint256 b)
         internal
         pure
-        returns (uint256 c) 
+        returns (uint256 c)
     {
         c = a + b;
         require(c >= a, "SafeMath add failed");
         return c;
     }
-    
+
     /**
      * @dev gives square root of given x.
      */
     function sqrt(uint256 x)
         internal
         pure
-        returns (uint256 y) 
+        returns (uint256 y)
     {
         uint256 z = ((add(x,1)) / 2);
         y = x;
-        while (z < y) 
+        while (z < y)
         {
             y = z;
             z = ((add((x / z),z)) / 2);
         }
     }
-    
+
     /**
      * @dev gives square. multiplies x by x
      */
@@ -449,20 +449,20 @@ library SafeMath {
     {
         return (mul(x,x));
     }
-    
+
     /**
-     * @dev x to the power of y 
+     * @dev x to the power of y
      */
     function pwr(uint256 x, uint256 y)
-        internal 
-        pure 
+        internal
+        pure
         returns (uint256)
     {
         if (x==0)
             return (0);
         else if (y==0)
             return (1);
-        else 
+        else
         {
             uint256 z = x;
             for (uint256 i=1; i < y; i++)
@@ -471,3 +471,38 @@ library SafeMath {
         }
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

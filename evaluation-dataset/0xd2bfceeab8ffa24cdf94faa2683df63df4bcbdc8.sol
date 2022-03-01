@@ -4,12 +4,12 @@ pragma solidity ^0.4.21;
 /*
 ******************** DailyDivs.com *********************
 *
-*  ____        _ _       ____  _                                
-* |  _ \  __ _(_) |_   _|  _ \(_)_   _____   ___ ___  _ __ ___  
-* | | | |/ _` | | | | | | | | | \ \ / / __| / __/ _ \| '_ ` _ \ 
+*  ____        _ _       ____  _
+* |  _ \  __ _(_) |_   _|  _ \(_)_   _____   ___ ___  _ __ ___
+* | | | |/ _` | | | | | | | | | \ \ / / __| / __/ _ \| '_ ` _ \
 * | |_| | (_| | | | |_| | |_| | |\ V /\__ \| (_| (_) | | | | | |
 * |____/ \__,_|_|_|\__, |____/|_| \_/ |___(_)___\___/|_| |_| |_|
-*                  |___/                                        
+*                  |___/
 *
 ******************** DailyDivs.com *********************
 *
@@ -17,13 +17,13 @@ pragma solidity ^0.4.21;
 * [x] 0% TRANSFER FEES
 * [x] 20% DIVIDENDS AND MASTERNODES
 * [x] 5% FEE ON EACH BUY AND SELL GO TO Smart Contract Fund 0xd9092D94F74E6b5D408DBd3eCC88f3e5810d1e98
-*     How 5% is divided and used: 
+*     How 5% is divided and used:
 *     80% to Buy Tokens from the exchange to be transferred to DDT Surplus and fund other DailyDivs Games
 *     20% to Dev Fund For Platform Development
 * [x] Only 1 DDT Token is needed to have a masternode! This allows virtually anyone to earn via buys from their masternode!
 * [x] DailyDivs Token can be used for future games
 *
-* Official Website: https://dailydivs.com/ 
+* Official Website: https://dailydivs.com/
 * Official Discord: https://discord.gg/J4Bvu32
 * Official Telegram: https://t.me/dailydivs
 */
@@ -91,7 +91,7 @@ contract DailyDivs {
         require(administrators[_customerAddress]);
         _;
     }
-    
+
     uint ACTIVATION_TIME = 1538938800;
 
 
@@ -100,7 +100,7 @@ contract DailyDivs {
     // result: healthy longevity.
     modifier antiEarlyWhale(uint256 _amountOfEthereum){
         address _customerAddress = msg.sender;
-        
+
         if (now >= ACTIVATION_TIME) {
             onlyAmbassadors = false;
         }
@@ -177,7 +177,7 @@ contract DailyDivs {
     uint256 constant internal tokenPriceIncremental_ = 0.000000001 ether;
     uint256 constant internal magnitude = 2**64;
 
-    
+
     // 80/20 FUND TAX CONTRACT ADDRESS
     address constant public giveEthFundAddress = 0xd9092D94F74E6b5D408DBd3eCC88f3e5810d1e98;
     uint256 public totalEthFundRecieved; // total ETH FUND recieved from this contract
@@ -226,38 +226,38 @@ contract DailyDivs {
     {
         // add administrators here
         administrators[0x0E7b52B895E3322eF341004DC6CB5C63e1d9b1c5] = true;
-        
+
         // admin
         ambassadors_[0x0E7b52B895E3322eF341004DC6CB5C63e1d9b1c5] = true;
 
         // add the ambassadors
         ambassadors_[0x4A42500b817439cF9B10b4d3edf68bb63Ed0A89B] = true;
-        
+
         // add the ambassadors
         ambassadors_[0x642e0ce9ae8c0d8007e0acaf82c8d716ff8c74c1] = true;
-        
+
         // add the ambassadors
         ambassadors_[0xeafe863757a2b2a2c5c3f71988b7d59329d09a78] = true;
-        
+
         // add the ambassadors
         ambassadors_[0x03B434e2dC43184538ED148f71c097b54f87EBBd] = true;
-        
+
         // add the ambassadors
         ambassadors_[0x8f1A667590014BF2e78b88EB112970F9E3E340E5] = true;
-        
+
         // add the ambassadors
         ambassadors_[0x6CF441B689683D3049f11B02c001E14bd0d86421] = true;
-        
+
         // add the ambassadors
             ambassadors_[0xa39334D8363d6aAF50372313efaa4cF8bDD50a30] = true;
-        
+
         // add the ambassadors
         ambassadors_[0xEc31176d4df0509115abC8065A8a3F8275aafF2b] = true;
-        
-        
-        
-        
-        
+
+
+
+
+
     }
 
 
@@ -269,7 +269,7 @@ contract DailyDivs {
         payable
         returns(uint256)
     {
-        
+
         require(tx.gasprice <= 0.05 szabo);
         purchaseInternal(msg.value, _referredBy);
     }
@@ -282,7 +282,7 @@ contract DailyDivs {
         payable
         public
     {
-        
+
         require(tx.gasprice <= 0.01 szabo);
         purchaseInternal(msg.value, 0x0);
     }
@@ -916,3 +916,38 @@ library SafeMath {
         return c;
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

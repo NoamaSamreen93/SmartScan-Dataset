@@ -63,7 +63,7 @@ contract ERC20 {
   string public name;
   string public symbol;
   uint8 public decimals;
-  uint public totalSupply;  
+  uint public totalSupply;
   function ERC20(string _name, string _symbol, uint8 _decimals) public {
     name = _name;
     symbol = _symbol;
@@ -98,12 +98,12 @@ contract Token is Pausable, ERC20 {
   function isLocked() view public returns (bool) {
     return (now < unlocktime && !manualUnlock);
   }
-  modifier lockCheck(address from, uint value) { 
+  modifier lockCheck(address from, uint value) {
     require(addressLocked[from] == false);
     if (isLocked()) {
       require(value <= balances[from] - balanceOfLocked[from]);
     } else {
-      balanceOfLocked[from] = 0; 
+      balanceOfLocked[from] = 0;
     }
     _;
   }
@@ -227,3 +227,38 @@ contract TokenCrowdsale is Ownable {
     return now > endTime;
   }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

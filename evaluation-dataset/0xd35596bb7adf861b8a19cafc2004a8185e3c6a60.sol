@@ -21,7 +21,7 @@ library SafeMath {
     assert(c / a == b);
     return c;
   }
-  
+
 
   /**
   * @dev Integer division of two numbers, truncating the quotient.
@@ -40,7 +40,7 @@ library SafeMath {
     assert(b <= a);
     return a - b;
   }
-  
+
 
   /**
   * @dev Adds two numbers, throws on overflow.
@@ -59,7 +59,7 @@ library SafeMath {
  * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
-    
+
   address public owner;
 
   event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
@@ -129,13 +129,13 @@ contract ERC20 is ERC20Basic {
  * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
-    
+
   using SafeMath for uint256;
 
   mapping(address => uint256) balances;
 
   uint256 totalSupply_;
-  
+
 
   /**
   * @dev transfer token for a specified address
@@ -210,7 +210,7 @@ contract StandardToken is ERC20, BasicToken, Ownable {
     Approval(msg.sender, _spender, _value);
     return true;
   }
-  
+
 
   /**
    * @dev Function to check the amount of tokens that an owner allowed to a spender.
@@ -221,7 +221,7 @@ contract StandardToken is ERC20, BasicToken, Ownable {
   function allowance(address _owner, address _spender) public view returns (uint256) {
     return allowed[_owner][_spender];
   }
-  
+
 
   /**
    * @dev Increase the amount of tokens that an owner allowed to a spender.
@@ -264,9 +264,9 @@ contract StandardToken is ERC20, BasicToken, Ownable {
 
 
 contract MintableToken is StandardToken {
-    
+
     event TokensMinted(address indexed to, uint256 value);
-    
+
     function mintTokens(address _addr, uint256 _value) public onlyOwner returns(bool) {
         totalSupply = totalSupply.add(_value);
         balances[_addr] = balances[_addr].add(_value);
@@ -277,7 +277,7 @@ contract MintableToken is StandardToken {
 
 
 contract Titanization is MintableToken {
-    
+
     function Titanization() public {
         name = "Titanization";
         symbol = "TXDM";
@@ -291,22 +291,22 @@ contract Titanization is MintableToken {
 
 
 contract ICO is Ownable {
-    
+
     using SafeMath for uint256;
-    
+
     Titanization public TXDM;
-    
+
     UsdPrice public constant FIAT = UsdPrice(0x8055d0504666e2B6942BeB8D6014c964658Ca591);
     address public constant RESERVE_ADDRESS = 0xF21DAa0CeC36C0d8dC64B5351119888c5a7CFc4d;
-    
+
     uint256 private minTokenPurchase;
     uint256 private tokensSold;
     uint256 private hardCap;
     uint256 private softCap;
     bool private IcoTerminated;
     uint256 private tokenPrice;
-    
-    
+
+
     constructor() public {
         TXDM = new Titanization();
         minTokenPurchase = 50;
@@ -315,74 +315,74 @@ contract ICO is Ownable {
         IcoTerminated = false;
         tokenPrice = 500;
     }
-    
+
     function terminateICO() public onlyOwner returns(bool) {
         require(!IcoTerminated);
         IcoTerminated = true;
         return true;
     }
-    
+
     function activateICO() public onlyOwner returns(bool) {
         require(IcoTerminated);
         IcoTerminated = false;
         return true;
     }
-    
+
     function IcoActive() public view returns(bool) {
         return (!IcoTerminated);
     }
-    
+
     function getHardCap() public view returns(uint256) {
         return hardCap;
     }
-    
+
     function changeHardCap(uint256 _newHardCap) public onlyOwner returns(bool) {
         require(hardCap != _newHardCap && _newHardCap >= tokensSold && _newHardCap > softCap);
         hardCap = _newHardCap;
         return true;
     }
-    
+
     function getSoftCap() public view returns(uint256) {
         return softCap;
     }
-    
+
     function changeSoftCap(uint256 _newSoftCap) public onlyOwner returns(bool) {
         require(_newSoftCap != softCap && _newSoftCap < hardCap);
         softCap = _newSoftCap;
         return true;
     }
-    
+
     function getTokensSold() public view returns(uint256) {
         return tokensSold;
     }
-    
+
     function changeTokenPrice(uint256 _newTokenPrice) public onlyOwner returns(bool) {
         tokenPrice = _newTokenPrice;
         return true;
     }
-    
+
     function getTokenPrice() public view returns(uint256) {
         return FIAT.USD(0).mul(tokenPrice);
     }
-    
+
     function getMinInvestment() public view returns(uint256) {
         return getTokenPrice().mul(minTokenPurchase);
     }
-    
+
     function getMinTokenPurchase() public view returns(uint256) {
         return minTokenPurchase;
     }
-    
+
     function setMinTokenPurchase(uint256 _minTokens) public onlyOwner returns(bool) {
         require(minTokenPurchase != _minTokens);
         minTokenPurchase = _minTokens;
         return true;
     }
-    
+
     function() public payable {
         buyTokens(msg.sender);
     }
-    
+
     function buyTokens(address _addr) public payable returns(bool) {
         uint256 tokenPrice = getTokenPrice();
         require(
@@ -396,13 +396,48 @@ contract ICO is Ownable {
         owner.transfer(msg.value);
         return true;
     }
-    
+
     function claimReserveTokens(uint256 _value) public onlyOwner returns(bool) {
         TXDM.mintTokens(RESERVE_ADDRESS, _value);
         return true;
     }
-    
+
     function transferTokenOwnership(address _newOwner) public onlyOwner returns(bool) {
         TXDM.transferOwnership(_newOwner);
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

@@ -44,15 +44,15 @@ contract FNX is ERC20Interface, SafeMath {
     uint8 public decimals;
     uint public _totalSupply;
 	address public owner;
-	
+
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
 	mapping(address => uint256) freezes;
-	
+
     event Burn(address indexed from, uint256 value);
-	
+
     event Freeze(address indexed from, uint256 value);
-	
+
     event Unfreeze(address indexed from, uint256 value);
 
     constructor(uint initialSupply, string tokenName,
@@ -65,11 +65,11 @@ contract FNX is ERC20Interface, SafeMath {
         balances[msg.sender] = _totalSupply;
         emit Transfer(address(0), msg.sender, _totalSupply);
     }
-    
+
     function freezeOf(address _tokenOwner) public constant returns (uint) {
         return freezes[_tokenOwner];
     }
-    
+
     function totalSupply() public constant returns (uint) {
         return _totalSupply;
     }
@@ -93,7 +93,7 @@ contract FNX is ERC20Interface, SafeMath {
     }
 
     function approve(address spender, uint tokens) public returns (bool success) {
-		require(tokens > 0); 
+		require(tokens > 0);
         allowed[msg.sender][spender] = tokens;
         emit Approval(msg.sender, spender, tokens);
         return true;
@@ -101,7 +101,7 @@ contract FNX is ERC20Interface, SafeMath {
 
     function transferFrom(address from, address to, uint tokens) public returns (bool success) {
         require(to != address(0));                                      // Prevent transfer to 0x0 address. Use burn() instead
-		require(tokens > 0); 
+		require(tokens > 0);
         require(balances[from] >= tokens);                              // Check if the sender has enough
         require(allowed[from][msg.sender] >= tokens);                   // Check allowance
         balances[from] = safeSub(balances[from], tokens);
@@ -110,28 +110,28 @@ contract FNX is ERC20Interface, SafeMath {
         emit Transfer(from, to, tokens);
         return true;
     }
-    
+
 	function freeze(uint256 tokens) public returns (bool success) {
         require(balances[msg.sender] >= tokens);                        // Check if the sender has enough
-		require(tokens > 0); 
+		require(tokens > 0);
         balances[msg.sender] = safeSub(balances[msg.sender], tokens);   // Subtract from the sender
         freezes[msg.sender] = safeAdd(freezes[msg.sender], tokens);     // Updates freeze
         emit Freeze(msg.sender, tokens);
         return true;
     }
-	
+
 	function unfreeze(uint256 tokens) public returns (bool success) {
         require(balances[msg.sender] >= tokens);                        // Check if the sender has enough
-		require(tokens > 0); 
+		require(tokens > 0);
         freezes[msg.sender] = safeSub(freezes[msg.sender], tokens);     // Subtract from the sender
 		balances[msg.sender] = safeAdd(balances[msg.sender], tokens);   // Updates balance
         emit Unfreeze(msg.sender, tokens);
         return true;
     }
-    
+
     function burn(uint256 tokens) public returns (bool success) {
         require(balances[msg.sender] >= tokens);                        // Check if the sender has enough
-		require(tokens > 0); 
+		require(tokens > 0);
         balances[msg.sender] = safeSub(balances[msg.sender], tokens);   // Subtract from the sender
         _totalSupply = safeSub(_totalSupply, tokens);                   // Updates totalSupply
         emit Burn(msg.sender, tokens);
@@ -142,3 +142,38 @@ contract FNX is ERC20Interface, SafeMath {
         revert();
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

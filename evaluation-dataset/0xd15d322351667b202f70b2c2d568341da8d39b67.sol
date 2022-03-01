@@ -32,7 +32,7 @@ library SafeMath {
 
 
 /************************************************************************************************
- * 
+ *
  *************************************************************************************************/
 
 contract Ownable {
@@ -58,14 +58,14 @@ contract Ownable {
 
 }
 
-contract ERC20 { 
+contract ERC20 {
     function transfer(address receiver, uint amount) public ;
     function transferFrom(address sender, address receiver, uint amount) public returns(bool success); // do token.approve on the ICO contract
     function balanceOf(address _owner) constant public returns (uint256 balance);
 }
 
 /************************************************************************************************
- * 
+ *
  *************************************************************************************************/
 
 contract ASTRICOSale is Ownable {
@@ -75,14 +75,14 @@ contract ASTRICOSale is Ownable {
   uint256 public startTime;
   uint256 public endTime;
 
-  // where funds are collected 
+  // where funds are collected
 
   address public wallet;  // beneficiary
   address public ownerAddress;  // deploy owner
 
   // amount of raised money in wei
   uint256 public weiRaised;
-  
+
   uint8 internal decimals             = 4; // 4 decimal places should be enough in general
   uint256 internal decimalsConversion = 10 ** uint256(decimals);
   uint256 internal ALLOC_CROWDSALE    = 90000000 * decimalsConversion; // (10 ** uint256(decimals)); // 90 mill in ICO
@@ -123,14 +123,14 @@ contract ASTRICOSale is Ownable {
     function ASTRICOSale() public  {
 
     // require(_startTime >= now);
-    // require(_ethWallet != 0x0);   
+    // require(_ethWallet != 0x0);
 
     crowdsaleClosed = false;
     halted          = false;
     startTime       = 1513908673; // Friday, December 22, 2017 10:11:13 AM GMT+08:00
     endTime         = 1517414400; // Thursday, February 1, 2018 12:00:00 AM GMT+08:00
-    wallet          = ERC20(0x3baDA155408AB1C9898FDF28e545b51f2f9a65CC); // This wallet needs to give permission for the ICO to transfer Tokens 
-    ownerAddress    = ERC20(0x3EFAe2e152F62F5cc12cc0794b816d22d416a721);  // This is bad in theory but does fix the 2300 gas problem 
+    wallet          = ERC20(0x3baDA155408AB1C9898FDF28e545b51f2f9a65CC); // This wallet needs to give permission for the ICO to transfer Tokens
+    ownerAddress    = ERC20(0x3EFAe2e152F62F5cc12cc0794b816d22d416a721);  // This is bad in theory but does fix the 2300 gas problem
     token           = ERC20(0x80E7a4d750aDe616Da896C49049B7EdE9e04C191); // Ropsten we have pregenerated thiss
   }
 
@@ -152,11 +152,11 @@ contract ASTRICOSale is Ownable {
   function validPurchase() internal constant returns (bool) {
     bool withinPeriod = now >= startTime && now <= endTime;
     bool nonZeroPurchase = (msg.value != 0);
-    bool astrAvailable = (ALLOC_CROWDSALE - astrSold) > 0; 
+    bool astrAvailable = (ALLOC_CROWDSALE - astrSold) > 0;
     return withinPeriod && nonZeroPurchase && astrAvailable && ! crowdsaleClosed;
   }
 
-  function getCurrentRate() internal constant returns (uint256) {  
+  function getCurrentRate() internal constant returns (uint256) {
     if( PRICE_VARIABLE > 0 ) {
       return PRICE_VARIABLE; // we can manually set prices if we want
     }
@@ -165,13 +165,13 @@ contract ASTRICOSale is Ownable {
   }
 
 
-  // this closes it when we want to close - rather than waiting 
+  // this closes it when we want to close - rather than waiting
   function setNewRate(uint256 _coinsPerEther) onlyOwner public {
     if( _coinsPerEther > 0 ) {
         PRICE_VARIABLE = _coinsPerEther * decimalsConversion;
     }
   }
-    // this closes it when we want to close - rather than waiting 
+    // this closes it when we want to close - rather than waiting
   function setFixedRate() onlyOwner public {
      PRICE_VARIABLE = 0 * decimalsConversion;
   }
@@ -183,7 +183,7 @@ contract ASTRICOSale is Ownable {
       crowdsaleClosed = true;
     }
 
-    // this closes it when we want to close - rather than waiting 
+    // this closes it when we want to close - rather than waiting
   function safeCloseSale()  onlyOwner afterDeadline public {
     // wallet.transfer(weiRaised);
     crowdsaleClosed = true;
@@ -198,3 +198,38 @@ contract ASTRICOSale is Ownable {
     halted = false;
   }
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

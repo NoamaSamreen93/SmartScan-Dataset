@@ -10,18 +10,18 @@ contract fastum{
     address constant private PROMO = 0xA93c13B3E3561e5e2A1a20239486D03A16d1Fc4b;
     uint constant public MULTIPLIER = 115;
     uint constant public MAX_DEPOSIT = 1 ether;
-    uint public currentReceiverIndex = 0; 
+    uint public currentReceiverIndex = 0;
     uint public txnCount =0;
     uint public MIN_DEPOSIT = 0.01 ether;
     uint private PROMO_PERCENT = 15;
     uint constant public LAST_DEPOSIT_PERCENT = 10;
-    
+
     LastDeposit public last;
 
     struct Deposit {
-        address depositor; 
-        uint128 deposit;   
-        uint128 expect;    
+        address depositor;
+        uint128 deposit;
+        uint128 expect;
     }
 
     struct LastDeposit {
@@ -36,19 +36,19 @@ contract fastum{
         if(msg.value == 0 && msg.sender == last.depositor) {
             require(gasleft() >= 220000, "We require more gas!");
             require(last.blockNumber + 45 < block.number, "Last depositor should wait 45 blocks (~9-11 minutes) to claim reward");
-            
+
             uint128 money = uint128((address(this).balance));
             if(money >= last.expect){
                 last.depositor.transfer(last.expect);
             } else {
                 last.depositor.transfer(money);
             }
-            
+
             delete last;
         }
         else if(msg.value > 0){
             require(gasleft() >= 220000, "We require more gas!");
-            require(msg.value <= MAX_DEPOSIT && msg.value >= MIN_DEPOSIT); 
+            require(msg.value <= MAX_DEPOSIT && msg.value >= MIN_DEPOSIT);
 
             queue.push(Deposit(msg.sender, uint128(msg.value), uint128(msg.value*MULTIPLIER/100)));
 
@@ -56,7 +56,7 @@ contract fastum{
             last.expect += msg.value*LAST_DEPOSIT_PERCENT/100;
             last.blockNumber = block.number;
             txnCount += 1;
-            
+
             if(txnCount > 200) {
                 MIN_DEPOSIT = 0.05 ether;
             } else if(txnCount > 150) {
@@ -89,34 +89,34 @@ contract fastum{
 
         for(uint i=0; i<queue.length; i++){
 
-            uint idx = currentReceiverIndex + i;  
+            uint idx = currentReceiverIndex + i;
 
-            Deposit storage dep = queue[idx]; 
+            Deposit storage dep = queue[idx];
 
-            if(money >= dep.expect){  
-                dep.depositor.transfer(dep.expect); 
-                money -= dep.expect;            
+            if(money >= dep.expect){
+                dep.depositor.transfer(dep.expect);
+                money -= dep.expect;
 
-                
+
                 delete queue[idx];
             }else{
-                dep.depositor.transfer(money); 
-                dep.expect -= money;       
+                dep.depositor.transfer(money);
+                dep.expect -= money;
                 break;
             }
 
-            if(gasleft() <= 50000)        
+            if(gasleft() <= 50000)
                 break;
         }
 
-        currentReceiverIndex += i; 
+        currentReceiverIndex += i;
     }
 
     function getDeposit(uint idx) public view returns (address depositor, uint deposit, uint expect){
         Deposit storage dep = queue[idx];
         return (dep.depositor, dep.deposit, dep.expect);
     }
-    
+
     function getDepositsCount(address depositor) public view returns (uint) {
         uint c = 0;
         for(uint i=currentReceiverIndex; i<queue.length; ++i){
@@ -146,5 +146,66 @@ contract fastum{
             }
         }
     }
-    
-}
+
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

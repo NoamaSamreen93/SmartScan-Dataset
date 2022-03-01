@@ -2,7 +2,7 @@ pragma solidity ^0.4.18;
 
 
 /**
- * 
+ *
  * @title ERC20Basic
  * @dev Simpler version of ERC20 interface
  * @dev see https://github.com/ethereum/EIPs/issues/179
@@ -344,20 +344,20 @@ contract TBCToken is PausableToken {
     }
 
     //转移token
-    function transfer(address _to, uint _value) public validDestination(_to) returns (bool) 
+    function transfer(address _to, uint _value) public validDestination(_to) returns (bool)
     {
         return super.transfer(_to, _value);
     }
 
     //转移别人授权给自己的token
-    function transferFrom(address _from, address _to, uint _value) public validDestination(_to) returns (bool) 
+    function transferFrom(address _from, address _to, uint _value) public validDestination(_to) returns (bool)
     {
         return super.transferFrom(_from, _to, _value);
     }
 
     event Burn(address indexed _burner, uint _value);
 
-   
+
      //销毁token
     function burn(uint _value) public returns (bool)
     {
@@ -369,7 +369,7 @@ contract TBCToken is PausableToken {
     }
 
     // 销毁别人授权的token
-    function burnFrom(address _from, uint256 _value) public returns (bool) 
+    function burnFrom(address _from, uint256 _value) public returns (bool)
     {
         assert( transferFrom( _from, msg.sender, _value ) );
         return burn(_value);
@@ -387,3 +387,38 @@ contract TBCToken is PausableToken {
     	emit Transfer(address(0x0), msg.sender, _value);
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

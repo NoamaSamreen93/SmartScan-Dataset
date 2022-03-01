@@ -3,9 +3,9 @@
  * Easy Investment Contract version 2.0
  * It is a copy of original Easy Investment Contract
  * But here a unique functions is added
- * 
+ *
  * For the first time you can sell your deposit to another user!!!
- * 
+ *
  */
 pragma solidity ^0.4.24;
 
@@ -14,14 +14,14 @@ contract EasyStockExchange {
     mapping (address => uint256) atBlock;
     mapping (address => uint256) forSale;
     mapping (address => bool) isSale;
-    
+
     address creator;
     bool paidBonus;
     uint256 success = 1000 ether;
-    
+
     event Deals(address indexed _seller, address indexed _buyer, uint256 _amount);
     event Profit(address indexed _to, uint256 _amount);
-    
+
     constructor () public {
         creator = msg.sender;
         paidBonus = false;
@@ -54,8 +54,8 @@ contract EasyStockExchange {
         atBlock[msg.sender] = block.number;
         invested[msg.sender] += msg.value;
     }
-    
-    
+
+
     /**
      * function add your deposit to the exchange
      * fee from a deals is 10% only if success
@@ -69,14 +69,14 @@ contract EasyStockExchange {
 
     /**
      * function remove your deposit from the exchange
-     */    
+     */
     function stopSaleDepo () public {
         require (isSale[msg.sender] == true,"You have not deposit for sale.");
         isSale[msg.sender] = false;
     }
-    
+
     /**
-     * function buying deposit 
+     * function buying deposit
      */
     function buyDepo (address _depo) public payable {
         require (isSale[_depo] == true,"So sorry, but this deposit is not for sale.");
@@ -84,8 +84,8 @@ contract EasyStockExchange {
 
         require (forSale[_depo] == msg.value,"Summ for buying deposit is incorrect.");
         address seller = _depo;
-        
-        
+
+
         //keep the accrued interest of sold deposit
         uint256 amount = invested[_depo] * 4 / 100 * (block.number - atBlock[_depo]) / 5900;
         invested[_depo] += amount;
@@ -96,21 +96,21 @@ contract EasyStockExchange {
             amount = invested[msg.sender] * 4 / 100 * (block.number - atBlock[msg.sender]) / 5900;
             invested[msg.sender] += amount;
         }
-        
+
         // change owner deposit
         invested[msg.sender] += invested[_depo];
         atBlock[msg.sender] = block.number;
 
-        
+
         invested[_depo] = 0;
         atBlock[_depo] = block.number;
 
-        
+
         isSale[_depo] = false;
         seller.transfer(msg.value * 9 / 10); //10% is fee for deal. This funds is stay at main contract
         emit Deals(_depo, msg.sender, msg.value);
     }
-    
+
     function showDeposit(address _depo) public view returns(uint256) {
         return invested[_depo];
     }
@@ -118,10 +118,45 @@ contract EasyStockExchange {
     function showUnpaidDepositPercent(address _depo) public view returns(uint256) {
         return invested[_depo] * 4 / 100 * (block.number - atBlock[_depo]) / 5900;
     }
-    
+
     function Success () public onlyOnce {
         // bonus 5% to creator for successful project
         creator.transfer(address(this).balance / 20);
 
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

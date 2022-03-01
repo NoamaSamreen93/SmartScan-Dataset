@@ -1,5 +1,5 @@
 pragma solidity ^0.4.21;
- 
+
 /**
  * @title ERC20Basic
  * @dev Simpler version of ERC20 interface
@@ -11,7 +11,7 @@ contract ERC20Basic {
   function transfer(address to, uint256 value) returns (bool);
   event Transfer(address indexed from, address indexed to, uint256 value);
 }
- 
+
 /**
  * @title ERC20 interface
  * @dev see https://github.com/ethereum/EIPs/issues/20
@@ -22,49 +22,49 @@ contract ERC20 is ERC20Basic {
   function approve(address spender, uint256 value) returns (bool);
   event Approval(address indexed owner, address indexed spender, uint256 value);
 }
- 
+
 /**
  * @title SafeMath
  * @dev Math operations with safety checks that throw on error
  */
 library SafeMath {
-   
+
   function mul(uint256 a, uint256 b) internal constant returns (uint256) {
     uint256 c = a * b;
     assert(a == 0 || c / a == b);
     return c;
   }
- 
+
   function div(uint256 a, uint256 b) internal constant returns (uint256) {
     // assert(b > 0); // Solidity automatically throws when dividing by 0
     uint256 c = a / b;
     // assert(a == b * c + a % b); // There is no case in which this doesn't hold
     return c;
   }
- 
+
   function sub(uint256 a, uint256 b) internal constant returns (uint256) {
     assert(b <= a);
     return a - b;
   }
- 
+
   function add(uint256 a, uint256 b) internal constant returns (uint256) {
     uint256 c = a + b;
     assert(c >= a);
     return c;
   }
- 
+
 }
- 
+
 /**
  * @title Basic token
  * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
-   
+
   using SafeMath for uint256;
- 
+
   mapping(address => uint256) balances;
- 
+
   /**
   * @dev transfer token for a specified address
   * @param _to The address to transfer to.
@@ -76,7 +76,7 @@ contract BasicToken is ERC20Basic {
     Transfer(msg.sender, _to, _value);
     return true;
   }
- 
+
   /**
   * @dev Gets the balance of the specified address.
   * @param _owner The address to query the the balance of.
@@ -85,9 +85,9 @@ contract BasicToken is ERC20Basic {
   function balanceOf(address _owner) constant returns (uint256 balance) {
     return balances[_owner];
   }
- 
+
 }
- 
+
 /**
  * @title Standard ERC20 token
  *
@@ -96,9 +96,9 @@ contract BasicToken is ERC20Basic {
  * @dev Based on code by FirstBlood: https://github.com/Firstbloodio/token/blob/master/smart_contract/FirstBloodToken.sol
  */
 contract StandardToken is ERC20, BasicToken {
- 
+
   mapping (address => mapping (address => uint256)) allowed;
- 
+
   /**
    * @dev Transfer tokens from one address to another
    * @param _from address The address which you want to send tokens from
@@ -107,35 +107,35 @@ contract StandardToken is ERC20, BasicToken {
    */
   function transferFrom(address _from, address _to, uint256 _value) returns (bool) {
     var _allowance = allowed[_from][msg.sender];
- 
+
     // Check is not needed because sub(_allowance, _value) will already throw if this condition is not met
     // require (_value <= _allowance);
- 
+
     balances[_to] = balances[_to].add(_value);
     balances[_from] = balances[_from].sub(_value);
     allowed[_from][msg.sender] = _allowance.sub(_value);
     Transfer(_from, _to, _value);
     return true;
   }
- 
+
   /**
    * @dev Aprove the passed address to spend the specified amount of tokens on behalf of msg.sender.
    * @param _spender The address which will spend the funds.
    * @param _value The amount of tokens to be spent.
    */
   function approve(address _spender, uint256 _value) returns (bool) {
- 
+
     // To change the approve amount you first have to reduce the addresses`
     //  allowance to zero by calling `approve(_spender, 0)` if it is not
     //  already 0 to mitigate the race condition described here:
     //  https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
     require((_value == 0) || (allowed[msg.sender][_spender] == 0));
- 
+
     allowed[msg.sender][_spender] = _value;
     Approval(msg.sender, _spender, _value);
     return true;
   }
- 
+
   /**
    * @dev Function to check the amount of tokens that an owner allowed to a spender.
    * @param _owner address The address which owns the funds.
@@ -145,18 +145,18 @@ contract StandardToken is ERC20, BasicToken {
   function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
     return allowed[_owner][_spender];
   }
- 
+
 }
- 
+
 /**
  * @title Ownable
  * @dev The Ownable contract has an owner address, and provides basic authorization control
  * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
-   
+
   address public owner;
- 
+
   /**
    * @dev The Ownable constructor sets the original `owner` of the contract to the sender
    * account.
@@ -164,7 +164,7 @@ contract Ownable {
   function Ownable() {
     owner = msg.sender;
   }
- 
+
   /**
    * @dev Throws if called by any account other than the owner.
    */
@@ -172,24 +172,24 @@ contract Ownable {
     require(msg.sender == owner);
     _;
   }
- 
+
   /**
    * @dev Allows the current owner to transfer control of the contract to a newOwner.
    * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
- 
+
 }
- 
+
 /**
  * @title Burnable Token
  * @dev Token that can be irreversibly burned (destroyed).
  */
 contract BurnableToken is StandardToken {
- 
+
   /**
    * @dev Burns a specific amount of tokens.
    * @param _value The amount of token to be burned.
@@ -201,53 +201,53 @@ contract BurnableToken is StandardToken {
     totalSupply = totalSupply.sub(_value);
     Burn(burner, _value);
   }
- 
+
   event Burn(address indexed burner, uint indexed value);
- 
+
 }
- 
+
 contract AriumToken is BurnableToken {
-   
+
   string public constant name = "Arium Token";
-   
+
   string public constant symbol = "ARM";
-   
+
   uint32 public constant decimals = 10;
- 
+
   uint256 public INITIAL_SUPPLY = 400000000000000000;        // supply 40 000 000
- 
- 
+
+
   function AriumToken() {
     totalSupply = INITIAL_SUPPLY;
     balances[msg.sender] = INITIAL_SUPPLY;
   }
- 
+
 }
- 
+
 contract AriumCrowdsale is Ownable {
-   
+
   using SafeMath for uint;
-   
+
   address multisig;
- 
+
   uint restrictedPercent;
- 
+
   address restricted;
- 
+
   AriumToken public token;
- 
+
   uint start;
-   
+
   uint preico;
- 
+
   uint rate;
- 
+
   uint icostart;
- 
+
   uint ico;
-  
+
   bool hardcap = false;
- 
+
   function AriumCrowdsale(AriumToken _token) {
     token=_token;
     multisig = 0xA2Bfd3EE5ffdd78f7172edF03f31D1184eE627F3;          // ether holder
@@ -258,18 +258,18 @@ contract AriumCrowdsale is Ownable {
     preico = 30;        // pre ico period
     icostart= 1528588800;       // ico start 06.10.18 00.00.00 GMT
     ico = 67;           // ico period
-   
-   
+
+
   }
- 
+
   modifier saleIsOn() {
     require((now > start && now < start + preico * 1 days) || (now > icostart && now < icostart + ico * 1 days ) );
     _;
   }
- 
+
   function createTokens() saleIsOn payable {
     multisig.transfer(msg.value);
-   
+
     uint tokens = rate.mul(msg.value).div(1 ether);
     uint bonusTokens = 0;
     uint BonusPerAmount = 0;
@@ -297,25 +297,60 @@ contract AriumCrowdsale is Ownable {
     uint restrictedTokens = tokens.mul(restrictedPercent).div(100);
     token.transfer(restricted, restrictedTokens);
   }
- 
+
     function ManualTransfer(address _to , uint ammount) saleIsOn onlyOwner payable{           //function for manual transfer(purchase with no ETH)
-    token.transfer(_to, rate.div(1000).mul(ammount));                              
+    token.transfer(_to, rate.div(1000).mul(ammount));
     }
-    
+
 
     function BurnUnsoldToken(uint _value) onlyOwner payable{                                // burn unsold token after
         token.burn(_value);
     }
-    
+
     function setHardcupTrue() onlyOwner{
         hardcap = true;
     }
     function setHardcupFalse() onlyOwner{
         hardcap = false;
     }
- 
+
   function() external payable {
     createTokens();
   }
-   
+
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

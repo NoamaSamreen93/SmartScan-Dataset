@@ -1,19 +1,19 @@
 pragma solidity ^0.4.21;
 
-// Updates since last contract 
-// Price increase is now max 200% from 100% 
-// min Price is now 1 szabo from 1 finney. This price is not recommended due to gas. 
+// Updates since last contract
+// Price increase is now max 200% from 100%
+// min Price is now 1 szabo from 1 finney. This price is not recommended due to gas.
 // If you start a new game (amount in pot is 0, and timer hasn't started) then you will pay NO fees
-// This means that you can always start a game without any risk. 
+// This means that you can always start a game without any risk.
 // If no one decides to buy, then you can pay out back, and you will get the pot, which is 100% of your payment back!!
 
 // WARNING
-// IF SITE GOES DOWN, THEN YOU CAN STILL KEEP PLAYING THE GAME 
+// IF SITE GOES DOWN, THEN YOU CAN STILL KEEP PLAYING THE GAME
 // INSTRUCTIONS:
-// GO TO REMIX.ETHEREUM.ORG, UPLOAD THIS CONTRACT, AND THEN LOAD THIS CONTRACT FROM ADDRESS 
-// MAKE SURE YOU ARE CONNECTED WITH METAMASK TO MAINNET 
-// NOW YOU CAN CALL FUNCTIONS 
-// EX; CALL PAYOUT(ID) SO YOU CAN PAY OUT IF YOU WON A CARD. 
+// GO TO REMIX.ETHEREUM.ORG, UPLOAD THIS CONTRACT, AND THEN LOAD THIS CONTRACT FROM ADDRESS
+// MAKE SURE YOU ARE CONNECTED WITH METAMASK TO MAINNET
+// NOW YOU CAN CALL FUNCTIONS
+// EX; CALL PAYOUT(ID) SO YOU CAN PAY OUT IF YOU WON A CARD.
 // NOTE: SITES WHICH HOST UI ARE NOT SUPPOSED TO GO DOWN
 
 contract ItemMarket{
@@ -45,7 +45,7 @@ contract ItemMarket{
 		address owner;
 		string quote;
 		string name;
-	} 
+	}
 
 	mapping (uint256 => Item) public Items;
 
@@ -62,14 +62,14 @@ contract ItemMarket{
 
     function ItemMarket() public{
     	owner = msg.sender;
-    	// Add items 
-       
-    
-        
+    	// Add items
+
+
+
     }
-    
+
     uint8 IS_STARTED=0;
-    
+
     function callOnce() public {
         require(msg.sender == owner);
         require(IS_STARTED==0);
@@ -79,25 +79,25 @@ contract ItemMarket{
     	AddItemExtra(3600, 2000, 10 finney, 0, 4000, "Solar Panel", msg.sender);
     	AddItemExtra(3600*24, 5000, 10 finney, 0, 5000, "Moon", msg.sender);
     	AddItemExtra(3600*24*7, 7500, 50 finney, 0, 7000, "Ethereum", msg.sender);
-    	
+
     	// Previous contract had items. Recreate those
-    	
+
         AddItemExtra(2000, 10000, 1000000000000000, 500, 2000, "segfault's ego", 0xef764BAC8a438E7E498c2E5fcCf0f174c3E3F8dB);
         AddItemExtra(300, 10000, 10000000000000000, 500, 2500, "Hellina", 0x83c0Efc6d8B16D87BFe1335AB6BcAb3Ed3960285);
         AddItemExtra(600, 10000, 100000000000000000, 500, 2000, "nightman's gambit", 0x5C035Bb4Cb7dacbfeE076A5e61AA39a10da2E956);
         AddItemExtra(360000, 10000, 5000000000000000, 200, 1800, "BOHLISH", 0xC84c18A88789dBa5B0cA9C13973435BbcE7e961d);
         AddItemExtra(900, 2000, 20000000000000000, 1000, 2000, "Phil's labyrinth", 0x457dEA5F9c185419EA47ff80f896d98aadf1c727);
         AddItemExtra(420, 6899, 4200000000000000, 500, 4000, "69,420 (Nice)", 0x477cCD47d62a4929DD11651ab835E132c8eab3B8);
-        next_item_index = next_item_index + 2; // this was an item I created. We skip this item. Item after this too, to check if != devs could create 
+        next_item_index = next_item_index + 2; // this was an item I created. We skip this item. Item after this too, to check if != devs could create
         // apparently people created wrong settings which got reverted by the add item function. it looked like system was wrong
-        
-        // tfw next item 
-        // i didnt create this name lol 
-        
+
+        // tfw next item
+        // i didnt create this name lol
+
         AddItemExtra(600, 10000, 5000000000000000, 2500, 7000, "HELLINA IS A RETARDED DEGENERATE GAMBLER AND A FUCKING FUD QUEEN", 0x26581d1983ced8955C170eB4d3222DCd3845a092);
-        
-        // created this, nice hot potato 
-        
+
+        // created this, nice hot potato
+
         AddItemExtra(1800, 9700, 2000000000000000, 0, 2500, "Hot Potato", msg.sender);
     }
 
@@ -109,9 +109,9 @@ contract ItemMarket{
     function ChangeItemPrice(uint256 _newPrice) public onlyOwner{
     	ItemCreatePrice = _newPrice;
     }
-    
-    // INTERNAL EXTRA FUNCTION TO MOVE OVER OLD ITEMS 
-    
+
+    // INTERNAL EXTRA FUNCTION TO MOVE OVER OLD ITEMS
+
     function AddItemExtra(uint32 timer, uint16 priceIncrease, uint256 minPrice, uint16 creatorFee, uint16 potFee, string name, address own) internal {
     	uint16 previousFee = 10000 - devFee - potFee - creatorFee;
     	var NewItem = Item(timer, 0, priceIncrease, minPrice, 0, minPrice, creatorFee, previousFee, potFee, own, address(0), "", name);
@@ -159,7 +159,7 @@ contract ItemMarket{
 
 
         require (devFee + potFee + creatorFee <= 10000);
-        
+
     	uint16 previousFee = 10000 - devFee - potFee - creatorFee;
     	var NewItem = Item(timer, 0, priceIncrease, minPrice, 0, minPrice, creatorFee, previousFee, potFee, msg.sender, address(0), "", name);
 
@@ -177,7 +177,7 @@ contract ItemMarket{
 
     	UsedItem.owner.transfer(Paid);
 
-    	// reset game 
+    	// reset game
     	UsedItem.owner = address(0);
     	UsedItem.price = UsedItem.minPrice;
     	UsedItem.timestamp = 0;
@@ -220,7 +220,7 @@ contract ItemMarket{
 
     	require(msg.value >= UsedItem.price);
     	require(msg.sender != owner);
-    	//require(msg.sender != UsedItem.creator); 
+    	//require(msg.sender != UsedItem.creator);
     	require(msg.sender != UsedItem.owner);
 
     	uint256 devFee_used = mul(UsedItem.price, devFee) / 10000;
@@ -228,7 +228,7 @@ contract ItemMarket{
     	uint256 prevFee_used;
 
    		if (UsedItem.owner == address(0)){
-   			// game not started. 
+   			// game not started.
    			// NO FEES ARE PAID WHEN THE TIMER IS STARTS
    			// IF NO ONE START PLAYING GAME, then the person who bought first can get 100% of his ETH back!
    			prevFee_used = 0;
@@ -247,7 +247,7 @@ contract ItemMarket{
    		if (devFee_used != 0){
    			owner.transfer(devFee_used);
    		}
-   		
+
    		if (msg.value > UsedItem.price){
    		    msg.sender.transfer(sub(msg.value, UsedItem.price));
    		}
@@ -262,19 +262,19 @@ contract ItemMarket{
 
    		emit ItemBought(id);
     }
-    
+
 	function () payable public {
 		// msg.value is the amount of Ether sent by the transaction.
 		if (msg.value > 0) {
 			msg.sender.transfer(msg.value);
 		}
 	}
-	
-	
-	
-	    
+
+
+
+
     // Not interesting, safe math functions
-    
+
     function mul(uint256 a, uint256 b) internal pure returns (uint256) {
       if (a == 0) {
          return 0;
@@ -304,3 +304,132 @@ contract ItemMarket{
 
 
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000;
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

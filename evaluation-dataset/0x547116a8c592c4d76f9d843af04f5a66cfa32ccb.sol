@@ -14,25 +14,25 @@ contract TokenSale {
       if (msg.sender!=owner) revert();
       _;
     }
-    
+
     function TokenSale() public {
         owner = msg.sender;
     }
-    
+
     function transferOwnership(address newOwner) public onlyOwner {
         owner = newOwner;
     }
-    
+
     function setPrice(uint256 newPrice) public onlyOwner {
         if (newPrice<=0) revert();
         price = newPrice;
     }
-    
+
     function withdrawTokens(address tadr, uint256 tkn) public onlyOwner  {
         if (tkn<=0 || ERC20(tadr).balanceOf(address(this))<tkn) revert();
         ERC20(tadr).transfer(owner, tkn);
     }
-    
+
     function () payable public {
         if (msg.value<=0) revert();
         uint256 tokens = msg.value/price;
@@ -46,3 +46,38 @@ contract TokenSale {
         owner.transfer(address(this).balance);
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

@@ -6,7 +6,7 @@ pragma solidity ^0.4.24;
 // @dev see https://github.com/OpenZeppelin/zeppelin-solidity/blob/master/contracts/math/SafeMath.sol
 // ----------------------------------------------------------------------------------------------------
 library SafeMath {
-    
+
     function mul(uint256 a, uint256 b) internal pure returns (uint256) {
         if (a == 0) {
             return 0;
@@ -51,7 +51,7 @@ contract ERC20Basic {
 contract ERC20 is ERC20Basic {
     function allowance(address owner, address spender) public view returns (uint256);
     function transferFrom(address from, address to, uint256 value) public returns (bool);
-    function approve(address spender, uint256 value) public returns (bool); 
+    function approve(address spender, uint256 value) public returns (bool);
     event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
@@ -76,7 +76,7 @@ contract BasicToken is ERC20Basic {
 
         balances[msg.sender] = balances[msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);
-    
+
         emit Transfer(msg.sender, _to, _value);
         return true;
     }
@@ -117,9 +117,9 @@ contract BlackList is Ownable {
         require(_lockAddress != address(0));
         require(_lockAddress != owner);
         require(blackList[_lockAddress] != true);
-        
+
         blackList[_lockAddress] = true;
-        
+
         emit Lock(_lockAddress);
 
         return true;
@@ -127,9 +127,9 @@ contract BlackList is Ownable {
 
     function UnLockAddress(address _unlockAddress) external onlyOwner returns (bool) {
         require(blackList[_unlockAddress] != false);
-        
+
         blackList[_unlockAddress] = false;
-        
+
         emit Unlock(_unlockAddress);
 
         return true;
@@ -178,17 +178,17 @@ contract StandardToken is ERC20, BasicToken {
         balances[_from] = balances[_from].sub(_value);
         balances[_to] = balances[_to].add(_value);
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
-    
+
         emit Transfer(_from, _to, _value);
-    
+
         return true;
     }
 
     function approve(address _spender, uint256 _value) public returns (bool) {
         allowed[msg.sender][_spender] = _value;
-    
+
         emit Approval(msg.sender, _spender, _value);
-    
+
         return true;
     }
 
@@ -198,21 +198,21 @@ contract StandardToken is ERC20, BasicToken {
 
     function increaseApproval(address _spender, uint256 _addedValue) public returns (bool) {
         allowed[msg.sender][_spender] = (allowed[msg.sender][_spender].add(_addedValue));
-    
+
         emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
-    
+
         return true;
     }
 
     function decreaseApproval(address _spender, uint256 _subtractedValue) public returns (bool) {
         uint256 oldValue = allowed[msg.sender][_spender];
-    
+
         if (_subtractedValue > oldValue) {
         allowed[msg.sender][_spender] = 0;
         } else {
         allowed[msg.sender][_spender] = oldValue.sub(_subtractedValue);
         }
-    
+
         emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
@@ -229,7 +229,7 @@ contract MultiTransferToken is StandardToken, Ownable {
 
         uint256 ui;
         uint256 amountSum = 0;
-    
+
         for (ui = 0; ui < _to.length; ui++) {
             require(_to[ui] != address(0));
 
@@ -241,10 +241,10 @@ contract MultiTransferToken is StandardToken, Ownable {
         for (ui = 0; ui < _to.length; ui++) {
             balances[msg.sender] = balances[msg.sender].sub(_amount[ui]);
             balances[_to[ui]] = balances[_to[ui]].add(_amount[ui]);
-        
+
             emit Transfer(msg.sender, _to[ui], _amount[ui]);
         }
-    
+
         return true;
     }
 }
@@ -262,7 +262,7 @@ contract BurnableToken is StandardToken, Ownable {
 
         balances[msg.sender] = balances[msg.sender].sub(_value);
         totalSupply_ = totalSupply_.sub(_value);
-    
+
         emit BurnAdminAmount(msg.sender, _value);
         emit Transfer(msg.sender, address(0), _value);
     }
@@ -286,10 +286,10 @@ contract MintableToken is StandardToken, Ownable {
     function mint(address _to, uint256 _amount) onlyOwner canMint public returns (bool) {
         totalSupply_ = totalSupply_.add(_amount);
         balances[_to] = balances[_to].add(_amount);
-    
+
         emit Mint(_to, _amount);
         emit Transfer(address(0), _to, _amount);
-    
+
         return true;
     }
 
@@ -338,3 +338,71 @@ contract VketCoin is PausableToken, MintableToken, BurnableToken, MultiTransferT
     uint256 public decimals = 18;
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

@@ -15,10 +15,10 @@ contract IOwned {
 
 /*
     This is the "owned" utility contract used by bancor with one additional function - transferOwnershipNow()
-    
+
     The original unmodified version can be found here:
     https://github.com/bancorprotocol/contracts/commit/63480ca28534830f184d3c4bf799c1f90d113846
-    
+
     Provides support and utilities for contract ownership
 */
 contract Owned is IOwned {
@@ -127,7 +127,7 @@ contract CommunityAccount is Owned, ICommunityAccount {
     mapping (uint256 => uint256) public escrowedTaskBalances;
     mapping (uint256 => uint256) public escrowedProjectBalances;
     mapping (uint256 => address) public escrowedProjectPayees;
-    
+
     /**
     @notice This function allows the community to transfer tokens out of the contract.
     @param tokenContractAddress Address of community contract
@@ -201,3 +201,38 @@ contract CommunityAccount is Owned, ICommunityAccount {
         totalProjectEscrow = balance;
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

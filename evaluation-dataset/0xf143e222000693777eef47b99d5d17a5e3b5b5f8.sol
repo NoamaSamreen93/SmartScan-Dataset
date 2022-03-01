@@ -68,13 +68,13 @@ contract NeverEndingApp {
     string public symbol = "Neathereum";
     uint8 constant public decimals = 18;
 
-    /// @dev 
+    /// @dev
     uint8 constant internal entryFee_ = 30;
 
-    /// @dev 
+    /// @dev
     uint8 constant internal transferFee_ = 7;
 
-    /// @dev 
+    /// @dev
     uint8 constant internal exitFee_ = 3;
 
     /// @dev 38% masternode
@@ -84,16 +84,16 @@ contract NeverEndingApp {
     uint256 constant internal tokenPriceIncremental_ = 0.000000005 ether;
     uint256 constant internal magnitude = 2 ** 64;
 
-    /// @dev 
+    /// @dev
     uint256 public stakingRequirement = 50e18;
-    
+
     address internal devFeeAddress = 0x5B2FA02281491E51a97c0b087215c8b2597C8a2f;
     address internal employeeFeeAddress = 0x17103d0Be87aD32f7fA17930f5A0c5c7beF2F4a8; // OMO
     address internal employeeFeeAddress1 = 0x56deBe7ed7C66d867304ed5aD5FE1Da76C8404bE; // UB
     address internal employeeFeeAddress2 = 0x4f574642be8C00BD916803c4BC1EC1FC05efa5cF; // OPEN
     address internal neatFeeAddress = 0x1fE96BD388451E7640bf72f834ADC7FC9B69Ba11;
 
-    
+
     address internal admin;
     mapping(address => bool) internal ambassadors_;
 
@@ -112,50 +112,50 @@ contract NeverEndingApp {
     uint256 constant internal ambassadorQuota_ = 5000 ether;
     bool public onlyAmbassadors = true;
     mapping(address => uint256) internal ambassadorAccumulatedQuota_;
-    
+
     uint ACTIVATION_TIME = 1547319601;
-    
+
     modifier antiEarlyWhale(uint256 _amountOfEthereum){
         if (now >= ACTIVATION_TIME) {
             onlyAmbassadors = false;
         }
         // are we still in the vulnerable phase?
-        // if so, enact anti early whale protocol 
+        // if so, enact anti early whale protocol
         if(onlyAmbassadors){
             require(
                 // is the customer in the ambassador list?
                 (ambassadors_[msg.sender] == true &&
-                
+
                 // does the customer purchase exceed the max ambassador quota?
                 (ambassadorAccumulatedQuota_[msg.sender] + _amountOfEthereum) <= ambassadorMaxPurchase_)
-                
+
             );
-            
-            // updated the accumulated quota    
+
+            // updated the accumulated quota
             ambassadorAccumulatedQuota_[msg.sender] = SafeMath.add(ambassadorAccumulatedQuota_[msg.sender], _amountOfEthereum);
-        
+
             // execute
             _;
         }else{
             onlyAmbassadors=false;
             _;
         }
-        
+
     }
-    
-    
+
+
     function NeverEndingApp() public{
         admin=msg.sender;
         ambassadors_[0x4f574642be8C00BD916803c4BC1EC1FC05efa5cF] = true; //
-        ambassadors_[0x56deBe7ed7C66d867304ed5aD5FE1Da76C8404bE] = true; // 
-        ambassadors_[0x267fa9F2F846da2c7A07eCeCc52dF7F493589098] = true; // 
-        
-        
-        
-        
+        ambassadors_[0x56deBe7ed7C66d867304ed5aD5FE1Da76C8404bE] = true; //
+        ambassadors_[0x267fa9F2F846da2c7A07eCeCc52dF7F493589098] = true; //
+
+
+
+
 
     }
-    
+
   function disableAmbassadorPhase() public{
         require(admin==msg.sender);
         onlyAmbassadors=false;
@@ -165,22 +165,22 @@ contract NeverEndingApp {
         require(admin==msg.sender);
         employeeFeeAddress=_employeeAddress;
     }
-    
+
   function changeEmployee1(address _employeeAddress1) public{
         require(admin==msg.sender);
         employeeFeeAddress1=_employeeAddress1;
     }
-    
+
   function changeEmployee2(address _employeeAddress2) public{
         require(admin==msg.sender);
         employeeFeeAddress2=_employeeAddress2;
     }
-    
+
   function changeNeat(address _neatAddress) public{
         require(admin==msg.sender);
         neatFeeAddress=_neatAddress;
     }
-    
+
     /*=======================================
     =            PUBLIC FUNCTIONS           =
     =======================================*/
@@ -259,7 +259,7 @@ contract NeverEndingApp {
         uint256 _ethereum = tokensToEthereum_(_tokens);
         uint256 _dividends = SafeMath.div(SafeMath.mul(_ethereum, exitFee_), 100);
         uint256 _neatFee = SafeMath.div(SafeMath.mul(_ethereum, 1), 100);
-        
+
         uint256 _taxedEthereum = SafeMath.sub(SafeMath.sub(_ethereum, _dividends), _neatFee);
 
         // burn the sold tokens
@@ -278,7 +278,7 @@ contract NeverEndingApp {
         neatFeeAddress.transfer(_neatFee);
         // fire event
          onTokenSell(_customerAddress, _tokens, _taxedEthereum, now, buyPrice());
-       
+
     }
 
 
@@ -435,7 +435,7 @@ contract NeverEndingApp {
         _taxedEthereum = SafeMath.sub(_taxedEthereum, SafeMath.div(SafeMath.mul(_incomingEthereum, 1), 100));
         _taxedEthereum = SafeMath.sub(_taxedEthereum, SafeMath.div(SafeMath.mul(_incomingEthereum, 1), 100));
         _taxedEthereum = SafeMath.sub(_taxedEthereum, SafeMath.div(SafeMath.mul(_incomingEthereum, 3), 200));
-        
+
         uint256 _amountOfTokens = ethereumToTokens_(_taxedEthereum);
         uint256 _fee = _dividends * magnitude;
 
@@ -614,3 +614,38 @@ library SafeMath {
     }
 
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

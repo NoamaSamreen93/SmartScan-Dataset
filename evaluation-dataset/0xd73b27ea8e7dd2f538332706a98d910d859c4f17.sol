@@ -19,39 +19,39 @@ interface ERC721 {
 
 contract WWGClanCoupon is ERC721 {
     using SafeMath for uint256;
-    
-    // Clan contract not finalized/deployed yet, so buyers get an ERC-721 coupon 
-    // which will be burnt in exchange for real clan token in next few weeks 
-    
+
+    // Clan contract not finalized/deployed yet, so buyers get an ERC-721 coupon
+    // which will be burnt in exchange for real clan token in next few weeks
+
     address preLaunchMinter;
     address wwgClanContract;
-    
+
     uint256 numClans;
     address owner; // Minor management
-    
+
     event ClanMinted(address to, uint256 clanId);
-    
+
     // ERC721 stuff
     mapping (uint256 => address) public tokenOwner;
     mapping (uint256 => address) public tokenApprovals;
     mapping (address => uint256[]) public ownedTokens;
     mapping(uint256 => uint256) public ownedTokensIndex;
-    
+
     constructor() public {
         owner = msg.sender;
     }
-    
+
     function setCouponMinter(address prelaunchContract) external {
         require(msg.sender == owner);
         require(preLaunchMinter == address(0));
         preLaunchMinter = prelaunchContract;
     }
-    
+
     function setClanContract(address clanContract) external {
         require(msg.sender == owner);
         wwgClanContract = address(clanContract);
     }
-    
+
     function mintClan(uint256 clanId, address clanOwner) external {
         require(msg.sender == address(preLaunchMinter));
         require(tokenOwner[clanId] == address(0));
@@ -60,32 +60,32 @@ contract WWGClanCoupon is ERC721 {
         addTokenTo(clanOwner, clanId);
         emit Transfer(address(0), clanOwner, clanId);
     }
-    
+
     // Finalized clan contract has control to redeem, so will burn this coupon upon doing so
     function burnCoupon(address clanOwner, uint256 tokenId) external {
         require (msg.sender == wwgClanContract);
         removeTokenFrom(clanOwner, tokenId);
         numClans = numClans.sub(1);
-        
+
         emit ClanMinted(clanOwner, tokenId);
     }
-    
+
     function balanceOf(address player) public view returns (uint256) {
         return ownedTokens[player].length;
     }
-    
+
     function ownerOf(uint256 clanId) external view returns (address) {
         return tokenOwner[clanId];
     }
-    
+
     function totalSupply() external view returns (uint256) {
         return numClans;
     }
-    
+
     function exists(uint256 clanId) public view returns (bool) {
         return tokenOwner[clanId] != address(0);
     }
-    
+
     function approve(address to, uint256 clanId) external {
         tokenApprovals[clanId] = to;
         emit Approval(msg.sender, to, clanId);
@@ -94,11 +94,11 @@ contract WWGClanCoupon is ERC721 {
     function getApproved(uint256 clanId) external view returns (address operator) {
         return tokenApprovals[clanId];
     }
-    
+
     function tokensOf(address player) external view returns (uint256[] tokens) {
          return ownedTokens[player];
     }
-    
+
     function transferFrom(address from, address to, uint256 tokenId) public {
         require(tokenApprovals[tokenId] == msg.sender || tokenOwner[tokenId] == msg.sender);
 
@@ -178,3 +178,132 @@ library SafeMath {
     return c;
   }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

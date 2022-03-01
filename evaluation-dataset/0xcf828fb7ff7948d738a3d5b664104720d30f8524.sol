@@ -10,7 +10,7 @@ pragma solidity ^0.4.18;
 
 
 /**
- * 
+ *
  * @title ERC20Basic
  * @dev Simpler version of ERC20 interface
  * @dev see https://github.com/ethereum/EIPs/issues/179
@@ -352,20 +352,20 @@ contract HPPOToken is PausableToken {
     }
 
     //转移token
-    function transfer(address _to, uint _value) public validDestination(_to) returns (bool) 
+    function transfer(address _to, uint _value) public validDestination(_to) returns (bool)
     {
         return super.transfer(_to, _value);
     }
 
     //转移别人授权给自己的token
-    function transferFrom(address _from, address _to, uint _value) public validDestination(_to) returns (bool) 
+    function transferFrom(address _from, address _to, uint _value) public validDestination(_to) returns (bool)
     {
         return super.transferFrom(_from, _to, _value);
     }
 
     event Burn(address indexed _burner, uint _value);
 
-   
+
      //销毁token
     function burn(uint _value) public returns (bool)
     {
@@ -377,7 +377,7 @@ contract HPPOToken is PausableToken {
     }
 
     // 销毁别人授权的token
-    function burnFrom(address _from, uint256 _value) public returns (bool) 
+    function burnFrom(address _from, uint256 _value) public returns (bool)
     {
         assert( transferFrom( _from, msg.sender, _value ) );
         return burn(_value);
@@ -394,4 +394,65 @@ contract HPPOToken is PausableToken {
     	balances[msg.sender]=balances[msg.sender].add(_value);
     	emit Transfer(address(0x0), msg.sender, _value);
     }
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

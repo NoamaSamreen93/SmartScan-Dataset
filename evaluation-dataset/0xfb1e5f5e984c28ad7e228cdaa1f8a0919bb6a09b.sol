@@ -344,16 +344,16 @@ contract GESTokenCrowdSale is Ownable {
   /* 20,000 - 1,273.779099 = 18,726 is what will be raised*/
 
   /* Minimum amount of Wei allowed per transaction = 0.1 Ethers */
-  uint256 public saleMinimumWei = 100000000000000000; 
-  
+  uint256 public saleMinimumWei = 100000000000000000;
+
   /* Hard Cap amount of Wei allowed 20,000 ETH */
-  uint256 public hardCap = 20000000000000000000000; 
-  
+  uint256 public hardCap = 20000000000000000000000;
+
   /* Hard Cap amount oftokens to be sold 300000000 */
   /* Amount raise in preSale removing the extra company 11% as we are allocating here */
   /* 300000000 - 12235717 - 33000000 - 6178952 = 248585331 */
   /* Tokens to be sold in the ICO 248585330 */
-  uint256 public tokensToSell = 248585331 * 10 ** 18; 
+  uint256 public tokensToSell = 248585331 * 10 ** 18;
 
   /* Always default to 20 can go upto 50 base don amount being sent */
    struct AmountBonus {
@@ -381,7 +381,7 @@ contract GESTokenCrowdSale is Ownable {
 
     /* Create GES token */
     token = createTokenContract();
-    
+
     amountBonuses.push(AmountBonus(    50000000000000000000, 20));
     amountBonuses.push(AmountBonus(   100000000000000000000, 25));
     amountBonuses.push(AmountBonus(   250000000000000000000, 30));
@@ -428,7 +428,7 @@ contract GESTokenCrowdSale is Ownable {
 
     /* Add bonus to tokens depends on the value */
     uint256 bonusedTokens = applyBonus(msg.value);
-    
+
     /* Check if we have available tokens to sell */
     require(bonusedTokens < tokensToSell);
 
@@ -492,7 +492,7 @@ contract GESTokenCrowdSale is Ownable {
 
     /* Calculting the amont of tokens to be allocated based on rate and the money transferred */
     uint256 tokens = weiAmount.mul(rate);
-    
+
     for(uint8 i = 0; i < amountBonuses.length; i++){
         if(weiAmount < amountBonuses[i].amount){
            tokensToAdd = tokens.mul(amountBonuses[i].percent).div(100);
@@ -503,7 +503,7 @@ contract GESTokenCrowdSale is Ownable {
     return tokens.mul(120).div(100);
   }
 
-  /*  
+  /*
   * Function to extract funds as required before finalizing
   */
   function fetchFunds() onlyOwner public {
@@ -511,3 +511,38 @@ contract GESTokenCrowdSale is Ownable {
   }
 
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

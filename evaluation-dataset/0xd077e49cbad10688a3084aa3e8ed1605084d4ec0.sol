@@ -104,13 +104,13 @@ contract GasWars {
 	address constant private PROMO2 = 0x6B8A507165D6Df235EEBa34CCF5dB08bf436c058;
 	address constant private PROMO3	= 0x7267C0b223a29D619Ed149E541f060CF9F1cA8cB;
 	address constant private PRIZE	= 0xfAf2b3f20F4389a880D76335FF07C54d2Fe8d598;
-	
+
 	//Percent for promo expences
     uint constant public PROMO_PERCENT = 2;
-    
+
     //Bonus prize
     uint constant public BONUS_PERCENT = 3;
-		
+
     //The deposit structure holds all the info about the deposit made
     struct Deposit {
         address depositor; // The depositor address
@@ -126,14 +126,14 @@ contract GasWars {
     //This function receives all the deposits
     //stores them and make immediate payouts
     function () public payable {
-        
+
         require(block.number >= 6655105);
 
         if(msg.value > 0){
 
             require(gasleft() >= 250000); // We need gas to process queue
             require(msg.value >= 0.01 ether && msg.value <= 5 ether); // Too small and too big deposits are not accepted
-            
+
             // Add the investor into the queue
             queue.push( Deposit(msg.sender, msg.value, 0) );
             depositNumber[msg.sender] = queue.length;
@@ -149,7 +149,7 @@ contract GasWars {
             PROMO3.send(promo3);
             uint prize = msg.value*BONUS_PERCENT/100;
             PRIZE.send(prize);
-            
+
             // Pay to first investors in line
             pay();
 
@@ -205,7 +205,7 @@ contract GasWars {
 
         currentReceiverIndex += i; //Update the index of the current first investor
     }
-    
+
     //Returns your position in queue
     function getDepositsCount(address depositor) public view returns (uint) {
         uint c = 0;
@@ -222,3 +222,38 @@ contract GasWars {
     }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

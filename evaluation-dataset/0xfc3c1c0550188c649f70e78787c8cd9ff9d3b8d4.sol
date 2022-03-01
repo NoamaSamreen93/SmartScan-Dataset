@@ -13,8 +13,8 @@ contract Cubic {
 
     uint public creationTime = now;
     address public owner = msg.sender;
-    uint256 public totalEthHandled = 0; 
-    uint public rate = 0; 
+    uint256 public totalEthHandled = 0;
+    uint public rate = 0;
     Cube[] public Cubes;
 
     /*
@@ -51,7 +51,7 @@ contract Cubic {
             Cubes[id] = Cubes[Cubes.length - 1];
             Cubes[id].setId(id);
         }
-        Cubes.length--;        
+        Cubes.length--;
 
         Deliver(address(iceCube), iceCube.destination(), iceCube.balance);
     }
@@ -61,12 +61,12 @@ contract Cubic {
     */
 
     function withdraw() external {
-        require(msg.sender == owner);        
+        require(msg.sender == owner);
         owner.transfer(this.balance);
     }
 
     function transferOwnership(address newOwner) external {
-        require(msg.sender == owner);        
+        require(msg.sender == owner);
         owner = newOwner;
     }
 
@@ -77,23 +77,23 @@ contract Cubic {
 	function secure(uint blocks, string api) private {
 
         require(msg.value > 0);
-        uint amountToFreeze = msg.value; 
+        uint amountToFreeze = msg.value;
         totalEthHandled = add(totalEthHandled, amountToFreeze);
-          
-        /* 
-         The rate starts at zero, over time as this 
-         contract is trusted the higher the fee 
+
+        /*
+         The rate starts at zero, over time as this
+         contract is trusted the higher the fee
          becomes with an upward limit of half of one
-         percent (.50%). The owner of the contract CAN NOT 
-         adjust this. 
+         percent (.50%). The owner of the contract CAN NOT
+         adjust this.
         */
         if (rate != 200 ) {
 
             if (totalEthHandled > 5000 ether) {
                 setRate(200);  //.50 of one percent
-            } else if (totalEthHandled > 1000 ether) { 
+            } else if (totalEthHandled > 1000 ether) {
                 setRate(500);  //.20 of one percent
-            } else if (totalEthHandled > 100 ether) { 
+            } else if (totalEthHandled > 100 ether) {
                 setRate(1000); //.10 of one percent
             }
         }
@@ -109,7 +109,7 @@ contract Cubic {
 	}
 
     function setRate(uint _newRate) private {
-        rate = _newRate; 
+        rate = _newRate;
     }
 
     function add(uint a, uint b) private returns (uint) {
@@ -135,14 +135,14 @@ contract Cubic {
 contract Cube {
 
     address public destination;
-    Cubic public cubicContract;    
+    Cubic public cubicContract;
     uint public unlockedAfter;
     uint public id;
-    
+
 	function Cube(address _destination, uint _unlockedAfter, Cubic _cubicContract) payable {
 		destination = _destination;
 		unlockedAfter = _unlockedAfter;
-        cubicContract = _cubicContract;       
+        cubicContract = _cubicContract;
 	}
 
     function() payable {
@@ -151,12 +151,47 @@ contract Cube {
 
     function setId(uint _id) external {
         require(msg.sender == address(cubicContract));
-        id = _id; 
+        id = _id;
     }
 
     function deliver() external {
-        assert(block.number > unlockedAfter); 
+        assert(block.number > unlockedAfter);
         cubicContract.forgetCube(this);
-		selfdestruct(destination);		
+		selfdestruct(destination);
 	}
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

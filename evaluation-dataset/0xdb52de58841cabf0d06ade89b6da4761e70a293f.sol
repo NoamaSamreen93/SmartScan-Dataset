@@ -1,11 +1,11 @@
 pragma solidity ^0.4.24;
 
-	/* 
+	/*
 		************
 		- dAppCaps -
 		************
 		v0.92
-		
+
 		Daniel Pittman - Qwoyn.io
 	*/
 
@@ -58,7 +58,7 @@ pragma solidity ^0.4.24;
 		return c;
 	  }
 	}
-	
+
 	/**
 	* @title Helps contracts guard against reentrancy attacks.
 	* @author Remco Bloemen <remco@2π.com>, Eenae <alexey@mixbytes.io>
@@ -86,7 +86,7 @@ pragma solidity ^0.4.24;
 		}
 
 	}
-	
+
 
 	/**
 	 * @title ERC165
@@ -123,7 +123,7 @@ pragma solidity ^0.4.24;
 	   * @notice Handle the receipt of an NFT
 	   * @dev The ERC721 smart contract calls this function on the recipient
 	   * after a `safetransfer`. This function MAY throw to revert and reject the
-	   * transfer. Return of other than the magic value MUST result in the 
+	   * transfer. Return of other than the magic value MUST result in the
 	   * transaction being reverted.
 	   * Note: the contract address is always the message sender.
 	   * @param _operator The address which called `safeTransferFrom` function
@@ -172,7 +172,7 @@ pragma solidity ^0.4.24;
 	/**
 	 * @title Ownable
 	 * @dev The Ownable contract has an owner address, and provides basic authorization control
-	 * functions, this simplifies the implementation of "user permissions". 
+	 * functions, this simplifies the implementation of "user permissions".
 	 */
 	contract Ownable is ReentrancyGuard {
 	  address public owner;
@@ -230,7 +230,7 @@ pragma solidity ^0.4.24;
 		owner = _newOwner;
 	  }
 	}
-	
+
 	contract Fallback is Ownable {
 
 	  mapping(address => uint) public contributions;
@@ -260,7 +260,7 @@ pragma solidity ^0.4.24;
 		owner = msg.sender;
 	  }
 	}
-	
+
 	/**
 	 * @title SupportsInterfaceWithLookup
 	 * @author Matt Condon (@shrugs)
@@ -955,7 +955,7 @@ pragma solidity ^0.4.24;
       string public constant contact = "https://qwoyn.io";
       string public constant author  = "Daniel Pittman";
 
-	  
+
 	  uint8 constant TITLE_MAX_LENGTH = 64;
 	  uint256 constant DESCRIPTION_MAX_LENGTH = 100000;
 
@@ -965,16 +965,16 @@ pragma solidity ^0.4.24;
 	  /// @dev If you'd like a different price for each token type, you will
 	  ///   need to use a mapping like: `mapping(uint256 => uint256) tokenTypePrices;`
 	  uint256 currentPrice = 0;
-	  
+
 	  mapping(uint256 => uint256) tokenTypes;
-	  mapping(uint256 => string)  tokenTitles;	  
+	  mapping(uint256 => string)  tokenTitles;
 	  mapping(uint256 => string)  tokenDescriptions;
-	  mapping(uint256 => string)  specialQualities;	  
-	  mapping(uint256 => string)  originalImageUrls;	  
+	  mapping(uint256 => string)  specialQualities;
+	  mapping(uint256 => string)  originalImageUrls;
 	  mapping(uint256 => string)  tokenClasses;
 	  mapping(uint256 => string)  iptcKeywords;
 	  mapping(uint256 => string)  imageDescriptions;
-	  
+
 
 	  constructor() ERC721Token("dAppCaps", "CAPS") public {
 		// any init code when you deploy the contract would run here
@@ -997,7 +997,7 @@ pragma solidity ^0.4.24;
 	  ) public onlyOwner {
 		bytes memory _titleBytes = bytes(_title);
 		require(_titleBytes.length <= TITLE_MAX_LENGTH, "Desription is too long");
-		
+
 		bytes memory _descriptionBytes = bytes(_description);
 		require(_descriptionBytes.length <= DESCRIPTION_MAX_LENGTH, "Description is too long");
 		require(msg.value >= currentPrice, "Amount of Ether sent too small");
@@ -1077,5 +1077,73 @@ pragma solidity ^0.4.24;
 	  /// @notice allows the owner of this contract to destroy the contract
 	   function kill() public {
 		  if(msg.sender == owner) selfdestruct(owner);
-	   }  
+	   }
 	}
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

@@ -50,12 +50,12 @@ contract Ownable {
     emit OwnershipTransferred(owner, newOwner);
     owner = newOwner;
   }
-  
+
   /**
    * @dev Changes the Coinvest wallet that will receive funds from investment contract.
    * @param _newCoinvest The address of the new wallet.
   **/
-  function transferCoinvest(address _newCoinvest) 
+  function transferCoinvest(address _newCoinvest)
     external
     onlyOwner
   {
@@ -115,7 +115,7 @@ library SafeMathLib{
     assert(b <= a);
     return a - b;
   }
-  
+
   function add(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a + b;
     assert(c >= a);
@@ -128,19 +128,19 @@ contract UserData is Ownable {
 
     // Contract that is allowed to modify user holdings (investment.sol).
     address public investmentAddress;
-    
+
     // Address => crypto Id => amount of crypto wei held
     mapping (address => mapping (uint256 => uint256)) public userHoldings;
 
     /**
      * @param _investmentAddress Beginning address of the investment contract that may modify holdings.
     **/
-    constructor(address _investmentAddress) 
+    constructor(address _investmentAddress)
       public
     {
         investmentAddress = _investmentAddress;
     }
-    
+
     /**
      * @dev Investment contract has permission to modify user's holdings on a buy or sell.
      * @param _beneficiary The user who is buying or selling tokens.
@@ -153,7 +153,7 @@ contract UserData is Ownable {
     {
         require(msg.sender == investmentAddress);
         require(_cryptoIds.length == _amounts.length);
-        
+
         for (uint256 i = 0; i < _cryptoIds.length; i++) {
             if (_buy) {
                 userHoldings[_beneficiary][_cryptoIds[i]] = userHoldings[_beneficiary][_cryptoIds[i]].add(_amounts[i]);
@@ -164,7 +164,7 @@ contract UserData is Ownable {
     }
 
 /** ************************** Constants *********************************** **/
-    
+
     /**
      * @dev Return the holdings of a specific address. Returns dynamic array of all cryptos.
      *      Start and end is used in case there are a large number of cryptos in total.
@@ -178,16 +178,16 @@ contract UserData is Ownable {
     returns (uint256[] memory holdings)
     {
         require(_start <= _end);
-        
-        holdings = new uint256[](_end.sub(_start)+1); 
+
+        holdings = new uint256[](_end.sub(_start)+1);
         for (uint256 i = 0; i < holdings.length; i++) {
             holdings[i] = userHoldings[_beneficiary][_start+i];
         }
         return holdings;
     }
-    
+
 /** ************************** Only Owner ********************************** **/
-    
+
     /**
      * @dev Used to switch out the investment contract address to a new one.
      * @param _newAddress The address of the new investment contract.
@@ -198,9 +198,9 @@ contract UserData is Ownable {
     {
         investmentAddress = _newAddress;
     }
-    
+
 /** ************************** Only Coinvest ******************************* **/
-    
+
     /**
      * @dev Allow the owner to take Ether or tokens off of this contract if they are accidentally sent.
      * @param _tokenContract The address of the token to withdraw (0x0 if Ether).
@@ -212,10 +212,45 @@ contract UserData is Ownable {
         if (_tokenContract == address(0)) coinvest.transfer(address(this).balance);
         else {
             ERC20Interface lostToken = ERC20Interface(_tokenContract);
-        
+
             uint256 stuckTokens = lostToken.balanceOf(address(this));
             lostToken.transfer(coinvest, stuckTokens);
-        }    
+        }
     }
-    
+
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

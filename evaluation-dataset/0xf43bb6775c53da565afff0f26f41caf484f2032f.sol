@@ -120,7 +120,7 @@ contract Ownable {
  * A game of financial hot potato. Players pay to click EtherButton.
  * Each player is given 105% of their payment by each subsequent player.
  * A seven hour timer resets after every click. The round advances once the timer reaches zero.
- * 
+ *
  * Bonus:
  *  For every player payout, an additional 1% is stored as an end-of-round bonus.
  *  Each player is entitled to their bonus if they click EtherButton during the *next* round.
@@ -158,7 +158,7 @@ contract EtherButton is Ownable, ReentrancyGuard {
   uint private constant PLAYER_PROFIT_DENOMINATOR = 100;
   // 1% price increase is allocated to player bonuses.
   uint private constant BONUS_NUMERATOR = 1;
-  uint private constant BONUS_DENOMINATOR = 100; 
+  uint private constant BONUS_DENOMINATOR = 100;
   // 2.5% price increase is allocated to the owner.
   uint private constant OWNER_FEE_NUMERATOR = 25;
   uint private constant OWNER_FEE_DENOMINATOR = 1000;
@@ -211,7 +211,7 @@ contract EtherButton is Ownable, ReentrancyGuard {
     // when value is sent to it. So, round advancement must be done just-in-time whenever a player pays to click.
     // Only advance the round when a player clicks because the next round's timer will begin immediately.
     if (getIsRoundOver(RoundId)) {
-      advanceRound(); 
+      advanceRound();
     }
 
     Round storage round = Rounds[RoundId];
@@ -223,7 +223,7 @@ contract EtherButton is Ownable, ReentrancyGuard {
 
     // Refund player extra value beyond price. If EtherButton is very popular then its price may
     // attempt to increase multiple times in a single block. In this situation, the first attempt
-    // would be successful, but subsequent attempts would fail due to insufficient funding. 
+    // would be successful, but subsequent attempts would fail due to insufficient funding.
     // To combat this issue, a player may send more value than necessary to
     // increase the chance of the price being payable with the amount of value they sent.
     if (msg.value > round.price) {
@@ -254,7 +254,7 @@ contract EtherButton is Ownable, ReentrancyGuard {
     round.price = getNextPrice(round.price);
     // Reset the round timer
     round.endTime = now.add(ROUND_DURATION);
-    
+
     // Log an event with relevant information from the round's state.
     LogClick(
       round.id,
@@ -360,7 +360,7 @@ contract EtherButton is Ownable, ReentrancyGuard {
   function advanceRound() private {
     if (RoundId > 1) {
       // Take all of the previous rounds unclaimed bonuses and roll them forward.
-      Round storage previousRound = Rounds[RoundId.sub(1)];      
+      Round storage previousRound = Rounds[RoundId.sub(1)];
       // If the active player of the previous round didn't claim their refund then they lose the ability to claim it.
       // Their refund is also rolled into the bonuses for the next round.
       uint remainingBonus = previousRound.totalBonus.add(INITIAL_PRICE).sub(previousRound.claimedBonus);
@@ -411,7 +411,7 @@ contract EtherButton is Ownable, ReentrancyGuard {
   }
 
   /**
-    Returns the next price to click EtherButton. The returned value should be 
+    Returns the next price to click EtherButton. The returned value should be
     8.50% larger than the current price:
       - 5.00% is paid to the player.
       - 1.00% is paid as bonuses.
@@ -459,3 +459,71 @@ contract EtherButton is Ownable, ReentrancyGuard {
     return price.add(getPlayerFee(price));
   }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000;
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

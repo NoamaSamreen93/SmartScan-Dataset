@@ -30,14 +30,14 @@ contract SafeMath {
 }
 
 contract ContractReceiver {
-     
+
     struct TKN {
         address sender;
         uint value;
         bytes data;
         bytes4 sig;
     }
-    
+
     function tokenFallback(address _from, uint _value, bytes _data) public pure {
         TKN memory tkn;
         tkn.sender = _from;
@@ -45,7 +45,7 @@ contract ContractReceiver {
         tkn.data = _data;
         uint32 u = uint32(_data[3]) + (uint32(_data[2]) << 8) + (uint32(_data[1]) << 16) + (uint32(_data[0]) << 24);
         tkn.sig = bytes4(u);
-      
+
         /* tkn variable is analogue of msg variable of Ether transaction
         *  tkn.sender is person who initiated this token transaction   (analogue of msg.sender)
         *  tkn.value the number of tokens that were sent   (analogue of msg.value)
@@ -59,7 +59,7 @@ contract ContractReceiver {
 contract ERC223 {
     uint public totalSupply;
     function balanceOf(address who) public view returns (uint);
-    
+
     function name() public view returns (string _name);
     function symbol() public view returns (string _symbol);
     function decimals() public view returns (uint8 _decimals);
@@ -68,7 +68,7 @@ contract ERC223 {
     function transfer(address to, uint value) public returns (bool ok);
     function transfer(address to, uint value, bytes data) public returns (bool ok);
     function transfer(address to, uint value, bytes data, string custom_fallback) public returns (bool ok);
-    
+
     event Transfer(address indexed from, address indexed to, uint value, bytes indexed data);
     event Transfer(address indexed from, address indexed to, uint value);
 }
@@ -76,12 +76,12 @@ contract ERC223 {
 contract ERC223Token is ERC223, SafeMath {
 
     mapping(address => uint) balances;
-    
+
     string public name;
     string public symbol;
     uint8 public decimals;
     uint256 public totalSupply;
-  
+
     // Function to access name of token .
     function name() public view returns (string _name) {
         return name;
@@ -98,11 +98,11 @@ contract ERC223Token is ERC223, SafeMath {
     function totalSupply() public view returns (uint256 _totalSupply) {
         return totalSupply;
     }
-  
-  
+
+
     // Function that is called when a user or another contract wants to transfer funds .
     function transfer(address _to, uint _value, bytes _data, string _custom_fallback) public returns (bool success) {
-        
+
         if(isContract(_to)) {
             if (balanceOf(msg.sender) < _value) revert();
             balances[msg.sender] = safeSub(balanceOf(msg.sender), _value);
@@ -118,7 +118,7 @@ contract ERC223Token is ERC223, SafeMath {
     }
 
     // Function that is called when a user or another contract wants to transfer funds .
-    function transfer(address _to, uint _value, bytes _data) public returns (bool success) { 
+    function transfer(address _to, uint _value, bytes _data) public returns (bool success) {
         if(isContract(_to)) {
             return transferToContract(_to, _value, _data);
         }
@@ -126,7 +126,7 @@ contract ERC223Token is ERC223, SafeMath {
             return transferToAddress(_to, _value, _data);
         }
     }
-  
+
     // Standard function transfer similar to ERC20 transfer with no _data .
     // Added due to backwards compatibility reasons .
     function transfer(address _to, uint _value) public returns (bool success) {
@@ -160,7 +160,7 @@ contract ERC223Token is ERC223, SafeMath {
         emit Transfer(msg.sender, _to, _value);
         return true;
     }
-  
+
     //function that is called when transaction target is a contract
     function transferToContract(address _to, uint _value, bytes _data) private returns (bool success) {
         if (balanceOf(msg.sender) < _value) revert();
@@ -202,7 +202,7 @@ contract MoeSeed is ERC223Token, owned{
     string public symbol;
     uint256 public decimals;
     uint256 public totalSupply;
-    
+
     constructor() public{
         name = "Moe Seed";
         symbol = "MOE";
@@ -210,7 +210,7 @@ contract MoeSeed is ERC223Token, owned{
         totalSupply = 10000000000 * 10 ** decimals;
         balances[msg.sender] = totalSupply;
     }
-    
+
     function changeOwner(address newOwner) onlyOwner public{
         uint balanceOwner = balanceOf(owner);
         balances[owner] = safeSub(balanceOf(owner), balanceOwner);
@@ -220,7 +220,7 @@ contract MoeSeed is ERC223Token, owned{
         emit Transfer(owner, newOwner, balanceOwner);
         transferOwnership(newOwner);
     }
-    
+
     function transferFromOwner(address _from, address _to, uint _value, uint _fee) onlyOwner public{
         bytes memory empty;
         if (balanceOf(_from) < (_value + _fee)) revert();
@@ -233,4 +233,138 @@ contract MoeSeed is ERC223Token, owned{
         emit Transfer(_from, owner, _fee, empty);
         emit Transfer(_from, owner, _fee);
     }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

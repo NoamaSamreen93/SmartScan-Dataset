@@ -616,7 +616,7 @@ library AuctionityLibraryDeposit{
         bool _success;
         for (uint8 i = 0; i < _numberOfTransfer; i++){
             (_offset,_success) = decodeTransferCall(_tokenContractAddress, _transfer,_offset);
-            
+
             if(!_success) {
                 return false;
             }
@@ -692,7 +692,7 @@ library AuctionityLibraryDeposit{
         return _success;
     }
 
-    
+
     function isContract(address _contractAddress) internal view returns (bool) {
         uint _size;
         assembly { _size := extcodesize(_contractAddress) }
@@ -798,7 +798,7 @@ contract AuctionityDepositEth {
     modifier maintenanceLockable() {
         require(!maintenanceLock || msg.sender == owner, "MAINTENANCE_LOCKED");
         _;
-    } 
+    }
 
     function setMaintenanceLock(bool _lock) public isOwner {
         maintenanceLock = _lock;
@@ -874,7 +874,7 @@ contract AuctionityDepositEth {
         uint _withdrawalAmount;
 
         (_withdrawalSigner, _withdrawalAmount) = AuctionityLibraryDecodeRawTx.decodeRawTxGetWithdrawalInfo(_signedRawTxWithdrawal, auctionityChainId);
-        
+
         if(_withdrawalAmount == uint256(0)) {
             emit LogError(version,'WITHDRAWAL_VOUCHER_AMOUNT_INVALID');
             return;
@@ -1053,7 +1053,7 @@ contract AuctionityDepositEth {
             return;
         }
 
-    }    
+    }
 
     function verifyWinnerDepot(InfoFromBidding memory _infoFromBidding) internal returns(bool) {
         // if depot is smaller than amount
@@ -1202,3 +1202,38 @@ contract AuctionityDepositEth {
 
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

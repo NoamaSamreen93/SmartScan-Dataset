@@ -59,9 +59,9 @@ contract Token is Owned, Mutex {
     address club;
     uint lockedSupply = 0;
     string public name;
-    uint8 public decimals; 
-    string public symbol;     
-    string public version = '0.1';  
+    uint8 public decimals;
+    string public symbol;
+    string public version = '0.1';
     bool transfersOn = false;
 
 
@@ -143,8 +143,8 @@ contract Token is Owned, Mutex {
         ledger.setBalance(_destAddr, curBalance);
     }
 
-    /* 
-     * Crowdsale -- 
+    /*
+     * Crowdsale --
      *
      */
     function completeCrowdsale() onlyOwner {
@@ -174,7 +174,7 @@ contract Token is Owned, Mutex {
         ledger.tokenTransfer(msg.sender, rentalContract, num);
     }
 
-    function claimUnrented() {  
+    function claimUnrented() {
         uint amount = rentalContract.claimBalance(msg.sender); // this should reduce sender's claimableBalance to 0
 
         ledger.tokenTransfer(rentalContract, msg.sender, amount);
@@ -231,7 +231,7 @@ contract Token is Owned, Mutex {
     }
 
     function allowance(address _from, address _to) constant returns(uint) {
-        return ledger.allowance(_from, _to); 
+        return ledger.allowance(_from, _to);
     }
 
     function approve(address _spender, uint _value) returns (bool) {
@@ -324,7 +324,7 @@ contract Ledger is Owned {
     function resetUsedToday(uint8 startI, uint8 numTimes) onlyTokenOrOwner returns(uint8) {
         uint8 numDeleted;
         for (uint i = 0; i < numTimes && i + startI < seenHereA.length; i++) {
-            if (usedToday[seenHereA[i+startI]] != 0) { 
+            if (usedToday[seenHereA[i+startI]] != 0) {
                 delete usedToday[seenHereA[i+startI]];
                 numDeleted++;
             }
@@ -357,7 +357,7 @@ contract Ledger is Owned {
     function reduceTotalSupply(uint amount) onlyToken {
         if (amount > totalSupply) throw;
 
-        totalSupply -= amount;    
+        totalSupply -= amount;
     }
 
     function setBalance(address _addr, uint amount) onlyTokenOrOwner {
@@ -376,3 +376,38 @@ contract Ledger is Owned {
     }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

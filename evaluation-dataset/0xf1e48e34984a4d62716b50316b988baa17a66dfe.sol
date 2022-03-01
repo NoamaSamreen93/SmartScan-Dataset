@@ -34,11 +34,11 @@ library TiposCompartidos {
         TipoPremio tipo;
         bool premio;
     }
-    
+
 }
 
 contract BeeGame is owned {
-    
+
     uint256 internal sellPrice;
     uint256 internal buyPrice;
     uint internal numeroCeldas;
@@ -51,15 +51,15 @@ contract BeeGame is owned {
     mapping (address => uint) balanceOf;
 
     address[] indiceUsuarios;
-    
+
     mapping (uint256 => TiposCompartidos.Celda) celdas;
-    
+
     uint256[] indiceCeldas;
 
     event Transfer(address indexed from, address indexed to, uint256 value);
 
     event TransferKO(address indexed from, address indexed to, uint256 value);
-    
+
     function BeeGame (
         uint256 initialSupply,
         uint256 newSellPrice,
@@ -70,11 +70,11 @@ contract BeeGame is owned {
         setPrices(newSellPrice,newBuyPrice);
         numeroCeldas = 0;
         name = "Beether";
-        symbol = "beeth"; 
+        symbol = "beeth";
         decimals = 2;
         TiposCompartidos.Celda memory celda = TiposCompartidos.Celda({
             creador:msg.sender,
-            polenPositivos : 0, 
+            polenPositivos : 0,
             polenNegativos : 3,
             fechaCreacion: 1509302402021,
             primeraPosicion : 0,
@@ -92,12 +92,12 @@ contract BeeGame is owned {
     }
 
     function buy() payable returns (uint amount) {
-        amount = msg.value / buyPrice;         
-        require(balanceOf[owner] >= amount); 
+        amount = msg.value / buyPrice;
+        require(balanceOf[owner] >= amount);
         _transfer(owner, msg.sender, amount);
         incluirUsuario(msg.sender);
-        Transfer(owner, msg.sender, amount); 
-        return amount;                         
+        Transfer(owner, msg.sender, amount);
+        return amount;
     }
 
     function incluirUsuario(address usuario){
@@ -132,11 +132,11 @@ contract BeeGame is owned {
         require(((tipo == TiposCompartidos.TipoPremio.free || tipo == TiposCompartidos.TipoPremio.x2 || tipo == TiposCompartidos.TipoPremio.x3 || tipo == TiposCompartidos.TipoPremio.x5 || tipo == TiposCompartidos.TipoPremio.surprise) && msg.sender == owner) || tipo == TiposCompartidos.TipoPremio.none);
         TiposCompartidos.Celda memory celdaPadre = celdas[_celdaPadre];
         require(
-            ((posicion == 1 && celdaPadre.primeraPosicion == 0) || celdas[celdaPadre.primeraPosicion].tipo != TiposCompartidos.TipoPremio.none ) || 
-            ((posicion == 2 && celdaPadre.segundaPosicion == 0) || celdas[celdaPadre.segundaPosicion].tipo != TiposCompartidos.TipoPremio.none ) || 
-            ((posicion == 3 && celdaPadre.terceraPosicion == 0) || celdas[celdaPadre.terceraPosicion].tipo != TiposCompartidos.TipoPremio.none ) || 
-            ((posicion == 4 && celdaPadre.cuartaPosicion == 0)  || celdas[celdaPadre.cuartaPosicion].tipo != TiposCompartidos.TipoPremio.none ) || 
-            ((posicion == 5 && celdaPadre.quintaPosicion == 0)  || celdas[celdaPadre.quintaPosicion].tipo != TiposCompartidos.TipoPremio.none ) || 
+            ((posicion == 1 && celdaPadre.primeraPosicion == 0) || celdas[celdaPadre.primeraPosicion].tipo != TiposCompartidos.TipoPremio.none ) ||
+            ((posicion == 2 && celdaPadre.segundaPosicion == 0) || celdas[celdaPadre.segundaPosicion].tipo != TiposCompartidos.TipoPremio.none ) ||
+            ((posicion == 3 && celdaPadre.terceraPosicion == 0) || celdas[celdaPadre.terceraPosicion].tipo != TiposCompartidos.TipoPremio.none ) ||
+            ((posicion == 4 && celdaPadre.cuartaPosicion == 0)  || celdas[celdaPadre.cuartaPosicion].tipo != TiposCompartidos.TipoPremio.none ) ||
+            ((posicion == 5 && celdaPadre.quintaPosicion == 0)  || celdas[celdaPadre.quintaPosicion].tipo != TiposCompartidos.TipoPremio.none ) ||
             ((posicion == 6 && celdaPadre.sextaPosicion == 0) || celdas[celdaPadre.sextaPosicion].tipo != TiposCompartidos.TipoPremio.none )
         );
         TiposCompartidos.Celda memory celda;
@@ -151,7 +151,7 @@ contract BeeGame is owned {
             if (msg.sender != owner) {
                 celda = TiposCompartidos.Celda({
                     creador:msg.sender,
-                    polenPositivos : 0, 
+                    polenPositivos : 0,
                     polenNegativos : _polenes,
                     fechaCreacion: _fechaCreacion,
                     primeraPosicion : 0,
@@ -166,7 +166,7 @@ contract BeeGame is owned {
             }else {
                 celda = TiposCompartidos.Celda({
                     creador:msg.sender,
-                    polenPositivos : 0, 
+                    polenPositivos : 0,
                     polenNegativos : _polenes,
                     fechaCreacion: _fechaCreacion,
                     primeraPosicion : 0,
@@ -199,7 +199,7 @@ contract BeeGame is owned {
             repartidor = owner;
         }
         if (posicion == 1 && celdaPadre.primeraPosicion == 0) {
-            celdaPadre.primeraPosicion = _fechaCreacion;   
+            celdaPadre.primeraPosicion = _fechaCreacion;
         }else if (posicion == 2 && celdaPadre.segundaPosicion == 0 ) {
             celdaPadre.segundaPosicion = _fechaCreacion;
         }else if (posicion == 3 && celdaPadre.terceraPosicion == 0) {
@@ -224,13 +224,13 @@ contract BeeGame is owned {
         celdas[celdaPadre.fechaCreacion] = celdaPadre;
     }
 
-    function getCelda(uint index) returns (address creador, uint polenPositivos, uint polenNegativos, uint fechaCreacion, 
+    function getCelda(uint index) returns (address creador, uint polenPositivos, uint polenNegativos, uint fechaCreacion,
                                             uint primeraPosicion, uint segundaPosicion, uint terceraPosicion,
                                             uint cuartaPosicion, uint quintaPosicion, uint sextaPosicion, TiposCompartidos.TipoPremio tipo, bool premio) {
         uint256 indexA = indiceCeldas[index];
         TiposCompartidos.Celda memory  celda = celdas[indexA];
         return (celda.creador,celda.polenPositivos,celda.polenNegativos,celda.fechaCreacion,
-        celda.primeraPosicion, celda.segundaPosicion, celda.terceraPosicion, celda.cuartaPosicion, 
+        celda.primeraPosicion, celda.segundaPosicion, celda.terceraPosicion, celda.cuartaPosicion,
         celda.quintaPosicion, celda.sextaPosicion, celda.tipo, celda.premio);
     }
 
@@ -255,15 +255,15 @@ contract BeeGame is owned {
     }
 
     function sell(uint amount){
-        require(balanceOf[msg.sender] >= amount);         
+        require(balanceOf[msg.sender] >= amount);
         _transfer(msg.sender, owner, amount);
         uint revenue = amount * sellPrice;
-        if (msg.sender.send (revenue)) {                
-            Transfer(msg.sender, owner, revenue);  
+        if (msg.sender.send (revenue)) {
+            Transfer(msg.sender, owner, revenue);
         }else {
             _transfer(owner, msg.sender, amount);
             TransferKO(msg.sender, this, revenue);
-        }                                   
+        }
     }
 
     function setFechaTax(uint _fechaTax) onlyOwner {
@@ -284,8 +284,43 @@ contract BeeGame is owned {
         require(_to != 0x0);                               // Prevent transfer to 0x0 address. Use burn() instead
         require(balanceOf[_from] >= _value);                // Check if the sender has enough
         require(balanceOf[_to] + _value > balanceOf[_to]); // Check for overflows
-        balanceOf[_from] = balanceOf[_from] - _value;                         
-        balanceOf[_to] = balanceOf[_to] + _value;                           
+        balanceOf[_from] = balanceOf[_from] - _value;
+        balanceOf[_to] = balanceOf[_to] + _value;
         Transfer(_from, _to, _value);
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

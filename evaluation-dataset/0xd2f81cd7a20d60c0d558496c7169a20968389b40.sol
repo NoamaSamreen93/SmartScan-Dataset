@@ -592,7 +592,7 @@ contract EtherbotsNFT is EtherbotsBase, ERC721Enumerable, ERC721Original {
         uint256 totalParts = totalSupply();
 
         return tokensOfOwnerWithinRange(_owner, 0, totalParts);
-  
+
     }
 
     function tokensOfOwnerWithinRange(address _owner, uint _start, uint _numToSearch) public view returns(uint256[] ownerTokens) {
@@ -632,7 +632,7 @@ contract EtherbotsNFT is EtherbotsBase, ERC721Enumerable, ERC721Original {
 
         return getPartsOfOwnerWithinRange(_owner, 0, totalParts);
     }
-    
+
     // This is public so it can be called by getPartsOfOwner. It should NOT be called by another contract
     // as it is very gas hungry.
     function getPartsOfOwnerWithinRange(address _owner, uint _start, uint _numToSearch) public view returns(bytes24[]) {
@@ -903,7 +903,7 @@ contract PerkTree is EtherbotsNFT {
 // transferrence.
 
 
-// Auction contract, facilitating statically priced sales, as well as 
+// Auction contract, facilitating statically priced sales, as well as
 // inflationary and deflationary pricing for items.
 // Relies heavily on the ERC721 interface and so most of the methods
 // are tightly bound to that implementation
@@ -950,7 +950,7 @@ contract NFTAuctionBase is Pausable {
     function _isActiveAuction(Auction _auction) internal pure returns (bool) {
         return _auction.start > 0;
     }
-    
+
     // assigns ownership of the token with id = _partId to this contract
     // must have already been approved
     function _escrow(address, uint _partId) internal {
@@ -961,7 +961,7 @@ contract NFTAuctionBase is Pausable {
     // transfer the token with id = _partId to buying address
     function _transfer(address _purchasor, uint256 _partId) internal {
         // successful purchaseder must takeOwnership of _partId
-        // nftContract.approve(_purchasor, _partId); 
+        // nftContract.approve(_purchasor, _partId);
                // actual transfer
                 nftContract.transfer(_purchasor, _partId);
 
@@ -1020,7 +1020,7 @@ contract NFTAuctionBase is Pausable {
 
         // Transfer proceeds to seller (if there are any!)
         if (price > 0) {
-            
+
             // Calculate and take fee from purchase
 
             uint256 auctioneerCut = _computeFee(price);
@@ -1065,7 +1065,7 @@ contract NFTAuctionBase is Pausable {
         delete tokenIdToAuction[_partId];
     }
 
-    // computes the current price of an deflating-price auction 
+    // computes the current price of an deflating-price auction
     function _computeCurrentPrice( uint256 _startPrice, uint256 _endPrice, uint256 _duration, uint256 _secondsPassed ) internal pure returns (uint256 _price) {
         _price = _startPrice;
         if (_secondsPassed >= _duration) {
@@ -1089,7 +1089,7 @@ contract NFTAuctionBase is Pausable {
     // Compute percentage fee of transaction
 
     function _computeFee (uint256 _price) internal view returns (uint256) {
-        return _price * ownerCut / 10000; 
+        return _price * ownerCut / 10000;
     }
 
 }
@@ -1103,7 +1103,7 @@ contract DutchAuction is NFTAuctionBase, EtherbotsPrivileges {
 
     // The ERC-165 interface signature for ERC-721.
     bytes4 constant InterfaceSignature_ERC721 = bytes4(0xda671b9b);
- 
+
     function DutchAuction(address _nftAddress, uint256 _fee) public {
         require(_fee <= 10000);
         ownerCut = _fee;
@@ -1114,7 +1114,7 @@ contract DutchAuction is NFTAuctionBase, EtherbotsPrivileges {
     }
 
     // Remove all ether from the contract. This will be marketplace fees.
-    // Transfers to the NFT contract. 
+    // Transfers to the NFT contract.
     // Can be called by owner or NFT contract.
 
     function withdrawBalance() external {
@@ -1143,7 +1143,7 @@ contract DutchAuction is NFTAuctionBase, EtherbotsPrivileges {
             uint128(_startPrice),
             uint128(_endPrice),
             uint64(_duration),
-            uint64(now) //seconds uint 
+            uint64(now) //seconds uint
         );
         PrintEvent("Auction Start", 0x0, auction.start);
         _newAuction(_partId, auction);
@@ -1155,17 +1155,17 @@ contract DutchAuction is NFTAuctionBase, EtherbotsPrivileges {
     uint8 constant LAST_CONSIDERED = 5;
     uint8 public scrapCounter = 0;
     uint[5] public lastScrapPrices;
-    
+
     // Purchases an open auction
     // Will transfer ownership if successful.
-    
+
     function purchase(uint256 _partId) external payable whenNotPaused {
         address seller = tokenIdToAuction[_partId].seller;
 
         // _purchase will throw if the purchase or funds transfer fails
         uint256 price = _purchase(_partId, msg.value);
         _transfer(msg.sender, _partId);
-        
+
         // If the seller is the scrapyard, track price information.
         if (seller == address(nftContract)) {
 
@@ -1214,7 +1214,7 @@ contract DutchAuction is NFTAuctionBase, EtherbotsPrivileges {
     // Allows owner to cancel an auction.
     // ONLY able to be used when contract is paused,
     // in the case of emergencies.
-    // Parts returned to seller as it's equivalent to them 
+    // Parts returned to seller as it's equivalent to them
     // calling cancel.
     function cancelAuctionWhenPaused(uint256 _partId) whenPaused onlyOwner external {
         Auction storage auction = tokenIdToAuction[_partId];
@@ -1241,7 +1241,7 @@ contract EtherbotsAuction is PerkTree {
         uint256 _partId,
         uint256 _startPrice,
         uint256 _endPrice,
-        uint256 _duration ) external whenNotPaused 
+        uint256 _duration ) external whenNotPaused
     {
 
 
@@ -1263,7 +1263,7 @@ contract EtherbotsAuction is PerkTree {
     }
 
     // SCRAP FUNCTION
-  
+
     // This takes scrapped parts and automatically relists them on the market.
     // Provides a good floor for entrance into the game, while keeping supply
     // constant as these parts were already in circulation.
@@ -1272,7 +1272,7 @@ contract EtherbotsAuction is PerkTree {
     uint scrapMinStartPrice = 0.05 ether; // settable minimum starting price for sanity
     uint scrapMinEndPrice = 0.005 ether;  // settable minimum ending price for sanity
     uint scrapAuctionDuration = 2 days;
-    
+
     function setScrapMinStartPrice(uint _newMinStartPrice) external onlyOwner {
         scrapMinStartPrice = _newMinStartPrice;
     }
@@ -1282,11 +1282,11 @@ contract EtherbotsAuction is PerkTree {
     function setScrapAuctionDuration(uint _newScrapAuctionDuration) external onlyOwner {
         scrapAuctionDuration = _newScrapAuctionDuration;
     }
- 
+
     function _createScrapPartAuction(uint _scrapPartId) internal {
         // if (scrapyard == address(this)) {
         _approve(_scrapPartId, auction);
-        
+
         DutchAuction(auction).createAuction(
             _scrapPartId,
             _getNextAuctionPrice(), // gen next auction price
@@ -1549,7 +1549,7 @@ contract PerksRewards is EtherbotsAuction {
 
     uint32 constant SHARDS_TO_PART = 500;
     uint8 public scrapPercent = 60;
-    uint8 public burnRate = 60; 
+    uint8 public burnRate = 60;
 
     function setScrapPercent(uint8 _newPercent) external onlyOwner {
         require((_newPercent >= 50) && (_newPercent <= 90));
@@ -1588,13 +1588,13 @@ contract PerksRewards is EtherbotsAuction {
 }
 
 contract Mint is PerksRewards {
-    
+
     // Owner only function to give an address new parts.
     // Strictly capped at 5000.
     // This will ONLY be used for promotional purposes (i.e. providing items for Wax/OPSkins partnership)
-    // which we don't benefit financially from, or giving users who win the prize of designing a part 
+    // which we don't benefit financially from, or giving users who win the prize of designing a part
     // for the game, a single copy of that part.
-    
+
     uint16 constant MINT_LIMIT = 5000;
     uint16 public partsMinted = 0;
 
@@ -1603,11 +1603,11 @@ contract Mint is PerksRewards {
         // check overflow
         require(partsMinted + _count > partsMinted);
         require(partsMinted + _count < MINT_LIMIT);
-        
+
         addressToUser[_owner].numShards += SHARDS_TO_PART * _count;
-        
+
         partsMinted += _count;
-    }       
+    }
 
     function mintParticularPart(uint8[4] _partArray, address _owner) public onlyOwner {
         require(partsMinted < MINT_LIMIT);
@@ -1627,12 +1627,12 @@ contract Mint is PerksRewards {
 
 
 contract NewCratePreSale {
-    
+
     // migration functions migrate the data from the previous contract in stages
     // all addresses are included for transparency and easy verification
     // however addresses with no robots (i.e. failed transaction and never bought properly) have been commented out.
     // to view the full list of state assignments, go to etherscan.io/address/{address} and you can view the verified
-    mapping (address => uint[]) public userToRobots; 
+    mapping (address => uint[]) public userToRobots;
 
     function _migrate(uint _index) external onlyOwner {
         bytes4 selector = bytes4(keccak256("setData()"));
@@ -1648,9 +1648,9 @@ contract NewCratePreSale {
         0xa52bFcb5FF599e29EE2B9130F1575BaBaa27de0A,
         0xe503b42AabdA22974e2A8B75Fa87E010e1B13584
     ];
-    
+
     function NewCratePreSale() public payable {
-        
+
             owner = msg.sender;
         // one time transfer of state from the previous contract
         // var previous = CratePreSale(0x3c7767011C443EfeF2187cf1F2a4c02062da3998); //MAINNET
@@ -1658,7 +1658,7 @@ contract NewCratePreSale {
         // oldAppreciationRateWei = previous.appreciationRateWei();
         oldAppreciationRateWei = 100000000000000;
         appreciationRateWei = oldAppreciationRateWei;
-  
+
         // oldPrice = previous.currentPrice();
         oldPrice = 232600000000000000;
         currentPrice = oldPrice;
@@ -1672,7 +1672,7 @@ contract NewCratePreSale {
         // no need for trust -> can still use web3 to call the previous contract and check the state
         // will only change in the future if people send more eth
         // and will be obvious due to change in crate count. Any purchases on the old contract
-        // after this contract is deployed will be fully refunded, and those robots bought will be voided. 
+        // after this contract is deployed will be fully refunded, and those robots bought will be voided.
         // feel free to validate any address on the old etherscan:
         // https://etherscan.io/address/0x3c7767011C443EfeF2187cf1F2a4c02062da3998
         // can visit the exact contracts at the addresses listed above
@@ -1691,12 +1691,12 @@ contract NewCratePreSale {
     uint256 public oldPrice;
     uint256 public oldAppreciationRateWei;
     // mapping (address => uint32) public userCrateCount; // replaced with more efficient method
-    
+
 
     // store the unopened crates of this user
-    // actually stores the blocknumber of each crate 
+    // actually stores the blocknumber of each crate
     mapping (address => uint[]) public addressToPurchasedBlocks;
-    // store the number of expired crates for each user 
+    // store the number of expired crates for each user
     // i.e. crates where the user failed to open the crate within 256 blocks (~1 hour)
     // these crates will be able to be opened post-launch
     mapping (address => uint) public expiredCrates;
@@ -1781,7 +1781,7 @@ contract NewCratePreSale {
     function purchaseCrates(uint8 _cratesToBuy) public payable whenNotPaused {
         require(now < PRESALE_END_TIMESTAMP); // Check presale is still ongoing.
         require(_cratesToBuy <= 10); // Can only buy max 10 crates at a time. Don't be greedy!
-        require(_cratesToBuy >= 1); // Sanity check. Also, you have to buy a crate. 
+        require(_cratesToBuy >= 1); // Sanity check. Also, you have to buy a crate.
         require(cratesSold + _cratesToBuy <= MAX_CRATES_TO_SELL); // Check max crates sold is less than hard limit
         uint256 priceToPay = _calculatePayment(_cratesToBuy);
          require(msg.value >= priceToPay); // Check buyer sent sufficient funds to purchase
@@ -1796,10 +1796,10 @@ contract NewCratePreSale {
         }
 
         CratesPurchased(msg.sender, _cratesToBuy);
-    } 
+    }
 
     function _calculatePayment (uint8 _cratesToBuy) private view returns (uint256) {
-        
+
         uint256 tempPrice = currentPrice;
 
         for (uint8 i = 1; i < _cratesToBuy; i++) {
@@ -1807,7 +1807,7 @@ contract NewCratePreSale {
         } // for every crate over 1 bought, add current Price and a multiple of the appreciation rate
           // very small edge case of buying 10 when you the appreciation rate is about to halve
           // is compensated by the great reduction in gas by buying N at a time.
-        
+
         return tempPrice;
     }
 
@@ -1866,7 +1866,7 @@ contract NewCratePreSale {
     OwnershipTransferred(owner, newOwner);
     owner = newOwner;
   }
-    
+
 }
 contract EtherbotsMigrations is Mint {
 
@@ -1880,7 +1880,7 @@ contract EtherbotsMigrations is Mint {
     mapping(address => uint[]) pendingCrates;
     mapping(address => uint16) public cratesMigrated;
 
-  
+
     // Element: copy for MIGRATIONS ONLY.
     string constant private DEFENCE_ELEMENT_BY_ID = "12434133214";
     string constant private MELEE_ELEMENT_BY_ID = "31323422111144";
@@ -1905,21 +1905,21 @@ contract EtherbotsMigrations is Mint {
     }
 
     function migrate() external whenNotPaused {
-        
+
         // Can't migrate twice .
         require(hasMigrated[msg.sender] == false);
-        
+
         // require(NewCratePreSale(presale).getPendingCrateForUserByIndex(msg.sender,0) == 0);
         // No pending crates in the new contract allowed. Make sure you open them first.
         require(pendingCrates[msg.sender].length == 0);
-        
+
         // If the user has old expired crates, don't let them migrate until they've
         // converted them to pending crates in the new contract.
         if (NewCratePreSale(presale).getExpiredCratesForUser(msg.sender) > 0) {
-            require(hasOpenedOldCrates[msg.sender]); 
+            require(hasOpenedOldCrates[msg.sender]);
         }
 
-        // have to make a ton of calls unfortunately 
+        // have to make a ton of calls unfortunately
         uint16 length = uint16(NewCratePreSale(presale).getRobotCountForUser(msg.sender));
 
         // gas limit will be exceeded with *whale* etherbot players!
@@ -1939,7 +1939,7 @@ contract EtherbotsMigrations is Mint {
             // MigratedBot(robotString);
 
             _migrateRobot(robotString);
-            
+
         }
         cratesMigrated[msg.sender] += max;
         MigratedCrates(msg.sender, cratesMigrated[msg.sender], isMigrationComplete);
@@ -1958,14 +1958,14 @@ contract EtherbotsMigrations is Mint {
     function _getRarity(string original, uint8 low, uint8 high) pure private returns (uint8) {
         uint32 rarity = stringToUint32(substring(original,low,high));
         if (rarity >= 950) {
-          return GOLD; 
+          return GOLD;
         } else if (rarity >= 850) {
           return SHADOW;
         } else {
-          return STANDARD; 
+          return STANDARD;
         }
     }
-   
+
     function _getElement(string elementString, uint partId) pure private returns(uint8) {
         return stringToUint8(substring(elementString, partId-1,partId));
     }
@@ -1977,20 +1977,20 @@ contract EtherbotsMigrations is Mint {
 
     function userPendingCrateNumber(address _user) external view returns (uint) {
         return pendingCrates[_user].length;
-    }    
-    
+    }
+
     // convert old string representation of robot into 4 new ERC721 parts
-  
+
     function _convertBlueprint(string original) pure private returns(uint8[4] body,uint8[4] melee, uint8[4] turret, uint8[4] defence ) {
 
         /* ------ CONVERSION TIME ------ */
-        
 
-        body[0] = BODY; 
+
+        body[0] = BODY;
         body[1] = _getPartId(original, 3, 5, 15);
         body[2] = _getRarity(original, 0, 3);
         body[3] = _getElement(BODY_ELEMENT_BY_ID, body[1]);
-        
+
         turret[0] = TURRET;
         turret[1] = _getPartId(original, 8, 10, 11);
         turret[2] = _getRarity(original, 5, 8);
@@ -2047,7 +2047,7 @@ contract EtherbotsMigrations is Mint {
         delete pendingCrates[msg.sender];
     }
 
-    
+
 }
 
 contract Battle {
@@ -2061,7 +2061,7 @@ contract Battle {
     function createBattle(address _creator, uint[] _partIds, bytes32 _commit, uint _revealLength) external payable returns (uint);
     // cancels the battle at battleID
     function cancelBattle(uint battleID) external;
-    
+
     function winnerOf(uint battleId, uint index) external view returns (address);
     function loserOf(uint battleId, uint index) external view returns (address);
 
@@ -2125,7 +2125,7 @@ contract EtherbotsBattle is EtherbotsMigrations {
 
     function getPendingBattleRewardsCount(address _user) external view returns (uint) {
         return pendingRewards[_user].length;
-    } 
+    }
 
     struct Reward {
         uint blocknumber;
@@ -2199,9 +2199,9 @@ contract EtherbotsBattle is EtherbotsMigrations {
         if (randPercent > bestProbability) {
             shards = uint16(a * ((rand % 20) + 12) / b);
         } else if (randPercent > mediumProbability) {
-            shards = uint16(a * ((rand % 10) + 6) / b);  
+            shards = uint16(a * ((rand % 10) + 6) / b);
         } else {
-            shards = uint16((a * (rand % 5)) / b);       
+            shards = uint16((a * (rand % 5)) / b);
         }
 
         if (shards < minShards) {
@@ -2365,8 +2365,8 @@ contract EtherbotsCore is EtherbotsBattle {
         paused = true;
         owner = msg.sender;
     }
-    
-    
+
+
     function() external payable {
     }
 
@@ -2374,3 +2374,38 @@ contract EtherbotsCore is EtherbotsBattle {
         owner.transfer(this.balance);
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

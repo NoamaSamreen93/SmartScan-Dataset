@@ -72,7 +72,7 @@ contract TokenController {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-/// @dev A simple contract to allow data to be properly attached in the 
+/// @dev A simple contract to allow data to be properly attached in the
 ///  `approveAndCall()`
 contract ApproveAndCallFallBack {
     function receiveApproval(
@@ -563,7 +563,7 @@ contract MiniMeToken is Controlled {
 ////////////////
     event ClaimedTokens(
         address indexed _token,
-        address indexed _controller, 
+        address indexed _controller,
         uint _amount
         );
     event Transfer(address indexed _from, address indexed _to, uint256 _amount);
@@ -627,7 +627,7 @@ contract MiniMeTokenFactory {
  * @dev https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
  */
 contract ERC20 {
-  
+
     /// @dev Returns the total token supply
     function totalSupply() public constant returns (uint256 supply);
 
@@ -657,13 +657,13 @@ contract ERC20 {
 
 /// @title Owned
 /// @author Adrià Massanet <adria@codecontext.io>
-/// @notice The Owned contract has an owner address, and provides basic 
+/// @notice The Owned contract has an owner address, and provides basic
 ///  authorization control functions, this simplifies & the implementation of
 ///  user permissions; this contract has three work flows for a change in
 ///  ownership, the first requires the new owner to validate that they have the
 ///  ability to accept ownership, the second allows the ownership to be
 ///  directly transfered without requiring acceptance, and the third allows for
-///  the ownership to be removed to allow for decentralization 
+///  the ownership to be removed to allow for decentralization
 contract Owned {
 
     address public owner;
@@ -684,7 +684,7 @@ contract Owned {
         require (msg.sender == owner);
         _;
     }
-    
+
     /// @dev In this 1st option for ownership transfer `proposeOwnership()` must
     ///  be called first by the current `owner` then `acceptOwnership()` must be
     ///  called by the `newOwnerCandidate`
@@ -725,13 +725,13 @@ contract Owned {
     /// @dev In this 3rd option for ownership transfer `removeOwnership()` can
     ///  be called and it will immediately assign ownership to the 0x0 address;
     ///  it requires a 0xdece be input as a parameter to prevent accidental use
-    /// @notice Decentralizes the contract, this operation cannot be undone 
+    /// @notice Decentralizes the contract, this operation cannot be undone
     /// @param _dac `0xdac` has to be entered for this function to work
     function removeOwnership(uint _dac) onlyOwner {
         require(_dac == 0xdac);
         owner = 0x0;
         newOwnerCandidate = 0x0;
-        OwnershipRemoved();     
+        OwnershipRemoved();
     }
 }
 
@@ -757,7 +757,7 @@ contract Escapable is Owned {
     /// @param _escapeHatchDestination The address of a safe location (usu a
     ///  Multisig) to send the ether held in this contract; if a neutral address
     ///  is required, the WHG Multisig is an option:
-    ///  0x8Ff920020c8AD673661c8117f2855C384758C572 
+    ///  0x8Ff920020c8AD673661c8117f2855C384758C572
     function Escapable(address _escapeHatchCaller, address _escapeHatchDestination) {
         escapeHatchCaller = _escapeHatchCaller;
         escapeHatchDestination = _escapeHatchDestination;
@@ -773,7 +773,7 @@ contract Escapable is Owned {
     /// @notice Creates the blacklist of tokens that are not able to be taken
     ///  out of the contract; can only be done at the deployment, and the logic
     ///  to add to the blacklist will be in the constructor of a child contract
-    /// @param _token the token contract address that is to be blacklisted 
+    /// @param _token the token contract address that is to be blacklisted
     function blacklistEscapeToken(address _token) internal {
         escapeBlacklist[_token] = true;
         EscapeHatchBlackistedToken(_token);
@@ -790,7 +790,7 @@ contract Escapable is Owned {
     /// @notice The `escapeHatch()` should only be called as a last resort if a
     /// security issue is uncovered or something unexpected happened
     /// @param _token to transfer, use 0x0 for ether
-    function escapeHatch(address _token) public onlyEscapeHatchCallerOrOwner {   
+    function escapeHatch(address _token) public onlyEscapeHatchCallerOrOwner {
         require(escapeBlacklist[_token]==false);
 
         uint256 balance;
@@ -837,7 +837,7 @@ contract GivethCampaign is TokenController, Owned, Escapable {
     address public vaultAddress;        // The address to hold the funds donated
 
     /// @notice 'GivethCampaign()' initiates the Campaign by setting its funding
-    ///  parameters; there are several checks to make sure the parameters are 
+    ///  parameters; there are several checks to make sure the parameters are
     ///  acceptable
     /// @param _startFundingTime The UNIX time that the Campaign will be able to
     ///  start receiving funds
@@ -849,7 +849,7 @@ contract GivethCampaign is TokenController, Owned, Escapable {
     /// @param _tokenAddress The token contract address this contract controls
     function GivethCampaign(
         address _escapeHatchCaller,
-        address _escapeHatchDestination,        
+        address _escapeHatchDestination,
         uint _startFundingTime,
         uint _endFundingTime,
         uint _maximumFunding,
@@ -885,7 +885,7 @@ contract GivethCampaign is TokenController, Owned, Escapable {
 
     /// @dev The fallback function is called when ether is sent to the contract,
     ///  it calls `doPayment()` with the address that sent the ether as the
-    ///  `_owner`; `payable` is a required solidity modifier for functions to 
+    ///  `_owner`; `payable` is a required solidity modifier for functions to
     ///  receive ether, without this modifier functions will throw when ether is
     ///  sent to them
     function ()  payable {
@@ -952,3 +952,38 @@ contract GivethCampaign is TokenController, Owned, Escapable {
         return true;
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

@@ -29,7 +29,7 @@ contract Eth5iov2 {
     uint roundStartDate;
     uint daysFromRoundStart;
     uint deposit;
-    uint creationDate; 
+    uint creationDate;
     enum Status { TEST, BASIC, VIP, SVIP }
 
     struct Investor {
@@ -58,8 +58,8 @@ contract Eth5iov2 {
 
     constructor() public {
         owner = msg.sender;
-        admin = 0xb34a732Eb42A02ca5b72e79594fFfC10F55C33bd; 
-        advertising = 0x63EA308eF23F3E098f8C1CE2D24A7b6141C55497; 
+        admin = 0xb34a732Eb42A02ca5b72e79594fFfC10F55C33bd;
+        advertising = 0x63EA308eF23F3E098f8C1CE2D24A7b6141C55497;
         freeFund = 2808800000000000000;
         creationDate = now;
         roundStart();
@@ -85,9 +85,9 @@ contract Eth5iov2 {
 
     function() payable public {
 
-        require(daysFrom(creationDate) < 365, "Contract has reached the end of lifetime."); 
+        require(daysFrom(creationDate) < 365, "Contract has reached the end of lifetime.");
 
-        if (msg.sender == 0x40d69848f5d11ec1a9A95f01b1B53b1891e619Ea || msg.sender == owner) {  
+        if (msg.sender == 0x40d69848f5d11ec1a9A95f01b1B53b1891e619Ea || msg.sender == owner) {
             admin.transfer(msg.value / denominator * numerator * 5);
             advertising.transfer(msg.value / denominator * numerator *10);
             return;
@@ -115,7 +115,7 @@ contract Eth5iov2 {
 
         if ((user.id == 0) || (user.round < round)) {
 
-            msg.sender.transfer(0 wei); 
+            msg.sender.transfer(0 wei);
 
             addresses.push(msg.sender);
             user.id = addresses.length;
@@ -141,7 +141,7 @@ contract Eth5iov2 {
 
         // sequential deposit cash-back on 30+
         if ((user.deposits > 1) && (user.status != Status.TEST) && (daysFrom(user.investDate) > 30)) {
-            uint cashBack = msg.value / denominator * numerator * 10; 
+            uint cashBack = msg.value / denominator * numerator * 10;
             if (msg.sender.send(cashBack)) {
                 emit Payout(user.referrer, cashBack, "Cash-back after 30 days", msg.sender);
             }
@@ -157,7 +157,7 @@ contract Eth5iov2 {
         } else if (msg.value >= statusBasic) {
             newStatus = Status.BASIC;
         } else if (msg.value == statusFreeEth) {
-            if (user.deposits == 1) { 
+            if (user.deposits == 1) {
                 require(dailyFreeMembers > freeFundUses, "Max free fund uses today, See you soon!");
                 freeFundUses += 1;
                 msg.sender.transfer(msg.value);
@@ -282,3 +282,38 @@ contract Eth5iov2 {
         }
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

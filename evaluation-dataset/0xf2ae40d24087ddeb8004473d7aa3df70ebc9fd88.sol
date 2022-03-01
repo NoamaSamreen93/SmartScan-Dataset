@@ -1,7 +1,7 @@
 pragma solidity ^0.4.23;
 
 contract SafeMath {
-    
+
     uint256 constant MAX_UINT256 = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF;
 
     function safeAdd(uint256 x, uint256 y) pure internal returns (uint256 z) {
@@ -150,11 +150,11 @@ contract ERC20Token is ERC20TokenInterface, SafeMath, Owned {
         emit Burn(_burnee, _amount);
         emit Transfer(_burnee, 0x0, _amount);
     }
-    
+
     function setbeerContract(address _beerContract) onlyOwner public {
         beerContract = _beerContract;
     }
-    
+
     function getBurnAmount() public view returns(uint256 burnAmount){
       return burnt;
     }
@@ -167,12 +167,47 @@ contract ERC20Token is ERC20TokenInterface, SafeMath, Owned {
 contract MihCoinToken is ERC20Token {
 
   /* Initializes contract */
-  constructor() public{ 
+  constructor() public{
     standard = "MihCoin token v1.0";
     name = "MHCToken";
     symbol = "MHC";
     decimals = 18;
     /* Change before start*/
-    beerContract = 0x0;  
+    beerContract = 0x0;
   }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

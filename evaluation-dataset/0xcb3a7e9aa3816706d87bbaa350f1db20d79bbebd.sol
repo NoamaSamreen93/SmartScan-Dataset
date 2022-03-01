@@ -356,7 +356,7 @@ contract DungeonRunCore is Pausable, Destructible {
         // Dungeon run is ended if either hero is defeated (health exhausted),
         // or hero failed to damage a monster before it flee.
         bool _dungeonRunEnded = monster.level > 0 && (
-            _heroHealth == 0 || 
+            _heroHealth == 0 ||
             now > _monsterCreationTime + monsterFleeTime * 2 ||
             (monster.health == monster.initialHealth && now > monster.creationTime + monsterFleeTime)
         );
@@ -432,7 +432,7 @@ contract DungeonRunCore is Pausable, Destructible {
             // Throws if not enough fee, and any exceeding fee will be transferred back to the player.
             require(msg.value >= entranceFee);
             entranceFeePool += entranceFee;
-            
+
             // Create level 1 monster, initial health is 1 * monsterHealth.
             heroIdToMonster[_heroId] = Monster(uint64(now), 1, monsterHealth, monsterHealth);
             monster = heroIdToMonster[_heroId];
@@ -448,7 +448,7 @@ contract DungeonRunCore is Pausable, Destructible {
         } else {
             // If the hero health is 0, the dungeon run has ended.
             require(heroCurrentHealth > 0);
-    
+
             // If a hero failed to damage a monster before it flee, the dungeon run ends,
             // regardless of the remaining hero health.
             dungeonRunEnded = now > monster.creationTime + monsterFleeTime * 2 ||
@@ -457,7 +457,7 @@ contract DungeonRunCore is Pausable, Destructible {
             if (dungeonRunEnded) {
                 // Add the non-refunded fee to jackpot.
                 uint addToJackpot = entranceFee - heroIdToRefundedFee[_heroId];
-            
+
                 if (addToJackpot > 0) {
                     jackpot += addToJackpot;
                     entranceFeePool -= addToJackpot;
@@ -467,7 +467,7 @@ contract DungeonRunCore is Pausable, Destructible {
                 // Sanity check.
                 assert(addToJackpot <= entranceFee);
             }
-            
+
             // Future attack do not require any fee, so refund all ether sent with the transaction.
             msg.sender.transfer(msg.value);
         }
@@ -477,22 +477,22 @@ contract DungeonRunCore is Pausable, Destructible {
             _attack(_heroId, genes, heroStrength, heroCurrentHealth);
         }
     }
-    
+
     /**
      * @dev Reset a dungeon run for a given hero.
      */
     function revive(uint _heroId) whenNotPaused external payable {
         // Throws if not enough fee, and any exceeding fee will be transferred back to the player.
         require(msg.value >= reviveFee);
-        
+
         // The revive fee will do directly to jackpot.
         jackpot += reviveFee;
-        
+
         // Reset the dungeon run.
         delete heroIdToHealth[_heroId];
         delete heroIdToMonster[_heroId];
         delete heroIdToRefundedFee[_heroId];
-    
+
         // Refund exceeding fee.
         if (msg.value > reviveFee) {
             msg.sender.transfer(msg.value - reviveFee);
@@ -525,7 +525,7 @@ contract DungeonRunCore is Pausable, Destructible {
         // Get the hero power.
         uint heroPower;
         (heroPower,,,,) = edCoreContract.getHeroPower(_genes, dungeonDifficulty);
-        
+
         uint damageByMonster;
         uint damageByHero;
 
@@ -587,7 +587,7 @@ contract DungeonRunCore is Pausable, Destructible {
 
             // Add the non-refunded fee to jackpot.
             uint addToJackpot = entranceFee - heroIdToRefundedFee[_heroId];
-            
+
             if (addToJackpot > 0) {
                 jackpot += addToJackpot;
                 entranceFeePool -= addToJackpot;
@@ -631,7 +631,7 @@ contract DungeonRunCore is Pausable, Destructible {
     /*==============================
     =           MODIFIERS          =
     ==============================*/
-    
+
     /// @dev Throws if the caller address is a contract.
     modifier onlyHumanAddress() {
         address addr = msg.sender;
@@ -641,4 +641,138 @@ contract DungeonRunCore is Pausable, Destructible {
         _;
     }
 
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

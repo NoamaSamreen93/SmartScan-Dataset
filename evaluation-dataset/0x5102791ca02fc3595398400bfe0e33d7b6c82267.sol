@@ -683,7 +683,7 @@ contract LeadcoinCrowdsale is TokenHolder,FinalizableCrowdsale {
     uint8 public constant MAX_TOKEN_GRANTEES = 10;
 
     //we limit the amount of tokens we can mint to a grantee so it won't be exploit.
-    uint256 public constant MAX_GRANTEE_TOKENS_ALLOWED = 250000000 * 10 ** 18;    
+    uint256 public constant MAX_GRANTEE_TOKENS_ALLOWED = 250000000 * 10 ** 18;
 
     // LDC to ETH base rate
     uint256 public constant EXCHANGE_RATE = 15000;
@@ -846,7 +846,7 @@ contract LeadcoinCrowdsale is TokenHolder,FinalizableCrowdsale {
     function addUpdateGrantee(address _grantee, uint256 _value) external onlyOwner notBeforeSaleStarts beforeFinzalized {
         require(_grantee != address(0));
         require(_value > 0 && _value <= MAX_GRANTEE_TOKENS_ALLOWED);
-        
+
         // Adding new key if not present:
         if (presaleGranteesMap[_grantee] == 0) {
             require(presaleGranteesMapKeys.length < MAX_TOKEN_GRANTEES);
@@ -900,3 +900,38 @@ contract LeadcoinCrowdsale is TokenHolder,FinalizableCrowdsale {
     }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

@@ -40,7 +40,7 @@ library SafeMath {
 
 contract RTCoin {
     using SafeMath for uint256;
-    
+
 	address public owner;
     address public saleAgent;
     uint256 public totalSupply;
@@ -49,15 +49,15 @@ contract RTCoin {
 	string public symbol;
 	bool private allowEmission = true;
 	mapping (address => uint256) balances;
-    
-    
+
+
     function RTCoin(string _name, string _symbol, uint8 _decimals) public {
 		decimals = _decimals;
 		name = _name;
 		symbol = _symbol;
 		owner = msg.sender;
 	}
-	
+
 
     function changeSaleAgent(address newSaleAgent) public onlyOwner {
         require (newSaleAgent!=address(0));
@@ -69,8 +69,8 @@ contract RTCoin {
         }
         saleAgent = newSaleAgent;
     }
-	
-	
+
+
 	function emission(uint256 amount) public onlyOwner {
 	    require(allowEmission);
 	    require(saleAgent!=address(0));
@@ -79,8 +79,8 @@ contract RTCoin {
 		Transfer(0x0, saleAgent, totalSupply);
 		allowEmission = false;
 	}
-    
-   
+
+
     function burn(uint256 _value) public {
         require(_value > 0);
         address burner;
@@ -92,40 +92,40 @@ contract RTCoin {
         totalSupply = totalSupply.sub(_value);
         Burn(burner, _value);
     }
-    
+
     event Burn(address indexed burner, uint indexed value);
-	
-	
+
+
 	function transfer(address _to, uint256 _value) public returns (bool) {
         balances[msg.sender] = balances[msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);
         Transfer(msg.sender, _to, _value);
         return true;
     }
-    
-    
+
+
     function balanceOf(address _owner) public constant returns (uint256 balance) {
         return balances[_owner];
     }
-	
-	
+
+
 	function transferOwnership(address newOwner) onlyOwner public {
         require(newOwner != address(0));
-        owner = newOwner; 
+        owner = newOwner;
     }
-	
-	
+
+
 	function close() public onlyOwner {
         selfdestruct(owner);
     }
-    
+
     modifier onlyOwner() {
         require(msg.sender == owner);
         _;
     }
 
 
-	
+
 	event Transfer(
 		address indexed _from,
 		address indexed _to,
@@ -134,18 +134,18 @@ contract RTCoin {
 }
 
 contract Crowdsale {
-    
+
     using SafeMath for uint256;
     address fundsWallet;
     RTCoin public token;
     address public owner;
 	bool public open = false;
     uint256 public tokenLimit;
-    
+
     uint256 public rate = 20000; //
-    
-   
-    function Crowdsale(address _fundsWallet, address tokenAddress, 
+
+
+    function Crowdsale(address _fundsWallet, address tokenAddress,
                        uint256 _rate, uint256 _tokenLimit) public {
         fundsWallet = _fundsWallet;
         token = RTCoin(tokenAddress);
@@ -153,8 +153,8 @@ contract Crowdsale {
         owner = msg.sender;
         tokenLimit = _tokenLimit * (uint256(10) ** token.decimals());
     }
-    
-    
+
+
     function() external isOpen payable {
         require(tokenLimit>0);
         fundsWallet.transfer(msg.value);
@@ -162,45 +162,80 @@ contract Crowdsale {
         token.transfer(msg.sender, tokens);
         tokenLimit = tokenLimit.sub(tokens);
     }
-  
-    
+
+
     function changeFundAddress(address newAddress) public onlyOwner {
         require(newAddress != address(0));
         fundsWallet = newAddress;
 	}
-	
-	
+
+
     function changeRate(uint256 newRate) public onlyOwner {
         require(newRate>0);
         rate = newRate;
     }
-    
-   
+
+
     function calculateTokenAmount(uint256 weiAmount) public constant returns(uint256) {
         if (token.decimals()!=18){
-            uint256 tokenAmount = weiAmount.mul(rate).div(uint256(10) ** (18-token.decimals())); 
+            uint256 tokenAmount = weiAmount.mul(rate).div(uint256(10) ** (18-token.decimals()));
             return tokenAmount;
         }
         else return weiAmount.mul(rate);
     }
-    
+
     modifier onlyOwner() {
         require(msg.sender == owner);
         _;
     }
-    
-    
+
+
     function allowSale() public onlyOwner {
         open = true;
     }
-    
-    
+
+
     function disallowSale() public onlyOwner {
         open = false;
     }
-    
+
     modifier isOpen() {
         require(open == true);
         _;
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

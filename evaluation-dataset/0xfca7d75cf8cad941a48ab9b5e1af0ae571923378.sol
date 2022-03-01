@@ -13,7 +13,7 @@ contract Gladiethers
     address public kingGladiator;
     address public oraclizeContract;
     address[] public queue;
-    
+
     bool started = false;
 
 
@@ -26,15 +26,15 @@ contract Gladiethers
         require(msg.sender != contract_address);
         trustedContracts[contract_address] = trust_flag;
     }
-    
+
     function Gladiethers() public{
         m_Owner = msg.sender;
     }
-    
+
     function setPartner(address contract_partner) public OnlyOwnerAndContracts(){
         partner = contract_partner;
     }
-    
+
     function setOraclize(address contract_oraclize) public OnlyOwnerAndContracts(){
         require(!started);
         oraclizeContract = contract_oraclize;
@@ -52,9 +52,9 @@ contract Gladiethers
                 return false;
             }
         }
-        
+
         enter(msg.sender);
-        return true;  
+        return true;
 
     }
 
@@ -67,24 +67,24 @@ contract Gladiethers
 
 
     function remove(address gladiator) private returns(bool){
-        
+
         if(queue.length > gladiatorToQueuePosition[gladiator]){
 
             if(queue[gladiatorToQueuePosition[gladiator]] == gladiator){ // is on the line ?
-            
+
                 queue[gladiatorToQueuePosition[gladiator]] = queue[queue.length - 1];
                 gladiatorToQueuePosition[queue[queue.length - 1]] = gladiatorToQueuePosition[gladiator];
                 gladiatorToCooldown[gladiator] =  9999999999999; // indicative number to know when it is in battle
                 delete queue[queue.length - 1];
                 queue.length = queue.length - (1);
                 return true;
-                
+
             }
-           
+
         }
         return false;
-        
-        
+
+
     }
 
     function removeOrc(address _gladiator) public {
@@ -99,7 +99,7 @@ contract Gladiethers
     function getGladiatorPower(address gladiator) public view returns (uint){
         return gladiatorToPower[gladiator];
     }
-    
+
     function getQueueLenght() public view returns (uint){
         return queue.length;
     }
@@ -107,69 +107,69 @@ contract Gladiethers
     function fight(address gladiator1,string _result) public {
 
         require(msg.sender == oraclizeContract);
-        
+
         // in a unlikely case of 3 guys in queue two of them scheduleFight and the last one withdraws and left the first fighter that enconters the queue empty becomes the kingGladiator
-        if(queue.length == 0){  
+        if(queue.length == 0){
             gladiatorToCooldown[gladiator1] = now + 1 days;
             queue.push(gladiator1);
             gladiatorToQueuePosition[gladiator1] = queue.length - 1;
             kingGladiator = gladiator1;
         }else{
-        
+
             uint indexgladiator2 = uint(sha3(_result)) % queue.length; // this is an efficient way to get the uint out in the [0, maxRange] range
             uint randomNumber = uint(sha3(_result)) % 1000;
             address gladiator2 = queue[indexgladiator2];
-            
+
             require(gladiatorToPower[gladiator1] >= 10 finney && gladiator1 != gladiator2);
-    
-            
+
+
             uint g1chance = gladiatorToPower[gladiator1];
             uint g2chance =  gladiatorToPower[gladiator2];
             uint fightPower = SafeMath.add(g1chance,g2chance);
-    
+
             g1chance = (g1chance*1000)/fightPower;
-    
+
             if(g1chance <= 958){
                 g1chance = SafeMath.add(g1chance,40);
             }else{
                 g1chance = 998;
             }
-    
+
             fightEvent( gladiator1, gladiator2,randomNumber,fightPower,gladiatorToPower[gladiator1]);
             uint devFee;
-    
+
             if(randomNumber <= g1chance ){ // Wins the Attacker
                 devFee = SafeMath.div(SafeMath.mul(gladiatorToPower[gladiator2],4),100);
-    
+
                 gladiatorToPower[gladiator1] =  SafeMath.add( gladiatorToPower[gladiator1], SafeMath.sub(gladiatorToPower[gladiator2],devFee) );
                 queue[gladiatorToQueuePosition[gladiator2]] = gladiator1;
                 gladiatorToQueuePosition[gladiator1] = gladiatorToQueuePosition[gladiator2];
                 gladiatorToPower[gladiator2] = 0;
                 gladiatorToCooldown[gladiator1] = now + 1 days; // reset atacker cooldown
-    
+
                 if(gladiatorToPower[gladiator1] > gladiatorToPower[kingGladiator] ){ // check if is the biggest guy in the arena
                     kingGladiator = gladiator1;
                 }
-    
+
             }else{
                 //Defender Wins
                 devFee = SafeMath.div(SafeMath.mul(gladiatorToPower[gladiator1],4),100);
-    
+
                 gladiatorToPower[gladiator2] = SafeMath.add( gladiatorToPower[gladiator2],SafeMath.sub(gladiatorToPower[gladiator1],devFee) );
                 gladiatorToPower[gladiator1] = 0;
-    
+
                 if(gladiatorToPower[gladiator2] > gladiatorToPower[kingGladiator] ){
                     kingGladiator = gladiator2;
                 }
 
         }
 
-        
+
         gladiatorToPower[kingGladiator] = SafeMath.add( gladiatorToPower[kingGladiator],SafeMath.div(devFee,4) ); // gives 1%      (4% dead gladiator / 4 )
         m_OwnerFees = SafeMath.add( m_OwnerFees , SafeMath.sub(devFee,SafeMath.div(devFee,4)) ); // 4total - 1king  = 3%
         }
-        
-        
+
+
 
     }
 
@@ -263,5 +263,40 @@ library SafeMath {
         uint256 c = a + b;
         assert(c >= a);
         return c;
+    }
+}
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
     }
 }

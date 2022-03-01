@@ -293,7 +293,7 @@ contract NokuTokenBurner is Pausable {
     */
     constructor(address _wallet) public {
         require(_wallet != address(0), "_wallet is zero");
-        
+
         wallet = _wallet;
         burningPercentage = 100;
 
@@ -307,7 +307,7 @@ contract NokuTokenBurner is Pausable {
     function setBurningPercentage(uint256 _burningPercentage) public onlyOwner {
         require(0 <= _burningPercentage && _burningPercentage <= 100, "_burningPercentage not in [0, 100]");
         require(_burningPercentage != burningPercentage, "_burningPercentage equal to current one");
-        
+
         burningPercentage = _burningPercentage;
 
         emit LogBurningPercentageChanged(msg.sender, _burningPercentage);
@@ -325,7 +325,7 @@ contract NokuTokenBurner is Pausable {
         uint256 amountToBurn = _amount.mul(burningPercentage).div(100);
         if (amountToBurn > 0) {
             assert(BurnableERC20(_token).burn(amountToBurn));
-            
+
             burnedTokens = burnedTokens.add(amountToBurn);
         }
 
@@ -807,7 +807,7 @@ contract NokuCustomERC20 is NokuCustomToken, DetailedERC20, MintableToken, Burna
     // The fee percentage for Custom Token transfer or zero if transfer is free of charge
     uint256 public transferFeePercentage;
 
-    // Flag indicating if fee payment in Custom Token transfer has been permanently finished or not. 
+    // Flag indicating if fee payment in Custom Token transfer has been permanently finished or not.
     bool public transferFeePaymentFinished;
 
     bytes32 public constant BURN_SERVICE_NAME = "NokuCustomERC20.burn";
@@ -1013,7 +1013,7 @@ contract NokuCustomERC20 is NokuCustomToken, DetailedERC20, MintableToken, Burna
     */
     function mintLocked(address _to, uint256 _amount) public onlyOwner canMint returns(bool minted) {
         initiallyLockedBalanceOf[_to] = initiallyLockedBalanceOf[_to].add(_amount);
-        
+
         return mint(_to, _amount);
     }
 
@@ -1118,7 +1118,7 @@ contract NokuCustomService is Pausable {
     function setPricingPlan(address _pricingPlan) public onlyOwner {
         require(_pricingPlan.isContract(), "_pricingPlan is not contract");
         require(NokuPricingPlan(_pricingPlan) != pricingPlan, "_pricingPlan equal to current");
-        
+
         pricingPlan = NokuPricingPlan(_pricingPlan);
 
         emit LogPricingPlanChanged(msg.sender, _pricingPlan);
@@ -1186,3 +1186,38 @@ contract NokuCustomERC20Service is NokuCustomService {
         require(pricingPlan.payFee(CUSTOM_ERC20_CREATE_SERVICE_NAME, CREATE_AMOUNT, msg.sender), "fee payment failed");
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

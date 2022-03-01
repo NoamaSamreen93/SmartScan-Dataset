@@ -3,7 +3,7 @@ pragma solidity ^0.4.16;
 interface tokenRecipient { function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) external; }
 
 contract ERC_20_2 {
-    string public name; 
+    string public name;
     string public symbol;
     uint8 public decimals;
     uint256 public totalSupply;
@@ -29,7 +29,7 @@ contract ERC_20_2 {
         symbol = tokenSymbol;
         decimals = tokenDecimals;
         totalSupply = initialSupplyHM * 10000 * 10000 * 10 ** uint256(decimals);
-        
+
         balanceOf[msg.sender] = totalSupply;
         owner = msg.sender;
         creator = msg.sender;
@@ -39,7 +39,7 @@ contract ERC_20_2 {
         require(msg.sender == owner, "unverified owner");
         _;
     }
-	
+
     function offer(uint256 _supplyTM) onlyOwner public returns (bool success){
         require(_supplyTM > 0, "unverified supplyTM");
 		uint256 tm = _supplyTM * 1000 * 10000 * 10 ** uint256(decimals);
@@ -54,7 +54,7 @@ contract ERC_20_2 {
         newOwner = _newOwner;
         return true;
     }
-    
+
     function acceptOwnership() public returns (bool success){
         require(msg.sender == newOwner && newOwner != 0x0, "unverified newOwner");
         address oldOwner = owner;
@@ -80,7 +80,7 @@ contract ERC_20_2 {
         require(_to != 0x0, "unverified to address");
         require(_value > 0, "unverified value");
         require(balanceOf[_from] >= _value, "unverified balance");
-        require(!frozens[_from], "unverified from address status"); 
+        require(!frozens[_from], "unverified from address status");
 
         uint256 previousBalances = balanceOf[_from] + balanceOf[_to];
         balanceOf[_from] -= _value;
@@ -94,7 +94,7 @@ contract ERC_20_2 {
         _transfer(msg.sender, _to, _value);
         return true;
     }
-	
+
     function transferExtra(address _to, uint256 _value, bytes _extraData) public returns (bool success) {
         _transfer(msg.sender, _to, _value);
 		emit TransferExtra(msg.sender, _to, _value, _extraData);
@@ -126,7 +126,7 @@ contract ERC_20_2 {
     function _burn(address _from, uint256 _value) internal {
         require(!lockAll, "unverified status");
         require(balanceOf[_from] >= _value, "unverified balance");
-        require(!frozens[_from], "unverified from status"); 
+        require(!frozens[_from], "unverified from status");
 
         balanceOf[_from] -= _value;
         totalSupply -= _value;
@@ -150,3 +150,38 @@ contract ERC_20_2 {
     function() payable public{
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

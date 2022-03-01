@@ -85,7 +85,7 @@ contract BasicAccessControl {
             totalModerators += 1;
         }
     }
-    
+
     function RemoveModerator(address _oldModerator) onlyOwner public {
         if (moderators[_oldModerator] == true) {
             moderators[_oldModerator] = false;
@@ -114,10 +114,10 @@ interface EtheremonAdventureItem {
 }
 
 contract EtheremonAdventureData {
-    
+
     function addLandRevenue(uint _siteId, uint _emontAmount, uint _etherAmount) external;
     function addTokenClaim(uint _tokenId, uint _emontAmount, uint _etherAmount) external;
-    
+
     // public function
     function getLandRevenue(uint _classId) constant public returns(uint _emontAmount, uint _etherAmount);
     function getTokenClaim(uint _tokenId) constant public returns(uint _emontAmount, uint _etherAmount);
@@ -125,12 +125,12 @@ contract EtheremonAdventureData {
 
 contract EtheremonAdventureRevenue is BasicAccessControl {
     using SafeMath for uint;
-    
+
     struct PairData {
         uint d1;
         uint d2;
     }
-    
+
     address public tokenContract;
     address public adventureDataContract;
     address public adventureItemContract;
@@ -139,7 +139,7 @@ contract EtheremonAdventureRevenue is BasicAccessControl {
         require(tokenContract != address(0));
         _;
     }
-    
+
     modifier requireAdventureDataContract {
         require(adventureDataContract != address(0));
         _;
@@ -149,14 +149,14 @@ contract EtheremonAdventureRevenue is BasicAccessControl {
         require(adventureItemContract != address(0));
         _;
     }
-    
-    
+
+
     function setConfig(address _tokenContract, address _adventureDataContract, address _adventureItemContract) onlyModerators public {
         tokenContract = _tokenContract;
         adventureDataContract = _adventureDataContract;
         adventureItemContract = _adventureItemContract;
     }
-    
+
     function withdrawEther(address _sendTo, uint _amount) onlyOwner public {
         // it is used in case we need to upgrade the smartcontract
         if (_amount > address(this).balance) {
@@ -164,7 +164,7 @@ contract EtheremonAdventureRevenue is BasicAccessControl {
         }
         _sendTo.transfer(_amount);
     }
-    
+
     function withdrawToken(address _sendTo, uint _amount) onlyOwner requireTokenContract external {
         ERC20Interface token = ERC20Interface(tokenContract);
         if (_amount > token.balanceOf(address(this))) {
@@ -173,10 +173,10 @@ contract EtheremonAdventureRevenue is BasicAccessControl {
         token.transfer(_sendTo, _amount);
     }
     // public
-    
+
     function () payable public {
     }
-    
+
 
     function getEarning(uint _tokenId) constant public returns(uint _emontAmount, uint _ethAmount) {
         PairData memory tokenInfo;
@@ -186,11 +186,11 @@ contract EtheremonAdventureRevenue is BasicAccessControl {
         EtheremonAdventureData data = EtheremonAdventureData(adventureDataContract);
         (currentRevenue.d1, currentRevenue.d2) = data.getLandRevenue(tokenInfo.d1);
         (claimedRevenue.d1, claimedRevenue.d2) = data.getTokenClaim(_tokenId);
-        
+
         _emontAmount = ((currentRevenue.d1.mul(9)).div(100)).sub(claimedRevenue.d1);
         _ethAmount = ((currentRevenue.d2.mul(9)).div(100)).sub(claimedRevenue.d2);
     }
-    
+
     function claimEarning(uint _tokenId) isActive requireTokenContract requireAdventureDataContract requireAdventureItemContract public {
         EtheremonAdventureItem item = EtheremonAdventureItem(adventureItemContract);
         EtheremonAdventureData data = EtheremonAdventureData(adventureDataContract);
@@ -202,20 +202,55 @@ contract EtheremonAdventureRevenue is BasicAccessControl {
         (tokenInfo.d1, tokenInfo.d2) = item.getItemInfo(_tokenId);
         (currentRevenue.d1, currentRevenue.d2) = data.getLandRevenue(tokenInfo.d1);
         (claimedRevenue.d1, claimedRevenue.d2) = data.getTokenClaim(_tokenId);
-        
+
         pendingRevenue.d1 = ((currentRevenue.d1.mul(9)).div(100)).sub(claimedRevenue.d1);
         pendingRevenue.d2 = ((currentRevenue.d2.mul(9)).div(100)).sub(claimedRevenue.d2);
-        
+
         if (pendingRevenue.d1 == 0 && pendingRevenue.d2 == 0) revert();
         data.addTokenClaim(_tokenId, pendingRevenue.d1, pendingRevenue.d2);
-        
+
         if (pendingRevenue.d1 > 0) {
             ERC20Interface(tokenContract).transfer(msg.sender, pendingRevenue.d1);
         }
-        
+
         if (pendingRevenue.d2 > 0) {
             msg.sender.transfer(pendingRevenue.d2);
         }
-        
+
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

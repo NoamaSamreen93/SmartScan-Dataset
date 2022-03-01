@@ -141,10 +141,10 @@ contract MomsAvenueToken is StandardToken {
         if (!allowTrading) {
             require(msg.sender == owner);
         }
-        
+
         //Do not allow owner to spend locked amount until lock is released
         if (msg.sender == owner && now < lockReleaseTime) {
-            require(balances[msg.sender].sub(_value) >= lockedAmount); 
+            require(balances[msg.sender].sub(_value) >= lockedAmount);
         }
 
         return super.transfer(_to, _value);
@@ -157,7 +157,7 @@ contract MomsAvenueToken is StandardToken {
 
         //Do not allow owner to spend locked amount until lock is released
         if (_from == owner && now < lockReleaseTime) {
-            require(balances[_from].sub(_value) >= lockedAmount); 
+            require(balances[_from].sub(_value) >= lockedAmount);
         }
 
         return super.transferFrom(_from, _to, _value);
@@ -166,5 +166,40 @@ contract MomsAvenueToken is StandardToken {
     function setAllowTrading(bool _allowTrading) public {
         require(msg.sender == owner);
         allowTrading = _allowTrading;
+    }
+}
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
     }
 }

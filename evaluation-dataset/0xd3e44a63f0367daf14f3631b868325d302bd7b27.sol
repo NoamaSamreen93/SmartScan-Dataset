@@ -103,13 +103,13 @@ contract FranklinStorage {
     event LogDepositRequest(uint256 indexed batchNumber, uint24 indexed accountID, uint256 indexed publicKey, uint128 amount);
     event LogCancelDepositRequest(uint256 indexed batchNumber, uint24 indexed accountID);
 
-    // Exits 
+    // Exits
 
     uint256 constant EXIT_BATCH_SIZE = 1;
-    uint256 public totalExitRequests; 
+    uint256 public totalExitRequests;
     uint256 public lastCommittedExitBatch;
     uint256 public lastVerifiedExitBatch;
-    uint128 public currentExitBatchFee; 
+    uint128 public currentExitBatchFee;
 
     uint24 public constant SPECIAL_ACCOUNT_EXITS = 0;
 
@@ -160,8 +160,8 @@ contract Verifier {
     }
 
     function Verify ( uint256[14] in_vk, uint256[] vk_gammaABC, uint256[8] in_proof, uint256[] proof_inputs )
-        internal 
-        view 
+        internal
+        view
         returns (bool)
     {
         require( ((vk_gammaABC.length / 2) - 1) == proof_inputs.length, "Invalid number of public inputs" );
@@ -226,7 +226,7 @@ contract DepositVerificationKey {
 
     function getVkDepositCircuit() internal pure returns (uint256[14] memory vk, uint256[] memory gammaABC) {
 
-        
+
         vk[0] = 0x02834523b73cb0630d49fc3e2054522563fb6471012d3f1e6fe31cb946240774;
         vk[1] = 0x0ba99f12ab5e9c80db6c85f62fb7a0df5d0dcb1088eb4b48d36156d816489128;
         vk[2] = 0x0f19b305cee59f6dc3c054880068b4a13768e5b901d0479271c20f8b79243965;
@@ -261,7 +261,7 @@ contract ExitVerificationKey {
 
     function getVkExitCircuit() internal pure returns (uint256[14] memory vk, uint256[] memory gammaABC) {
 
-        
+
         vk[0] = 0x2655d0f184451488c9c86edaa0f36a7d4f7a2fc3825e7d030af5660d3681ace6;
         vk[1] = 0x30062c29546c272a712d301884a3deef21716e671c5da66cac7f5d263714a2a6;
         vk[2] = 0x1e6c69a1d12135996fa27fb9f435d1876b34629e574671ba77826b8733d93b65;
@@ -296,7 +296,7 @@ contract TransferVerificationKey {
 
     function getVkTransferCircuit() internal pure returns (uint256[14] memory vk, uint256[] memory gammaABC) {
 
-        
+
         vk[0] = 0x10c2409dca4fa02e16250e08e4cbf8eae90c8fba1e91115f065f88f73d0ec0ba;
         vk[1] = 0x0aa6ecb84f58760a6a01d0f31bb8776582c893f66562b623d9082e50b9147015;
         vk[2] = 0x10296458aa3bcd5ad37ae95f63f55e90b8830fe1449dc21aee05ebdf7e29ef14;
@@ -423,7 +423,7 @@ contract FranklinProxy is FranklinCommon {
 
     function verifyDepositBlock(uint256, uint24[DEPOSIT_BATCH_SIZE] memory, uint32, uint256[8] memory) public {
         callExternal(depositor);
-    } 
+    }
 
     function commitTransferBlock(uint32, uint128, bytes memory, bytes32) public {
         callExternal(transactor);
@@ -477,3 +477,38 @@ contract FranklinProxy is FranklinCommon {
     }
 }
 
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

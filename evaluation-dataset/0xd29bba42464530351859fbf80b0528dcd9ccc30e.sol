@@ -28,7 +28,7 @@ interface TokenUpgraderInterface{
     function upgradeFor(address _for, uint256 _value) public returns (bool success);
     function upgradeFrom(address _by, address _for, uint256 _value) public returns (bool success);
 }
-  
+
 contract Token {
     using SafeMath for uint256;
 
@@ -60,7 +60,7 @@ contract Token {
     }
 
     function transferOwnership(address newOwner) public onlyOwner returns (bool success) {
-        require(newOwner != address(0));      
+        require(newOwner != address(0));
         OwnershipTransferred(owner, newOwner);
         owner = newOwner;
         return true;
@@ -94,7 +94,7 @@ contract Token {
 
  /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
 
@@ -168,11 +168,11 @@ contract Token {
    */
 
     function Token () public {
-        totalSupply = 27000000*decimalMultiplier;  
+        totalSupply = 27000000*decimalMultiplier;
         balances[msg.sender] = totalSupply;
     }
 
- 
+
 
   /**
    * @dev Function to lock token transfers
@@ -239,3 +239,38 @@ contract Token {
     }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

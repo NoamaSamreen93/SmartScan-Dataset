@@ -35,7 +35,7 @@ library SafeMath {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
@@ -56,7 +56,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -199,38 +199,38 @@ contract MintableToken is StandardToken, Ownable {
 }
 
 contract VanilCoin is MintableToken {
-  	
+
 	string public name = "Vanil";
   	string public symbol = "VAN";
   	uint256 public decimals = 18;
-  
+
   	// tokens locked for one week after ICO, 8 Oct 2017, 0:0:0 GMT: 1507420800
   	uint public releaseTime = 1507420800;
-  
+
 	modifier canTransfer(address _sender, uint256 _value) {
 		require(_value <= transferableTokens(_sender, now));
 	   	_;
 	}
-	
+
 	function transfer(address _to, uint256 _value) canTransfer(msg.sender, _value) returns (bool) {
 		return super.transfer(_to, _value);
 	}
-	
+
 	function transferFrom(address _from, address _to, uint256 _value) canTransfer(_from, _value) returns (bool) {
 		return super.transferFrom(_from, _to, _value);
 	}
-	
+
 	function transferableTokens(address holder, uint time) constant public returns (uint256) {
-		
+
 		uint256 result = 0;
-				
+
 		if(time > releaseTime){
 			result = balanceOf(holder);
 		}
-		
+
 		return result;
 	}
-	
+
 }
 
 
@@ -238,58 +238,58 @@ contract VanilCoin is MintableToken {
 contract ETH888CrowdsaleS1 {
 
 	using SafeMath for uint256;
-	
+
 	// The token being sold
 	MintableToken public token;
-	
+
 	// address where funds are collected
 	address public wallet;
-	
+
 	// how many token units a buyer gets per wei
 	uint256 public rate = 1250;
-	
+
 	// timestamps for ICO starts and ends
 	uint public startTimestamp;
 	uint public endTimestamp;
-	
+
 	// amount of raised money in wei
 	uint256 public weiRaised;
-	
+
 	// first round ICO cap
 	uint256 public cap;
-	
+
 	/**
 	   * event for token purchase logging
 	   * @param purchaser who paid for the tokens
 	   * @param beneficiary who got the tokens
 	   * @param value weis paid for purchase
 	   * @param amount amount of tokens purchased
-	   */ 
+	   */
 	event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
-	
+
 	function ETH888CrowdsaleS1(address _wallet) {
-		
+
 		require(_wallet != 0x0);
-		
+
 		// 11 Aug 2017, 00:00:00 GMT: 1502409600
 		startTimestamp = 1502409600;
-		
+
 		// 30 Sep 2017, 23:59:59 GMT: 1506815999
 		endTimestamp = 1506815999;
-		
+
 		token = createTokenContract();
-		
+
 		// maximum 8000 ETH for this stage 1 crowdsale
 		cap = 8000 ether;
-		
+
 		wallet = _wallet;
 	}
-		
+
 	// fallback function can be used to buy tokens
 	function () payable {
 	    buyTokens(msg.sender);
 	}
-	
+
 	// low level token purchase function
 	function buyTokens(address beneficiary) payable {
 		require(beneficiary != 0x0);
@@ -312,29 +312,64 @@ contract ETH888CrowdsaleS1 {
 	// send ether to the fund collection wallet
 	function forwardFunds() internal {
 		wallet.transfer(msg.value);
-	}	
-	
+	}
+
 	// @return true if investors can buy at the moment
 	function validPurchase() internal constant returns (bool) {
 		bool withinCap = weiRaised.add(msg.value) <= cap;
-		
+
 		uint current = now;
 		bool withinPeriod = current >= startTimestamp && current <= endTimestamp;
 		bool nonZeroPurchase = msg.value != 0;
-		
+
 		return withinPeriod && nonZeroPurchase && withinCap && msg.value >= 1000 szabo;
 	}
 
 	// @return true if crowdsale event has ended
 	function hasEnded() public constant returns (bool) {
 		bool capReached = weiRaised >= cap;
-		
+
 		return now > endTimestamp || capReached;
 	}
-	
+
 	// creates the token to be sold.
 	function createTokenContract() internal returns (MintableToken) {
 		return new VanilCoin();
 	}
-	
+
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

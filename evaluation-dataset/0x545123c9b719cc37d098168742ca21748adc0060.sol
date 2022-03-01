@@ -36,13 +36,13 @@ contract Enums {
         ERROR_INVALID_AMOUNT
     }
 
-    enum AngelAura { 
-        Blue, 
-        Yellow, 
-        Purple, 
-        Orange, 
-        Red, 
-        Green 
+    enum AngelAura {
+        Blue,
+        Yellow,
+        Purple,
+        Orange,
+        Red,
+        Green
     }
 }
 contract AccessControl {
@@ -51,7 +51,7 @@ contract AccessControl {
     mapping (address => bool) public seraphims;
 
     bool public isMaintenanceMode = true;
- 
+
     modifier onlyCREATOR() {
         require(msg.sender == creatorAddress);
         _;
@@ -61,17 +61,17 @@ contract AccessControl {
         require(seraphims[msg.sender] == true);
         _;
     }
-    
+
     modifier isContractActive {
         require(!isMaintenanceMode);
         _;
     }
-    
+
     // Constructor
     function AccessControl() public {
         creatorAddress = msg.sender;
     }
-    
+
 
     function addSERAPHIM(address _newSeraphim) onlyCREATOR public {
         if (seraphims[_newSeraphim] == false) {
@@ -79,7 +79,7 @@ contract AccessControl {
             totalSeraphims += 1;
         }
     }
-    
+
     function removeSERAPHIM(address _oldSeraphim) onlyCREATOR public {
         if (seraphims[_oldSeraphim] == true) {
             seraphims[_oldSeraphim] = false;
@@ -91,13 +91,13 @@ contract AccessControl {
         isMaintenanceMode = _isMaintaining;
     }
 
-  
-} 
+
+}
 contract IAngelCardData is AccessControl, Enums {
     uint8 public totalAngelCardSeries;
     uint64 public totalAngels;
 
-    
+
     // write
     // angels
     function createAngelCardSeries(uint8 _angelCardSeriesId, uint _basePrice,  uint64 _maxTotal, uint8 _baseAura, uint16 _baseBattlePower, uint64 _liveTime) onlyCREATOR external returns(uint8);
@@ -120,9 +120,9 @@ contract IAngelCardData is AccessControl, Enums {
     function getTotalAngels() constant public returns (uint64);
 }
 contract IPetCardData is AccessControl, Enums {
-    uint8 public totalPetCardSeries;    
+    uint8 public totalPetCardSeries;
     uint64 public totalPets;
-    
+
     // write
     function createPetCardSeries(uint8 _petCardSeriesId, uint32 _maxTotal) onlyCREATOR public returns(uint8);
     function setPet(uint8 _petCardSeriesId, address _owner, string _name, uint8 _luck, uint16 _auraRed, uint16 _auraYellow, uint16 _auraBlue) onlySERAPHIM external returns(uint64);
@@ -144,14 +144,14 @@ contract IPetCardData is AccessControl, Enums {
 }
 
 contract TrainingField is AccessControl{
-    // Addresses for other contracts realm interacts with. 
+    // Addresses for other contracts realm interacts with.
     address public angelCardDataContract;
     address public petCardDataContract;
     address public accessoryDataContract;
-    
+
     // events
      event EventSuccessfulTraining(uint64 angelId,uint64 pet1ID,uint64 pet2ID);
-    
+
 
     /*** DATA TYPES ***/
 
@@ -181,10 +181,10 @@ contract TrainingField is AccessControl{
         uint16 auraBlue;
         uint64 lastTrainingTime;
         uint64 lastBreedingTime;
-        uint price; 
+        uint price;
         uint64 liveTime;
     }
-    
+
 
     // write functions
     function SetAngelCardDataContact(address _angelCardDataContract) onlyCREATOR external {
@@ -193,12 +193,12 @@ contract TrainingField is AccessControl{
     function SetPetCardDataContact(address _petCardDataContract) onlyCREATOR external {
         petCardDataContract = _petCardDataContract;
     }
-       
+
         function checkTraining (uint64 angelID, uint64  pet1ID, uint64 pet2ID) private returns (uint8) {
               IAngelCardData angelCardData = IAngelCardData(angelCardDataContract);
               IPetCardData petCardData = IPetCardData(petCardDataContract);
-        
-        //check if training function has improper parameters 
+
+        //check if training function has improper parameters
         if (pet1ID == pet2ID) {return 0;}
         if ((pet1ID <= 0) || (pet1ID > petCardData.getTotalPets())) {return 0;}
         if ((pet2ID <= 0) || (pet2ID > petCardData.getTotalPets())) {return 0;}
@@ -211,33 +211,33 @@ contract TrainingField is AccessControl{
         if (canTrain == 0 ) {revert();}
         IAngelCardData angelCardData = IAngelCardData(angelCardDataContract);
         IPetCardData petCardData = IPetCardData(petCardDataContract);
-        
+
         Pet memory pet1;
         Pet memory pet2;
         Angel memory angel;
         (,,,angel.aura,,,,,,,angel.owner) = angelCardData.getAngel(angelID);
         (,,,,pet1.auraRed,pet1.auraBlue,pet1.auraYellow,pet1.lastTrainingTime,,pet1.owner) = petCardData.getPet(pet1ID);
         (,,,,pet2.auraRed,pet2.auraBlue,pet2.auraYellow,pet2.lastTrainingTime,,pet2.owner) = petCardData.getPet(pet2ID);
-     
-     //can't train with someone else's pets. 
+
+     //can't train with someone else's pets.
      if ((angel.owner != msg.sender) || (pet1.owner != msg.sender) || (pet2.owner!= msg.sender)) {revert();}
-     //check that you haven't trained for 24 hours 24 *60 * 60 
+     //check that you haven't trained for 24 hours 24 *60 * 60
      if ((now < (pet1.lastTrainingTime+86400)) || (now < (pet1.lastTrainingTime+60))) {revert();}
-    
-    //AngelRed is a 0 when the angel�s aura isnt� compatible with Red and 1 when it is. 
- 
+
+    //AngelRed is a 0 when the angel�s aura isnt� compatible with Red and 1 when it is.
+
     uint32 AngelRed = 0;
     uint32 AngelBlue = 0;
     uint32 AngelYellow = 0;
- 
-    if ((angel.aura == 4) || (angel.aura == 3) || (angel.aura == 2)) {AngelRed = 1;} 
+
+    if ((angel.aura == 4) || (angel.aura == 3) || (angel.aura == 2)) {AngelRed = 1;}
     if ((angel.aura == 0) || (angel.aura == 2) || (angel.aura == 5)) {AngelBlue = 1;}
     if ((angel.aura == 3) || (angel.aura == 1) || (angel.aura == 5)) {AngelYellow = 1;}
 
-    //You can�t Gain new aura colors, only strengthen the ones you have, so first make sure it HAS a red Aura before increasing it. 
-    
-   
-    
+    //You can�t Gain new aura colors, only strengthen the ones you have, so first make sure it HAS a red Aura before increasing it.
+
+
+
     //Set Results
     petCardData.setPetAuras(pet1ID,uint8(findAuras(pet1.auraRed, pet1.auraRed,pet2.auraRed, AngelRed)),uint8(findAuras(pet1.auraBlue, pet1.auraBlue,pet2.auraBlue, AngelBlue)), uint8(findAuras(pet1.auraYellow, pet1.auraYellow,pet2.auraYellow, AngelYellow)) );
      petCardData.setPetAuras(pet2ID,uint8(findAuras(pet2.auraRed, pet1.auraRed,pet2.auraRed, AngelRed)),uint8(findAuras(pet2.auraBlue, pet1.auraBlue,pet2.auraBlue, AngelBlue)), uint8(findAuras(pet2.auraYellow, pet1.auraYellow,pet2.auraYellow, AngelYellow)) );
@@ -246,21 +246,56 @@ contract TrainingField is AccessControl{
    EventSuccessfulTraining(angelID, pet1ID, pet2ID);
 
 
-        } 
-        
+        }
+
          function findAuras (uint16 petBaseAura, uint32 pet1Aura, uint32 pet2Aura, uint32 angelAura) private returns (uint32) {
-        //Increase by 1 if there is one compatible pet and 2 if there are two. 
+        //Increase by 1 if there is one compatible pet and 2 if there are two.
          if ((petBaseAura >=250) || (petBaseAura == 0)) {return petBaseAura;}
-         //max value allowed. 
+         //max value allowed.
          if ((pet1Aura != 0) && (angelAura == 1)) {
          if (pet2Aura != 0) {return petBaseAura + 2;}
         else {return petBaseAura + 1;}
         }
-        return petBaseAura;    
-        
+        return petBaseAura;
+
     }
-        
+
       function kill() onlyCREATOR external {
         selfdestruct(creatorAddress);
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

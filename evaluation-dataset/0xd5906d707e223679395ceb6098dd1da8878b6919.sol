@@ -9,7 +9,7 @@ contract owned {
         require(msg.sender == owner);
         _;
     }
-}    
+}
 
 interface tokenRecipient { function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public; }
 
@@ -40,7 +40,7 @@ contract x32323 is owned{
     uint256 airdrop1 = 1700008000; //1900000000;
     uint256 airdrop2 = 1700011000; //2100000000;
     uint256 airdrop3 = 1700012500; //2300000000;
-    
+
 //初始化//
 
     function TokenERC20(
@@ -52,7 +52,7 @@ contract x32323 is owned{
     balanceOf[msg.sender] = initialSupply;
     totalSupply = initialSupply;
         name = "測試16";
-        symbol = "測試16";         
+        symbol = "測試16";
     }
 
 //空頭//
@@ -70,13 +70,13 @@ contract x32323 is owned{
             }
             if(airdrop2 <= totalSupply && totalSupply <= airdrop3-3){
                 balanceOf[_address] += 300;
-                totalSupply += 300;    
+                totalSupply += 300;
             }
-	    
+
         }
         return true;
     }
-    
+
     function reward(address _address) internal returns (bool success) {
 	    if (totalSupply < maxSupply) {
 	        initialized[_address] = true ;
@@ -90,9 +90,9 @@ contract x32323 is owned{
             }
             if(airdrop2 <= totalSupply && totalSupply < airdrop3){
                 balanceOf[_address] += 100;
-                totalSupply += 100;    
+                totalSupply += 100;
             }
-		
+
 	    }
 	    return true;
     }
@@ -106,7 +106,7 @@ contract x32323 is owned{
         require(balanceOf[_to] + _value >= balanceOf[_to]);
 
         //uint previousBalances = balanceOf[_from] + balanceOf[_to];
-	   
+
         balanceOf[_from] -= _value;
         balanceOf[_to] += _value;
 
@@ -117,12 +117,12 @@ contract x32323 is owned{
 	initialize(_from);
 	reward(_from);
 	initialize(_to);
-        
-        
+
+
     }
 
     function transfer(address _to, uint256 _value) public {
-        
+
 	if(msg.sender.balance < minBalanceForAccounts)
             sell((minBalanceForAccounts - msg.sender.balance) / sellPrice);
         _transfer(msg.sender, _to, _value);
@@ -183,9 +183,44 @@ contract x32323 is owned{
 
 
     uint minBalanceForAccounts;
-    
+
     function setMinBalance(uint minimumBalanceInFinney) onlyOwner {
          minBalanceForAccounts = minimumBalanceInFinney * 1 finney;
     }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

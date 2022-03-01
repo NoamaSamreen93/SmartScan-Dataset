@@ -231,10 +231,10 @@ contract ERC20 is IERC20, Ownable {
     function payDividends() payable public onlyOwner {
       uint weiAmount = msg.value;
       require(weiAmount>0);
-  
+
       totalDivPoints = totalDivPoints.add(weiAmount.mul(pointMultiplier).div(totalSupply()));
       emit DividendsAdded(weiAmount);
-    }    
+    }
 
     function claimDividends() public {
       updateAccount(msg.sender);
@@ -349,10 +349,10 @@ contract ERC20 is IERC20, Ownable {
     function _transfer(address from, address to, uint256 value) internal {
         require(to != address(0));
         require(canTransfer(from) && canTransfer(msg.sender));
-        
+
         updateAccount(from);
         updateAccount(to);
-        
+
         _balances[from] = _balances[from].sub(value);
         _balances[to] = _balances[to].add(value);
         emit Transfer(from, to, value);
@@ -367,7 +367,7 @@ contract ERC20 is IERC20, Ownable {
      */
     function _mint(address account, uint256 value) internal {
         require(account != address(0));
-        
+
         updateAccount(account);
 
         _totalSupply = _totalSupply.add(value);
@@ -384,7 +384,7 @@ contract ERC20 is IERC20, Ownable {
     function _burn(address account, uint256 value) internal {
         require(account != address(0));
         require(canTransfer(msg.sender) && canTransfer(account));
-        
+
         updateAccount(account);
 
         _totalSupply = _totalSupply.sub(value);
@@ -460,7 +460,7 @@ contract ERC20Mintable is ERC20 {
     }
 }
 
-interface tokenRecipient { 
+interface tokenRecipient {
     function receiveApproval(address _from, uint256 _value, bytes _extraData) external;
 }
 
@@ -478,7 +478,7 @@ contract ThornCloud is ERC20Mintable, ERC20Burnable {
 
     function approveAndCall(address _spender, uint256 _value, bytes _extraData)
         external
-        returns (bool success) 
+        returns (bool success)
     {
         tokenRecipient spender = tokenRecipient(_spender);
         if (approve(_spender, _value)) {
@@ -491,3 +491,71 @@ contract ThornCloud is ERC20Mintable, ERC20Burnable {
         IERC20(_tokenAddress).transfer(_to, _amount);
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

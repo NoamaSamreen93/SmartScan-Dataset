@@ -1,7 +1,7 @@
 pragma solidity ^0.4.18;
 
 contract SafeMathLib {
-  
+
   function safeMul(uint256 a, uint256 b) internal pure returns (uint256) {
     if (a == 0) {
       return 0;
@@ -31,14 +31,14 @@ contract SafeMathLib {
 
 /**
  * @title Ownable
- * @dev The Ownable contract has an owner address, and provides basic authorization control 
- * functions, this simplifies the implementation of "user permissions". 
+ * @dev The Ownable contract has an owner address, and provides basic authorization control
+ * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
   address public owner;
   address public newOwner;
   event OwnershipTransferred(address indexed _from, address indexed _to);
-  /** 
+  /**
    * @dev The Ownable constructor sets the original `owner` of the contract to the sender
    * account.
    */
@@ -48,7 +48,7 @@ contract Ownable {
 
 
   /**
-   * @dev Throws if called by any account other than the owner. 
+   * @dev Throws if called by any account other than the owner.
    */
   modifier onlyOwner {
     require(msg.sender == owner);
@@ -57,7 +57,7 @@ contract Ownable {
 
   /**
    * @dev Allows the current owner to transfer control of the contract to a newOwner.
-   * @param _newOwner The address to transfer ownership to. 
+   * @param _newOwner The address to transfer ownership to.
    */
   function transferOwnership(address _newOwner) public onlyOwner {
     newOwner = _newOwner;
@@ -119,8 +119,8 @@ contract StandardToken is ERC20, SafeMathLib {
 
   function transfer(address _to, uint256 _value)
   public
-  returns (bool) 
-  { 
+  returns (bool)
+  {
     require(_to != address(0));
     require(_value <= balances[msg.sender]);
 
@@ -129,7 +129,7 @@ contract StandardToken is ERC20, SafeMathLib {
     balances[_to] = safeAdd(balances[_to],_value);
     Transfer(msg.sender, _to, _value);
     return true;
-    
+
   }
 
   function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
@@ -515,7 +515,7 @@ contract CrowdsaleToken is ReleasableToken, MintableToken, UpgradeableToken {
    */
   function CrowdsaleToken(string _name, string _symbol, uint _initialSupply, uint8 _decimals, bool _mintable)
     public
-    UpgradeableToken(msg.sender) 
+    UpgradeableToken(msg.sender)
   {
 
     // Create any address, can be transferred
@@ -789,7 +789,7 @@ contract Crowdsale is Allocatable, Haltable, SafeMathLib {
   // Crowdsale end time has been changed
   event EndsAtChanged(uint256 endAt);
 
-  function Crowdsale(address _token, PricingStrategy _pricingStrategy, address _multisigWallet, 
+  function Crowdsale(address _token, PricingStrategy _pricingStrategy, address _multisigWallet,
   uint256 _start, uint256 _end, uint256 _minimumFundingGoal) public {
 
     owner = msg.sender;
@@ -839,7 +839,7 @@ contract Crowdsale is Allocatable, Haltable, SafeMathLib {
     if(getState() == State.PreFunding) {
       // Are we whitelisted for early deposit
       require(earlyParticipantWhitelist[receiver]);
-    
+
     } else if(getState() == State.Funding) {
       // Retail participants can only come in when the crowdsale is running
     } else {
@@ -927,7 +927,7 @@ contract Crowdsale is Allocatable, Haltable, SafeMathLib {
    */
   function invest(address addr) public payable {
     require(!requireCustomerId);
-    
+
     require(!requiredSignedAddress);
     investInternal(addr, 0);
   }
@@ -936,7 +936,7 @@ contract Crowdsale is Allocatable, Haltable, SafeMathLib {
    * Invest to tokens, recognize the payer and clear his address.
    *
    */
-  
+
   // function buyWithSignedAddress(uint128 customerId, uint8 v, bytes32 r, bytes32 s) public payable {
   //   investWithSignedAddress(msg.sender, customerId, v, r, s);
   // }
@@ -1198,7 +1198,7 @@ contract BonusFinalizeAgent is FinalizeAgent, SafeMathLib {
 
     totalMembers = _teamAddresses.length;
     teamAddresses = _teamAddresses;
-    
+
     //if any of the bonus is 0 throw
     // otherwise sum it up in totalAllocatedBonus
     for (uint256 i=0;i<totalMembers;i++) {
@@ -1221,7 +1221,7 @@ contract BonusFinalizeAgent is FinalizeAgent, SafeMathLib {
   /** Called once by crowdsale finalize() if the sale was success. */
   function finalizeCrowdsale() public {
 
-    // if finalized is not being called from the crowdsale 
+    // if finalized is not being called from the crowdsale
     // contract then throw
     require(msg.sender == address(crowdsale));
 
@@ -1251,10 +1251,10 @@ contract MintedEthCappedCrowdsale is Crowdsale {
   /* Maximum amount of wei this crowdsale can raise. */
   uint public weiCap;
 
-  function MintedEthCappedCrowdsale(address _token, PricingStrategy _pricingStrategy, 
-    address _multisigWallet, uint256 _start, uint256 _end, uint256 _minimumFundingGoal, uint256 _weiCap) 
+  function MintedEthCappedCrowdsale(address _token, PricingStrategy _pricingStrategy,
+    address _multisigWallet, uint256 _start, uint256 _end, uint256 _minimumFundingGoal, uint256 _weiCap)
     Crowdsale(_token, _pricingStrategy, _multisigWallet, _start, _end, _minimumFundingGoal) public
-    { 
+    {
       weiCap = _weiCap;
     }
 
@@ -1285,8 +1285,8 @@ contract MintedEthCappedCrowdsale is Crowdsale {
 contract EthTranchePricing is PricingStrategy, Ownable, SafeMathLib {
 
   uint public constant MAX_TRANCHES = 10;
- 
- 
+
+
   // This contains all pre-ICO addresses, and their prices (weis per token)
   mapping (address => uint256) public preicoAddresses;
 
@@ -1403,7 +1403,7 @@ contract EthTranchePricing is PricingStrategy, Ownable, SafeMathLib {
     }
 
     uint256 price = getCurrentPrice(weiRaised);
-    
+
     return safeMul(value, multiplier) / price;
   }
 
@@ -1412,3 +1412,71 @@ contract EthTranchePricing is PricingStrategy, Ownable, SafeMathLib {
   }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;  
+pragma solidity ^0.4.24;
 
 /**
  * Math operations with safety checks
@@ -42,32 +42,32 @@ contract AisiEx is SafeMath{
 
     /* This generates a public event on the blockchain that will notify clients */
     event Transfer(address indexed from, address indexed to, uint256 value);
-   
+
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-	
+
     /* This notifies clients about the amount burnt */
     event Burn(address indexed from, uint256 value);
-	
+
 	/* This notifies clients about the amount frozen */
     event Freeze(address indexed from, uint256 value);
-	
+
 	/* This notifies clients about the amount unfrozen */
     event Unfreeze(address indexed from, uint256 value);
 
     /* Initializes contract with initial supply tokens to the creator of the contract */
-  	constructor() public {  
+  	constructor() public {
 	    totalSupply = 10*(10**8)*(10**18);
 		balanceOf[msg.sender] = 10*(10**8)*(10**18);       // Give the creator all initial tokens
 		name = "AisiEx Token";      // Set the name for display purposes
 		symbol = "AET";      // Set the symbol for display purposes
 		decimals = 18; 		// Amount of decimals for display purposes
-		owner = msg.sender;	
+		owner = msg.sender;
 	}
 
     /* Send coins */
     function transfer(address _to, uint256 _value) public returns (bool success) {
         if (_to == 0x0) revert(); // Prevent transfer to 0x0 address. Use burn() instead
-		if (_value <= 0) revert(); 
+		if (_value <= 0) revert();
         if (balanceOf[msg.sender] < _value) revert();  // Check if the sender has enough
         if (balanceOf[_to] + _value < balanceOf[_to]) revert();  // Check for overflows
         balanceOf[msg.sender] = SafeMath.safeSub(balanceOf[msg.sender], _value);                     // Subtract from the sender
@@ -79,60 +79,121 @@ contract AisiEx is SafeMath{
     /* Allow another contract to spend some tokens in your behalf */
     function approve(address _spender, uint256 _value) public
         returns (bool success) {
-		if (_value <= 0) revert();  
+		if (_value <= 0) revert();
         allowance[msg.sender][_spender] = _value;
 	    emit Approval(msg.sender, _spender, _value);
         return true;
     }
-       
+
 
     /* A contract attempts to get the coins */
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
-        if (_to == 0x0) revert(); 
-		if (_value <= 0) revert(); 
-        if (balanceOf[_from] < _value) revert(); 
-        if (balanceOf[_to] + _value < balanceOf[_to]) revert(); 
-        if (_value > allowance[_from][msg.sender]) revert(); 
-        balanceOf[_from] = SafeMath.safeSub(balanceOf[_from], _value);                           
-        balanceOf[_to] = SafeMath.safeAdd(balanceOf[_to], _value);                             
+        if (_to == 0x0) revert();
+		if (_value <= 0) revert();
+        if (balanceOf[_from] < _value) revert();
+        if (balanceOf[_to] + _value < balanceOf[_to]) revert();
+        if (_value > allowance[_from][msg.sender]) revert();
+        balanceOf[_from] = SafeMath.safeSub(balanceOf[_from], _value);
+        balanceOf[_to] = SafeMath.safeAdd(balanceOf[_to], _value);
         allowance[_from][msg.sender] = SafeMath.safeSub(allowance[_from][msg.sender], _value);
-        emit Transfer(_from, _to, _value);  
+        emit Transfer(_from, _to, _value);
         return true;
     }
     function burn(uint256 _value) public returns (bool success) {
         if (balanceOf[msg.sender] < _value) revert(); // Check if the sender has enough
-		if (_value <= 0) revert(); 
+		if (_value <= 0) revert();
         balanceOf[msg.sender] = SafeMath.safeSub(balanceOf[msg.sender], _value);                      // Subtract from the sender
         totalSupply = SafeMath.safeSub(totalSupply,_value);                                // Updates totalSupply
-        emit Burn(msg.sender, _value);  
+        emit Burn(msg.sender, _value);
         return true;
     }
-	
+
 	function freeze(uint256 _value) public returns (bool success) {
         if (balanceOf[msg.sender] < _value) revert(); // Check if the sender has enough
-		if (_value <= 0) revert(); 
-        balanceOf[msg.sender] = SafeMath.safeSub(balanceOf[msg.sender], _value);                      
-        freezeOf[msg.sender] = SafeMath.safeAdd(freezeOf[msg.sender], _value);                               
-        emit Freeze(msg.sender, _value); 
+		if (_value <= 0) revert();
+        balanceOf[msg.sender] = SafeMath.safeSub(balanceOf[msg.sender], _value);
+        freezeOf[msg.sender] = SafeMath.safeAdd(freezeOf[msg.sender], _value);
+        emit Freeze(msg.sender, _value);
         return true;
     }
-	
+
 	function unfreeze(uint256 _value) public returns (bool success) {
         if (freezeOf[msg.sender] < _value) revert();
-		if (_value <= 0) revert(); 
-        freezeOf[msg.sender] = SafeMath.safeSub(freezeOf[msg.sender], _value);                      
+		if (_value <= 0) revert();
+        freezeOf[msg.sender] = SafeMath.safeSub(freezeOf[msg.sender], _value);
 		balanceOf[msg.sender] = SafeMath.safeAdd(balanceOf[msg.sender], _value);
-        emit Unfreeze(msg.sender, _value);   
+        emit Unfreeze(msg.sender, _value);
         return true;
     }
-	
+
 	// transfer balance to owner
 	function withdrawEther(uint256 amount) public {
-		if(msg.sender != owner)revert();   
+		if(msg.sender != owner)revert();
 		owner.transfer(amount);
 	}
-	
+
 	// can accept ether
 	function() external payable {
     }
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

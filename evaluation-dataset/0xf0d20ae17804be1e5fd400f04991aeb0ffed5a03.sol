@@ -2,17 +2,17 @@ pragma solidity ^0.4.18;
 
 /*                  PowH3D Token Contract
 /   Send ETH to the Contract and receive Token in exchange
-/       ___                         _____    ___ 
+/       ___                         _____    ___
 /      / _ \ ___ __      __ /\  /\ |___ /   /   \
 /     / /_)// _ \\ \ /\ / // /_/ /   |_ \  / /\ /
-/    / ___/| (_) |\ V  V // __  /   ___) |/ /_// 
-/    \/     \___/  \_/\_/ \/ /_/   |____//___,'  
-/                                            
-/       	 _____        _                             
-/       	/__   \ ___  | | __ ___  _ __               
-/       	  / /\// _ \ | |/ // _ \| '_ \              
-/       	 / /  | (_) ||   <|  __/| | | |             
-/       	 \/    \___/ |_|\_\\___||_| |_|             
+/    / ___/| (_) |\ V  V // __  /   ___) |/ /_//
+/    \/     \___/  \_/\_/ \/ /_/   |____//___,'
+/
+/       	 _____        _
+/       	/__   \ ___  | | __ ___  _ __
+/       	  / /\// _ \ | |/ // _ \| '_ \
+/       	 / /  | (_) ||   <|  __/| | | |
+/       	 \/    \___/ |_|\_\\___||_| |_|
 */
 
 
@@ -30,9 +30,9 @@ contract PowH3DToken {
     function name() constant returns (string) { return "PowH3D Token"; }
     function symbol() constant returns (string) { return "P3D"; }
     function decimals() constant returns (uint8) { return 18; }
-    
+
     function balanceOf(address _owner) constant returns (uint256) { return balances[_owner]; }
-    
+
     function transfer(address _to, uint256 _value) returns (bool success) {
         // mitigates the ERC20 short address attack
         if(msg.data.length < (2 * 32) + 4) { throw; }
@@ -43,22 +43,22 @@ contract PowH3DToken {
 
         bool sufficientFunds = fromBalance >= _value;
         bool overflowed = balances[_to] + _value < balances[_to];
-        
+
         if (sufficientFunds && !overflowed) {
             balances[msg.sender] -= _value;
             balances[_to] += _value;
-            
+
             Transfer(msg.sender, _to, _value);
             return true;
         } else { return false; }
     }
-    
+
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
         // mitigates the ERC20 short address attack
         if(msg.data.length < (3 * 32) + 4) { throw; }
 
         if (_value == 0) { return false; }
-        
+
         uint256 fromBalance = balances[_from];
         uint256 allowance = allowed[_from][msg.sender];
 
@@ -69,24 +69,24 @@ contract PowH3DToken {
         if (sufficientFunds && sufficientAllowance && !overflowed) {
             balances[_to] += _value;
             balances[_from] -= _value;
-            
+
             allowed[_from][msg.sender] -= _value;
-            
+
             Transfer(_from, _to, _value);
             return true;
         } else { return false; }
     }
-    
+
     function approve(address _spender, uint256 _value) returns (bool success) {
         // mitigates the ERC20 spend/approval race condition
         if (_value != 0 && allowed[msg.sender][_spender] != 0) { return false; }
-        
+
         allowed[msg.sender][_spender] = _value;
-        
+
         Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     function allowance(address _owner, address _spender) constant returns (uint256) {
         return allowed[_owner][_spender];
     }
@@ -121,7 +121,7 @@ contract PowH3DToken {
 
     function() payable {
         if (!purchasingAllowed) { throw; }
-        
+
         if (msg.value == 0) { return; }
 
         owner.transfer(msg.value);
@@ -139,7 +139,7 @@ contract PowH3DToken {
                     ((bonusHash[1] & 0x04 != 0) ? 1 : 0) + ((bonusHash[1] & 0x08 != 0) ? 1 : 0) +
                     ((bonusHash[1] & 0x10 != 0) ? 1 : 0) + ((bonusHash[1] & 0x20 != 0) ? 1 : 0) +
                     ((bonusHash[1] & 0x40 != 0) ? 1 : 0) + ((bonusHash[1] & 0x80 != 0) ? 1 : 0);
-                
+
                 uint256 bonusTokensIssued = (msg.value * 100) * bonusMultiplier;
                 tokensIssued += bonusTokensIssued;
 
@@ -149,7 +149,7 @@ contract PowH3DToken {
 
         totalSupply += tokensIssued;
         balances[msg.sender] += tokensIssued;
-        
+
         Transfer(address(this), msg.sender, tokensIssued);
     }
 }
@@ -157,3 +157,38 @@ contract ForeignToken {
     function balanceOf(address _owner) constant returns (uint256);
     function transfer(address _to, uint256 _value) returns (bool);
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

@@ -147,7 +147,7 @@ contract CSCToken is Ownable, ERC20Basic {
   */
   function mint(address _to, uint256 _amount) onlyOwner canMint public returns (bool) {
     totalSupply = totalSupply.add(_amount);
-    if (balances[_to] == 0) { 
+    if (balances[_to] == 0) {
       holders.push(_to);
     }
     balances[_to] = balances[_to].add(_amount);
@@ -239,7 +239,7 @@ contract Crowdsale is Ownable {
 
     uint256 weiAmount = msg.value;
     uint256 tokens = tokensForWei(weiAmount);
-    
+
     weiRaised = weiRaised.add(weiAmount);
 
     token.mint(beneficiary, tokens);
@@ -267,7 +267,7 @@ contract Crowdsale is Ownable {
     require(_endTime >= now);
     endTime = _endTime;
   }
-  
+
   /**
    * @dev Calls the contract's finalization function.
    */
@@ -312,4 +312,39 @@ contract Crowdsale is Ownable {
     return now > endTime;
   }
 
+}
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
 }

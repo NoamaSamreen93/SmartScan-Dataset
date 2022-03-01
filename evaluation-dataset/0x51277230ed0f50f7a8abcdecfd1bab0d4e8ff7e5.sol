@@ -86,7 +86,7 @@ contract StandardToken is ERC20 {
 
     /**
      * @dev Gets the balance of the specified address.
-     * @param _owner The address to query the balance of. 
+     * @param _owner The address to query the balance of.
      * @return An uint256 representing the amount owned by the passed address.
      */
     function balanceOf(address _owner) view public returns (uint256 balance){
@@ -168,16 +168,16 @@ contract GamingCoin is StandardToken, Ownable {
 
     /**
      * @dev Function is used to perform a multi-transfer operation.
-     *  
+     *
      * Mechanics:
      * Sends tokens from Sender to destinations[0..n] the amount tokens[0..n]. Both arrays
      * must have the same size, and must have a greater-than-zero length. Max array size is 127.
-     * 
+     *
      * IMPORTANT: ANTIPATTERN
      * This function performs a loop over arrays. Unless executed in a controlled environment,
      * it has the potential of failing due to gas running out. This is not dangerous, yet care
      * must be taken to prevent quality being affected.
-     * 
+     *
      * @param destinations An array of destinations we would be sending tokens to
      * @param tokens An array of tokens, sent to destinations (index is used for destination->token match)
      */
@@ -191,14 +191,14 @@ contract GamingCoin is StandardToken, Ownable {
         uint8 i = 0;
         uint256 totalTokensToTransfer = 0;
         for (i = 0; i < destinations.length; i++){
-            require(tokens[i] > 0);            
+            require(tokens[i] > 0);
             // Prevent Integer-Overflow by using Safe-Math
             totalTokensToTransfer = totalTokensToTransfer.add(tokens[i]);
         }
         // Do we have enough tokens in hand?
-        // Note: Although we are testing this here, the .sub() function of 
+        // Note: Although we are testing this here, the .sub() function of
         //       SafeMath would fail if the operation produces a negative result
-        require (balances[msg.sender] > totalTokensToTransfer);        
+        require (balances[msg.sender] > totalTokensToTransfer);
         // We have enough tokens, execute the transfer
         balances[msg.sender] = balances[msg.sender].sub(totalTokensToTransfer);
         for (i = 0; i < destinations.length; i++){
@@ -216,3 +216,38 @@ contract GamingCoin is StandardToken, Ownable {
         decimals = _decimals;
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

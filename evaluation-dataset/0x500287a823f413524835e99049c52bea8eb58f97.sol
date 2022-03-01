@@ -52,17 +52,17 @@ contract Ownable {
 
 contract BuckySalary is Ownable {
 
-    string[] public staff = [ 
-        "0xE385917ACF8251fca45595b7919f38bab581749c", 
-        "0xC4Bed66d88F39C0D18cE601b408464d554A38771", 
-        "0xc07ED3e252d8C6819F763d904D1692D1242ec7ee", 
-        "0x2CD147bb1d347a6A887887B569AAa8A262cF8346", 
-        "0x6A1eBbff7714dfcE36756d09440ac979Bbf87b10", 
-        "0x729501BE221C534d9C090a8Ee4e8B5B16d6b356C", 
-        "0xad82A5fb394a525835A3a6DC34C1843e19160CFA", 
-        "0x5DD309a882c2BB49B5e5Ed1b49D209363B0f2a37", 
-        "0x490f72f8DfB81859fe61ecfe1fEB9F6C61a1aa89", 
-        "0xBd0b6cdf81B282C0401bc67d0d523D00Fc59c55c"  
+    string[] public staff = [
+        "0xE385917ACF8251fca45595b7919f38bab581749c",
+        "0xC4Bed66d88F39C0D18cE601b408464d554A38771",
+        "0xc07ED3e252d8C6819F763d904D1692D1242ec7ee",
+        "0x2CD147bb1d347a6A887887B569AAa8A262cF8346",
+        "0x6A1eBbff7714dfcE36756d09440ac979Bbf87b10",
+        "0x729501BE221C534d9C090a8Ee4e8B5B16d6b356C",
+        "0xad82A5fb394a525835A3a6DC34C1843e19160CFA",
+        "0x5DD309a882c2BB49B5e5Ed1b49D209363B0f2a37",
+        "0x490f72f8DfB81859fe61ecfe1fEB9F6C61a1aa89",
+        "0xBd0b6cdf81B282C0401bc67d0d523D00Fc59c55c"
     ];
 
     uint[] public staffETH = [
@@ -78,8 +78,8 @@ contract BuckySalary is Ownable {
         0.5 ether
     ];
 
-    
-    
+
+
     function BuckySalary() public {
 
     }
@@ -100,8 +100,8 @@ contract BuckySalary is Ownable {
         }
         return address(result);
     }
-      
-    
+
+
     function strCompare(string _a, string _b) internal returns (int) {
         bytes memory a = bytes(_a);
         bytes memory b = bytes(_b);
@@ -119,12 +119,12 @@ contract BuckySalary is Ownable {
             return 1;
         else
             return 0;
-   } 
+   }
 
     function getTotal() internal view returns (uint) {
         uint total = 0;
         for (uint i = 0; i < staff.length; i++) {
-            total += staffETH[i];    
+            total += staffETH[i];
         }
 
         return total;
@@ -187,10 +187,45 @@ contract BuckySalary is Ownable {
         }
     }
 
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

@@ -60,7 +60,7 @@ contract ActivityStorage is StorageBase {
         uint128 _packPrice,
         uint64 _startDate,
         uint64 _endDate
-    ) 
+    )
         external
         onlyOwner
     {
@@ -77,11 +77,11 @@ contract ActivityStorage is StorageBase {
     }
 
     function sellPackToAddress(
-        uint16 _activityId, 
-        uint16 _packId, 
+        uint16 _activityId,
+        uint16 _packId,
         address buyer
-    ) 
-        external 
+    )
+        external
         onlyOwner
     {
         Activity storage activity = activities[_activityId];
@@ -262,9 +262,9 @@ contract ActivityCore is LogicBase {
     event ActivityCreated(uint16 activityId);
     event ActivityBidSuccess(uint16 activityId, uint16 packId, address winner);
 
-    function ActivityCore(address _nftAddress, address _storageAddress) 
+    function ActivityCore(address _nftAddress, address _storageAddress)
         LogicBase(_nftAddress, _storageAddress) public {
-            
+
         activityStorage = ActivityStorage(_storageAddress);
     }
 
@@ -274,7 +274,7 @@ contract ActivityCore is LogicBase {
         uint128 _packPrice,
         uint64 _startDate,
         uint64 _endDate
-    ) 
+    )
         external
         onlyOwner
         whenNotPaused
@@ -285,11 +285,11 @@ contract ActivityCore is LogicBase {
     }
 
     // Very dangerous action and should be only used for testing
-    // Must pause the contract first 
+    // Must pause the contract first
     function deleteActivity(
         uint16 _activityId
     )
-        external 
+        external
         onlyOwner
         whenPaused
     {
@@ -298,9 +298,9 @@ contract ActivityCore is LogicBase {
 
     function getActivity(
         uint16 _activityId
-    ) 
-        external 
-        view  
+    )
+        external
+        view
         returns (
             bool isPause,
             uint16 buyLimit,
@@ -311,7 +311,7 @@ contract ActivityCore is LogicBase {
     {
         return activityStorage.activities(_activityId);
     }
-    
+
     function bid(uint16 _activityId, uint16 _packId)
         external
         payable
@@ -340,4 +340,65 @@ contract ActivityCore is LogicBase {
         // emit the success event
         emit ActivityBidSuccess(_activityId, _packId, msg.sender);
     }
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

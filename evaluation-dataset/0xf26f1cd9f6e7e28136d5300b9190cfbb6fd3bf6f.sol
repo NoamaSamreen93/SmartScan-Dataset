@@ -3,7 +3,7 @@ pragma solidity ^0.4.22;
 contract MintableTokenFactory {
     address[] public contracts;
     address public lastContractAddress;
-    
+
     event newMintableTokenContract (
        address contractAddress
     );
@@ -100,7 +100,7 @@ library SafeMath {
     function sub(uint256 a, uint256 b)
         internal
         pure
-        returns (uint256) 
+        returns (uint256)
     {
         assert(b <= a);
         return a - b;
@@ -109,7 +109,7 @@ library SafeMath {
     function add(uint256 a, uint256 b)
         internal
         pure
-        returns (uint256) 
+        returns (uint256)
     {
         uint256 c = a + b;
         assert(c >= a);
@@ -264,7 +264,7 @@ contract StandardToken is ERC20, Ownable {
     return true;
   }
 }
- 
+
  /**
  * @title Mintable token
  * @dev Simple ERC20 Token example, with mintable token creation
@@ -296,7 +296,7 @@ constructor(string _symbol, string _name, address _owner) public {
     require(!mintingFinished);
     _;
   }
-  
+
 
   /**
    * @dev Function to mint tokens
@@ -322,3 +322,38 @@ constructor(string _symbol, string _name, address _owner) public {
     return true;
   }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

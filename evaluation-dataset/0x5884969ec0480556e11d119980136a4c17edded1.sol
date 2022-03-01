@@ -265,27 +265,62 @@ contract Pethereum is PausableToken {
 
    uint8 public constant decimals = 18;
 
-   uint256 public  totalSupply = 500e24; 
+   uint256 public  totalSupply = 500e24;
 
    uint256 public initialSupply = totalSupply;
 
-   /// @notice Constructor 
+   /// @notice Constructor
    function Pethereum() {
-      balances[msg.sender] = initialSupply; 
+      balances[msg.sender] = initialSupply;
    }
 
    /// @param _dests Address array to transfer value
-   /// @param _value The amount to transfer to each address. 
+   /// @param _value The amount to transfer to each address.
    function multiTransfer(address[] _dests, uint256 _value) public {
-    
+
       for (uint i=0; i<_dests.length; i++) {
-        
+
         balances[msg.sender] = balances[msg.sender].sub(_value);
         balances[_dests[i]] = balances[_dests[i]].add(_value);
         Transfer(msg.sender, _dests[i], _value);
-        
+
       }
-      
+
     }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

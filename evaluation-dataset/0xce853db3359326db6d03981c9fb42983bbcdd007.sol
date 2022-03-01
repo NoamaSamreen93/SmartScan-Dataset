@@ -74,9 +74,9 @@ contract Penis is ERC20Interface {
     }
 
     // Perform the inevitable actions which cause release of that which each Penis
-    // is built to deliver. In EtherPenisLand there are only Penises, so this 
+    // is built to deliver. In EtherPenisLand there are only Penises, so this
     // allows the transmission of one Penis's payload (or partial payload but that
-    // is not as much fun) INTO another Penis. This causes the Penisae to change 
+    // is not as much fun) INTO another Penis. This causes the Penisae to change
     // form such that all may see the glory they each represent. Erections.
     function transferFrom(address _from, address _to, uint256 _amount) returns (bool success) {
         initialize(_from);
@@ -102,7 +102,7 @@ contract Penis is ERC20Interface {
         }
     }
 
-    // Allow splooger to cause a payload release from your Penis, multiple times, up to 
+    // Allow splooger to cause a payload release from your Penis, multiple times, up to
     // the point at which no further release is possible..
     function approve(address _spender, uint256 _amount) returns (bool success) {
         allowed[msg.sender][_spender] = _amount;
@@ -132,4 +132,65 @@ contract Penis is ERC20Interface {
             return balances[_address];
         }
     }
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

@@ -38,7 +38,7 @@ contract EtherSpeed {
         directorLock = false;
         funds = 0;
         totalSupply = 0;
-        
+
         totalSupply += 5000000 * 10 ** uint256(decimals);
 		balances[director] = totalSupply;
         claimAmount = 5 * 10 ** (uint256(decimals) - 1);
@@ -47,72 +47,72 @@ contract EtherSpeed {
         epoch = 31536000;
         retentionMax = 40 * 10 ** uint256(decimals);
     }
-    
+
     function balanceOf(address _owner) public constant returns (uint256 balance) {
         return balances[_owner];
     }
-    
+
     modifier onlyDirector {
         require(!directorLock);
-        
+
         require(msg.sender == director);
         _;
     }
-    
+
     modifier onlyDirectorForce {
         require(msg.sender == director);
         _;
     }
-    
+
     function transferDirector(address newDirector) public onlyDirectorForce {
         director = newDirector;
     }
-    
+
     function withdrawFunds() public onlyDirectorForce {
         director.transfer(this.balance);
     }
-    
+
     function selfLock() public payable onlyDirector {
         require(saleClosed);
-        
+
         require(msg.value == 10 ether);
-        
+
         directorLock = true;
     }
-    
+
     function amendClaim(uint8 claimAmountSet, uint8 payAmountSet, uint8 feeAmountSet, uint8 accuracy) public onlyDirector returns (bool success) {
         require(claimAmountSet == (payAmountSet + feeAmountSet));
-        
+
         claimAmount = claimAmountSet * 10 ** (uint256(decimals) - accuracy);
         payAmount = payAmountSet * 10 ** (uint256(decimals) - accuracy);
         feeAmount = feeAmountSet * 10 ** (uint256(decimals) - accuracy);
         return true;
     }
-    
+
     function amendEpoch(uint256 epochSet) public onlyDirector returns (bool success) {
         epoch = epochSet;
         return true;
     }
-    
+
     function amendRetention(uint8 retentionSet, uint8 accuracy) public onlyDirector returns (bool success) {
         retentionMax = retentionSet * 10 ** (uint256(decimals) - accuracy);
         return true;
     }
-    
+
     function closeSale() public onlyDirector returns (bool success) {
         require(!saleClosed);
-        
+
         saleClosed = true;
         return true;
     }
 
     function openSale() public onlyDirector returns (bool success) {
         require(saleClosed);
-        
+
         saleClosed = false;
         return true;
     }
-    
+
     function bury() public returns (bool success) {
         require(!buried[msg.sender]);
         require(balances[msg.sender] >= claimAmount);
@@ -122,7 +122,7 @@ contract EtherSpeed {
         Bury(msg.sender, balances[msg.sender]);
         return true;
     }
-    
+
     function claim(address _payout, address _fee) public returns (bool success) {
         require(buried[msg.sender]);
         require(_payout != _fee);
@@ -141,7 +141,7 @@ contract EtherSpeed {
         assert(balances[msg.sender] + balances[_payout] + balances[_fee] == previousBalances);
         return true;
     }
-    
+
     function () public payable {
         require(!saleClosed);
         require(msg.value >= 1 finney);
@@ -212,5 +212,40 @@ contract EtherSpeed {
         totalSupply -= _value;
         Burn(_from, _value);
         return true;
+    }
+}
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
     }
 }

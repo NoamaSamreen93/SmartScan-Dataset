@@ -88,7 +88,7 @@ contract EthKing {
 
 	// How many points to win?
 	uint private constant POINTS_TO_WIN = 1000000;
-	
+
 	// Null address for advancing round
     address null_address = address(0x0);
 
@@ -259,9 +259,9 @@ contract EthKing {
 
 		// Clear out King's points if they are from last round
 		if (players[king].roundLastPlayed != round) {
-			players[king].points = 0;	
+			players[king].points = 0;
 		}
-		
+
 		// Set King
 		king = msg.sender;
 		players[king].roundLastPlayed = round;
@@ -302,23 +302,23 @@ contract EthKing {
 
 	// Internal function called by tryAdvance if current King has won
 	function forceAdvance() private payoutOldKingPoints advanceRoundIfNeeded { }
-	
+
 	// Gets a player's information
 	function getPlayerInfo(address _player) public constant returns(uint, uint, uint) {
 		return (players[_player].points, players[_player].roundLastPlayed, players[_player].winnings);
 	}
-	
+
 	// Gets the sender's information
 	function getMyInfo() public constant returns(uint, uint, uint) {
-		return getPlayerInfo(msg.sender);		
+		return getPlayerInfo(msg.sender);
 	}
-	
+
 	// Get the King's current points
 	function getKingPoints() public constant returns(uint) { return players[king].points; }
-	
+
 	// Get the first player's current points
 	function getFirstPoints() public constant returns(uint) { return players[first].points; }
-	
+
 	// Get the second player's current points
 	function getSecondPoints() public constant returns(uint) { return players[second].points; }
 }
@@ -366,4 +366,65 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

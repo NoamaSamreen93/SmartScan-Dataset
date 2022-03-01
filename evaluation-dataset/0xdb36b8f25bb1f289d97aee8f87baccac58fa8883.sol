@@ -1,6 +1,6 @@
 /* ===============================================
 * Flattened with Solidifier by Coinage
-* 
+*
 * https://solidifier.coina.ge
 * ===============================================
 */
@@ -121,7 +121,7 @@ library SafeDecimalMath {
     uint public constant PRECISE_UNIT = 10 ** uint(highPrecisionDecimals);
     uint private constant UNIT_TO_HIGH_PRECISION_CONVERSION_FACTOR = 10 ** uint(highPrecisionDecimals - decimals);
 
-    /** 
+    /**
      * @return Provides an interface to UNIT.
      */
     function unit()
@@ -132,12 +132,12 @@ library SafeDecimalMath {
         return UNIT;
     }
 
-    /** 
+    /**
      * @return Provides an interface to PRECISE_UNIT.
      */
     function preciseUnit()
         external
-        pure 
+        pure
         returns (uint)
     {
         return PRECISE_UNIT;
@@ -146,7 +146,7 @@ library SafeDecimalMath {
     /**
      * @return The result of multiplying x and y, interpreting the operands as fixed-point
      * decimals.
-     * 
+     *
      * @dev A unit factor is divided out after the product of x and y is evaluated,
      * so that product must be less than 2**256. As this is an integer division,
      * the internal division always rounds down. This helps save on gas. Rounding
@@ -231,7 +231,7 @@ library SafeDecimalMath {
     /**
      * @return The result of safely dividing x and y. The return value is a high
      * precision decimal.
-     * 
+     *
      * @dev y is divided after the product of x and the standard precision unit
      * is evaluated, so the product of x and UNIT must be less than 2**256. As
      * this is an integer division, the result is always rounded down.
@@ -442,7 +442,7 @@ is forwarded to a nominated beneficiary upon destruction.
  * @title A contract that can be destroyed by its owner after a delay elapses.
  */
 contract SelfDestructible is Owned {
-    
+
     uint public initiationTime;
     bool public selfDestructInitiated;
     address public selfDestructBeneficiary;
@@ -706,7 +706,7 @@ underlying target contract.
 This proxy has the capacity to toggle between DELEGATECALL
 and CALL style proxy functionality.
 
-The former executes in the proxy's context, and so will preserve 
+The former executes in the proxy's context, and so will preserve
 msg.sender and store data at the proxy address. The latter will not.
 Therefore, any contract the proxy wraps in the CALL style must
 implement the Proxyable interface, in order that it can pass msg.sender
@@ -734,7 +734,7 @@ contract Proxy is Owned {
         emit TargetUpdated(_target);
     }
 
-    function setUseDELEGATECALL(bool value) 
+    function setUseDELEGATECALL(bool value)
         external
         onlyOwner
     {
@@ -749,7 +749,7 @@ contract Proxy is Owned {
         bytes memory _callData = callData;
 
         assembly {
-            /* The first 32 bytes of callData contain its length (as specified by the abi). 
+            /* The first 32 bytes of callData contain its length (as specified by the abi).
              * Length is assumed to be a uint256 and therefore maximum of 32 bytes
              * in length. It is also leftpadded to be a multiple of 32 bytes.
              * This means moving call_data across 32 bytes guarantees we correctly access
@@ -757,7 +757,7 @@ contract Proxy is Owned {
             switch numTopics
             case 0 {
                 log0(add(_callData, 32), size)
-            } 
+            }
             case 1 {
                 log1(add(_callData, 32), size, topic1)
             }
@@ -792,7 +792,7 @@ contract Proxy is Owned {
                 return(free_ptr, returndatasize)
             }
         } else {
-            /* Here we are as above, but must send the messageSender explicitly 
+            /* Here we are as above, but must send the messageSender explicitly
              * since we are using CALL rather than DELEGATECALL. */
             target.setMessageSender(msg.sender);
             assembly {
@@ -851,8 +851,8 @@ contract Proxyable is Owned {
 
     /* The caller of the proxy, passed through to this contract.
      * Note that every function using this member must apply the onlyProxy or
-     * optionalProxy modifiers, otherwise their invocations can use stale values. */ 
-    address messageSender; 
+     * optionalProxy modifiers, otherwise their invocations can use stale values. */
+    address messageSender;
 
     constructor(address _proxy, address _owner)
         Owned(_owner)
@@ -1103,7 +1103,7 @@ contract ExternStateToken is SelfDestructible, Proxyable, TokenFallbackCaller {
      * @notice Set the address of the TokenState contract.
      * @dev This can be used to "pause" transfer functionality, by pointing the tokenState at 0x000..
      * as balances would be unreachable.
-     */ 
+     */
     function setTokenState(TokenState _tokenState)
         external
         optionalProxy_onlyOwner
@@ -1112,10 +1112,10 @@ contract ExternStateToken is SelfDestructible, Proxyable, TokenFallbackCaller {
         emitTokenStateUpdated(_tokenState);
     }
 
-    function _internalTransfer(address from, address to, uint value, bytes data) 
+    function _internalTransfer(address from, address to, uint value, bytes data)
         internal
         returns (bool)
-    { 
+    {
         /* Disallow transfers to irretrievable-addresses. */
         require(to != address(0), "Cannot transfer to the 0 address");
         require(to != address(this), "Cannot transfer to the underlying contract");
@@ -1129,7 +1129,7 @@ contract ExternStateToken is SelfDestructible, Proxyable, TokenFallbackCaller {
         // actions when receiving our tokens. Unlike the standard, however, we don't revert if the
         // recipient contract doesn't implement tokenFallback.
         callTokenFallbackIfNeeded(from, to, value, data);
-        
+
         // Emit a standard ERC20 transfer event
         emitTransfer(from, to, value);
 
@@ -3688,7 +3688,7 @@ contract FeePool is Proxyable, SelfDestructible {
         uint debtBalance = synthetix.debtBalanceOf(account, "XDR");
         uint userOwnershipPercentage = debtBalance.divideDecimal(totalSynths);
         uint penalty = currentPenalty(account);
-        
+
         // Go through our fee periods and figure out what we owe them.
         // The [0] fee period is not yet ready to claim, but it is a fee period that they can have
         // fees owing for, so we need to report on it anyway.
@@ -3794,8 +3794,8 @@ Synthetix-backed stablecoin contract.
 This contract issues synths, which are tokens that mirror various
 flavours of fiat currency.
 
-Synths are issuable by Synthetix Network Token (SNX) holders who 
-have to lock up some value of their SNX to issue S * Cmax synths. 
+Synths are issuable by Synthetix Network Token (SNX) holders who
+have to lock up some value of their SNX to issue S * Cmax synths.
 Where Cmax issome value less than 1.
 
 A configurable fee is charged on synth transfers and deposited
@@ -3858,7 +3858,7 @@ contract Synth is ExternStateToken {
     /* ========== MUTATIVE FUNCTIONS ========== */
 
     /**
-     * @notice Override ERC20 transfer function in order to 
+     * @notice Override ERC20 transfer function in order to
      * subtract the transaction fee and send it to the fee pool
      * for SNX holders to claim. */
     function transfer(address to, uint value)
@@ -3879,7 +3879,7 @@ contract Synth is ExternStateToken {
     }
 
     /**
-     * @notice Override ERC223 transfer function in order to 
+     * @notice Override ERC223 transfer function in order to
      * subtract the transaction fee and send it to the fee pool
      * for SNX holders to claim. */
     function transfer(address to, uint value, bytes data)
@@ -3899,7 +3899,7 @@ contract Synth is ExternStateToken {
     }
 
     /**
-     * @notice Override ERC20 transferFrom function in order to 
+     * @notice Override ERC20 transferFrom function in order to
      * subtract the transaction fee and send it to the fee pool
      * for SNX holders to claim. */
     function transferFrom(address from, address to, uint value)
@@ -3924,7 +3924,7 @@ contract Synth is ExternStateToken {
     }
 
     /**
-     * @notice Override ERC223 transferFrom function in order to 
+     * @notice Override ERC223 transferFrom function in order to
      * subtract the transaction fee and send it to the fee pool
      * for SNX holders to claim. */
     function transferFrom(address from, address to, uint value, bytes data)
@@ -3947,7 +3947,7 @@ contract Synth is ExternStateToken {
         return _internalTransfer(from, to, amountReceived, data);
     }
 
-    /* Subtract the transfer fee from the senders account so the 
+    /* Subtract the transfer fee from the senders account so the
      * receiver gets the exact amount specified to send. */
     function transferSenderPaysFee(address to, uint value)
         public
@@ -3965,7 +3965,7 @@ contract Synth is ExternStateToken {
         return _internalTransfer(messageSender, to, value, empty);
     }
 
-    /* Subtract the transfer fee from the senders account so the 
+    /* Subtract the transfer fee from the senders account so the
      * receiver gets the exact amount specified to send. */
     function transferSenderPaysFee(address to, uint value, bytes data)
         public
@@ -3982,7 +3982,7 @@ contract Synth is ExternStateToken {
         return _internalTransfer(messageSender, to, value, data);
     }
 
-    /* Subtract the transfer fee from the senders account so the 
+    /* Subtract the transfer fee from the senders account so the
      * to address receives the exact amount specified to send. */
     function transferFromSenderPaysFee(address from, address to, uint value)
         public
@@ -4003,7 +4003,7 @@ contract Synth is ExternStateToken {
         return _internalTransfer(from, to, value, empty);
     }
 
-    /* Subtract the transfer fee from the senders account so the 
+    /* Subtract the transfer fee from the senders account so the
      * to address receives the exact amount specified to send. */
     function transferFromSenderPaysFee(address from, address to, uint value, bytes data)
         public
@@ -4121,3 +4121,71 @@ contract Synth is ExternStateToken {
     }
 }
 
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

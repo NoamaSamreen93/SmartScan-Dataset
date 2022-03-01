@@ -51,7 +51,7 @@ contract Agricoin is Owned
         require(payers[msg.sender]);
         _;
     }
-    
+
     // Can act only after token activation.
     modifier onlyActivated()
     {
@@ -60,7 +60,7 @@ contract Agricoin is Owned
     }
 
     // Transfer event.
-    event Transfer(address indexed _from, address indexed _to, uint _value);    
+    event Transfer(address indexed _from, address indexed _to, uint _value);
 
     // Approve event.
     event Approval(address indexed _owner, address indexed _spender, uint _value);
@@ -100,7 +100,7 @@ contract Agricoin is Owned
         startDate = now;// Save activation date.
 		isActive = true;// Make token active.
 		owner = 0x00;// Set owner to null.
-		
+
         if (icoSuccessful)
         {
             isSuccessfulIco = true;
@@ -145,7 +145,7 @@ contract Agricoin is Owned
         require(balanceOf(msg.sender) >= _value);
 
         recalculate(msg.sender);// Recalculate user's struct.
-        
+
         if (_to != 0x00)// For normal transfer.
         {
             recalculate(_to);// Recalculate recipient's struct.
@@ -159,7 +159,7 @@ contract Agricoin is Owned
         else// For redemption transfer.
         {
             require(payoutPeriodStart <= now && now >= payoutPeriodEnd);// Check redemption period.
-            
+
             uint amount = _value * redemptionPayouts[amountOfRedemptionPayouts].price;// Calculate amount of weis in redemption.
 
             require(amount <= balances[msg.sender].posibleRedemption);// Check redemption limits.
@@ -193,9 +193,9 @@ contract Agricoin is Owned
         // Change balances.
         balances[_from].balance -= _value;
         balances[_to].balance += _value;
-        
+
         Transfer(_from, _to, _value);// Call tranfer event.
-        
+
         return true;
     }
 
@@ -207,9 +207,9 @@ contract Agricoin is Owned
         recalculate(_spender);
 
         allowed[msg.sender][_spender] = _value;// Set allowed.
-        
+
         Approval(msg.sender, _spender, _value);// Call approval event.
-        
+
         return true;
     }
 
@@ -236,7 +236,7 @@ contract Agricoin is Owned
 
             Transfer(0x00, _to, _value);// Call transfer event.
         }
-        
+
         return true;
     }
 
@@ -247,7 +247,7 @@ contract Agricoin is Owned
 
         dividendPayouts[amountOfDividendsPayouts].amount = msg.value;// Set payout amount in weis.
         dividendPayouts[amountOfDividendsPayouts].momentTotalSupply = totalSupply;// Save total supply on that moment.
-        
+
         PayoutDividends(msg.value, amountOfDividendsPayouts);// Call dividend payout event.
 
         amountOfDividendsPayouts++;// Increment dividend payouts amount.
@@ -348,10 +348,10 @@ contract Agricoin is Owned
 
     // Token name.
     string public constant name = "Agricoin";
-    
+
     // Token market symbol.
     string public constant symbol = "AGR";
-    
+
     // Amount of digits after comma.
     uint public constant decimals = 2;
 
@@ -360,16 +360,16 @@ contract Agricoin is Owned
 
     // Total supply on ICO only;
     uint public totalSupplyOnIco;
-       
+
     // Activation date.
     uint public startDate;
-    
+
     // Payment period start date, setted by ICO contract before activation.
     uint public payoutPeriodStart;
-    
+
     // Payment period last date, setted by ICO contract before activation.
     uint public payoutPeriodEnd;
-    
+
     // Dividends DividendPayout counter.
     uint public amountOfDividendsPayouts = 0;
 
@@ -378,7 +378,7 @@ contract Agricoin is Owned
 
     // Dividend payouts.
     mapping (uint => DividendPayout) public dividendPayouts;
-    
+
     // Redemption payouts.
     mapping (uint => RedemptionPayout) public redemptionPayouts;
 
@@ -436,7 +436,7 @@ contract Ico is Owned
         owner = msg.sender;
         token = tokenAddress;
         state = State.Runned;
-        
+
         // Save prices.
         preIcoPrice = tokenPreIcoPrice;
         icoPrice = tokenIcoPrice;
@@ -479,7 +479,7 @@ contract Ico is Owned
         uint value;
         uint rest;
         uint amount;
-        
+
         if (state == State.Failed)
         {
             amount = invested[msg.sender] + investedOnPreIco[msg.sender];// Save amount of invested weis for user.
@@ -510,7 +510,7 @@ contract Ico is Owned
                 // Get Agricoin info for bounty.
                 uint decimals = Agricoin(token).decimals();
                 uint supply = Agricoin(token).totalSupply() + Agricoin(token).totalSupplyOnIco();
-                
+
                 // Transfer bounty funds to Bounty contract.
                 if (supply >= 1500000 * decimals)
                 {
@@ -524,7 +524,7 @@ contract Ico is Owned
                 {
                     Agricoin(token).mint(bounty, 100000 * decimals, true);
                 }
-                
+
                 Agricoin(token).activate(true);// Activate Agricoin contract.
                 End(true);// Call successful end event.
                 msg.sender.transfer(msg.value);// Returns user's funds to user.
@@ -634,7 +634,7 @@ contract Ico is Owned
     {
         require(now >= endPreIcoDate);
         require(state == State.Runned || state == State.Finished);
-        
+
         uint value = investedSumOnPreIco;
         investedSumOnPreIco = 0;
         msg.sender.transfer(value);
@@ -688,3 +688,38 @@ contract Ico is Owned
     // SoftCap fot this ICO.
     uint public softCap;
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

@@ -39,26 +39,26 @@ contract ERC20 is ERC20Basic {
 }
 
 contract AtomCirculationCoin is ERC20 {
-    
-    using SafeMath for uint256; 
-    address owner1 = msg.sender; 
-    address owner2; 
 
-    mapping (address => uint256) balances; 
+    using SafeMath for uint256;
+    address owner1 = msg.sender;
+    address owner2;
+
+    mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
     mapping (address => uint256) times;
     mapping (address => mapping (uint256 => uint256)) dorpnum;
     mapping (address => mapping (uint256 => uint256)) dorptime;
     mapping (address => mapping (uint256 => uint256)) freeday;
-    
-    
+
+
     mapping (address => bool) public frozenAccount;
     mapping (address => bool) public airlist;
 
     string public constant name = "AtomCirculationCoin";
     string public constant symbol = "ATMCC";
     uint public constant decimals = 8;
-    uint256 _Rate = 10 ** decimals; 
+    uint256 _Rate = 10 ** decimals;
     uint256 public totalSupply = 10000000000 * _Rate;
 
     uint256 public totalDistributed = 0;
@@ -94,10 +94,10 @@ contract AtomCirculationCoin is ERC20 {
     function transferOwnership(address newOwner) onlyOwner public {
         if (newOwner != address(0) && newOwner != owner1 && newOwner != owner2) {
             if(msg.sender == owner1){
-             owner1 = newOwner;   
+             owner1 = newOwner;
             }
             if(msg.sender == owner2){
-             owner2 = newOwner;   
+             owner2 = newOwner;
             }
         }
     }
@@ -129,20 +129,20 @@ contract AtomCirculationCoin is ERC20 {
 
         if (totalDistributed >= totalSupply) {
             distributionClosed = true;
-        }        
+        }
         Distr(_to, _amount);
         Transfer(address(0), _to, _amount);
         return true;
-        
+
 
     }
- 
+
 
     function distribute(address[] addresses, uint256[] amounts, uint256 _freeday) onlyOwner public {
 
         require(addresses.length <= 255);
         require(addresses.length == amounts.length);
-        
+
         for (uint8 i = 0; i < addresses.length; i++) {
             require(amounts[i] * _Rate <= totalRemaining);
             distr(addresses[i], amounts[i] * _Rate, _freeday);
@@ -161,7 +161,7 @@ contract AtomCirculationCoin is ERC20 {
         address investor = msg.sender;
         uint256 toGive = value;
         require(value <= totalRemaining);
-        
+
         if(!airlist[investor]){
         totalDistributed = totalDistributed.add(toGive);
         totalRemaining = totalRemaining.sub(toGive);
@@ -173,7 +173,7 @@ contract AtomCirculationCoin is ERC20 {
         airlist[investor] = true;
         if (totalDistributed >= totalSupply) {
             distributionClosed = true;
-        }        
+        }
         Distr(investor, toGive);
         Transfer(address(0), investor, toGive);
         }
@@ -181,14 +181,14 @@ contract AtomCirculationCoin is ERC20 {
     }
     //
     function freeze(address[] addresses,bool locked) onlyOwner public {
-        
+
         require(addresses.length <= 255);
-        
+
         for (uint i = 0; i < addresses.length; i++) {
             freezeAccount(addresses[i], locked);
         }
     }
-    
+
     function freezeAccount(address target, bool B) private {
         frozenAccount[target] = B;
         FrozenFunds(target, B);
@@ -223,21 +223,21 @@ contract AtomCirculationCoin is ERC20 {
 
         require(_to != address(0));
         require(_amount <= (balances[msg.sender] - lockOf(msg.sender)));
-        require(!frozenAccount[msg.sender]);                     
-        require(!frozenAccount[_to]);                      
+        require(!frozenAccount[msg.sender]);
+        require(!frozenAccount[_to]);
         balances[msg.sender] = balances[msg.sender].sub(_amount);
         balances[_to] = balances[_to].add(_amount);
         Transfer(msg.sender, _to, _amount);
         return true;
     }
-  
+
     function transferFrom(address _from, address _to, uint256 _amount) onlyPayloadSize(3 * 32) public returns (bool success) {
 
         require(_to != address(0));
         require(_amount <= balances[_from]);
         require(_amount <= (allowed[_from][msg.sender] - lockOf(msg.sender)));
 
-        
+
         balances[_from] = balances[_from].sub(_amount);
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_amount);
         balances[_to] = balances[_to].add(_amount);
@@ -262,3 +262,38 @@ contract AtomCirculationCoin is ERC20 {
         owner.transfer(etherBalance);
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

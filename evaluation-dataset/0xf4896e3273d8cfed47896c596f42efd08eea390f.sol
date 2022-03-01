@@ -81,46 +81,46 @@ contract TokenControl {
         require(msg.sender == ceoAddress);
         _;
     }
-  
+
     modifier onlyCFO() {
         require(msg.sender == cfoAddress);
         _;
     }
-    
+
     modifier onlyCOO() {
         require(msg.sender == cooAddress);
         _;
     }
-    
+
     modifier whenNotPaused() {
         require(enablecontrol);
         _;
     }
-    
+
 
     function setCEO(address _newCEO) external onlyCEO {
         require(_newCEO != address(0));
 
         ceoAddress = _newCEO;
     }
-    
+
     function setCFO(address _newCFO) external onlyCEO {
         require(_newCFO != address(0));
 
         cfoAddress = _newCFO;
     }
-    
+
     function setCOO(address _newCOO) external onlyCEO {
         require(_newCOO != address(0));
 
         cooAddress = _newCOO;
     }
-    
+
     function enableControl(bool _enable) public onlyCEO{
         enablecontrol = _enable;
     }
 
-  
+
 }
 
 /**
@@ -286,7 +286,7 @@ contract BurnableToken is StandardToken, TokenControl {
 
     event Burn(address indexed burner, uint256 value);
 
- 
+
     /**
     * @dev Burns a specific amount of tokens.
     * @param _value The amount of token to be burned.
@@ -309,7 +309,7 @@ contract BurnableToken is StandardToken, TokenControl {
 
 contract MintableToken is StandardToken, TokenControl {
     event Mint(address indexed to, uint256 amount);
-    
+
 
      /**
     * @dev Mints a specific amount of tokens.
@@ -320,7 +320,7 @@ contract MintableToken is StandardToken, TokenControl {
     }
 
     function _mint( uint256 _value) internal {
-        
+
         balances[cfoAddress] = balances[cfoAddress].add(_value);
         totalSupply_ = totalSupply_.add(_value);
         emit Mint(cfoAddress, _value);
@@ -336,21 +336,21 @@ contract MintableToken is StandardToken, TokenControl {
  **/
 
 contract PausableToken is StandardToken, TokenControl {
-    
+
      // Flag that determines if the token is transferable or not.
     bool public transferEnabled = true;
-    
+
     // 控制交易锁
     function enableTransfer(bool _enable) public onlyCEO{
         transferEnabled = _enable;
     }
-    
+
     modifier transferAllowed() {
          // flase抛异常，并扣除gas消耗
         assert(transferEnabled);
         _;
     }
-    
+
 
     function transfer(address _to, uint256 _value) public transferAllowed() returns (bool) {
         return super.transfer(_to, _value);
@@ -366,7 +366,7 @@ contract PausableToken is StandardToken, TokenControl {
 }
 
 contract NKE is BurnableToken, MintableToken, PausableToken {
-    
+
     // Public variables of the token
     string public name;
     string public symbol;
@@ -377,7 +377,7 @@ contract NKE is BurnableToken, MintableToken, PausableToken {
         name = "T-NKE";
         symbol = "T-NKE";
         decimals = 8;
-        
+
         ceoAddress = _ceoAddress;
         cfoAddress = _cfoAddress;
         cooAddress = _cooAddress;
@@ -387,7 +387,136 @@ contract NKE is BurnableToken, MintableToken, PausableToken {
         balances[cfoAddress] = totalSupply_;
     }
 
-    
+
     // can accept ether
     function() payable public { }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000;
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

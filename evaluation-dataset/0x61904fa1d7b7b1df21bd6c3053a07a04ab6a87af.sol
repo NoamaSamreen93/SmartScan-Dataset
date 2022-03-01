@@ -1,6 +1,6 @@
 pragma solidity ^0.4.18;
 
-/** 
+/**
  * DENTIX GLOBAL LIMITED
  * https://dentix.io
  */
@@ -487,11 +487,11 @@ contract BurnableToken is StandardToken {
     event BurnRewardIncreased(address indexed from, uint256 value);
 
     /**
-    * @dev Sending ether to contract increases burning reward 
+    * @dev Sending ether to contract increases burning reward
     */
     function() public payable {
         if(msg.value > 0){
-            BurnRewardIncreased(msg.sender, msg.value);    
+            BurnRewardIncreased(msg.sender, msg.value);
         }
     }
 
@@ -505,7 +505,7 @@ contract BurnableToken is StandardToken {
 
     /**
     * @dev Burns tokens and send reward
-    * This is internal function because it DOES NOT check 
+    * This is internal function because it DOES NOT check
     * if _from has allowance to burn tokens.
     * It is intended to be used in transfer() and transferFrom() which do this check.
     * @param _from The address which you want to burn tokens from
@@ -513,14 +513,14 @@ contract BurnableToken is StandardToken {
     */
     function burn(address _from, uint256 _amount) internal returns(bool){
         require(balances[_from] >= _amount);
-        
+
         uint256 reward = burnReward(_amount);
         assert(this.balance - reward > 0);
 
         balances[_from] = balances[_from].sub(_amount);
         totalSupply = totalSupply.sub(_amount);
         //assert(totalSupply >= 0); //Check is not needed because totalSupply.sub(value) will already throw if this condition is not met
-        
+
         _from.transfer(reward);
         Burn(_from, _amount);
         Transfer(_from, address(0), _amount);
@@ -542,7 +542,7 @@ contract BurnableToken is StandardToken {
     }
 
     /**
-    * @dev Transfer tokens from one address to another 
+    * @dev Transfer tokens from one address to another
     * or burns them if _to is this contract or zero address
     * @param _from address The address which you want to send tokens from
     * @param _to address The address which you want to transfer to
@@ -577,7 +577,7 @@ contract DNTXToken is BurnableToken, MintableToken, HasNoContracts, HasNoTokens 
         require(mintingFinished || msg.sender == founder);
         _;
     }
-    
+
     function transfer(address _to, uint256 _value) canTransfer public returns (bool) {
         return BurnableToken.transfer(_to, _value);
     }
@@ -589,13 +589,13 @@ contract DNTXToken is BurnableToken, MintableToken, HasNoContracts, HasNoTokens 
 
 contract DNTXCrowdsale is Ownable, Destructible {
     using SafeMath for uint256;
-    
-    uint8 private constant PERCENT_DIVIDER = 100;              
+
+    uint8 private constant PERCENT_DIVIDER = 100;
 
     event SpecialMint(address beneficiary, uint256 amount, string description);
 
     enum State { NotStarted, PreICO, ICO, Finished }
-    State public state;         //Current contract state                     
+    State public state;         //Current contract state
 
     struct ICOBonus {
         uint32 expire;       //timestamp of date when this bonus expires (purshases before this time will use the bonus)
@@ -610,7 +610,7 @@ contract DNTXCrowdsale is Ownable, Destructible {
     uint256 public icoGoal;            //How much ether we need to collect to assume ICO is successfull
     uint256 public hardCap;            //Max amount possibly collected
 
-    DNTXToken public token;                                 
+    DNTXToken public token;
 
     uint256 public icoCollected;
     uint256 public totalCollected;
@@ -620,7 +620,7 @@ contract DNTXCrowdsale is Ownable, Destructible {
         state = State.NotStarted;
         token = new DNTXToken();
         token.init(owner);
-    }   
+    }
 
     function() public payable {
         require(msg.value > 0);
@@ -754,3 +754,38 @@ contract DNTXCrowdsale is Ownable, Destructible {
     }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

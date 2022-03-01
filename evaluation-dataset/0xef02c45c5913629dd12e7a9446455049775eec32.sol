@@ -1,27 +1,27 @@
 pragma solidity ^0.4.8;
 
 contract RuletkaIo {
-    
+
     /*** EVENTS ***/
-    
+
     /// @dev A russian Roulette has been executed between 6 players
-    /// in room roomId and unfortunately, victim got shot and didn't 
+    /// in room roomId and unfortunately, victim got shot and didn't
     /// make it out alive... RIP
     event partyOver(uint256 roomId, address victim, address[] winners);
 
     /// @dev A new player has enter a room
     event newPlayer(uint256 roomId, address player);
-    
+
     /// @dev A room is full, we close the door. Game can start.
     event fullRoom(uint256 roomId);
-    
+
     /// @dev A safety mechanism has been triggered to empty the room and refund entirely the players (Should never happen)
     event  roomRefunded(uint256 _roomId, address[] refundedPlayers);
 
     /*** Founders addresses ***/
     address CTO;
     address CEO;
-    
+
      Room[] private allRooms;
 
     function () public payable {} // Give the ability of receiving ether
@@ -30,28 +30,28 @@ contract RuletkaIo {
         CTO = msg.sender;
         CEO = msg.sender;
     }
-    
+
     /*** ACCESS MODIFIERS ***/
     /// @dev Access modifier for CTO-only functionality
     modifier onlyCTO() {
         require(msg.sender == CTO);
         _;
     }
-    
+
     /// @dev Assigns a new address to act as the CTO.
     /// @param _newCTO The address of the new CTO
     function setCTO(address _newCTO) public onlyCTO {
         require(_newCTO != address(0));
         CTO = _newCTO;
     }
-    
+
     /// @dev Assigns a new address to act as the CEO.
     /// @param _newCEO The address of the new CEO
     function setCEO(address _newCEO) public onlyCTO {
         require(_newCEO != address(0));
         CEO = _newCEO;
     }
-    
+
     /*** DATATYPES ***/
       struct Room {
         string name;
@@ -59,8 +59,8 @@ contract RuletkaIo {
         uint256 balance;
         address[] players;
       }
-    
-    
+
+
     /// For creating Room
   function createRoom(string _name, uint256 _entryPrice) public onlyCTO{
     address[] memory players;
@@ -73,71 +73,71 @@ contract RuletkaIo {
 
     allRooms.push(_room);
   }
-    
+
     function enter(uint256 _roomId) public payable {
         Room storage room = allRooms[_roomId-1]; //if _roomId doesn't exist in array, exits.
-        
+
         require(room.players.length < 6);
         require(msg.value >= room.entryPrice);
-        
+
         room.players.push(msg.sender);
         room.balance += room.entryPrice;
-        
+
         emit newPlayer(_roomId, msg.sender);
-        
+
         if(room.players.length == 6){
             executeRoom(_roomId);
         }
     }
-    
+
     function enterWithReferral(uint256 _roomId, address referrer) public payable {
-        
+
         Room storage room = allRooms[_roomId-1]; //if _roomId doesn't exist in array, exits.
-        
+
         require(room.players.length < 6);
         require(msg.value >= room.entryPrice);
-        
+
         uint256 referrerCut = SafeMath.div(room.entryPrice, 100); // Referrer get one percent of the bet as reward
         referrer.transfer(referrerCut);
-         
+
         room.players.push(msg.sender);
         room.balance += room.entryPrice - referrerCut;
-        
+
         emit newPlayer(_roomId, msg.sender);
-        
+
         if(room.players.length == 6){
             emit fullRoom(_roomId);
             executeRoom(_roomId);
         }
     }
-    
+
     function executeRoom(uint256 _roomId) public {
-        
+
         Room storage room = allRooms[_roomId-1]; //if _roomId doesn't exist in array, exits.
-        
+
         //Check if the room is really full before shooting people...
         require(room.players.length == 6);
-        
+
         uint256 halfFee = SafeMath.div(room.entryPrice, 20);
         CTO.transfer(halfFee);
         CEO.transfer(halfFee);
         room.balance -= halfFee * 2;
-        
+
         uint256 deadSeat = random();
-        
+
         distributeFunds(_roomId, deadSeat);
-        
+
         delete room.players;
     }
-    
+
     function distributeFunds(uint256 _roomId, uint256 _deadSeat) private returns(uint256) {
-        
+
         Room storage room = allRooms[_roomId-1]; //if _roomId doesn't exist in array, exits.
         uint256 balanceToDistribute = SafeMath.div(room.balance,5);
-        
+
         address victim = room.players[_deadSeat];
         address[] memory winners = new address[](5);
-        uint256 j = 0; 
+        uint256 j = 0;
         for (uint i = 0; i<6; i++) {
             if(i != _deadSeat){
                room.players[i].transfer(balanceToDistribute);
@@ -146,12 +146,12 @@ contract RuletkaIo {
                j++;
             }
         }
-        
+
         emit partyOver(_roomId, victim, winners);
-       
+
         return address(this).balance;
     }
-    
+
      /// @dev Empty the room and refund each player. Safety mechanism which shouldn't be used.
     /// @param _roomId The Room id to empty and refund
     function refundPlayersInRoom(uint256 _roomId) public onlyCTO{
@@ -162,21 +162,21 @@ contract RuletkaIo {
              room.players[i].transfer(balanceToRefund);
              room.balance -= balanceToRefund;
         }
-        
+
         emit roomRefunded(_roomId, room.players);
         delete room.players;
     }
-    
-    
+
+
     /// @dev A clean and efficient way to generate random and make sure that it
-    /// will remain the same accross the executing nodes of random value 
+    /// will remain the same accross the executing nodes of random value
     /// Ethereum Blockchain. We base our computation on the block.timestamp
     /// and difficulty which will remain the same accross the nodes to ensure
     /// same result for the same execution.
     function random() private view returns (uint256) {
         return uint256(uint256(keccak256(block.timestamp, block.difficulty))%6);
     }
-    
+
     function getRoom(uint256 _roomId) public view returns (
     string name,
     address[] players,
@@ -189,7 +189,7 @@ contract RuletkaIo {
     entryPrice = room.entryPrice;
     balance = room.balance;
   }
-  
+
   function payout(address _to) public onlyCTO {
     _payout(_to);
   }
@@ -203,7 +203,7 @@ contract RuletkaIo {
       _to.transfer(address(this).balance);
     }
   }
-  
+
 }
 
 library SafeMath {
@@ -247,3 +247,38 @@ library SafeMath {
     return c;
   }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

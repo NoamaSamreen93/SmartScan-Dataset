@@ -50,27 +50,27 @@ library SafeMath {
 
 contract Owned {
 	address private Owner;
-	
+
 	function Owned() public{
-	    
+
 	    Owner = msg.sender;
 	}
-    
+
 	function IsOwner(address addr) view public returns(bool)
 	{
 	    return Owner == addr;
 	}
-	
+
 	function TransferOwner(address newOwner) public onlyOwner
 	{
 	    Owner = newOwner;
 	}
-	
+
 	function Terminate() public onlyOwner
 	{
 	    selfdestruct(Owner);
 	}
-	
+
 	modifier onlyOwner(){
         require(msg.sender == Owner);
         _;
@@ -86,28 +86,28 @@ contract EMPRB is Owned {
     uint256 private currentSupply;
     mapping(address => uint256) private balances;
     mapping(address => mapping(address=> uint256)) private allowed;
-    mapping(address => bool) private lockedAccounts;  
-	
+    mapping(address => bool) private lockedAccounts;
+
 	/*
 		Incoming Ether
-	*/	
+	*/
     event ReceivedEth(address indexed _from, uint256 _value);
 	//this is the fallback
 	function () payable public {
-		emit ReceivedEth(msg.sender, msg.value);		
+		emit ReceivedEth(msg.sender, msg.value);
 	}
-	
+
 	event TransferredEth(address indexed _to, uint256 _value);
 	function FoundationTransfer(address _to, uint256 amtEth, uint256 amtToken) public onlyOwner
 	{
 		require(address(this).balance >= amtEth && balances[this] >= amtToken );
-		
+
 		if(amtEth >0)
 		{
 			_to.transfer(amtEth);
 			emit TransferredEth(_to, amtEth);
 		}
-		
+
 		if(amtToken > 0)
 		{
 			require(balances[_to] + amtToken > balances[_to]);
@@ -115,23 +115,23 @@ contract EMPRB is Owned {
 			balances[_to] += amtToken;
 			emit Transfer(this, _to, amtToken);
 		}
-		
-		
-	}	
+
+
+	}
 	/*
 		End Incoming Ether
 	*/
-	
-	
-	
+
+
+
     function EMPRB( ) public
     {
         uint256 initialTotalSupplyRaw = 20000000000000000;
         balances[this] = initialTotalSupplyRaw;
-        
+
         currentSupply =  initialTotalSupplyRaw;
 	    emit Transfer(address(0), this, currentSupply);
-        
+
     }
 
 	function MintToken(uint256 amt) public onlyOwner {
@@ -140,27 +140,27 @@ contract EMPRB is Owned {
 	    balances[this] += amt;
 	    emit Transfer(address(0), this, amt);
 	}
-	
+
 	function DestroyToken(uint256 amt) public onlyOwner {
 	    require ( balances[this] >= amt);
 	    currentSupply -= amt;
 	    balances[this] -= amt;
 	    emit Transfer(this,address(0), amt);
 	}
-	
-	
-	
+
+
+
     event SoldToken(address _buyer, uint256 _value, string note);
     function BuyToken(address _buyer, uint256 _value, string note) public onlyOwner
     {
 		require(balances[this] >= _value && balances[_buyer] + _value > balances[_buyer]);
-		
+
         emit SoldToken( _buyer,  _value,  note);
         balances[this] -= _value;
         balances[_buyer] += _value;
         emit Transfer(this, _buyer, _value);
     }
-    
+
     function LockAccount(address toLock) public onlyOwner
     {
         lockedAccounts[toLock] = true;
@@ -169,7 +169,7 @@ contract EMPRB is Owned {
     {
         delete lockedAccounts[toUnlock];
     }
-    
+
     function SetTradeable(bool t) public onlyOwner
     {
         tradeable = t;
@@ -178,8 +178,8 @@ contract EMPRB is Owned {
     {
         return tradeable;
     }
-    
-    
+
+
     function totalSupply() constant public returns (uint256)
     {
         return currentSupply;
@@ -205,9 +205,9 @@ contract EMPRB is Owned {
         if (balances[_from] >= _value
             && allowed[_from][msg.sender] >= _value
             && balances[_to] + _value > balances[_to]) {
-                
+
             emit Transfer( _from, _to,  _value);
-                
+
             balances[_from] -= _value;
             allowed[_from][msg.sender] -= _value;
             balances[_to] += _value;
@@ -216,7 +216,7 @@ contract EMPRB is Owned {
             return false;
         }
     }
-    
+
      /**
    * @dev Approve the passed address to spend the specified amount of tokens on behalf of msg.sender.
    *
@@ -281,9 +281,77 @@ contract EMPRB is Owned {
   }
     event Transfer(address indexed _from, address indexed _to, uint _value);
     event Approval(address indexed _owner, address indexed _spender, uint _value);
-   
+
    modifier notLocked(){
        require (!lockedAccounts[msg.sender]);
        _;
    }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

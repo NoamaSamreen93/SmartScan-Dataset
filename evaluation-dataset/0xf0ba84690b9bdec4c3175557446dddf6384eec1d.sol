@@ -48,7 +48,7 @@ contract ERC721Abstract
 	function approve(address _to, uint256 _tokenId) public;
 	function transferFrom(address _from, address _to, uint256 _tokenId) public;
 	function transfer(address _to, uint256 _tokenId) public;
- 
+
 	event Transfer(address indexed from, address indexed to, uint256 indexed tokenId);
 	event Approval(address indexed owner, address indexed approved, uint256 indexed tokenId);
 
@@ -71,48 +71,48 @@ contract ERC721 is ERC721Abstract
 		uint256	option;			//  [payout]96[idLottery]64[combination]32[dateBuy]0
 	}
 	mapping (uint256 => Token) tokens;
-	
+
 	// A mapping from tokens IDs to the address that owns them. All tokens have some valid owner address
 	mapping (uint256 => address) public tokenIndexToOwner;
-	
-	// A mapping from owner address to count of tokens that address owns.	
-	mapping (address => uint256) ownershipTokenCount; 
+
+	// A mapping from owner address to count of tokens that address owns.
+	mapping (address => uint256) ownershipTokenCount;
 
 	// A mapping from tokenIDs to an address that has been approved to call transferFrom().
 	// Each token can only have one approved address for transfer at any time.
 	// A zero value means no approval is outstanding.
 	mapping (uint256 => address) public tokenIndexToApproved;
-	
+
 	function implementsERC721() public pure returns (bool)
 	{
 		return true;
 	}
 
-	function balanceOf(address _owner) public view returns (uint256 count) 
+	function balanceOf(address _owner) public view returns (uint256 count)
 	{
 		return ownershipTokenCount[_owner];
 	}
-	
+
 	function ownerOf(uint256 _tokenId) public view returns (address owner)
 	{
 		owner = tokenIndexToOwner[_tokenId];
 		require(owner != address(0));
 	}
-	
-	// Marks an address as being approved for transferFrom(), overwriting any previous approval. 
+
+	// Marks an address as being approved for transferFrom(), overwriting any previous approval.
 	// Setting _approved to address(0) clears all transfer approval.
-	function _approve(uint256 _tokenId, address _approved) internal 
+	function _approve(uint256 _tokenId, address _approved) internal
 	{
 		tokenIndexToApproved[_tokenId] = _approved;
 	}
-	
+
 	// Checks if a given address currently has transferApproval for a particular token.
 	// param _claimant the address we are confirming token is approved for.
 	// param _tokenId token id, only valid when > 0
 	function _approvedFor(address _claimant, uint256 _tokenId) internal view returns (bool) {
 		return tokenIndexToApproved[_tokenId] == _claimant;
 	}
-	
+
 	function approve( address _to, uint256 _tokenId ) public
 	{
 		// Only an owner can grant transfer approval.
@@ -124,7 +124,7 @@ contract ERC721 is ERC721Abstract
 		// Emit approval event.
 		emit Approval(msg.sender, _to, _tokenId);
 	}
-	
+
 	function transferFrom( address _from, address _to, uint256 _tokenId ) public
 	{
 		// Check for approval and valid ownership
@@ -134,17 +134,17 @@ contract ERC721 is ERC721Abstract
 		// Reassign ownership (also clears pending approvals and emits Transfer event).
 		_transfer(_from, _to, _tokenId);
 	}
-	
+
 	function _owns(address _claimant, uint256 _tokenId) internal view returns (bool) {
 		return tokenIndexToOwner[_tokenId] == _claimant;
 	}
-	
-	function _transfer(address _from, address _to, uint256 _tokenId) internal 
+
+	function _transfer(address _from, address _to, uint256 _tokenId) internal
 	{
 		ownershipTokenCount[_to]++;
 		tokenIndexToOwner[_tokenId] = _to;
 
-		if (_from != address(0)) 
+		if (_from != address(0))
 		{
 			emit Transfer(_from, _to, _tokenId);
 			ownershipTokenCount[_from]--;
@@ -153,7 +153,7 @@ contract ERC721 is ERC721Abstract
 		}
 
 	}
-	
+
 	function transfer(address _to, uint256 _tokenId) public
 	{
 		require(_to != address(0));
@@ -162,32 +162,32 @@ contract ERC721 is ERC721Abstract
 	}
 
 }
-contract Owned 
+contract Owned
 {
     address private candidate;
 	address public owner;
 
 	mapping(address => bool) public admins;
-	
-    function Owned() public 
+
+    function Owned() public
 	{
         owner = msg.sender;
         admins[owner] = true;
     }
 
-    function changeOwner(address newOwner) public 
+    function changeOwner(address newOwner) public
 	{
 		require(msg.sender == owner);
         candidate = newOwner;
     }
-	
-	function confirmOwner() public 
+
+	function confirmOwner() public
 	{
         require(candidate == msg.sender); // run by name=candidate
 		owner = candidate;
     }
-	
-    function addAdmin(address addr) external 
+
+    function addAdmin(address addr) external
 	{
 		require(msg.sender == owner);
         admins[addr] = true;
@@ -202,7 +202,7 @@ contract Owned
 contract Functional
 {
 	// parseInt(parseFloat*10^_b)
-	function parseInt(string _a, uint _b) internal pure returns (uint) 
+	function parseInt(string _a, uint _b) internal pure returns (uint)
 	{
 		bytes memory bresult = bytes(_a);
 		uint mint = 0;
@@ -220,7 +220,7 @@ contract Functional
 		if (_b > 0) mint *= 10**_b;
 		return mint;
 	}
-	
+
 	function uint2str(uint i) internal pure returns (string)
 	{
 		if (i == 0) return "0";
@@ -238,7 +238,7 @@ contract Functional
 		}
 		return string(bstr);
 	}
-	
+
 	function strConcat(string _a, string _b, string _c) internal pure returns (string)
 	{
 		bytes memory _ba = bytes(_a);
@@ -263,12 +263,12 @@ contract Functional
         for (i = 0; i < _bc.length; i++) babc[k++] = _bc[i];
 		return string(babc);
 	}
-	
+
 	function timenow() public view returns(uint32) { return uint32(block.timestamp); }
 }
 contract NBAONLINE is Functional,Owned,ERC721{
     using SafeMath for uint256;
-    
+
     enum STATUS {
 		NOTFOUND,		//0 game not created
 		PLAYING,		//1 buying tickets for players
@@ -279,19 +279,19 @@ contract NBAONLINE is Functional,Owned,ERC721{
     struct Game{
         string name;                                //GameName
         uint256 id;                                 //Game ID
-        uint256 totalPot;                           //Total Deposit 
+        uint256 totalPot;                           //Total Deposit
         uint256 totalWinnersDeposit;                //Total Winner Deposit
         uint256 dateStopBuy;                        //Deadline of buying tickets of the game
-        STATUS status;                              //Game Status 
+        STATUS status;                              //Game Status
         mapping(uint8=>uint256)potDetail;           //The amount of each player in a Game
         mapping(uint8=>uint8)result;                //The results of 30 players in a game 0:Lose 1: Win
     }
     mapping(uint256=>Game)private games;            //id find game
     uint256[] private gameIdList;
-    
+
     uint256 private constant min_amount = 0.005 ether;
     uint256 private constant max_amount = 1000 ether;
-    
+
     function NBAONLINE () public {
     }
 
@@ -321,14 +321,14 @@ contract NBAONLINE is Functional,Owned,ERC721{
     function generateTicketData(uint256 idLottery, uint8 combination,uint8 status) public view returns(uint256 packed){
         packed = (uint256(status) << 12*8) + ( uint256(idLottery) << 8*8 ) + ( uint256(combination) << 4*8 ) + uint256(block.timestamp);
     }
-    
+
     function parseTicket(uint256	packed)public pure returns(uint8 payout,uint256 idLottery,uint256 combination,uint256 dateBuy){
 		payout = uint8((packed >> (12*8)) & 0xFF);
 		idLottery   = uint256((packed >> (8*8)) & 0xFFFFFFFF);
 		combination = uint256((packed >> (4*8)) & 0xFFFFFFFF);
 		dateBuy     = uint256(packed & 0xFFFFFFFF);
     }
-    
+
     function updateTicketStatus(uint256	packed,uint8 newStatus)public pure returns(uint256 npacked){
 		uint8 payout = uint8((packed >> (12*8)) & 0xFF);
 		npacked = packed + (uint256(newStatus-payout)<< 12*8);
@@ -366,7 +366,7 @@ contract NBAONLINE is Functional,Owned,ERC721{
         Game storage curGame = games[gameId];
         //confirm game status
         require(curGame.status == STATUS.PLAYING);
-        //confirm game time 
+        //confirm game time
         require( timenow() < curGame.dateStopBuy );
         uint8 ticketStatus = uint8((_token.option >> (12*8)) & 0xFF);
         //confirm ticket status
@@ -384,7 +384,7 @@ contract NBAONLINE is Functional,Owned,ERC721{
         Game storage curGame = games[_id];
         require(curGame.status == STATUS.PLAYING);
         require(timenow() > curGame.dateStopBuy + 2*60*60);
-        
+
         uint256 _totalWinnersDeposit = 0;
         for(uint256 i=0; i< _result.length; i++){
             require(_result[i]<30&&_result[i]>=0);
@@ -399,7 +399,7 @@ contract NBAONLINE is Functional,Owned,ERC721{
         }
     }
 
-    
+
     function getWinningPrize(uint256 _tid)payable external{
         require(tokenIndexToOwner[_tid] == msg.sender);
         Token storage _token = tokens[_tid];
@@ -442,7 +442,7 @@ contract NBAONLINE is Functional,Owned,ERC721{
         uint256 refundFee = _token.price;
         //confirm ticket price
         require(refundFee > 0);
-  
+
         _token.option = updateTicketStatus(_token.option,2);
         msg.sender.transfer(refundFee);
     }
@@ -451,7 +451,7 @@ contract NBAONLINE is Functional,Owned,ERC721{
     uint256 _totalWinnersDeposit,
     uint256 _dateStopBuy,
     uint8 _gameStatus,
-    string _potDetail, 
+    string _potDetail,
     string _results,
     string _name
     )
@@ -495,7 +495,7 @@ contract NBAONLINE is Functional,Owned,ERC721{
             }
         }
     }
-        
+
     function getMyTicketList(bool active,uint256 from, uint256 to)public view returns(string info){
         info = "";
         uint256 counter = 0;
@@ -509,7 +509,7 @@ contract NBAONLINE is Functional,Owned,ERC721{
                     if(counter > to){
                         break;
                     }
-                    
+
                     Token memory _token = tokens[i];
                     uint256 gameId = uint256((_token.option >> (8*8)) & 0xFFFFFFFF);
                     uint256 tStatus = uint256((_token.option >> (12*8)) & 0xFF);
@@ -576,3 +576,38 @@ contract NBAONLINE is Functional,Owned,ERC721{
         }
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

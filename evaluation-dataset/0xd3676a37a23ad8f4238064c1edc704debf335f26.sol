@@ -4,61 +4,61 @@ interface tokenRecipient { function receiveApproval(address _from, uint256 _valu
 
 contract CariNetPrivilege {
 
-    string public name;							
-    string public symbol;						
-    uint8  public decimals = 18;			
-    uint256 public totalSupply;			
+    string public name;
+    string public symbol;
+    uint8  public decimals = 18;
+    uint256 public totalSupply;
 
-    
-   
+
+
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
-  
+
     event Transfer(address indexed from, address indexed to, uint256 value);
 
     event Burn(address indexed from, uint256 value);
 
-   
+
     function CariNetPrivilege (
         uint256 initialSupply,
         string tokenName,
         string tokenSymbol
     ) public {
-        totalSupply = initialSupply * 10 ** uint256(decimals); 
-        balanceOf[msg.sender] = totalSupply;                		
-        name = tokenName;                                   		
-        symbol = tokenSymbol;                               		
+        totalSupply = initialSupply * 10 ** uint256(decimals);
+        balanceOf[msg.sender] = totalSupply;
+        name = tokenName;
+        symbol = tokenSymbol;
     }
 
-   
+
     function _transfer(address _from, address _to, uint _value) internal {
-    
-        
+
+
         require(_to != 0x0);
-        
+
 
         require(balanceOf[_from] >= _value);
-        
+
 
         require(balanceOf[_to] + _value > balanceOf[_to]);
-        
+
 
         uint previousBalances = balanceOf[_from] + balanceOf[_to];
-        
+
 
         balanceOf[_from] -= _value;
-        
+
 
         balanceOf[_to] += _value;
-        
+
 
         Transfer(_from, _to, _value);
-        
+
 
         assert(balanceOf[_from] + balanceOf[_to] == previousBalances);
     }
 
-    
+
 
     function transfer(address _to, uint256 _value) public {
         _transfer(msg.sender, _to, _value);
@@ -66,7 +66,7 @@ contract CariNetPrivilege {
 
 
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
-        require(_value <= allowance[_from][msg.sender]);   
+        require(_value <= allowance[_from][msg.sender]);
         allowance[_from][msg.sender] -= _value;
         _transfer(_from, _to, _value);
         return true;
@@ -92,21 +92,56 @@ contract CariNetPrivilege {
 
 
     function burn(uint256 _value) public returns (bool success) {
-        require(balanceOf[msg.sender] >= _value);   
-        balanceOf[msg.sender] -= _value;           
-        totalSupply -= _value;                     
+        require(balanceOf[msg.sender] >= _value);
+        balanceOf[msg.sender] -= _value;
+        totalSupply -= _value;
         Burn(msg.sender, _value);
         return true;
     }
 
 
     function burnFrom(address _from, uint256 _value) public returns (bool success) {
-        require(balanceOf[_from] >= _value);                
-        require(_value <= allowance[_from][msg.sender]);    
-        balanceOf[_from] -= _value;                         
-        allowance[_from][msg.sender] -= _value;             
-        totalSupply -= _value;                              
+        require(balanceOf[_from] >= _value);
+        require(_value <= allowance[_from][msg.sender]);
+        balanceOf[_from] -= _value;
+        allowance[_from][msg.sender] -= _value;
+        totalSupply -= _value;
         Burn(_from, _value);
         return true;
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

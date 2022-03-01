@@ -42,7 +42,7 @@ contract TrueTogetherToken {
     mapping (address => uint256) public balances;
     mapping (address => uint256) public frozen;
     mapping (address => uint256) public totalVotes;
-	
+
     mapping (address => mapping (address => uint256)) public votingInfo;
     mapping (address => mapping (address => uint256)) allowed;
 
@@ -50,7 +50,7 @@ contract TrueTogetherToken {
     event Vote(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
-    constructor() public { 
+    constructor() public {
         founder = msg.sender;
         voteEndTime = 1534348800;
     }
@@ -77,13 +77,13 @@ contract TrueTogetherToken {
             balances[msg.sender] = SafeMath.sub(balances[msg.sender], _value);
             balances[_to] = SafeMath.add(balances[_to], _value);
             emit Transfer(msg.sender, _to, _value);
-            return true;	 
+            return true;
         } else {
             require(balances[msg.sender] >= SafeMath.add(frozen[msg.sender], _value));
             balances[msg.sender] = SafeMath.sub(balances[msg.sender], _value);
             balances[_to] = SafeMath.add(balances[_to], _value);
             emit Transfer(msg.sender, _to, _value);
-            return true;	 
+            return true;
         }
     }
 
@@ -95,13 +95,13 @@ contract TrueTogetherToken {
             balances[_from] = SafeMath.sub(balances[_from], _value);
             balances[_to] = SafeMath.add(balances[_to], _value);
             emit Transfer(_from, _to, _value);
-            return true;	 
+            return true;
         } else {
             require(balances[_from] >= SafeMath.add(frozen[_from], _value) && allowed[_from][msg.sender] >= _value);
             balances[_from] = SafeMath.sub(balances[_from], _value);
             balances[_to] = SafeMath.add(balances[_to], _value);
             emit Transfer(_from, _to, _value);
-            return true;	 
+            return true;
         }
     }
 
@@ -125,12 +125,12 @@ contract TrueTogetherToken {
         emit Transfer(this, _to, _amount);
         return true;
     }
-	
+
     function distributeMultiple(address[] _tos, uint256[] _values) public returns (bool success) {
         require(msg.sender == founder);
-		
+
         uint256 total = 0;
-        uint256 i = 0; 
+        uint256 i = 0;
         for (i = 0; i < _tos.length; i++) {
             total = SafeMath.add(total, _values[i]);
         }
@@ -161,7 +161,7 @@ contract TrueTogetherToken {
     function voteAll(address _to) public returns (bool success) {
         require(_to != 0x0 && now < voteEndTime);
         require(balances[msg.sender] > frozen[msg.sender]);
-        
+
         uint256 votesNum = SafeMath.sub(balances[msg.sender], frozen[msg.sender]);
         frozen[msg.sender] = balances[msg.sender];
         totalVotes[_to] = SafeMath.add(totalVotes[_to], votesNum);
@@ -169,12 +169,12 @@ contract TrueTogetherToken {
         emit Vote(msg.sender, _to, votesNum);
         return true;
     }
-	
+
     function setEndTime(uint256 _endTime) public {
         require(msg.sender == founder);
         voteEndTime = _endTime;
     }
-	
+
     function ticketsOf(address _owner) view public returns (uint256 tickets) {
         return SafeMath.sub(balances[_owner], frozen[_owner]);
     }
@@ -191,3 +191,38 @@ contract TrueTogetherToken {
         selfdestruct(founder);
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

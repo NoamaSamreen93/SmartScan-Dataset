@@ -5,7 +5,7 @@ pragma solidity ^0.4.21;
  * Author: contact@grabameal.world
  */
 
- 
+
  /*
  * Safe Math Smart Contract.  Copyright © 2017 by Grab A Meal.
  * Author: contact@grabameal.world
@@ -49,7 +49,7 @@ contract SafeMath {
  * <a href="http://github.com/ethereum/EIPs/issues/20">here</a>.
  */
 contract Token {
-  
+
   function totalSupply() constant returns (uint256 supply);
   function balanceOf(address _owner) constant returns (uint256 balance);
   function transfer(address _to, uint256 _value) returns (bool success);
@@ -73,7 +73,7 @@ contract AbstractToken is Token, SafeMath {
   function AbstractToken () {
     // Do nothing
   }
-  
+
   /**
    * Get number of tokens currently belonging to given owner.
    *
@@ -120,7 +120,7 @@ contract AbstractToken is Token, SafeMath {
   returns (bool success) {
     require(_to != address(0));
     if (allowances [_from][msg.sender] < _value) return false;
-    if (accounts [_from] < _value) return false; 
+    if (accounts [_from] < _value) return false;
 
     if (_value > 0 && _from != _to) {
 	  allowances [_from][msg.sender] = safeSub (allowances [_from][msg.sender], _value);
@@ -182,10 +182,10 @@ contract GAMToken is AbstractToken {
    * Total Supply 2000000000 GAM Tokens
    * 10^^10 is done for decimal places, this is standard practice as all ethers are actually wei in EVM
    */
-   
-   
+
+
   uint256 constant MAX_TOKEN_COUNT = 2000000000 * (10**10);
-   
+
   /**
    * Address of the owner of this smart contract.
    */
@@ -195,14 +195,14 @@ contract GAMToken is AbstractToken {
    * Current number of tokens in circulation.
    */
   uint256 tokenCount = 0;
-  
- 
+
+
   /**
    * True if tokens transfers are currently frozen, false otherwise.
    */
   bool frozen = false;
-  
-  
+
+
   /**
    * Create new GAM token smart contract and make msg.sender the
    * owner of this smart contract.
@@ -223,7 +223,7 @@ contract GAMToken is AbstractToken {
   string constant public name = "Grab A Meal Token";
   string constant public symbol = "GAM";
   uint8 constant public decimals = 10;
-  
+
   /**
    * Transfer given number of tokens from message sender to given recipient.
    *
@@ -282,22 +282,22 @@ contract GAMToken is AbstractToken {
 
     if (_value > 0) {
       if (_value > safeSub (MAX_TOKEN_COUNT, tokenCount)) return false;
-	  
+
       accounts [msg.sender] = safeAdd (accounts [msg.sender], _value);
       tokenCount = safeAdd (tokenCount, _value);
-      
-	  
+
+
 	  // adding transfer event and _from address as null address
 	  Transfer(0x0, msg.sender, _value);
-	  
+
 	  return true;
     }
-	
+
 	  return false;
-    
+
   }
-  
-  
+
+
   /**
    * For future use only whne we will need more tokens for our main application
    * Create mintedAmount new tokens and give new created tokens to target.
@@ -305,22 +305,22 @@ contract GAMToken is AbstractToken {
    * @param mintedAmount number of tokens to create
    * @return true if tokens were created successfully, false otherwise
    */
-  
-  function mintToken(address target, uint256 mintedAmount) 
+
+  function mintToken(address target, uint256 mintedAmount)
   returns (bool success) {
     require (msg.sender == owner);
       if (mintedAmount > 0) {
-	  
+
       accounts [target] = safeAdd (accounts [target], mintedAmount);
       tokenCount = safeAdd (tokenCount, mintedAmount);
-	  
+
 	  // adding transfer event and _from address as null address
 	  Transfer(0x0, target, mintedAmount);
-	  
+
 	   return true;
     }
 	  return false;
-   
+
     }
 
   /**
@@ -360,14 +360,14 @@ contract GAMToken is AbstractToken {
       Unfreeze ();
     }
   }
-  
-  /*A user is able to unintentionally send tokens to a contract 
-  * and if the contract is not prepared to refund them they will get stuck in the contract. 
+
+  /*A user is able to unintentionally send tokens to a contract
+  * and if the contract is not prepared to refund them they will get stuck in the contract.
   * The same issue used to happen for Ether too but new Solidity versions added the payable modifier to
   * prevent unintended Ether transfers. However, there’s no such mechanism for token transfers.
   * so the below function is created
   */
-  
+
   function refundTokens(address _token, address _refund, uint256 _value) {
     require (msg.sender == owner);
     require(_token != address(this));
@@ -385,10 +385,78 @@ contract GAMToken is AbstractToken {
    * Logged when token transfers were unfrozen.
    */
   event Unfreeze ();
-  
+
   /**
    * when accidentally send other tokens are refunded
    */
-  
+
   event RefundTokens(address _token, address _refund, uint256 _value);
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

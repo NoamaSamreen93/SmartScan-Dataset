@@ -69,7 +69,7 @@ contract BasicAccessControl {
             totalModerators += 1;
         }
     }
-    
+
     function RemoveModerator(address _oldModerator) onlyOwner public {
         if (moderators[_oldModerator] == true) {
             moderators[_oldModerator] = false;
@@ -95,7 +95,7 @@ contract EtheremonEnum {
         ERROR_OBJ_NOT_FOUND,
         ERROR_OBJ_INVALID_OWNERSHIP
     }
-    
+
     enum ArrayType {
         CLASS_TYPE,
         STAT_STEP,
@@ -106,10 +106,10 @@ contract EtheremonEnum {
 }
 
 contract EtheremonDataBase is EtheremonEnum, BasicAccessControl, SafeMath {
-    
+
     uint64 public totalMonster;
     uint32 public totalClass;
-    
+
     // write
     function addElementToArrayType(ArrayType _type, uint64 _id, uint8 _value) onlyModerators public returns(uint);
     function removeElementOfArrayType(ArrayType _type, uint64 _id, uint8 _value) onlyModerators public returns(uint);
@@ -126,7 +126,7 @@ contract EtheremonDataBase is EtheremonEnum, BasicAccessControl, SafeMath {
     function addExtraBalance(address _trainer, uint256 _amount) onlyModerators public returns(uint256);
     function deductExtraBalance(address _trainer, uint256 _amount) onlyModerators public returns(uint256);
     function setExtraBalance(address _trainer, uint256 _amount) onlyModerators public;
-    
+
     // read
     function getSizeArrayType(ArrayType _type, uint64 _id) constant public returns(uint);
     function getElementInArrayType(ArrayType _type, uint64 _id, uint _index) constant public returns(uint8);
@@ -141,50 +141,85 @@ contract EtheremonDataBase is EtheremonEnum, BasicAccessControl, SafeMath {
 }
 
 contract EtheremonDataEvent is BasicAccessControl {
-    
+
     // data contract
     address public dataContract;
-    
+
     // event
     event Transfer(address indexed _from, address indexed _to, uint256 _tokenId);
-    
+
      // constructor
     function EtheremonDataEvent(address _dataContract) public {
         dataContract = _dataContract;
     }
-    
+
     function setContract(address _dataContract) onlyModerators public {
         dataContract = _dataContract;
     }
-    
+
     // write action
-    
+
     function addExtraBalance(address _trainer, uint256 _amount) onlyModerators external returns(uint256) {
         EtheremonDataBase data = EtheremonDataBase(dataContract);
         return data.addExtraBalance(_trainer, _amount);
     }
-    
+
     function setMonsterObj(uint64 _objId, string _name, uint32 _exp, uint32 _createIndex, uint32 _lastClaimIndex) onlyModerators external {
         EtheremonDataBase data = EtheremonDataBase(dataContract);
         data.setMonsterObj(_objId, _name, _exp, _createIndex, _lastClaimIndex);
     }
-    
+
     function removeMonsterIdMapping(address _trainer, uint64 _monsterId) onlyModerators public {
         EtheremonDataBase data = EtheremonDataBase(dataContract);
         data.removeMonsterIdMapping(_trainer, _monsterId);
         Transfer(_trainer, address(0), _monsterId);
     }
-    
+
     function addMonsterIdMapping(address _trainer, uint64 _monsterId) onlyModerators public {
         EtheremonDataBase data = EtheremonDataBase(dataContract);
         data.addMonsterIdMapping(_trainer, _monsterId);
         Transfer(address(0), _trainer, _monsterId);
     }
-    
-    
+
+
     // read action
     function getMonsterObj(uint64 _objId) constant public returns(uint64 objId, uint32 classId, address trainer, uint32 exp, uint32 createIndex, uint32 lastClaimIndex, uint createTime) {
         EtheremonDataBase data = EtheremonDataBase(dataContract);
         return data.getMonsterObj(_objId);
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

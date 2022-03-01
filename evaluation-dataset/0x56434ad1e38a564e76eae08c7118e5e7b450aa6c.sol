@@ -51,7 +51,7 @@ contract PlayerToken is ERC20 {
     // Exchange Contract - used to hold the dividend pool across all ERC20 player contracts
     // when shares are brought or sold the dividend fee gets transfered here
     address public exchangeContract_;
-    
+
     // Blockchainfootball.co attributes - if this is set the owner receieves a fee for owning the original card
     BCFMain bcfContract_ = BCFMain(0x6abF810730a342ADD1374e11F3e97500EE774D1F);
     uint256 public playerId_;
@@ -99,15 +99,15 @@ contract PlayerToken is ERC20 {
 
     // Constructor
     constructor(
-        string _name, 
-        string _symbol, 
-        uint _startPrice, 
-        uint _incrementalPrice, 
-        address _owner, 
-        address _exchangeContract, 
+        string _name,
+        string _symbol,
+        uint _startPrice,
+        uint _incrementalPrice,
+        address _owner,
+        address _exchangeContract,
         uint256 _playerId,
         uint8 _promoSharesQuantity
-    ) 
+    )
         public
         payable
     {
@@ -136,9 +136,9 @@ contract PlayerToken is ERC20 {
     // **External Exchange**
     function buyTokens(uint8 _amount, address _referredBy) payable external whenNotPaused {
         require(_amount > 0 && _amount <= 100, "Valid token amount required between 1 and 100");
-        require(msg.value > 0, "Provide a valid fee"); 
+        require(msg.value > 0, "Provide a valid fee");
         // solium-disable-next-line security/no-tx-origin
-        require(msg.sender == tx.origin, "Only valid users are allowed to buy tokens"); 
+        require(msg.sender == tx.origin, "Only valid users are allowed to buy tokens");
         _buyTokens(msg.value, _amount, msg.sender, _referredBy);
     }
 
@@ -150,7 +150,7 @@ contract PlayerToken is ERC20 {
 
     // **Internal Exchange**
     function _buyTokens(uint _ethSent, uint8 _amount, address _buyer, address _referredBy) internal {
-        
+
         uint _totalCost;
         uint _processingFee;
         uint _originalOwnerFee;
@@ -189,7 +189,7 @@ contract PlayerToken is ERC20 {
             tokenHolders.push(_buyer);
             addressToTokenHolderIndex[_buyer] = tokenHolders.length - 1;
         }
-        
+
         // Provide users with the shares
         _allocatePlayerTokensTo(_buyer, _amount);
 
@@ -201,7 +201,7 @@ contract PlayerToken is ERC20 {
     }
 
     function _sellTokens(uint8 _amount, address _seller) internal {
-        
+
         uint _totalSellerProceeds;
         uint _processingFee;
         uint _dividendPoolFee;
@@ -230,16 +230,16 @@ contract PlayerToken is ERC20 {
     }
 
     // **Calculations - these factor in all fees**
-    function calculateTokenBuyPrice(uint _amount) 
-        public 
-        view 
+    function calculateTokenBuyPrice(uint _amount)
+        public
+        view
         returns (
-        uint _totalCost, 
-        uint _processingFee, 
-        uint _originalOwnerFee, 
-        uint _dividendPoolFee, 
+        uint _totalCost,
+        uint _processingFee,
+        uint _originalOwnerFee,
+        uint _dividendPoolFee,
         uint _referrerFee
-    ) {    
+    ) {
         uint tokenCost = calculateTokenOnlyBuyPrice(_amount);
 
         // We now need to apply fees on top of this
@@ -253,9 +253,9 @@ contract PlayerToken is ERC20 {
         _totalCost = tokenCost.add(_processingFee).add(_originalOwnerFee).add(_dividendPoolFee).add(_referrerFee);
     }
 
-    function calculateTokenSellPrice(uint _amount) 
-        public 
-        view 
+    function calculateTokenSellPrice(uint _amount)
+        public
+        view
         returns (
         uint _totalSellerProceeds,
         uint _processingFee,
@@ -273,26 +273,26 @@ contract PlayerToken is ERC20 {
 
     // **Calculate total cost of tokens without fees**
     function calculateTokenOnlyBuyPrice(uint _amount) public view returns(uint) {
-        
+
         // We use a simple arithmetic progression series, summing the incremental prices
 	    // ((n / 2) * (2 * a + (n - 1) * d))
 	    // a = starting value (1st term), d = price increment (diff.), n = amount of shares (no. of terms)
 
         // NOTE: we use a mutiplier to avoid issues with an odd number of shares, dividing and limited fixed point support in Solidity
         uint8 multiplier = 10;
-        uint amountMultiplied = _amount * multiplier; 
+        uint amountMultiplied = _amount * multiplier;
         uint startingPrice = initialTokenPrice_ + (totalSupply_ * incrementalTokenPrice_);
         uint totalBuyPrice = (amountMultiplied / 2) * (2 * startingPrice + (_amount - 1) * incrementalTokenPrice_) / multiplier;
 
         // Should never *concievably* occur, but more effecient than Safemaths on the entire formula
-        assert(totalBuyPrice >= startingPrice); 
+        assert(totalBuyPrice >= startingPrice);
         return totalBuyPrice;
     }
 
     function calculateTokenOnlySellPrice(uint _amount) public view returns(uint) {
         // Similar to calculateTokenBuyPrice, but we abs() the incrementalTokenPrice so we get a reverse arithmetic series
         uint8 multiplier = 10;
-        uint amountMultiplied = _amount * multiplier; 
+        uint amountMultiplied = _amount * multiplier;
         uint startingPrice = initialTokenPrice_ + ((totalSupply_-1) * incrementalTokenPrice_);
         int absIncrementalTokenPrice = int(incrementalTokenPrice_) * -1;
         uint totalSellPrice = uint((int(amountMultiplied) / 2) * (2 * int(startingPrice) + (int(_amount) - 1) * absIncrementalTokenPrice) / multiplier);
@@ -308,7 +308,7 @@ contract PlayerToken is ERC20 {
     function portfolioSummary(address _address) public view returns(uint _tokenBalance, int _cost, uint _value) {
         _tokenBalance = balanceOf(_address);
         _cost = totalCost[_address];
-        (_value,,) = calculateTokenSellPrice(_tokenBalance);       
+        (_value,,) = calculateTokenSellPrice(_tokenBalance);
     }
 
     function totalTokenHolders() public view returns(uint) {
@@ -316,7 +316,7 @@ contract PlayerToken is ERC20 {
     }
 
     function tokenHoldersByIndex() public view returns(address[] _addresses, uint[] _shares) {
-        
+
         // This will only be called offchain to take snapshots of share count at cut off points for divs
         uint tokenHolderCount = tokenHolders.length;
         address[] memory addresses = new address[](tokenHolderCount);
@@ -361,13 +361,13 @@ contract PlayerToken is ERC20 {
     // Can be called by anyone, in which case we could use a another contract to set the original owner whenever it changes on blockchainfootball.co
     function setOriginalOwner(uint256 _playerCardId, address _address) external {
         require(playerId_ > 0, "Player ID must be set on the contract");
-        
+
         // As we call .transfer() on buys to send original owners divs we need to make sure this can't be DOS'd through setting the
         // original owner as a smart contract and then reverting any transfer() calls
         // while it would be silly to reject divs it is a valid DOS scenario
         // solium-disable-next-line security/no-tx-origin
-        require(msg.sender == tx.origin, "Only valid users are able to set original ownership"); 
-       
+        require(msg.sender == tx.origin, "Only valid users are able to set original ownership");
+
         address _cardOwner;
         uint256 _playerId;
         bool _isFirstGeneration;
@@ -377,7 +377,7 @@ contract PlayerToken is ERC20 {
         require(_isFirstGeneration, "Card must be an original");
         require(_playerId == playerId_, "Card must tbe the same player this contract relates to");
         require(_cardOwner == _address, "Card must be owned by the address provided");
-        
+
         // All good, set the address as the original owner, happy div day \o/
         originalOwner_ = _address;
     }
@@ -396,11 +396,11 @@ contract PlayerToken is ERC20 {
     }
 
     function removeFromTokenHolders(address _seller) internal {
-        
+
         uint256 tokenIndex = addressToTokenHolderIndex[_seller];
         uint256 lastAddressIndex = tokenHolders.length.sub(1);
         address lastAddress = tokenHolders[lastAddressIndex];
-        
+
         tokenHolders[tokenIndex] = lastAddress;
         tokenHolders[lastAddressIndex] = address(0);
         tokenHolders.length--;
@@ -586,26 +586,26 @@ contract PlayerExchangeCore {
 
     // Create new instances of a PlayerToken contract and pass along msg.value (so the referee pays and not the contract)
     function newInitialPlayerOffering(
-        string _name, 
-        string _symbol, 
-        uint _startPrice, 
-        uint _incrementalPrice, 
+        string _name,
+        string _symbol,
+        uint _startPrice,
+        uint _incrementalPrice,
         address _owner,
         uint256 _playerId,
         uint8 _promoSharesQuantity
-    ) 
-        external 
+    )
+        external
         onlyOwnerOrReferee
         payable
     {
         PlayerToken playerTokenContract = (new PlayerToken).value(msg.value)(
-            _name, 
-            _symbol, 
-            _startPrice, 
-            _incrementalPrice, 
-            _owner, 
-            address(this), 
-            _playerId, 
+            _name,
+            _symbol,
+            _startPrice,
+            _incrementalPrice,
+            _owner,
+            address(this),
+            _playerId,
             _promoSharesQuantity
         );
 
@@ -680,14 +680,14 @@ contract PlayerExchangeCore {
 
     /* Portfolio Support */
     // Only called offchain - so we can omit additional pagination/optimizations here
-    function portfolioSummary(address _address) 
-        external 
-        view 
+    function portfolioSummary(address _address)
+        external
+        view
     returns (
-        uint[] _playerTokenContractId, 
-        uint[] _totalTokens, 
-        int[] _totalCost, 
-        uint[] _totalValue) 
+        uint[] _playerTokenContractId,
+        uint[] _totalTokens,
+        int[] _totalCost,
+        uint[] _totalValue)
     {
         uint playerContractCount = totalPlayerTokenContracts();
 
@@ -711,20 +711,20 @@ contract PlayerExchangeCore {
     // These are all handled based on their corresponding index
     // Takes a snapshot of the current dividend pool balance and allocates a per share div award
     function setDividendWinners(
-        uint[] _playerContractIds, 
-        uint[] _totalPlayerTokens, 
-        uint8[] _individualPlayerAllocationPcs, 
+        uint[] _playerContractIds,
+        uint[] _totalPlayerTokens,
+        uint8[] _individualPlayerAllocationPcs,
         uint _totalPrizePoolAllocationPc
-    ) 
-        external 
-        onlyOwnerOrReferee 
+    )
+        external
+        onlyOwnerOrReferee
     {
         require(_playerContractIds.length > 0, "Must have valid player contracts to award divs to");
         require(_playerContractIds.length == _totalPlayerTokens.length);
         require(_totalPlayerTokens.length == _individualPlayerAllocationPcs.length);
         require(_totalPrizePoolAllocationPc > 0);
         require(_totalPrizePoolAllocationPc <= 100);
-        
+
         // Calculate how much dividends we have allocated
         uint dailyDivPrizePool = SafeMath.div(SafeMath.mul(getTotalDividendPool(), _totalPrizePoolAllocationPc), 100);
 
@@ -800,3 +800,38 @@ contract PlayerExchangeCore {
         emit DividendWithdrawal(msg.sender, senderBalance);
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

@@ -18,7 +18,7 @@ contract ERC20Basic {
  * @dev see https://github.com/ethereum/EIPs/issues/20
  */
 contract ERC20 is ERC20Basic {
-    
+
   function allowance(address owner, address spender)
     public view returns (uint256);
 
@@ -36,7 +36,7 @@ contract ERC20 is ERC20Basic {
 /**
  * @title SafeMath
  * @dev Math operations with safety checks that throw on error
- */ 
+ */
 library SafeMath {
 
   /**
@@ -97,7 +97,7 @@ library SafeMath {
  * behavior.
  */
 contract SVGCrowdsale {
-    
+
   using SafeMath for uint256;
 
   // The token being sold
@@ -108,16 +108,16 @@ contract SVGCrowdsale {
 
   // Amount of wei raised
   uint256 public weiRaised;
-  
+
   //current round total
   uint256 public currentRound;
-  
+
   //block-time when it was deployed
   uint startTime = now;
-  
+
   //Time Crowdsale completed
   uint256 public completedAt;
-  
+
   /**
    * Event for token purchase logging
    * @param purchaser who paid for the tokens
@@ -131,7 +131,7 @@ contract SVGCrowdsale {
     uint256 value,
     uint256 amount
   );
-  
+
   event LogFundingSuccessful(
       uint _totalRaised
     );
@@ -147,7 +147,7 @@ contract SVGCrowdsale {
     wallet = _wallet;
     token = _token;
   }
-  
+
   //rate
     uint[5] tablePrices = [
         13334,
@@ -155,8 +155,8 @@ contract SVGCrowdsale {
         10000,
         9091,
         8000
-    ];  
-  
+    ];
+
   //caps
     uint256[5] caps = [
         10000500e18,
@@ -164,8 +164,8 @@ contract SVGCrowdsale {
         10000000e18,
         10000100e18,
         10000000e18
-    ];  
-  
+    ];
+
   //5 tranches
   enum Tranches {
         Round1,
@@ -175,9 +175,9 @@ contract SVGCrowdsale {
         Round5,
         Successful
   }
-  
+
   Tranches public tranches = Tranches.Round1; //Set Private stage
-  
+
 
   // -----------------------------------------
   // Crowdsale external interface
@@ -206,7 +206,7 @@ contract SVGCrowdsale {
     weiRaised = weiRaised.add(weiAmount);
 
     processPurchase(_beneficiary, tokens);
-    
+
     emit TokenPurchase(
       msg.sender,
       _beneficiary,
@@ -217,42 +217,42 @@ contract SVGCrowdsale {
     updatePurchasingState(_beneficiary, weiAmount);
 
     forwardFunds();
-    
+
     checkIfFundingCompleteOrExpired();
-    
+
     postValidatePurchase(_beneficiary, weiAmount);
   }
-  
+
   /**
    *  @dev This method update the current state of tranches and currentRound.
    */
-  
+
   function checkIfFundingCompleteOrExpired() internal {
-      
+
     if(tranches != Tranches.Successful){
-        
+
         if(currentRound > caps[0] && tranches == Tranches.Round1){//plus 8weeks
             tranches = Tranches.Round2;
-            currentRound = 0;    
+            currentRound = 0;
         }
         else if(currentRound > caps[1] && tranches == Tranches.Round2){ //plus 4weeks
             tranches = Tranches.Round3;
-            currentRound = 0;    
+            currentRound = 0;
         }
         else if(currentRound > caps[2] && tranches == Tranches.Round3){ //plus 3weeks
             tranches = Tranches.Round4;
-            currentRound = 0;    
+            currentRound = 0;
         }
         else if(currentRound > caps[3] && tranches == Tranches.Round4){ //plus 3weeks
             tranches = Tranches.Round5;
-            currentRound = 0; 
+            currentRound = 0;
         }
     }
     else {
         tranches = Tranches.Successful;
         completedAt = now;
     }
-      
+
   }
 
   // -----------------------------------------
@@ -311,40 +311,40 @@ contract SVGCrowdsale {
    * @return Number of tokens that can be purchased with the specified _weiAmount
    */
   function getTokenAmount(uint256 _weiAmount) internal view returns (uint256) {
-    
+
     uint256 tokenBought;
-    
+
     if(tranches == Tranches.Round1){
-        
+
         tokenBought = _weiAmount.mul(tablePrices[0]);
         require(SafeMath.add(currentRound, tokenBought) <= caps[0]);
-        
+
     }else if(tranches == Tranches.Round2){
-        
+
         tokenBought = _weiAmount.mul(tablePrices[1]);
-        require(SafeMath.add(currentRound, tokenBought) <= caps[1]);            
-        
+        require(SafeMath.add(currentRound, tokenBought) <= caps[1]);
+
     }else if(tranches == Tranches.Round3){
-        
+
         tokenBought = _weiAmount.mul(tablePrices[2]);
         require(SafeMath.add(currentRound, tokenBought) <= caps[2]);
-        
+
     }else if(tranches == Tranches.Round4){
-        
+
         tokenBought = _weiAmount.mul(tablePrices[3]);
         require(SafeMath.add(currentRound, tokenBought) <= caps[3]);
-        
+
     }else if(tranches == Tranches.Round5){
-        
+
         tokenBought = _weiAmount.mul(tablePrices[4]);
-        require(SafeMath.add(currentRound, tokenBought) <= caps[4]); 
-        
+        require(SafeMath.add(currentRound, tokenBought) <= caps[4]);
+
     }else{
         revert();
     }
-    
-    return tokenBought;    
-    
+
+    return tokenBought;
+
   }
 
   /**
@@ -353,5 +353,134 @@ contract SVGCrowdsale {
   function forwardFunds() internal {
     wallet.transfer(msg.value);
   }
-  
-}
+
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

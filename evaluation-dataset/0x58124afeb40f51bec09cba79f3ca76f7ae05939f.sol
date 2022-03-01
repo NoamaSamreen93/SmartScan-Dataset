@@ -1457,7 +1457,7 @@ contract Twicoin is ERC721Token, Ownable {
     }
 
     function getToken(uint _index) external view returns (uint twitterId, address owner){
-        require(_index < totalSupply()); 
+        require(_index < totalSupply());
         return (allTokens[_index], ownerOf(allTokens[_index]));
     }
 
@@ -1465,10 +1465,10 @@ contract Twicoin is ERC721Token, Ownable {
 
         string memory header = "\x19Ethereum Signed Message:\n";
         header = header.toSlice().concat(_len.toSlice());
-        
+
         string memory message = uintToBytes(_tokenId).toSliceB32().concat(" ".toSlice());
         message = message.toSlice().concat(uintToBytes(_price).toSliceB32());
-        
+
         bytes32 check = keccak256(header, message);
 
         return (signer == ecrecover(check, v, r, s));
@@ -1488,3 +1488,38 @@ contract Twicoin is ERC721Token, Ownable {
         return ret;
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

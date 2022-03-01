@@ -53,7 +53,7 @@ contract Token {
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
 }
 
 
@@ -134,7 +134,7 @@ contract LUVTOKEN is StandardToken {
 
     function LUVTOKEN(
         ) {
-        decimals = 0; 
+        decimals = 0;
         totalSupply = 200000000;                        // Update total supply (100000 for example)
         balances[msg.sender] = totalSupply;               // Give the creator all initial tokens (100000 for example)
         name = "LUVTOKEN";                                   // Set the name for display purposes
@@ -198,7 +198,7 @@ contract Ownable {
 }
 
 /**
- * @title Token 
+ * @title Token
  * @dev API interface for interacting with the LUVTOKEN contract
  * /
  interface Token {
@@ -230,11 +230,11 @@ contract LUV_Crowdsale is Ownable {
 
   // Max amount of wei accepted in the crowdsale
   uint256 public cap;
-  
+
   // Min amount of wei an investor can send
   uint256 public minInvest;
-  
-  
+
+
   // address where funds are collected
   address public wallet;
 
@@ -242,8 +242,8 @@ contract LUV_Crowdsale is Ownable {
   uint256 public phase_1_rate = 13000;
   uint256 public phase_2_rate = 12000;
   uint256 public phase_3_rate = 11000;
-  
-  
+
+
   // amount of raised money in wei
   uint256 public weiRaised;
 
@@ -261,7 +261,7 @@ contract LUV_Crowdsale is Ownable {
       else if(current_time > phase_2_Time && current_time < endTime){
       return phase_3_rate;
     }
-      
+
   }
 
   /**
@@ -329,7 +329,7 @@ contract LUV_Crowdsale is Ownable {
   function hasEnded() public constant returns (bool) {
     return now > endTime;
   }
-  
+
 /**
  * @notice Terminate contract and refund to owner
  */
@@ -338,10 +338,45 @@ contract LUV_Crowdsale is Ownable {
      uint256 balance = token.balanceOf(this);
      assert (balance > 0);
      token.transfer(owner,balance);
-     
+
      // There should be no ether in the contract but just in case
      selfdestruct(owner);
-     
+
  }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

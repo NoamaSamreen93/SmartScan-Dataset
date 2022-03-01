@@ -1,6 +1,6 @@
 // Copyright (C) 2017  The Halo Platform by Scott Morrison
 // https://www.haloplatform.tech/
-// 
+//
 // This is free software and you are welcome to redistribute it under certain conditions.
 // ABSOLUTELY NO WARRANTY; for details visit:
 //
@@ -24,7 +24,7 @@ contract Token {
 contract TokenVault is Ownable {
     address owner;
     event TokenTransfer(address indexed to, address token, uint amount);
-    
+
     function withdrawTokenTo(address token, address to) public onlyOwner returns (bool) {
         uint amount = balanceOfToken(token);
         if (amount > 0) {
@@ -33,7 +33,7 @@ contract TokenVault is Ownable {
         }
         return false;
     }
-    
+
     function balanceOfToken(address token) public constant returns (uint256 bal) {
         bal = Token(token).balanceOf(address(this));
     }
@@ -41,9 +41,9 @@ contract TokenVault is Ownable {
 
 // store ether & tokens for a period of time
 contract SafeDeposit is TokenVault {
-    
+
     string public constant version = "v1.5";
-    
+
     event Deposit(address indexed depositor, uint amount);
     event Withdrawal(address indexed to, uint amount);
     event OpenDate(uint date);
@@ -58,7 +58,7 @@ contract SafeDeposit is TokenVault {
         minDeposit = 0.5 ether;
         deposit();
     }
-    
+
     function MinimumDeposit() public constant returns (uint) { return minDeposit; }
     function ReleaseDate() public constant returns (uint) { return Date; }
     function WithdrawEnabled() public constant returns (bool) { return Date > 0 && Date <= now; }
@@ -73,7 +73,7 @@ contract SafeDeposit is TokenVault {
         }
     }
 
-    function setRelease(uint newDate) public { 
+    function setRelease(uint newDate) public {
         Date = newDate;
         OpenDate(Date);
     }
@@ -93,3 +93,38 @@ contract SafeDeposit is TokenVault {
     function kill() public { require(this.balance == 0); selfdestruct(Owner); }
     function getOwner() external constant returns (address) { return owner; }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

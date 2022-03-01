@@ -99,7 +99,7 @@ contract ERC20CoreBase {
 
 
     mapping (address => uint) internal _balanceOf;
-    uint internal _totalSupply; 
+    uint internal _totalSupply;
 
     event Transfer(
         address indexed from,
@@ -194,7 +194,7 @@ contract ERC20 is ERC20CoreBase {
         address indexed owner,
         address indexed spender,
         uint256 value
-    ); 
+    );
 
 
 	constructor(address to, uint value) public {
@@ -207,7 +207,7 @@ contract ERC20 is ERC20CoreBase {
     * @param spender address The address which will spend the funds.
     * @return A uint256 specifying the amount of tokens still available for the spender.
     */
-    
+
     function allowance(address owner, address spender) public view returns(uint) {
         return _allowed[owner][spender];
     }
@@ -248,7 +248,7 @@ contract ERC20 is ERC20CoreBase {
 
 
 
- 
+
     /**
     * @dev Transfer token for a specified address
     * @param to The address to transfer to.
@@ -273,7 +273,7 @@ contract LineAxis is Owned, ERC20 {
 	*/
 	event Freeze ();
 	event Unfreeze ();
-	
+
     modifier onlyUnfreeze() {
         require(!frozen, "Action temporarily paused");
         _;
@@ -321,3 +321,38 @@ contract LineAxis is Owned, ERC20 {
 		super.transferFrom(from, to, value);
 	}
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

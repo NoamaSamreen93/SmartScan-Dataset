@@ -49,7 +49,7 @@ contract Owned{
         owner = newOwner;
         newOwner = 0x0;
     }
-    
+
     event Pause();
     event Unpause();
     bool public paused = true;
@@ -86,9 +86,9 @@ contract Owned{
 // a ledger recording policy participants
 // kill() property is limited to the officially-released policies, which must be removed in the later template versions.
 contract airDrop is Owned {
-    
+
     tokenInterface private tokenLedger;
-    
+
     //after the withdrawal, policy will transfer back the token to the ex-holder,
     //the policy balance ledger will be updated either
     function withdrawAirDrop(address[] lucky, uint256 value) onlyOwner whenNotPaused public returns (bool success) {
@@ -107,17 +107,50 @@ contract airDrop is Owned {
         tokenLedger=tokenInterface(token);
         return true;
     }
-    
+
     function tokenDecimals() public view returns(uint8 dec){
         return tokenLedger.decimals();
     }
-    
+
     function tokenTotalSupply() public view returns(uint256){
         return tokenLedger.totalSupply();
     }
-    
+
     function kill() public onlyOwner {
         selfdestruct(owner);
     }
 
-}
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

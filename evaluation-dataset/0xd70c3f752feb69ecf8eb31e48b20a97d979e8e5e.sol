@@ -13,21 +13,21 @@ pragma solidity ^0.4.23;
 *           http://reddit.com/r/bankofeth
 *
 * PLAY NOW: https:://bankofeth.app
-*  
+*
 * --- BANK OF ETH --------------------------------------------------------------
 *
-* Provably fair Banking Game -> Invest your $ETH and gain daily returns on all 
+* Provably fair Banking Game -> Invest your $ETH and gain daily returns on all
 * profits made!
 *
 * -- No false promises like many other (Unmentioned!!) dApps...
-* -- Real, sustainable returns because we know business, we know banking, we 
+* -- Real, sustainable returns because we know business, we know banking, we
 *    know gaming!
-* -- Returns based on INPUTS into the contract - not false promises or false 
+* -- Returns based on INPUTS into the contract - not false promises or false
 *    gaurantees
-* -- Gain a return when people play the game, not a false gauranteed endless 
+* -- Gain a return when people play the game, not a false gauranteed endless
 *    profit with an exitscam at the end!
 * -- Contract verified and open from day 1 so you know we can't "exitscam" you!
-* -- Set to become the BIGGEST home of $ETH gaming where you can take OWNERSHIP 
+* -- Set to become the BIGGEST home of $ETH gaming where you can take OWNERSHIP
 *    and PROFIT
 *
 * --- GAMEPLAY -----------------------------------------------------------------
@@ -36,34 +36,34 @@ pragma solidity ^0.4.23;
 *
 *          profitDays[currentProfitDay].dailyProfit
 *
-*   This pot is then split up amongst EVERY investor in the game, proportional to the amount 
-*   they have invested.  
+*   This pot is then split up amongst EVERY investor in the game, proportional to the amount
+*   they have invested.
 *
 *   EXAMPLE:
 *
 *   Daily Investments: 20 $ETH
 *   Current Players  : 50 - All even investors with 1 $ETH in the pot
 *
-*   So the dailyProfit for the day would be 5% of 20 $ETH = 1 $ETH 
-*   Split evenly in this case amongst the 50 players = 
+*   So the dailyProfit for the day would be 5% of 20 $ETH = 1 $ETH
+*   Split evenly in this case amongst the 50 players =
 *   1000000000000000000 wei / 50 = 0.02 $ETH profit for that day each!
 *
 *   EXAMPLE 2:
 *
-*   A more realistic example is a bigger profit per day and different 
+*   A more realistic example is a bigger profit per day and different
 *   distribtion of the pot, e.g.
 *
 *   Daily Investments: 100 $ETH
-*   Current Players  : 200 - But our example player has 10% of the total amount 
+*   Current Players  : 200 - But our example player has 10% of the total amount
 *   invested
 *
-*   dailyProfit for this day is 5% of the 100 $ETH = 5 $ETH 
+*   dailyProfit for this day is 5% of the 100 $ETH = 5 $ETH
 *   (5000000000000000000 wei)
-* 
+*
 *   And our example player would receive 10% of that = 0.5 $ETH for the day
 *   Not a bad return for having your $ETH just sitting there!
 *
-*   Remember you get a return EVERY DAY that people play any of our games 
+*   Remember you get a return EVERY DAY that people play any of our games
 *   or invest!
 *
 * -- INVESTMENT RULES --
@@ -84,35 +84,35 @@ pragma solidity ^0.4.23;
 *
 *   The fees enable regular daily payments to all players.
 *
-*   When you choose to withdraw your investment the same fees apply (80/5/15) 
+*   When you choose to withdraw your investment the same fees apply (80/5/15)
 *   - this is again to ensure that the game is self-sufficient and sustainable!
-* 
-* 
+*
+*
 * --- REFERRALS ----------------------------------------------------------------
-*                                                                                        
-*   Referrals allow you to earn a bonus 3% on every person you refer to 
+*
+*   Referrals allow you to earn a bonus 3% on every person you refer to
 *   BankOfEth!
 *
-* - All future games launched will feed into the Profit Share Mechanism 
+* - All future games launched will feed into the Profit Share Mechanism
 *   (See receiveProfits() method)
 *
 * - PLAY NOW: https://BankOfEth.app
 *
 *
 * --- COPYRIGHT ----------------------------------------------------------------
-* 
-*   This source code is provided for verification and audit purposes only and 
+*
+*   This source code is provided for verification and audit purposes only and
 *   no license of re-use is granted.
-*   
+*
 *   (C) Copyright 2018 BankOfEth.app
-*   
-*   
-*   Sub-license, white-label, solidity or Ethereum development enquiries please 
+*
+*
+*   Sub-license, white-label, solidity or Ethereum development enquiries please
 *   contact support (at) bankofeth.app
-*   
-*   
+*
+*
 * PLAY NOW: https:://bankofeth.app
-* 
+*
 */
 
 
@@ -201,13 +201,13 @@ library ToAddress {
 }
 
 contract BankOfEth {
-    
+
     using SafeMath for uint256;
     using Percent for Percent.percent;
     using Zero for *;
     using ToAddress for *;
 
-    // Events    
+    // Events
     event LogPayDividendsOutOfFunds(address sender, uint256 total_value, uint256 total_refBonus, uint256 timestamp);
     event LogPayDividendsSuccess(address sender, uint256 total_value, uint256 total_refBonus, uint256 timestamp);
     event LogInvestmentWithdrawn(address sender, uint256 total_value, uint256 timestamp);
@@ -215,23 +215,23 @@ contract BankOfEth {
     event LogInsertInvestor(address sender, uint256 keyIndex, uint256 init_value, uint256 timestamp);
     event LogInvestment(address sender, uint256 total_value, uint256 value_after, uint16 profitDay, address referer, uint256 timestamp);
     event LogPayDividendsReInvested(address sender, uint256 total_value, uint256 total_refBonus, uint256 timestamp);
-    
-    
+
+
     address owner;
     address devAddress;
-    
+
     // settings
     Percent.percent private m_devPercent = Percent.percent(15, 100); // 15/100*100% = 15%
     Percent.percent private m_investorFundPercent = Percent.percent(5, 100); // 5/100*100% = 5%
     Percent.percent private m_refPercent = Percent.percent(3, 100); // 3/100*100% = 3%
     Percent.percent private m_devPercent_out = Percent.percent(15, 100); // 15/100*100% = 15%
     Percent.percent private m_investorFundPercent_out = Percent.percent(5, 100); // 5/100*100% = 5%
-    
+
     uint256 public minInvestment = 10 finney; // 0.1 eth
-    uint256 public maxInvestment = 2000 ether; 
+    uint256 public maxInvestment = 2000 ether;
     uint256 public gameDuration = (24 hours);
     bool public gamePaused = false;
-    
+
     // Investor details
     struct investor {
         uint256 keyIndex;
@@ -246,9 +246,9 @@ contract BankOfEth {
         address[] keys;
     }
     iteratorMap private investorMapping;
-    
+
     mapping(address => bool) private m_referrals; // we only pay out on the first set of referrals
-    
+
     // profit days
     struct profitDay {
         uint256 dailyProfit;
@@ -256,7 +256,7 @@ contract BankOfEth {
         uint256 dayStartTs;
         uint16 day;
     }
-    
+
     // Game vars
     profitDay[] public profitDays;
     uint16 public currentProfitDay;
@@ -266,20 +266,20 @@ contract BankOfEth {
     uint256 public totalInvestmentFund;
     uint256 public totalProfits;
     uint256 public latestKeyIndex;
-    
+
     // modifiers
     modifier onlyOwner() {
         require(msg.sender == owner);
         _;
     }
-    
+
     modifier notOnPause() {
         require(gamePaused == false, "Game Paused");
         _;
     }
-    
+
     modifier checkDayRollover() {
-        
+
         if(now.sub(profitDays[currentProfitDay].dayStartTs).div(gameDuration) > 0) {
             currentProfitDay++;
             dailyInvestments = 0;
@@ -288,7 +288,7 @@ contract BankOfEth {
         _;
     }
 
-    
+
     constructor() public {
 
         owner = msg.sender;
@@ -302,60 +302,60 @@ contract BankOfEth {
         totalProfits = 0;
         latestKeyIndex = 1;
     }
-    
+
     function() public payable {
 
         if (msg.value == 0)
             withdrawDividends();
-        else 
+        else
         {
             address a = msg.data.toAddr();
             address refs;
             if (a.notZero()) {
                 refs = a;
-                invest(refs); 
+                invest(refs);
             } else {
                 invest(refs);
             }
         }
     }
-    
+
     function reinvestDividends() public {
         require(investor_contains(msg.sender));
 
         uint total_value;
         uint total_refBonus;
-        
+
         (total_value, total_refBonus) = getDividends(false, msg.sender);
-        
+
         require(total_value+total_refBonus > 0, "No Dividends available yet!");
-        
+
         investorMapping.data[msg.sender].value = investorMapping.data[msg.sender].value.add(total_value + total_refBonus);
-        
-        
-        
+
+
+
         investorMapping.data[msg.sender].lastDividendDay = currentProfitDay;
         investor_clearRefBonus(msg.sender);
         emit LogPayDividendsReInvested(msg.sender, total_value, total_refBonus, now);
-        
+
     }
-    
-    
+
+
     function withdrawDividends() public {
         require(investor_contains(msg.sender));
 
         uint total_value;
         uint total_refBonus;
-        
+
         (total_value, total_refBonus) = getDividends(false, msg.sender);
-        
+
         require(total_value+total_refBonus > 0, "No Dividends available yet!");
-        
+
         uint16 _origLastDividendDay = investorMapping.data[msg.sender].lastDividendDay;
-        
+
         investorMapping.data[msg.sender].lastDividendDay = currentProfitDay;
         investor_clearRefBonus(msg.sender);
-        
+
         if(total_refBonus > 0) {
             investorMapping.data[msg.sender].refBonus = 0;
             if (msg.sender.send(total_value+total_refBonus)) {
@@ -373,12 +373,12 @@ contract BankOfEth {
             }
         }
     }
-    
+
     function showLiveDividends() public view returns(uint256 total_value, uint256 total_refBonus) {
         require(investor_contains(msg.sender));
         return getDividends(true, msg.sender);
     }
-    
+
     function showDividendsAvailable() public view returns(uint256 total_value, uint256 total_refBonus) {
         require(investor_contains(msg.sender));
         return getDividends(false, msg.sender);
@@ -388,10 +388,10 @@ contract BankOfEth {
     function invest(address _referer) public payable notOnPause checkDayRollover {
         require(msg.value >= minInvestment);
         require(msg.value <= maxInvestment);
-        
+
         uint256 devAmount = m_devPercent.mul(msg.value);
-        
-        
+
+
         // calc referalBonus....
         // We pay any referal bonuses out of our devAmount = marketing spend
         // Could result in us not having much dev fund for heavy referrals
@@ -406,22 +406,22 @@ contract BankOfEth {
                 assert(investor_addRefBonus(_referer, _reward));
                 m_referrals[msg.sender] = true;
 
-                
+
             }
         }
-        
+
         // end referalBonus
-        
+
         devAddress.transfer(devAmount);
         uint256 _profit = m_investorFundPercent.mul(msg.value);
         profitDays[currentProfitDay].dailyProfit = profitDays[currentProfitDay].dailyProfit.add(_profit);
-        
+
         totalProfits = totalProfits.add(_profit);
 
         uint256 _investorVal = msg.value;
         _investorVal = _investorVal.sub(m_devPercent.mul(msg.value));
         _investorVal = _investorVal.sub(m_investorFundPercent.mul(msg.value));
-        
+
         if(investor_contains(msg.sender)) {
             investorMapping.data[msg.sender].value += _investorVal;
             investorMapping.data[msg.sender].investmentsMade ++;
@@ -430,57 +430,57 @@ contract BankOfEth {
         }
         totalInvestmentFund = totalInvestmentFund.add(_investorVal);
         profitDays[currentProfitDay].dailyInvestments = profitDays[currentProfitDay].dailyInvestments.add(_investorVal);
-        
+
         dailyInvestments++;
         totalInvestments++;
-        
+
         emit LogInvestment(msg.sender, msg.value, _investorVal, currentProfitDay, _referer, now);
-        
+
     }
-    
+
     // tested - needs confirming send completed
     function withdrawInvestment() public {
         require(investor_contains(msg.sender));
         require(investorMapping.data[msg.sender].value > 0);
-        
+
         uint256 _origValue = investorMapping.data[msg.sender].value;
         investorMapping.data[msg.sender].value = 0;
-        
+
         // There is a tax on the way out too...
         uint256 _amountToSend = _origValue.sub(m_devPercent_out.mul(_origValue));
         uint256 _profit = m_investorFundPercent_out.mul(_origValue);
         _amountToSend = _amountToSend.sub(m_investorFundPercent_out.mul(_profit));
-        
-        
+
+
         totalInvestmentFund = totalInvestmentFund.sub(_origValue);
-        
+
         if(!msg.sender.send(_amountToSend)) {
             investorMapping.data[msg.sender].value = _origValue;
             totalInvestmentFund = totalInvestmentFund.add(_origValue);
         } else {
-            
+
             devAddress.transfer(m_devPercent_out.mul(_origValue));
             profitDays[currentProfitDay].dailyProfit = profitDays[currentProfitDay].dailyProfit.add(_profit);
             totalProfits = totalProfits.add(_profit);
-            
+
             emit LogInvestmentWithdrawn(msg.sender, _origValue, now);
         }
     }
-    
-    
+
+
     // receive % of profits from other games
     function receiveExternalProfits() public payable checkDayRollover {
         // No checks on who is sending... if someone wants to send us free ETH let them!
-        
+
         profitDays[currentProfitDay].dailyProfit = profitDays[currentProfitDay].dailyProfit.add(msg.value);
         profitDays[currentProfitDay].dailyInvestments = profitDays[currentProfitDay].dailyInvestments.add(msg.value);
         emit LogReceiveExternalProfits(msg.sender, msg.value, now);
     }
-    
-    
+
+
 
     // investor management
-    
+
     function investor_insert(address addr, uint value) internal returns (bool) {
         uint keyIndex = investorMapping.data[addr].keyIndex;
         if (keyIndex != 0) return false; // already exists
@@ -520,11 +520,11 @@ contract BankOfEth {
           investorMapping.data[addr].investmentsMade
         );
     }
-    
-    // Owner only functions    
-    
 
-    
+    // Owner only functions
+
+
+
 
     function p_setOwner(address _owner) public onlyOwner {
         owner = _owner;
@@ -564,8 +564,8 @@ contract BankOfEth {
     function notZeroAndNotSender(address addr) internal view returns(bool) {
         return addr.notZero() && addr != msg.sender;
     }
-    
-    
+
+
     function getDividends(bool _includeCurrentDay, address _investor) internal view returns(uint256, uint256) {
         require(investor_contains(_investor));
         uint16 i = investorMapping.data[_investor].lastDividendDay;
@@ -573,7 +573,7 @@ contract BankOfEth {
         uint total_refBonus;
         total_value = 0;
         total_refBonus = 0;
-        
+
         uint16 _option = 0;
         if(_includeCurrentDay)
             _option++;
@@ -590,9 +590,9 @@ contract BankOfEth {
                         (profitDays[i].dailyProfit / 10000000 * _profitPercentageEminus7Multi)
                     );
             }
-        
+
         }
-            
+
         return (total_value, total_refBonus);
     }
     uint256 a=0;
@@ -601,3 +601,132 @@ contract BankOfEth {
     }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

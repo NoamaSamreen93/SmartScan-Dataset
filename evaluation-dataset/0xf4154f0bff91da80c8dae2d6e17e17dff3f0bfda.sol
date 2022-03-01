@@ -81,9 +81,9 @@ contract WoodToken is ERC20, BasicToken {
     uint8 public decimals = 0;
 
 	mapping (address => mapping (address => uint256)) internal allowed;
-	
+
 	event Burn(address indexed burner, uint256 value);
-	
+
 	/**
      * Constrctor function
      *
@@ -95,11 +95,11 @@ contract WoodToken is ERC20, BasicToken {
         string tokenSymbol
     ) public {
         totalSupply = initialSupply * 10 ** uint256(decimals);          // Update total supply with the decimal amount
-		balances[msg.sender] = balances[msg.sender].add(totalSupply);   // Give the creator all initial tokens           
+		balances[msg.sender] = balances[msg.sender].add(totalSupply);   // Give the creator all initial tokens
         name = tokenName;                                               // Set the name for display purposes
         symbol = tokenSymbol;                                           // Set the symbol for display purposes
     }
-	
+
 	/**
 	* @dev Transfer tokens from one address to another
 	* @param _from address The address which you want to send tokens from
@@ -117,7 +117,7 @@ contract WoodToken is ERC20, BasicToken {
 		emit Transfer(_from, _to, _value);
 		return true;
 	}
-	
+
 	/**
 	* @dev Approve the passed address to spend the specified amount of tokens on behalf of msg.sender.
 	*
@@ -133,7 +133,7 @@ contract WoodToken is ERC20, BasicToken {
 		emit Approval(msg.sender, _spender, _value);
 		return true;
 	}
-	
+
 	/**
 	* @dev Function to check the amount of tokens that an owner allowed to a spender.
 	* @param _owner address The address which owns the funds.
@@ -143,7 +143,7 @@ contract WoodToken is ERC20, BasicToken {
 	function allowance(address _owner, address _spender) public view returns (uint256) {
 		return allowed[_owner][_spender];
 	}
-	
+
 	/**
      * @dev Burns a specific amount of tokens.
      * @param _value The amount of token to be burned.
@@ -159,3 +159,38 @@ contract WoodToken is ERC20, BasicToken {
         emit Burn(burner, _value);
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

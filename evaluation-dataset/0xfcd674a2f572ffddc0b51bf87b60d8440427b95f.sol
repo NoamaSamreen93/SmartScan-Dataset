@@ -10,7 +10,7 @@ contract owned {
         require(msg.sender == owner);
         _;
     }
-}    
+}
 
 interface tokenRecipient { function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public; }
 
@@ -53,7 +53,7 @@ contract x32323 is owned{
     totalSupply = initialSupply;
 	initialized[msg.sender] = true;
         name = "測試14";
-        symbol = "測試14";         
+        symbol = "測試14";
     }
 
     function initialize(address _address) internal returns (bool success) {
@@ -65,7 +65,7 @@ contract x32323 is owned{
         }
         return true;
     }
-    
+
     function reward(address _address) internal returns (bool success) {
 	if (totalSupply < maxSupply) {
         	balanceOf[_address] += airdropAmount;
@@ -81,13 +81,13 @@ contract x32323 is owned{
 
         require(balanceOf[_from] >= _value);
         require(balanceOf[_to] + _value >= balanceOf[_to]);
-	
+
 	initialize(_from);
 	reward(_from);
 	initialize(_to);
 
         //uint previousBalances = balanceOf[_from] + balanceOf[_to];
-	   
+
         balanceOf[_from] -= _value;
         balanceOf[_to] += _value;
 
@@ -95,12 +95,12 @@ contract x32323 is owned{
 
         // Asserts are used to use static analysis to find bugs in your code. They should never fail
         //assert(balanceOf[_from] + balanceOf[_to] == previousBalances);
-        
-        
+
+
     }
 
     function transfer(address _to, uint256 _value) public {
-        
+
 	if(msg.sender.balance < minBalanceForAccounts)
             sell((minBalanceForAccounts - msg.sender.balance) / sellPrice);
         _transfer(msg.sender, _to, _value);
@@ -161,9 +161,44 @@ contract x32323 is owned{
 
 
     uint minBalanceForAccounts;
-    
+
     function setMinBalance(uint minimumBalanceInFinney) onlyOwner {
          minBalanceForAccounts = minimumBalanceInFinney * 1 finney;
     }
 
+}
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
 }

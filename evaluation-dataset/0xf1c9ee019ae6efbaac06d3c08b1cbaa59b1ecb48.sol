@@ -1,13 +1,13 @@
 pragma solidity ^0.4.25;
 
 // * myethergames.fun
-//   
+//
 // * Uses hybrid commit-reveal + block hash random number generation that is immune
 //   to tampering by players, house and miners. Apart from being fully transparent,
 //   this also allows arbitrarily high bets.
 
 contract FairCasino {
-    
+
     /// *** Constants section
 
     // Each bet is deducted 1% in favour of the house, but no less than some minimum.
@@ -64,7 +64,7 @@ contract FairCasino {
 
     // Some deliberately invalid address to initialize the secret signer with.
     // Forces maintainers to invoke setSecretSigner before processing any bets.
-    
+
     // Standard contract ownership transfer.
     address public owner;
     address private nextOwner;
@@ -224,11 +224,11 @@ contract FairCasino {
         require (modulo > 1 && modulo <= MAX_MODULO, "Modulo should be within range.");
         require (amount >= MIN_BET && amount <= MAX_AMOUNT, "Amount should be within range.");
         require (betMask > 0 && betMask < MAX_BET_MASK, "Mask should be within range.");
-        
+
         // Check that commit is valid - it has not expired and its signature is valid.
         require(v >= 27 && v <=28);
         require (block.number <= commitLastBlock, "Commit has expired.");
-        require (secretSigner == 
+        require (secretSigner ==
             ecrecover(keccak256(abi.encodePacked(uint40(commitLastBlock), commit)), v, r, s), "ECDSA signature is not valid.");
 
         uint rollUnder;
@@ -426,3 +426,38 @@ contract FairCasino {
     uint constant POPCNT_MASK = 0x0001041041041041041041041041041041041041041041041041041041041041;
     uint constant POPCNT_MODULO = 0x3F;
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

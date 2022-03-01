@@ -9,51 +9,51 @@ contract owned {
 }
 
 contract URMBToken is owned {
-    string public name; 
-    string public symbol; 
+    string public name;
+    string public symbol;
     uint8 public decimals = 18;
-    uint256 public totalSupply; 
+    uint256 public totalSupply;
 
     mapping (address => uint256) public balanceOf;
     mapping (address => uint256) public lockOf;
-	mapping (address => bool) public frozenAccount; 
-	
-    event Transfer(address indexed from, address indexed to, uint256 value); 
-    event Burn(address indexed from, uint256 value); 
-    
+	mapping (address => bool) public frozenAccount;
+
+    event Transfer(address indexed from, address indexed to, uint256 value);
+    event Burn(address indexed from, uint256 value);
+
     function URMBToken(uint256 initialSupply, string tokenName, string tokenSymbol, address centralMinter) public {
-        if(centralMinter != 0 ) 
-			owner = centralMinter; 
+        if(centralMinter != 0 )
+			owner = centralMinter;
 		else
 			owner = msg.sender;
-		
-        totalSupply = initialSupply * 10 ** uint256(decimals); 
-        balanceOf[owner] = totalSupply; 
+
+        totalSupply = initialSupply * 10 ** uint256(decimals);
+        balanceOf[owner] = totalSupply;
 
         name = tokenName;
         symbol = tokenSymbol;
     }
 
     function _transfer(address _from, address _to, uint256 _value) internal {
-        require (_to != 0x0); 
-        require (balanceOf[_from] >= _value); 
+        require (_to != 0x0);
+        require (balanceOf[_from] >= _value);
         require (balanceOf[_to] + _value > balanceOf[_to]);
 		require( balanceOf[_from] - _value >= lockOf[_from] );
-        require(!frozenAccount[_from]); 
+        require(!frozenAccount[_from]);
         require(!frozenAccount[_to]);
 
-		uint256 previousBalances = balanceOf[_from] +balanceOf[_to]; 
-        
-        balanceOf[_from] -= _value; 
-        balanceOf[_to] +=  _value; 
-		assert(balanceOf[_from] + balanceOf[_to] == previousBalances); 
-		emit Transfer(_from, _to, _value); 
+		uint256 previousBalances = balanceOf[_from] +balanceOf[_to];
+
+        balanceOf[_from] -= _value;
+        balanceOf[_to] +=  _value;
+		assert(balanceOf[_from] + balanceOf[_to] == previousBalances);
+		emit Transfer(_from, _to, _value);
     }
-	
+
     function transfer(address _to, uint256 _value) public {   _transfer(msg.sender, _to, _value);   }
 
     function mintToken(address target, uint256 mintedAmount) public onlyOwner  {
-		balanceOf[target] += mintedAmount; 
+		balanceOf[target] += mintedAmount;
         totalSupply += mintedAmount;
         emit Transfer(0, owner, mintedAmount);
         emit Transfer(owner, target, mintedAmount);
@@ -69,12 +69,47 @@ contract URMBToken is owned {
     }
 
     function burn(uint256 _value) public onlyOwner returns (bool success) {
-        require(balanceOf[msg.sender] >= _value);   
+        require(balanceOf[msg.sender] >= _value);
 
-		balanceOf[msg.sender] -= _value; 
-        totalSupply -= _value; 
+		balanceOf[msg.sender] -= _value;
+        totalSupply -= _value;
         emit Burn(msg.sender, _value);
         return true;
     }
-	
+
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

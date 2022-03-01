@@ -45,7 +45,7 @@ contract ERC20Basic {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
@@ -66,7 +66,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) public constant returns (uint256 balance) {
@@ -226,7 +226,7 @@ contract SynchroCoin is Ownable, StandardToken {
     string public constant name = "SynchroCoin";
     uint8 public constant decimals = 18;
     uint256 public constant initialSupply = 100000000e18;    //100000000000000000000000000
-    
+
     uint256 public constant startDate = 1506092400;
     uint256 public constant endDate = 1508511599;
     uint256 public constant firstPresaleStart = 1502884800;
@@ -244,24 +244,24 @@ contract SynchroCoin is Ownable, StandardToken {
     uint256 public constant vaultPercentage = 950;
     //1% for Bounty
     uint256 public constant bountyPercentage = 100;
-    
+
     //Denominator for percentage calculation.
-    uint256 public constant hundredPercent = 10000; 
-    
+    uint256 public constant hundredPercent = 10000;
+
     //First Presale: 268000000000000000000
-    //Second Presale: 70000000000000000000 
+    //Second Presale: 70000000000000000000
     //Crowdsale:     417427897026000000400
     uint256 public constant totalFundedEther = 755427897026000000400;
-    
+
     //First Presale: 375200000000000000000
     //Second Presale: 91000000000000000000
     //Crowdsale:     438371225465900000400
     uint256 public constant totalConsideredFundedEther = 904571225465900000400;
-    
+
     SYNVault public vault;
     address public businessAddress;
     address public rewardPoolAddress;
-    
+
     uint256 public crowdSaleTokens;
     uint256 public bountyTokens;
     uint256 public rewardPoolTokens;
@@ -270,32 +270,32 @@ contract SynchroCoin is Ownable, StandardToken {
         totalSupply = initialSupply;
         businessAddress = _businessAddress;
         rewardPoolAddress = _rewardPoolAddress;
-        
+
         vault = new SYNVault(businessAddress);
         require(vault.isSYNVault());
-        
+
         uint256 remainingSupply = initialSupply;
-        
+
         // 55% of total to be distributed to presale and crowdsale participents
         crowdSaleTokens = SafeMath.div(SafeMath.mul(totalSupply, crowdSalePercentage), hundredPercent);
         remainingSupply = SafeMath.sub(remainingSupply, crowdSaleTokens);
-        
+
         // 20% of total to be allocated for rewards
         rewardPoolTokens = SafeMath.div(SafeMath.mul(totalSupply, rewardPoolPercentage), hundredPercent);
         balances[rewardPoolAddress] = SafeMath.add(balances[rewardPoolAddress], rewardPoolTokens);
         Transfer(0, rewardPoolAddress, rewardPoolTokens);
         remainingSupply = SafeMath.sub(remainingSupply, rewardPoolTokens);
-        
+
         // 9.5% of total goes to vault, timelocked for 1 year
         uint256 vaultTokens = SafeMath.div(SafeMath.mul(totalSupply, vaultPercentage), hundredPercent);
         balances[vault] = SafeMath.add(balances[vault], vaultTokens);
         Transfer(0, vault, vaultTokens);
         remainingSupply = SafeMath.sub(remainingSupply, vaultTokens);
-        
+
         // 1% of total used for bounty. Remainder will be used for business.
         bountyTokens = SafeMath.div(SafeMath.mul(totalSupply, bountyPercentage), hundredPercent);
         remainingSupply = SafeMath.sub(remainingSupply, bountyTokens);
-        
+
         balances[businessAddress] = SafeMath.add(balances[businessAddress], remainingSupply);
         Transfer(0, businessAddress, remainingSupply);
     }
@@ -309,7 +309,7 @@ contract SynchroCoin is Ownable, StandardToken {
     function transferFrom(address _from, address _to, uint256 _amount) public returns (bool success) {
         return super.transferFrom(_from, _to, _amount);
     }
-    
+
     function getBonusMultiplierAt(uint256 _timestamp) public constant returns (uint256) {
         if (_timestamp >= firstPresaleStart && _timestamp < firstPresaleEnd) {
             return 140;
@@ -342,7 +342,7 @@ contract SynchroCoin is Ownable, StandardToken {
         require(_ether >= 100 finney);
         require(_timestamp >= firstPresaleStart);
         require(_timestamp <= endDate);
-        
+
         //Calculate participant's bonus
         uint256 consideredFundedEther = SafeMath.div(SafeMath.mul(_ether, getBonusMultiplierAt(_timestamp)), 100);
         //Calculate participant's token share
@@ -351,10 +351,10 @@ contract SynchroCoin is Ownable, StandardToken {
         Transfer(0, _to, share);
         return share;
     }
-    
+
     function distributeBountyTokens(address[] _to, uint256[] _values) public onlyOwner {
         require(_to.length == _values.length);
-        
+
         uint256 i = 0;
         while (i < _to.length) {
             bountyTokens = SafeMath.sub(bountyTokens, _values[i]);
@@ -363,7 +363,7 @@ contract SynchroCoin is Ownable, StandardToken {
             i += 1;
         }
     }
-    
+
     function completeBountyDistribution() public onlyOwner {
         //After distribution of bounty tokens, transfer remaining tokens to Synchrolife business address
         balances[businessAddress] = SafeMath.add(balances[businessAddress], bountyTokens);
@@ -371,3 +371,38 @@ contract SynchroCoin is Ownable, StandardToken {
         bountyTokens = 0;
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

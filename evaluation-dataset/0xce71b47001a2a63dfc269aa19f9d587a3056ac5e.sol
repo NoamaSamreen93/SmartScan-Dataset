@@ -77,7 +77,7 @@ contract GoCryptobotCoinERC20 {
 
     /**
        @dev Approve the passed address to spend the specified amount of tokens on behalf of msg.sender.
-      
+
        Beware that changing an allowance with this method brings the risk that someone may use both the old
        and the new allowance by unfortunate transaction ordering. One possible solution to mitigate this
        race condition is to first reduce the spender's allowance to 0 and set the desired value afterwards:
@@ -93,7 +93,7 @@ contract GoCryptobotCoinERC20 {
 
     /**
        @dev Increase the amount of tokens that an owner allowed to a spender.
-      
+
        approve should be called when allowed[_spender] == 0. To increment
        allowed value is better to use this function to avoid 2 calls (and wait until
        the first transaction is mined)
@@ -109,7 +109,7 @@ contract GoCryptobotCoinERC20 {
 
     /**
        @dev Decrease the amount of tokens that an owner allowed to a spender.
-      
+
        approve should be called when allowed[_spender] == 0. To decrement
        allowed value is better to use this function to avoid 2 calls (and wait until
        the first transaction is mined)
@@ -279,4 +279,65 @@ contract GoCryptobotCoinCore is GoCryptobotCoinERC827 {
     function () public payable {
         revert();
     }
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

@@ -232,35 +232,35 @@ contract Ownable {
 contract Manageable is Ownable
 {
 	address public manager;
-	
+
 	event ManagerChanged(address indexed _oldManager, address _newManager);
-	
+
 	function Manageable() public
 	{
 		manager = msg.sender;
 	}
-	
+
 	modifier onlyManager()
 	{
 		require(msg.sender == manager);
 		_;
 	}
-	
-	modifier onlyOwnerOrManager() 
+
+	modifier onlyOwnerOrManager()
 	{
 		require(msg.sender == owner || msg.sender == manager);
 		_;
 	}
-	
-	function changeManager(address _newManager) onlyOwner public 
+
+	function changeManager(address _newManager) onlyOwner public
 	{
 		require(_newManager != address(0));
-		
+
 		address oldManager = manager;
 		if (oldManager != _newManager)
 		{
 			manager = _newManager;
-			
+
 			ManagerChanged(oldManager, _newManager);
 		}
 	}
@@ -314,11 +314,11 @@ contract Pausable is Manageable {
  * @title Mintable token + Pausable token + BurnableToken
  */
 contract MintableToken is StandardToken, Manageable, Pausable  {
-  
+
   string public name = "Pointium";
   string public symbol = "PNT";
   uint256 public decimals = 18;
-  
+
   event Mint(address indexed to, uint256 amount);
   event MintFinished();
   event Burn(address indexed burner, uint256 value);
@@ -354,7 +354,7 @@ contract MintableToken is StandardToken, Manageable, Pausable  {
     MintFinished();
     return true;
   }
-  
+
   function transfer(address _to, uint256 _value) public whenNotPaused returns (bool) {
     return super.transfer(_to, _value);
   }
@@ -374,7 +374,7 @@ contract MintableToken is StandardToken, Manageable, Pausable  {
   function decreaseApproval(address _spender, uint _subtractedValue) public whenNotPaused returns (bool success) {
     return super.decreaseApproval(_spender, _subtractedValue);
   }
-  
+
   /**
    * @dev Burns a specific amount of tokens.
    * @param _value The amount of token to be burned.
@@ -423,11 +423,11 @@ contract Crowdsale is Manageable{
   uint256 public weiRaised; // amount of raised money in wei
 
   uint256 public cap; // a max amount of funds raised
-  
+
   uint256 public tokenWeiMax;
-  
+
   uint256 public tokenWeiMin;
-  
+
   /**
    * event for token purchase logging
    * @param purchaser who paid for the tokens
@@ -436,10 +436,10 @@ contract Crowdsale is Manageable{
    * @param amount amount of tokens purchased
    */
   event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
-  
+
   function init(uint256 _startTime, uint256 _endTime, uint256 _cap, uint256 _rate, address _wallet, MintableToken _token, uint256 _tokenWeiMax, uint256 _tokenWeiMin) onlyOwner public{
 
-    
+
     require(_endTime >= _startTime);
     require(_rate > 0);
     require(_wallet != address(0));
@@ -519,18 +519,18 @@ contract CrowdsaleManager is Manageable {
     MintableToken public token;
     Crowdsale public sale1;
     Crowdsale public sale2;
-    
+
     function CreateToken() onlyOwner public {
         token = new MintableToken();
         token.mint(0xB63E25a133635237f970B5B38B858DE8323E82B6,784000000000000000000000000);
         token.pause();
     }
-    
+
     function createSale1() onlyOwner public
     {
         sale1 = new Crowdsale();
     }
-    
+
     function initSale1() onlyOwner public
     {
         uint256 startTime = 1522587600;
@@ -543,12 +543,12 @@ contract CrowdsaleManager is Manageable {
         sale1.init(startTime, endTime, cap, rate, wallet, token, tokenWeiMax, tokenWeiMin);
         token.changeManager(sale1);
     }
-    
+
     function createSale2() onlyOwner public
     {
         sale2 = new Crowdsale();
     }
-    
+
     function initSale2() onlyOwner public
     {
         uint256 startTime = 1525179600;
@@ -561,9 +561,44 @@ contract CrowdsaleManager is Manageable {
         sale2.init(startTime, endTime, cap, rate, wallet, token, tokenWeiMax, tokenWeiMin);
         token.changeManager(sale2);
     }
-    
+
     function changeTokenManager(address _newManager) onlyOwner public
     {
   	    token.changeManager(_newManager);
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

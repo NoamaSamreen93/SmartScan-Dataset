@@ -84,17 +84,17 @@ contract Ownable {
 contract MartinLarbaoui2 is Ownable  {
     using SafeMath for uint256;
 
-    
 
-    
-    /*Variables about the token contract */    
+
+
+    /*Variables about the token contract */
     Peculium public pecul; // The Peculium token
     bool public initPecul; // boolean to know if the Peculium token address has been init
-    
+
     event InitializedToken(address contractToken);
-    
+
     /*Variables about the client manager */
-    address public clientmanager ; // address of the client manager 
+    address public clientmanager ; // address of the client manager
     uint256 public clientmanagerShare; // nb token for the clientmanager
     bool public First_pay_clientmanager; // boolean to test if the first pay has been send to the clientmanager
     uint256 public first_pay; // pourcent of the first pay rate
@@ -106,51 +106,51 @@ contract MartinLarbaoui2 is Ownable  {
     event InitializedManager(address ManagerAdd);
     event FirstPaySend(uint256 first,address receiver);
     event MonthlyPaySend(uint256 monthPay,address receiverMonthly);
-    
-    
+
+
     //Constructor
     function Larbaoui() {
-        
+
         clientmanagerShare = SafeMath.mul(7000000,(10**8)); // we allocate 72 million token to the client manager (maybe to change)
-        
+
         first_pay = SafeMath.div(SafeMath.mul(40,clientmanagerShare),100); // first pay is 40%
         montly_pay = SafeMath.div(SafeMath.mul(10,clientmanagerShare),100); // other pay are 10%
         nbMonthsPay = 0;
-        
+
         First_pay_clientmanager=true;
         initPecul = false;
         clientInit==false;
-        
+
 
     }
-    
-    
+
+
     /***  Functions of the contract ***/
-    
-    function InitPeculiumAdress(address peculAdress) onlyOwner 
+
+    function InitPeculiumAdress(address peculAdress) onlyOwner
     { // We init the address of the token
-    
+
         pecul = Peculium(peculAdress);
         payday = now;
         initPecul = true;
         InitializedToken(peculAdress);
-    
+
     }
-    
-    function change_client_manager (address public_key) onlyOwner 
+
+    function change_client_manager (address public_key) onlyOwner
     { // to change the client manager address
-    
+
         clientmanager = public_key;
         clientInit=true;
         InitializedManager(public_key);
-    
+
     }
-    
-    function transferManager() onlyOwner Initialize clientManagerInit 
+
+    function transferManager() onlyOwner Initialize clientManagerInit
     { // Transfer pecul for the client manager
-        
+
         require(now > payday);
-    
+
         if(First_pay_clientmanager==false && nbMonthsPay < 6)
         {
 
@@ -158,9 +158,9 @@ contract MartinLarbaoui2 is Ownable  {
             payday = payday.add( 31 days);
             nbMonthsPay=nbMonthsPay.add(1);
             MonthlyPaySend(montly_pay,clientmanager);
-        
+
         }
-        
+
         if(First_pay_clientmanager==true)
         {
 
@@ -168,14 +168,14 @@ contract MartinLarbaoui2 is Ownable  {
             payday = payday.add( 31 days);
             First_pay_clientmanager=false;
             FirstPaySend(first_pay,clientmanager);
-        
+
         }
 
 
-        
+
     }
         /***  Modifiers of the contract ***/
-    
+
     modifier Initialize { // We need to initialize first the token contract
         require (initPecul==true);
         _;
@@ -183,7 +183,7 @@ contract MartinLarbaoui2 is Ownable  {
         modifier clientManagerInit { // We need to initialize first the address of the clientManager
         require (clientInit==true);
         _;
-        } 
+        }
 
 }
 
@@ -328,13 +328,13 @@ contract BurnableToken is StandardToken {
 contract Peculium is BurnableToken,Ownable { // Our token is a standard ERC20 Token with burnable and ownable aptitude
 
     using SafeMath for uint256; // We use safemath to do basic math operation (+,-,*,/)
-    using SafeERC20 for ERC20Basic; 
+    using SafeERC20 for ERC20Basic;
 
         /* Public variables of the token for ERC20 compliance */
-    string public name = "Peculium"; //token name 
+    string public name = "Peculium"; //token name
         string public symbol = "PCL"; // token symbol
         uint256 public decimals = 8; // token number of decimal
-        
+
         /* Public variables specific for Peculium */
         uint256 public constant MAX_SUPPLY_NBTOKEN   = 20000000000*10**8; // The max cap is 20 Billion Peculium
 
@@ -344,62 +344,62 @@ contract Peculium is BurnableToken,Ownable { // Our token is a standard ERC20 To
 
 
         /* Event for the freeze of account */
-     event FrozenFunds(address target, bool frozen);          
+     event FrozenFunds(address target, bool frozen);
          event Defroze(address msgAdd, bool freeze);
-    
 
 
-   
+
+
     //Constructor
     function Peculium() {
         totalSupply = MAX_SUPPLY_NBTOKEN;
-        balances[owner] = totalSupply; // At the beginning, the owner has all the tokens. 
+        balances[owner] = totalSupply; // At the beginning, the owner has all the tokens.
         balancesCanSell[owner] = true; // The owner need to sell token for the private sale and for the preICO, ICO.
-        
+
         dateStartContract=now;
         dateDefrost = dateStartContract + 85 days; // everybody can defrost his own token after the 25 january 2018 (85 days after 1 November)
 
     }
 
-    /*** Public Functions of the contract ***/    
-    
-    function defrostToken() public 
+    /*** Public Functions of the contract ***/
+
+    function defrostToken() public
     { // Function to defrost your own token, after the date of the defrost
-    
+
         require(now>dateDefrost);
         balancesCanSell[msg.sender]=true;
         Defroze(msg.sender,true);
     }
-                
-    function transfer(address _to, uint256 _value) public returns (bool) 
+
+    function transfer(address _to, uint256 _value) public returns (bool)
     { // We overright the transfer function to allow freeze possibility
-    
+
         require(balancesCanSell[msg.sender]);
         return BasicToken.transfer(_to,_value);
-    
+
     }
-    
-    function transferFrom(address _from, address _to, uint256 _value) public returns (bool) 
+
+    function transferFrom(address _from, address _to, uint256 _value) public returns (bool)
     { // We overright the transferFrom function to allow freeze possibility (need to allow before)
-    
-        require(balancesCanSell[msg.sender]);    
+
+        require(balancesCanSell[msg.sender]);
         return StandardToken.transferFrom(_from,_to,_value);
-    
+
     }
 
-    /***  Owner Functions of the contract ***/    
+    /***  Owner Functions of the contract ***/
 
-       function freezeAccount(address target, bool canSell) onlyOwner 
+       function freezeAccount(address target, bool canSell) onlyOwner
        {
-        
+
             balancesCanSell[target] = canSell;
             FrozenFunds(target, canSell);
-        
+
         }
 
 
-    /*** Others Functions of the contract ***/    
-    
+    /*** Others Functions of the contract ***/
+
     /* Approves and then calls the receiving contract */
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool success) {
         allowed[msg.sender][_spender] = _value;
@@ -411,17 +411,52 @@ contract Peculium is BurnableToken,Ownable { // Our token is a standard ERC20 To
 
       function getBlockTimestamp() constant returns (uint256)
       {
-        
+
             return now;
-      
+
       }
 
-      function getOwnerInfos() constant returns (address ownerAddr, uint256 ownerBalance)  
+      function getOwnerInfos() constant returns (address ownerAddr, uint256 ownerBalance)
       { // Return info about the public address and balance of the account of the owner of the contract
-        
+
             ownerAddr = owner;
         ownerBalance = balanceOf(ownerAddr);
-      
+
       }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

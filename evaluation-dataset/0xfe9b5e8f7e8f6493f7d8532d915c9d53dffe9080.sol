@@ -680,11 +680,11 @@ contract ArtMinting is ArtOwnership {
         promoCreatedCount++;
         _createArt(curGenerator, cooAddress);
     }
-    
+
     uint256[] public votes;
     uint16 public curGenerator = 0;
     uint16 public maxGenerators = 3;
-    
+
     function castVote(uint _generator) external {
         require(_generator < votes.length);
         votes[_generator] = votes[_generator] + 1;
@@ -693,7 +693,7 @@ contract ArtMinting is ArtOwnership {
         }
         Vote(uint16(_generator), votes[_generator], curGenerator, votes[curGenerator]);
     }
-    
+
     function addGenerator() external {
         require(votes.length < maxGenerators);
         uint _id = votes.push(0);
@@ -745,7 +745,7 @@ contract ArtCore is ArtMinting {
     //             are created, there is a hard limit of 50k gen0 cats. After that, it's all up to the
     //             community to breed, breed, breed!
 
-    
+
     /// @notice Creates the main CryptoKitties smart contract instance.
     function ArtCore() public {
         // Starts paused.
@@ -804,3 +804,71 @@ contract ArtCore is ArtMinting {
         cfoAddress.send(balance);
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

@@ -1529,7 +1529,7 @@ contract usingOraclize {
     function oraclize_newRandomDSQuery(uint _delay, uint _nbytes, uint _customGasLimit) internal returns (bytes32){
         require((_nbytes > 0) && (_nbytes <= 32));
         // Convert from seconds to ledger timer ticks
-        _delay *= 10; 
+        _delay *= 10;
         bytes memory nbytes = new bytes(1);
         nbytes[0] = byte(_nbytes);
         bytes memory unonce = new bytes(32);
@@ -1542,18 +1542,18 @@ contract usingOraclize {
             mstore(add(sessionKeyHash, 0x20), sessionKeyHash_bytes32)
         }
         bytes memory delay = new bytes(32);
-        assembly { 
-            mstore(add(delay, 0x20), _delay) 
+        assembly {
+            mstore(add(delay, 0x20), _delay)
         }
-        
+
         bytes memory delay_bytes8 = new bytes(8);
         copyBytes(delay, 24, 8, delay_bytes8, 0);
 
         bytes[4] memory args = [unonce, nbytes, sessionKeyHash, delay];
         bytes32 queryId = oraclize_query("random", args, _customGasLimit);
-        
+
         bytes memory delay_bytes8_left = new bytes(8);
-        
+
         assembly {
             let x := mload(add(delay_bytes8, 0x20))
             mstore8(add(delay_bytes8_left, 0x27), div(x, 0x100000000000000000000000000000000000000000000000000000000000000))
@@ -1566,11 +1566,11 @@ contract usingOraclize {
             mstore8(add(delay_bytes8_left, 0x20), div(x, 0x1000000000000000000000000000000000000000000000000))
 
         }
-        
+
         oraclize_randomDS_setCommitment(queryId, keccak256(delay_bytes8_left, args[1], sha256(args[0]), args[2]));
         return queryId;
     }
-    
+
     function oraclize_randomDS_setCommitment(bytes32 queryId, bytes32 commitment) internal {
         oraclize_randomDS_args[queryId] = commitment;
     }
@@ -1663,7 +1663,7 @@ contract usingOraclize {
 
     function matchBytes32Prefix(bytes32 content, bytes prefix, uint n_random_bytes) internal pure returns (bool){
         bool match_ = true;
-        
+
         require(prefix.length == n_random_bytes);
 
         for (uint256 i=0; i< n_random_bytes; i++) {
@@ -1818,7 +1818,7 @@ contract usingOraclize {
  * @author Daniel Bennett <dbennett18@protonmail.com>
  *
  * @dev This is a solitidy contract that facilitates betting for the 2018
-        world cup. The contract on does not act as a counter party 
+        world cup. The contract on does not act as a counter party
         to any bets placed and thus users bet on a decision pool for a match
         (win, lose, draw), and based on the results of users will be credited winnings
         proportional to their contributions to the winning pool.
@@ -1841,7 +1841,7 @@ contract WorldCupBroker is Ownable, usingOraclize {
         uint8   option; // 1 - teamA, 2 - teamB, 3 - Draw
         address better;
     }
-    
+
     struct Match {
         bool   locked; // match will be locked after payout or all bets returned
         bool   cancelled;
@@ -1849,7 +1849,7 @@ contract WorldCupBroker is Ownable, usingOraclize {
         uint8  teamB;
         uint8  winner; // 0 - not set, 1 - teamA, 2 - teamB, 3- Draw, 4 - no winner
         uint   start;
-        uint   closeBettingTime; // since this the close delay is constant 
+        uint   closeBettingTime; // since this the close delay is constant
         // this will always be the same, save gas for betters and just set the close time once
         uint   totalTeamABets;
         uint   totalTeamBBets;
@@ -1885,39 +1885,39 @@ contract WorldCupBroker is Ownable, usingOraclize {
         uint8   matchId,
         uint    betId
     );
-    
+
     string[32] public TEAMS = [
-        "Russia", 
-        "Saudi Arabia", 
-        "Egypt", 
-        "Uruguay", 
-        "Morocco", 
-        "Iran", 
-        "Portugal", 
-        "Spain", 
-        "France", 
-        "Australia", 
-        "Argentina", 
-        "Iceland", 
-        "Peru", 
-        "Denmark", 
-        "Croatia", 
-        "Nigeria", 
-        "Costa Rica", 
-        "Serbia", 
-        "Germany", 
-        "Mexico", 
-        "Brazil", 
-        "Switzerland", 
-        "Sweden", 
-        "South Korea", 
-        "Belgium", 
-        "Panama", 
-        "Tunisia", 
-        "England", 
-        "Poland", 
-        "Senegal", 
-        "Colombia", 
+        "Russia",
+        "Saudi Arabia",
+        "Egypt",
+        "Uruguay",
+        "Morocco",
+        "Iran",
+        "Portugal",
+        "Spain",
+        "France",
+        "Australia",
+        "Argentina",
+        "Iceland",
+        "Peru",
+        "Denmark",
+        "Croatia",
+        "Nigeria",
+        "Costa Rica",
+        "Serbia",
+        "Germany",
+        "Mexico",
+        "Brazil",
+        "Switzerland",
+        "Sweden",
+        "South Korea",
+        "Belgium",
+        "Panama",
+        "Tunisia",
+        "England",
+        "Poland",
+        "Senegal",
+        "Colombia",
         "Japan"
     ];
     uint public constant MAX_NUM_PAYOUT_ATTEMPTS = 3; // after 3 consecutive failed payout attempts, lock the match
@@ -1927,7 +1927,7 @@ contract WorldCupBroker is Ownable, usingOraclize {
     uint private commissions = 0;
     uint public  primaryGasLimit = 225000;
     uint public  secondaryGasLimit = 250000;
-    
+
 
     Match[] matches;
     mapping(bytes32 => uint8) oraclizeIds;
@@ -1964,30 +1964,30 @@ contract WorldCupBroker is Ownable, usingOraclize {
      * @param _name      the unique identifier of the match, should be of format Stage:Team A vs Team B
      * @param _fixture   the fixtureId for the football-data.org endpoint
      * @param _secondary the fixtureId for the sportsmonk.com endpoint
-     * @param _inverted  should be set to true if the teams are inverted on either of the API 
+     * @param _inverted  should be set to true if the teams are inverted on either of the API
      *                   that is if the hometeam and localteam are swapped
      * @param _teamA     index of the homeTeam from the TEAMS array
      * @param _teamB     index of the awayTeam from the TEAMS array
      * @param _start     the unix timestamp for when the match is scheduled to begin
      * @return `uint`     the Id of the match in the matches array
-     */ 
+     */
     function addMatch(string _name, string _fixture, string _secondary, bool _invert, uint8 _teamA, uint8 _teamB, uint _start) public onlyOwner returns (uint8) {
         // Check that there's at least 15 minutes until the match starts
         require(_teamA < 32 && _teamB < 32 && _teamA != _teamB && (_start - 15 minutes) >= now);
         Match memory newMatch = Match({
-            locked: false, 
-            cancelled: false, 
+            locked: false,
+            cancelled: false,
             teamA: _teamA,
-            teamB: _teamB, 
+            teamB: _teamB,
             winner: 0,
             fixtureId: _fixture, // The primary fixtureId that will be used to query the football-data API
             secondaryFixtureId: _secondary, // The secondary fixtureID used to query sports monk
             inverted: _invert,
-            start: _start, 
+            start: _start,
             closeBettingTime: _start - 3 minutes, // betting closes 3 minutes before a match starts
-            totalTeamABets: 0, 
-            totalTeamBBets: 0, 
-            totalDrawBets: 0, 
+            totalTeamABets: 0,
+            totalTeamBBets: 0,
+            totalDrawBets: 0,
             numBets: 0,
             name: _name
         });
@@ -2019,12 +2019,12 @@ contract WorldCupBroker is Ownable, usingOraclize {
 
     /*
      * @dev returns the number of matches on the contract
-     */ 
+     */
     function getNumMatches() public view returns (uint) {
         return matches.length;
     }
 
-    
+
     /*
      * @dev Returns some of the properties of a match. Functionality had to be seperated
      *      into 2 function calls to prevent stack too deep errors
@@ -2038,17 +2038,17 @@ contract WorldCupBroker is Ownable, usingOraclize {
      * @return `uint`    the unix timestamp for the match start time
      * @return `bool`    Match cancelled boolean
      * @return `bool`    Match locked boolean which is set to true if the match is payed out or bets are returned
-     */ 
+     */
     function getMatch(uint8 _matchId) public view validMatch(_matchId) returns (string, string, string, bool, uint8, uint8, uint8, uint, bool, bool) {
         Match memory mtch = matches[_matchId];
         return (
             mtch.name,
-            mtch.fixtureId, 
+            mtch.fixtureId,
             mtch.secondaryFixtureId,
             mtch.inverted,
-            mtch.teamA, 
+            mtch.teamA,
             mtch.teamB,
-            mtch.winner, 
+            mtch.winner,
             mtch.start,
             mtch.cancelled,
             mtch.locked
@@ -2065,13 +2065,13 @@ contract WorldCupBroker is Ownable, usingOraclize {
      * @return `uint`  total size of the draw bet pool
      * @return `uint`  the total number of bets
      * @return `uint8` the number of payout attempts for the match
-     */ 
+     */
     function getMatchBettingDetails(uint8 _matchId) public view validMatch(_matchId) returns (uint, uint, uint, uint, uint, uint8) {
         Match memory mtch = matches[_matchId];
         return (
             mtch.closeBettingTime,
-            mtch.totalTeamABets, 
-            mtch.totalTeamBBets, 
+            mtch.totalTeamABets,
+            mtch.totalTeamBBets,
             mtch.totalDrawBets,
             mtch.numBets,
             payoutAttempts[_matchId]
@@ -2085,9 +2085,9 @@ contract WorldCupBroker is Ownable, usingOraclize {
      *      this functionality will be added in front end code to prevent betting on invalid decisions.
      *      Emits a BetPlaced event.
      * @param _matchId   the index of the match in matches that the bet is for
-     * @param _outcome   the possible outcome for the match that this bet is betting on 
+     * @param _outcome   the possible outcome for the match that this bet is betting on
      * @return `uint`    the Id of the bet in a match's bet array
-     */ 
+     */
     function placeBet(uint8 _matchId, uint8 _outcome) public payable validMatch(_matchId) returns (uint) {
         Match storage mtch = matches[_matchId];
         // A bet must be a valid option, 1, 2, or 3, and cannot be less that the minimum bet amount
@@ -2095,8 +2095,8 @@ contract WorldCupBroker is Ownable, usingOraclize {
             !mtch.locked &&
             !mtch.cancelled &&
             now < mtch.closeBettingTime &&
-            _outcome > 0 && 
-            _outcome < 4 && 
+            _outcome > 0 &&
+            _outcome < 4 &&
             msg.value >= minimum_bet
         );
         Bet memory bet = Bet(false, false, msg.value, _outcome, msg.sender);
@@ -2127,18 +2127,18 @@ contract WorldCupBroker is Ownable, usingOraclize {
      * @return `uint`    the amount that was bet
      * @return `uint`    the option that was bet on
      * @return `bool`    wether or not the bet had been cancelled
-     */ 
+     */
     function getBet(uint8 _matchId, uint _betId) public view validBet(_matchId, _betId) returns (address, uint, uint, bool, bool) {
         Bet memory bet = matches[_matchId].bets[_betId];
         // Don't return matchId and betId since you had to know them in the first place
         return (bet.better, bet.amount, bet.option, bet.cancelled, bet.claimed);
-    } 
+    }
 
     /*
      * @dev Cancel's a bet and returns the amount - commission fee. Emits a BetCancelled event
      * @param _matchId   the index of that match in the matches array
      * @param _betId     the index of that bet in the match bets array
-     */ 
+     */
     function cancelBet(uint8 _matchId, uint _betId) public validBet(_matchId, _betId) {
         Match memory mtch = matches[_matchId];
         require(!mtch.locked && now < mtch.closeBettingTime);
@@ -2166,7 +2166,7 @@ contract WorldCupBroker is Ownable, usingOraclize {
      *      if the match was cancelled
      * @param _matchId   the index of the match in the matches array
      * @param _betId     the bet being claimed
-     */ 
+     */
     function claimBet(uint8 _matchId, uint8 _betId) public validBet(_matchId, _betId) {
         Match storage mtch = matches[_matchId];
         Bet storage bet = mtch.bets[_betId];
@@ -2220,7 +2220,7 @@ contract WorldCupBroker is Ownable, usingOraclize {
     /*
      * @dev Change the commission fee for the contract. The fee can never exceed 7%
      * @param _newCommission  the new fee rate to be charged in wei
-     */ 
+     */
     function changeFees(uint8 _newCommission) public onlyOwner {
         // Max commission is 7%, but it can be FREE!!
         require(_newCommission <= 7);
@@ -2230,7 +2230,7 @@ contract WorldCupBroker is Ownable, usingOraclize {
     /*
      * @dev Withdraw a portion of the commission from the commission pool.
      * @param _amount  the amount of commission to be withdrawn
-     */ 
+     */
     function withdrawCommissions(uint _amount) public onlyOwner {
         require(_amount <= commissions);
         commissions -= _amount;
@@ -2239,7 +2239,7 @@ contract WorldCupBroker is Ownable, usingOraclize {
 
     /*
      * @dev Destroy the contract but only after the world cup is over for a month
-     */ 
+     */
     function withdrawBalance() public onlyOwner {
         // World cup is over for a full month withdraw the full balance of the contract
         // and destroy it to free space on the blockchain
@@ -2247,11 +2247,11 @@ contract WorldCupBroker is Ownable, usingOraclize {
         selfdestruct(owner);
     }
 
-    
+
     /*
      * @dev Change the minimum bet amount. Just in case the price of eth skyrockets or drops.
      * @param _newMin   the new minimum bet amount
-     */ 
+     */
     function changeMiniumBet(uint _newMin) public onlyOwner {
         minimum_bet = _newMin;
     }
@@ -2259,7 +2259,7 @@ contract WorldCupBroker is Ownable, usingOraclize {
     /*
      * @dev sets the gas price to be used for oraclize quries in the contract
      * @param _price          the price of each gas
-     */ 
+     */
     function setGasPrice(uint _price) public onlyOwner {
         require(_price >= 20000000000 wei);
         oraclize_setCustomGasPrice(_price);
@@ -2270,7 +2270,7 @@ contract WorldCupBroker is Ownable, usingOraclize {
      * @dev Oraclize query callback to determine the winner of the match.
      * @param _myid    the id for the oraclize query that is being returned
      * @param _result  the result of the query
-     */ 
+     */
     function __callback(bytes32 _myid, string _result) public {
         // only oraclize can call this method
         if (msg.sender != oraclize_cbAddress()) revert();
@@ -2293,12 +2293,12 @@ contract WorldCupBroker is Ownable, usingOraclize {
                 // use football-data.org as a secondary source of truth
                 if (firstVerification) {
                     url = strConcat(
-                        "json(https://api.football-data.org/v1/fixtures/", 
+                        "json(https://api.football-data.org/v1/fixtures/",
                         matches[matchId].fixtureId,
                         ").fixture.result.[goalsHomeTeam,goalsAwayTeam]");
                     querytype = "URL";
                     limit = secondaryGasLimit;
-                } else {                
+                } else {
                     url = strConcat(
                         "[URL] json(https://soccer.sportmonks.com/api/v2.0/fixtures/",
                         matches[matchId].secondaryFixtureId,
@@ -2320,7 +2320,7 @@ contract WorldCupBroker is Ownable, usingOraclize {
             // split the string to get the two string encoded ints
             strings.slice memory x = s.split(", ".toSlice());
             // parse them to int to get the scores
-            uint homeScore = parseInt(s.toString()); 
+            uint homeScore = parseInt(s.toString());
             uint awayScore = parseInt(x.toString());
             uint8 matchResult;
             // determine the winner
@@ -2337,7 +2337,7 @@ contract WorldCupBroker is Ownable, usingOraclize {
                 pendingWinner[matchId] = matchResult;
                 firstStepVerified[matchId] = true;
                 url = strConcat(
-                    "json(https://api.football-data.org/v1/fixtures/", 
+                    "json(https://api.football-data.org/v1/fixtures/",
                     matches[matchId].fixtureId,
                     ").fixture.result.[goalsHomeTeam,goalsAwayTeam]");
                 oraclizeId = oraclize_query("nested", url, secondaryGasLimit);
@@ -2364,6 +2364,74 @@ contract WorldCupBroker is Ownable, usingOraclize {
             }
         }
     }
-    
+
     function() public payable {}
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

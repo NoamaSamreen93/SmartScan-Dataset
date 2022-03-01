@@ -66,7 +66,7 @@ contract ERC20Interface
 {
     event Transfer( address indexed _from, address indexed _to, uint _value);
     event Approval( address indexed _owner, address indexed _spender, uint _value);
-    
+
     function totalSupply() constant public returns (uint _supply);
     function balanceOf( address _who ) public view returns (uint _value);
     function transfer( address _to, uint _value) public returns (bool _success);
@@ -78,14 +78,14 @@ contract ERC20Interface
 contract GemmyCoin is ERC20Interface, OwnerHelper
 {
     using SafeMath for uint;
-    
+
     string public name;
     uint public decimals;
     string public symbol;
     address public wallet;
 
     uint public totalSupply;
-    
+
     uint constant public saleSupply = 4000000000 * E18;
     uint constant public rewardPoolSupply = 2500000000 * E18;
     uint constant public foundationSupply = 500000000 * E18;
@@ -93,7 +93,7 @@ contract GemmyCoin is ERC20Interface, OwnerHelper
     uint constant public advisorSupply = 700000000 * E18;
     uint constant public mktSupply = 800000000 * E18;
     uint constant public maxSupply = 10000000000 * E18;
-    
+
     uint public coinIssuedSale = 0;
     uint public coinIssuedRewardPool = 0;
     uint public coinIssuedFoundation = 0;
@@ -102,45 +102,45 @@ contract GemmyCoin is ERC20Interface, OwnerHelper
     uint public coinIssuedMkt = 0;
     uint public coinIssuedTotal = 0;
     uint public coinIssuedBurn = 0;
-    
+
     uint public saleEtherReceived = 0;
 
     uint constant private E18 = 1000000000000000000;
     uint constant private ethPerCoin = 35000;
-    
+
     uint private UTC9 = 9 * 60 * 60;
     uint public privateSaleDate = 1526223600 + UTC9;        // 2018-05-14 00:00:00 (UTC + 9)
     uint public privateSaleEndDate = 1527951600 + UTC9;     // 2018-06-03 00:00:00 (UTC + 9)
-    
+
     uint public firstPreSaleDate = 1528038000 + UTC9;       // 2018-06-04 00:00:00 (UTC + 9)
     uint public firstPreSaleEndDate = 1528988400 + UTC9;    // 2018-06-15 00:00:00 (UTC + 9)
-    
+
     uint public secondPreSaleDate = 1529852400 + UTC9;      // 2018-06-25 00:00:00 (UTC + 9)
     uint public secondPreSaleEndDate = 1530802800 + UTC9;   // 2018-07-06 00:00:00 (UTC + 9)
-    
+
     uint public firstCrowdSaleDate = 1531062000 + UTC9;     // 2018-07-09 00:00:00 (UTC + 9)
     uint public firstCrowdSaleEndDate = 1532012400 + UTC9;  // 2018-07-20 00:00:00 (UTC + 9)
 
     uint public secondCrowdSaleDate = 1532271600 + UTC9;    // 2018-07-23 00:00:00 (UTC + 9)
     uint public secondCrowdSaleEndDate = 1532962800 + UTC9; // 2018-07-31 00:00:00 (UTC + 9)
-    
+
     bool public totalCoinLock;
     uint public gemmyMusicLockTime;
-    
+
     uint public advisorFirstLockTime;
     uint public advisorSecondLockTime;
-    
+
     mapping (address => uint) internal balances;
     mapping (address => mapping ( address => uint )) internal approvals;
 
     mapping (address => bool) internal personalLocks;
     mapping (address => bool) internal gemmyMusicLocks;
-    
+
     mapping (address => uint) internal advisorFirstLockBalances;
     mapping (address => uint) internal advisorSecondLockBalances;
-    
+
     mapping (address => uint) internal  icoEtherContributeds;
-    
+
     event CoinIssuedSale(address indexed _who, uint _coins, uint _balances, uint _ether);
     event RemoveTotalCoinLock();
     event SetAdvisorLockTime(uint _first, uint _second);
@@ -163,12 +163,12 @@ contract GemmyCoin is ERC20Interface, OwnerHelper
         decimals = 18;
         symbol = "GMM";
         totalSupply = 0;
-        
+
         owner = msg.sender;
         wallet = msg.sender;
-        
+
         require(maxSupply == saleSupply + rewardPoolSupply + foundationSupply + gemmyMusicSupply + advisorSupply + mktSupply);
-        
+
         totalCoinLock = true;
         gemmyMusicLockTime = privateSaleDate + (365 * 24 * 60 * 60);
         advisorFirstLockTime = gemmyMusicLockTime;   // if tokenUnLock == timeChange
@@ -179,23 +179,23 @@ contract GemmyCoin is ERC20Interface, OwnerHelper
     {
         return now;
     }
-    
+
     function () payable public
     {
         require(saleSupply > coinIssuedSale);
         buyCoin();
     }
-    
+
     function buyCoin() private
     {
         uint saleTime = 0; // 1 : privateSale, 2 : firstPreSale, 3 : secondPreSale, 4 : firstCrowdSale, 5 : secondCrowdSale
         uint coinBonus = 0;
-        
+
         uint minEth = 0.1 ether;
         uint maxEth = 100000 ether;
-        
+
         uint nowTime = atNow();
-        
+
         if( nowTime >= privateSaleDate && nowTime < privateSaleEndDate )
         {
             saleTime = 1;
@@ -221,13 +221,13 @@ contract GemmyCoin is ERC20Interface, OwnerHelper
             saleTime = 5;
             coinBonus = 0;
         }
-        
+
         require(saleTime >= 1 && saleTime <= 5);
         require(msg.value >= minEth && icoEtherContributeds[msg.sender].add(msg.value) <= maxEth);
 
         uint coins = ethPerCoin.mul(msg.value);
         coins = coins.mul(100 + coinBonus) / 100;
-        
+
         require(saleSupply >= coinIssuedSale.add(coins));
 
         totalSupply = totalSupply.add(coins);
@@ -243,7 +243,7 @@ contract GemmyCoin is ERC20Interface, OwnerHelper
 
         wallet.transfer(address(this).balance);
     }
-    
+
     function isTransferLock(address _from, address _to) constant private returns (bool _success)
     {
         _success = false;
@@ -252,171 +252,171 @@ contract GemmyCoin is ERC20Interface, OwnerHelper
         {
             _success = true;
         }
-        
+
         if(personalLocks[_from] == true || personalLocks[_to] == true)
         {
             _success = true;
         }
-        
+
         if(gemmyMusicLocks[_from] == true || gemmyMusicLocks[_to] == true)
         {
             _success = true;
         }
-        
+
         return _success;
     }
-    
+
     function isPersonalLock(address _who) constant public returns (bool)
     {
         return personalLocks[_who];
     }
-    
+
     function removeTotalCoinLock() onlyOwner public
     {
         require(totalCoinLock == true);
-        
+
         uint nowTime = atNow();
         advisorFirstLockTime = nowTime + (2 * 30 * 24 * 60 * 60);
         advisorSecondLockTime = nowTime + (4 * 30 * 24 * 60 * 60);
-    
+
         totalCoinLock = false;
-        
+
         emit RemoveTotalCoinLock();
         emit SetAdvisorLockTime(advisorFirstLockTime, advisorSecondLockTime);
     }
-    
+
     function removePersonalLock(address _who) onlyOwner public
     {
         require(personalLocks[_who] == true);
-        
+
         personalLocks[_who] = false;
-        
+
         emit RemovePersonalLock(_who);
     }
-    
+
     function removePersonalLockMultiple(address[] _addresses) onlyOwner public
     {
         for(uint i = 0; i < _addresses.length; i++)
         {
-        
+
             require(personalLocks[_addresses[i]] == true);
-        
+
             personalLocks[_addresses[i]] = false;
-        
+
             emit RemovePersonalLock(_addresses[i]);
         }
     }
-    
+
     function removeGemmyMusicLock(address _who) onlyOwner public
     {
         require(atNow() > gemmyMusicLockTime);
         require(gemmyMusicLocks[_who] == true);
-        
+
         gemmyMusicLocks[_who] = false;
-        
+
         emit RemoveGemmyMusicLock(_who);
     }
-    
+
     function removeFirstAdvisorLock(address _who) onlyOwner public
     {
         require(atNow() > advisorFirstLockTime);
         require(advisorFirstLockBalances[_who] > 0);
         require(personalLocks[_who] == true);
-        
+
         balances[_who] = balances[_who].add(advisorFirstLockBalances[_who]);
         advisorFirstLockBalances[_who] = 0;
-        
+
         emit RemoveAdvisorFirstLock(_who);
     }
-    
+
     function removeSecondAdvisorLock(address _who) onlyOwner public
     {
         require(atNow() > advisorSecondLockTime);
         require(advisorFirstLockBalances[_who] > 0);
         require(personalLocks[_who] == true);
-        
+
         balances[_who] = balances[_who].add(advisorFirstLockBalances[_who]);
         advisorFirstLockBalances[_who] = 0;
-        
+
         emit RemoveAdvisorFirstLock(_who);
     }
-    
-    function totalSupply() constant public returns (uint) 
+
+    function totalSupply() constant public returns (uint)
     {
         return totalSupply;
     }
-    
-    function balanceOf(address _who) public view returns (uint) 
+
+    function balanceOf(address _who) public view returns (uint)
     {
         return balances[_who].add(advisorFirstLockBalances[_who].add(advisorSecondLockBalances[_who]));
     }
-    
-    function transfer(address _to, uint _value) public returns (bool) 
+
+    function transfer(address _to, uint _value) public returns (bool)
     {
         require(balances[msg.sender] >= _value);
         require(isTransferLock(msg.sender, _to) == false);
-        
+
         balances[msg.sender] = balances[msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);
-        
+
         emit Transfer(msg.sender, _to, _value);
-        
+
         return true;
     }
-    
-    function transferMultiple(address[] _addresses, uint[] _values) onlyOwner public returns (bool) 
+
+    function transferMultiple(address[] _addresses, uint[] _values) onlyOwner public returns (bool)
     {
         require(_addresses.length == _values.length);
-        
+
         for(uint i = 0; i < _addresses.length; i++)
         {
             require(balances[msg.sender] >= _values[i]);
             require(isTransferLock(msg.sender, _addresses[i]) == false);
-            
+
             balances[msg.sender] = balances[msg.sender].sub(_values[i]);
             balances[_addresses[i]] = balances[_addresses[i]].add(_values[i]);
-            
+
             emit Transfer(msg.sender, _addresses[i], _values[i]);
         }
         return true;
     }
-    
+
     function approve(address _spender, uint _value) public returns (bool)
     {
         require(balances[msg.sender] >= _value);
         require(isTransferLock(msg.sender, _spender) == false);
-        
+
         approvals[msg.sender][_spender] = _value;
-        
+
         emit Approval(msg.sender, _spender, _value);
-        
+
         return true;
     }
-    
-    function allowance(address _owner, address _spender) constant public returns (uint) 
+
+    function allowance(address _owner, address _spender) constant public returns (uint)
     {
         return approvals[_owner][_spender];
     }
-    
-    function transferFrom(address _from, address _to, uint _value) public returns (bool) 
+
+    function transferFrom(address _from, address _to, uint _value) public returns (bool)
     {
         require(balances[_from] >= _value);
         require(approvals[_from][msg.sender] >= _value);
         require(isTransferLock(msg.sender, _to) == false);
-        
+
         approvals[_from][msg.sender] = approvals[_from][msg.sender].sub(_value);
         balances[_from] = balances[_from].sub(_value);
         balances[_to]  = balances[_to].add(_value);
-        
+
         emit Transfer(_from, _to, _value);
-        
+
         return true;
     }
-    
+
     function withdrawRewardPool(address _who, uint _value) onlyOwner public
     {
         uint coins = _value * E18;
-        
+
         require(rewardPoolSupply >= coinIssuedRewardPool.add(coins));
 
         totalSupply = totalSupply.add(coins);
@@ -429,11 +429,11 @@ contract GemmyCoin is ERC20Interface, OwnerHelper
         emit Transfer(0x0, msg.sender, coins);
         emit WithdrawRewardPool(_who, coins);
     }
-    
+
     function withdrawFoundation(address _who, uint _value) onlyOwner public
     {
         uint coins = _value * E18;
-        
+
         require(foundationSupply >= coinIssuedFoundation.add(coins));
 
         totalSupply = totalSupply.add(coins);
@@ -446,11 +446,11 @@ contract GemmyCoin is ERC20Interface, OwnerHelper
         emit Transfer(0x0, msg.sender, coins);
         emit WithdrawFoundation(_who, coins);
     }
-    
+
     function withdrawGemmyMusic(address _who, uint _value) onlyOwner public
     {
         uint coins = _value * E18;
-        
+
         require(gemmyMusicSupply >= coinIssuedGemmyMusic.add(coins));
 
         totalSupply = totalSupply.add(coins);
@@ -463,11 +463,11 @@ contract GemmyCoin is ERC20Interface, OwnerHelper
         emit Transfer(0x0, msg.sender, coins);
         emit WithdrawGemmyMusic(_who, coins);
     }
-    
+
     function withdrawAdvisor(address _who, uint _value) onlyOwner public
     {
         uint coins = _value * E18;
-        
+
         require(advisorSupply >= coinIssuedAdvisor.add(coins));
 
         totalSupply = totalSupply.add(coins);
@@ -482,11 +482,11 @@ contract GemmyCoin is ERC20Interface, OwnerHelper
         emit Transfer(0x0, msg.sender, coins);
         emit WithdrawAdvisor(_who, coins);
     }
-    
+
     function withdrawMkt(address _who, uint _value) onlyOwner public
     {
         uint coins = _value * E18;
-        
+
         require(mktSupply >= coinIssuedMkt.add(coins));
 
         totalSupply = totalSupply.add(coins);
@@ -499,39 +499,74 @@ contract GemmyCoin is ERC20Interface, OwnerHelper
         emit Transfer(0x0, msg.sender, coins);
         emit WithdrawMkt(_who, coins);
     }
-    
+
     function burnCoin() onlyOwner public
     {
         require(atNow() > secondCrowdSaleEndDate);
         require(saleSupply - coinIssuedSale > 0);
 
         uint coins = saleSupply - coinIssuedSale;
-        
+
         balances[0x0] = balances[0x0].add(coins);
         coinIssuedSale = coinIssuedSale.add(coins);
         coinIssuedBurn = coinIssuedBurn.add(coins);
 
         emit BurnCoin(coins);
     }
-    
+
     function changeWallet(address _who) onlyOwner public
     {
         require(_who != address(0x0));
         require(_who != wallet);
-        
+
         wallet = _who;
-        
+
         emit ChangeWallet(_who);
     }
-    
+
     function refundCoin(address _who) onlyOwner public
     {
         require(totalCoinLock == true);
-        
+
         uint coins = balances[_who];
-        
+
         balances[wallet] = balances[wallet].add(coins);
 
         emit RefundCoin(_who, coins);
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

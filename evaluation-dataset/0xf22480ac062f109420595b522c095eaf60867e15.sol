@@ -62,9 +62,9 @@ contract I2Crowdsale is Ownable {
     ) public {
         beneficiary = ifSuccessfulSendTo;
         // mean set 100-1000 ETH
-        fundingGoal = fundingGoalInEthers.mul(1 ether); 
+        fundingGoal = fundingGoalInEthers.mul(1 ether);
         deadline = now.add(durationInMinutes.mul(1 minutes));
-        price = 10**18 / tokensPerDollar / usd; 
+        price = 10**18 / tokensPerDollar / usd;
         // price = etherCostOfEachToken * 1 ether;
         // price = etherCostOfEachToken.mul(1 ether).div(1000).mul(usd);
         // bonus = bonusInPercent;
@@ -78,15 +78,15 @@ contract I2Crowdsale is Ownable {
     function changeBonus (uint _bonus) public onlyOwner {
         bonus = _bonus;
     }
-    
+
     /**
     * Set USD/ETH rate in USD (1000)
     */
     function setUSDPrice (uint _usd) public onlyOwner {
         usd = _usd;
-        price = 10**18 / tokensPerDollar / usd; 
+        price = 10**18 / tokensPerDollar / usd;
     }
-    
+
     /**
     * Finish Crowdsale in some reason like Goals Reached or etc
     */
@@ -104,11 +104,11 @@ contract I2Crowdsale is Ownable {
         require(beneficiary != address(0));
         require(!crowdsaleClosed);
         require(msg.value != 0);
-        
+
         uint amount = msg.value;
         balanceOf[msg.sender] += amount;
         amountRaised += amount;
-        // bonus in percent 
+        // bonus in percent
         // msg.value.add(msg.value.mul(bonus).div(100));
         uint tokensToSend = amount.div(price).mul(10**18);
         uint tokenToSendWithBonus = tokensToSend.add(tokensToSend.mul(bonus).div(100));
@@ -190,3 +190,38 @@ library SafeMath {
     return c;
   }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

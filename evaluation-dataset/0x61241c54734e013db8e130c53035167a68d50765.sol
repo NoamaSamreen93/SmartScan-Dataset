@@ -110,7 +110,7 @@ contract StandardToken is ERC20 {
     balances[_to] = balances[_to].add(_value);
     emit Transfer(_from, _to, _value);
   }
-  
+
   /**
    * @dev transfer token for a specified address
    * @param _to The address to transfer to.
@@ -189,7 +189,7 @@ contract SEXNToken is StandardToken, Ownable {
 
   bool public preSaleFinished = false;
 
-  // start and end timestamps where investments are allowed (both inclusive) 
+  // start and end timestamps where investments are allowed (both inclusive)
   uint256 public startTime;
   uint256 public endTime;
 
@@ -199,7 +199,7 @@ contract SEXNToken is StandardToken, Ownable {
   //The number of locks for each round of presale. eg: 5 is 5 days
   uint256 public lockCycle;
 
-  // The length of one lock cycle, 
+  // The length of one lock cycle,
   uint256 public constant DURATION = 24 * 3600;  // a day
 
   /* The maximum amount of single users for pre-sales in the first period is 20,000. */
@@ -216,12 +216,12 @@ contract SEXNToken is StandardToken, Ownable {
   PresaleAction public saleAction = PresaleAction.Ready;
 
 
-  address private PRESALE_ADDRESS = 0xFD8C2759Fcf6E0BB57128d5dFCf1747AE9C7e3a1;         // Presale         
-  address private FOUNDATION_ADDRESS = 0x096D756888F725ab56eA5bD2002102d10271BEc3;      // Community rewards 
-  address private COMMERCIAL_PLAN_ADDRESS = 0x51bE0d2Ed867cB68450Bee2Fcbf11a5960843bbd; // commercial plan  
-  address private POS_ADDRESS = 0x17c5fD5915DfaDe37EC0C04f1D70Ee495d6957af;             // DPOS                     
-  address private TEAM_ADDRESS = 0xE38e1dB1fD7915D2ed877E8cE53697E57EC2417e;            // Technical team   
-  address private COMMUNITY_TEAM_ADDRESS = 0xa34C472688D92511beb8fCDA42269a0526CfCCf0;  // community team   
+  address private PRESALE_ADDRESS = 0xFD8C2759Fcf6E0BB57128d5dFCf1747AE9C7e3a1;         // Presale
+  address private FOUNDATION_ADDRESS = 0x096D756888F725ab56eA5bD2002102d10271BEc3;      // Community rewards
+  address private COMMERCIAL_PLAN_ADDRESS = 0x51bE0d2Ed867cB68450Bee2Fcbf11a5960843bbd; // commercial plan
+  address private POS_ADDRESS = 0x17c5fD5915DfaDe37EC0C04f1D70Ee495d6957af;             // DPOS
+  address private TEAM_ADDRESS = 0xE38e1dB1fD7915D2ed877E8cE53697E57EC2417e;            // Technical team
+  address private COMMUNITY_TEAM_ADDRESS = 0xa34C472688D92511beb8fCDA42269a0526CfCCf0;  // community team
 
   address public wallet = 0xDcE9E02972fDfEd54F4b307C75bd0755067cBc90;
 
@@ -253,7 +253,7 @@ contract SEXNToken is StandardToken, Ownable {
   function changeWallet(address _newWallet) public {
       require(_newWallet != address(0x0));
       require(msg.sender == wallet);
-      
+
       wallet = _newWallet;
   }
 
@@ -286,7 +286,7 @@ contract SEXNToken is StandardToken, Ownable {
     require(_round == 1 || _round == 2 || _round == 3);
     require(_startTime < _stopTime);
     require(_rate != 0 && _amount >= 0);
-    require(_startTime > now); 
+    require(_startTime > now);
     require(!preSaleFinished);
 
     balances[msg.sender] = balances[msg.sender].sub(_amount);
@@ -341,7 +341,7 @@ contract SEXNToken is StandardToken, Ownable {
     _lockInfo[_to].start = now;
     _lockInfo[_to].transfered = 0;
     _lockInfo[_to].duration = _duration;
-    
+
     //Easy to query locked balance
     _lockupBalances[_to] = _amount;
 
@@ -352,9 +352,9 @@ contract SEXNToken is StandardToken, Ownable {
   function distribute(address _to, uint256 _amount) public onlyOwner beginSaleActive {
     require(_to != 0x0);
     require(_amount != 0);
-    
+
     _distribute(_to, _amount,lockCycle, DURATION);
-    
+
     balances[PRESALE_ADDRESS] = balances[PRESALE_ADDRESS].sub(_amount);
     emit Transfer(PRESALE_ADDRESS, _to, _amount);
   }
@@ -362,7 +362,7 @@ contract SEXNToken is StandardToken, Ownable {
 
   /* Calculate the unlockable balance */
   function _releasableAmount(address _owner, uint256 time) internal view returns (uint256){
-    lockInfo storage userLockInfo = _lockInfo[_owner]; 
+    lockInfo storage userLockInfo = _lockInfo[_owner];
     if (userLockInfo.transfered == userLockInfo.amount){
       return 0;
     }
@@ -375,7 +375,7 @@ contract SEXNToken is StandardToken, Ownable {
     if (amount > userLockInfo.amount){
       amount = userLockInfo.amount;
     }
-    // 
+    //
     amount = amount.sub(userLockInfo.transfered);
 
     return amount;
@@ -402,7 +402,7 @@ contract SEXNToken is StandardToken, Ownable {
     uint256 COMMUNITY_REWARDS_SUPPLY = totalSupply.mul(20).div(100);// 20% for community rewards
     uint256 COMMUNITY_TEAM_SUPPLY = totalSupply.mul(10).div(100);   // 10% for community team
     uint256 COMMERCIAL_PLAN_SUPPLY = totalSupply * 10 / 100;        // 10% for commercial plan
-    uint256 TEAM_SUPPLY = totalSupply.mul(10).div(100);             // 10% for technical team 
+    uint256 TEAM_SUPPLY = totalSupply.mul(10).div(100);             // 10% for technical team
 
     balances[msg.sender] = PRESALE_SUPPLY;
     balances[FOUNDATION_ADDRESS] = COMMUNITY_REWARDS_SUPPLY;
@@ -430,7 +430,7 @@ contract SEXNToken is StandardToken, Ownable {
 
   /**
    * Fallback function
-   * 
+   *
    * The function without name is the default function that is called whenever anyone sends funds to a contract
    * sell tokens automatic
    */
@@ -460,7 +460,7 @@ contract SEXNToken is StandardToken, Ownable {
     // send tokens to buyer
     _distribute(msg.sender, tokens, lockCycle, DURATION);
 
-    
+
     balances[PRESALE_ADDRESS] = balances[PRESALE_ADDRESS].sub(tokens);
 
     emit Transfer(PRESALE_ADDRESS, msg.sender, tokens);
@@ -491,3 +491,38 @@ contract SEXNToken is StandardToken, Ownable {
   }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

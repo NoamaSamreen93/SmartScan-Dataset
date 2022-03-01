@@ -295,7 +295,7 @@ contract CFTToken is StandardBurnableToken {
     string  public constant name = "Crypto Financial Token";
     string  public constant symbol = "CFT";
     uint8   public constant decimals = 18;
-    string  public website = "www.cftoken.io"; 
+    string  public website = "www.cftoken.io";
     uint256 public constant INITIAL_SUPPLY      =  9000000000 * (10 ** uint256(decimals));
     uint256 public constant CROWDSALE_ALLOWANCE =  6000000000 * (10 ** uint256(decimals));
     uint256 public constant ADMIN_ALLOWANCE     =  3000000000 * (10 ** uint256(decimals));
@@ -486,7 +486,7 @@ contract CFTSale {
         _;
     }
 
-    
+
     /**
     * @dev Modifier to make a function callable only when the contract is not paused.
     */
@@ -655,4 +655,25 @@ contract CFTSale {
     function changeStartTime(uint256 _startTime) external onlyOwner {startTime = _startTime;}
     function changeEndTime(uint256 _endTime) external onlyOwner {endTime = _endTime;}
 
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

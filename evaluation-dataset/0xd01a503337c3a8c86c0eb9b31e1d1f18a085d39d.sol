@@ -188,7 +188,7 @@ contract YiqiniuToken is MintableToken {
     string public constant symbol	= 'YQN';
     uint256 public constant decimals	= 18;
     event Burned(address indexed burner, uint256 value);
-    
+
     function burn(uint256 _value) public onlyOwner {
         require(_value > 0);
 
@@ -230,17 +230,17 @@ contract YiqiniuCrowdsale is Ownable, CrowdsaleConfig{
     uint256 public minTokenPurchase = 1 * MIN_TOKEN_UNIT;
     TokenTimelock public AgencyLock1;
     TokenTimelock public AgencyLock2;
-    
+
     event NewYiqiniuToken(address _add);
 
     constructor() public {
         startTime = uint64(now);
         endTime = uint64(now + 3600*24*4);
         goalSale = PUBLIC_SALE_TOKEN_CAP / 100 * 50;
-        
+
         token = new YiqiniuToken();
         emit NewYiqiniuToken(address(token));
-        
+
         token.mint(address(this), TOTAL_SUPPLY_CAP);
         token.finishMinting();
 
@@ -263,23 +263,23 @@ contract YiqiniuCrowdsale is Ownable, CrowdsaleConfig{
         AgencyLock2.release();
     }
 
-    function () external payable {   
+    function () external payable {
         buyTokens(msg.sender);
     }
-    
+
     modifier canCrowdsale() {
         require(CrowdsaleEnabled);
         _;
     }
-    
+
     function enableCrowdsale() public onlyOwner {
         CrowdsaleEnabled = true;
     }
-    
+
     function closeCrowdsale() public onlyOwner {
         CrowdsaleEnabled = false;
     }
-    
+
     function buyTokens(address participant) internal canCrowdsale {
         require(now >= startTime);
         require(now < endTime);
@@ -287,21 +287,21 @@ contract YiqiniuCrowdsale is Ownable, CrowdsaleConfig{
         require(isVerified[participant]);
         uint256 weiAmount = msg.value;
         uint256 tokens = weiAmount.mul(rate);
-        
+
         tokensPurchased[participant] = tokensPurchased[participant].add(tokens);
         require(tokensPurchased[participant] >= minTokenPurchase);
         require(tokensPurchased[participant] <= maxTokenPurchase);
-        
+
         totalPurchased = totalPurchased.add(tokens);
         token.safeTransfer(participant, tokens);
     }
-    
+
     function setTokenPrice(uint256 _tokenRate) public onlyOwner {
         require(now > startTime);
         require(_tokenRate > 0);
         rate = _tokenRate;
     }
-    
+
     function setLimitTokenPurchase(uint256 _minToken, uint256 _maxToken) public onlyOwner {
         require(goalSale >= maxTokenPurchase);
         minTokenPurchase = _minToken;
@@ -317,10 +317,45 @@ contract YiqiniuCrowdsale is Ownable, CrowdsaleConfig{
     function removeVerified (address _address) public onlyOwner {
         isVerified[_address] = false;
     }
-    
+
     function close() onlyOwner public {
         require(now >= endTime || totalPurchased >= goalSale);
         token.burn(token.balanceOf(this));
         WALLET_ADDR.transfer(address(this).balance);
    }
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

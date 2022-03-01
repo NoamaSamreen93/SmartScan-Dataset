@@ -170,16 +170,16 @@ contract PTG_Crowdsale is Pausable {
 
   // Amount of wei raised
   uint256 public weiRaised;
-  
+
   // Min amount of wei an investor can send
   uint256 public minInvest;
-  
+
   // Max amount of wei an investor can send
   uint256 public maxInvest;
-  
+
   // Crowdsale opening time
   uint256 public openingTime;
-  
+
   // Crowdsale closing time
   uint256 public closingTime;
 
@@ -205,12 +205,12 @@ contract PTG_Crowdsale is Pausable {
     openingTime = 1529035200;  // Determined by start()
     closingTime = openingTime + duration;  // Determined by start()
   }
-  
+
   /**
    * @dev called by the owner to start the crowdsale
    */
   function start() public onlyOwner {
-    openingTime = now;       
+    openingTime = now;
     closingTime =  now + duration;
   }
 
@@ -306,7 +306,7 @@ contract PTG_Crowdsale is Pausable {
   function _forwardFunds() internal {
     wallet.transfer(msg.value);
   }
-  
+
   /**
    * @dev Checks whether the period in which the crowdsale is open has already elapsed.
    * @return Whether crowdsale period has elapsed
@@ -322,5 +322,40 @@ contract PTG_Crowdsale is Pausable {
     uint256 unsold = token.balanceOf(this);
     token.transfer(owner, unsold);
   }
-    
+
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

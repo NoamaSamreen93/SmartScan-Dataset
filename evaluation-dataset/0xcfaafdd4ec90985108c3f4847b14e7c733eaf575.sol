@@ -247,8 +247,8 @@ contract EIP20Interface {
     /// @return Amount of remaining tokens allowed to spent
     function allowanceFlower(address _owner, address _spender) public view returns (uint256 remaining);
 
-    // solhint-disable-next-line no-simple-event-func-name  
-    event TransferFlower(address from, address to, uint256 value); 
+    // solhint-disable-next-line no-simple-event-func-name
+    event TransferFlower(address from, address to, uint256 value);
     event ApprovalFlower(address owner, address spender, uint256 value);
 
     function supportsEIP20Interface(bytes4 _interfaceID) external view returns (bool);
@@ -692,7 +692,7 @@ contract TrueloveShop is TrueloveRegistration {
 
 		uint256 newDiamondId = diamonds.push(Diamond({model: model.model, year: model.year, no: uint16(model.current + 1), activateAt: 0})) - 1;
 		_transfer(0, msg.sender, newDiamondId);
-		
+
 		model.current++;
 		return newDiamondId;
 	}
@@ -729,7 +729,7 @@ contract TrueloveDelivery is TrueloveShop {
 		);
 
 	uint public giftSendIndex = 1;
-	
+
 	modifier sendCheck(bytes32 _registerID) {
     require(sendGiftPrice <= msg.value);
 		require(registrations[_registerID].signed);
@@ -744,9 +744,9 @@ contract TrueloveDelivery is TrueloveShop {
 	function sendDiamond(address _truelove, bytes32 _registerID, string _letter, bytes16 _date, uint _tokenId) public payable sendCheck(_registerID) {
 		require(_owns(msg.sender, _tokenId));
 		require(now > diamonds[_tokenId].activateAt);
-		
+
 		_transfer(msg.sender, _truelove, _tokenId);
-		
+
 		diamonds[_tokenId].activateAt = now + 3 days;
 
 		GiftSend(giftSendIndex, _truelove, msg.sender, _registerID, _letter, _date,
@@ -850,7 +850,7 @@ contract TrueloveCore is TrueloveAuction {
 	event Transfer(address from, address to, uint256 tokenId);
 	event Approval(address owner, address approved, uint256 tokenId);
 
-	event TransferFlower(address from, address to, uint256 value); 
+	event TransferFlower(address from, address to, uint256 value);
 	event ApprovalFlower(address owner, address spender, uint256 value);
 
 	event GiftSend(uint indexed index, address indexed receiver, address indexed from, bytes32 registerID, string letter, bytes16 date,
@@ -860,7 +860,7 @@ contract TrueloveCore is TrueloveAuction {
 		uint16 no,
 		uint amount
 		);
-		
+
 	function TrueloveCore() public {
 		paused = true;
 
@@ -1286,7 +1286,7 @@ contract DiamondAuction is ClockAuction {
     event AuctionCreated(uint256 indexed tokenId, address indexed seller, uint256 startingPrice, uint256 endingPrice, uint256 duration);
     event AuctionSuccessful(uint256 indexed tokenId, uint256 totalPrice, address winner);
     event AuctionCancelled(uint256 indexed tokenId);
-    
+
     // Delegate constructor
     function DiamondAuction(address _nftAddr) public
         ClockAuction(_nftAddr, 0) {}
@@ -1590,4 +1590,65 @@ contract FlowerAuction is Pausable {
         return _price * ownerCut / 10000;
     }
 
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

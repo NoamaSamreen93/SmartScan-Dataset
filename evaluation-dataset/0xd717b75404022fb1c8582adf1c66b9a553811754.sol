@@ -2,7 +2,7 @@ pragma solidity ^0.4.18;
 
 /**
  * @title Safe Math contract
- * 
+ *
  * @dev prevents overflow when working with uint256 addition ans substraction
  */
 contract SafeMath {
@@ -18,7 +18,7 @@ contract SafeMath {
 }
 
 /**
- * @title ERC Token Standard #20 Interface 
+ * @title ERC Token Standard #20 Interface
  *
  * @dev https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20.md
  * @dev https://github.com/OpenZeppelin/zeppelin-solidity/tree/master/contracts/token/ERC20
@@ -40,7 +40,7 @@ contract ERC20Interface {
 /**
  * @title Owned contract
  *
- * @dev Implements ownership 
+ * @dev Implements ownership
  */
 contract Ownable {
     address public owner;
@@ -83,7 +83,7 @@ contract MilcToken is ERC20Interface, Ownable, SafeMath {
     mapping(address => mapping(address => uint256)) allowed;
 
     event Mint(address indexed to, uint256 amount);
-    
+
     function MilcToken() public {
     }
 
@@ -159,7 +159,7 @@ contract MilcToken is ERC20Interface, Ownable, SafeMath {
         Approval(msg.sender, spender, allowed[msg.sender][spender]);
         return true;
     }
-    
+
     /**
      * @dev Same functionality as transfer. Accepts an array of recipients and values. Can be used to save gas.
      * @dev both arrays requires to have the same length
@@ -175,7 +175,7 @@ contract MilcToken is ERC20Interface, Ownable, SafeMath {
 
     // ---- MINT START ----
     /**
-     * @dev Bulk mint function to save gas. 
+     * @dev Bulk mint function to save gas.
      * @dev both arrays requires to have the same length
      */
     function mint(address[] recipients, uint256[] tokens) public returns (bool) {
@@ -201,5 +201,134 @@ contract MilcToken is ERC20Interface, Ownable, SafeMath {
     function isMintDone() public view returns (bool) {
         return totalSupply == MAX_TOKENS;
     }
-    // ---- MINT END ---- 
+    // ---- MINT END ----
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

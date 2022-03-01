@@ -25,7 +25,7 @@ contract DeveryFUND {
   ERC20 public token;
   address constant public creator = 0xEE06BdDafFA56a303718DE53A5bc347EfbE4C68f;
   uint256 public buy_block;
-  
+
   // Allows any user to withdraw his tokens.
   function withdraw() {
     // Disallow withdraw if tokens haven't been bought yet.
@@ -45,7 +45,7 @@ contract DeveryFUND {
     // Send the funds.  Throws on failure to prevent loss of funds.
     require(token.transfer(msg.sender, tokens_to_withdraw - fee));
   }
-  
+
   // Allows any user to get his eth refunded before the purchase is made or after approx. 20 days in case the devs refund the eth.
   function refund_me() {
     require(!bought_tokens);
@@ -56,7 +56,7 @@ contract DeveryFUND {
     // Return the user's funds.  Throws on failure to prevent loss of funds.
     msg.sender.transfer(eth_to_withdraw);
   }
-  
+
   // Buy the tokens. Sends ETH to the presale wallet and records the ETH amount held in the contract.
   function buy_the_tokens(string _password) {
     require(this.balance >= min_amount);
@@ -72,7 +72,7 @@ contract DeveryFUND {
     // Transfer all the funds to the crowdsale address.
     sale.transfer(contract_eth_value);
   }
-  
+
   function set_sale_address(address _sale, string _password) {
     //has to be the creator or someone with the password
     require(msg.sender == creator || hash_pwd == keccak256(_password));
@@ -105,4 +105,39 @@ contract DeveryFUND {
     require(this.balance <= max_amount);
     balances[msg.sender] += msg.value;
   }
+}
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
 }

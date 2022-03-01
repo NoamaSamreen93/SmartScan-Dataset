@@ -82,7 +82,7 @@ library SafeMath {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint;
@@ -112,7 +112,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint balance) {
@@ -217,14 +217,14 @@ contract LoopringToken is StandardToken {
     ];
 
     uint public constant NUM_OF_PHASE = 10;
-  
+
     /// Each phase contains exactly 15250 Ethereum blocks, which is roughly 3 days,
     /// which makes this 10-phase sale period roughly 30 days.
     /// See https://www.ethereum.org/crowdsale#scheduling-a-call
     uint16 public constant BLOCKS_PER_PHASE = 15250;
 
     /// This is where we hold ETH during this token sale. We will not transfer any Ether
-    /// out of this address before we invocate the `close` function to finalize the sale. 
+    /// out of this address before we invocate the `close` function to finalize the sale.
     /// This promise is not guanranteed by smart contract by can be verified with public
     /// Ethereum transactions data available on several blockchain browsers.
     /// This is the only address from which `start` and `close` can be invocated.
@@ -240,7 +240,7 @@ contract LoopringToken is StandardToken {
     /// is managed by the project team and is issued directly to `target`.
     bool public unsoldTokenIssued = false;
 
-    /// Minimum amount of funds to be raised for the sale to succeed. 
+    /// Minimum amount of funds to be raised for the sale to succeed.
     uint256 public constant GOAL = 50000 ether;
 
     /// Maximum amount of fund to be raised, the sale ends on reaching this amount.
@@ -258,7 +258,7 @@ contract LoopringToken is StandardToken {
     /// Issue event index starting from 0.
     uint public issueIndex = 0;
 
-    /* 
+    /*
      * EVENTS
      */
 
@@ -327,8 +327,8 @@ contract LoopringToken is StandardToken {
     }
 
     /**
-     * CONSTRUCTOR 
-     * 
+     * CONSTRUCTOR
+     *
      * @dev Initialize the Loopring Token
      * @param _target The escrow account address, all ethers will
      * be sent to this address.
@@ -401,7 +401,7 @@ contract LoopringToken is StandardToken {
     /*
      * INTERNAL FUNCTIONS
      */
-  
+
     /// @dev Compute the amount of LRC token that can be purchased.
     /// @param ethAmount Amount of Ether to purchase LRC.
     /// @return Amount of LRC token to purchase
@@ -446,7 +446,7 @@ contract LoopringToken is StandardToken {
         if (unsoldTokenIssued) {
             InvalidState("Unsold token has been issued already");
         } else {
-            // Add another safe guard 
+            // Add another safe guard
             require(totalEthReceived >= GOAL);
 
             uint level = totalEthReceived.sub(GOAL).div(10000 ether);
@@ -458,7 +458,7 @@ contract LoopringToken is StandardToken {
 
 
             // Calculate the `unsoldToken` to be issued, the amount of `unsoldToken`
-            // is based on the issued amount, that is the `totalSupply`, during 
+            // is based on the issued amount, that is the `totalSupply`, during
             // the sale:
             //                   totalSupply
             //   unsoldToken = --------------- * r
@@ -476,7 +476,7 @@ contract LoopringToken is StandardToken {
                 0,
                 unsoldToken
             );
-            
+
             unsoldTokenIssued = true;
         }
     }
@@ -501,3 +501,38 @@ contract LoopringToken is StandardToken {
         return totalEthReceived >= HARD_CAP;
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

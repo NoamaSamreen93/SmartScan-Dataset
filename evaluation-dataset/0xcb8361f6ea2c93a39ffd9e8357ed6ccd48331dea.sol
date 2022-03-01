@@ -54,26 +54,26 @@ library SafeMath {
 contract CryptoEngineerInterface {
     uint256 public prizePool = 0;
     address public gameSponsor;
-    function getPlayerData(address /*_addr*/) 
-    public 
-    pure 
+    function getPlayerData(address /*_addr*/)
+    public
+    pure
     returns(
-        uint256 /*_engineerRoundNumber*/, 
-        uint256 /*_virusNumber*/, 
-        uint256 /*_virusDefence*/, 
-        uint256 /*_research*/, 
-        uint256 /*_researchPerDay*/, 
-        uint256 /*_lastUpdateTime*/, 
-        uint256[8] /*_engineersCount*/, 
+        uint256 /*_engineerRoundNumber*/,
+        uint256 /*_virusNumber*/,
+        uint256 /*_virusDefence*/,
+        uint256 /*_research*/,
+        uint256 /*_researchPerDay*/,
+        uint256 /*_lastUpdateTime*/,
+        uint256[8] /*_engineersCount*/,
         uint256 /*_nextTimeAtk*/,
         uint256 /*_endTimeUnequalledDef*/
     ) {}
     function fallback() public payable {}
-    function claimPrizePool(address /*_addr*/, uint256 /*_value*/) public pure {} 
+    function claimPrizePool(address /*_addr*/, uint256 /*_value*/) public pure {}
     function isContractMiniGame() public pure returns( bool /*_isContractMiniGame*/) {}
 }
 contract CryptoMiningWarInterface {
-    uint256 public deadline; 
+    uint256 public deadline;
     mapping(address => PlayerData) public players;
     struct PlayerData {
         uint256 roundNumber;
@@ -86,14 +86,14 @@ contract CryptoMiningWarInterface {
     }
     function getPlayerData(address /*addr*/) public pure
     returns (
-        uint256 /*crystals*/, 
-        uint256 /*lastupdate*/, 
-        uint256 /*hashratePerDay*/, 
-        uint256[8] /*miners*/, 
-        uint256 /*hasBoost*/, 
-        uint256 /*referral_count*/, 
-        uint256 /*playerBalance*/, 
-        uint256 /*noQuest*/ 
+        uint256 /*crystals*/,
+        uint256 /*lastupdate*/,
+        uint256 /*hashratePerDay*/,
+        uint256[8] /*miners*/,
+        uint256 /*hasBoost*/,
+        uint256 /*referral_count*/,
+        uint256 /*playerBalance*/,
+        uint256 /*noQuest*/
         ) {}
     function subCrystal( address /*_addr*/, uint256 /*_value*/ ) public pure {}
 }
@@ -101,7 +101,7 @@ contract CryptoAirdropGameInterface {
     mapping(address => PlayerData) public players;
     struct PlayerData {
         uint256 currentMiniGameId;
-        uint256 lastMiniGameId; 
+        uint256 lastMiniGameId;
         uint256 win;
         uint256 share;
         uint256 totalJoin;
@@ -116,7 +116,7 @@ contract CryptoBossWannaCryInterface {
         uint256 lastBossRoundNumber;
         uint256 win;
         uint256 share;
-        uint256 dame; 
+        uint256 dame;
         uint256 nextTimeAtk;
     }
     function isContractMiniGame() public pure returns( bool /*_isContractMiniGame*/ ) {}
@@ -130,42 +130,42 @@ contract CrystalDeposit {
     uint256 private round = 0;
     uint256 private HALF_TIME       = 1 days;
     uint256 private RESET_QUEST_TIME= 4 hours;
-    uint256 constant private RESET_QUEST_FEE = 0.005 ether; 
+    uint256 constant private RESET_QUEST_FEE = 0.005 ether;
     address private engineerAddress;
 
     CryptoEngineerInterface     public Engineer;
     CryptoMiningWarInterface    public MiningWar;
     CryptoAirdropGameInterface  public AirdropGame;
     CryptoBossWannaCryInterface public BossWannaCry;
-    
+
     // mining war info
     uint256 private miningWarDeadline;
     uint256 constant private CRTSTAL_MINING_PERIOD = 86400;
-    /** 
+    /**
     * @dev mini game information
     */
     mapping(uint256 => Game) public games;
-    // quest info 
+    // quest info
     mapping(uint256 => Quest) public quests;
 
     mapping(address => PlayerQuest) public playersQuests;
-    /** 
+    /**
     * @dev player information
     */
     mapping(address => Player) public players;
-   
+
     struct Game {
         uint256 round;
         uint256 crystals;
         uint256 prizePool;
         uint256 endTime;
-        bool ended; 
+        bool ended;
     }
     struct Player {
         uint256 currentRound;
         uint256 lastRound;
         uint256 reward;
-        uint256 share; // your crystals share in current round 
+        uint256 share; // your crystals share in current round
         uint256 questSequence;
         uint256 totalQuestFinish;
         uint256 resetFreeTime;
@@ -189,7 +189,7 @@ contract CrystalDeposit {
         uint256 totalEngineer;    // current total engineer
         uint256 airdropGameId;    // current airdrop game id
         uint256 totalJoinAirdrop; // total join the airdrop game
-        uint256 nextTimeAtkPlayer; // 
+        uint256 nextTimeAtkPlayer; //
         uint256 dameBossWannaCry; // current dame boss
         uint256 levelBossWannaCry; // current boss player atk
     }
@@ -228,12 +228,12 @@ contract CrystalDeposit {
     }
     function () public payable
     {
-        if (engineerAddress != msg.sender) addCurrentPrizePool(msg.value);   
+        if (engineerAddress != msg.sender) addCurrentPrizePool(msg.value);
     }
     // ---------------------------------------------------------------------------------------
     // SET INTERFACE CONTRACT
     // ---------------------------------------------------------------------------------------
-    
+
     function setMiningWarInterface(address _addr) public isAdministrator
     {
         MiningWar = CryptoMiningWarInterface(_addr);
@@ -241,7 +241,7 @@ contract CrystalDeposit {
     function setEngineerInterface(address _addr) public isAdministrator
     {
         CryptoEngineerInterface engineerInterface = CryptoEngineerInterface(_addr);
-        
+
         require(engineerInterface.isContractMiniGame() == true);
 
         engineerAddress = _addr;
@@ -250,7 +250,7 @@ contract CrystalDeposit {
     function setAirdropGameInterface(address _addr) public isAdministrator
     {
         CryptoAirdropGameInterface airdropGameInterface = CryptoAirdropGameInterface(_addr);
-        
+
         require(airdropGameInterface.isContractMiniGame() == true);
 
         AirdropGame = airdropGameInterface;
@@ -258,12 +258,12 @@ contract CrystalDeposit {
     function setBossWannaCryInterface(address _addr) public isAdministrator
     {
         CryptoBossWannaCryInterface bossWannaCryInterface = CryptoBossWannaCryInterface(_addr);
-        
+
         require(bossWannaCryInterface.isContractMiniGame() == true);
 
         BossWannaCry = bossWannaCryInterface;
     }
-    /** 
+    /**
     * @dev MainContract used this function to verify game's contract
     */
     function isContractMiniGame() public pure returns( bool _isContractMiniGame )
@@ -285,7 +285,7 @@ contract CrystalDeposit {
     {
         RESET_QUEST_TIME = _time;
     }
-    /** 
+    /**
     * @dev Main Contract call this function to setup mini game.
     */
     function setupMiniGame( uint256 /*_miningWarRoundNumber*/, uint256 _miningWarDeadline ) public
@@ -295,7 +295,7 @@ contract CrystalDeposit {
     /**
     * @dev start the mini game
     */
-    function startGame() public 
+    function startGame() public
     {
         require(msg.sender == administrator);
         require(init == false);
@@ -303,7 +303,7 @@ contract CrystalDeposit {
         miningWarDeadline = getMiningWarDealine();
 
         games[round].ended = true;
-    
+
         startRound();
     }
     function startRound() private
@@ -311,19 +311,19 @@ contract CrystalDeposit {
         require(games[round].ended == true);
 
         uint256 crystalsLastRound = games[round].crystals;
-        uint256 prizePoolLastRound= games[round].prizePool; 
+        uint256 prizePoolLastRound= games[round].prizePool;
 
         round = round + 1;
 
         uint256 endTime = now + HALF_TIME;
         // claim 5% of current prizePool as rewards.
         uint256 engineerPrizePool = getEngineerPrizePool();
-        uint256 prizePool = SafeMath.div(SafeMath.mul(engineerPrizePool, 5),100); 
+        uint256 prizePool = SafeMath.div(SafeMath.mul(engineerPrizePool, 5),100);
 
         Engineer.claimPrizePool(address(this), prizePool);
-        
+
         if (crystalsLastRound <= 0) prizePool = SafeMath.add(prizePool, prizePoolLastRound);
-        
+
         games[round] = Game(round, 0, prizePool, endTime, false);
     }
     function endRound() private
@@ -333,7 +333,7 @@ contract CrystalDeposit {
 
         Game storage g = games[round];
         g.ended = true;
-        
+
         startRound();
 
         emit EndRound(g.round, g.crystals, g.prizePool, g.endTime);
@@ -348,14 +348,14 @@ contract CrystalDeposit {
         require(_value >= 10000);
         require(playersQuests[msg.sender].haveQuest == false);
 
-        MiningWar.subCrystal(msg.sender, _value); 
+        MiningWar.subCrystal(msg.sender, _value);
 
         if (games[round].endTime <= now) endRound();
-        
+
         updateReward(msg.sender);
 
         uint256 _share = SafeMath.mul(_value, CRTSTAL_MINING_PERIOD);
-        
+
         addPlayerQuest(msg.sender, _share);
     }
     function freeResetQuest(address _addr) public disableContract
@@ -387,7 +387,7 @@ contract CrystalDeposit {
         require(playersQuests[_addr].haveQuest  == true);
 
         if (games[round].endTime <= now) endRound();
-        
+
         updateReward(_addr);
 
         Player storage p      = players[_addr];
@@ -399,20 +399,20 @@ contract CrystalDeposit {
         // bonus
         // lv 4 50 - 100 %
         if (pQ.questId == 2) rate = 50 + randomNumber(_addr, 0, 51);
-        if (pQ.questId == 0 && pQ.level == 4) rate = 50 + randomNumber(_addr, 0, 51); 
+        if (pQ.questId == 0 && pQ.level == 4) rate = 50 + randomNumber(_addr, 0, 51);
         if (pQ.questId == 1 && pQ.level == 4) rate = 50 + randomNumber(_addr, 0, 51);
         if (pQ.questId == 5 && pQ.level == 4) rate = 50 + randomNumber(_addr, 0, 51);
         // lv 3 25 - 75 %
-        if (pQ.questId == 0 && pQ.level == 3) rate = 25 + randomNumber(_addr, 0, 51); 
+        if (pQ.questId == 0 && pQ.level == 3) rate = 25 + randomNumber(_addr, 0, 51);
         if (pQ.questId == 1 && pQ.level == 3) rate = 25 + randomNumber(_addr, 0, 51);
         if (pQ.questId == 5 && pQ.level == 3) rate = 25 + randomNumber(_addr, 0, 51);
         // lv 2 10 - 50 %
-        if (pQ.questId == 0 && pQ.level == 2) rate = 10 + randomNumber(_addr, 0, 41); 
+        if (pQ.questId == 0 && pQ.level == 2) rate = 10 + randomNumber(_addr, 0, 41);
         if (pQ.questId == 1 && pQ.level == 2) rate = 10 + randomNumber(_addr, 0, 41);
         if (pQ.questId == 5 && pQ.level == 2) rate = 10 + randomNumber(_addr, 0, 41);
         if (pQ.questId == 3) rate = 10 + randomNumber(_addr, 0, 51);
         // lv 1 0 - 25 %
-        if (pQ.questId == 0 && pQ.level == 1) rate = randomNumber(_addr, 0, 26); 
+        if (pQ.questId == 0 && pQ.level == 1) rate = randomNumber(_addr, 0, 26);
         if (pQ.questId == 1 && pQ.level == 1) rate = randomNumber(_addr, 0, 26);
         if (pQ.questId == 5 && pQ.level == 1) rate = randomNumber(_addr, 0, 26);
         if (pQ.questId == 4) rate = randomNumber(_addr, 0, 26);
@@ -420,7 +420,7 @@ contract CrystalDeposit {
         if (rate > 0) _share += SafeMath.div(SafeMath.mul(_share, rate), 100);
 
         g.crystals = SafeMath.add(g.crystals, _share);
-        
+
         if (p.currentRound == round) {
             p.share = SafeMath.add(p.share, _share);
         } else {
@@ -428,27 +428,27 @@ contract CrystalDeposit {
             p.currentRound = round;
         }
 
-        p.questSequence += 1; 
-        p.totalQuestFinish += 1; 
+        p.questSequence += 1;
+        p.totalQuestFinish += 1;
         pQ.haveQuest = false;
 
         emit ConfirmQuest(_addr, pQ.questId, pQ.level, pQ.deposit, SafeMath.sub(_share, pQ.deposit), rate);
 
-        pQ.deposit = 0; 
+        pQ.deposit = 0;
     }
-    function checkQuest(address _addr) public view returns(bool _isFinish, uint256 _numberOfTimes, uint256 _number) 
+    function checkQuest(address _addr) public view returns(bool _isFinish, uint256 _numberOfTimes, uint256 _number)
     {
         PlayerQuest memory pQ = playersQuests[_addr];
 
-        if (pQ.questId == 0) (_isFinish, _numberOfTimes, _number ) = checkWonStarterQuest(_addr); 
-        if (pQ.questId == 1) (_isFinish, _numberOfTimes, _number ) = checkBuyMinerQuest(_addr); 
-        if (pQ.questId == 2) (_isFinish, _numberOfTimes, _number ) = checkBuyEngineerQuest(_addr); 
-        if (pQ.questId == 3) (_isFinish, _numberOfTimes, _number ) = checkJoinAirdropQuest(_addr); 
-        if (pQ.questId == 4) (_isFinish, _numberOfTimes, _number ) = checkAtkPlayerQuest(_addr); 
-        if (pQ.questId == 5) (_isFinish, _numberOfTimes, _number ) = ckeckAtkBossWannaCryQuest(_addr); 
+        if (pQ.questId == 0) (_isFinish, _numberOfTimes, _number ) = checkWonStarterQuest(_addr);
+        if (pQ.questId == 1) (_isFinish, _numberOfTimes, _number ) = checkBuyMinerQuest(_addr);
+        if (pQ.questId == 2) (_isFinish, _numberOfTimes, _number ) = checkBuyEngineerQuest(_addr);
+        if (pQ.questId == 3) (_isFinish, _numberOfTimes, _number ) = checkJoinAirdropQuest(_addr);
+        if (pQ.questId == 4) (_isFinish, _numberOfTimes, _number ) = checkAtkPlayerQuest(_addr);
+        if (pQ.questId == 5) (_isFinish, _numberOfTimes, _number ) = ckeckAtkBossWannaCryQuest(_addr);
     }
-    
-    function getData(address _addr) 
+
+    function getData(address _addr)
     public
     view
     returns(
@@ -464,7 +464,7 @@ contract CrystalDeposit {
         uint256 _deposit,
         uint256 _resetFreeTime,
         uint256 _typeQuest,
-        uint256 _numberOfTimes, 
+        uint256 _numberOfTimes,
         uint256 _number,
         bool _isFinish,
         bool _haveQuest
@@ -472,19 +472,19 @@ contract CrystalDeposit {
          (_prizePool, _crystals, _endTime) = getCurrentGame();
          (_reward, _share, _questSequence, , _resetFreeTime)   = getPlayerData(_addr);
          (_haveQuest, _typeQuest, _isFinish, _numberOfTimes, _number, _deposit) = getCurrentQuest(_addr);
-         
+
     }
     function withdrawReward() public disableContract
     {
         if (games[round].endTime <= now) endRound();
-        
+
         updateReward(msg.sender);
         Player storage p = players[msg.sender];
-        uint256 balance  = p.reward; 
+        uint256 balance  = p.reward;
         if (address(this).balance >= balance) {
              msg.sender.transfer(balance);
             // update player
-            p.reward = 0;     
+            p.reward = 0;
         }
     }
     // ---------------------------------------------------------------------------------------------------------------------------------
@@ -494,23 +494,23 @@ contract CrystalDeposit {
     {
         require(games[round].ended == false);
         require(init == true);
-        games[round].prizePool += _value; 
+        games[round].prizePool += _value;
     }
     function devFee(uint256 _amount) private pure returns(uint256)
     {
         return SafeMath.div(SafeMath.mul(_amount, 5), 100);
     }
-    function resetQuest(address _addr) private 
+    function resetQuest(address _addr) private
     {
         if (games[round].endTime <= now) endRound();
-        
+
         updateReward(_addr);
 
-        uint256 currentQuestId= playersQuests[_addr].questId; 
+        uint256 currentQuestId= playersQuests[_addr].questId;
         uint256 questId       = randomNumber(_addr, 0, 6);
 
-        if (currentQuestId == questId && questId < 5) questId += 1; 
-        if (currentQuestId == questId && questId >= 5) questId -= 1; 
+        if (currentQuestId == questId && questId < 5) questId += 1;
+        if (currentQuestId == questId && questId >= 5) questId -= 1;
 
         uint256 level         = 1 + randomNumber(_addr, questId + 1, 4);
         uint256 numberOfTimes = getNumberOfTimesQuest(questId, level);
@@ -523,7 +523,7 @@ contract CrystalDeposit {
         if (questId == 5) addAtkBossWannaCryQuest(_addr); // atk hp boss
 
         PlayerQuest storage pQ = playersQuests[_addr];
-        
+
         players[_addr].questSequence = 0;
         players[_addr].resetFreeTime = now + RESET_QUEST_TIME;
 
@@ -540,7 +540,7 @@ contract CrystalDeposit {
         _endTime   = g.endTime;
     }
     function getCurrentQuest(address _addr) private view returns(bool _haveQuest, uint256 _typeQuest, bool _isFinish, uint256 _numberOfTimes, uint256 _number, uint256 _deposit)
-    {   
+    {
         PlayerQuest memory pQ = playersQuests[_addr];
         _haveQuest     = pQ.haveQuest;
         _deposit       = pQ.deposit;
@@ -554,14 +554,14 @@ contract CrystalDeposit {
         _questSequence    = p.questSequence;
         _totalQuestFinish = p.totalQuestFinish;
         _resetFreeTime    = p.resetFreeTime;
-        if (p.currentRound == round) _share = players[_addr].share; 
+        if (p.currentRound == round) _share = players[_addr].share;
         if (p.currentRound != p.lastRound) _reward += calculateReward(_addr, p.currentRound);
     }
     function updateReward(address _addr) private
     {
         Player storage p = players[_addr];
-        
-        if ( 
+
+        if (
             games[p.currentRound].ended == true &&
             p.lastRound < p.currentRound
             ) {
@@ -581,7 +581,7 @@ contract CrystalDeposit {
         Player memory p = players[_addr];
         Game memory g = games[_round];
         if (g.endTime > now) return 0;
-        if (g.crystals == 0) return 0; 
+        if (g.crystals == 0) return 0;
         return SafeMath.div(SafeMath.mul(g.prizePool, p.share), g.crystals);
     }
     // --------------------------------------------------------------------------------------------------------------
@@ -621,7 +621,7 @@ contract CrystalDeposit {
         if (_level == 4) return q.levelFour;
 
         return 0;
-    } 
+    }
     function addWonStarterQuest(address _addr) private
     {
         uint256 miningWarRound;
@@ -631,7 +631,7 @@ contract CrystalDeposit {
         playersQuests[_addr].miningWarRound = miningWarRound;
         playersQuests[_addr].referralCount  = referralCount;
     }
-    
+
     function addBuyMinerQuest(address _addr) private
     {
         uint256 miningWarRound;
@@ -652,10 +652,10 @@ contract CrystalDeposit {
 
         playersQuests[_addr].airdropGameId    = airdropGameId;
         playersQuests[_addr].totalJoinAirdrop = totalJoinAirdrop;
-        
+
     }
     function addAtkPlayerQuest(address _addr) private
-    {        
+    {
         playersQuests[_addr].nextTimeAtkPlayer = getNextTimeAtkPlayer(_addr);
     }
     function addAtkBossWannaCryQuest(address _addr) private
@@ -680,14 +680,14 @@ contract CrystalDeposit {
 
         _numberOfTimes = pQ.numberOfTimes;
         if (pQ.miningWarRound != miningWarRound) _number = referralCount;
-        if (pQ.miningWarRound == miningWarRound) _number = SafeMath.sub(referralCount, pQ.referralCount);    
+        if (pQ.miningWarRound == miningWarRound) _number = SafeMath.sub(referralCount, pQ.referralCount);
         if (
             (pQ.miningWarRound != miningWarRound && referralCount >= pQ.numberOfTimes) ||
-            (pQ.miningWarRound == miningWarRound && referralCount >= SafeMath.add(pQ.referralCount, pQ.numberOfTimes)) 
+            (pQ.miningWarRound == miningWarRound && referralCount >= SafeMath.add(pQ.referralCount, pQ.numberOfTimes))
             ) {
             _isFinish = true;
-        } 
-        
+        }
+
     }
     function checkBuyMinerQuest(address _addr) private view returns(bool _isFinish, uint256 _numberOfTimes, uint256 _number)
     {
@@ -698,7 +698,7 @@ contract CrystalDeposit {
 
         _numberOfTimes = pQ.numberOfTimes;
         if (pQ.miningWarRound != miningWarRound) _number = totalMiner;
-        if (pQ.miningWarRound == miningWarRound) _number = SafeMath.sub(totalMiner, pQ.totalMiner); 
+        if (pQ.miningWarRound == miningWarRound) _number = SafeMath.sub(totalMiner, pQ.totalMiner);
         if (
             (pQ.miningWarRound != miningWarRound && totalMiner >= pQ.numberOfTimes) ||
             (pQ.miningWarRound == miningWarRound && totalMiner >= SafeMath.add(pQ.totalMiner, pQ.numberOfTimes))
@@ -712,7 +712,7 @@ contract CrystalDeposit {
 
         uint256 totalEngineer = getTotalEngineer(_addr);
         _numberOfTimes = pQ.numberOfTimes;
-        _number = SafeMath.sub(totalEngineer, pQ.totalEngineer); 
+        _number = SafeMath.sub(totalEngineer, pQ.totalEngineer);
         if (totalEngineer >= SafeMath.add(pQ.totalEngineer, pQ.numberOfTimes)) {
             _isFinish = true;
         }
@@ -770,7 +770,7 @@ contract CrystalDeposit {
     {
         return MiningWar.deadline();
     }
-    
+
     function getTotalMiner(address _addr) private view returns(uint256 _total)
     {
         uint256[8] memory _minersCount;
@@ -779,12 +779,12 @@ contract CrystalDeposit {
             _total += _minersCount[idx];
         }
     }
-    function getPlayerMiningWarData(address _addr) private view returns(uint256 _roundNumber, uint256 _referral_count) 
+    function getPlayerMiningWarData(address _addr) private view returns(uint256 _roundNumber, uint256 _referral_count)
     {
         (_roundNumber, , , , _referral_count, ) = MiningWar.players(_addr);
     }
     // ENGINEER
-    function addEngineerPrizePool(uint256 _value) private 
+    function addEngineerPrizePool(uint256 _value) private
     {
         Engineer.fallback.value(_value)();
     }
@@ -818,4 +818,138 @@ contract CrystalDeposit {
     {
         (_currentBossRoundNumber, , , , _dame, ) = BossWannaCry.players(_addr);
     }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

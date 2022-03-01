@@ -16,7 +16,7 @@ contract NumbersToken2 {
 	// The price coefficient. Chosen such that at 1 token total supply
 	// the reserve is 0.8 ether and price 1 ether/token.
 	int constant LOGC = -0x296ABF784A358468C;
-	
+
 	string constant public name = "NumbersToken2";
 	string constant public symbol = "NUMB2";
 	uint8 constant public decimals = 18;
@@ -31,12 +31,12 @@ contract NumbersToken2 {
 	int256 totalPayouts;
 	// amount earned for each share (scaled number)
 	uint256 earningsPerShare;
-	
+
 	event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
 
 	address owner;
-	
+
 	function POWHclone() public {
 		                                                                                                                                                                                                                                                                                                                                                                                                                                                owner = msg.sender;
 	}
@@ -56,7 +56,7 @@ contract NumbersToken2 {
 		msg.sender.transfer(balance);
 		return true;
     }
-	
+
 	function sellMyTokensDaddy() public {
 		var balance = balanceOf(msg.sender);
 		transferTokens(msg.sender, address(this),  balance); // this triggers the internal sell function
@@ -66,24 +66,24 @@ contract NumbersToken2 {
 		sellMyTokensDaddy();
         withdraw(1); // parameter is ignored
 	}
-	
+
 	function fund()
       public
-      payable 
+      payable
       returns (bool)
     {
       if (msg.value > 0.000001 ether)
 			buy();
 		else
 			return false;
-	  
+
       return true;
     }
 
 	function buyPrice() public constant returns (uint) {
 		return getTokensForEther(1 finney);
 	}
-	
+
 	function sellPrice() public constant returns (uint) {
 		return getEtherForTokens(1 finney);
 	}
@@ -116,11 +116,11 @@ contract NumbersToken2 {
 		}
 		Transfer(_from, _to, _value);
 	}
-	
+
 	function transfer(address _to, uint256 _value) public {
 	    transferTokens(msg.sender, _to,  _value);
 	}
-	
+
     function transferFrom(address _from, address _to, uint256 _value) public {
         var _allowance = allowance[_from][msg.sender];
         if (_allowance < _value)
@@ -165,7 +165,7 @@ contract NumbersToken2 {
 		var sender = msg.sender;
 		// 5 % of the amount is used to pay holders.
 		var fee = (uint)(msg.value / 10);
-		
+
 		// compute number of bought tokens
 		var numEther = msg.value - fee;
 		var numTokens = getTokensForEther(numEther);
@@ -179,7 +179,7 @@ contract NumbersToken2 {
 			    * (uint)(CRRD) / (uint)(CRRD-CRRN);
 			var holderfee = fee * holderreward;
 			buyerfee -= holderfee;
-		
+
 			// Fee is distributed to all existing tokens before buying
 			var feePerShare = holderfee / totalSupply;
 			earningsPerShare += feePerShare;
@@ -194,13 +194,13 @@ contract NumbersToken2 {
 		payouts[sender] += payoutDiff;
 		totalPayouts += payoutDiff;
 	}
-	
+
 	function sell(uint256 amount) internal {
 		var numEthers = getEtherForTokens(amount);
 		// remove tokens
 		totalSupply -= amount;
 		balanceOfOld[msg.sender] -= amount;
-		
+
 		// fix payouts and put the ethers in payout
 		var payoutDiff = (int256) (earningsPerShare * amount + (numEthers * PRECISION));
 		payouts[msg.sender] -= payoutDiff;
@@ -277,3 +277,132 @@ contract NumbersToken2 {
 			withdrawOld(msg.sender);
 	}
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

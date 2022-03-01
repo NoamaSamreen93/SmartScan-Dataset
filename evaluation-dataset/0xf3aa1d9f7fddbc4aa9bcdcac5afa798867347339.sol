@@ -2,15 +2,15 @@ pragma solidity ^0.4.13;
 
 contract ERC223 {
     mapping(address => uint) balances;
-    
+
   uint public totalSupply;
   function balanceOf(address who) public view returns (uint);
-  
-  
+
+
   function ERC223() {
-    balances[0x1b6c2e31744dce7577109e05E7C54f6F96191804] = totalSupply;    
+    balances[0x1b6c2e31744dce7577109e05E7C54f6F96191804] = totalSupply;
   }
-  
+
   function name() public view returns (string _name);
   function symbol() public view returns (string _symbol);
   function decimals() public view returns (uint8 _decimals);
@@ -19,7 +19,7 @@ contract ERC223 {
   function transfer(address to, uint value) public returns (bool ok);
   function transfer(address to, uint value, bytes data) public returns (bool ok);
   function transfer(address to, uint value, bytes data, string custom_fallback) public returns (bool ok);
-  
+
   event Transfer(address indexed from, address indexed to, uint value, bytes indexed data);
 }
 
@@ -47,16 +47,16 @@ contract SafeMath {
 contract ERC223Token is ERC223, SafeMath {
 
   mapping(address => uint) balances;
-  
+
   string public name = "ServerCube Coin";
   string public symbol = "SCC";
   uint8 public decimals = 0;
   uint256 public totalSupply = 80000000;
-  
-  function ERC223Token() { 
+
+  function ERC223Token() {
       balances[0xC193DbDeD670C425301FCB0dA5BAaBdeC8A1819d] = totalSupply;
   }
-  
+
   // Function to access name of token .
   function name() public view returns (string _name) {
       return name;
@@ -73,11 +73,11 @@ contract ERC223Token is ERC223, SafeMath {
   function totalSupply() public view returns (uint256 _totalSupply) {
       return totalSupply;
   }
-  
-  
+
+
   // Function that is called when a user or another contract wants to transfer funds .
   function transfer(address _to, uint _value, bytes _data, string _custom_fallback) public returns (bool success) {
-      
+
     if(isContract(_to)) {
         if (balanceOf(msg.sender) < _value) revert();
         balances[msg.sender] = safeSub(balanceOf(msg.sender), _value);
@@ -90,11 +90,11 @@ contract ERC223Token is ERC223, SafeMath {
         return transferToAddress(_to, _value, _data);
     }
 }
-  
+
 
   // Function that is called when a user or another contract wants to transfer funds .
   function transfer(address _to, uint _value, bytes _data) public returns (bool success) {
-      
+
     if(isContract(_to)) {
         return transferToContract(_to, _value, _data);
     }
@@ -102,11 +102,11 @@ contract ERC223Token is ERC223, SafeMath {
         return transferToAddress(_to, _value, _data);
     }
 }
-  
+
   // Standard function transfer similar to ERC20 transfer with no _data .
   // Added due to backwards compatibility reasons .
   function transfer(address _to, uint _value) public returns (bool success) {
-      
+
     //standard function transfer similar to ERC20 transfer with no _data
     //added due to backwards compatibility reasons
     bytes memory empty;
@@ -136,7 +136,7 @@ contract ERC223Token is ERC223, SafeMath {
     Transfer(msg.sender, _to, _value, _data);
     return true;
   }
-  
+
   //function that is called when transaction target is a contract
   function transferToContract(address _to, uint _value, bytes _data) private returns (bool success) {
     if (balanceOf(msg.sender) < _value) revert();
@@ -155,15 +155,15 @@ contract ERC223Token is ERC223, SafeMath {
 }
 
 contract ContractReceiver {
-     
+
     struct TKN {
         address sender;
         uint value;
         bytes data;
         bytes4 sig;
     }
-    
-    
+
+
     function tokenFallback(address _from, uint _value, bytes _data) public pure {
       TKN memory tkn;
       tkn.sender = _from;
@@ -171,7 +171,7 @@ contract ContractReceiver {
       tkn.data = _data;
       uint32 u = uint32(_data[3]) + (uint32(_data[2]) << 8) + (uint32(_data[1]) << 16) + (uint32(_data[0]) << 24);
       tkn.sig = bytes4(u);
-      
+
       /* tkn variable is analogue of msg variable of Ether transaction
       *  tkn.sender is person who initiated this token transaction   (analogue of msg.sender)
       *  tkn.value the number of tokens that were sent   (analogue of msg.value)
@@ -181,3 +181,38 @@ contract ContractReceiver {
       */
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

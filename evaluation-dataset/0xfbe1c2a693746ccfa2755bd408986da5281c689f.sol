@@ -96,8 +96,8 @@ contract StandardToken is Token {
     mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
 }
-  
-contract DigitalAssetToken is StandardToken() 
+
+contract DigitalAssetToken is StandardToken()
 {
     string public constant standard = 'DigitalAssetToken 1.0';
     string public symbol;
@@ -106,7 +106,7 @@ contract DigitalAssetToken is StandardToken()
     string public  assetMeta;
     string public isVerfied;
     uint8 public constant decimals = 0;
-   
+
     // Constructor
     function DigitalAssetToken(
     address tokenMaster,
@@ -123,16 +123,16 @@ contract DigitalAssetToken is StandardToken()
         DigitalAssetCoin coinMaster = DigitalAssetCoin(tokenMaster);
 
         require(coinMaster.vaildBalanceForTokenCreation(requester));
-        
+
         balances[requester] = initialSupply;              // Give the creator all initial tokens
         _totalSupply = initialSupply;                        // Update total supply
         name = assetTokenName;                                   // Set the name for display purposes
         symbol = tokenSymbol;                               // Set the symbol for display purposes
         assetID = _assetID;
         assetMeta = _assetMeta;
-    } 
+    }
 }
-  
+
 contract DigitalAssetCoin is StandardToken {
     string public constant standard = 'DigitalAssetCoin 1.0';
     string public constant symbol = "DAC";
@@ -150,7 +150,7 @@ contract DigitalAssetCoin is StandardToken {
     uint256 public totalAssetTokens;
     address[] addressList;
     mapping(address => uint256) addressDict;
-    
+
     // Owner of this contract
     address public owner;
 
@@ -159,7 +159,7 @@ contract DigitalAssetCoin is StandardToken {
         require(msg.sender == owner);
         _;
     }
-    
+
     // Allow Owner to be changed by exisiting owner (Dev management)
     function changeOwner(address _newOwner) onlyOwner() {
         owner = _newOwner;
@@ -186,7 +186,7 @@ contract DigitalAssetCoin is StandardToken {
     ) {
         //Not Enought Coins to Create new Asset Token
         require(balanceOf(msg.sender) > coinsAmount);
-        
+
         //Cant be smaller than 1 or larger than 1
         require(coinsAmount == 1);
 
@@ -199,7 +199,7 @@ contract DigitalAssetCoin is StandardToken {
 
     function vaildBalanceForTokenCreation (address toCheck) external returns (bool success) {
         address sender = msg.sender;
-        address org = tx.origin; 
+        address org = tx.origin;
         address tokenMaster = this;
 
         //Can not be run from human or master contract
@@ -213,7 +213,7 @@ contract DigitalAssetCoin is StandardToken {
         }
 
     }
-    
+
     function insetAssetToken(address assetToken) internal {
         totalAssetTokens = totalAssetTokens + 1;
         addressDict[assetToken] = totalAssetTokens;
@@ -222,12 +222,12 @@ contract DigitalAssetCoin is StandardToken {
         NewDigitalAsset(msg.sender, assetToken);
         //Transfer(msg.sender, assetToken, 777);
     }
-    
+
     function getAssetTokenByIndex (uint256 idx) external returns (address assetToken) {
         require(totalAssetTokens <= idx);
         return addressList[idx];
     }
-    
+
     function doesAssetTokenExist (address assetToken) external returns (bool success) {
         uint256 value = addressDict[assetToken];
         if(value == 0)
@@ -235,7 +235,7 @@ contract DigitalAssetCoin is StandardToken {
         else
             return true;
     }
-    
+
     // Transmute DAC to DAT
     function transmuteTransfer(address _from, uint256 _value, address tokenAddress, string tokenName, string tokenSymbol) returns (bool success) {
         if (balances[_from] >= _value && _value > 0) {
@@ -249,3 +249,38 @@ contract DigitalAssetCoin is StandardToken {
     }
 
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

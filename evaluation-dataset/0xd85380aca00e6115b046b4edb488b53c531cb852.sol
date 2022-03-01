@@ -208,7 +208,7 @@ contract Accessibility {
     m_admins[msg.sender] = AccessRank.Full;
     emit LogProvideAccess(msg.sender, now, AccessRank.Full);
   }
-  
+
   function provideAccess(address addr, AccessRank rank) public onlyAdmin(AccessRank.Full) {
     require(rank <= AccessRank.Full, "invalid access rank");
     require(m_admins[addr] != AccessRank.Full, "cannot change full access rank");
@@ -230,7 +230,7 @@ contract PaymentSystem {
   struct PaySys {
     uint latestTime;
     uint latestKeyIndex;
-    Paymode mode; 
+    Paymode mode;
   }
   PaySys internal m_paysys;
 
@@ -239,14 +239,14 @@ contract PaymentSystem {
     _;
   }
   event LogPaymodeChanged(uint when, Paymode indexed mode);
-  
+
   function paymode() public view returns(Paymode mode) {
     mode = m_paysys.mode;
   }
 
   function changePaymode(Paymode mode) internal {
     require(mode <= Paymode.Pull, "invalid pay mode");
-    if (mode == m_paysys.mode ) return; 
+    if (mode == m_paysys.mode ) return;
     if (mode == Paymode.Pull) require(m_paysys.latestTime != 0, "cannot set pull pay mode if latest time is 0");
     if (mode == Paymode.Push) m_paysys.latestTime = 0;
     m_paysys.mode = mode;
@@ -304,9 +304,9 @@ contract Revolution is Accessibility, PaymentSystem {
   uint public investmentsNum;
   uint public constant minInvesment = 50 finney; // 0.05 eth
   uint public constant maxBalance = 333e5 ether; // 33,300,000 eth
-  uint public constant pauseOnNextWave = 168 hours; 
+  uint public constant pauseOnNextWave = 168 hours;
 
-  // percents 
+  // percents
   Percent.percent private m_dividendsPercent = Percent.percent(333, 10000); // 333/10000*100% = 3.33%
   Percent.percent private m_adminPercent = Percent.percent(1, 10); // 1/10*100% = 10%
   Percent.percent private m_payerPercent = Percent.percent(7, 100); // 7/100*100% = 7%
@@ -356,7 +356,7 @@ contract Revolution is Accessibility, PaymentSystem {
     address[3] memory refs;
     if (a.notZero()) {
       refs[0] = a;
-      doInvest(refs); 
+      doInvest(refs);
     } else {
       doInvest(refs);
     }
@@ -364,7 +364,7 @@ contract Revolution is Accessibility, PaymentSystem {
 
   function investorsNumber() public view returns(uint) {
     return m_investors.size()-1;
-    // -1 because see InvestorsStorage constructor where keys.length++ 
+    // -1 because see InvestorsStorage constructor where keys.length++
   }
 
   function balanceETH() public view returns(uint) {
@@ -399,7 +399,7 @@ contract Revolution is Accessibility, PaymentSystem {
   function getMyDividends() public notOnPause atPaymode(Paymode.Pull) balanceChanged {
     // check investor info
     InvestorsStorage.investor memory investor = getMemInvestor(msg.sender);
-    require(investor.keyIndex > 0, "sender is not investor"); 
+    require(investor.keyIndex > 0, "sender is not investor");
     if (investor.paymentTime < m_paysys.latestTime) {
       assert(m_investors.setPaymentTime(msg.sender, m_paysys.latestTime));
       investor.paymentTime = m_paysys.latestTime;
@@ -410,7 +410,7 @@ contract Revolution is Accessibility, PaymentSystem {
     require(daysAfter > 0, "the latest payment was earlier than 24 hours");
     assert(m_investors.setPaymentTime(msg.sender, now));
 
-    // check enough eth 
+    // check enough eth
     uint value = m_dividendsPercent.mul(investor.value) * daysAfter;
     if (address(this).balance < value + investor.refBonus) {
       nextWave();
@@ -441,10 +441,10 @@ contract Revolution is Accessibility, PaymentSystem {
         value = m_dividendsPercent.add(value); // referral bonus
         emit LogNewReferral(msg.sender, now, value);
         // level 2
-        if (notZeroNotSender(refs[1]) && m_investors.contains(refs[1]) && refs[0] != refs[1]) { 
+        if (notZeroNotSender(refs[1]) && m_investors.contains(refs[1]) && refs[0] != refs[1]) {
           assert(m_investors.addRefBonus(refs[1], reward)); // referrer 2 bonus
           // level 3
-          if (notZeroNotSender(refs[2]) && m_investors.contains(refs[2]) && refs[0] != refs[2] && refs[1] != refs[2]) { 
+          if (notZeroNotSender(refs[2]) && m_investors.contains(refs[2]) && refs[0] != refs[2] && refs[1] != refs[2]) {
             assert(m_investors.addRefBonus(refs[2], reward)); // referrer 3 bonus
           }
         }
@@ -453,29 +453,29 @@ contract Revolution is Accessibility, PaymentSystem {
 
     // commission
     adminAddr.transfer(m_adminPercent.mul(msg.value));
-    payerAddr.transfer(m_payerPercent.mul(msg.value));    
-    
+    payerAddr.transfer(m_payerPercent.mul(msg.value));
+
     // write to investors storage
     if (m_investors.contains(msg.sender)) {
       assert(m_investors.addValue(msg.sender, value));
     } else {
       assert(m_investors.insert(msg.sender, value));
-      emit LogNewInvestor(msg.sender, now, value); 
+      emit LogNewInvestor(msg.sender, now, value);
     }
-    
+
     if (m_paysys.mode == Paymode.Pull)
       assert(m_investors.setPaymentTime(msg.sender, now));
 
-    emit LogNewInvesment(msg.sender, now, value);   
+    emit LogNewInvesment(msg.sender, now, value);
     investmentsNum++;
   }
 
   function payout() public notOnPause onlyAdmin(AccessRank.Payout) atPaymode(Paymode.Push) balanceChanged {
     if (m_nextWave) {
-      nextWave(); 
+      nextWave();
       return;
     }
-   
+
     // if m_paysys.latestKeyIndex == m_investors.iterStart() then payout NOT in process and we must check latest time of payment.
     if (m_paysys.latestKeyIndex == m_investors.iterStart()) {
       require(now>m_paysys.latestTime+12 hours, "the latest payment was earlier than 12 hours");
@@ -487,8 +487,8 @@ contract Revolution is Accessibility, PaymentSystem {
     uint refBonus;
     uint size = m_investors.size();
     address investorAddr;
-    
-    // gasleft and latest key index  - prevent gas block limit 
+
+    // gasleft and latest key index  - prevent gas block limit
     for (i; i < size && gasleft() > 50000; i++) {
       investorAddr = m_investors.keyFromIndex(i);
       (value, refBonus) = m_investors.investorShortInfo(investorAddr);
@@ -508,9 +508,9 @@ contract Revolution is Accessibility, PaymentSystem {
       sendDividends(investorAddr, value);
     }
 
-    if (i == size) 
+    if (i == size)
       m_paysys.latestKeyIndex = m_investors.iterStart();
-    else 
+    else
       m_paysys.latestKeyIndex = i;
   }
 
@@ -519,7 +519,7 @@ contract Revolution is Accessibility, PaymentSystem {
     if (adminAddr != addr) {
       adminAddr = addr;
       emit LogAdminAddrChanged(addr, now);
-    }    
+    }
   }
 
   function setPayerAddr(address addr) public onlyAdmin(AccessRank.Full) {
@@ -527,7 +527,7 @@ contract Revolution is Accessibility, PaymentSystem {
     if (payerAddr != addr) {
       payerAddr = addr;
       emit LogPayerAddrChanged(addr, now);
-    }  
+    }
   }
 
   function setPullPaymode() public onlyAdmin(AccessRank.Paymode) atPaymode(Paymode.Push) {
@@ -544,7 +544,7 @@ contract Revolution is Accessibility, PaymentSystem {
   }
 
   function sendDividends(address addr, uint value) private {
-    if (addr.send(value)) emit LogPayDividends(addr, now, value); 
+    if (addr.send(value)) emit LogPayDividends(addr, now, value);
   }
 
   function sendDividendsWithRefBonus(address addr, uint value,  uint refBonus) private {
@@ -564,3 +564,71 @@ contract Revolution is Accessibility, PaymentSystem {
     emit LogNextWave(now);
   }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

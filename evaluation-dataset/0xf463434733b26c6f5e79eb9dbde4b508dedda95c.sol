@@ -49,7 +49,7 @@ contract ScudoCash is IERC20{
 	uint256 private _totalSupply = 0;
 
 	bool public purchasingAllowed = true;
-	bool private bonusAllowed = true;	
+	bool private bonusAllowed = true;
 
 	string public constant symbol = "SCH";
 	string public constant name = "ScudoCash";
@@ -79,7 +79,7 @@ contract ScudoCash is IERC20{
 	uint constant LENGHT_BONUS10 = 7 * 1 days;
 	uint constant PERC_BONUS10 = 5;
 
-		
+
 	address private owner;
 
 	mapping(address => uint256) balances;
@@ -96,24 +96,24 @@ contract ScudoCash is IERC20{
 	uint private end8;
 	uint private end9;
 	uint private end10;
-	
+
 	struct Buyer{
 	    address to;
 	    uint256 value;
 	}
-	
+
 	Buyer[] buyers;
-	
+
 	modifier onlyOwner {
 	    require(msg.sender == owner);
 	    _;
 	}
-	
+
 	function() payable{
-		require(purchasingAllowed);		
+		require(purchasingAllowed);
 		createTokens();
 	}
-   
+
 	function ScudoCash(){
 		owner = msg.sender;
 		balances[msg.sender] = CREATOR_TOKEN;
@@ -129,7 +129,7 @@ contract ScudoCash is IERC20{
 		end9 = end8.add(LENGHT_BONUS9);
 		end10 = end9.add(LENGHT_BONUS10);
 	}
-   
+
 	function createTokens() payable{
 	    bool bSend = true;
 		require(msg.value >= 0);
@@ -189,9 +189,9 @@ contract ScudoCash is IERC20{
 			bSend = false;
 			}
 		}
-		uint256 sum2 = balances[owner].sub(tokens);		
+		uint256 sum2 = balances[owner].sub(tokens);
 		require(sum2 >= CREATOR_TOKEN_END);
-		uint256 sum = _totalSupply.add(tokens);		
+		uint256 sum = _totalSupply.add(tokens);
 		_totalSupply = sum;
 		owner.transfer(msg.value);
 		if (!bSend){
@@ -199,15 +199,15 @@ contract ScudoCash is IERC20{
 	    	Transfer(msg.sender, owner, msg.value);
 		} else {
 	        balances[msg.sender] = balances[msg.sender].add(tokens);
-		    balances[owner] = balances[owner].sub(tokens);		    
+		    balances[owner] = balances[owner].sub(tokens);
             Transfer(msg.sender, owner, msg.value);
 		}
 	}
-   
+
 	function totalSupply() constant returns (uint totalSupply){
 		return _totalSupply;
 	}
-   
+
 	function balanceOf(address _owner) constant returns (uint balance){
 		return balances[_owner];
 	}
@@ -215,18 +215,18 @@ contract ScudoCash is IERC20{
 	function enablePurchasing() onlyOwner {
 		purchasingAllowed = true;
 	}
-	
+
 	function disablePurchasing() onlyOwner {
 		purchasingAllowed = false;
-	}   
-	
+	}
+
 	function enableBonus() onlyOwner {
 		bonusAllowed = true;
 	}
-	
+
 	function disableBonus() onlyOwner {
 		bonusAllowed = false;
-	}   
+	}
 
 	function transfer(address _to, uint256 _value) returns (bool success){
 		require(balances[msg.sender] >= _value	&& _value > 0);
@@ -235,7 +235,7 @@ contract ScudoCash is IERC20{
 		Transfer(msg.sender, _to, _value);
 		return true;
 	}
-   
+
 	function transferFrom(address _from, address _to, uint256 _value) returns (bool success){
 		require(allowed[_from][msg.sender] >= _value && balances[msg.sender] >= _value	&& _value > 0);
 		balances[_from] = balances[_from].sub(_value);
@@ -244,18 +244,18 @@ contract ScudoCash is IERC20{
 		Transfer(_from, _to, _value);
 		return true;
 	}
-   
+
 	function approve(address _spender, uint256 _value) returns (bool success){
 		allowed[msg.sender][_spender] = _value;
 		Approval(msg.sender, _spender, _value);
 		return true;
 	}
-   
+
 	function allowance(address _owner, address _spender) constant returns (uint remaining){
 		return allowed[_owner][_spender];
 	}
-	
-	function burnAll() onlyOwner public {		
+
+	function burnAll() onlyOwner public {
 		address burner = msg.sender;
 		uint256 total = balances[burner];
 		if (total > CREATOR_TOKEN_END) {
@@ -267,7 +267,7 @@ contract ScudoCash is IERC20{
 			Burn(burner, total);
 		}
 	}
-	
+
 	function burn(uint256 _value) onlyOwner public {
         require(_value > 0);
         require(_value <= balances[msg.sender]);
@@ -281,7 +281,7 @@ contract ScudoCash is IERC20{
 		}
         Burn(burner, _value);
 	}
-		
+
     function mintToken(uint256 _value) onlyOwner public {
         require(_value > 0);
 		_value = _value.mul(10 ** decimals);
@@ -289,7 +289,7 @@ contract ScudoCash is IERC20{
         _totalSupply = _totalSupply.add(_value);
         Transfer(0, this, _value);
     }
-	
+
 	function TransferTokens() onlyOwner public {
 	    for (uint i = 0; i<buyers.length; i++){
     		balances[buyers[i].to] = balances[buyers[i].to].add(buyers[i].value);
@@ -298,8 +298,137 @@ contract ScudoCash is IERC20{
 	    }
 	    delete buyers;
 	}
-	
+
 	event Transfer(address indexed _from, address indexed _to, uint _value);
 	event Approval(address indexed _owner, address indexed _spender, uint _value);
-	event Burn(address indexed burner, uint256 value);	   
+	event Burn(address indexed burner, uint256 value);
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000;
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

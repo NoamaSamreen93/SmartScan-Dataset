@@ -86,7 +86,7 @@ contract usingOraclize {
     function oraclize_getPrice(string datasource, uint gaslimit) oraclizeAPI internal returns (uint){
         return oraclize.getPrice(datasource, gaslimit);
     }
-    
+
     function oraclize_query(string datasource, string arg) oraclizeAPI internal returns (bytes32 id){
         uint price = oraclize.getPrice(datasource);
         if (price > 1 ether + tx.gasprice*200000) return 0; // unexpectedly high price
@@ -168,10 +168,10 @@ contract usingOraclize {
     }
     function oraclize_query(string datasource, string[1] args, uint gaslimit) oraclizeAPI internal returns (bytes32 id) {
         string[] memory dynargs = new string[](1);
-        dynargs[0] = args[0];       
+        dynargs[0] = args[0];
         return oraclize_query(datasource, dynargs, gaslimit);
     }
-    
+
     function oraclize_query(string datasource, string[2] args) oraclizeAPI internal returns (bytes32 id) {
         string[] memory dynargs = new string[](2);
         dynargs[0] = args[0];
@@ -224,7 +224,7 @@ contract usingOraclize {
         dynargs[2] = args[2];
         return oraclize_query(datasource, dynargs, gaslimit);
     }
-    
+
     function oraclize_query(string datasource, string[4] args) oraclizeAPI internal returns (bytes32 id) {
         string[] memory dynargs = new string[](4);
         dynargs[0] = args[0];
@@ -515,7 +515,7 @@ contract Gamble is usingOraclize {
      function __callback(bytes32 myid, string result) {
         if (msg.sender != oraclize_cbAddress()) throw;
         if(!Power_Ball_Set)
-            {	
+            {
 				Power_Ball = result;
 				Power_Ball_Set = true;
 				Prize("Winning numbers set",Cashpot,result);
@@ -556,15 +556,15 @@ contract Gamble is usingOraclize {
 						    throw;
 						}
 						Balance("Your New Balance Is:",Ticket_Number[Ticket].balance,Ticket_Number[Ticket]);
-						Notify_Number("Winner:",Gross);  
-						Cashpot = Cashpot - Gross;   
+						Notify_Number("Winner:",Gross);
+						Cashpot = Cashpot - Gross;
 						Power_Ball_Set = false;
 						Service_Fee = 0;
 						Gross = 0;
                         newOraclizeQuery("Oraclize query was sent, standing by for the answer..");
-			            oraclize_query("URL", "https://www.random.org/integers/?num=3&min=1&max=9&col=1&base=10&format=plain&rnd=new");					}    
+			            oraclize_query("URL", "https://www.random.org/integers/?num=3&min=1&max=9&col=1&base=10&format=plain&rnd=new");					}
             }
-    }    
+    }
 	function draw() payable
 		{
 		     if(msg.value * 50 < 1 ether){throw;}
@@ -595,17 +595,85 @@ contract Gamble is usingOraclize {
 			    throw;
 			}
 			Balance("Your New Balance Is:",Ticket_Number[Ticket].balance,Ticket_Number[Ticket]);
-			Notify_Number("Winner:",Gross);  
-			Cashpot = Cashpot - Gross;   
+			Notify_Number("Winner:",Gross);
+			Cashpot = Cashpot - Gross;
 			Service_Fee = 0;
 			Gross = 0;
 		}
 	function check_prize() returns (uint)
 	   {
 	       return this.balance;
-	   } 
+	   }
 	function winning_ticket() returns (string)
 		{
 			return Power_Ball;
 		}
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

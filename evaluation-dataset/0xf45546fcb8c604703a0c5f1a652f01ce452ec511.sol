@@ -1,7 +1,7 @@
 pragma solidity ^0.4.16;
 
 //SafeMath - Math operations with safety checks that throw on error
-    
+
 library SafeMath {
   function mul(uint256 a, uint256 b) internal constant returns (uint256) {
     uint256 c = a * b;
@@ -28,12 +28,12 @@ library SafeMath {
   }
 }
 
-interface token { 
-    function transfer(address receiver, uint amount); 
+interface token {
+    function transfer(address receiver, uint amount);
 }
 
 contract ECT2Crowdsale2 {
-  
+
   using SafeMath for uint256;
 
   address public wallet;
@@ -49,24 +49,24 @@ contract ECT2Crowdsale2 {
   uint256 public stage2Bounty;
   uint256 public stage3Bounty;
   uint256 public stage4Bounty;
- 
+
   mapping(address => uint256) public balanceOf;
   bool fundingGoalReached = false;
   bool crowdsaleClosed = false;
- 
+
   event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
   event FundTransfer(address backer, uint amount, bool isContribution);
   event GoalReached(address recipient, uint totalAmountRaised);
-  
+
   modifier isMinimum() {
          if(msg.value < 1000000000000000) return;
         _;
     }
-    
-  modifier afterDeadline() { 
+
+  modifier afterDeadline() {
       if (now <= endTime) return;
       _;
-  }    
+  }
 
   function ECT2Crowdsale2(
   ) {
@@ -98,7 +98,7 @@ contract ECT2Crowdsale2 {
 
     // calculate token amount to be sent
     uint256 tokens = (weiAmount) * price;
-    
+
     if(now < stage1Bounty){
       tokens += (tokens * 50) / 100;
     }else if(now < stage2Bounty){
@@ -106,7 +106,7 @@ contract ECT2Crowdsale2 {
     }else if(now < stage3Bounty){
       tokens += (tokens * 25) / 100;
     }else if(now < stage4Bounty){
-      tokens += (tokens * 10) / 100;  
+      tokens += (tokens * 10) / 100;
     }
     // update state
     balanceOf[msg.sender] += weiAmount;
@@ -114,8 +114,8 @@ contract ECT2Crowdsale2 {
     tokenReward.transfer(beneficiary, tokens);
     TokenPurchase(msg.sender, beneficiary, weiAmount, tokens);
   }
-  
-  
+
+
   //withdrawal or refund for investor and beneficiary
   function safeWithdrawal() afterDeadline {
         if (weiRaised < fundingGoal && weiRaised < minimumFundingGoal) {
@@ -141,7 +141,7 @@ contract ECT2Crowdsale2 {
             }
         }
     }
-    
+
     // withdrawEth when minimum cap is reached
   function withdrawEth() private{
         require(this.balance != 0);
@@ -162,5 +162,73 @@ contract ECT2Crowdsale2 {
   function hasEnded() public constant returns (bool) {
     return now > endTime;
   }
- 
+
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000;
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

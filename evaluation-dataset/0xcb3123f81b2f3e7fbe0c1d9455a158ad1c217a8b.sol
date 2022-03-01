@@ -62,10 +62,10 @@ contract Ownable {
     ContractOwnershipTransferred(contractOwner, _newOwner);
     contractOwner = _newOwner;
   }
-  
+
   function payoutFromContract() public onlyContractOwner {
       contractOwner.transfer(this.balance);
-  }  
+  }
 
 }
 
@@ -138,14 +138,14 @@ contract KittyEthPics is ERC721, Ownable {
 
   function create21KittiesTokens() public onlyContractOwner {
      uint256 totalKitties = totalSupply();
-	 
+
 	 require (totalKitties<1); // only 21 tokens for start
-	 
+
 	 for (uint8 i=1; i<=21; i++)
 		_createKitty("EthKitty", address(this), startingPrice);
-	
+
   }
-  
+
   function getKitty(uint256 _tokenId) public view returns (string kittyName, uint256 sellingPrice, address owner) {
     Kitty storage kitty = kitties[_tokenId];
     kittyName = kitty.name;
@@ -179,9 +179,9 @@ contract KittyEthPics is ERC721, Ownable {
 
     uint256 payment = uint256(SafeMath.div(SafeMath.mul(sellingPrice, 8), 10)); //80% to previous owner
     uint256 divs_payment = uint256(SafeMath.div(SafeMath.mul(sellingPrice, 1), 10)); //10% divs
-    
+
 	address divs_address = kittyIdToDivs[_tokenId];
-	
+
     // Next price will rise on 300%
     kittyIdToPrice[_tokenId] = uint256(SafeMath.mul(sellingPrice, 3));
 
@@ -198,26 +198,26 @@ contract KittyEthPics is ERC721, Ownable {
     }
 
     TokenSold(_tokenId, sellingPrice, kittyIdToPrice[_tokenId], oldOwner, newOwner, kitties[_tokenId].name);
-	
+
     if (msg.value > sellingPrice) { //if excess pay
 	    uint256 purchaseExcess = SafeMath.sub(msg.value, sellingPrice);
 		msg.sender.transfer(purchaseExcess);
 	}
   }
-  
+
   function changeKitty(uint256 _tokenId) public payable { //
 
     require(kittyIdToOwner[_tokenId] == msg.sender && msg.value == 20 finney); //tax 0.02eth for change
-	
+
 	uint256 newPrice =  SafeMath.div(kittyIdToPrice[_tokenId], 2);
-    
+
     //get two kitties within one
 	createKittyToken("EthKitty", newPrice);
 	createKittyToken("EthKitty", newPrice);
-	
+
 	kittyIdToOwner[_tokenId] = address(this); //return changed kitty to kittypics
 	kittyIdToPrice[_tokenId] = 10 finney;
-	 
+
   }
 
 
@@ -241,35 +241,35 @@ contract KittyEthPics is ERC721, Ownable {
   }
 
   function ALLownersANDprices(uint256 _startKittyId) public view returns (address[] owners, address[] divs, uint256[] prices) { //for web site view
-	
+
 	uint256 totalKitties = totalSupply();
-	
+
     if (totalKitties == 0 || _startKittyId >= totalKitties) {
         // Return an empty array
       return (new address[](0),new address[](0),new uint256[](0));
     }
-	
+
 	uint256 indexTo;
 	if (totalKitties > _startKittyId+1000)
 		indexTo = _startKittyId + 1000;
-	else 	
+	else
 		indexTo = totalKitties;
-		
-    uint256 totalResultKitties = indexTo - _startKittyId;		
-		
+
+    uint256 totalResultKitties = indexTo - _startKittyId;
+
 	address[] memory owners_res = new address[](totalResultKitties);
 	address[] memory divs_res = new address[](totalResultKitties);
 	uint256[] memory prices_res = new uint256[](totalResultKitties);
-	
+
 	for (uint256 kittyId = _startKittyId; kittyId < indexTo; kittyId++) {
 	  owners_res[kittyId - _startKittyId] = kittyIdToOwner[kittyId];
 	  divs_res[kittyId - _startKittyId] = kittyIdToDivs[kittyId];
 	  prices_res[kittyId - _startKittyId] = kittyIdToPrice[kittyId];
 	}
-	
+
 	return (owners_res, divs_res, prices_res);
   }
-  
+
   function tokensOfOwner(address _owner) public view returns(uint256[] ownerToken) { //ERC721 for web site view
     uint256 tokenCount = balanceOf(_owner);
     if (tokenCount == 0) {
@@ -354,4 +354,138 @@ function _transfer(address _from, address _to, uint256 _tokenId) private {
     // Emit the transfer event.
     Transfer(_from, _to, _tokenId);
   }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

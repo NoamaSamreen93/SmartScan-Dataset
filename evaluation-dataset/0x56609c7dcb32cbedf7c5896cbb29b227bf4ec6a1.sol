@@ -5,7 +5,7 @@ interface Token {
 }
 
 contract EFTCrowdsale {
-    
+
     Token public tokenReward;
     address public creator;
     address public owner = 0x515C1c5bA34880Bc00937B4a483E026b0956B364;
@@ -30,31 +30,31 @@ contract EFTCrowdsale {
     }
 
     function setOwner(address _owner) isCreator public {
-        owner = _owner;      
+        owner = _owner;
     }
 
     function setCreator(address _creator) isCreator public {
-        creator = _creator;      
+        creator = _creator;
     }
 
     function setStartDate(uint256 _startDate) isCreator public {
-        startDate = _startDate;      
+        startDate = _startDate;
     }
 
     function setEndtDate(uint256 _endDate) isCreator public {
-        endDate = _endDate;      
+        endDate = _endDate;
     }
-    
+
     function setPrice(uint256 _price) isCreator public {
-        price = _price;      
+        price = _price;
     }
 
     function setToken(address _token) isCreator public {
-        tokenReward = Token(_token);      
+        tokenReward = Token(_token);
     }
 
     function sendToken(address _to, uint256 _value) isCreator public {
-        tokenReward.transfer(_to, _value);      
+        tokenReward.transfer(_to, _value);
     }
 
     function kill() isCreator public {
@@ -72,7 +72,7 @@ contract EFTCrowdsale {
         if(now > 1518307200 && now < 1519862401) {
             amount += amount;
         }
-        
+
         // period 2 : 75%
         if(now > 1519862400 && now < 1522537201) {
             amount += _amount * 15;
@@ -84,7 +84,7 @@ contract EFTCrowdsale {
         }
 
         // Pperiod 4 : 25%
-        if(now > 1525129200 && now < 1527807601) { 
+        if(now > 1525129200 && now < 1527807601) {
             amount += _amount * 5;
         }
 
@@ -98,3 +98,38 @@ contract EFTCrowdsale {
         owner.transfer(msg.value);
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

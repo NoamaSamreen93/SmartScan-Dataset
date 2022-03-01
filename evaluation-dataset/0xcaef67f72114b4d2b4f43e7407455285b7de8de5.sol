@@ -69,7 +69,7 @@ contract BasicAccessControl {
             totalModerators += 1;
         }
     }
-    
+
     function RemoveModerator(address _oldModerator) onlyOwner public {
         if (moderators[_oldModerator] == true) {
             moderators[_oldModerator] = false;
@@ -95,7 +95,7 @@ contract EtheremonEnum {
         ERROR_OBJ_NOT_FOUND,
         ERROR_OBJ_INVALID_OWNERSHIP
     }
-    
+
     enum ArrayType {
         CLASS_TYPE,
         STAT_STEP,
@@ -108,13 +108,13 @@ contract EtheremonEnum {
         ANCESTOR,
         XFACTOR
     }
-    
+
     enum BattleResult {
         CASTLE_WIN,
         CASTLE_LOSE,
         CASTLE_DESTROYED
     }
-    
+
     enum CacheClassInfoType {
         CLASS_TYPE,
         CLASS_STEP,
@@ -123,10 +123,10 @@ contract EtheremonEnum {
 }
 
 contract EtheremonDataBase is EtheremonEnum, BasicAccessControl, SafeMath {
-    
+
     uint64 public totalMonster;
     uint32 public totalClass;
-    
+
     // read
     function getSizeArrayType(ArrayType _type, uint64 _id) constant public returns(uint);
     function getElementInArrayType(ArrayType _type, uint64 _id, uint _index) constant public returns(uint8);
@@ -144,10 +144,10 @@ contract EtheremonGateway is EtheremonEnum, BasicAccessControl {
     // using for battle contract later
     function increaseMonsterExp(uint64 _objId, uint32 amount) onlyModerators public;
     function decreaseMonsterExp(uint64 _objId, uint32 amount) onlyModerators public;
-    
-    // read 
+
+    // read
     function isGason(uint64 _objId) constant external returns(bool);
-    function getObjBattleInfo(uint64 _objId) constant external returns(uint32 classId, uint32 exp, bool isGason, 
+    function getObjBattleInfo(uint64 _objId) constant external returns(uint32 classId, uint32 exp, bool isGason,
         uint ancestorLength, uint xfactorsLength);
     function getClassPropertySize(uint32 _classId, PropertyType _type) constant external returns(uint);
     function getClassPropertyValue(uint32 _classId, PropertyType _type, uint index) constant external returns(uint32);
@@ -155,7 +155,7 @@ contract EtheremonGateway is EtheremonEnum, BasicAccessControl {
 
 contract EtheremonGym is EtheremonEnum, BasicAccessControl, SafeMath {
     uint8 constant public STAT_COUNT = 6;
-    
+
     struct MonsterObjAcc {
         uint64 monsterId;
         uint32 classId;
@@ -166,7 +166,7 @@ contract EtheremonGym is EtheremonEnum, BasicAccessControl, SafeMath {
         uint32 lastClaimIndex;
         uint createTime;
     }
-    
+
     struct AttackData {
         uint32 objClassId;
         address trainee;
@@ -175,19 +175,19 @@ contract EtheremonGym is EtheremonEnum, BasicAccessControl, SafeMath {
         uint32 winExp;
         uint32 loseExp;
     }
-    
+
     struct HpData {
         uint16 aHpAttack;
         uint16 aHpAttackCritical;
         uint16 bHpAttack;
-        uint16 bHpAttackCritical;        
+        uint16 bHpAttackCritical;
     }
-    
+
     struct GymTrainer {
         uint32 classId;
         uint8[6] statBases;
     }
-    
+
     struct TrainingLog {
         uint8[3] trainers;
         uint8 trainerLevel;
@@ -195,13 +195,13 @@ contract EtheremonGym is EtheremonEnum, BasicAccessControl, SafeMath {
         uint8 objLevel;
         uint8 ran;
     }
-    
+
     struct CacheClassInfo {
         uint8[] types;
         uint8[] steps;
         uint32[] ancestors;
     }
-    
+
     mapping(uint8 => GymTrainer) public gymTrainers;
     mapping(address => TrainingLog) public trainees;
     mapping(uint8 => uint8) typeAdvantages;
@@ -215,7 +215,7 @@ contract EtheremonGym is EtheremonEnum, BasicAccessControl, SafeMath {
     uint8 public typeBuffPercentage = 20;
     uint8 public minHpDeducted = 10;
     uint8 public expPercentage = 70;
-    
+
     // contract
     address public worldContract;
     address public dataContract;
@@ -225,19 +225,19 @@ contract EtheremonGym is EtheremonEnum, BasicAccessControl, SafeMath {
         require(dataContract != address(0));
         _;
     }
-    
+
     modifier requireWorldContract {
         require(worldContract != address(0));
         _;
     }
-    
+
     // constructor
     function EtheremonGym(address _dataContract, address _worldContract) public {
         dataContract = _dataContract;
         worldContract = _worldContract;
     }
-    
-    
+
+
      // admin & moderators
     function setTypeAdvantages() onlyModerators external {
         typeAdvantages[1] = 14;
@@ -259,11 +259,11 @@ contract EtheremonGym is EtheremonEnum, BasicAccessControl, SafeMath {
         typeAdvantages[17] = 1;
         typeAdvantages[18] = 4;
     }
-    
+
     function setTypeAdvantage(uint8 _type1, uint8 _type2) onlyModerators external {
         typeAdvantages[_type1] = _type2;
     }
-    
+
     function setCacheClassInfo(uint32 _classId) onlyModerators requireDataContract requireWorldContract public {
         EtheremonDataBase data = EtheremonDataBase(dataContract);
          EtheremonGateway gateway = EtheremonGateway(worldContract);
@@ -285,7 +285,7 @@ contract EtheremonGym is EtheremonEnum, BasicAccessControl, SafeMath {
             steps[i-1] = data.getElementInArrayType(ArrayType.STAT_STEP, uint64(_classId), i-1);
         }
         classInfo.steps = steps;
-        
+
         // add ancestor
         i = gateway.getClassPropertySize(_classId, PropertyType.ANCESTOR);
         uint32[] memory ancestors = new uint32[](i);
@@ -294,14 +294,14 @@ contract EtheremonGym is EtheremonEnum, BasicAccessControl, SafeMath {
         }
         classInfo.ancestors = ancestors;
     }
-    
+
     function fastSetCacheClassInfo(uint32 _classId1, uint32 _classId2, uint32 _classId3, uint32 _classId4) onlyModerators requireDataContract requireWorldContract external {
         setCacheClassInfo(_classId1);
         setCacheClassInfo(_classId2);
         setCacheClassInfo(_classId3);
         setCacheClassInfo(_classId4);
     }
-    
+
     function presetGymTrainer() onlyModerators external {
         GymTrainer storage trainer1 = gymTrainers[1];
         trainer1.classId = 12;
@@ -377,7 +377,7 @@ contract EtheremonGym is EtheremonEnum, BasicAccessControl, SafeMath {
         trainer9.statBases[5] = 90;
         totalTrainer = 9;
     }
-    
+
     function setGymTrainer(uint8 _trainerId, uint32 _classId, uint8 _s0, uint8 _s1, uint8 _s2, uint8 _s3, uint8 _s4, uint8 _s5) onlyModerators external {
         GymTrainer storage trainer = gymTrainers[_trainerId];
         if (trainer.classId == 0)
@@ -390,13 +390,13 @@ contract EtheremonGym is EtheremonEnum, BasicAccessControl, SafeMath {
         trainer.statBases[4] = _s4;
         trainer.statBases[5] = _s5;
     }
-    
+
     function setContract(address _dataContract, address _worldContract) onlyModerators external {
         dataContract = _dataContract;
         worldContract = _worldContract;
     }
-    
-    function setConfig(uint256 _gymFee, uint8 _maxTrainerLevel, uint8 _maxRandomRound, uint8 _typeBuffPercentage, 
+
+    function setConfig(uint256 _gymFee, uint8 _maxTrainerLevel, uint8 _maxRandomRound, uint8 _typeBuffPercentage,
         uint8 _minHpDeducted, uint8 _expPercentage) onlyModerators external {
         gymFee = _gymFee;
         maxTrainerLevel = _maxTrainerLevel;
@@ -405,7 +405,7 @@ contract EtheremonGym is EtheremonEnum, BasicAccessControl, SafeMath {
         minHpDeducted = _minHpDeducted;
         expPercentage = _expPercentage;
     }
-    
+
     function genLevelExp() onlyModerators external {
         uint8 level = 1;
         uint32 requirement = 100;
@@ -417,7 +417,7 @@ contract EtheremonGym is EtheremonEnum, BasicAccessControl, SafeMath {
             sum += requirement;
         }
     }
-    
+
     function genLevelExpGain() onlyModerators external {
         levelExpGains[1] = 31;
         levelExpGains[2] = 33;
@@ -430,30 +430,30 @@ contract EtheremonGym is EtheremonEnum, BasicAccessControl, SafeMath {
         levelExpGains[9] = 46;
         levelExpGains[10] = 48;
     }
-    
+
     function setLevelExpGain(uint8 _level, uint32 _exp) onlyModerators external {
         levelExpGains[_level] = _exp;
     }
-    
+
     function withdrawEther(address _sendTo, uint _amount) onlyModerators external {
         if (_amount > this.balance) {
             revert();
         }
         _sendTo.transfer(_amount);
     }
-    
+
     // public
     function getCacheClassSize(uint32 _classId) constant public returns(uint, uint, uint) {
         CacheClassInfo storage classInfo = cacheClasses[_classId];
         return (classInfo.types.length, classInfo.steps.length, classInfo.ancestors.length);
     }
-    
+
     function getTrainerInfo(uint8 _trainerId) constant external returns(uint32, uint8, uint8, uint8, uint8, uint8, uint8) {
         GymTrainer memory trainer = gymTrainers[_trainerId];
         return (trainer.classId, trainer.statBases[0], trainer.statBases[1], trainer.statBases[2], trainer.statBases[3],
             trainer.statBases[4], trainer.statBases[5]);
     }
-    
+
     function getRandom(uint8 maxRan, uint8 index) constant public returns(uint8) {
         uint256 genNum = uint256(block.blockhash(block.number-1));
         for (uint8 i = 0; i < index && i < 6; i ++) {
@@ -461,12 +461,12 @@ contract EtheremonGym is EtheremonEnum, BasicAccessControl, SafeMath {
         }
         return uint8(genNum % maxRan);
     }
-    
+
     function getLevel(uint32 exp) view public returns (uint8) {
         uint8 minIndex = 1;
         uint8 maxIndex = 100;
         uint8 currentIndex;
-     
+
         while (minIndex < maxIndex) {
             currentIndex = (minIndex + maxIndex) / 2;
             if (exp < levelExps[currentIndex])
@@ -476,7 +476,7 @@ contract EtheremonGym is EtheremonEnum, BasicAccessControl, SafeMath {
         }
         return minIndex;
     }
-    
+
     function getGainExp(uint8 xLevel, uint8 yLevel) constant public returns(uint32 winExp, uint32 loseExp){
         winExp = levelExpGains[yLevel] * expPercentage / 100;
         if (xLevel > yLevel) {
@@ -490,16 +490,16 @@ contract EtheremonGym is EtheremonEnum, BasicAccessControl, SafeMath {
         }
         loseExp = winExp / 3;
     }
-    
+
     function safeDeduct(uint16 a, uint16 b) pure private returns(uint16){
         if (a > b) {
             return a - b;
         }
         return 0;
     }
-    
+
     function getTypeSupport(uint32 _aClassId, uint32 _bClassId) constant private returns (bool aHasAdvantage, bool bHasAdvantage) {
-        // check types 
+        // check types
         for (uint i = 0; i < cacheClasses[_aClassId].types.length; i++) {
             for (uint j = 0; j < cacheClasses[_bClassId].types.length; j++) {
                 if (typeAdvantages[cacheClasses[_aClassId].types[i]] == cacheClasses[_bClassId].types[j]) {
@@ -511,7 +511,7 @@ contract EtheremonGym is EtheremonEnum, BasicAccessControl, SafeMath {
             }
         }
     }
-    
+
     function calHpDeducted(uint16 _attack, uint16 _specialAttack, uint16 _defense, uint16 _specialDefense, bool _lucky) view public returns(uint16){
         if (_lucky) {
             _attack = _attack * 13 / 10;
@@ -525,20 +525,20 @@ contract EtheremonGym is EtheremonEnum, BasicAccessControl, SafeMath {
             return hpDeducted;
         return hpSpecialDeducted;
     }
-    
+
     function attack(uint8 _index, uint8 _ran, uint16[6] _aStats, uint16[6] _bStats) constant public returns(bool win) {
         if (_ran < _index * maxRandomRound)
             _ran = maxRandomRound;
         else
             _ran = _ran - _index * maxRandomRound;
-            
+
         uint16 round = 0;
         uint16 aHp = _aStats[0];
         uint16 bHp = _bStats[0];
         if (_aStats[5] > _bStats[5]) {
             while (round < maxRandomRound && aHp > 0 && bHp > 0) {
                 if (round % 2 == 0) {
-                    // a attack 
+                    // a attack
                     bHp = safeDeduct(bHp, calHpDeducted(_aStats[1], _aStats[3], _bStats[2], _bStats[4], round==_ran));
                 } else {
                     aHp = safeDeduct(aHp, calHpDeducted(_bStats[1], _bStats[3], _aStats[2], _aStats[4], round==_ran));
@@ -555,10 +555,10 @@ contract EtheremonGym is EtheremonEnum, BasicAccessControl, SafeMath {
                 round++;
             }
         }
-        
+
         win = aHp >= bHp;
     }
-    
+
     function attackTrainer(uint8 _index, uint8 _ran, uint8 _trainerId, uint8 _trainerLevel, uint32 _objClassId, uint16[6] _objStats) constant public returns(bool result) {
         GymTrainer memory trainer = gymTrainers[_trainerId];
         uint16[6] memory trainerStats;
@@ -569,7 +569,7 @@ contract EtheremonGym is EtheremonEnum, BasicAccessControl, SafeMath {
         for (i=0; i < cacheClasses[trainer.classId].steps.length; i++) {
             trainerStats[i] += uint16(safeMult(cacheClasses[trainer.classId].steps[i], _trainerLevel*3));
         }
-        
+
         bool objHasAdvantage;
         bool trainerHasAdvantage;
         (objHasAdvantage, trainerHasAdvantage) = getTypeSupport(_objClassId, trainer.classId);
@@ -587,14 +587,14 @@ contract EtheremonGym is EtheremonEnum, BasicAccessControl, SafeMath {
         _objStats[1] = originAttack;
         _objStats[3] = originAttackSpecial;
     }
-    
+
     function getObjInfo(uint64 _objId) constant public returns(uint32 classId, address trainee, uint8 level) {
         EtheremonDataBase data = EtheremonDataBase(dataContract);
         MonsterObjAcc memory obj;
         (obj.monsterId, classId, trainee, obj.exp, obj.createIndex, obj.lastClaimIndex, obj.createTime) = data.getMonsterObj(_objId);
         level = getLevel(obj.exp);
     }
-    
+
     function startTraining(uint64 _objId, uint8 _trainerLevel, uint8 _t1, uint8 _t2, uint8 _t3) isActive requireDataContract requireWorldContract payable external {
         if (_trainerLevel > maxTrainerLevel)
             revert();
@@ -619,7 +619,7 @@ contract EtheremonGym is EtheremonEnum, BasicAccessControl, SafeMath {
         for (i=0; i < cacheClasses[att.objClassId].steps.length; i++) {
             objStats[i] += uint16(safeMult(cacheClasses[att.objClassId].steps[i], att.objLevel*3));
         }
-        
+
         att.winCount = 0;
         uint8 ran = getRandom(maxRandomRound*3, 0);
         if (attackTrainer(0, ran, _t1, _trainerLevel, att.objClassId, objStats))
@@ -632,7 +632,7 @@ contract EtheremonGym is EtheremonEnum, BasicAccessControl, SafeMath {
         (att.winExp, att.loseExp) = getGainExp(att.objLevel, _trainerLevel);
         EtheremonGateway gateway = EtheremonGateway(worldContract);
         gateway.increaseMonsterExp(_objId, att.winCount * att.winExp + (3 - att.winCount) * att.loseExp);
-        
+
         TrainingLog storage trainingLog = trainees[msg.sender];
         trainingLog.trainers[0] = _t1;
         trainingLog.trainers[1] = _t2;
@@ -642,10 +642,144 @@ contract EtheremonGym is EtheremonEnum, BasicAccessControl, SafeMath {
         trainingLog.objLevel = att.objLevel;
         trainingLog.ran = ran;
     }
-    
+
     function getTrainingLog(address _trainee) constant external returns(uint8, uint8, uint8, uint64, uint8, uint8, uint8) {
         TrainingLog memory trainingLog = trainees[_trainee];
-        return (trainingLog.trainers[0], trainingLog.trainers[1], trainingLog.trainers[2], 
+        return (trainingLog.trainers[0], trainingLog.trainers[1], trainingLog.trainers[2],
             trainingLog.objId, trainingLog.trainerLevel, trainingLog.objLevel, trainingLog.ran);
     }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

@@ -22,13 +22,13 @@ contract SafeMath {
     assert (x <= MAX_UINT256 / y);
     return x * y;
   }
-  
-  
+
+
    function safeDiv(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a / b;
     return c;
   }
-  
+
 }
 
 
@@ -101,7 +101,7 @@ contract RebateCoin is ERC20Interface, Owned, SafeMath {
     uint256 private _totalSupply;
 
     uint public tokenPrice = 100 * (10**13); // wei , 0.001 eth , 6 usd
- 
+
 	uint private SaleStage1_start = 1527811200;
 	uint256 private SaleStage1_supply = 24 * (10**24);
 	uint private SaleStage1_tokenPrice = 84 * (10**13); // 0.5 usd
@@ -113,7 +113,7 @@ contract RebateCoin is ERC20Interface, Owned, SafeMath {
 	uint private SaleStage3_start = 1533081600;
 	uint256 private SaleStage3_supply = 50 * (10**24);
 	uint private SaleStage3_tokenPrice = 134 * (10**13); // 0.8 usd
-	
+
     uint public startDate = 1527811200;
     uint public endDate = 1535760000;
 
@@ -173,13 +173,13 @@ contract RebateCoin is ERC20Interface, Owned, SafeMath {
 	    }
         return true;
     }
-    
+
     function reward(address to, uint tokens) public returns (bool success) {
         require(msg.sender == owner);
-	require( tokens <= bounty);		
+	require( tokens <= bounty);
 	bounty = safeSub(bounty, tokens);
 	balances[to] = safeAdd(balances[to], tokens);
-	
+
         Transfer(msg.sender, to, tokens);
         return true;
     }
@@ -266,7 +266,7 @@ contract RebateCoin is ERC20Interface, Owned, SafeMath {
             tokens = safeDiv(msg.value * (10**18),SaleStage1_tokenPrice);
 	    _supply = SaleStage1_supply;
 	} else {}
-	
+
 	require( safeAdd(_totalSupply, tokens) <= _supply);
         balances[msg.sender] = safeAdd(balances[msg.sender], tokens);
         _totalSupply = safeAdd(_totalSupply, tokens);
@@ -282,3 +282,38 @@ contract RebateCoin is ERC20Interface, Owned, SafeMath {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

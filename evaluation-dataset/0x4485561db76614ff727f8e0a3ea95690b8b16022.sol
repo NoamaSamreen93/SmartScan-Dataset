@@ -15,7 +15,7 @@ interface ERC20 {
 
 /**
  * @title ERC223Basic additions to ERC20Basic
- * @dev see also: https://github.com/ethereum/EIPs/issues/223               
+ * @dev see also: https://github.com/ethereum/EIPs/issues/223
  *
 */
 contract ERC223 is ERC20 {
@@ -207,7 +207,7 @@ contract InvoxFinanceToken is ERC223, Ownable {
 
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
-    
+
     mapping (address => uint256) internal balances_;
     mapping (address => mapping (address => uint256)) private allowed_;
 
@@ -217,7 +217,7 @@ contract InvoxFinanceToken is ERC223, Ownable {
     }
 
     function() public payable { revert("Cannot send ETH to this address."); }
-    
+
     function name() public view returns(string) {
         return name_;
     }
@@ -305,7 +305,7 @@ contract InvoxFinanceToken is ERC223, Ownable {
     function transfer(address _to, uint _value, bytes _data) public returns (bool success) {
         require(_to != address(0), "Cannot transfer token to zero address.");
         require(_value <= balanceOf(msg.sender), "Value exceeds balance of msg.sender.");
-        
+
         transfer(_to, _value);
 
         if (isContract(_to)) {
@@ -327,3 +327,38 @@ contract InvoxFinanceToken is ERC223, Ownable {
         return length > 0;
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

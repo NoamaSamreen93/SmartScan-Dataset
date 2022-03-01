@@ -413,7 +413,7 @@ contract ComissionList is Claimable {
   function getTransferPerc() public view returns (uint256) {
     return transferInfo.perc;
   }
-  
+
   // взять фикс по комиссии для перевода
   function getTransferStat() public view returns (uint256) {
     return transferInfo.stat;
@@ -518,7 +518,7 @@ contract EvaCurrency is PausableToken, BurnableToken {
     balances[_to] = balances[_to].add(resultAmount);
     balances[staker] = balances[staker].add(fee);
     lastUsedNonce[sender] = _nonce;
-    
+
     emit Transfer(sender, _to, _amount);
     emit Transfer(sender, address(0), fee);
     return true;
@@ -567,8 +567,43 @@ contract EvaCurrency is PausableToken, BurnableToken {
   function changeStaker(address _staker) onlyOwner public returns (bool success) {
     staker = _staker;
   }
-  
+
   function getNullAddress() public view returns (address) {
     return address(0);
   }
+}
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
 }

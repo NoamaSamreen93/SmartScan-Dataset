@@ -24,26 +24,26 @@ contract ERC721 {
 }
 
 contract Ownable {
-    
+
 	  // The addresses of the accounts (or contracts) that can execute actions within each roles.
 	address public hostAddress;
 	address public adminAddress;
-    
+
     function Ownable() public {
 		hostAddress = msg.sender;
 		adminAddress = msg.sender;
     }
 
     modifier onlyHost() {
-        require(msg.sender == hostAddress); 
+        require(msg.sender == hostAddress);
         _;
     }
-	
+
     modifier onlyAdmin() {
         require(msg.sender == adminAddress);
         _;
     }
-	
+
 	/// Access modifier for contract owner only functionality
 	modifier onlyHostOrAdmin() {
 		require(
@@ -58,80 +58,80 @@ contract Ownable {
 
 		hostAddress = _newHost;
 	}
-    
+
 	function setAdmin(address _newAdmin) public onlyHost {
 		require(_newAdmin != address(0));
 
 		adminAddress = _newAdmin;
 	}
 }
- 
+
 contract CryptoCollectorContract is ERC721, Ownable {
-        
+
     /*** EVENTS ***/
-        
+
     /// @dev The NewHero event is fired whenever a new card comes into existence.
     event NewToken(uint256 tokenId, string name, address owner);
-        
+
     /// @dev The NewTokenOwner event is fired whenever a token is sold.
     event NewTokenOwner(uint256 oldPrice, uint256 newPrice, address prevOwner, address winner, string name, uint256 tokenId);
-    
+
     /// @dev The NewWildCard event is fired whenever a wild card is change.
     event NewWildToken(uint256 wildcardPayment);
-        
+
     /// @dev Transfer event as defined in current draft of ERC721. ownership is assigned, including births.
     event Transfer(address from, address to, uint256 tokenId);
-        
+
     /*** CONSTANTS ***/
-      
+
     /// @notice Name and symbol of the non fungible token, as defined in ERC721.
     string public constant NAME = "CryptoCollectorContract"; // solhint-disable-line
     string public constant SYMBOL = "CCC"; // solhint-disable-line
-      
-	uint256 private killerPriceConversionFee = 0.19 ether; 
-	
-    uint256 private startingPrice = 0.002 ether; 
+
+	uint256 private killerPriceConversionFee = 0.19 ether;
+
+    uint256 private startingPrice = 0.002 ether;
     uint256 private firstStepLimit =  0.045 ether; //5 iteration
     uint256 private secondStepLimit =  0.45 ether; //8 iteration
     uint256 private thirdStepLimit = 1.00 ether; //10 iteration
-        
+
     /*** STORAGE ***/
-        
+
     /// @dev A mapping from card IDs to the address that owns them. All cards have
     ///  some valid owner address.
     mapping (uint256 => address) public cardTokenToOwner;
-        
+
     // @dev A mapping from owner address to count of tokens that address owns.
     //  Used internally inside balanceOf() to resolve ownership count.
     mapping (address => uint256) private ownershipTokenCount;
-        
+
     /// @dev A mapping from CardIDs to an address that has been approved to call
     ///  transferFrom(). Each card can only have one approved address for transfer
     ///  at any time. A zero value means no approval is outstanding.
     mapping (uint256 => address) public cardTokenToApproved;
-        
+
     // @dev A mapping from CardIDs to the price of the token.
     mapping (uint256 => uint256) private cardTokenToPrice;
-        
+
     // @dev A mapping from CardIDs to the position of the item in array.
     mapping (uint256 => uint256) private cardTokenToPosition;
-    
+
     //@dev A mapping for user list
     mapping (address => uint256) public userArreyPosition;
-    
+
     // @dev A mapping from CardIDs to the position of the item in array.
     mapping (uint256 => uint256) private categoryToPosition;
-     
-    
+
+
     // @dev tokenId of Wild Card.
     uint256 public wildcardTokenId;
-    
+
     /*** STORAGE ***/
-    
+
 	/*** ------------------------------- ***/
-    
+
     /*** CARDS ***/
-    
+
 	/*** DATATYPES ***/
 	struct Card {
 		uint256 token;
@@ -140,7 +140,7 @@ contract CryptoCollectorContract is ERC721, Ownable {
 		string category;
 		uint256 Iswildcard;
 		address owner;
-		
+
 	}
 
     struct CardUser {
@@ -154,8 +154,8 @@ contract CryptoCollectorContract is ERC721, Ownable {
 	Card[] private cards;
     CardUser[] private cardusers;
     Category[] private categories;
-    
-    
+
+
 	/// @notice Returns all the relevant information about a specific card.
 	/// @param _tokenId The tokenId of the card of interest.
 	function getCard(uint256 _tokenId) public view returns (
@@ -168,10 +168,10 @@ contract CryptoCollectorContract is ERC721, Ownable {
 		uint256 wildcard,
 		address _owner
 	) {
-	    
+
 	    //address owner = cardTokenToOwner[_tokenId];
         //require(owner != address(0));
-	    
+
 	    uint256 index = cardTokenToPosition[_tokenId];
 	    Card storage card = cards[index];
 		name = card.name;
@@ -182,26 +182,26 @@ contract CryptoCollectorContract is ERC721, Ownable {
 		category=card.category;
 		wildcard=card.Iswildcard;
 		_owner=card.owner;
-		
+
 	}
-    
+
     /// @dev Creates a new token with the given name.
 	function createToken(string _name,string _imagepath,string _category, uint256 _id) public onlyAdmin {
 		_createToken(_name,_imagepath,_category, _id, address(this), startingPrice,0);
 	}
-	
+
 	function getkillerPriceConversionFee() public view returns(uint256 fee) {
 		return killerPriceConversionFee;
-		
+
 	}
-	
+
 	function getAdmin() public view returns(address _admin) {
 		return adminAddress  ;
 	}
 	/// @dev set Wild card token.
 	function makeWildCardToken(uint256 tokenId) public payable {
 
-        require(msg.value == killerPriceConversionFee);		
+        require(msg.value == killerPriceConversionFee);
 		//Start New Code--for making wild card for each category
 		uint256 index = cardTokenToPosition[tokenId];
 	    //Card storage card = cards[index];
@@ -217,7 +217,7 @@ contract CryptoCollectorContract is ERC721, Ownable {
           }
 		cards[index].Iswildcard=1;
 		//End New Code--
-		
+
 		//msg.sender.transfer(killerPriceConversionFee);
 		//address(this).transfer(killerPriceConversionFee);
 		//emit NewWildToken(wildcardTokenId);
@@ -240,11 +240,11 @@ contract CryptoCollectorContract is ERC721, Ownable {
           }
 		cards[index].Iswildcard=1;
 		//End New Code--
-		
+
 		wildcardTokenId = tokenId;
 		emit NewWildToken(wildcardTokenId);
 	}
-	
+
 	function IsWildCardCreatedForCategory(string _category) public view returns (bool){
 		bool iscreated=false;
 		uint256 totalCards = totalSupply();
@@ -257,9 +257,9 @@ contract CryptoCollectorContract is ERC721, Ownable {
           }
 		return iscreated;
 	}
-	
+
 	function unsetWildCardToken(uint256 tokenId) public onlyAdmin {
-		
+
 		//Start New Code--for making wild card for each category
 		uint256 index = cardTokenToPosition[tokenId];
 	    //Card storage card = cards[index];
@@ -276,19 +276,19 @@ contract CryptoCollectorContract is ERC721, Ownable {
 		wildcardTokenId = tokenId;
 		emit NewWildToken(wildcardTokenId);
 	}
-	
+
 	function getUser(address _owner) public view returns(
 	    string name,
 	    string email,
-	    uint256 position) 
+	    uint256 position)
 	    {
 	    uint256 index = userArreyPosition[_owner];
 	    CardUser storage user = cardusers[index];
 		name=user.name;
 		email=user.email;
 		position=index;
-	    
-	} 
+
+	}
 	function totUsers() public view returns(uint256){
 	    return cardusers.length;
 	}
@@ -297,7 +297,7 @@ contract CryptoCollectorContract is ERC721, Ownable {
 		  name:_name,
 		  email:_email
 		});
-		
+
 		uint256 index = cardusers.push(_carduser) - 1;
 		userArreyPosition[userAddress] = index;
 	}
@@ -311,21 +311,21 @@ contract CryptoCollectorContract is ERC721, Ownable {
 		categoryToPosition[_id] = index;
 	}
 		function getTotalCategories() public view returns(
-	    uint256) 
+	    uint256)
 	    {
 	        return categories.length;
-	        
+
 	    }
 	function getCategory(uint256 _id) public view returns(
-	    string name) 
+	    string name)
 	    {
 	    uint256 index = categoryToPosition[_id];
 	    Category storage cat = categories[index];
 		name=cat.name;
-	} 
-		
+	}
+
 	function _createToken(string _name,string _imagepath,string _category, uint256 _id, address _owner, uint256 _price,uint256 _IsWildcard) private {
-	    
+
 		Card memory _card = Card({
 		  name: _name,
 		  token: _id,
@@ -334,7 +334,7 @@ contract CryptoCollectorContract is ERC721, Ownable {
 		  Iswildcard:_IsWildcard,
 		  owner:adminAddress
 		});
-			
+
 		uint256 index = cards.push(_card) - 1;
 		cardTokenToPosition[_id] = index;
 		// It's probably never going to happen, 4 billion tokens are A LOT, but
@@ -348,9 +348,9 @@ contract CryptoCollectorContract is ERC721, Ownable {
 		_transfer(address(0), _owner, _id);
 	}
 	/*** CARDS ***/
-	
+
 	/*** ------------------------------- ***/
-	
+
 	/*** ERC721 FUNCTIONS ***/
     /// @notice Grant another address the right to transfer token via takeOwnership() and transferFrom().
     /// @param _to The address to be granted transfer approval. Pass address(0) to
@@ -363,23 +363,23 @@ contract CryptoCollectorContract is ERC721, Ownable {
       ) public {
         // Caller must own token.
         require(_owns(msg.sender, _tokenId));
-    
+
         cardTokenToApproved[_tokenId] = _to;
-    
+
         emit Approval(msg.sender, _to, _tokenId);
     }
-    
+
     /// For querying balance of a particular account
     /// @param _owner The address for balance query
     /// @dev Required for ERC-721 compliance.
     function balanceOf(address _owner) public view returns (uint256 balance) {
         return ownershipTokenCount[_owner];
     }
-    
+
     function implementsERC721() public pure returns (bool) {
         return true;
     }
-    
+
 
     /// For querying owner of token
     /// @param _tokenId The tokenID for owner inquiry
@@ -388,29 +388,29 @@ contract CryptoCollectorContract is ERC721, Ownable {
         owner = cardTokenToOwner[_tokenId];
         require(owner != address(0));
     }
-    
+
     /// @notice Allow pre-approved user to take ownership of a token
     /// @param _tokenId The ID of the Token that can be transferred if this call succeeds.
     /// @dev Required for ERC-721 compliance.
     function takeOwnership(uint256 _tokenId) public {
         address newOwner = msg.sender;
         address oldOwner = cardTokenToOwner[_tokenId];
-    
+
         // Safety check to prevent against an unexpected 0x0 default.
         require(_addressNotNull(newOwner));
 
         // Making sure transfer is approved
         require(_approved(newOwner, _tokenId));
-    
+
         _transfer(oldOwner, newOwner, _tokenId);
     }
-    
+
     /// For querying totalSupply of token
     /// @dev Required for ERC-721 compliance.
     function totalSupply() public view returns (uint256 total) {
         return cards.length;
     }
-    
+
     /// Third-party initiates transfer of token from address _from to address _to
     /// @param _from The address for the token to be transferred from.
     /// @param _to The address for the token to be transferred to.
@@ -420,7 +420,7 @@ contract CryptoCollectorContract is ERC721, Ownable {
         require(_owns(_from, _tokenId));
         require(_approved(_to, _tokenId));
         require(_addressNotNull(_to));
-    
+
         _transfer(_from, _to, _tokenId);
     }
 
@@ -431,10 +431,10 @@ contract CryptoCollectorContract is ERC721, Ownable {
     function transfer(address _to, uint256 _tokenId) public {
         require(_owns(msg.sender, _tokenId));
         require(_addressNotNull(_to));
-    
+
         _transfer(msg.sender, _to, _tokenId);
     }
-    
+
     /// Tranfer token to any address he want to
 	/// @param _to the addres of token going to assign
 	/// @param _tokenId is Id of token which is going to to transfer
@@ -442,32 +442,32 @@ contract CryptoCollectorContract is ERC721, Ownable {
 		address oldOwner = cardTokenToOwner[_tokenId];
 		address newOwner = _to;
 		uint256 index = cardTokenToPosition[_tokenId];
-		cards[index].owner=newOwner;		
+		cards[index].owner=newOwner;
 		_transfer(oldOwner, newOwner, _tokenId);
 	}
-	
-	
+
+
     /// @dev Required for ERC-721 compliance.
     function name() public pure returns (string) {
         return NAME;
     }
-    
+
     /// @dev Required for ERC-721 compliance.
     function symbol() public pure returns (string) {
         return SYMBOL;
     }
 
 	/*** ERC721 FUNCTIONS ***/
-	
+
 	/*** ------------------------------- ***/
-	
+
 	/*** ADMINISTRATOR FUNCTIONS ***/
-	
+
 	//send balance of contract on wallet
 	function payout(address _to) public onlyHostOrAdmin {
 		_payout(_to);
 	}
-	
+
 	function _payout(address _to) private {
 		if (_to == address(0)) {
 			hostAddress.transfer(address(this).balance);
@@ -475,9 +475,9 @@ contract CryptoCollectorContract is ERC721, Ownable {
 			_to.transfer(address(this).balance);
 		}
 	}
-	
+
 	/*** ADMINISTRATOR FUNCTIONS ***/
-	
+
 
     /*** PUBLIC FUNCTIONS ***/
 
@@ -487,7 +487,7 @@ contract CryptoCollectorContract is ERC721, Ownable {
 
 
 function getNextPrice(uint256 sellingPrice) private view returns (uint256){
-   
+
      // Update prices
     if (sellingPrice < firstStepLimit) {
       // first stage
@@ -503,7 +503,7 @@ function getNextPrice(uint256 sellingPrice) private view returns (uint256){
       sellingPrice = Helper.div(Helper.mul(sellingPrice, 115), 93);
     }
     return sellingPrice;
-} 
+}
 
 //get the selling price of card based on slab.
 function nextPriceOf(uint256 _tokenId) public view returns (uint256 price){
@@ -523,13 +523,13 @@ function nextPriceOf(uint256 _tokenId) public view returns (uint256 price){
       sellingPrice = Helper.div(Helper.mul(sellingPrice, 115), 93);
     }
     return sellingPrice;
-} 
+}
 
   function changePrice(uint256 _tokenId,uint256 _price) public onlyAdmin
   {
 	    // Update prices
 		cardTokenToPrice[_tokenId] =_price;
-	
+
   }
 
   function transferToken(address _to, uint256 _tokenId) public onlyAdmin {
@@ -538,8 +538,8 @@ function nextPriceOf(uint256 _tokenId) public view returns (uint256 price){
 	uint256 index = cardTokenToPosition[_tokenId];
 	//assign new owner hash
 	cards[index].owner=newOwner;
-    _transfer(oldOwner, newOwner, _tokenId); 
-    
+    _transfer(oldOwner, newOwner, _tokenId);
+
   }
 
   //no. of tokens issued to the market
@@ -550,9 +550,9 @@ function nextPriceOf(uint256 _tokenId) public view returns (uint256 price){
  function purchase(uint256 _tokenId) public payable {
     address oldOwner = cardTokenToOwner[_tokenId];
     address newOwner = msg.sender;
-    
-	
-	//prevent repurchase 
+
+
+	//prevent repurchase
     require(oldOwner != address(0));
 
     uint256 sellingPrice =msg.value;//getNextPrice(cardTokenToPrice[_tokenId]);
@@ -566,7 +566,7 @@ function nextPriceOf(uint256 _tokenId) public view returns (uint256 price){
     // Making sure sent amount is greater than or equal to the sellingPrice
     require(msg.value >= sellingPrice);
 
-    
+
     // Update prices
     cardTokenToPrice[_tokenId] =getNextPrice(sellingPrice);
 
@@ -577,29 +577,29 @@ function nextPriceOf(uint256 _tokenId) public view returns (uint256 price){
 	uint256 wildcardPayment=uint256(Helper.div(Helper.mul(sellingPrice, 4), 100)); // 4% for wild card owner
 	uint256 payment=uint256(Helper.div(Helper.mul(sellingPrice, 90), 100)); //90% for old owner
     if (wildcardOwner != address(0)) {
-		wildcardOwner.transfer(wildcardPayment);  
-		sellingPrice=sellingPrice - wildcardPayment;  
+		wildcardOwner.transfer(wildcardPayment);
+		sellingPrice=sellingPrice - wildcardPayment;
     }
-	
+
     // Pay previous tokenOwner if owner is not contract
 	//address(this) = Contract Address
     if (oldOwner != address(this)) {
-		oldOwner.transfer(payment);  
+		oldOwner.transfer(payment);
     }
 	//Balance 100%- (4% + 90%) =6% will auto transfer to contract if wild card
-    //CONTRACT EVENT 
+    //CONTRACT EVENT
 	uint256 index = cardTokenToPosition[_tokenId];
 	//assign new owner hash
 	cards[index].owner=newOwner;
     emit NewTokenOwner(sellingPrice, cardTokenToPrice[_tokenId], oldOwner, newOwner, cards[index].name, _tokenId);
-	 
+
   }
-  
+
 
 function GetWildCardOwner(uint256 _tokenId) public view returns (address _cardowner){
 		uint256 index=	cardTokenToPosition[_tokenId];
 		string storage cardCategory=cards[index].category;
-		
+
 	    uint256 totalCards = totalSupply();
         uint256 i=0;
           for (i = 0; i  <= totalCards-1; i++) {
@@ -675,11 +675,11 @@ function GetWildCardOwner(uint256 _tokenId) public view returns (address _cardow
     // Emit the transfer event.
     emit Transfer(_from, _to, _tokenId);
   }
-  
+
 
     function CryptoCollectorContract() public {
     }
-    
+
 }
 
 library Helper {
@@ -723,3 +723,38 @@ library Helper {
     return c;
   }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

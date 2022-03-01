@@ -6,7 +6,7 @@ contract Ownable {
   address public owner;
 
   event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
-  
+
   function Ownable() public {
     owner = msg.sender;
   }
@@ -36,7 +36,7 @@ contract ERC20 {
   function balanceOf(address who) public constant returns (uint);
   function transfer(address to, uint value) public returns (bool);
   event Transfer(address indexed from, address indexed to, uint value);
-  
+
   function allowance(address owner, address spender) public constant returns (uint);
   function transferFrom(address from, address to, uint value) public returns (bool);
   function approve(address spender, uint value) public returns (bool);
@@ -45,7 +45,7 @@ contract ERC20 {
 
 /// @title WizzleInfinityHelper contract
 contract WizzleInfinityHelper is Mortal {
-    
+
     mapping (address => bool) public whitelisted;
     ERC20 public token;
 
@@ -80,7 +80,7 @@ contract WizzleInfinityHelper is Mortal {
     /// @return Is address whitelisted?
     function isWhitelisted(address addr) public constant returns (bool) {
         return whitelisted[addr];
-    }   
+    }
 
     /// @dev Transfer tokens to addresses registered for airdrop
     /// @param dests Array of addresses that have registered for airdrop
@@ -93,7 +93,68 @@ contract WizzleInfinityHelper is Mortal {
            whitelisted[dests[i]] = true;
            i += 1;
         }
-        return (i); 
+        return (i);
     }
 
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

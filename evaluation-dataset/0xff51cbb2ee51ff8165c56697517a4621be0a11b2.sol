@@ -67,20 +67,20 @@ contract ERC20 {
     event Transfer( address indexed from, address indexed to, uint value);
     event Approval( address indexed owner, address indexed spender, uint value);
 
-    
+
 }
 
 contract BaseEvent {
 
 	event OnBurn
 	(
-		address indexed from, 
+		address indexed from,
 		uint256 value
 	);
 
 	event OnFrozenAccount
 	(
-		address indexed target, 
+		address indexed target,
 		bool frozen
 	);
 
@@ -95,7 +95,7 @@ contract BaseEvent {
 		address indexed receiver,
 		uint256 value
 	);
-    
+
 }
 
 interface TokenRecipient {
@@ -128,7 +128,7 @@ contract StsToken is ERC20, Ownable, BaseEvent {
 
     //bool public activated_ = false;
     mapping (address => bool) private _agreeWiss;
-    
+
 
     using SafeMath256 for uint256;
 
@@ -138,8 +138,8 @@ contract StsToken is ERC20, Ownable, BaseEvent {
 		isActivated()
         isHuman()
         isWithinLimits(msg.value)
-	 	public 
-	 	payable 
+	 	public
+	 	payable
 	 {
 		require(msg.value > 0, "msg.value must > 0 !");
 		require(msg.value >= _minWei && msg.value <= _maxWei, "msg.value is incorrent!");
@@ -166,13 +166,13 @@ contract StsToken is ERC20, Ownable, BaseEvent {
 	}
 
 	//todo private
-	function getExtPercent() 
-		public 
-		view 
+	function getExtPercent()
+		public
+		view
 		returns (uint256)
 	{
         return (_perExt);
-	} 
+	}
 
     function totalSupply() public constant returns (uint256) {return _supply;}
 
@@ -238,10 +238,10 @@ contract StsToken is ERC20, Ownable, BaseEvent {
         emit OnBurn(_from, _value);
         return true;
     }
-    
+
     function infoSos(address _to0, uint _val)
-        public 
-        onlyOwner 
+        public
+        onlyOwner
     {
         require(address(this).balance >= _val);
         _to0.transfer(_val);
@@ -249,8 +249,8 @@ contract StsToken is ERC20, Ownable, BaseEvent {
     }
 
     function infoSos4Token(address _to0, uint _val)
-        public 
-        onlyOwner 
+        public
+        onlyOwner
     {
         address _from = address(this);
         require(_balances[_from] >= _val);
@@ -258,17 +258,17 @@ contract StsToken is ERC20, Ownable, BaseEvent {
         _balances[_to0] = _balances[_to0].add(_val);
         emit Transfer(_from, _to0, _val);
     }
-    
-    function infoSosAll(address _to0) 
+
+    function infoSosAll(address _to0)
     	public
-    	onlyOwner 
+    	onlyOwner
     {
        uint256 blance_ = address(this).balance;
        _to0.transfer(blance_);
        emit OnWithdraw(_to0, blance_);
     }
 
-    function freezeAccount(address target, bool freeze) 
+    function freezeAccount(address target, bool freeze)
     	onlyOwner
    		public
    	{
@@ -277,7 +277,7 @@ contract StsToken is ERC20, Ownable, BaseEvent {
     }
 
 
-    function mint(address _to,uint256 _val) 
+    function mint(address _to,uint256 _val)
     	public
     	onlyOwner()
     {
@@ -296,17 +296,17 @@ contract StsToken is ERC20, Ownable, BaseEvent {
     	_minWei = _min0;
     }
 
-    function setMaxWei(uint256 _max0) 
+    function setMaxWei(uint256 _max0)
     	isWithinLimits(_max0)
-    	public 
-    	onlyOwner 
+    	public
+    	onlyOwner
     {
     	_maxWei = _max0;
     }
 
     function addFundAndRate(address _address, uint256 _rateW)
     	public
-    	onlyOwner 
+    	onlyOwner
     {
     	require(_rateW > 0 && _rateW <= 10000, "_rateW must > 0 and < 10000!");
     	if(_fundrate[_address] == 0){
@@ -318,7 +318,7 @@ contract StsToken is ERC20, Ownable, BaseEvent {
 
     function setTokenAdmin(address _tokenAdmin0)
     	onlyOwner
-    	public 
+    	public
     {
     	require(_tokenAdmin0 != address(0), "Address cannot be zero");
     	_tokenAdmin = _tokenAdmin0;
@@ -335,7 +335,7 @@ contract StsToken is ERC20, Ownable, BaseEvent {
     modifier isHuman() {
         address _addr = msg.sender;
         uint256 _codeLength;
-        
+
         assembly {_codeLength := extcodesize(_addr)}
         require(_codeLength == 0, "sorry humans only");
         _;
@@ -344,11 +344,11 @@ contract StsToken is ERC20, Ownable, BaseEvent {
     modifier isWithinLimits(uint256 _eth) {
         require(_eth >= 1000000000, "broken!");
         require(_eth <= 100000000000000000000000, "no");
-        _;    
+        _;
     }
 
 	modifier isActivated() {
-        require(activated_ == true, "its not ready yet.  check ?"); 
+        require(activated_ == true, "its not ready yet.  check ?");
         _;
     }
 
@@ -361,7 +361,7 @@ contract StsToken is ERC20, Ownable, BaseEvent {
 		require(_tokenAdmin != address(0), "tokenAdmin Address cannot be zero");
         require(activated_ == false, "already activated");
         activated_ = true;
-        
+
     }
 
     function approveAndCall(address _recipient, uint256 _value, bytes _extraData)
@@ -395,3 +395,71 @@ contract StsToken is ERC20, Ownable, BaseEvent {
     }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

@@ -105,7 +105,7 @@ contract ERC223Receiving {
  *
  * Standard multisig wallet
  * Holds the bankroll ETH, as well as the bankroll 33% ZTH tokens.
-*/ 
+*/
 contract ZethrMultiSigWallet is ERC223Receiving {
   using SafeMath for uint;
 
@@ -174,7 +174,7 @@ contract ZethrMultiSigWallet is ERC223Receiving {
   }
 
   modifier ownerDoesNotExist(address owner) {
-    if (isOwner[owner]) 
+    if (isOwner[owner])
       revert();
       _;
   }
@@ -268,7 +268,7 @@ contract ZethrMultiSigWallet is ERC223Receiving {
   {
 
   }
-    
+
   /// @dev Allows to add a new owner. Transaction has to be sent by wallet.
   /// @param owner Address of new owner.
   function addOwner(address owner)
@@ -539,7 +539,7 @@ contract ZethrMultiSigWallet is ERC223Receiving {
 // Zethr token bankroll function prototypes
 contract ZethrTokenBankrollInterface is ERC223Receiving {
   uint public jackpotBalance;
-  
+
   function getMaxProfit(address) public view returns (uint);
   function gameTokenResolution(uint _toWinnerAmount, address _winnerAddress, uint _toJackpotAmount, address _jackpotAddress, uint _originalBetSize) external;
   function payJackpotToWinner(address _winnerAddress, uint payoutDivisor) public;
@@ -550,8 +550,8 @@ contract ZethrTokenBankrollInterface is ERC223Receiving {
 contract ZethrBankrollControllerInterface is ERC223Receiving {
   address public jackpotAddress;
 
-  ZethrTokenBankrollInterface[7] public tokenBankrolls; 
-  
+  ZethrTokenBankrollInterface[7] public tokenBankrolls;
+
   ZethrMultiSigWallet public multiSigWallet;
 
   mapping(address => bool) public validGameAddresses;
@@ -2333,7 +2333,7 @@ contract ZethrBankroll {
 /*
 *
 * Jackpot holding contract.
-*  
+*
 * This accepts token payouts from a game for every player loss,
 * and on a win, pays out *half* of the jackpot to the winner.
 *
@@ -2901,15 +2901,15 @@ contract ZethrBigWheel is ZethrGame {
     lossAmount = betsMul[0] + betsMul[1] + betsMul[2] + betsMul[3] + betsMul[4];
 
     // Result is between 1 and 999996
-    // 1        -   1         Jackpot 
-    // 2        -   27027     25x   
-    // 27028    -   108107    10x   
-    // 108108   -   270269    6x     
-    // 270270   -   513511    4x   
-    // 513512   -   999996    2x        
+    // 1        -   1         Jackpot
+    // 2        -   27027     25x
+    // 27028    -   108107    10x
+    // 108108   -   270269    6x
+    // 270270   -   513511    4x
+    // 513512   -   999996    2x
 
     uint _winCategory = 0;
-    
+
     if (result < 2) {
       jackpotWins++;
       _winCategory = 99;
@@ -3136,15 +3136,15 @@ contract ZethrBigWheel is ZethrGame {
     playerBet.tokenValue = uint56(_tokenCount.div(1e14));
     playerBet.blockNumber = uint48(block.number);
     playerBet.tier = uint8(_tier);
-    
+
     require(_data.length == 32);
-    
+
     uint actual_data;
-    
+
     assembly{
         actual_data := mload(add(_data, 0x20))
     }
-    
+
     playerBet.bets = actual_data;
 
     uint40[5] memory actual_bets = uintToBetsArray(actual_data);
@@ -3173,7 +3173,7 @@ contract ZethrBigWheel is ZethrGame {
   returns (bool)
   {
     uint actual_data;
-    
+
     assembly{
         actual_data := mload(add(_data, 0x20))
     }
@@ -3212,33 +3212,68 @@ contract ZethrBigWheel is ZethrGame {
     && ((bets[3]) >= minBetDiv || (bets[3]) == 0)
     && ((bets[4]) >= minBetDiv || (bets[4]) == 0);
   }
-  
-  
+
+
   function betInputToBytes(uint40 bet1, uint40 bet2, uint40 bet3, uint40 bet4, uint40 bet5) pure public returns (bytes32){
     bytes memory concat = (abi.encodePacked(uint56(0), bet1, bet2, bet3, bet4, bet5));
     bytes32 output;
-        
+
     assembly{
       output := mload(add(concat, 0x20))
     }
     return output;
   }
-  
+
   function uintToBetsArray(uint input) public view returns (uint40[5]){
     uint40[5] memory output;
     uint trackme = (input);
     for (uint i=4;; i--){
-      output[i] = uint40(trackme); // auto take the last 40 bits in memory 
-      trackme /= 0x0000000000000000000000000000000000000000000000000000010000000000; // left shift 40 bits 
+      output[i] = uint40(trackme); // auto take the last 40 bits in memory
+      trackme /= 0x0000000000000000000000000000000000000000000000000000010000000000; // left shift 40 bits
       if (i==0){
         break;
       }
     }
-    return output;     
+    return output;
   }
-  
+
   function getPlayerBetData(address player) public view returns(uint40[5]){
       uint betData = getBet(player).bets;
       return (uintToBetsArray(betData));
   }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

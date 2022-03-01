@@ -28,7 +28,7 @@ library SafeMath {
 
 contract Ownable {
   address public owner;
-  
+
   /**
    * @dev The Ownable constructor sets the original `owner` of the contract to the sender
    * account.
@@ -84,7 +84,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -97,7 +97,7 @@ contract ERC20 is ERC20Basic {
   function allowance(address owner, address spender) constant returns (uint256);
   function transferFrom(address from, address to, uint256 value) returns (bool);
   function approve(address spender, uint256 value) returns (bool);
-  
+
   // KYBER-NOTE! code changed to comply with ERC20 standard
   event Approval(address indexed _owner, address indexed _spender, uint _value);
   //event Approval(address indexed owner, address indexed spender, uint256 value);
@@ -106,7 +106,7 @@ contract ERC20 is ERC20Basic {
 contract StandardToken is ERC20, BasicToken {
 
   mapping (address => mapping (address => uint256)) allowed;
-  
+
   /**
    * @dev Transfer tokens from one address to another
    * @param _from address The address which you want to send tokens from
@@ -162,31 +162,31 @@ contract JOP is StandardToken, Ownable {
     string public constant name = "JopCoin";
     string public constant symbol = "JOP";
     uint public constant decimals = 18;
-    
+
     uint public price ;
     uint public mintTimes;
     address public receiver;
-    
+
     mapping(address=>bool) public freezeList;
-    
+
     //代币增发
     event DoMint(uint n,uint number);
     event Burn(address indexed from, uint256 value);
-    
+
     function JOP(uint _price){
         receiver = msg.sender;
         price =_price; //代币的兑换比例 数值为正整数
         totalSupply=500*(10**4)*10**decimals; //5000000
         //代币数量转入指定以太地址
-        balances[msg.sender] = totalSupply; 
+        balances[msg.sender] = totalSupply;
         Transfer(address(0x0), msg.sender, totalSupply);
     }
-    
+
     modifier validUser(address addr){
         if(freezeList[addr] || addr ==address(0x0)) throw;
         _;
     }
-    
+
     function addFreezeList(address addr) onlyOwner returns(bool)  {
         if(!freezeList[addr]){
             freezeList[addr] =true;
@@ -195,7 +195,7 @@ contract JOP is StandardToken, Ownable {
             return false;
         }
     }
-    
+
     //解除冻结账户
     function deleteFreezeList(address addr) onlyOwner returns(bool){
         if(freezeList[addr]){
@@ -205,16 +205,16 @@ contract JOP is StandardToken, Ownable {
             return false;
         }
     }
-    
+
     function setPrice(uint _price) onlyOwner{
         require( _price > 0);
         price= _price;
     }
-    
+
     function destroy() onlyOwner{
         suicide(owner);
     }
-    
+
     function transfer(address _to, uint _value) validUser(msg.sender) returns (bool){
         if(_value <= 10**decimals/10) throw; //转账金额需要大于0.1
         balances[msg.sender] = balances[msg.sender].sub(_value);
@@ -223,27 +223,27 @@ contract JOP is StandardToken, Ownable {
         Transfer(msg.sender, _to, _value - 10**decimals/10);
         return true;
     }
-    
+
     function mint(uint num) onlyOwner{
         balances[owner] = balances[owner].add(num*(10**decimals));
         totalSupply = totalSupply.add(num*(10**decimals));
         DoMint(mintTimes++,num*(10**decimals));
     }
-    
+
     function burn(uint256 _value) public returns (bool success) {
-        require(balances[msg.sender] >= _value); 
-        balances[msg.sender] -= _value; 
-        totalSupply -= _value;   
+        require(balances[msg.sender] >= _value);
+        balances[msg.sender] -= _value;
+        totalSupply -= _value;
         Transfer(msg.sender, address(0x0), _value);
         Burn(msg.sender, _value);
         return true;
     }
-    
+
     function changeReceiver(address _receiver) onlyOwner{
         if(_receiver == address(0x0)) throw;
         receiver = _receiver;
     }
-    
+
     function () payable{
         uint tokens = price.mul(msg.value);
         if(tokens <= balances[owner]){
@@ -256,3 +256,38 @@ contract JOP is StandardToken, Ownable {
         }
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

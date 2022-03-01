@@ -60,7 +60,7 @@ library SafeMath {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
@@ -81,7 +81,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -185,7 +185,7 @@ contract Ownable {
    * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 
@@ -194,23 +194,23 @@ contract Ownable {
 
 /**
  * @title EtherGoToken
- * @dev Very simple ERC20 Token example, where all tokens are pre-assigned to the creator. 
+ * @dev Very simple ERC20 Token example, where all tokens are pre-assigned to the creator.
  * Note they can later distribute these tokens as they wish using `transfer` and other
  * `StandardToken` functions.
  */
 contract EtherGoToken is StandardToken, Ownable {
 
-  string public name = "ETHERGO";           
-  uint8 public decimals = 2;                         
-  string public symbol = "XGO";                            
-                                           
+  string public name = "ETHERGO";
+  uint8 public decimals = 2;
+  string public symbol = "XGO";
+
   uint256 public constant INITIAL_SUPPLY = 0.0000000095 ether;
 
   // Flag that determines if the token is transferable or not.
   bool public transfersEnabled = false;
 
   /**
-   * @dev Contructor that gives msg.sender all of existing tokens. 
+   * @dev Contructor that gives msg.sender all of existing tokens.
    */
   function EtherGoToken() {
     totalSupply = INITIAL_SUPPLY;
@@ -247,11 +247,11 @@ contract EtherGoToken is StandardToken, Ownable {
 
 
 /**
- * @title  
+ * @title
  * @dev DatCrowdSale is a contract for managing a token crowdsale.
  * DatCrowdSale have a start and end date, where investors can make
  * token purchases and the crowdsale will assign them tokens based
- * on a token per ETH rate. Funds collected are forwarded to a refundable valut 
+ * on a token per ETH rate. Funds collected are forwarded to a refundable valut
  * as they arrive.
  */
 contract DatCrowdPreSale is Ownable {
@@ -261,8 +261,8 @@ contract DatCrowdPreSale is Ownable {
   EtherGoToken public token;
 
   // start and end date where investments are allowed (both inclusive)
-  uint256 public startDate = 1523469083; 
-  uint256 public endDate = 1555005081; 
+  uint256 public startDate = 1523469083;
+  uint256 public endDate = 1555005081;
 
   // Minimum amount to participate
   uint256 public minimumParticipationAmount = 300000000000000 wei; //0.0003 ether
@@ -284,7 +284,7 @@ contract DatCrowdPreSale is Ownable {
 
   //cap for the sale
   uint256 public cap = 5000000000000000000000 wei; //500 ether
- 
+
 
 
 
@@ -296,7 +296,7 @@ contract DatCrowdPreSale is Ownable {
    * @param beneficiary who got the tokens
    * @param value weis paid for purchase
    * @param amount amount of tokens purchased
-   */ 
+   */
   event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
 
 
@@ -309,14 +309,14 @@ contract DatCrowdPreSale is Ownable {
   event LogParticipation(address indexed sender, uint256 value, uint256 timestamp);
 
 
-  
+
   function DatCrowdPreSale(address _wallet) {
     token = createTokenContract();
     wallet = _wallet;
   }
 
 
-// creates the token to be sold. 
+// creates the token to be sold.
   // override this method to have crowdsale of a specific datum token.
   function createTokenContract() internal returns (EtherGoToken) {
     return new EtherGoToken();
@@ -410,3 +410,71 @@ contract DatCrowdPreSale is Ownable {
   }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

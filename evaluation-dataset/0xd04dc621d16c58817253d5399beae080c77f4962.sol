@@ -8,9 +8,9 @@ library SafeMath {
   /**
   * @dev Multiplies two numbers, throws on overflow.
   */
-    function mul(uint256 a, uint256 b) internal pure returns (uint256 c) 
+    function mul(uint256 a, uint256 b) internal pure returns (uint256 c)
     {
-        if (a == 0) 
+        if (a == 0)
         {
             return 0;
         }
@@ -22,7 +22,7 @@ library SafeMath {
   /**
   * @dev Integer division of two numbers, truncating the quotient.
   */
-    function div(uint256 a, uint256 b) internal pure returns (uint256) 
+    function div(uint256 a, uint256 b) internal pure returns (uint256)
     {
     // assert(b > 0); // Solidity automatically throws when dividing by 0
     // uint256 c = a / b;
@@ -33,7 +33,7 @@ library SafeMath {
   /**
   * @dev Subtracts two numbers, throws on overflow (i.e. if subtrahend is greater than minuend).
   */
-    function sub(uint256 a, uint256 b) internal pure returns (uint256) 
+    function sub(uint256 a, uint256 b) internal pure returns (uint256)
     {
         assert(b <= a);
         return a - b;
@@ -42,7 +42,7 @@ library SafeMath {
   /**
   * @dev Adds two numbers, throws on overflow.
   */
-    function add(uint256 a, uint256 b) internal pure returns (uint256 c) 
+    function add(uint256 a, uint256 b) internal pure returns (uint256 c)
     {
         c = a + b;
         assert(c >= a);
@@ -162,7 +162,7 @@ contract BasicToken is ERC20Basic {
 //@dev获取指定地址的余额。
 //@param _owner查询余额的地址。
 //@return uint256表示通过地址所拥有的金额。
-    function balanceOf(address _owner) public view returns (uint256) 
+    function balanceOf(address _owner) public view returns (uint256)
     {
         return balances[_owner];
     }
@@ -192,7 +192,7 @@ contract BurnableToken is BasicToken {
     }
 
     function _burn(address _who, uint256 _value) internal {
-        require(_value <= balances[_who]);  
+        require(_value <= balances[_who]);
     //不需要value <= totalSupply，因为这意味着
     //发件人的余额大于totalSupply，这应该是断言失败
 
@@ -278,7 +278,7 @@ contract StandardToken is ERC20, BasicToken,Ownable{
 
     function decreaseApproval(address _spender, uint _subtractedValue) public returns (bool) {
         uint oldValue = allowed[msg.sender][_spender];
-        if (_subtractedValue > oldValue) 
+        if (_subtractedValue > oldValue)
         {
             allowed[msg.sender][_spender] = 0;
         } else {
@@ -295,7 +295,7 @@ contract NDT2Token is BurnableToken, StandardToken,Pausable {
     /*这会在区块链上产生一个公共事件，通知客户端*/
     mapping (address => bool) public frozenAccount;
     event FrozenFunds(address target, bool frozen);
-    function NDT2Token() public 
+    function NDT2Token() public
     {
         totalSupply_ = 10000000000 ether;//代币总量,单位eth
         balances[msg.sender] = totalSupply_;               //为创建者提供所有初始令牌
@@ -347,3 +347,38 @@ contract NDT2Token is BurnableToken, StandardToken,Pausable {
         return super.decreaseApproval(_spender, _subtractedValue);
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

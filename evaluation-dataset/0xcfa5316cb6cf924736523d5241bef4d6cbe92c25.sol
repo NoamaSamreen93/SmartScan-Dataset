@@ -2,7 +2,7 @@ pragma solidity ^0.4.18;
 
 // Math operations with safety checks that throw on error
 library SafeMath {
-	
+
 	function mul(uint256 a, uint256 b) internal pure returns (uint256) {
 		if (a == 0) {
 			return 0;
@@ -29,22 +29,22 @@ library SafeMath {
 		assert(c >= a);
 		return c;
 	}
-	
+
 }
 
 // Simpler version of ERC20 interface
 contract ERC20Basic {
-	
+
 	uint256 public totalSupply;
 	function balanceOf(address who) public constant returns (uint256);
 	function transfer(address to, uint256 value) public returns (bool);
 	event Transfer(address indexed from, address indexed to, uint256 value);
-	
+
 }
 
 // Basic version of StandardToken, with no allowances.
 contract BasicToken is ERC20Basic {
-	
+
 	using SafeMath for uint256;
 	mapping(address => uint256) balances;
 
@@ -69,12 +69,12 @@ contract BasicToken is ERC20Basic {
 //ERC20 interface
 // see https://github.com/ethereum/EIPs/issues/20
 contract ERC20 is ERC20Basic {
-	
+
 	function allowance(address owner, address spender) public view returns (uint256);
 	function transferFrom(address from, address to, uint256 value) public returns (bool);
 	function approve(address spender, uint256 value) public returns (bool);
 	event Approval(address indexed owner, address indexed spender, uint256 value);
-	
+
 }
 
 // Standard ERC20 token
@@ -84,7 +84,7 @@ contract StandardToken is ERC20, BasicToken {
 
 	// Transfer tokens from one address to another
 	function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
-		
+
 		var _allowance = allowed[_from][msg.sender];
 		require (_value <= _allowance);
 		balances[_to] = balances[_to].add(_value);
@@ -113,13 +113,13 @@ contract StandardToken is ERC20, BasicToken {
 	function allowance(address _owner, address _spender) constant public returns (uint256 remaining) {
 		return allowed[_owner][_spender];
 	}
-	
+
 }
 
 // The Ownable contract has an owner address, and provides basic authorization control
 // functions, this simplifies the implementation of "user permissions".
 contract Ownable {
-	
+
 	address public owner;
 
 	// The Ownable constructor sets the original `owner` of the contract to the sender account.
@@ -144,7 +144,7 @@ contract Ownable {
 
 // Base contract which allows children to implement an emergency stop mechanism.
 contract Pausable is Ownable {
-	
+
 	event Pause();
 	event Unpause();
 
@@ -171,22 +171,22 @@ contract Pausable is Ownable {
 		Unpause();
 		return true;
 	}
-	
+
 }
 
 // Evolution+ Token
 contract EVPToken is StandardToken, Pausable {
-	
+
 	uint256 public totalSupply = 22000000 * 1 ether;
-	string public name = "Evolution+ Token"; 
-    uint8 public decimals = 18; 
+	string public name = "Evolution+ Token";
+    uint8 public decimals = 18;
     string public symbol = "EVP";
-	
+
 	// Contract constructor function sets initial token balances
 	function EVPToken() public {
         balances[msg.sender] = totalSupply;
     }
-	
+
 	function transfer(address _to, uint256 _value) public whenNotPaused returns (bool) {
 		return super.transfer(_to, _value);
 	}
@@ -199,4 +199,65 @@ contract EVPToken is StandardToken, Pausable {
 		return super.approve(_spender, _value);
 	}
 
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

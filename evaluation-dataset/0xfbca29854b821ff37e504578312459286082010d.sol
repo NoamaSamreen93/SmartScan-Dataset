@@ -16,7 +16,7 @@ pragma solidity ^0.4.11;
 */
 
 /**
- * Storage contract for Etherep to store ratings and score data.  It's been 
+ * Storage contract for Etherep to store ratings and score data.  It's been
  * separated from the main contract because this is much less likely to change
  * than the other parts.  It would allow for upgrading the main contract without
  * losing data.
@@ -42,18 +42,18 @@ contract RatingStore {
     /**
      * Only the manager or controller can use this method
      */
-    modifier restricted() { 
+    modifier restricted() {
         require(msg.sender == manager || tx.origin == manager || msg.sender == controller);
-        _; 
+        _;
     }
 
     /**
      * Only a certain address can use this modified method
      * @param by The address that can use the method
      */
-    modifier onlyBy(address by) { 
+    modifier onlyBy(address by) {
         require(msg.sender == by);
-        _; 
+        _;
     }
 
     /**
@@ -190,8 +190,8 @@ contract Etherep {
     event DebugInt(int message);
     event DebugUint(uint message);
     event Rating(
-        address by, 
-        address who, 
+        address by,
+        address who,
         int rating
     );
     event FeeChanged(uint f);
@@ -201,9 +201,9 @@ contract Etherep {
      * Only a certain address can use this modified method
      * @param by The address that can use the method
      */
-    modifier onlyBy(address by) { 
+    modifier onlyBy(address by) {
         require(msg.sender == by);
-        _; 
+        _;
     }
 
     /**
@@ -225,7 +225,7 @@ contract Etherep {
         _;
     }
 
-    /** 
+    /**
      * Constructor
      * @param _manager The key that can make changes to this contract
      * @param _fee The variable fee that will be charged per rating
@@ -314,7 +314,7 @@ contract Etherep {
         manager.transfer(this.balance);
     }
 
-    /** 
+    /**
      * Adds a rating to an address' cumulative score
      * @param who The address that is being rated
      * @param rating The rating(-5 to 5)
@@ -326,7 +326,7 @@ contract Etherep {
         require(who != msg.sender);
 
         RatingStore store = RatingStore(storageAddress);
-        
+
         // Starting weight
         int weight = 0;
 
@@ -358,7 +358,7 @@ contract Etherep {
         else {
             weight = multiplier;
         }
-        
+
         // Calculate weighted rating
         int workRating = rating * weight;
 
@@ -380,12 +380,12 @@ contract Etherep {
     function getScore(address who) external constant returns (int score) {
 
         RatingStore store = RatingStore(storageAddress);
-        
+
         int cumulative;
         uint ratings;
         (cumulative, ratings) = store.get(who);
-        
-        // The score should have room for 2 decimal places, but ratings is a 
+
+        // The score should have room for 2 decimal places, but ratings is a
         // single count
         score = cumulative / int(ratings);
 
@@ -400,14 +400,49 @@ contract Etherep {
     function getScoreAndCount(address who) external constant returns (int score, uint ratings) {
 
         RatingStore store = RatingStore(storageAddress);
-        
+
         int cumulative;
         (cumulative, ratings) = store.get(who);
-        
-        // The score should have room for 2 decimal places, but ratings is a 
+
+        // The score should have room for 2 decimal places, but ratings is a
         // single count
         score = cumulative / int(ratings);
 
     }
 
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

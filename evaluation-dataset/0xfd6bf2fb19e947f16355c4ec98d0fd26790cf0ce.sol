@@ -273,7 +273,7 @@ contract MintableToken is StandardToken, Ownable {
 
   /**
   *
-  * Add adresses that can run an airdrop 
+  * Add adresses that can run an airdrop
   *
   */
   function whitelistAddressArray (address[] users) onlyOwner public {
@@ -284,7 +284,7 @@ contract MintableToken is StandardToken, Ownable {
 
   /**
   *
-  * only whitelisted address can airdrop  
+  * only whitelisted address can airdrop
   *
   */
 
@@ -316,7 +316,7 @@ contract MintableToken is StandardToken, Ownable {
   /**
   *
   * Run air drop, only from whitelisted adresses ( can run multiple pending transactions at a time )
-  * the granularity is 50 adresses at a time for the same amount, saving a good amount of gaz 
+  * the granularity is 50 adresses at a time for the same amount, saving a good amount of gaz
   *
   */
 
@@ -497,4 +497,39 @@ contract kdoTokenIcoListMe is MintableToken,BurnableToken {
     string public constant name = "A ? from ico-list.me/kdo";
     string public constant symbol = "KDO ?";
     uint8 public decimals = 3;
+}
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
 }

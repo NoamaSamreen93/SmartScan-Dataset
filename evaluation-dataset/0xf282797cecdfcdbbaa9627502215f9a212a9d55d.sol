@@ -1306,7 +1306,7 @@ contract Crowdsale is Ownable, usingOraclize{
   // Constructor
   constructor (address _tokenAddress, address _distributionAddress) public payable{
     require (msg.value > 0);
-    
+
     token = ArtNoyToken(_tokenAddress);
     // techSupport = msg.sender;
     techSupport = 0x08531Ea431B6adAa46D2e7a75f48A8d9Ce412FDc;
@@ -1331,13 +1331,13 @@ contract Crowdsale is Ownable, usingOraclize{
   uint public minDeposit = 0.01 ether;
   uint public tokenPrice; //1usd
 
-  // pre ico functions: 
+  // pre ico functions:
   uint public constant PRE_ICO_START = 1528243201; //1528344001; //1528228860-no; //06/06/2018 UTC-4 UTC-0
   uint public constant PRE_ICO_FINISH = 1530403199; //1530417599; //1530388740-no; //30/06/2018 UTC-4 UTC-0
-  
+
   uint public constant PRE_ICO_MIN_CAP = 0;
   uint public constant PRE_ICO_MAX_CAP = 5000000 ether; //tokens
-  
+
   uint public preIcoTokensSold;
 
   //end pre ico functions
@@ -1352,7 +1352,7 @@ contract Crowdsale is Ownable, usingOraclize{
   //end ico functions
 
   mapping (address => uint) contributorsBalances;
-  
+
   function getCurrentPhase (uint _time) public view returns(uint8){
     if(_time == 0){
       _time = now;
@@ -1365,7 +1365,7 @@ contract Crowdsale is Ownable, usingOraclize{
     }
     return 0;
   }
-  
+
   function getTimeBasedBonus (uint _time) public view returns(uint) {
     if(_time == 0){
       _time = now;
@@ -1394,7 +1394,7 @@ contract Crowdsale is Ownable, usingOraclize{
     require (msg.value >= minDeposit);
     require (buy(msg.sender, msg.value, now));
   }
-  
+
   function buy (address _address, uint _value, uint _time) internal returns(bool){
     uint8 currentPhase = getCurrentPhase(_time);
     require (currentPhase != 0);
@@ -1405,7 +1405,7 @@ contract Crowdsale is Ownable, usingOraclize{
 
     if (currentPhase == 1){
       require (preIcoTokensSold.add(tokensToSend) <= PRE_ICO_MAX_CAP);
-      
+
       preIcoTokensSold = preIcoTokensSold.add(tokensToSend);
 
       distributionAddress.transfer(address(this).balance.sub(oraclizeBalance));
@@ -1426,7 +1426,7 @@ contract Crowdsale is Ownable, usingOraclize{
     return true;
   }
 
-  bool public areTokensSended = false; 
+  bool public areTokensSended = false;
 
   function calculateTokensWithoutBonus (uint _value) public view returns(uint) {
     return _value.mul(uint(10).pow(decimals))/(tokenPrice);
@@ -1456,10 +1456,10 @@ contract Crowdsale is Ownable, usingOraclize{
 
   function manualSendEther (address _address, uint _value) public onlyTechSupport {
     uint tokensToSend = calculateTokensWithBonus(_value);
-    
+
     ethCollected = ethCollected.add(_value);
     tokensSold = tokensSold.add(tokensToSend);
-    
+
     token.sendCrowdsaleTokens(_address, tokensToSend);
     emit OnSuccessfullyBuy(_address, 0, false, tokensToSend);
   }
@@ -1478,7 +1478,7 @@ contract Crowdsale is Ownable, usingOraclize{
 
     emit IcoEnded();
   }
-  
+
 
   // ORACLIZE functions
 
@@ -1490,14 +1490,14 @@ contract Crowdsale is Ownable, usingOraclize{
   function update() internal {
     oraclize_query(86400,"URL", "json(https://api.kraken.com/0/public/Ticker?pair=ETHUSD).result.XETHZUSD.c.0");
     //86400 - 1 day
-  
+
     oraclizeBalance = oraclizeBalance.sub(oraclize_getPrice("URL")); //request to oraclize
   }
 
   function startOraclize (uint _time) public onlyOwner {
     require (_time != 0);
     require (!updateFlag);
-    
+
     updateFlag = true;
     oraclize_query(_time,"URL", "json(https://api.kraken.com/0/public/Ticker?pair=ETHUSD).result.XETHZUSD.c.0");
     oraclizeBalance = oraclizeBalance.sub(oraclize_getPrice("URL"));
@@ -1516,11 +1516,11 @@ contract Crowdsale is Ownable, usingOraclize{
     }
     oraclizeBalance = 0;
   }
-  
+
   function stopOraclize () public onlyOwner {
     updateFlag = false;
   }
-    
+
   function __callback(bytes32, string result, bytes) public {
     require(msg.sender == oraclize_cbAddress());
 
@@ -1531,11 +1531,46 @@ contract Crowdsale is Ownable, usingOraclize{
     tokenPrice = price;
 
     priceUpdateAt = block.timestamp;
-            
+
     if(updateFlag){
       update();
     }
   }
-  
+
   //end ORACLIZE functions
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

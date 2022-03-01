@@ -19,22 +19,22 @@ contract CrowdSale {
     }
     Contribution[] contributions;
 
-    
-    
+
+
     uint public totalRaised;
     uint public currentBalance;
     uint public deadline;
     uint public completedAt;
     uint public priceInWei;
-    uint public fundingMinimumTargetInWei; 
-    uint public fundingMaximumTargetInWei; 
+    uint public fundingMinimumTargetInWei;
+    uint public fundingMaximumTargetInWei;
     token public tokenReward;
     address public creator;
-    address public beneficiary; 
+    address public beneficiary;
     string campaignUrl;
     byte constant version = 1;
 
-    
+
     event LogFundingReceived(address addr, uint amount, uint currentTotal);
     event LogWinnerPaid(address winnerAddress);
     event LogFundingSuccessful(uint totalRaised);
@@ -42,7 +42,7 @@ contract CrowdSale {
         address creator,
         address beneficiary,
         string url,
-        uint _fundingMaximumTargetInEther, 
+        uint _fundingMaximumTargetInEther,
         uint256 deadline);
 
 
@@ -63,7 +63,7 @@ contract CrowdSale {
         _;
     }
 
-    
+
     modifier atEndOfLifecycle() {
         if(!((state == State.Failed || state == State.Successful) && completedAt + 1 hours < now)) {
             throw;
@@ -71,7 +71,7 @@ contract CrowdSale {
         _;
     }
 
-    
+
     function CrowdSale(
         uint _timeInMinutesForFundraising,
         string _campaignUrl,
@@ -84,8 +84,8 @@ contract CrowdSale {
         creator = msg.sender;
         beneficiary = _ifSuccessfulSendTo;
         campaignUrl = _campaignUrl;
-        fundingMinimumTargetInWei = _fundingMinimumTargetInEther * 1 ether; 
-        fundingMaximumTargetInWei = _fundingMaximumTargetInEther * 1 ether; 
+        fundingMinimumTargetInWei = _fundingMinimumTargetInEther * 1 ether;
+        fundingMaximumTargetInWei = _fundingMaximumTargetInEther * 1 ether;
         deadline = now + (_timeInMinutesForFundraising * 1 minutes);
         currentBalance = 0;
         tokenReward = token(_addressOfTokenUsedAsReward);
@@ -104,12 +104,12 @@ contract CrowdSale {
     {
         uint256 amountInWei = msg.value;
 
-        
+
         contributions.push(
             Contribution({
                 amount: msg.value,
                 contributor: msg.sender
-                }) 
+                })
             );
 
         totalRaised += msg.value;
@@ -117,7 +117,7 @@ contract CrowdSale {
 
 
         if(fundingMaximumTargetInWei != 0){
-            
+
             tokenReward.transfer(msg.sender, amountInWei * 1000000000000000000 / priceInWei);
         }
         else{
@@ -126,41 +126,41 @@ contract CrowdSale {
 
         LogFundingReceived(msg.sender, msg.value, totalRaised);
 
-        
+
 
         checkIfFundingCompleteOrExpired();
-        return contributions.length - 1; 
+        return contributions.length - 1;
     }
 
     function checkIfFundingCompleteOrExpired() {
-        
-       
+
+
         if (fundingMaximumTargetInWei != 0 && totalRaised > fundingMaximumTargetInWei) {
             state = State.Successful;
             LogFundingSuccessful(totalRaised);
             payOut();
             completedAt = now;
-            
+
             } else if ( now > deadline )  {
                 if(totalRaised >= fundingMinimumTargetInWei){
                     state = State.Successful;
                     LogFundingSuccessful(totalRaised);
-                    payOut();  
+                    payOut();
                     completedAt = now;
                 }
                 else{
-                    state = State.Failed; 
+                    state = State.Failed;
                     completedAt = now;
                 }
-            } 
-        
+            }
+
     }
 
         function payOut()
         public
         inState(State.Successful)
         {
-            
+
             if(!beneficiary.send(this.balance)) {
                 throw;
             }
@@ -172,7 +172,7 @@ contract CrowdSale {
 
         function getRefund()
         public
-        inState(State.Failed) 
+        inState(State.Failed)
         returns (bool)
         {
             for(uint i=0; i<=contributions.length; i++)
@@ -200,8 +200,43 @@ contract CrowdSale {
         atEndOfLifecycle()
         {
             selfdestruct(msg.sender);
-            
+
         }
 
         function () { throw; }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

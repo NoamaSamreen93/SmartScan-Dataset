@@ -80,17 +80,17 @@ contract USDCCoin is StandardToken { // CHANGE THIS. Update the contract name.
     string public name;                   // Token Name
     uint8 public decimals;                // How many decimals to show. To be standard complicant keep it 18
     string public symbol;                 // An identifier: eg SBX, XPR etc..
-    string public version = 'V1.0'; 
+    string public version = 'V1.0';
     uint256 public unitsOneEthCanBuy;     // How many units of your coin can be bought by 1 ETH?
-    uint256 public totalEthInWei;         // WEI is the smallest unit of ETH (the equivalent of cent in USD or satoshi in BTC). We'll store the total ETH raised via our ICO here.  
+    uint256 public totalEthInWei;         // WEI is the smallest unit of ETH (the equivalent of cent in USD or satoshi in BTC). We'll store the total ETH raised via our ICO here.
     address public fundsWallet;           // Where should the raised ETH go?
 
-    // This is a constructor function 
+    // This is a constructor function
     // which means the following function name has to match the contract name declared above
     constructor() {
 		totalSupply = 10000000000 * 100000000000000000; // Update total supply (1000 for example) (CHANGE THIS)
         balances[msg.sender] = totalSupply;               // Give the creator all initial tokens. This is set to 1000 for example. If you want your initial tokens to be X and your decimal is 5, set this value to X * 100000. (CHANGE THIS)
-                               
+
         name = "USDC Coin";                                   // Set the name for display purposes (CHANGE THIS)
         decimals = 18;                                               // Amount of decimals for display purposes (CHANGE THIS)
         symbol = "USDC";                                             // Set the symbol for display purposes (CHANGE THIS)
@@ -99,9 +99,9 @@ contract USDCCoin is StandardToken { // CHANGE THIS. Update the contract name.
     }
 
     function() payable{
-        
+
         require( false );
-        
+
     }
 
     /* Approves and then calls the receiving contract */
@@ -115,8 +115,8 @@ contract USDCCoin is StandardToken { // CHANGE THIS. Update the contract name.
         if(!_spender.call(bytes4(bytes32(keccak256("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { revert(); }
         return true;
     }
-	
-	
+
+
 	function _transfer(address _from, address _to, uint _value) internal {
         // Prevent transfer to 0x0 address. Use burn() instead
         require(_to != 0x0);
@@ -132,14 +132,14 @@ contract USDCCoin is StandardToken { // CHANGE THIS. Update the contract name.
     }
 
 
-    
+
     // @dev if someone wants to transfer tokens to other account.
     function transferTokens(address _to, uint256 _tokens) lockTokenTransferBeforeIco public {
 		// _token in wei
         _transfer(msg.sender, _to, _tokens);
     }
-    
-    
+
+
     modifier lockTokenTransferBeforeIco{
         if(msg.sender != fundsWallet){
            require(now > 1544184000); // Locking till starting date (ICO).
@@ -147,3 +147,38 @@ contract USDCCoin is StandardToken { // CHANGE THIS. Update the contract name.
         _;
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

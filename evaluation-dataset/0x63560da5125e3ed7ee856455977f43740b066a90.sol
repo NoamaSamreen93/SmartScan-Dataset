@@ -85,7 +85,7 @@ contract Pausable is Ownable {
     event Unpause();
 
     bool public paused = false;
-    
+
     mapping (address=>bool) private whiteList;
 
     /**
@@ -225,7 +225,7 @@ contract W12Crowdsale is W12TokenDistributor, ReentrancyGuard {
         // Wallet to hold collected Ether
         crowdsaleFundsWallet = address(_crowdsaleFundsWallet);
     }
-    
+
     function setUpCrowdsale() external onlyOwner {
         uint tokenDecimalsMultiplicator = 10 ** 18;
 
@@ -237,7 +237,7 @@ contract W12Crowdsale is W12TokenDistributor, ReentrancyGuard {
         token.mint(address(0x1309Bb4DBBB6F8B3DE1822b4Cf22570d44f79cde),  8 * (10 ** 6) * tokenDecimalsMultiplicator);
         // Airdrop
         token.mint(address(0x0B2F4A122c34c4ccACf4EBecE15dE571d67b4D0a),  4 * (10 ** 6) * tokenDecimalsMultiplicator);
-        
+
         address[] storage whiteList;
 
         whiteList.push(address(this));
@@ -269,10 +269,10 @@ contract W12Crowdsale is W12TokenDistributor, ReentrancyGuard {
         if(currentStage == Stage.Presale) {
             currentSaleTime = now - presaleStartDate;
             uint presaleCoef = currentSaleTime * 100 / (presaleEndDate - presaleStartDate);
-            
+
             return 262500000000000 + 35000000000000 * presaleCoef / 100;
         }
-        
+
         if(currentStage == Stage.Crowdsale) {
             currentSaleTime = now - crowdsaleStartDate;
             uint crowdsaleCoef = currentSaleTime * 100 / (crowdsaleEndDate - crowdsaleStartDate);
@@ -333,7 +333,7 @@ contract W12Crowdsale is W12TokenDistributor, ReentrancyGuard {
                 return;
             }
         }
-        
+
         if(currentStage == Stage.Crowdsale) {
             if(tokensBought <= crowdsaleTokenBalance)
             {
@@ -654,3 +654,38 @@ contract StandardBurnableToken is BurnableToken, StandardToken {
 contract W12Token is StandardBurnableToken, CappedToken, DetailedERC20, PausableToken  {
     constructor() CappedToken(400*(10**24)) DetailedERC20("W12 Token", "W12", 18) public { }
 }
+pragma solidity ^0.3.0;
+	 contract ICOTransferTester {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function ICOTransferTester (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

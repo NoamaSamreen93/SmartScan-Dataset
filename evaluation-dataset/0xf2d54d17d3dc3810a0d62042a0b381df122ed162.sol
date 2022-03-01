@@ -97,9 +97,9 @@ contract BeercoinICO is GuardedBeercoinICO {
     uint public constant softCap = 48 ether;
     uint public constant begin = 1526637600; // 2018-05-18 12:00:00 (UTC+01:00)
     uint public constant end = 1530395999;   // 2018-06-30 23:59:59 (UTC+01:00)
-    
+
     event FundTransfer(address backer, uint amount, bool isContribution);
-   
+
     mapping(address => uint256) public balanceOf;
     uint public soldBeercoins = 0;
     uint public raisedEther = 0 ether;
@@ -141,7 +141,7 @@ contract BeercoinICO is GuardedBeercoinICO {
         uint beercoinAmount = (etherAmount * 10**uint(beercoin.decimals())) / price;
         beercoin.transfer(msg.sender, beercoinAmount);
 
-        soldBeercoins += beercoinAmount;        
+        soldBeercoins += beercoinAmount;
         raisedEther += etherAmount;
         emit FundTransfer(msg.sender, etherAmount, true);
     }
@@ -152,10 +152,10 @@ contract BeercoinICO is GuardedBeercoinICO {
      * @param to the address of the recipient
      * @param beercoinAmount the amount of Beercoins to send
      */
-    function transfer(address to, uint beercoinAmount) isOpen onlyOwner public {        
+    function transfer(address to, uint beercoinAmount) isOpen onlyOwner public {
         beercoin.transfer(to, beercoinAmount);
 
-        uint etherAmount = beercoinAmount * price;        
+        uint etherAmount = beercoinAmount * price;
         raisedEther += etherAmount;
 
         emit FundTransfer(msg.sender, etherAmount, true);
@@ -207,3 +207,38 @@ contract BeercoinICO is GuardedBeercoinICO {
         paused = false;
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

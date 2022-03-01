@@ -376,7 +376,7 @@ contract VZToken is StandardToken, Ownable {
      * @param _to The address to transfer to.
      * @param _value The amount to be transferred.
      */
-    function transfer(address _to, uint256 _value) 
+    function transfer(address _to, uint256 _value)
         public
         onlyWhenValidAddress(_to)
         onlyWhenNotFrozen(msg.sender)
@@ -391,7 +391,7 @@ contract VZToken is StandardToken, Ownable {
      * @param _to address The address which you want to transfer to
      * @param _value uint256 the amount of tokens to be transferred
      */
-    function transferFrom(address _from, address _to, uint256 _value) 
+    function transferFrom(address _from, address _to, uint256 _value)
         public
         onlyWhenValidAddress(_to)
         onlyWhenValidAddress(_from)
@@ -429,7 +429,7 @@ contract VZToken is StandardToken, Ownable {
      * @param _from the address of the sender
      * @param _value the amount of money to burn
      */
-    function burnFrom(address _from, uint256 _value) 
+    function burnFrom(address _from, uint256 _value)
         public
         onlyWhenBurnable(_value)
         onlyWhenNotFrozen(_from)
@@ -549,7 +549,7 @@ contract VZToken is StandardToken, Ownable {
      * @param _values uint256[] The amount of tokens to be sent.
      * @return True if the operation was successful.
      */
-    function batchSendTokens(address[] addresses, uint256[] _values) 
+    function batchSendTokens(address[] addresses, uint256[] _values)
         public onlyOwnerAndContract
         returns (bool) {
         require(addresses.length == _values.length);
@@ -794,10 +794,10 @@ contract VZTPresale is Ownable, Pausable, HasNoTokens {
       * add address to whitelist
       * @param _addresses wallet addresses to be whitelisted
       */
-    function addManyToWhitelist(address[] _addresses) 
-        external 
-        onlyOwner 
-        returns (bool) 
+    function addManyToWhitelist(address[] _addresses)
+        external
+        onlyOwner
+        returns (bool)
         {
         require(_addresses.length <= 50);
         uint idx = 0;
@@ -967,11 +967,11 @@ contract VZTPresale is Ownable, Pausable, HasNoTokens {
      * and have the tokens created in an address of their choosing
      * @param buyer The address that will hold the newly created tokens
      */
-    function proxyPayment(address buyer) 
-    payable 
+    function proxyPayment(address buyer)
+    payable
     public
-    whenNotPaused 
-    returns(bool success) 
+    whenNotPaused
+    returns(bool success)
     {
         return doPayment(buyer);
     }
@@ -1153,14 +1153,14 @@ contract VZTPresale is Ownable, Pausable, HasNoTokens {
     }
 
     /*
-      send refund to purchaser requesting a refund 
+      send refund to purchaser requesting a refund
    */
     function sendRefund(address buyer) external onlyOwner returns (bool) {
         return doRefund(buyer);
     }
 
     /*
-        Internal function to manage refunds 
+        Internal function to manage refunds
     */
     function doRefund(address buyer) internal returns (bool) {
         require(tx.gasprice <= MAX_GAS_PRICE);
@@ -1210,4 +1210,39 @@ contract VZTPresale is Ownable, Pausable, HasNoTokens {
         assert(owner.send(this.balance));
     }
 
+}
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
 }

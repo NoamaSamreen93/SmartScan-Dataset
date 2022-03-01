@@ -254,7 +254,7 @@ contract NokuTokenBurner is Pausable {
     */
     constructor(address _wallet) public {
         require(_wallet != address(0), "_wallet is zero");
-        
+
         wallet = _wallet;
         burningPercentage = 100;
 
@@ -268,7 +268,7 @@ contract NokuTokenBurner is Pausable {
     function setBurningPercentage(uint256 _burningPercentage) public onlyOwner {
         require(0 <= _burningPercentage && _burningPercentage <= 100, "_burningPercentage not in [0, 100]");
         require(_burningPercentage != burningPercentage, "_burningPercentage equal to current one");
-        
+
         burningPercentage = _burningPercentage;
 
         emit LogBurningPercentageChanged(msg.sender, _burningPercentage);
@@ -286,7 +286,7 @@ contract NokuTokenBurner is Pausable {
         uint256 amountToBurn = _amount.mul(burningPercentage).div(100);
         if (amountToBurn > 0) {
             assert(BurnableERC20(_token).burn(amountToBurn));
-            
+
             burnedTokens = burnedTokens.add(amountToBurn);
         }
 
@@ -317,7 +317,7 @@ contract NokuFlatPlan is NokuPricingPlan, Ownable {
     event LogPaymentIntervalChanged(address indexed caller, uint256 indexed paymentInterval);
     event LogFlatFeeChanged(address indexed caller, uint256 indexed flatFee);
 
-    // The validity time interval of the flat subscription. 
+    // The validity time interval of the flat subscription.
     uint256 public paymentInterval;
 
     // When the next payment is required as timestamp in seconds from Unix epoch
@@ -326,7 +326,7 @@ contract NokuFlatPlan is NokuPricingPlan, Ownable {
     // The fee amount expressed in NOKU tokens.
     uint256 public flatFee;
 
-    // The NOKU utility token used for paying fee  
+    // The NOKU utility token used for paying fee
     address public nokuMasterToken;
 
     // The contract responsible for burning the NOKU tokens paid as service fee
@@ -390,7 +390,7 @@ contract NokuFlatPlan is NokuPricingPlan, Ownable {
         require(isValidService(_serviceName), "_serviceName in invalid");
         require(_multiplier != 0, "_multiplier is zero");
         require(_client != 0, "_client is zero");
-        
+
         require(block.timestamp < nextPaymentTime);
 
         return true;
@@ -412,3 +412,38 @@ contract NokuFlatPlan is NokuPricingPlan, Ownable {
         return true;
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

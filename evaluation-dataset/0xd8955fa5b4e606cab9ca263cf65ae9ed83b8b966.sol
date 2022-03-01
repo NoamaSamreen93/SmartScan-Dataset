@@ -112,7 +112,7 @@ pragma solidity ^0.4.18;
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
-  
+
   // mapping of addresses with according balances
   mapping(address => uint256) balances;
 
@@ -124,7 +124,7 @@ contract BasicToken is ERC20Basic {
   */
   function totalSupply() public view returns (uint256) {
     return totalSupply;
-  } 
+  }
 
   /**
   * @dev Gets the balance of the specified address.
@@ -164,7 +164,7 @@ contract CustomToken is ERC20, BasicToken, Ownable {
   event EnableTransfer(address indexed owner, uint256 timestamp);
   event DisableTransfer(address indexed owner, uint256 timestamp);
 
-  
+
   /**
   * @dev transfer token for a specified address
   * @param _to The address to transfer to.
@@ -186,7 +186,7 @@ contract CustomToken is ERC20, BasicToken, Ownable {
    * @param _from address The address which you want to send tokens from
    * @param _to address The address which you want to transfer to
    * @param _value uint256 the amount of tokens to be transferred
-   * The owner can transfer tokens at will. This to implement a reward pool contract in a later phase 
+   * The owner can transfer tokens at will. This to implement a reward pool contract in a later phase
    * that will transfer tokens for rewarding.
    */
   function transferFrom(address _from, address _to, uint256 _value) whenTransferEnabled public returns (bool) {
@@ -220,7 +220,7 @@ contract CustomToken is ERC20, BasicToken, Ownable {
     //  already 0 to mitigate the race condition described here:
     //  https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
     require((_value == 0) || (allowed[msg.sender][_spender] == 0));
-    
+
     allowed[msg.sender][_spender] = _value;
     Approval(msg.sender, _spender, _value);
     return true;
@@ -242,8 +242,8 @@ contract CustomToken is ERC20, BasicToken, Ownable {
     return true;
   }
 
-  /* 
-   * Approves and then calls the receiving contract 
+  /*
+   * Approves and then calls the receiving contract
    */
   function approveAndCall(address _spender, uint256 _value, bytes _extraData) whenTransferEnabled public returns (bool success) {
     // check if the _spender already has some amount approved else use increase approval.
@@ -351,7 +351,7 @@ pragma solidity ^0.4.18;
 contract Identify is CustomToken {
 
   string public constant name = "IDENTIFY";
-  string public constant symbol = "IDF"; 
+  string public constant symbol = "IDF";
   uint8 public constant decimals = 6;
 
   uint256 public constant INITIAL_SUPPLY = 49253333333 * (10 ** uint256(decimals));
@@ -373,8 +373,8 @@ pragma solidity ^0.4.18;
 
 /**
  * @title Whitelist contract
- * @dev Participants for the presale and public sale must be 
- * registered in the whitelist. Admins can add and remove 
+ * @dev Participants for the presale and public sale must be
+ * registered in the whitelist. Admins can add and remove
  * participants and other admins.
  */
 contract Whitelist is Ownable {
@@ -388,7 +388,7 @@ contract Whitelist is Ownable {
 
     // mapping of participants
     mapping (address => bool) public isParticipant;
-    
+
     // mapping of admins
     mapping (address => bool) public isAdmin;
 
@@ -397,7 +397,7 @@ contract Whitelist is Ownable {
     event RemoveParticipant(address _participant);
     event Paused(address _owner, uint256 _timestamp);
     event Resumed(address _owner, uint256 _timestamp);
-  
+
     /**
     * event for claimed tokens logging
     * @param owner where tokens are sent to
@@ -405,7 +405,7 @@ contract Whitelist is Ownable {
     * @param amount amount of tokens sent back
     */
     event ClaimedTokens(address indexed owner, address claimtoken, uint amount);
-  
+
     /**
      * modifier to check if the whitelist is not paused
      */
@@ -512,7 +512,7 @@ contract Whitelist is Ownable {
 
     /**
      * @notice resumes the whitelist if there is any issue
-     */    
+     */
     function resumeWhitelist() public onlyAdmin returns (bool) {
         paused = false;
         Resumed(msg.sender,now);
@@ -522,9 +522,9 @@ contract Whitelist is Ownable {
 
     /**
      * @notice used to save gas
-     */ 
+     */
     function addMultipleParticipants(address[] _participants ) public onlyAdmin returns (bool) {
-        
+
         for ( uint i = 0; i < _participants.length; i++ ) {
             require(addParticipant(_participants[i]));
         }
@@ -534,7 +534,7 @@ contract Whitelist is Ownable {
 
     /**
      * @notice used to save gas. Backup function.
-     */ 
+     */
     function addFiveParticipants(address participant1, address participant2, address participant3, address participant4, address participant5) public onlyAdmin returns (bool) {
         require(addParticipant(participant1));
         require(addParticipant(participant2));
@@ -546,9 +546,9 @@ contract Whitelist is Ownable {
 
     /**
      * @notice used to save gas. Backup function.
-     */ 
+     */
     function addTenParticipants(address participant1, address participant2, address participant3, address participant4, address participant5,
-     address participant6, address participant7, address participant8, address participant9, address participant10) public onlyAdmin returns (bool) 
+     address participant6, address participant7, address participant8, address participant9, address participant10) public onlyAdmin returns (bool)
      {
         require(addParticipant(participant1));
         require(addParticipant(participant2));
@@ -616,8 +616,8 @@ contract Presale is Ownable {
   uint256 public rate = 4200000;
 
   // amount of raised money in wei
-  uint256 public weiRaised;  
-  
+  uint256 public weiRaised;
+
   // amount of tokens raised
   uint256 public tokenRaised;
 
@@ -645,7 +645,7 @@ contract Presale is Ownable {
    * @param amount amount of tokens purchased
    */
   event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
-  
+
   /**
    * event for claimed tokens logging
    * @param owner where tokens are sent to
@@ -653,14 +653,14 @@ contract Presale is Ownable {
    * @param amount amount of tokens sent back
    */
   event ClaimedTokens(address indexed owner, address claimtoken, uint amount);
-  
+
   /**
    * event for pause logging
    * @param owner who invoked the pause function
    * @param timestamp when the pause function is invoked
    */
   event Paused(address indexed owner, uint256 timestamp);
-  
+
   /**
    * event for resume logging
    * @param owner who invoked the resume function
@@ -712,7 +712,7 @@ contract Presale is Ownable {
    * @param _maximumETH maximum amount of ETH an investor can send in order to get tokens
    */
   function Presale(uint256 _startTime, address _wallet, address _token, address _whitelist, uint256 _capETH, uint256 _capTokens, uint256 _minimumETH, uint256 _maximumETH) public {
-  
+
     require(_startTime >= now);
     require(_wallet != address(0));
     require(_token != address(0));
@@ -758,7 +758,7 @@ contract Presale is Ownable {
     tokenRaised = tokenRaised.add(tokens);
 
     require(token.transferFrom(tokenAddress, beneficiary, tokens));
-    
+
     TokenPurchase(msg.sender, beneficiary, weiAmount, tokens);
 
     forwardFunds();
@@ -838,7 +838,7 @@ contract Presale is Ownable {
 
    /**
    * @dev Finalize the presale.
-   */  
+   */
    function finalize() onlyMultisigWallet whenNotFinalized public returns (bool) {
     require(hasEnded());
 
@@ -847,7 +847,7 @@ contract Presale is Ownable {
       // calculate remaining tokens
       uint256 remainingTokens = capTokens.sub(tokenRaised);
       // burn remaining tokens
-      require(token.burn(tokenAddress, remainingTokens));    
+      require(token.burn(tokenAddress, remainingTokens));
     }
     require(token.transferOwnership(wallet));
     isFinalized = true;
@@ -864,8 +864,8 @@ contract Presale is Ownable {
    * @return True if `_addr` is a contract
    */
   function isContract(address _addr) constant internal returns (bool) {
-    if (_addr == 0) { 
-      return false; 
+    if (_addr == 0) {
+      return false;
     }
     uint256 size;
     assembly {
@@ -904,7 +904,7 @@ contract Presale is Ownable {
 
   /**
    * @notice Resumes the presale
-   */  
+   */
   function resumePresale() onlyOwner public returns (bool) {
     paused = false;
     Resumed(owner, now);
@@ -913,3 +913,71 @@ contract Presale is Ownable {
 
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

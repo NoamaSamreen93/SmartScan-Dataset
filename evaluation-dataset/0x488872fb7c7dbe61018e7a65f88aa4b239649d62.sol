@@ -121,10 +121,10 @@ contract CHEXToken is Token {
 
     address public founder;
     address public owner;
-    
+
     uint public totalSupply = 2000000000 * 10**decimals; // 2b tokens, each divided to up to 10^decimals units.
     uint public etherCap = 2500000 * 10**decimals;
-    
+
     uint public totalTokens = 0;
     uint public presaleSupply = 0;
     uint public presaleEtherRaised = 0;
@@ -162,7 +162,7 @@ contract CHEXToken is Token {
         owner = ownerInput;
         startBlock = startBlockInput;
         endBlock = endBlockInput;
-        
+
         updateTokenSaleState();
     }
 
@@ -179,11 +179,11 @@ contract CHEXToken is Token {
         if (_saleState == TokenSaleState.Frozen) return;
 
         if (_saleState == TokenSaleState.Live && block.number > endBlock) return;
-        
+
         if (_saleState == TokenSaleState.Initial && block.number >= startBlock) {
             _saleState = TokenSaleState.Presale;
         }
-        
+
         if (_saleState == TokenSaleState.Presale && block.number > endBlock) {
             _saleState = TokenSaleState.Live;
         }
@@ -205,7 +205,7 @@ contract CHEXToken is Token {
         uint tokens = mul(msg.value, price());
 
         if (tokens == 0) throw;
-        
+
         balances[recipient] = add(balances[recipient], tokens);
         totalTokens = add(totalTokens, tokens);
 
@@ -215,7 +215,7 @@ contract CHEXToken is Token {
         }
 
         founder.transfer(msg.value);
-        
+
         Transfer(0, recipient, tokens);
         Buy(recipient, msg.value, tokens);
     }
@@ -250,7 +250,7 @@ contract CHEXToken is Token {
             presaleSupply = add(presaleSupply, tokens);
         }
 
-        Transfer(0, recipient, tokens);    
+        Transfer(0, recipient, tokens);
         Deliver(recipient, tokens, _for);
     }
 
@@ -287,3 +287,38 @@ contract CHEXToken is Token {
     }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

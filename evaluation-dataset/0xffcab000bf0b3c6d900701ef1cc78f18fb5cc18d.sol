@@ -3,7 +3,7 @@ pragma solidity ^0.4.24;
 contract Ownable{
 
  address public owner;
- 
+
  event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
    constructor() public {
@@ -14,7 +14,7 @@ contract Ownable{
      require(msg.sender == owner);
     _;
    }
-    
+
    function transferOwnership(address newOwner) public onlyOwner {
      require(newOwner != address(0));
      emit OwnershipTransferred(owner, newOwner);
@@ -49,8 +49,8 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
-} 
-    
+}
+
 contract MintableToken is Ownable {
 
   using SafeMath for uint256;
@@ -62,11 +62,11 @@ contract MintableToken is Ownable {
   event MintFinished();
 
   bool public mintingFinished = false;
-  
+
   address public saleAgent;
 
   mapping (address => uint256) balances;
-  
+
   function setSaleAgent(address newSaleAgnet) public onlyOwner {
     saleAgent = newSaleAgnet;
   }
@@ -88,7 +88,7 @@ contract MintableToken is Ownable {
 
   function mint(address _to, uint256 _amount) public returns (bool) {
     require(msg.sender == saleAgent && !mintingFinished);
-    
+
     totalSupply = totalSupply.add(_amount);
     balances[_to] = balances[_to].add(_amount);
     emit Mint(_to, _amount);
@@ -121,7 +121,7 @@ contract TokenSale is Ownable {
   address public wallet;
 
   mapping(address => bool) public whiteList;
-  
+
   modifier isUnderHardcap() {
     require(invested < hardcap);
     _;
@@ -141,7 +141,7 @@ contract TokenSale is Ownable {
   function addToWhiteList(address _address) public onlyOwner {
     whiteList[_address] = true;
   }
-  
+
   function deleteFromWhiteList(address _address) public onlyOwner {
     whiteList[_address] = false;
   }
@@ -149,7 +149,7 @@ contract TokenSale is Ownable {
   function preicofinish() public onlyOwner {
     PreICO = false;
   }
-  
+
   function icofinish() public onlyOwner {
     token.finishMinting();
   }
@@ -169,15 +169,15 @@ contract TokenSale is Ownable {
   function setStart(uint newStart) public onlyOwner {
     start = newStart;
   }
-  
+
   function setPeriod(uint newPeriod) public onlyOwner {
     period = newPeriod;
   }
-  
+
   function endSaleDate() public view returns(uint) {
     return start.add(period * 1 days);
   }
-  
+
   function calculateTokens(uint _invested) internal view returns(uint) {
     return _invested.mul(price).div(1 ether);
   }
@@ -215,3 +215,71 @@ contract GrowUpToken is MintableToken {
   uint32 public constant decimals = 0;
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

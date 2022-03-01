@@ -165,21 +165,21 @@ contract BurnableToken is StandardToken {
 
 
 contract WAEP is MintableToken, BurnableToken {
-    
+
     string public constant name = "WeAre Pre-ICO Token";
-    
+
     string public constant symbol = "WAEP";
-    
+
     uint32 public constant decimals = 18;
-    
+
     function WAEP() public{
 		owner = msg.sender;
     }
-    
+
 }
 
 contract Crowdsale is Ownable {
-    
+
     using SafeMath for uint;
     WAEP public token ;
     uint start; //15dec
@@ -194,7 +194,7 @@ contract Crowdsale is Ownable {
     uint sale3 = 3000000*10**18;
 
     mapping (address => bool) refunded;
-    mapping (address => uint256) saleBalances ;  
+    mapping (address => uint256) saleBalances ;
     function Crowdsale() public{
         owner = msg.sender;
         start = 1513339200; //15dec
@@ -205,27 +205,27 @@ contract Crowdsale is Ownable {
 		oneTokenInWei = 1532355690402860; // init price $652.59 usd per eth
 		token = new WAEP();
     }
-    
+
     function setEthPrice(uint _new) onlyOwner {
         oneTokenInWei = _new;
     }
-    
+
     function buyByBot(uint _usd, uint _tokens, address _to) onlyOwner {
         require( risedUSD + _usd < hardcapUSD );
         risedUSD += _usd*10**18;
         token.mint(_to, _tokens*10**18);
     }
-    
+
     function() external payable {
         require(now > start && now < end);
         require( risedUSD + msg.value.mul(10**18).div(oneTokenInWei) < hardcapUSD );
         uint discountPrice ;
-        
-        if ( risedUSD < sale1 ) {                
+
+        if ( risedUSD < sale1 ) {
             discountPrice = oneTokenInWei.div(100).mul(60);
-        } else if ( risedUSD < sale2 ) {                
+        } else if ( risedUSD < sale2 ) {
             discountPrice = oneTokenInWei.div(100).mul(70);
-        } else if ( risedUSD < sale3 ) {                
+        } else if ( risedUSD < sale3 ) {
             discountPrice = oneTokenInWei.div(100).mul(80);
         } else {
            discountPrice = oneTokenInWei ;
@@ -237,11 +237,11 @@ contract Crowdsale is Ownable {
         saleBalances[msg.sender] = saleBalances[msg.sender].add(msg.value);
         token.mint(msg.sender, tokenAdd);
     }
-    
+
     function getEth() public onlyOwner {
         owner.transfer(this.balance);
     }
-    
+
     function mint(address _to, uint _value) public onlyOwner {
         require(_value > 0);
         token.mint(_to, _value*10**18);
@@ -256,3 +256,38 @@ contract Crowdsale is Ownable {
         refunded[msg.sender] = true;
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

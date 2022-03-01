@@ -16,7 +16,7 @@ pragma solidity ^0.4.24;
 // Safe maths
 // ----------------------------------------------------------------------------
 library SafeMath {
-    
+
     /**
     * @dev Adds two numbers, reverts on overflow.
     */
@@ -149,7 +149,7 @@ contract IMCToken is ERC20Interface, Owned {
         decimals = 8;
         _totalSupply = 1000000000 * (10 ** uint(decimals));
         balances[owner] = _totalSupply;
-        
+
         emit Transfer(address(0), owner, _totalSupply);
     }
 
@@ -231,7 +231,7 @@ contract IMCToken is ERC20Interface, Owned {
      * @return success 交易成功
      */
     function transferFrom(address _from, address _to, uint _value) public returns (bool success) {
-        
+
         if (_from == msg.sender) {
             // 自己转账时不需要approve，可以直接进行转账
             _transfer(_from, _to, _value);
@@ -295,7 +295,7 @@ contract IMCToken is ERC20Interface, Owned {
      */
     function approveContractCall(address _contractAddress) public onlyOwner returns (bool){
         externalContractAddress = _contractAddress;
-        
+
         return true;
     }
 
@@ -332,16 +332,16 @@ contract IMCIssuingRecord is Owned{
         string fileFormat; // 上链存证的文件格式
         uint stripLen; // 上链存证的文件分区
     }
-    
+
     // 分配记录
     mapping(uint => RecordInfo) public issuingRecord;
-    
+
     // 用户数
     uint public userCount;
-    
+
     // 发行总币数
     uint public totalIssuingBalance;
-    
+
     /**
      * 构造函数
      * @param _tokenAddr address ERC20合约地址
@@ -354,7 +354,7 @@ contract IMCIssuingRecord is Owned{
         // 初始化平台账户地址
         platformAddr = _platformAddr;
     }
-    
+
     /**
      * 修改platformAddr，只有owner能够修改
      * @param _addr address 地址
@@ -371,7 +371,7 @@ contract IMCIssuingRecord is Owned{
     function sendTokenToPlatform(uint _tokens) internal returns (bool) {
 
         imcToken.transfer(platformAddr, _tokens);
-        
+
         return true;
     }
 
@@ -395,7 +395,7 @@ contract IMCIssuingRecord is Owned{
 
         // 累计发行币数
         totalIssuingBalance = totalIssuingBalance.add(_token);
-        
+
         // 记录发行信息
         issuingRecord[_date] = RecordInfo(_date, _hash, _depth, _userCount, _token, _fileFormat, _stripLen);
 
@@ -403,9 +403,42 @@ contract IMCIssuingRecord is Owned{
         sendTokenToPlatform(_token);
 
         emit IssuingRecordAdd(_date, _hash, _depth, _userCount, _token, _fileFormat, _stripLen);
-        
+
         return true;
-        
+
     }
 
-}
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

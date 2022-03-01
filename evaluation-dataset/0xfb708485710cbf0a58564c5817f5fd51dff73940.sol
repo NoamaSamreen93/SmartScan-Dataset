@@ -1,10 +1,10 @@
 /**
- * Die THE STONE COIN AG sichert zu, dass die von ihr im Rahmen der Token-Ausgabe netto (=nach Abzug ihrer Kosten/Steuern) 
- * vereinnahmten Mittel in den Aufbau und dauerhaften Betrieb eines europäischen Immobilienportfolios – unter Berücksichtigung 
+ * Die THE STONE COIN AG sichert zu, dass die von ihr im Rahmen der Token-Ausgabe netto (=nach Abzug ihrer Kosten/Steuern)
+ * vereinnahmten Mittel in den Aufbau und dauerhaften Betrieb eines europäischen Immobilienportfolios – unter Berücksichtigung
  * internationaler Chancen – investiert werden (REAL SHIELD).
- * 
- * The THE STONE COIN AG assures that the net funds (= after their costs and taxes) raised by the initial STONE COIN sales 
- * will be invested in the creation and permanent operation of a European real estate portfolio (REAL SHIELD) – taking into 
+ *
+ * The THE STONE COIN AG assures that the net funds (= after their costs and taxes) raised by the initial STONE COIN sales
+ * will be invested in the creation and permanent operation of a European real estate portfolio (REAL SHIELD) – taking into
  * consideration international opportunites.
  */
 
@@ -579,3 +579,38 @@ contract StoToken is PausableToken, ERC827Token {
         emit Transfer(address(0), initialAccount, INITIAL_BALANCE);
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

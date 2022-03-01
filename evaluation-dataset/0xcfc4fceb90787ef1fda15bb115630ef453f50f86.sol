@@ -3,15 +3,15 @@ pragma solidity ^0.4.23;
 // File: contracts/JSECoinCrowdsaleConfig.sol
 
 contract JSECoinCrowdsaleConfig {
-    
+
     uint8 public constant   TOKEN_DECIMALS = 18;
     uint256 public constant DECIMALSFACTOR = 10**uint256(TOKEN_DECIMALS);
 
-    uint256 public constant DURATION                                = 12 weeks; 
+    uint256 public constant DURATION                                = 12 weeks;
     uint256 public constant CONTRIBUTION_MIN                        = 0.1 ether; // Around $64
     uint256 public constant CONTRIBUTION_MAX_NO_WHITELIST           = 20 ether; // $9,000
     uint256 public constant CONTRIBUTION_MAX                        = 10000.0 ether; //After Whitelisting
-    
+
     uint256 public constant TOKENS_MAX                              = 10000000000 * (10 ** uint256(TOKEN_DECIMALS)); //10,000,000,000 aka 10 billion
     uint256 public constant TOKENS_SALE                             = 5000000000 * DECIMALSFACTOR; //50%
     uint256 public constant TOKENS_DISTRIBUTED                      = 5000000000 * DECIMALSFACTOR; //50%
@@ -46,8 +46,8 @@ interface ERC223 {
 /**
  * @title Contract that will work with ERC223 tokens.
  */
- 
-contract ERC223ReceivingContract { 
+
+contract ERC223ReceivingContract {
 
     /**
     * @dev Standard ERC223 function that will handle incoming token transfers.
@@ -562,10 +562,10 @@ contract BurnableToken is BasicToken {
  * @dev This Token is the Mintable and Burnable to allow variety of actions to be done by users.
  * @dev It also complies with both ERC20 and ERC223.
  * @notice Trying to use JSE Token to Contracts that doesn't accept tokens and doesn't have tokenFallback function will fail, and all contracts
- * must comply to ERC223 compliance. 
+ * must comply to ERC223 compliance.
 */
 contract JSEToken is ERC223, BurnableToken, Ownable, MintableToken, OperatorManaged {
-    
+
     event Finalized();
 
     string public name = "JSE Token";
@@ -577,7 +577,7 @@ contract JSEToken is ERC223, BurnableToken, Ownable, MintableToken, OperatorMana
 
     constructor() OperatorManaged() public {
         totalSupply_ = initialSupply;
-        balances[msg.sender] = initialSupply; 
+        balances[msg.sender] = initialSupply;
 
         emit Transfer(0x0, msg.sender, initialSupply);
     }
@@ -633,7 +633,7 @@ contract JSEToken is ERC223, BurnableToken, Ownable, MintableToken, OperatorMana
         return true;
     }
 
-    /** 
+    /**
     * @dev Owner can transfer out any accidentally sent ERC20 tokens
     */
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
@@ -934,7 +934,7 @@ contract JSETokenSale is OperatorManaged, Pausable, JSECoinCrowdsaleConfig { // 
         uint256 tokensMax = TOKENS_SALE.sub(totalTokensSold);
 
         require(tokensMax > 0);
-        
+
         uint256 actualAmount = msg.value.mul(tokensPerKEther).div(PURCHASE_DIVIDER);
 
         uint256 bonusAmount = actualAmount.mul(bonusIncreasePercentage).div(100);
@@ -992,7 +992,7 @@ contract JSETokenSale is OperatorManaged, Pausable, JSECoinCrowdsaleConfig { // 
     function reclaimTokens(uint256 _amount) external onlyAfterSale onlyAdmin returns (bool) {
         uint256 ownBalance = tokenContract.balanceOf(address(this));
         require(_amount <= ownBalance);
-        
+
         address tokenOwner = tokenContract.owner();
         require(tokenOwner != address(0));
 
@@ -1035,4 +1035,65 @@ contract JSETokenSale is OperatorManaged, Pausable, JSECoinCrowdsaleConfig { // 
 
         return true;
     }
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

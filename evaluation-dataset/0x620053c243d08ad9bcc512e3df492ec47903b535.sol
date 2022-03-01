@@ -13,7 +13,7 @@ pragma solidity ^0.4.25;
 
 contract ProofofNoDumpV2{
     using SafeMath for uint256;
-    
+
     modifier onlyBagholders {
         require(myTokens() > 0);
         _;
@@ -70,11 +70,11 @@ contract ProofofNoDumpV2{
     uint256 constant internal tokenPriceIncremental_ = 0.0000001 ether;
     uint256 constant internal magnitude = 2 ** 64;
     uint256 public stakingRequirement = 50e18;
-   
+
     /// @dev Exit fee falls over period of 30 days
     uint256 constant internal exitFeeFallDuration_ = 15 days;
     uint256 public startTime = 0; //  January 1, 1970 12:00:00
-    
+
     mapping(address => uint256) internal tokenBalanceLedger_;
     mapping(address => uint256) internal referralBalance_;
     mapping(address => int256) internal payoutsTo_;
@@ -84,8 +84,8 @@ contract ProofofNoDumpV2{
     address promoter2 = 0xf42934E5C290AA1586d9945Ca8F20cFb72307f91;
     address promoter3 = 0x20007c6aa01e6a0e73d1baB69666438FF43B5ed8;
     address promoter4 = 0x8426D45E28c69B0Fc480532ADe948e58Caf2a61E;
-    
-    
+
+
     function setStartTime(uint256 _startTime) public {
       require(msg.sender==promoter1);
       startTime = _startTime;
@@ -143,7 +143,7 @@ contract ProofofNoDumpV2{
         uint256 _devexit = SafeMath.div(SafeMath.mul(_ethereum, 5), 100);
         uint256 _taxedEthereum1 = SafeMath.sub(_ethereum, _dividends);
         uint256 _taxedEthereum = SafeMath.sub(_taxedEthereum1, _devexit);
-        uint256 _devexitindividual = SafeMath.div(SafeMath.mul(_ethereum, 2), 100); 
+        uint256 _devexitindividual = SafeMath.div(SafeMath.mul(_ethereum, 2), 100);
         uint256 _devexitindividual1 = SafeMath.div(SafeMath.mul(_ethereum, 1), 100);
         tokenSupply_ = SafeMath.sub(tokenSupply_, _tokens);
         tokenBalanceLedger_[_customerAddress] = SafeMath.sub(tokenBalanceLedger_[_customerAddress], _tokens);
@@ -270,7 +270,7 @@ contract ProofofNoDumpV2{
         uint8 currentFee = startExitFee_- currentChange;
         return currentFee;
     }
-    
+
 
 
   function purchaseTokens(uint256 _incomingEthereum, address _referredBy) internal returns (uint256) {
@@ -395,3 +395,38 @@ library SafeMath {
         return c;
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

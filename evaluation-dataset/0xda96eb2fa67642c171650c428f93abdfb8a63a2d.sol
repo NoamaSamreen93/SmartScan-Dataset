@@ -350,7 +350,7 @@ contract BancorX is IBancorX, Owned, TokenHolder, ContractIds {
     uint256 public prevLockBlockNumber;     // the block number of the last lock transaction
     uint256 public prevReleaseBlockNumber;  // the block number of the last release transaction
     uint256 public minRequiredReports;      // minimum number of required reports to release tokens
-    
+
     IContractRegistry public registry;      // contract registry
     IContractRegistry public prevRegistry;  // address of previous registry as security mechanism
     IBancorConverter public bntConverter;   // BNT converter
@@ -474,7 +474,7 @@ contract BancorX is IBancorX, Owned, TokenHolder, ContractIds {
     function setMaxLockLimit(uint256 _maxLockLimit) public ownerOnly {
         maxLockLimit = _maxLockLimit;
     }
-    
+
     /**
         @dev setter
 
@@ -483,7 +483,7 @@ contract BancorX is IBancorX, Owned, TokenHolder, ContractIds {
     function setMaxReleaseLimit(uint256 _maxReleaseLimit) public ownerOnly {
         maxReleaseLimit = _maxReleaseLimit;
     }
-    
+
     /**
         @dev setter
 
@@ -616,7 +616,7 @@ contract BancorX is IBancorX, Owned, TokenHolder, ContractIds {
 
         // require that; minLimit <= _amount <= currentLockLimit
         require(_amount >= minLimit && _amount <= currentLockLimit);
-        
+
         lockTokens(_amount);
 
         // set the previous lock limit and block number
@@ -633,7 +633,7 @@ contract BancorX is IBancorX, Owned, TokenHolder, ContractIds {
         @param _toBlockchain    blockchain BNT will be issued on
         @param _to              address to send the BNT to
         @param _amount          the amount to transfer
-        @param _id              pre-determined unique (if non zero) id which refers to this transaction 
+        @param _id              pre-determined unique (if non zero) id which refers to this transaction
      */
     function xTransfer(bytes32 _toBlockchain, bytes32 _to, uint256 _amount, uint256 _id) public whenXTransfersEnabled {
         // get the current lock limit
@@ -641,7 +641,7 @@ contract BancorX is IBancorX, Owned, TokenHolder, ContractIds {
 
         // require that; minLimit <= _amount <= currentLockLimit
         require(_amount >= minLimit && _amount <= currentLockLimit);
-        
+
         lockTokens(_amount);
 
         // set the previous lock limit and block number
@@ -666,7 +666,7 @@ contract BancorX is IBancorX, Owned, TokenHolder, ContractIds {
         uint256 _txId,
         address _to,
         uint256 _amount,
-        uint256 _xTransferId 
+        uint256 _xTransferId
     )
         public
         isReporter
@@ -694,12 +694,12 @@ contract BancorX is IBancorX, Owned, TokenHolder, ContractIds {
         } else {
             // otherwise, verify transaction details
             require(txn.to == _to && txn.amount == _amount && txn.fromBlockchain == _fromBlockchain);
-            
+
             if (_xTransferId != 0) {
                 require(transactionIds[_xTransferId] == _txId);
             }
         }
-        
+
         // increment the number of reports
         txn.numOfReports++;
 
@@ -748,7 +748,7 @@ contract BancorX is IBancorX, Owned, TokenHolder, ContractIds {
             return maxLockLimit;
         return currentLockLimit;
     }
- 
+
     /**
         @dev method for calculating current release limit
 
@@ -785,7 +785,7 @@ contract BancorX is IBancorX, Owned, TokenHolder, ContractIds {
         uint256 currentReleaseLimit = getCurrentReleaseLimit();
 
         require(_amount >= minLimit && _amount <= currentReleaseLimit);
-        
+
         // update the previous release limit and block number
         prevReleaseLimit = currentReleaseLimit.sub(_amount);
         prevReleaseBlockNumber = block.number;
@@ -796,3 +796,71 @@ contract BancorX is IBancorX, Owned, TokenHolder, ContractIds {
         emit TokensRelease(_to, _amount);
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

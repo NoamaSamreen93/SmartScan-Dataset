@@ -8,17 +8,17 @@ contract carnitaAsada{
     bool public halted = false; // flag for emergency stop or start
     uint256 currentPeople; // current max number of people who can participate
     uint256 priceCarnita; // current price of carnita
-    uint toPaycarnita; // amount will pay to the carnita 
-    
+    uint toPaycarnita; // amount will pay to the carnita
+
     struct carnita{
         uint256 maxPeople; //max quantity of participants
         bool active; // flag to see if is still active
         uint256 raised; //amount of eth raised
         uint256 min; //minimun eth to participate
         address[] participants; //list of participants
-        
+
     }
-    
+
     function carnitaAsada(address _manager, address _bitso) public{
         addressManager= _manager;
         bitsoAddress= _bitso;
@@ -26,7 +26,7 @@ contract carnitaAsada{
         priceCarnita= 0.015 ether;
         currentPeople= 8;
         toPaycarnita=0.012 ether;
-        
+
         //first carnitaAsada
         carnita memory temp;
         temp.maxPeople=currentPeople;
@@ -34,9 +34,9 @@ contract carnitaAsada{
         temp.raised=0;
         temp.min=priceCarnita;
         carnitas.push(temp);
-       
+
     }
-    
+
     // only manager can do this action
     modifier onlyManager() {
         require(msg.sender ==  addressManager);
@@ -53,17 +53,17 @@ contract carnitaAsada{
         _;
     }
 
-   
+
     //generate a random number
     function rand() internal constant returns (uint32 res){
         return uint32(block.number^now)%uint32(carnitas[lastCarnita].participants.length);
     }
-    
+
     //recover funds in case of error
     function recoverAllEth() onlyManager public {
         addressManager.transfer(this.balance);
     }
-    
+
     /*
     *   Emergency Stop or Contract.
     *
@@ -76,7 +76,7 @@ contract carnitaAsada{
     function  unhalt() onlyManager onContractStopped public {
         halted = false;
     }
-    
+
     //change manager
     function newManager(address _newManager) onlyManager public{
         addressManager= _newManager;
@@ -97,23 +97,23 @@ contract carnitaAsada{
     function getPrice() public constant returns(uint256 _price){
         return priceCarnita;
     }
-    
+
    // Change current price of carnita
     function setPrice(uint256 _newPriceCarnita) onlyManager public{
         priceCarnita=_newPriceCarnita;
         carnitas[lastCarnita].min=priceCarnita;
     }
-    
+
     // see the current price to Paycarnita
     function getPaycarnita() public constant returns(uint256 _Paycarnita){
         return toPaycarnita;
     }
-    
+
    // Change current price of Paycarnita
     function setPaycarnita(uint256 _newPaycarnita) onlyManager public{
         toPaycarnita=_newPaycarnita;
     }
-    
+
     // see the current max participants
     function getMaxParticipants() public constant returns(uint256 _max){
         return currentPeople;
@@ -123,8 +123,8 @@ contract carnitaAsada{
         currentPeople=_newMax;
         carnitas[lastCarnita].maxPeople=currentPeople;
     }
-    
-   
+
+
     //check the number of current participants
     function seeCurrentParticipants()public constant returns(uint256 _participants){
         return carnitas[lastCarnita].participants.length;
@@ -140,7 +140,7 @@ contract carnitaAsada{
         if(carnitas[lastCarnita].maxPeople == carnitas[lastCarnita].participants.length){
             halted = true;
         }
-        
+
     }
     //generate new carnitaAsada
     function newCarnita() internal{
@@ -153,36 +153,71 @@ contract carnitaAsada{
         carnitas.push(temp);
         lastCarnita+=1;
     }
-    
+
     //pay the carnitaAsada
-    
+
     function payCarnita(uint256 _gasUsed, uint256 _bill) onlyManager public{
         uint256 winner = uint256(rand());// define a random winner
         addressManager.transfer(_gasUsed); //pay the gas to the Manager
-        
+
         //to pay the bill could be toPaycarnita variable or set by manager
         if(_bill>0){
             bitsoAddress.transfer(carnitas[lastCarnita].participants.length*_bill);
         }else{
         bitsoAddress.transfer(carnitas[lastCarnita].participants.length*toPaycarnita);
         }
-        
+
         carnitas[lastCarnita].participants[winner].transfer(this.balance);//send money to the winner
         halted=false;//activate the Contract again
         newCarnita(); //create new carnita
-        
+
     }
-    
+
     /*
-     *  default fall back function      
+     *  default fall back function
      */
     function () onContractRunning payable  public {
-                 addParticipant(msg.sender, msg.value);           
+                 addParticipant(msg.sender, msg.value);
             }
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

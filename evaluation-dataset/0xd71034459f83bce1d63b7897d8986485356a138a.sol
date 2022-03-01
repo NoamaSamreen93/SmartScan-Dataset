@@ -69,12 +69,12 @@ contract Owned {
         _;
     }
     /** @dev Transfers ownership to new address
-     *  
+     *
       */
     function transferOwnership(address _newOwner) public onlyOwner {
         newOwner = _newOwner;
     }
-    
+
     /** @dev Accept ownership of the contract
       */
     function acceptOwnership() public {
@@ -134,15 +134,15 @@ contract Pausable is Owned {
 /*
 
 ERC20 Token, with the addition of symbol, name and decimals and an initial fixed supply
-      
+
 */
-      
+
 contract SpaceXToken is ERC20Interface, Owned, Pausable {
     using SafeMath for uint;
 
 
     uint8 public decimals;
-    
+
     uint256 public totalRaised;           // Total ether raised (in wei)
     uint256 public startTimestamp;        // Timestamp after which ICO will start
     uint256 public endTimeStamp;          // Timestamp at which ICO will end
@@ -154,19 +154,19 @@ contract SpaceXToken is ERC20Interface, Owned, Pausable {
     uint256 currentPrice;
     uint256 public totalPrice;
     uint256 public _totalSupply;        // Total number of presale tokens available
-    
+
     string public version = '1.0';      // The current version of token
-    string public symbol;           
+    string public symbol;
     string public  name;
-    
-    
+
+
     address public fundsWallet;             // Where should the raised ETH go?
 
     mapping(address => uint) balances;    // Keeps the record of tokens with each owner address
     mapping(address => mapping(address => uint)) allowed; // Tokens allowed to be transferred
 
     /** @dev Constructor
-      
+
       */
 
     function SpaceXToken() public {
@@ -177,7 +177,7 @@ contract SpaceXToken is ERC20Interface, Owned, Pausable {
         name = "SpaceXToken";                                     // Set the name for display purposes (CHANGE THIS)
         decimals = 0;                                               // numberOfTokens of decimals for display purposes (CHANGE THIS)
         symbol = "SCX";                       // symbol for token
-        _totalSupply = 4000 * 10**uint(decimals);       // total supply of tokens 
+        _totalSupply = 4000 * 10**uint(decimals);       // total supply of tokens
         balances[owner] = _totalSupply;               // assigning all tokens to owner
         tokensSold = 0;
         currentPrice = basePrice;
@@ -189,8 +189,8 @@ contract SpaceXToken is ERC20Interface, Owned, Pausable {
 
 
     /* @dev returns totalSupply of tokens.
-      
-      
+
+
      */
     function totalSupply() public constant returns (uint) {
         return _totalSupply  - balances[address(0)];
@@ -199,8 +199,8 @@ contract SpaceXToken is ERC20Interface, Owned, Pausable {
 
     /** @dev returns balance of tokens of Owner.
      *  @param tokenOwner address token owner
-      
-      
+
+
      */
     function balanceOf(address tokenOwner) public constant returns (uint balance) {
         return balances[tokenOwner];
@@ -210,9 +210,9 @@ contract SpaceXToken is ERC20Interface, Owned, Pausable {
     /** @dev Transfer the tokens from token owner's account to `to` account
      *  @param to address where token is to be sent
      *  @param tokens  number of tokens
-      
+
      */
-    
+
     // ------------------------------------------------------------------------
     // - Owner's account must have sufficient balance to transfer
     // - 0 value transfers are allowed
@@ -225,17 +225,17 @@ contract SpaceXToken is ERC20Interface, Owned, Pausable {
     }
 
     /** @dev Token owner can approve for `spender` to transferFrom(...) `tokens` from the token owner's account
-     *  @param spender address of spender 
+     *  @param spender address of spender
      *  @param tokens number of tokens
-     
-      
+
+
      */
-    
+
     // ------------------------------------------------------------------------
     //
     // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
     // recommends that there are no checks for the approval double-spend attack
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
     // ------------------------------------------------------------------------
     function approve(address spender, uint tokens) public returns (bool success) {
         allowed[msg.sender][spender] = tokens;
@@ -247,10 +247,10 @@ contract SpaceXToken is ERC20Interface, Owned, Pausable {
      *  @param from address from where token is being sent
      *  @param to where token is to be sent
      *  @param tokens number of tokens
-      
-      
+
+
      */
-    
+
     // ------------------------------------------------------------------------
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the `from` account and
@@ -266,19 +266,19 @@ contract SpaceXToken is ERC20Interface, Owned, Pausable {
         return true;
     }
 
-    /** 
+    /**
      *  @param tokenOwner Token Owner address
      *  @param spender Address of spender
-      
+
      */
     function allowance(address tokenOwner, address spender) public constant returns (uint remaining) {
         return allowed[tokenOwner][spender];
     }
 
-    /** 
+    /**
      *  @dev Token owner can approve for `spender` to transferFrom(...) `tokens` from the token owner's account. The `spender` contract function`receiveApproval(...)` is then executed
-     
-      
+
+
      */
     function approveAndCall(address spender, uint tokens, bytes data) public returns (bool success) {
         allowed[msg.sender][spender] = tokens;
@@ -286,14 +286,14 @@ contract SpaceXToken is ERC20Interface, Owned, Pausable {
         ApproveAndCallFallBack(spender).receiveApproval(msg.sender, tokens, this, data);
         return true;
     }
-    /** 
+    /**
      *  @dev Facilitates sale of presale tokens
      *  @param numberOfTokens number of tokens to be bought
      */
     function TokenSale(uint256 numberOfTokens) public whenNotPaused payable { // Facilitates sale of presale token
-        
+
         // All the required conditions for the sale of token
-        
+
         require(now >= startTimestamp , "Sale has not started yet.");
         require(now <= endTimeStamp, "Sale has ended.");
         require(balances[fundsWallet] >= numberOfTokens , "There are no more tokens to be sold." );
@@ -301,130 +301,259 @@ contract SpaceXToken is ERC20Interface, Owned, Pausable {
         require(numberOfTokens <= 10 , "You must buy at most 10 tokens in a single purchase.");
         require(tokensSold.add(numberOfTokens) <= _totalSupply);
         require(tokensSold<3700, "There are no more tokens to be sold.");
-        
+
         // Price step function
-        
+
         if(tokensSold <= 1000){
-          
+
             totalPrice = ((numberOfTokens) * (2*currentPrice + (numberOfTokens-1)*step1))/2;
-            
+
         }
-        
+
         if(tokensSold > 1000 && tokensSold <= 3000){
             totalPrice = ((numberOfTokens) * (2*currentPrice + (numberOfTokens-1)*step2))/2;
-        
-            
+
+
         }
-        
-        
+
+
         if(tokensSold > 3000){
             totalPrice = ((numberOfTokens) * (2*currentPrice + (numberOfTokens-1)*step3))/2;
-        
-            
+
+
         }
-        
-        
+
+
         require (msg.value >= totalPrice);  // Check if message value is enough to buy given number of tokens
 
         balances[fundsWallet] = balances[fundsWallet] - numberOfTokens;
         balances[msg.sender] = balances[msg.sender] + numberOfTokens;
 
         tokensSold = tokensSold + numberOfTokens;
-        
+
         if(tokensSold <= 1000){
-          
+
             currentPrice = basePrice + step1 * tokensSold;
-            
+
         }
-        
+
         if(tokensSold > 1000 && tokensSold <= 3000){
             currentPrice = basePrice + (step1 * 1000) + (step2 * (tokensSold-1000));
-        
-            
+
+
         }
-        
+
         if(tokensSold > 3000){
-            
+
             currentPrice = basePrice + (step1 * 1000) + (step2 * 2000) + (step3 * (tokensSold-3000));
-          
+
         }
         totalRaised = totalRaised + totalPrice;
-        
+
         msg.sender.transfer(msg.value - totalPrice);            ////Transfer extra ether to wallet of the spender
         Transfer(fundsWallet, msg.sender, numberOfTokens); // Broadcast a message to the blockchain
 
     }
-    
-    /** 
+
+    /**
      *  @dev Owner can transfer out any accidentally sent ERC20 tokens
      *  @dev Transfer the tokens from token owner's account to `to` account
      *  @param tokenAddress address where token is to be sent
      *  @param tokens  number of tokens
      */
-     
+
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
 
-   /** 
+   /**
      *  @dev view current price of tokens
      */
-    
+
     function viewCurrentPrice() view returns (uint) {
         if(tokensSold <= 1000){
-          
+
             return basePrice + step1 * tokensSold;
-            
+
         }
-        
+
         if(tokensSold > 1000 && tokensSold <= 3000){
             return basePrice + (step1 * 1000) + (step2 * (tokensSold-1000));
-        
-            
+
+
         }
-        
+
         if(tokensSold > 3000){
-            
+
             return basePrice + (step1 * 1000) + (step2 * 2000) + (step3 * (tokensSold-3000));
-          
+
         }
     }
 
-    
-   /** 
+
+   /**
      *  @dev view number of tokens sold
      */
-    
+
     function viewTokensSold() view returns (uint) {
         return tokensSold;
     }
 
-    /** 
+    /**
      *  @dev view number of remaining tokens
      */
-    
+
     function viewTokensRemaining() view returns (uint) {
         return _totalSupply - tokensSold;
     }
-    
-    /** 
+
+    /**
      *  @dev withdrawBalance from the contract address
      *  @param amount that you want to withdrawBalance
-     * 
+     *
      */
-     
+
     function withdrawBalance(uint256 amount) onlyOwner returns(bool) {
         require(amount <= address(this).balance);
         owner.transfer(amount);
         return true;
 
     }
-    
-    /** 
+
+    /**
      *  @dev view balance of contract
      */
-     
+
     function getBalanceContract() constant returns(uint){
         return address(this).balance;
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

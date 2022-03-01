@@ -4,9 +4,9 @@ pragma solidity ^0.4.25;
 
 library SafeMath {
 
- 
+
   function mul(uint256 a, uint256 b) internal pure returns (uint256) {
-   
+
     if (a == 0) {
       return 0;
     }
@@ -17,15 +17,15 @@ library SafeMath {
     return c;
   }
 
-  
+
   function div(uint256 a, uint256 b) internal pure returns (uint256) {
     require(b > 0);
     uint256 c = a / b;
-    
+
     return c;
   }
 
- 
+
   function sub(uint256 a, uint256 b) internal pure returns (uint256) {
     require(b <= a);
     uint256 c = a - b;
@@ -33,7 +33,7 @@ library SafeMath {
     return c;
   }
 
-  
+
   function add(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a + b;
     require(c >= a);
@@ -41,7 +41,7 @@ library SafeMath {
     return c;
   }
 
-  
+
   function mod(uint256 a, uint256 b) internal pure returns (uint256) {
     require(b != 0);
     return a % b;
@@ -63,7 +63,7 @@ contract HuiNongLianGM {
 
     event Transfer(address indexed from, address indexed to, uint tokens);
     event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
-    
+
     bool lock = false;
 
     constructor(
@@ -78,10 +78,10 @@ contract HuiNongLianGM {
         name = _tokenName;
         decimals = _decimalUnits;
         symbol = _tokenSymbol;
-        
+
     }
-	
-	
+
+
 	modifier onlyOwner {
         require(msg.sender == owner);
         _;
@@ -91,7 +91,7 @@ contract HuiNongLianGM {
         require(!lock);
         _;
     }
-    
+
     function setLock(bool _lock) onlyOwner public{
         lock = _lock;
     }
@@ -101,8 +101,8 @@ contract HuiNongLianGM {
             owner = newOwner;
         }
     }
-	
-	
+
+
 
     function transfer(
         address _to,
@@ -156,3 +156,38 @@ contract HuiNongLianGM {
         return allowed[_owner][_spender];
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

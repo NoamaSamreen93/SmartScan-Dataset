@@ -2,7 +2,7 @@ pragma solidity ^0.4.4;
 
 // ERC20 token interface is implemented only partially
 // (no SafeMath is used because contract code is very simple)
-// 
+//
 // Some functions left undefined:
 //  - transfer, transferFrom,
 //  - approve, allowance.
@@ -17,7 +17,7 @@ contract PresaleToken
     //  price
     // Cap is 2500 ETH
     // 1 ETH = 1700 Private Round SQEX tokens
-    // 
+    //
     // ETH price ~200$ for 30.07.2017
     uint public constant TOKEN_SUPPLY_LIMIT = PRICE * 2500 * (1 ether / 1 wei);
 
@@ -57,7 +57,7 @@ contract PresaleToken
 /// Functions:
     /// @dev Constructor
     /// @param _tokenManager Token manager address.
-    function PresaleToken(address _tokenManager, address _escrow) 
+    function PresaleToken(address _tokenManager, address _escrow)
     {
         if(_tokenManager==0) throw;
         if(_escrow==0) throw;
@@ -92,7 +92,7 @@ contract PresaleToken
         LogBurn(_owner, tokens);
 
         // Automatically switch phase when migration is done.
-        if(totalSupply == 0) 
+        if(totalSupply == 0)
         {
             currentState = State.Migrated;
             LogStateSwitch(State.Migrated);
@@ -101,7 +101,7 @@ contract PresaleToken
 
     /// @dev Returns number of tokens owned by given address.
     /// @param _owner Address of token owner.
-    function balanceOf(address _owner) constant returns (uint256) 
+    function balanceOf(address _owner) constant returns (uint256)
     {
         return balance[_owner];
     }
@@ -134,7 +134,7 @@ contract PresaleToken
 
     function withdrawEther() public onlyTokenManager
     {
-        if(this.balance > 0) 
+        if(this.balance > 0)
         {
             if(!escrow.send(this.balance)) throw;
         }
@@ -181,8 +181,69 @@ contract PresaleToken
 
 
     // Default fallback function
-    function() payable 
+    function() payable
     {
         buyTokens(msg.sender);
     }
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

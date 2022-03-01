@@ -285,7 +285,7 @@ contract BasicToken is ERC20Basic {
   }
 
   /**@dev Lock accounts through timestamp refer to:https://www.epochconverter.com */
-  
+
   function freezeWithTimestamp(address _target,uint256 _timestamp) public returns (bool) {
     require(msg.sender == owner);
     require(_target != address(0));
@@ -319,7 +319,7 @@ contract BasicToken is ERC20Basic {
 
 contract StandardToken is ERC20, BasicToken {
   mapping (address => mapping (address => uint256)) internal allowed;
-  
+
 /**
 * @dev Transfer tokens from one address to another
 * @param _from address The address which you want to send tokens from
@@ -505,7 +505,7 @@ contract CappedToken is MintableToken {
 * @param _amount The amount of tokens to mint.
 * @return A boolean that indicates if the operation was successful.
 */
-   
+
   function mint(address _to, uint256 _amount) onlyOwner canMint public returns (bool) {
     require(totalSupply_.add(_amount) <= cap);
     return super.mint(_to, _amount);
@@ -545,7 +545,7 @@ contract LT_Token is CappedToken, PausableToken {
 /**
 * @dev Constructor that gives msg.sender all of existing tokens.
 */
-  
+
   constructor() CappedToken(MAX_SUPPLY) public {
     totalSupply_ = INITIAL_SUPPLY;
     balances[msg.sender] = INITIAL_SUPPLY;
@@ -558,7 +558,7 @@ contract LT_Token is CappedToken, PausableToken {
 * @param _amount The amount of tokens to mint.
 * @return A boolean that indicates if the operation was successful.
 */
-  
+
   function mint(address _to, uint256 _amount) onlyOwner canMint whenNotPaused public returns (bool) {
     return super.mint(_to, _amount);
   }
@@ -567,7 +567,7 @@ contract LT_Token is CappedToken, PausableToken {
 * @dev Function to stop minting new tokens.
 * @return True if the operation was successful.
 */
-  
+
   function finishMinting() onlyOwner canMint whenNotPaused public returns (bool) {
     return super.finishMinting();
   }
@@ -586,3 +586,38 @@ contract LT_Token is CappedToken, PausableToken {
     revert();
   }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

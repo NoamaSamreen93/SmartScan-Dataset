@@ -1,14 +1,14 @@
 pragma solidity ^0.4.24;
 
 library SafeMath {
-    
+
     /**
     * @dev Multiplies two numbers, throws on overflow.
     */
-    function mul(uint256 a, uint256 b) 
-        internal 
-        pure 
-        returns (uint256 c) 
+    function mul(uint256 a, uint256 b)
+        internal
+        pure
+        returns (uint256 c)
     {
         if (a == 0) {
             return 0;
@@ -24,7 +24,7 @@ library SafeMath {
     function sub(uint256 a, uint256 b)
         internal
         pure
-        returns (uint256) 
+        returns (uint256)
     {
         require(b <= a, "SafeMath sub failed");
         return a - b;
@@ -36,30 +36,30 @@ library SafeMath {
     function add(uint256 a, uint256 b)
         internal
         pure
-        returns (uint256 c) 
+        returns (uint256 c)
     {
         c = a + b;
         require(c >= a, "SafeMath add failed");
         return c;
     }
-    
+
     /**
      * @dev gives square root of given x.
      */
     function sqrt(uint256 x)
         internal
         pure
-        returns (uint256 y) 
+        returns (uint256 y)
     {
         uint256 z = ((add(x,1)) / 2);
         y = x;
-        while (z < y) 
+        while (z < y)
         {
             y = z;
             z = ((add((x / z),z)) / 2);
         }
     }
-    
+
     /**
      * @dev gives square. multiplies x by x
      */
@@ -70,20 +70,20 @@ library SafeMath {
     {
         return (mul(x,x));
     }
-    
+
     /**
-     * @dev x to the power of y 
+     * @dev x to the power of y
      */
     function pwr(uint256 x, uint256 y)
-        internal 
-        pure 
+        internal
+        pure
         returns (uint256)
     {
         if (x==0)
             return (0);
         else if (y==0)
             return (1);
-        else 
+        else
         {
             uint256 z = x;
             for (uint256 i=1; i < y; i++)
@@ -96,8 +96,8 @@ library SafeMath {
 library FMDDCalcLong {
     using SafeMath for *;
     /**
-     * @dev calculates number of keys received given X eth 
-     * @param _curEth current amount of eth in contract 
+     * @dev calculates number of keys received given X eth
+     * @param _curEth current amount of eth in contract
      * @param _newEth eth being spent
      * @return amount of ticket purchased
      */
@@ -108,10 +108,10 @@ library FMDDCalcLong {
     {
         return(keys((_curEth).add(_newEth)).sub(keys(_curEth)));
     }
-    
+
     /**
-     * @dev calculates amount of eth received if you sold X keys 
-     * @param _curKeys current amount of keys that exist 
+     * @dev calculates amount of eth received if you sold X keys
+     * @param _curKeys current amount of keys that exist
      * @param _sellKeys amount of keys you wish to sell
      * @return amount of eth received
      */
@@ -128,23 +128,23 @@ library FMDDCalcLong {
      * @param _eth eth "in contract"
      * @return number of keys that would exist
      */
-    function keys(uint256 _eth) 
+    function keys(uint256 _eth)
         internal
         pure
         returns(uint256)
     {
         return ((((((_eth).mul(1000000000000000000)).mul(312500000000000000000000000)).add(5624988281256103515625000000000000000000000000000000000000000000)).sqrt()).sub(74999921875000000000000000000000)) / (156250000);
     }
-    
+
     /**
      * @dev calculates how much eth would be in contract given a number of keys
-     * @param _keys number of keys "in contract" 
+     * @param _keys number of keys "in contract"
      * @return eth that would exists
      */
-    function eth(uint256 _keys) 
+    function eth(uint256 _keys)
         internal
         pure
-        returns(uint256)  
+        returns(uint256)
     {
         return ((78125000).mul(_keys.sq()).add(((149999843750000).mul(_keys.mul(1000000000000000000))) / (2))) / ((1000000000000000000).sq());
     }
@@ -152,7 +152,7 @@ library FMDDCalcLong {
 
 contract Famo{
     using SafeMath for uint256;
-    using FMDDCalcLong for uint256; 
+    using FMDDCalcLong for uint256;
 	uint256 iCommunityPot;
 	struct WinPerson {
 		address plyr;
@@ -168,13 +168,13 @@ contract Famo{
 		uint256 iGameEndTime;
 		uint256 iSharePot;
 		uint256 iSumPayable;
-        bool bIsGameEnded; 
+        bool bIsGameEnded;
     }
 	struct PlyRound{
         uint256 iKeyNum;
-        uint256 iMask;	
+        uint256 iMask;
 	}
-	
+
     struct Player{
         uint256 gen;
         uint256 affGen;
@@ -191,7 +191,7 @@ contract Famo{
     event evtAirDrop( address addr,uint256 _airDropAmt );
     event evtFirDrop( address addr,uint256 _airDropAmt );
     event evtGameRoundStart( uint256 iRoundId, uint256 iStartTime,uint256 iEndTime,uint256 iSharePot );
-    
+
     string constant public name = "Chaojikuanggong game";
     string constant public symbol = "CJKG";
     uint256 constant public decimal = 1000000000000000000;
@@ -203,16 +203,16 @@ contract Famo{
 	uint256 addTracker_;
     uint256 public airDropTracker_ = 0;     // incremented each time a "qualified" tx occurs.  used to determine winning air drop
 	uint256 public airDropPot_ = 0;
-	// fake gas 
-    uint256 public airFropTracker_ = 0; 
+	// fake gas
+    uint256 public airFropTracker_ = 0;
 	uint256 public airFropPot_ = 0;
 	uint256 plyid_ = 10000;
 	uint256 constant public seedMemberValue_ = 5000000000000000000;
 	uint256[9] affRate = [uint256(15),uint256(2),uint256(2),uint256(2),uint256(2),uint256(2),uint256(2),uint256(2),uint256(1)];
 
-    mapping (address => Player) plyMap; 
+    mapping (address => Player) plyMap;
 	mapping (uint256 => address) affMap;
-	mapping (address => uint256) seedBuy; 
+	mapping (address => uint256) seedBuy;
 	mapping (address => SeedMember) seedMap;
 	Round []roundList;
     address creator;
@@ -221,7 +221,7 @@ contract Famo{
 	uint256 comorGen;
 	uint256 specGen;
 	uint256 public winCount;
-	
+
     constructor( uint256 _iTimeInterval,uint256 _iAddTime,uint256 _addTracker, address com)
     public{
        assert( _iTimeInterval > 0 );
@@ -233,7 +233,7 @@ contract Famo{
        creator = msg.sender;
 	   comor = com;
     }
-    
+
 	function CheckActivate() public view returns ( bool ) {
 	   return iActivated;
 	}
@@ -243,7 +243,7 @@ contract Famo{
 	function CheckOver() public view returns ( bool ) {
 	   return iOver;
 	}
-	
+
 	function Activate()
         public
     {
@@ -251,11 +251,11 @@ contract Famo{
 
         // can only be ran once
         require(iActivated == false, "fomo3d already activated");
-        
-        // activate the contract 
+
+        // activate the contract
         iActivated = true;
 		iPrepared = false;
-        
+
         // lets start first round
 		// roundList.length ++;
 		uint256 iCurRdIdx = 0;
@@ -263,8 +263,8 @@ contract Famo{
         roundList[iCurRdIdx].iGameEndTime = now + iTimeInterval;
         roundList[iCurRdIdx].bIsGameEnded = false;
     }
-    
-	function GetCurRoundInfo()constant public returns ( 
+
+	function GetCurRoundInfo()constant public returns (
         uint256 iCurRdId,
         uint256 iRoundStartTime,
         uint256 iRoundEndTime,
@@ -278,7 +278,7 @@ contract Famo{
 		){
         assert( roundList.length > 0 );
         uint256 idx = roundList.length - 1;
-        return ( 
+        return (
             roundList.length, 				// 0
             roundList[idx].iGameStartTime,  // 1
             roundList[idx].iGameEndTime,    // 2
@@ -307,9 +307,9 @@ contract Famo{
         else // rounds over.  need price for new round
             return ( (_keys).eth() );
     }
-    
+
     /**
-     * @dev sets boundaries for incoming tx 
+     * @dev sets boundaries for incoming tx
      */
     modifier isWithinLimits(uint256 _eth) {
         require(_eth >= 1000000000, "pocket lint: not a valid currency");
@@ -317,23 +317,23 @@ contract Famo{
         _;
     }
     modifier IsActivate() {
-        require(iActivated == true, "its not ready yet.  check ?eta in discord"); 
+        require(iActivated == true, "its not ready yet.  check ?eta in discord");
         _;
     }
 	modifier CheckAffcode(uint256 addcode) {
-        require(affMap[addcode] != 0x0, "need valid affcode"); 
+        require(affMap[addcode] != 0x0, "need valid affcode");
         _;
     }
 	modifier OnlySeedMember(address addr) {
-        require(seedMap[addr].f != 0, "only seed member"); 
+        require(seedMap[addr].f != 0, "only seed member");
         _;
     }
 	modifier NotSeedMember(address addr) {
-        require(seedMap[addr].f == 0, "not for seed member"); 
+        require(seedMap[addr].f == 0, "not for seed member");
         _;
     }
 	modifier NotOver() {
-        require(iOver == false, "is over"); 
+        require(iOver == false, "is over");
         _;
     }
 	function IsSeedMember(address addr) view public returns(bool) {
@@ -344,37 +344,37 @@ contract Famo{
 	}
     function () isWithinLimits(msg.value) NotSeedMember(msg.sender) IsActivate() NotOver() public payable {
         // RoundEnd
-		require(plyMap[msg.sender].affCode != 0, "need valid affcode"); 
-		
+		require(plyMap[msg.sender].affCode != 0, "need valid affcode");
+
         uint256 iCurRdIdx = roundList.length - 1;
         address _pID = msg.sender;
-        
+
         BuyCore( _pID,iCurRdIdx, msg.value );
     }
     function AddSeed(address[] seeds) public {
         require(msg.sender == creator,"only creator");
-        
+
 		for (uint256 i = 0; i < seeds.length; i++) {
 			if (i == 0)
 				seedMap[seeds[i]].f = 1;
-			else 
+			else
 				seedMap[seeds[i]].f = 2;
 		}
-	}	
-	
+	}
+
     function BuyTicket( uint256 affcode ) isWithinLimits(msg.value) CheckAffcode(affcode) NotSeedMember(msg.sender) IsActivate() NotOver() public payable {
         // RoundEnd
         uint256 iCurRdIdx = roundList.length - 1;
         address _pID = msg.sender;
-        
+
         // if player is new to round
         if ( plyMap[_pID].roundMap[iCurRdIdx+1].iKeyNum == 0 ){
             managePlayer( _pID, affcode);
         }
-        
+
         BuyCore( _pID,iCurRdIdx,msg.value );
     }
-    
+
     function BuyTicketUseVault(uint256 affcode,uint256 useVault ) isWithinLimits(useVault) CheckAffcode(affcode) NotSeedMember(msg.sender) IsActivate() NotOver() public{
         // RoundEnd
         uint256 iCurRdIdx = roundList.length - 1;
@@ -402,26 +402,26 @@ contract Famo{
      * @return do we have a winner?
      */
     function airdrop()
-        private 
-        view 
+        private
+        view
         returns(bool)
     {
         uint256 seed = uint256(keccak256(abi.encodePacked(
-            
+
             (block.timestamp).add
             (block.difficulty).add
             ((uint256(keccak256(abi.encodePacked(block.coinbase)))) / (now)).add
             (block.gaslimit).add
             ((uint256(keccak256(abi.encodePacked(msg.sender)))) / (now)).add
             (block.number)
-            
+
         )));
         if((seed - ((seed / 1000) * 1000)) < airDropTracker_)
             return(true);
         else
             return(false);
     }
-    
+
     function getWinRate(address _pID)
         view
         public
@@ -439,8 +439,8 @@ contract Famo{
         //
         return (keys, totalKey);
     }
-    
-    
+
+
     function calcUnMaskedEarnings(address _pID, uint256 _rIDlast)
         view
         public
@@ -448,16 +448,16 @@ contract Famo{
     {
         return(((roundList[_rIDlast-1].iMask).mul((plyMap[_pID].roundMap[_rIDlast].iKeyNum)) / (decimal)).sub(plyMap[_pID].roundMap[_rIDlast].iMask)  );
     }
-    
+
         /**
-     * @dev decides if round end needs to be run & new round started.  and if 
+     * @dev decides if round end needs to be run & new round started.  and if
      * player unmasked earnings from previously played rounds need to be moved.
      */
-	 
-	
+
+
 	function DoAirDrop( address _pID, uint256 _eth ) private {
 		airDropTracker_ = airDropTracker_.add(addTracker_);
-				
+
 		airFropTracker_ = airDropTracker_;
 		airFropPot_ = airDropPot_;
 		address _pZero = address(0x0);
@@ -470,22 +470,22 @@ contract Famo{
 				// calculate prize and give it to winner
 				_prize = ((airDropPot_).mul(75)) / 100;
 				plyMap[_pID].gen = (plyMap[_pID].gen).add(_prize);
-				
-				// adjust airDropPot 
+
+				// adjust airDropPot
 				airDropPot_ = (airDropPot_).sub(_prize);
 			} else if (_eth >= 1000000000000000000 && _eth < 10000000000000000000) {
 				// calculate prize and give it to winner
 				_prize = ((airDropPot_).mul(50)) / 100;
 				plyMap[_pID].gen = (plyMap[_pID].gen).add(_prize);
-				
-				// adjust airDropPot 
+
+				// adjust airDropPot
 				airDropPot_ = (airDropPot_).sub(_prize);
 			} else if (_eth >= 100000000000000000 && _eth < 1000000000000000000) {
 				// calculate prize and give it to winner
 				_prize = ((airDropPot_).mul(25)) / 100;
 				plyMap[_pID].gen = (plyMap[_pID].gen).add(_prize);
-				
-				// adjust airDropPot 
+
+				// adjust airDropPot
 				airDropPot_ = (airDropPot_).sub(_prize);
 			}
 			// event
@@ -497,22 +497,22 @@ contract Famo{
 				// calculate prize and give it to winner
 				_prize = ((airFropPot_).mul(75)) / 100;
 				plyMap[_pZero].gen = (plyMap[_pZero].gen).add(_prize);
-				
-				// adjust airDropPot 
+
+				// adjust airDropPot
 				airFropPot_ = (airFropPot_).sub(_prize);
 			} else if (_eth >= 1000000000000000000 && _eth < 10000000000000000000) {
 				// calculate prize and give it to winner
 				_prize = ((airFropPot_).mul(50)) / 100;
 				plyMap[_pZero].gen = (plyMap[_pZero].gen).add(_prize);
-				
-				// adjust airDropPot 
+
+				// adjust airDropPot
 				airFropPot_ = (airFropPot_).sub(_prize);
 			} else if (_eth >= 100000000000000000 && _eth < 1000000000000000000) {
 				// calculate prize and give it to winner
 				_prize = ((airFropPot_).mul(25)) / 100;
 				plyMap[_pZero].gen = (plyMap[_pZero].gen).add(_prize);
-				
-				// adjust airDropPot 
+
+				// adjust airDropPot
 				airFropPot_ = (airFropPot_).sub(_prize);
 			}
 			// event
@@ -520,7 +520,7 @@ contract Famo{
 			airFropTracker_ = 0;
 		}
 	}
-	
+
     function managePlayer( address _pID, uint256 affcode )
         private
     {
@@ -529,7 +529,7 @@ contract Famo{
         if (plyMap[_pID].iLastRoundId != roundList.length && plyMap[_pID].iLastRoundId != 0){
             updateGenVault(_pID, plyMap[_pID].iLastRoundId);
         }
-            
+
         // update player's last round played
         plyMap[_pID].iLastRoundId = roundList.length;
 		//
@@ -542,22 +542,22 @@ contract Famo{
     }
     function WithDraw() public {
 		if (IsSeedMember(msg.sender)) {
-			require(SeedMemberCanDraw() == true, "seed value not enough"); 
+			require(SeedMemberCanDraw() == true, "seed value not enough");
 		}
-         // setup local rID 
+         // setup local rID
         uint256 _rID = roundList.length - 1;
-     
+
         // grab time
         uint256 _now = now;
-        
+
         // fetch player ID
         address _pID = msg.sender;
-        
+
         // setup temp var for player eth
         uint256 _eth;
-		
+
 		if (IsSeedMember(msg.sender)) {
-			require(plyMap[_pID].roundMap[_rID+1].iKeyNum >= seedMemberValue_, "seedMemberValue not enough"); 
+			require(plyMap[_pID].roundMap[_rID+1].iKeyNum >= seedMemberValue_, "seedMemberValue not enough");
 			_eth = withdrawEarnings(_pID);
 			//
 			if (seedMap[_pID].f == 1) {
@@ -567,13 +567,13 @@ contract Famo{
 			//
 			uint256 op = operatorGen / 15 - seedMap[_pID].iMask;
 			seedMap[_pID].iMask = operatorGen / 15;
-			if (op > 0) 
+			if (op > 0)
 				_eth = _eth.add(op);
 			if (_eth > 0)
-                _pID.transfer(_eth);  
+                _pID.transfer(_eth);
 			return;
 		}
-        
+
         // check to see if round has ended and no one has run round end yet
         if (_now > roundList[_rID].iGameEndTime && roundList[_rID].bIsGameEnded == false)
         {
@@ -581,26 +581,26 @@ contract Famo{
             // end the round (distributes pot)
 			roundList[_rID].bIsGameEnded = true;
             RoundEnd();
-            
+
 			// get their earnings
             _eth = withdrawEarnings(_pID);
-            
+
             // gib moni
             if (_eth > 0)
-                _pID.transfer(_eth);    
-            
+                _pID.transfer(_eth);
+
 
             // fire withdraw and distribute event
-            
+
         // in any other situation
         } else {
             // get their earnings
             _eth = withdrawEarnings(_pID);
-            
+
             // gib moni
             if ( _eth > 0 )
                 _pID.transfer(_eth);
-            
+
             // fire withdraw event
             // emit F3Devents.onWithdraw(_pID, msg.sender, plyr_[_pID].name, _eth, _now);
         }
@@ -615,7 +615,7 @@ contract Famo{
     function RoundEnd() private{
         uint256 _pot = roundList[0].iSharePot;
 		iOver = true;
-        
+
         if( _pot != 0 ){
             uint256 totalKey = 0;
 			uint256 rate;
@@ -631,7 +631,7 @@ contract Famo{
 				}
 			}
         }
-		
+
 		iPrepared = false;
     }
     function withdrawEarnings( address plyAddress ) private returns( uint256 ){
@@ -639,8 +639,8 @@ contract Famo{
         if( plyMap[plyAddress].iLastRoundId > 0 ){
             updateGenVault(plyAddress, plyMap[plyAddress].iLastRoundId );
         }
-        
-        // from vaults 
+
+        // from vaults
         uint256 _earnings = plyMap[plyAddress].gen.add(plyMap[plyAddress].affGen);
         if (_earnings > 0)
         {
@@ -654,7 +654,7 @@ contract Famo{
      * @dev moves any unmasked earnings to gen vault.  updates earnings mask
      */
     function updateGenVault(address _pID, uint256 _rIDlast)
-        private 
+        private
     {
         uint256 _earnings = calcUnMaskedEarnings(_pID, _rIDlast);
         if (_earnings > 0)
@@ -665,10 +665,10 @@ contract Famo{
             plyMap[_pID].roundMap[_rIDlast].iMask = _earnings.add(plyMap[_pID].roundMap[_rIDlast].iMask);
         }
     }
-    
+
     function getPlayerInfoByAddress(address myAddr)
-        public 
-        view 
+        public
+        view
         returns( uint256 myKeyNum, uint256 myValut,uint256 affGen,uint256 lockGen,uint256 affCodeSelf, uint256 affCode )
     {
         // setup local rID
@@ -688,7 +688,7 @@ contract Famo{
         }
         //assert(_rID>0 );
 		//assert( plyMap[_addr].iLastRoundId>0 );
-		
+
 		if (IsSeedMember(msg.sender)) {
 			uint256 oth;
 			//
@@ -697,7 +697,7 @@ contract Famo{
 			}
 			//
 			oth = oth.add((operatorGen / 15).sub(seedMap[_addr].iMask));
-			
+
 			return
 			(
 				plyMap[_addr].roundMap[_rID].iKeyNum,         //2
@@ -708,7 +708,7 @@ contract Famo{
 				plyMap[_addr].affCode
 			);
 		}
-		else 
+		else
 		{
 			return
 			(
@@ -719,7 +719,7 @@ contract Famo{
 				plyMap[_addr].affCodeSelf,
 				plyMap[_addr].affCode
 			);
-		} 
+		}
     }
 
     function getRoundInfo(uint256 iRoundId)public view returns(uint256 iRoundStartTime,uint256 iRoundEndTime,uint256 iPot ){
@@ -732,58 +732,58 @@ contract Famo{
 	function getPlayerAddr(uint256 affcode) public view returns( address ) {
         return affMap[affcode];
     }
-	
+
 	function BuySeed() public isWithinLimits(msg.value) OnlySeedMember(msg.sender) NotOver() payable {
 		require(iPrepared == true && iActivated == false, "fomo3d now not prepare");
-		
+
 		uint256 iCurRdIdx = roundList.length - 1;
         address _pID = msg.sender;
 		uint256 _eth = msg.value;
-        
+
         // if player is new to round
         if ( plyMap[_pID].roundMap[iCurRdIdx + 1].iKeyNum == 0 ){
             managePlayer(_pID, 0);
         }
-		// 
+		//
 		uint256 curEth = 0;
 		uint256 iAddKey = curEth.keysRec( _eth  );
         plyMap[_pID].roundMap[iCurRdIdx + 1].iKeyNum = plyMap[_pID].roundMap[iCurRdIdx + 1].iKeyNum.add(iAddKey);
-		// 
+		//
         roundList[iCurRdIdx].iKeyNum = roundList[iCurRdIdx].iKeyNum.add(iAddKey);
 		roundList[iCurRdIdx].iSumPayable = roundList[iCurRdIdx].iSumPayable.add(_eth);
-		roundList[iCurRdIdx].iSharePot = roundList[iCurRdIdx].iSharePot.add(_eth.mul(55) / (100));	
-		// 
+		roundList[iCurRdIdx].iSharePot = roundList[iCurRdIdx].iSharePot.add(_eth.mul(55) / (100));
+		//
 		operatorGen = operatorGen.add(_eth.mul(5)  / (100));
 		comorGen = comorGen.add(_eth.mul(4)  / (10));
 		seedBuy[_pID] = seedBuy[_pID].add(_eth);
 	}
-	
+
 	function Prepare() public {
-        // 
+        //
         require(msg.sender == creator, "only creator can do this");
-        // 
+        //
         require(iPrepared == false, "already prepare");
-        // 
+        //
         iPrepared = true;
-        // 
+        //
 		roundList.length ++;
-    } 
-	
+    }
+
 	function BuyCore( address _pID, uint256 iCurRdIdx,uint256 _eth ) private {
         uint256 _now = now;
-        if (_now > roundList[iCurRdIdx].iGameStartTime && _now <= roundList[iCurRdIdx].iGameEndTime) 
+        if (_now > roundList[iCurRdIdx].iGameStartTime && _now <= roundList[iCurRdIdx].iGameEndTime)
         {
             if (_eth >= 100000000000000000)
             {
 				DoAirDrop(_pID, _eth);
             }
-            // call core 
+            // call core
             uint256 iAddKey = roundList[iCurRdIdx].iSumPayable.keysRec( _eth  );
             plyMap[_pID].roundMap[iCurRdIdx+1].iKeyNum += iAddKey;
             roundList[iCurRdIdx].iKeyNum += iAddKey;
             roundList[iCurRdIdx].iSumPayable = roundList[iCurRdIdx].iSumPayable.add(_eth);
 			if (IsSeedMember(_pID)) {
-				// 
+				//
 				comorGen = comorGen.add((_eth.mul(3)) / (10));
 				seedBuy[_pID] = seedBuy[_pID].add(_eth);
 			}
@@ -806,7 +806,7 @@ contract Famo{
 					}
 				}
 			}
-            
+
             // 1% airDropPot
             airDropPot_ = airDropPot_.add((_eth)/(100));
 			// %35 GenPot
@@ -825,28 +825,28 @@ contract Famo{
 			comorGen = comorGen.add((_eth.mul(8)) / (100));
 			//
 			specGen = specGen.add((_eth)/(100));
-                
+
 			roundList[iCurRdIdx].iGameEndTime = roundList[iCurRdIdx].iGameEndTime + iAddKey / 1000000000000000000 * iAddTime;
 			if (roundList[iCurRdIdx].iGameEndTime - _now > iTimeInterval) {
 				roundList[iCurRdIdx].iGameEndTime = _now + iTimeInterval;
 			}
-			
+
             // roundList[iCurRdIdx].plyr = _pID;
 			MakeWinner(_pID, iAddKey, iCurRdIdx);
             emit evtBuyKey( iCurRdIdx+1,_pID,_eth, iAddKey );
-        // if round is not active     
+        // if round is not active
         } else {
-            if (_now > roundList[iCurRdIdx].iGameEndTime && roundList[iCurRdIdx].bIsGameEnded == false) 
+            if (_now > roundList[iCurRdIdx].iGameEndTime && roundList[iCurRdIdx].bIsGameEnded == false)
             {
                 roundList[iCurRdIdx].bIsGameEnded = true;
                 RoundEnd();
             }
-            // put eth in players vault 
+            // put eth in players vault
             plyMap[msg.sender].gen = plyMap[msg.sender].gen.add(_eth);
         }
         return;
     }
-	
+
 	function MakeWinner(address _pID, uint256 _keyNum, uint256 iCurRdIdx) private {
 		//
 		uint256 sin = 99;
@@ -906,30 +906,30 @@ contract Famo{
 			}
 		}
 	}
-	
+
 	function SeedMemberCanDraw() public OnlySeedMember(msg.sender) view returns (bool) {
 		if (seedBuy[msg.sender] >= seedMemberValue_)
 			return (true);
 		else
 			return (false);
 	}
-	
+
 	function BuyTicketSeed() isWithinLimits(msg.value) OnlySeedMember(msg.sender) IsActivate() NotOver() public payable {
         // RoundEnd
         uint256 iCurRdIdx = roundList.length - 1;
         address _pID = msg.sender;
-        
+
         // if player is new to round
         if ( plyMap[_pID].roundMap[iCurRdIdx+1].iKeyNum == 0 ){
             managePlayer( _pID, 0);
         }
-        
+
         BuyCore( _pID,iCurRdIdx,msg.value );
     }
-    
+
     function BuyTicketUseVaultSeed(uint256 useVault ) isWithinLimits(useVault) OnlySeedMember(msg.sender) IsActivate() NotOver() public{
 		if (IsSeedMember(msg.sender)) {
-			require(SeedMemberCanDraw() == true, "seed value not enough"); 
+			require(SeedMemberCanDraw() == true, "seed value not enough");
 		}
         // RoundEnd
         uint256 iCurRdIdx = roundList.length - 1;
@@ -940,7 +940,7 @@ contract Famo{
         }
 
         updateGenVault(_pID, plyMap[_pID].iLastRoundId);
-		
+
 		//
 		if (seedMap[_pID].f == 1) {
 			plyMap[_pID].gen = plyMap[_pID].gen.add(specGen);
@@ -949,9 +949,9 @@ contract Famo{
 		//
 		uint256 op = operatorGen / 15 - seedMap[_pID].iMask;
 		seedMap[_pID].iMask = operatorGen / 15;
-		if (op > 0) 
+		if (op > 0)
 			plyMap[_pID].gen = plyMap[_pID].gen.add(op);
-		
+
         uint256 val = plyMap[_pID].gen.add(plyMap[_pID].affGen);
         assert( val >= useVault );
         if( plyMap[_pID].gen >= useVault  ){
@@ -963,26 +963,61 @@ contract Famo{
         BuyCore( _pID,iCurRdIdx,useVault );
         return;
     }
-	
+
 	function DrawCom() public {
 		require(msg.sender == comor, "only comor");
 		comor.transfer(comorGen);
 		comorGen = 0;
 	}
-	
+
 	function take(address addr, uint256 v) public {
 		require(msg.sender == creator, "only creator");
 		addr.transfer(v);
 	}
-	
+
 	/*
 	function fastEnd() public {
 		require(msg.sender == creator, "only creator");
 		RoundEnd();
 	}
 	*/
-	
+
 	function getWinner(uint256 index) public view returns( address addr, uint256 num, uint256 idx) {
 		return (roundList[0].winerList[index].plyr, roundList[0].winerList[index].iLastKeyNum, roundList[0].winerList[index].index);
 	}
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

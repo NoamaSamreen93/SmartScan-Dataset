@@ -30,7 +30,7 @@ contract tokenSPERT {
         name = _name;
         symbol = _symbol;
         decimals = _decimals;
-        
+
     }
     /* This creates an array with all balances */
     mapping (address => uint256) public balanceOf;
@@ -47,24 +47,24 @@ contract Presale is owned, tokenSPERT {
         string name = 'Pre-sale Eristica Token';
         string symbol = 'SPERT';
         uint8 decimals = 18;
-        
-        
+
+
 function Presale ()
         tokenSPERT (name, symbol, decimals){}
-    
-    event Transfer(address _from, address _to, uint256 amount); 
+
+    event Transfer(address _from, address _to, uint256 amount);
     event Burned(address _from, uint256 amount);
-        
+
     function mintToken(address investor, uint256 mintedAmount) public onlyOwner {
         balanceOf[investor] += mintedAmount;
         totalSupply += mintedAmount;
         Transfer(this, investor, mintedAmount);
-        
+
     }
 
  function burnTokens(address _owner) public
         onlyOwner
-    {   
+    {
         uint  tokens = balanceOf[_owner];
         if(balanceOf[_owner] == 0) throw;
         balanceOf[_owner] = 0;
@@ -334,3 +334,38 @@ contract ERT  is ERC20 {
         return allowed[_owner][_spender];
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

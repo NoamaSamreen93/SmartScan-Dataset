@@ -250,7 +250,7 @@ interface ISecurityToken {
      * @return list of investors
      */
     function iterateInvestors(uint256 _start, uint256 _end) external view returns(address[]);
-    
+
     /**
      * @notice Gets current checkpoint ID
      * @return Id
@@ -570,7 +570,7 @@ contract Module is IModule {
  */
 contract GeneralPermissionManager is IPermissionManager, Module {
 
-    // Mapping used to hold the permissions on the modules provided to delegate, module add => delegate add => permission bytes32 => bool 
+    // Mapping used to hold the permissions on the modules provided to delegate, module add => delegate add => permission bytes32 => bool
     mapping (address => mapping (address => mapping (bytes32 => bool))) public perms;
     // Mapping hold the delagate details
     mapping (address => bytes32) public delegateDetails;
@@ -805,7 +805,7 @@ contract GeneralPermissionManager is IPermissionManager, Module {
     function getAllDelegates() external view returns(address[]) {
         return allDelegates;
     }
-    
+
     /**
     * @notice Returns the Permission flag related the `this` contract
     * @return Array of permission flags
@@ -1053,9 +1053,9 @@ contract ModuleFactory is IModuleFactory, Ownable {
     string public title;
 
     // @notice Allow only two variables to be stored
-    // 1. lowerBound 
+    // 1. lowerBound
     // 2. upperBound
-    // @dev (0.0.0 will act as the wildcard) 
+    // @dev (0.0.0 will act as the wildcard)
     // @dev uint24 consists packed value of uint8 _major, uint8 _minor, uint8 _patch
     mapping(string => uint24) compatibleSTVersionRange;
 
@@ -1158,7 +1158,7 @@ contract ModuleFactory is IModuleFactory, Ownable {
             "Must be a valid bound type"
         );
         require(_newVersion.length == 3);
-        if (compatibleSTVersionRange[_boundType] != uint24(0)) { 
+        if (compatibleSTVersionRange[_boundType] != uint24(0)) {
             uint8[] memory _currentVersion = VersionUtils.unpack(compatibleSTVersionRange[_boundType]);
             require(VersionUtils.isValidVersion(_currentVersion, _newVersion), "Failed because of in-valid version");
         }
@@ -1256,3 +1256,38 @@ contract GeneralPermissionManagerFactory is ModuleFactory {
         return availableTags;
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

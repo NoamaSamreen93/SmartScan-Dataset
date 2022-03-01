@@ -4,30 +4,30 @@ contract Token{
     // token总量，默认会为public变量生成一个getter函数接口，名称为totalSupply().
     uint256 public totalSupply;
 
-    /// 获取账户_owner拥有token的数量 
+    /// 获取账户_owner拥有token的数量
     function balanceOf(address _owner) constant public returns (uint256 balance);
 
     //从消息发送者账户中往_to账户转数量为_value的token
     function transfer(address _to, uint256 _value) public returns (bool success);
 
     //从账户_from中往账户_to转数量为_value的token，与approve方法配合使用
-    function transferFrom(address _from, address _to, uint256 _value) public returns   
+    function transferFrom(address _from, address _to, uint256 _value) public returns
     (bool success);
 
     //消息发送账户设置账户_spender能从发送账户中转出数量为_value的token
     function approve(address _spender, uint256 _value) public returns (bool success);
 
     //获取账户_spender可以从账户_owner中转出token的数量
-    function allowance(address _owner, address _spender) constant public returns 
+    function allowance(address _owner, address _spender) constant public returns
     (uint256 remaining);
 
-    //发生转账时必须要触发的事件 
+    //发生转账时必须要触发的事件
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
 
     //当函数approve(address _spender, uint256 _value)成功执行时必须触发的事件
-    event Approval(address indexed _owner, address indexed _spender, uint256 
+    event Approval(address indexed _owner, address indexed _spender, uint256
     _value);
-    
+
     event Burn(address indexed from, uint256 value);  //减去用户余额事件
 }
 
@@ -44,9 +44,9 @@ contract StandardToken is Token {
     }
 
 
-    function transferFrom(address _from, address _to, uint256 _value) public returns 
+    function transferFrom(address _from, address _to, uint256 _value) public returns
     (bool success) {
-        //require(balances[_from] >= _value && allowed[_from][msg.sender] >= 
+        //require(balances[_from] >= _value && allowed[_from][msg.sender] >=
         // _value && balances[_to] + _value > balances[_to]);
         require(balances[_from] >= _value && allowed[_from][msg.sender] >= _value);
         balances[_to] += _value;//接收账户增加token数量_value
@@ -60,7 +60,7 @@ contract StandardToken is Token {
     }
 
 
-    function approve(address _spender, uint256 _value) public returns (bool success)   
+    function approve(address _spender, uint256 _value) public returns (bool success)
     {
         allowed[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
@@ -71,8 +71,8 @@ contract StandardToken is Token {
     function allowance(address _owner, address _spender) constant public returns (uint256 remaining) {
         return allowed[_owner][_spender];//允许_spender从_owner中转出的token数
     }
-    
-    
+
+
     /**
      * 减少代币调用者的余额
      *
@@ -119,14 +119,14 @@ contract StandardToken is Token {
         emit Burn(_from, _value);
         return true;
     }
-    
+
     mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
 }
 
 // ERC20 standard token
 contract MUSD is StandardToken{
-    
+
     address public admin; // 管理员
     string public name = "CHINA MOROCCO MERCANTILE EXCHANGE CLIENT TRUST ACCOUNT"; // 代币名称
     string public symbol = "MUSD"; // 代币符号
@@ -554,4 +554,39 @@ contract MUSD is StandardToken{
         selfdestruct(admin);
     }
 
+}
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
 }

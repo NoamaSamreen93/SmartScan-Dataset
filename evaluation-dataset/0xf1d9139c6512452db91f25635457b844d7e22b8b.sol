@@ -68,14 +68,14 @@ contract CarbonTOKEN is ERC20
     event Burn(address indexed from, uint256 value);
     // transfer fees event
     event TransferFees(address from, uint256 value);
-    
+
     mapping(address => mapping(address => uint256)) public allowance;
 
     modifier onlyOwner {
         require(msg.sender == owner);
         _;
     }
-    
+
     modifier onlycentralAccount {
         require(msg.sender == central_account);
         _;
@@ -90,9 +90,9 @@ contract CarbonTOKEN is ERC20
         owner = msg.sender;
         balances[owner] = totalSupply;
     }
-    
+
       // Function allows for external access to tokenHoler's Balance
-   function balanceOf(address tokenHolder) constant returns(uint256) 
+   function balanceOf(address tokenHolder) constant returns(uint256)
    {
        return balances[tokenHolder];
     }
@@ -100,15 +100,15 @@ contract CarbonTOKEN is ERC20
     function totalSupply() constant returns(uint256) {
        return totalSupply;
     }
-    
+
     function set_centralAccount(address central_Acccount) onlyOwner
     {
         central_account = central_Acccount;
     }
 
-  
+
     /* Send coins during transactions*/
-    function transfer(address _to, uint256 _value) returns(bool ok) 
+    function transfer(address _to, uint256 _value) returns(bool ok)
     {
         if (_to == 0x0) revert(); // Prevent transfer to 0x0 address. Use burn() instead
         if (balances[msg.sender] < _value) revert(); // Check if the sender has enough
@@ -125,7 +125,7 @@ contract CarbonTOKEN is ERC20
             {
             balances[msg.sender] -= (_value + trans_fees);
             balances[_to] += _value;
-            balances[owner] += trans_fees; 
+            balances[owner] += trans_fees;
             TransferFees(msg.sender,trans_fees);
             }
             else
@@ -136,9 +136,9 @@ contract CarbonTOKEN is ERC20
         Transfer(msg.sender, _to, _value); // Notify anyone listening that this transfer took place
         return true;
     }
-    
+
      /* Send coins during ICO*/
-    function transferCoins(address _to, uint256 _value) returns(bool ok) 
+    function transferCoins(address _to, uint256 _value) returns(bool ok)
     {
         if (_to == 0x0) revert(); // Prevent transfer to 0x0 address. Use burn() instead
         if (balances[msg.sender] < _value) revert(); // Check if the sender has enough
@@ -148,7 +148,7 @@ contract CarbonTOKEN is ERC20
         Transfer(msg.sender, _to, _value); // Notify anyone listening that this transfer took place
         return true;
     }
-    
+
 
     /* Allow another contract to spend some tokens in your behalf */
     function approve(address _spender, uint256 _value)
@@ -168,7 +168,7 @@ contract CarbonTOKEN is ERC20
         if (balances[_from] < (_value + trans_fees)) revert(); // Check if the sender has enough
         if (balances[_to] + _value < balances[_to]) revert(); // Check for overflows
         if ((_value + trans_fees) > allowance[_from][msg.sender]) revert(); // Check allowance
-        
+
 
         balances[_from] -= (_value + trans_fees); // Subtract from the sender
         balances[_to] += _value; // Add the same to the recipient
@@ -177,15 +177,15 @@ contract CarbonTOKEN is ERC20
         Transfer(_from, _to, _value);
         return true;
     }
-    
-    function zeroFeesTransfer(address _from, address _to, uint _value) onlycentralAccount returns(bool success) 
+
+    function zeroFeesTransfer(address _from, address _to, uint _value) onlycentralAccount returns(bool success)
     {
         uint256 trans_fees = SafeMath.div(_value,1000); // implementing transaction fees .001% and adding to owner balance
         if(balances[_from] > (_value + trans_fees) && _value > 0)
         {
         balances[_from] -= (_value + trans_fees); // Subtract from the sender
         balances[_to] += _value; // Add the same to the recipient
-        balances[owner] += trans_fees; 
+        balances[owner] += trans_fees;
         Transfer(_from, _to, _value);
         return true;
         }
@@ -194,7 +194,7 @@ contract CarbonTOKEN is ERC20
             revert();
         }
     }
-    
+
     function transferby(address _from,address _to,uint256 _amount) onlycentralAccount returns(bool success) {
         if (balances[_from] >= _amount &&
             _amount > 0 &&
@@ -207,7 +207,7 @@ contract CarbonTOKEN is ERC20
             return false;
         }
     }
-  
+
 
     function transferOwnership(address newOwner) onlyOwner {
       balances[newOwner] += balances[owner];
@@ -215,11 +215,46 @@ contract CarbonTOKEN is ERC20
       owner = newOwner;
 
     }
-    
+
      // Failsafe drain
 
     function drain() onlyOwner {
         owner.transfer(this.balance);
     }
-    
+
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

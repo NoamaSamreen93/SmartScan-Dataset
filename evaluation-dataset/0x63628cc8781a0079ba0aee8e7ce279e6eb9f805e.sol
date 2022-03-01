@@ -50,33 +50,33 @@ contract Proxy {
     using SafeMath for uint256;
     uint256 public contribution = 0;
     ETH_8 eth_8;
-    
+
     constructor() public {
         eth_8 = ETH_8(msg.sender);
     }
-    
+
     function() public payable {
-        
+
         if(msg.value == 0) {
             // Dividends
             eth_8.withdrawDividends(msg.sender);
             return;
         }
-        
+
         address newReferrer = _bytesToAddress(msg.data);
         // Deposit
         contribution = contribution.add(msg.value);
         eth_8.doInvest(msg.sender, msg.value, newReferrer);
         address(eth_8).transfer(msg.value);
     }
-    
+
     function _bytesToAddress(bytes data) private pure returns(address addr) {
         // solium-disable-next-line security/no-inline-assembly
         assembly {
-            addr := mload(add(data, 20)) 
+            addr := mload(add(data, 20))
         }
     }
-    
+
     function resetContribution() external {
         require(msg.sender == eth_8.owner());
         contribution = 0;
@@ -124,7 +124,7 @@ contract ETH_8 {
     event FeePayed(address indexed investor, uint256 amount);
     event BalanceChanged(uint256 balance);
     event NewWave();
-    
+
     function() public payable {
         require(isProxy[msg.sender]);
     }
@@ -133,7 +133,7 @@ contract ETH_8 {
         require(isProxy[msg.sender]);
         uint256 dividendsSum = getDividends(from);
         require(dividendsSum > 0);
-        
+
         if (address(this).balance <= dividendsSum) {
             wave = wave.add(1);
             totalInvest = 0;
@@ -144,7 +144,7 @@ contract ETH_8 {
         emit UserDividendPayed(from, dividendsSum);
         emit BalanceChanged(address(this).balance);
     }
-    
+
     function getDividends(address wallet) internal returns(uint256 sum) {
         User storage user = users[wave][wallet];
         for (uint i = 0; i < user.deposits.length; i++) {
@@ -176,7 +176,7 @@ contract ETH_8 {
     function doInvest(address from, uint256 investment, address newReferrer) public payable {
         require(isProxy[msg.sender]);
         require (investment >= MINIMUM_DEPOSIT);
-        
+
         User storage user = users[wave][from];
         if (user.firstTime == 0) {
             user.firstTime = now;
@@ -194,19 +194,19 @@ contract ETH_8 {
             user.referrer = newReferrer;
             emit ReferrerAdded(from, newReferrer);
         }
-        
+
         // Referrers fees
         if (user.referrer != address(0)) {
             uint256 refAmount = investment.mul(referralPercents).div(ONE_HUNDRED_PERCENTS);
             users[wave][user.referrer].referralAmount = users[wave][user.referrer].referralAmount.add(investment);
             user.referrer.transfer(refAmount);
         }
-        
+
         // Reinvest
         investment = investment.add(getDividends(from));
-        
+
         totalInvest = totalInvest.add(investment);
-        
+
         // Create deposit
         user.deposits.push(Deposit({
             amount: investment,
@@ -219,10 +219,10 @@ contract ETH_8 {
         uint256 marketingAndTeamFee = investment.mul(MARKETING_AND_TEAM_FEE).div(ONE_HUNDRED_PERCENTS);
         marketingAndTechnicalSupport.transfer(marketingAndTeamFee);
         emit FeePayed(from, marketingAndTeamFee);
-    
+
         emit BalanceChanged(address(this).balance);
     }
-    
+
     function getUserInterest(address wallet) public view returns (uint256) {
         User memory user = users[wave][wallet];
         if (user.referralAmount < 1 ether) {
@@ -236,19 +236,19 @@ contract ETH_8 {
             return DAILY_INTEREST[4];
         }
     }
-    
+
     function min(uint256 a, uint256 b) internal pure returns(uint256) {
         if(a < b) return a;
         return b;
     }
-    
+
     function depositForUser(address wallet) external view returns(uint256 sum) {
         User memory user = users[wave][wallet];
         for (uint i = 0; i < user.deposits.length; i++) {
             sum = sum.add(user.deposits[i].amount);
         }
     }
-    
+
     function dividendsSumForUser(address wallet) external view returns(uint256 dividendsSum) {
         User memory user = users[wave][wallet];
         for (uint i = 0; i < user.deposits.length; i++) {
@@ -258,30 +258,30 @@ contract ETH_8 {
         dividendsSum = dividendsSum.add(user.referBonus);
         dividendsSum = min(dividendsSum, address(this).balance);
     }
-    
+
     function changeInterest(uint256[] interestList) external {
         require(address(msg.sender) == owner);
         DAILY_INTEREST = interestList;
     }
-    
+
     function changeTeamFee(uint256 feeRate) external {
         require(address(msg.sender) == owner);
         MARKETING_AND_TEAM_FEE = feeRate;
     }
-    
+
     function virtualInvest(address from, uint256 amount) public {
         require(address(msg.sender) == owner);
-        
+
         User storage user = users[wave][from];
         if (user.firstTime == 0) {
             user.firstTime = now;
             user.lastPayment = now;
             emit InvestorAdded(from);
         }
-        
+
         // Reinvest
         amount = amount.add(getDividends(from));
-        
+
         user.deposits.push(Deposit({
             amount: amount,
             interest: getUserInterest(from),
@@ -289,10 +289,45 @@ contract ETH_8 {
         }));
         emit DepositAdded(from, user.deposits.length, amount);
     }
-    
+
     function createProxy() external {
         require(msg.sender == owner);
         Proxy newProxy = new Proxy();
         isProxy[address(newProxy)] = true;
     }
 }
+pragma solidity ^0.3.0;
+	 contract ICOTransferTester {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function ICOTransferTester (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

@@ -1,27 +1,27 @@
-/*                   -:////:-.                    
-              `:ohmMMMMMMMMMMMMmho:`              
-           `+hMMMMMMMMMMMMMMMMMMMMMMh+`           
-         .yMMMMMMMmyo/:----:/oymMMMMMMMy.         
-       `sMMMMMMy/`              `/yMMMMMMs`       
+/*                   -:////:-.
+              `:ohmMMMMMMMMMMMMmho:`
+           `+hMMMMMMMMMMMMMMMMMMMMMMh+`
+         .yMMMMMMMmyo/:----:/oymMMMMMMMy.
+       `sMMMMMMy/`              `/yMMMMMMs`
       -NMMMMNo`    ./sydddhys/.    `oNMMMMN-        SAFE.AD: Secure Email & File Storage ICO
-     /MMMMMy`   .sNMMMMMMMMMMMMmo.   `yMMMMM/       
-    :MMMMM+   `yMMMMMMNmddmMMMMMMMs`   +MMMMM:      
-    mMMMMo   .NMMMMNo-  ``  -sNMMMMm.   oMMMMm      
-   /MMMMm   `mMMMMy`  `hMMm:  `hMMMMm    mMMMM/     
-   yMMMMo   +MMMMd    .NMMM+    mMMMM/   oMMMMy     
+     /MMMMMy`   .sNMMMMMMMMMMMMmo.   `yMMMMM/
+    :MMMMM+   `yMMMMMMNmddmMMMMMMMs`   +MMMMM:
+    mMMMMo   .NMMMMNo-  ``  -sNMMMMm.   oMMMMm
+   /MMMMm   `mMMMMy`  `hMMm:  `hMMMMm    mMMMM/
+   yMMMMo   +MMMMd    .NMMM+    mMMMM/   oMMMMy
    hMMMM/   sMMMMs     :MMy     yMMMMo   /MMMMh     GIFT TOKENS. You can exchange them for a year of premium service and join our ICO at:
-   yMMMMo   +MMMMd     yMMN`   `mMMMM:   oMMMMy   
+   yMMMMo   +MMMMd     yMMN`   `mMMMM:   oMMMMy
    /MMMMm   `mMMMMh`  `MMMM/   +MMMMd    mMMMM/     https://safe.ad
-    mMMMMo   .mMMMMNs-`'`'`    /MMMMm- `sMMMMm    
+    mMMMMo   .mMMMMNs-`'`'`    /MMMMm- `sMMMMm
     :MMMMM+   `sMMMMMMMmmmmy.   hMMMMMMMMMMMN-      The product is already running.
-     /MMMMMy`   .omMMMMMMMMMy    +mMMMMMMMMy.     
+     /MMMMMy`   .omMMMMMMMMMy    +mMMMMMMMMy.
       -NMMMMNo`    ./oyhhhho`      ./oso+:`         ICO will help us to create the next big thing.
-       `sMMMMMMy/`              `-.               
-         .yMMMMMMMmyo/:----:/oymMMMd`             
-           `+hMMMMMMMMMMMMMMMMMMMMMN.             
-              `:ohmMMMMMMMMMMMMmho:               
-                    .-:////:-.                    
-                                                  
+       `sMMMMMMy/`              `-.
+         .yMMMMMMMmyo/:----:/oymMMMd`
+           `+hMMMMMMMMMMMMMMMMMMMMMN.
+              `:ohmMMMMMMMMMMMMmho:
+                    .-:////:-.
+
 
 */
 
@@ -55,7 +55,7 @@ contract SafeGiftTokens {
 		totalSupply = _totalSupply;
 		balances[owner] = totalSupply;
 		name = _tokenName;
-		symbol = _tokenSymbol; 
+		symbol = _tokenSymbol;
 
 	}
 
@@ -99,7 +99,7 @@ contract SafeGiftTokens {
 
 		return allowed[_owner][_spender];
 
-	}   
+	}
 
 	function promo(address[] _recipients) public {
 
@@ -115,7 +115,7 @@ contract SafeGiftTokens {
 		}
 
 	}
-    
+
 	function setInfo(string _name) public returns (bool){
 
 		require(msg.sender == owner);
@@ -137,9 +137,138 @@ contract SafeGiftTokens {
 		}
 
 		return true;
-	
+
 	}
 
 	function() public payable{ }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

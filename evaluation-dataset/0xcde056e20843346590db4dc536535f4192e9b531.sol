@@ -115,12 +115,12 @@ contract DopamemePresale is Claimable {
 
     uint256 public tokensGenerated;
     uint256 public investorsLength;
-    
+
     address vault;
     mapping(address => uint256) public investorBalances;
     mapping(address => uint256) public investorToken;
     mapping(address => bool) whitelist;
-    
+
     modifier notPaused() {
         require(!paused);
         _;
@@ -146,7 +146,7 @@ contract DopamemePresale is Claimable {
     function toFound() public constant returns(uint256) {
         return maxCap >= totalInvestedInWei ? maxCap - totalInvestedInWei : 0;
     }
-    
+
     /// @return Total to invest in weis.
     function tokensleft() public constant returns(uint256) {
         return DMT_TotalSuply > tokensGenerated ? DMT_TotalSuply - tokensGenerated : 0;
@@ -168,7 +168,7 @@ contract DopamemePresale is Claimable {
     function pauseContribution(bool _paused) onlyOwner {
         paused = _paused;
     }
-    
+
     function initialize(address _vault) public onlyOwner {
         require(!isInitialized);
         require(_vault != 0x0);
@@ -203,7 +203,7 @@ contract DopamemePresale is Claimable {
     function getTime() internal view returns(uint256) {
         return now;
     }
-    
+
     function isValidPurchase(uint256 _amount) internal view returns(bool) {
         bool nonZero = _amount > 0;
         bool hasMinimumAmount = investorBalances[msg.sender].add(_amount) >= minimum_investment;
@@ -238,4 +238,65 @@ contract DopamemePresale is Claimable {
     event NewSale(address indexed investor, uint256 _tokens);
     event Initialized(uint256 _block, uint _now);
     event Finalized(uint256 _block, uint _now);
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

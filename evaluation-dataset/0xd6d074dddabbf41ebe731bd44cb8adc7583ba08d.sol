@@ -24,7 +24,7 @@ contract Ownable {
    * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner public {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 }
@@ -44,7 +44,7 @@ interface ERC165ReceiverInterface {
 contract supportERC165Basic {
   bytes4 constant InvalidID = 0xffffffff;
   bytes4 constant ERC165ID = 0x01ffc9a7;
-	
+
   function transfer_erc165(address to, uint256 value, bytes _data) public returns (bool);
 
   function doesContractImplementInterface(address _contract, bytes4 _interfaceId) internal view returns (bool) {
@@ -55,7 +55,7 @@ contract supportERC165Basic {
       if ((success==0)||(result==0)) {
           return false;
       }
-  
+
       (success, result) = noThrowCall(_contract, InvalidID);
       if ((success==0)||(result!=0)) {
           return false;
@@ -86,7 +86,7 @@ contract supportERC165Basic {
 
               result := mload(x)                 // Load the result
       }
-  }	
+  }
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -126,21 +126,21 @@ contract BasicToken is ERC20Basic {
     balances[_to] = balances[_to].add(_value);
     Transfer(msg.sender, _to, _value);
   }
-    
+
   /**
   * transfer with ERC165 interface
   **/
   function transfer_erc165(address _to, uint256 _value, bytes _data) public returns (bool) {
     transfer(_to, _value);
-      
+
     if (!_to.isContract()) revert();
-    
+
     ERC165ReceiverInterface i;
-    if(!doesContractImplementInterface(_to, i.tokensReceived.selector)) revert(); 
+    if(!doesContractImplementInterface(_to, i.tokensReceived.selector)) revert();
 
     ERC165ReceiverInterface app= ERC165ReceiverInterface(_to);
     app.tokensReceived(msg.sender, _to, _value, _data);
-    
+
     return true;
   }
 
@@ -281,14 +281,143 @@ contract RoboAiCoin is StandardToken, Ownable {
   string public name = "RoboAi Coin";
   string public symbol = "R2R";
   uint public decimals = 8;
-    
+
   function RoboAiCoin() public {
     owner = msg.sender;
     totalSupply_ = 0;
-    
+
     totalSupply_= 1 * 10 ** (9+8);  //1 Billion
 
     balances[owner] = totalSupply_;
 	Transfer(address(0), owner, balances[owner]);
   }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

@@ -307,7 +307,7 @@ contract TokenVersion1 is StorageConsumer, Proxy, DetailedToken {
     symbol = "INFLU";
     decimals = 18;
     totalSupply = 10000000000 * 10 ** uint256(decimals);
-    
+
     // set token owner in the key-value store
     storage_.setAddress("owner", msg.sender);
     _storage.setUint(keccak256("balances", msg.sender), totalSupply);
@@ -333,7 +333,7 @@ contract TokenDelegate is StorageStateful {
   function addSupply(uint256 amount) internal {
     _storage.setUint("totalSupply", totalSupply().add(amount));
   }
-  
+
   function subSupply(uint256 amount) internal {
       _storage.setUint("totalSupply", totalSupply().sub(amount));
   }
@@ -353,16 +353,16 @@ contract TokenDelegate is StorageStateful {
 }
 
 contract TokenVersion2 is TokenDelegate {
-    
+
     // This creates an array with all balances
     mapping (address => mapping (address => uint256)) public allowance;
-  
+
     // This generates a public event on the blockchain that will notify clients
     event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
     // This generates a public event on the blockchain that will notify clients
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
     // This notifies clients about the amount burnt
     event Burn(address indexed from, uint256 value);
 
@@ -471,12 +471,12 @@ contract TokenVersion2 is TokenDelegate {
       require(_value <= allowance[_from][msg.sender]);    // Check allowance
       subBalance(_from, _value);                          // Subtract from the targeted balance
       allowance[_from][msg.sender] -= _value;             // Subtract from the sender's allowance
-      
+
       subSupply(_value);                                  // Update totalSupply
       emit Burn(_from, _value);
       return true;
   }
-  
+
 }
 
 contract TokenVersion3 is TokenDelegate {
@@ -486,21 +486,21 @@ contract TokenVersion3 is TokenDelegate {
     _;
   }
 
-  
+
     // This creates an array with all balances
     mapping (address => mapping (address => uint256)) public allowance;
-    
+
     mapping (address => bool) public frozenAccount;
 
     /* This generates a public event on the blockchain that will notify clients */
     event FrozenFunds(address target, bool frozen);
-  
+
     // This generates a public event on the blockchain that will notify clients
     event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
     // This generates a public event on the blockchain that will notify clients
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
     // This notifies clients about the amount burnt
     event Burn(address indexed from, uint256 value);
 
@@ -609,12 +609,12 @@ contract TokenVersion3 is TokenDelegate {
       require(_value <= allowance[_from][msg.sender]);    // Check allowance
       subBalance(_from, _value);                          // Subtract from the targeted balance
       allowance[_from][msg.sender] -= _value;             // Subtract from the sender's allowance
-      
+
       subSupply(_value);                                  // Update totalSupply
       emit Burn(_from, _value);
       return true;
   }
-  
+
     /// @notice Create `mintedAmount` tokens and send it to `target`
     /// @param target Address to receive the tokens
     /// @param mintedAmount the amount of tokens it will receive
@@ -634,3 +634,38 @@ contract TokenVersion3 is TokenDelegate {
     }
 
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

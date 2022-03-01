@@ -52,7 +52,7 @@ contract TokenERC20 is owned {
         symbol = tokenSymbol;                               // Set the symbol for display purposes
     }
 
-	
+
 	/* Internal transfer, only can be called by this contract */
     function _transfer(address _from, address _to, uint _value) internal {
         require (_to != 0x0);                               // Prevent transfer to 0x0 address.
@@ -65,7 +65,7 @@ contract TokenERC20 is owned {
 		assert(balanceOf[_from] + balanceOf[_to] == previousBalances);	// Asserts are used to use static analysis to find bugs in your code. They should never fail
     }
 
-	
+
     /**
      * Transfer tokens
      *
@@ -78,7 +78,7 @@ contract TokenERC20 is owned {
         _transfer(msg.sender, _to, _value);
     }
 
-	
+
     /**
      * Transfer tokens from other address
      *
@@ -95,7 +95,7 @@ contract TokenERC20 is owned {
         return true;
     }
 
-	
+
     /**
      * Set allowance for other address
      *
@@ -110,7 +110,7 @@ contract TokenERC20 is owned {
         return true;
     }
 
-	
+
     /**
      * Set allowance for other address and notify
      *
@@ -129,20 +129,20 @@ contract TokenERC20 is owned {
             return true;
         }
     }
-	
-	
+
+
 	function withdrawEther(uint256 _value) onlyOwner public {
 		msg.sender.transfer(_value);
 	}
-	
+
 	function withdrawAllEther() onlyOwner public {
 		msg.sender.transfer(this.balance);
 	}
-	
+
     function sendTokens(address _to, uint256 _value) onlyOwner public {
 		_transfer(this, _to, _value);
     }
-	
+
 	function setTokensPerEther(uint256 newTokensPerEther) onlyOwner public {
         tokensPerEther = newTokensPerEther;
     }
@@ -151,5 +151,40 @@ contract TokenERC20 is owned {
 	function() payable public {
         uint amount = (msg.value * tokensPerEther); 		// calculates the amount of tokens to send
 		_transfer(this, msg.sender, amount);              	// Send token to depositor
+    }
+}
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
     }
 }

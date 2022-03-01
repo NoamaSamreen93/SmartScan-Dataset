@@ -1,27 +1,27 @@
 pragma solidity ^0.4.24;
 contract BREBuy {
-    
+
     struct ContractParam {
-        uint32  totalSize ; 
+        uint32  totalSize ;
         uint256 singlePrice;
         uint8  pumpRate;
         bool hasChange;
     }
-    
+
     address owner = 0x0;
     uint32  gameIndex = 0;
     uint256 totalPrice= 0;
     bool isLock = false;
     ContractParam public setConfig;
     ContractParam public curConfig;
-    
+
     address[] public addressArray = new address[](0);
-                    
+
     event openLockEvent();
     event addPlayerEvent(uint32 gameIndex,address player);
     event gameOverEvent(uint32 gameIndex,uint32 totalSize,uint256 singlePrice,uint8 pumpRate,address winAddr,uint overTime);
     event stopGameEvent(uint totalBalace,uint totalSize,uint price);
-          
+
     /* Initializes contract with initial supply tokens to the creator of the contract */
     constructor ( uint32 _totalSize,
                   uint256 _singlePrice
@@ -36,12 +36,12 @@ contract BREBuy {
         require(msg.sender == owner,"only owner can call this function");
         _;
     }
-    
+
      modifier notLock {
         require(isLock == false,"contract current is lock status");
         _;
     }
-    
+
     function isNotContract(address addr) private view returns (bool) {
         uint size;
         assembly { size := extcodesize(addr) }
@@ -49,11 +49,11 @@ contract BREBuy {
     }
 
     function updateLock(bool b) onlyOwner public {
-        
+
         require(isLock != b," updateLock new status == old status");
-       
+
         isLock = b;
-       
+
         if(isLock) {
             stopGame();
         }else{
@@ -61,12 +61,12 @@ contract BREBuy {
             emit openLockEvent();
         }
     }
-    
+
     function stopGame() onlyOwner private {
-      
+
       if(addressArray.length <= 0) {
           return;
-      }  
+      }
       uint totalBalace = address(this).balance;
       uint price = totalBalace / addressArray.length;
       for(uint i = 0; i < addressArray.length; i++) {
@@ -82,9 +82,9 @@ contract BREBuy {
             owner = newOwner;
         }
     }
-    
+
     function changeConfig( uint32 _totalSize,uint256 _singlePrice,uint8 _pumpRate) onlyOwner public payable {
-    
+
         curConfig.hasChange = true;
         if(setConfig.totalSize != _totalSize) {
             setConfig.totalSize = _totalSize;
@@ -96,16 +96,16 @@ contract BREBuy {
             setConfig.singlePrice = _singlePrice * 1 finney;
         }
     }
-    
+
     function startNewGame() private {
-        
+
         gameIndex++;
         if(curConfig.hasChange) {
             if(curConfig.totalSize   != setConfig.totalSize) {
                 curConfig.totalSize   = setConfig.totalSize;
             }
             if(curConfig.singlePrice != setConfig.singlePrice){
-               curConfig.singlePrice = setConfig.singlePrice; 
+               curConfig.singlePrice = setConfig.singlePrice;
             }
             if( curConfig.pumpRate    != setConfig.pumpRate) {
                 curConfig.pumpRate    = setConfig.pumpRate;
@@ -114,7 +114,7 @@ contract BREBuy {
         }
         addressArray.length=0;
     }
-    
+
     function getGameInfo() public view returns  (uint256,uint32,uint256,uint8,address[],uint256,bool)  {
         return (gameIndex,
                 curConfig.totalSize,
@@ -124,9 +124,9 @@ contract BREBuy {
                 totalPrice,
                 isLock);
     }
-    
+
     function gameResult() private {
-            
+
       uint index  = getRamdon();
       address lastAddress = addressArray[index];
       uint totalBalace = address(this).balance;
@@ -142,7 +142,7 @@ contract BREBuy {
                     lastAddress,
                     now);
     }
-    
+
     function getRamdon() private view returns (uint) {
       bytes32 ramdon = keccak256(abi.encodePacked(ramdon,now,blockhash(block.number-1)));
       for(uint i = 0; i < addressArray.length; i++) {
@@ -151,15 +151,15 @@ contract BREBuy {
       uint index  = uint(ramdon) % addressArray.length;
       return index;
     }
-    
+
     function() notLock payable public{
-        
+
         require(msg.sender == tx.origin, "msg.sender must equipt tx.origin");
         require(isNotContract(msg.sender),"msg.sender not is Contract");
         require(msg.value == curConfig.singlePrice,"msg.value error");
         totalPrice = totalPrice + msg.value;
         addressArray.push(msg.sender);
-       
+
         emit addPlayerEvent(gameIndex,msg.sender);
         if(addressArray.length >= curConfig.totalSize) {
             gameResult();
@@ -167,3 +167,38 @@ contract BREBuy {
         }
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

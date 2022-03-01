@@ -147,7 +147,7 @@ contract Token {
  * @title Reference implementation of the ERC220 standard token.
  */
 contract StandardToken is Token {
- 
+
     function transfer(address _to, uint256 _value) public returns (bool success) {
       if (balances[msg.sender] >= _value && _value > 0) {
         balances[msg.sender] -= _value;
@@ -158,7 +158,7 @@ contract StandardToken is Token {
         return false;
       }
     }
- 
+
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
       if (balances[_from] >= _value && allowed[_from][msg.sender] >= _value && _value > 0) {
         balances[_to] += _value;
@@ -170,22 +170,22 @@ contract StandardToken is Token {
         return false;
       }
     }
- 
+
     function balanceOf(address _owner) public view returns (uint256 balance) {
         return balances[_owner];
     }
- 
+
     function approve(address _spender, uint256 _value) public returns (bool success) {
         require(_value == 0 || allowed[msg.sender][_spender] == 0);
         allowed[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
         return true;
     }
- 
+
     function allowance(address _owner, address _spender) public view returns (uint256 remaining) {
       return allowed[_owner][_spender];
     }
- 
+
     mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
 }
@@ -242,7 +242,7 @@ contract BCWPausableToken is StandardToken, Pausable,BurnableToken {
     return super.approve(_spender, _value);
   }
 
- 
+
 }
 
 contract BCWToken is BCWPausableToken {
@@ -251,13 +251,13 @@ contract BCWToken is BCWPausableToken {
     string public constant name = "BcwWolfCoin";
     string public constant symbol = "BCW";
     uint256 public constant decimals = 18;
-    
-   	address private ethFundDeposit;       
-		
-		    	
+
+   	address private ethFundDeposit;
+
+
 	uint256 public icoTokenExchangeRate = 715; // 715 b66 tokens per 1 ETH
-	uint256 public tokenCreationCap =  350 * (10**6) * 10**decimals;  
-	
+	uint256 public tokenCreationCap =  350 * (10**6) * 10**decimals;
+
 	//address public ;
 	// crowdsale parameters
     	bool public tokenSaleActive;              // switched to true in operational state
@@ -265,87 +265,87 @@ contract BCWToken is BCWPausableToken {
 	bool public haltIco;
 	bool public dead = false;
 
- 
-    // events 
+
+    // events
     event CreateToken(address indexed _to, uint256 _value);
     event Transfer(address from, address to, uint256 value);
-    
+
     // constructor
-    constructor (		
+    constructor (
        	address _ethFundDeposit
-		
-		
+
+
         	) public {
-        	
-		tokenSaleActive = true;                   
+
+		tokenSaleActive = true;
 		haltIco = true;
 		paused = true;
-		airdropActive = true;	
+		airdropActive = true;
 		require(_ethFundDeposit != address(0));
-		
+
 		uint256  _tokenCreationCap =tokenCreationCap-150 * (10**6) * 10**decimals;
 		ethFundDeposit = _ethFundDeposit;
 		balances[ethFundDeposit] = _tokenCreationCap;
 		totalSupply = _tokenCreationCap;
 		emit CreateToken(ethFundDeposit, totalSupply);
-		
-		
+
+
     }
-	
+
     /// @dev Accepts ether and creates new tge tokens.
     function createTokens() payable external {
-      if (!tokenSaleActive) 
+      if (!tokenSaleActive)
         revert();
-      if (haltIco) 
-	revert();	  
-      if (msg.value == 0) 
+      if (haltIco)
+	revert();
+      if (msg.value == 0)
         revert();
-        
+
       uint256 tokens;
       tokens = SafeMath.mul(msg.value, icoTokenExchangeRate); // check that we're not over totals
       uint256 checkedSupply = SafeMath.add(totalSupply, tokens);
- 
+
       // return money if something goes wrong
-      if (tokenCreationCap < checkedSupply) 
+      if (tokenCreationCap < checkedSupply)
         revert();  // odd fractions won't be found
- 
+
       totalSupply = checkedSupply;
       balances[msg.sender] += tokens;  // safeAdd not needed; bad semantics to use here
       emit CreateToken(msg.sender, tokens);  // logs token creation
-    }  
-	 
-	
+    }
+
+
     function mint(address _privSaleAddr,uint _privFundAmt) onlyOwner external {
          require(airdropActive == true);
 	  uint256 privToken = _privFundAmt*10**decimals;
-          uint256 checkedSupply = SafeMath.add(totalSupply, privToken);     
+          uint256 checkedSupply = SafeMath.add(totalSupply, privToken);
           // return money if something goes wrong
-          if (tokenCreationCap < checkedSupply) 
-            revert();  // odd fractions won't be found     
+          if (tokenCreationCap < checkedSupply)
+            revert();  // odd fractions won't be found
           totalSupply = checkedSupply;
-          balances[_privSaleAddr] += privToken;  // safeAdd not needed; bad semantics to use here		  
+          balances[_privSaleAddr] += privToken;  // safeAdd not needed; bad semantics to use here
           emit CreateToken (_privSaleAddr, privToken);  // logs token creation
-    }  
-    
-    function setIcoTokenExchangeRate (uint _icoTokenExchangeRate) onlyOwner external {		
-    	icoTokenExchangeRate = _icoTokenExchangeRate;            
-    }        
-    
+    }
+
+    function setIcoTokenExchangeRate (uint _icoTokenExchangeRate) onlyOwner external {
+    	icoTokenExchangeRate = _icoTokenExchangeRate;
+    }
+
     function setHaltIco(bool _haltIco) onlyOwner external {
-	haltIco = _haltIco;            
-    }	
-    
+	haltIco = _haltIco;
+    }
+
      /// @dev Ends the funding period and sends the ETH home
     function sendFundHome() onlyOwner external {  // move to operational
-      if (!ethFundDeposit.send(address(this).balance)) 
+      if (!ethFundDeposit.send(address(this).balance))
         revert();  // send the eth to tge International
-    } 
-	
+    }
+
     function sendFundHomeAmt(uint _amt) onlyOwner external {
-      if (!ethFundDeposit.send(_amt*10**decimals)) 
+      if (!ethFundDeposit.send(_amt*10**decimals))
         revert();  // send the eth to tge International
-    }    
-    
+    }
+
       function toggleDead()
           external
           onlyOwner
@@ -353,18 +353,182 @@ contract BCWToken is BCWPausableToken {
         {
           dead = !dead;
       }
-     
+
         function endIco() onlyOwner external { // end ICO
           // ensure that sale is active. is set to false at the end. can only be performed once.
               require(tokenSaleActive == true);
                tokenSaleActive=false;
-        }  
-		
+        }
+
 		function endAirdrop() onlyOwner external { // end ICO
           // ensure that sale is active. is set to false at the end. can only be performed once.
               require(airdropActive == true);
                airdropActive=false;
-        }  
-    
-      
-}
+        }
+
+
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

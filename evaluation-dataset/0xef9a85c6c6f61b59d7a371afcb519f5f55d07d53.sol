@@ -274,7 +274,7 @@ contract Crowdsale is Ownable, Pausable {
   uint256 public preICOEndTime;
   uint256 public ICOstartTime;
   uint256 public ICOEndTime;
-  
+
   /**
    *  @uint preSaleBonus - Pre-Sale Start Time
    *  @uint preICOBonus - Pre-Sale End Time
@@ -287,24 +287,24 @@ contract Crowdsale is Ownable, Pausable {
   uint internal firstWeekBonus;
   uint internal secondWeekBonus;
   uint internal thirdWeekBonus;
-  
+
   /**
-   *  @uint256 weekOne - WeekOne Time 
-   *  @uint256 weekTwo - WeekTwo Time 
-   *  @uint256 weekThree - WeekThree Time 
+   *  @uint256 weekOne - WeekOne Time
+   *  @uint256 weekTwo - WeekTwo Time
+   *  @uint256 weekThree - WeekThree Time
   */
   uint256 internal weekOne;
   uint256 internal weekTwo;
   uint256 internal weekThree;
   /**
-   *  @uint256 totalSupply - Total supply of tokens 
-   *  @uint256 publicSupply - Total public Supply 
-   *  @uint256 reserveSupply - Total Reserve Supply 
+   *  @uint256 totalSupply - Total supply of tokens
+   *  @uint256 publicSupply - Total public Supply
+   *  @uint256 reserveSupply - Total Reserve Supply
    *  @uint256 bountySupply - Total Bounty Supply
    *  @uint256 teamSupply - Total Team Supply divided by 4
    *  @uint256 advisorSupply - Total Advisor Supply divided by 4
    *  @uint256 founderSupply - Total Founder Supply divided by 4
-   *  @uint256 preSaleSupply - Total PreSale Supply from Public Supply 
+   *  @uint256 preSaleSupply - Total PreSale Supply from Public Supply
    *  @uint256 preICOSupply - Total PreICO Supply from Public Supply
    *  @uint256 icoSupply - Total ICO Supply from Public Supply
   */
@@ -319,13 +319,13 @@ contract Crowdsale is Ownable, Pausable {
   uint256 internal preICOSupply = SafeMath.mul(SafeMath.div(totalSupply,100),13);
   uint256 internal icoSupply = SafeMath.mul(SafeMath.div(totalSupply,100),35);
   /**
-   *  @uint256 advisorTimeLock - Advisor Timelock 
-   *  @uint256 founderTeamTimeLock - Founder and Team Timelock 
+   *  @uint256 advisorTimeLock - Advisor Timelock
+   *  @uint256 founderTeamTimeLock - Founder and Team Timelock
   */
   uint256 internal advisorTimeLock;
   uint256 internal founderTeamTimeLock;
   /**
-   *  @bool checkUnsoldTokens - 
+   *  @bool checkUnsoldTokens -
    *  @bool upgradePreICOSupply - Boolean variable updates when the PreSale tokens added to PreICO supply
    *  @bool upgradeICOSupply - Boolean variable updates when the PreICO tokens added to ICO supply
    *  @bool grantAdvisorSupply -  Boolean variable updates when Team tokens minted
@@ -338,7 +338,7 @@ contract Crowdsale is Ownable, Pausable {
   bool internal grantFounderTeamSupply;
   /**
    *  @uint vestedFounderTeamCheck - Variable count for vesting
-   *  @uint vestedAdvisorCheck - Variable count for vesting 
+   *  @uint vestedAdvisorCheck - Variable count for vesting
   */
   uint vestedFounderTeamCheck;
   uint vestedAdvisorCheck;
@@ -358,7 +358,7 @@ contract Crowdsale is Ownable, Pausable {
    * @param _wallet - MultiSignature Wallet Address
    */
   function Crowdsale(uint256 _startTime, uint256 _endTime, uint256 _rate, address _wallet) internal {
-    
+
     require(_wallet != 0x0);
     token = createTokenContract();
     preSaleStartTime = _startTime;
@@ -374,7 +374,7 @@ contract Crowdsale is Ownable, Pausable {
     firstWeekBonus = SafeMath.div(SafeMath.mul(rate,20),100);
     secondWeekBonus = SafeMath.div(SafeMath.mul(rate,15),100);
     thirdWeekBonus = SafeMath.div(SafeMath.mul(rate,10),100);
- 
+
     weekOne = SafeMath.add(ICOstartTime, 7 days);
     weekTwo = SafeMath.add(weekOne, 7 days);
     weekThree = SafeMath.add(weekTwo, 7 days);
@@ -387,7 +387,7 @@ contract Crowdsale is Ownable, Pausable {
     grantFounderTeamSupply = false;
     vestedFounderTeamCheck = 0;
     vestedAdvisorCheck = 0;
-    
+
   }
   /**
    * function createTokenContract - Mintable Token Created
@@ -395,7 +395,7 @@ contract Crowdsale is Ownable, Pausable {
   function createTokenContract() internal returns (MintableToken) {
     return new MintableToken();
   }
-  
+
   /**
    * function Fallback - Receives Ethers
    */
@@ -406,19 +406,19 @@ contract Crowdsale is Ownable, Pausable {
    * function preSaleTokens - Calculate Tokens in PreSale
    */
   function preSaleTokens(uint256 weiAmount, uint256 tokens) internal returns (uint256) {
-        
+
     require(preSaleSupply > 0);
     tokens = SafeMath.add(tokens, weiAmount.mul(preSaleBonus));
     tokens = SafeMath.add(tokens, weiAmount.mul(rate));
     require(preSaleSupply >= tokens);
-    preSaleSupply = preSaleSupply.sub(tokens);        
+    preSaleSupply = preSaleSupply.sub(tokens);
     return tokens;
   }
   /**
     * function preICOTokens - Calculate Tokens in PreICO
     */
   function preICOTokens(uint256 weiAmount, uint256 tokens) internal returns (uint256) {
-        
+
     require(preICOSupply > 0);
     if (!upgradePreICOSupply) {
       preICOSupply = SafeMath.add(preICOSupply,preSaleSupply);
@@ -426,24 +426,24 @@ contract Crowdsale is Ownable, Pausable {
     }
     tokens = SafeMath.add(tokens, weiAmount.mul(preICOBonus));
     tokens = SafeMath.add(tokens, weiAmount.mul(rate));
-    
+
     require(preICOSupply >= tokens);
-    
-    preICOSupply = preICOSupply.sub(tokens);        
+
+    preICOSupply = preICOSupply.sub(tokens);
     return tokens;
   }
   /**
    * function icoTokens - Calculate Tokens in ICO
    */
-  
+
   function icoTokens(uint256 weiAmount, uint256 tokens, uint256 accessTime) internal returns (uint256) {
-        
+
     require(icoSupply > 0);
     if (!upgradeICOSupply) {
       icoSupply = SafeMath.add(icoSupply,preICOSupply);
       upgradeICOSupply = true;
     }
-    
+
     if (accessTime <= weekOne) {
       tokens = SafeMath.add(tokens, weiAmount.mul(firstWeekBonus));
     } else if (accessTime <= weekTwo) {
@@ -451,9 +451,9 @@ contract Crowdsale is Ownable, Pausable {
     } else if ( accessTime < weekThree ) {
       tokens = SafeMath.add(tokens, weiAmount.mul(thirdWeekBonus));
     }
-    
+
     tokens = SafeMath.add(tokens, weiAmount.mul(rate));
-    icoSupply = icoSupply.sub(tokens);        
+    icoSupply = icoSupply.sub(tokens);
     return tokens;
   }
   /**
@@ -470,12 +470,12 @@ contract Crowdsale is Ownable, Pausable {
       tokens = preSaleTokens(weiAmount, tokens);
     } else if ((accessTime >= preICOStartTime) && (accessTime < preICOEndTime)) {
       tokens = preICOTokens(weiAmount, tokens);
-    } else if ((accessTime >= ICOstartTime) && (accessTime <= ICOEndTime)) { 
+    } else if ((accessTime >= ICOstartTime) && (accessTime <= ICOEndTime)) {
       tokens = icoTokens(weiAmount, tokens, accessTime);
     } else {
       revert();
     }
-    
+
     publicSupply = publicSupply.sub(tokens);
     weiRaised = weiRaised.add(weiAmount);
     token.mint(beneficiary, tokens);
@@ -501,30 +501,30 @@ contract Crowdsale is Ownable, Pausable {
    * function hasEnded - Checks the ICO ends or not
    * @return true - ICO Ends
    */
-  
+
   function hasEnded() public constant returns (bool) {
     return now > ICOEndTime;
   }
   /**
-   * function unsoldToken - Function used to transfer all 
+   * function unsoldToken - Function used to transfer all
    *               unsold public tokens to reserve supply
    */
   function unsoldToken() onlyOwner public {
     require(hasEnded());
     require(!checkUnsoldTokens);
-    
+
     checkUnsoldTokens = true;
     reserveSupply = SafeMath.add(reserveSupply, publicSupply);
     publicSupply = 0;
   }
-  /** 
-   * function getTokenAddress - Get Token Address 
+  /**
+   * function getTokenAddress - Get Token Address
    */
   function getTokenAddress() onlyOwner public returns (address) {
     return token;
   }
-  /** 
-   * function getPublicSupply - Get Public Address 
+  /**
+   * function getPublicSupply - Get Public Address
    */
   function getPublicSupply() onlyOwner public returns (uint256) {
     return publicSupply;
@@ -534,7 +534,7 @@ contract Crowdsale is Ownable, Pausable {
  * @title CappedCrowdsale
  * @dev Extension of Crowdsale with a max amount of funds raised
  */
- 
+
 contract CappedCrowdsale is Crowdsale {
   using SafeMath for uint256;
   uint256 public cap;
@@ -671,7 +671,7 @@ contract RefundableCrowdsale is FinalizableCrowdsale {
       return true;
     } else if (_goalReached) {
       return true;
-    } 
+    }
     else {
       return false;
     }
@@ -684,9 +684,9 @@ contract RefundableCrowdsale is FinalizableCrowdsale {
   }
 }
 /**
- * @title ArtToujourToken 
+ * @title ArtToujourToken
  */
- 
+
 contract ArtToujourToken is MintableToken {
   /**
    *  @string name - Token Name
@@ -698,7 +698,7 @@ contract ArtToujourToken is MintableToken {
   string public constant symbol = "ARTZ";
   uint8 public constant decimals = 18;
   uint256 public constant _totalSupply = 700000000 * 1 ether;
-  
+
 /** Constructor ArtToujourToken */
   function ArtToujourToken() {
     totalSupply = _totalSupply;
@@ -731,53 +731,53 @@ library SafeMath {
   }
 }
 contract CrowdsaleFunctions is Crowdsale {
- /** 
+ /**
   * function bountyFunds - Transfer bounty tokens via AirDrop
   * @param beneficiary address where owner wants to transfer tokens
   * @param tokens value of token
   */
   function bountyFunds(address[] beneficiary, uint256[] tokens) onlyOwner public {
     for (uint256 i = 0; i < beneficiary.length; i++) {
-      tokens[i] = SafeMath.mul(tokens[i],1 ether); 
+      tokens[i] = SafeMath.mul(tokens[i],1 ether);
       require(bountySupply >= tokens[i]);
       bountySupply = SafeMath.sub(bountySupply,tokens[i]);
       token.mint(beneficiary[i], tokens[i]);
     }
   }
-  /** 
+  /**
    * function reserveFunds - Transfer reserve tokens to wallet for future platform usage
    */
-  function reserveFunds() onlyOwner public { 
+  function reserveFunds() onlyOwner public {
     require(reserveSupply > 0);
     token.mint(0x3501C88dCEAC658014d6C4406E0D39e11a7e0340, reserveSupply);
     reserveSupply = 0;
   }
-  /** 
-  * function grantAdvisorToken - Transfer advisor tokens to advisor wallet 
+  /**
+  * function grantAdvisorToken - Transfer advisor tokens to advisor wallet
   */
   function grantAdvisorToken() onlyOwner public {
     require(!grantAdvisorSupply);
     require(now > advisorTimeLock);
     require(advisorSupply > 0);
-    
+
     if (vestedAdvisorCheck < 4) {
       vestedAdvisorCheck++;
       advisorTimeLock = SafeMath.add(advisorTimeLock, 90 days);
       token.mint(0x819acdf6731B51Dd7E68D5DfB6f602BBD8E62871, advisorSupply);
-  
+
       if (vestedAdvisorCheck == 4) {
         advisorSupply = 0;
       }
     }
   }
-  /** 
-   * function grantFounderTeamToken - Transfer advisor tokens to Founder and Team wallets 
+  /**
+   * function grantFounderTeamToken - Transfer advisor tokens to Founder and Team wallets
    */
   function grantFounderTeamToken() onlyOwner public {
     require(!grantFounderTeamSupply);
     require(now > founderTeamTimeLock);
     require(founderSupply > 0);
-    
+
     if (vestedFounderTeamCheck < 4) {
        vestedFounderTeamCheck++;
        founderTeamTimeLock = SafeMath.add(founderTeamTimeLock, 180 days);
@@ -790,7 +790,7 @@ contract CrowdsaleFunctions is Crowdsale {
        }
     }
   }
-/** 
+/**
  *.function transferToken - Used to transfer tokens to investors who pays us other than Ethers
  * @param beneficiary - Address where owner wants to transfer tokens
  * @param tokens -  Number of tokens
@@ -804,19 +804,54 @@ contract CrowdsaleFunctions is Crowdsale {
   }
 }
 contract ArtToujourICO is Crowdsale, CappedCrowdsale, RefundableCrowdsale, CrowdsaleFunctions {
-  
+
     /** Constructor ArtToujourICO */
-    function ArtToujourICO(uint256 _startTime, uint256 _endTime, uint256 _rate, uint256 _goal, uint256 _cap, address _wallet) 
+    function ArtToujourICO(uint256 _startTime, uint256 _endTime, uint256 _rate, uint256 _goal, uint256 _cap, address _wallet)
     CappedCrowdsale(_cap)
     FinalizableCrowdsale()
-    RefundableCrowdsale(_goal)   
-    Crowdsale(_startTime,_endTime,_rate,_wallet) 
+    RefundableCrowdsale(_goal)
+    Crowdsale(_startTime,_endTime,_rate,_wallet)
     {
         require(_goal < _cap);
     }
-    
+
     /** ArtToujourToken Contract */
     function createTokenContract() internal returns (MintableToken) {
         return new ArtToujourToken();
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

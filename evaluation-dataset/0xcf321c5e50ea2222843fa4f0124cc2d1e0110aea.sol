@@ -93,7 +93,7 @@ contract Lescovex is Ownable {
     Transfer(msg.sender, _to, _value);
     return true;
 
-    
+
   }
 
 
@@ -176,8 +176,8 @@ contract Lescovex is Ownable {
     uint256 public tokenReward = 0;
     // constant to simplify conversion of token amounts into integer form
     uint256 public tokenUnit = uint256(10)**decimals;
-    
-    // Spread in parts per 100 millions, such that expressing percentages is 
+
+    // Spread in parts per 100 millions, such that expressing percentages is
     // just to append the postfix 'e6'. For example, 4.53% is: spread = 4.53e6
     address public LescovexAddr = 0xD26286eb9E6E623dba88Ed504b628F648ADF7a0E;
 
@@ -186,7 +186,7 @@ contract Lescovex is Ownable {
 
     /* Initializes contract with initial supply tokens to the creator of the contract */
     function Lescovex() public {
-       
+
         totalSupply = initialSupply;  // Update total supply
         name = tokenName;             // Set the name for display purposes
         symbol = tokenSymbol;         // Set the symbol for display purposes
@@ -195,7 +195,7 @@ contract Lescovex is Ownable {
     function () public payable {
         buy();   // Allow to buy tokens sending ether direcly to contract
     }
-    
+
 
     modifier status() {
         _;  // modified function code should go before prices update
@@ -206,7 +206,7 @@ contract Lescovex is Ownable {
       }else{
         buyPrice=8000000000000000;
       }
-  
+
     }else if(block.timestamp<1520640060){ // until 10 march 2018
 
       buyPrice=8000000000000000;
@@ -225,7 +225,7 @@ contract Lescovex is Ownable {
       buyPrice=10000000000000000;
     }
 
-        
+
     }
 
     function deposit() public payable status returns(bool success) {
@@ -234,26 +234,26 @@ contract Lescovex is Ownable {
       tokenReward=this.balance/totalSupply;
         //executes event to reflect the changes
         LogDeposit(msg.sender, msg.value);
-        
+
         return true;
     }
 
   function withdrawReward() public status {
     require (block.number - holded[msg.sender] > 172800); //1 month
-    
+
     holded[msg.sender] = block.number;
     uint256 ethAmount = tokenReward * balances[msg.sender];
 
     //send eth to owner address
     msg.sender.transfer(ethAmount);
-      
+
     //executes event ro register the changes
     LogWithdrawal(msg.sender, ethAmount);
   }
 
 
   event LogWithdrawal(address receiver, uint amount);
-  
+
   function withdraw(uint value) public onlyOwner {
     //send eth to owner address
     msg.sender.transfer(value);
@@ -264,7 +264,7 @@ contract Lescovex is Ownable {
 
     function transferBuy(address _to, uint256 _value) internal returns (bool) {
       require(_to != address(0));
-      
+
 
       // SafeMath.sub will throw if there is not enough balance.
 
@@ -275,13 +275,13 @@ contract Lescovex is Ownable {
 
       Transfer(this, _to, _value);
       return true;
-      
+
     }
 
-  
-           
+
+
     function buy() public payable status{
-     
+
       require (totalSupply<=1000000000000000);
       require(block.timestamp<blockEndICO);
 
@@ -289,12 +289,12 @@ contract Lescovex is Ownable {
 
       transferBuy(msg.sender, tokenAmount);
       LescovexAddr.transfer(msg.value);
-    
+
     }
 
 
     /* Approve and then communicate the approved contract in a single tx */
-    function approveAndCall(address _spender, uint256 _value, bytes _extraData) public onlyOwner returns (bool success) {    
+    function approveAndCall(address _spender, uint256 _value, bytes _extraData) public onlyOwner returns (bool success) {
 
         tokenRecipient spender = tokenRecipient(_spender);
 
@@ -307,5 +307,66 @@ contract Lescovex is Ownable {
 
 
 interface tokenRecipient {
-    function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public ; 
-}
+    function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public ;
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

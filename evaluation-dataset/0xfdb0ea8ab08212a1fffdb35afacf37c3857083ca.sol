@@ -21,18 +21,18 @@ contract ServerRegistry {
         uint unregisterTime; // earliest timestamp in to to call unregister
         address unregisterCaller; // address of the caller requesting the unregister
     }
-    
+
     Web3Server[] public servers;
 
     function totalServers() public constant returns (uint)  {
         return servers.length;
     }
 
-    /// register a new Server with the sender as owner    
+    /// register a new Server with the sender as owner
     function registerServer(string _url, uint _props) public payable {
         // make sure this url and also this owner was not registered before.
         bytes32 hash = keccak256(_url);
-        for (uint i=0;i<servers.length;i++) 
+        for (uint i=0;i<servers.length;i++)
             require(keccak256(servers[i].url)!=hash && servers[i].owner!=msg.sender);
 
         // create new Webserver
@@ -51,25 +51,25 @@ contract ServerRegistry {
     ///    in this case he has to wait for one hour before actually removing the server.
     ///    This is needed in order to give others a chance to convict it in case this server signs wrong hashes
     /// b) anybody can request to remove a server because it has been inactive.
-    ///    in this case he needs to pay a small deposit, which he will lose 
-    //       if the owner become active again 
+    ///    in this case he needs to pay a small deposit, which he will lose
+    //       if the owner become active again
     //       or the caller will receive 20% of the deposit in case the owner does not react.
     function requestUnregisteringServer(uint _serverIndex) payable public {
         Web3Server storage server = servers[_serverIndex];
         // this can only be called if nobody requested it before
         require(server.unregisterCaller==address(0x0));
 
-        if (server.unregisterCaller == server.owner) 
+        if (server.unregisterCaller == server.owner)
            server.unregisterTime = now + 1 hours;
         else {
-            server.unregisterTime = now + 28 days; // 28 days are always good ;-) 
+            server.unregisterTime = now + 28 days; // 28 days are always good ;-)
             // the requester needs to pay the unregisterDeposit in order to spam-protect the server
             require(msg.value==unregisterDeposit);
         }
         server.unregisterCaller = msg.sender;
         emit LogServerUnregisterRequested(server.url, server.owner, msg.sender );
     }
-    
+
     function confirmUnregisteringServer(uint _serverIndex) public {
         Web3Server storage server = servers[_serverIndex];
         // this can only be called if somebody requested it before
@@ -95,12 +95,12 @@ contract ServerRegistry {
 
         // if this was requested by somebody who does not own this server,
         // the owner will get his deposit
-        if (server.unregisterCaller != server.owner) 
+        if (server.unregisterCaller != server.owner)
             server.owner.transfer( unregisterDeposit );
 
         server.unregisterCaller = address(0);
         server.unregisterTime = 0;
-        
+
         emit LogServerUnregisterCanceled(server.url, server.owner);
     }
 
@@ -126,14 +126,49 @@ contract ServerRegistry {
         removeServer(_serverIndex);
 
     }
-    
+
     // internal helpers
-    
+
     function removeServer(uint _serverIndex) internal {
         emit LogServerRemoved(servers[_serverIndex].url, servers[_serverIndex].owner );
         uint length = servers.length;
         Web3Server memory m = servers[length - 1];
         servers[_serverIndex] = m;
         servers.length--;
+    }
+}
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
     }
 }

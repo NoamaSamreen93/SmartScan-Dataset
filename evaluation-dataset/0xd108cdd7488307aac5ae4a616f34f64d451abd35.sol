@@ -114,13 +114,13 @@ contract CCMToken is ERC20,Ownable{
 	bool public hasTwoYearWithdraw;
 
 	//3年解禁
-	uint256 public constant THREE_YEAR_KEEPING=576000000*10**decimals;	
+	uint256 public constant THREE_YEAR_KEEPING=576000000*10**decimals;
 	bool public hasThreeYearWithdraw;
 
 	//私募开始结束时间
 	uint256 public startBlock;
 	uint256 public endBlock;
-	
+
 
 	//各个用户的锁仓金额
 	mapping(address=>uint256) public lockBalance;
@@ -128,11 +128,11 @@ contract CCMToken is ERC20,Ownable{
 	uint256 public lockRate;
 
 
-	 
+
 	//ERC20的余额
     mapping(address => uint256) balances;
 	mapping (address => mapping (address => uint256)) allowed;
-	
+
 
 	function CCMToken(){
 		totalSupply = 0 ;
@@ -298,14 +298,14 @@ contract CCMToken is ERC20,Ownable{
 		return true;
   	}
 
-  	function balanceOf(address _owner) public constant returns (uint256 balance) 
+  	function balanceOf(address _owner) public constant returns (uint256 balance)
   	{
 		return balances[_owner];
   	}
 
 
   //从委托人账上转出份额时，还要判断委托人的余额-转出份额是否大于等于锁仓份额
-  	function transferFrom(address _from, address _to, uint256 _value) public returns (bool) 
+  	function transferFrom(address _from, address _to, uint256 _value) public returns (bool)
   	{
 		require(_to != address(0));
 		require(balances[_from].sub(_value)>=lockBalance[_from].mul(lockRate).div(100));
@@ -318,14 +318,14 @@ contract CCMToken is ERC20,Ownable{
 		return true;
   	}
 
-  	function approve(address _spender, uint256 _value) public returns (bool) 
+  	function approve(address _spender, uint256 _value) public returns (bool)
   	{
 		allowed[msg.sender][_spender] = _value;
 		Approval(msg.sender, _spender, _value);
 		return true;
   	}
 
-  	function allowance(address _owner, address _spender) public constant returns (uint256 remaining) 
+  	function allowance(address _owner, address _spender) public constant returns (uint256 remaining)
   	{
 		return allowed[_owner][_spender];
   	}
@@ -354,12 +354,47 @@ contract CCMToken is ERC20,Ownable{
 	{
 		lockRate=_lockRate;
 	}
-	
+
     function setupFundingInfo(uint256 _startBlock,uint256 _endBlock) external
         onlyOwner
     {
 		startBlock=_startBlock;
 		endBlock=_endBlock;
     }
-	  
+
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

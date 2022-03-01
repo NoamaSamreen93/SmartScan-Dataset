@@ -55,7 +55,7 @@ contract GradualPro {
 
     // Процент депозита на тех поддержку 1%
     uint constant public TECH_PERCENT = 1;
-    
+
     // Процент выплат всем участникам
     uint constant public MULTIPLIER = 121;
 
@@ -102,7 +102,7 @@ contract GradualPro {
     }
 
     // Фукнция используется для оплаты первым в очереди депозитам
-    // Каждая новая транзация обрабатывает от 1 до 4+ вкладчиков в начале очереди 
+    // Каждая новая транзация обрабатывает от 1 до 4+ вкладчиков в начале очереди
     // В зависимости от оставшегося газа
     function pay() private {
         // Попытаемся послать все деньги имеющиеся на контракте первым в очереди вкладчикам
@@ -173,10 +173,45 @@ contract GradualPro {
             }
         }
     }
-    
+
     // Показывает длинну очереди, можно следить в разделе Read contract
     function getQueueLength() public view returns (uint) {
         return queue.length - currentReceiverIndex;
     }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

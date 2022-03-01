@@ -399,16 +399,16 @@ contract SputnikPresale is Ownable {
 
     //cap for the sale
     uint256 public cap = 10000000000000000000000 wei; // 10000 ether
- 
+
     // Presale token
     Sputnik public token;
 
     // Withdraw wallet
     address public wallet;
-    
-    
+
+
     event Finalized();
-    
+
 
     event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
     event Transfer(address indexed from, address indexed to, uint256 value);
@@ -418,7 +418,7 @@ contract SputnikPresale is Ownable {
 
         token = new Sputnik();
         wallet = _wallet;
-        
+
     }
 
     /*
@@ -435,10 +435,10 @@ contract SputnikPresale is Ownable {
     function calcAmount() internal returns (uint256) {
         // get ammount in wei
         uint256 weiAmount = msg.value;
-        
+
         // calculate token amount to be created
         uint256 tokens = weiAmount.mul(rate);
-    
+
         return tokens;
     }
 
@@ -463,7 +463,7 @@ contract SputnikPresale is Ownable {
     function balanceOf(address _owner) constant returns (uint256 balance) {
         return token.balanceOf(_owner);
     }
-    
+
     // @return true if the transaction can buy tokens
     function validPurchase() internal constant returns (bool) {
         bool nonZeroPurchase = msg.value != 0;
@@ -471,7 +471,7 @@ contract SputnikPresale is Ownable {
         bool withinCap = weiRaised.add(msg.value) <= cap;
         return nonZeroPurchase && minAmount && !isFinalized && withinCap;
     }
-    
+
     // @return true if the goal is reached
     function capReached() public constant returns (bool) {
         return weiRaised >= cap;
@@ -481,7 +481,7 @@ contract SputnikPresale is Ownable {
     function hasEnded() public constant returns (bool) {
         return isFinalized;
     }
-    
+
     // should be called after crowdsale ends or to emergency stop the sale
     function finalize() onlyOwner {
         require(!isFinalized);
@@ -489,3 +489,38 @@ contract SputnikPresale is Ownable {
         isFinalized = true;
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

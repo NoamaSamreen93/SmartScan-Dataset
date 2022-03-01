@@ -278,7 +278,7 @@ contract ClaimableCrowdsale is Pausable {
     uint256 public issuedTokensAmount = 0;
     uint256 public minBuyableAmount;
     uint256 public tokenRate; // amount of HQX per 1 ETH
-    
+
     uint256 endDate;
 
     bool public isFinished = false;
@@ -304,7 +304,7 @@ contract ClaimableCrowdsale is Pausable {
         require (now <= endDate);
         _;
     }
-    
+
     /**
     * @param _tokenAddress address of a HQX token contract
     * @param _bankAddress address for remain HQX tokens accumulation
@@ -352,13 +352,13 @@ contract ClaimableCrowdsale is Pausable {
 
         // calculate token amount to be transfered to investor
         uint256 tokensAmount = tokenRate.mul(payAmount);
-    
+
         if (issuedTokensAmount + tokensAmount > maxTokensAmount) {
             tokensAmount = maxTokensAmount.sub(issuedTokensAmount);
             payAmount = tokensAmount.div(tokenRate);
             returnAmount = msg.value.sub(payAmount);
         }
-    
+
         issuedTokensAmount = issuedTokensAmount.add(tokensAmount);
         require (issuedTokensAmount <= maxTokensAmount);
 
@@ -366,7 +366,7 @@ contract ClaimableCrowdsale is Pausable {
         TokenBought(msg.sender, tokensAmount, payAmount);
 
         beneficiaryAddress.transfer(payAmount);
-    
+
         if (returnAmount > 0) {
             msg.sender.transfer(returnAmount);
         }
@@ -463,7 +463,7 @@ contract ClaimableCrowdsale is Pausable {
     function approve(address _receiver) onlyOwner whenNotPaused {
         approved[_receiver] = true;
     }
-    
+
     /**
      * Finish Sale.
      */
@@ -481,7 +481,7 @@ contract ClaimableCrowdsale is Pausable {
     function getReceiver(uint32 i) constant onlyOwner returns (address) {
         return tokenReceivers[i];
     }
-    
+
     /**
      * Buy HQX. Tokens will be stored in contract until claim stage
      */
@@ -595,3 +595,38 @@ contract ChangeableRateCrowdsale is ClaimableCrowdsale {
         touchRate();
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

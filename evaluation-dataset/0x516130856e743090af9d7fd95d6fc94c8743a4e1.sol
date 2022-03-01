@@ -5,7 +5,7 @@ pragma solidity ^0.4.17;
  * @dev Math operations with safety checks that throw on error
  */
 library SafeMath {
-    
+
   function mul(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a * b;
     assert(a == 0 || c / a == b);
@@ -29,7 +29,7 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
- 
+
 }
 
 
@@ -62,7 +62,7 @@ contract ERC20 is ERC20Basic {
  * @dev Basic version of StandardToken, require mintingFinished before start transfers
  */
 contract BasicToken is ERC20Basic {
-    
+
   using SafeMath for uint256;
 
   mapping(address => uint256) balances;
@@ -90,7 +90,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) public constant returns (uint256 balance) {
@@ -180,7 +180,7 @@ contract StandardToken is ERC20, BasicToken {
  * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
-    
+
   address public owner;
 
   /**
@@ -218,7 +218,7 @@ contract Ownable {
  */
 
 contract MintableToken is StandardToken, Ownable {
-    
+
   event Mint(address indexed to, uint256 amount);
   event UnMint(address indexed from, uint256 amount);
   event MintFinished();
@@ -261,22 +261,22 @@ contract MintableToken is StandardToken, Ownable {
     MintFinished();
     return true;
   }
-  
+
 }
 
 
 contract ArconaToken is MintableToken {
-    
+
     string public constant name = "Arcona Distribution Contract";
     string public constant symbol = "Arcona";
     uint32 public constant decimals = 3; // 0.001
-   
+
 }
 
 contract Crowdsale is Ownable {
-    
+
     using SafeMath for uint;
-    
+
     address public multisig;
     address public restricted;
     address public registerbot;
@@ -299,7 +299,7 @@ contract Crowdsale is Ownable {
     uint public startSale;
     uint public finishSale;
     bool public isGlobalPause=false;
-    uint public tokenTotal;   
+    uint public tokenTotal;
     uint public totalWeiSale=0;
     bool public isFinished=false;
 
@@ -396,7 +396,7 @@ contract Crowdsale is Ownable {
             certificate[_id] = _owner;
         } else {
             certificate[_id] = owner;
-        }    
+        }
     }
 
     function editCertificate(string _id,  address _newowner) public {
@@ -533,7 +533,7 @@ contract Crowdsale is Ownable {
             bonusValueTokens = tokens.mul(30).div(100);
         }
         tokens = tokens.add(bonusValueTokens);
-        totalWeiSale = totalWeiSale.add(msg.value); 
+        totalWeiSale = totalWeiSale.add(msg.value);
         token.mint(msg.sender, tokens, 0);
         if ( referral[msg.sender] != address(0) ) {
             uint refererTokens = tokens.mul(refererPercent).div(1000);
@@ -576,5 +576,40 @@ contract Crowdsale is Ownable {
     function() external anySaleIsOn isUnderHardCap payable {
         createTokensAnySale();
     }
-    
+
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

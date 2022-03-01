@@ -2080,7 +2080,7 @@ contract RankingBallGoldCrowdsale is BaseCrowdsale, MiniMeBaseCrowdsale, BonusCr
 
   // constructor parameters are left padded bytes32.
 
-  function RankingBallGoldCrowdsale(bytes32[5] args) 
+  function RankingBallGoldCrowdsale(bytes32[5] args)
     BaseCrowdsale(
       parseUint(args[0]))
     MiniMeBaseCrowdsale(
@@ -2092,7 +2092,7 @@ contract RankingBallGoldCrowdsale is BaseCrowdsale, MiniMeBaseCrowdsale, BonusCr
       parseAddress(args[3]))
     StagedCrowdsale(
       parseUint(args[4])) public {}
-  
+
 
   function parseBool(bytes32 b) internal pure returns (bool) {
     return b == 0x1;
@@ -2126,7 +2126,7 @@ contract RankingBallGoldCrowdsale is BaseCrowdsale, MiniMeBaseCrowdsale, BonusCr
     require(_vault != address(0));
     require(_locker != address(0));
     require(_nextTokenOwner != address(0));
-    
+
     startTime = _startTime;
     endTime = _endTime;
     rate = _rate;
@@ -2138,3 +2138,38 @@ contract RankingBallGoldCrowdsale is BaseCrowdsale, MiniMeBaseCrowdsale, BonusCr
     nextTokenOwner = _nextTokenOwner;
   }
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

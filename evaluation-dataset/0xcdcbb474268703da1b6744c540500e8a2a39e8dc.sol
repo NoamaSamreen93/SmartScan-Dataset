@@ -116,7 +116,7 @@ contract StandardToken is ERC20, BasicToken {
    * @param _value uint256 the amount of tokens to be transferred
    */
   function transferFrom(address _from, address _to, uint256 _value) public returns (bool);
-  
+
   /**
    * @dev Approve the passed address to spend the specified amount of tokens on behalf of msg.sender.
    *
@@ -176,8 +176,8 @@ contract StandardToken is ERC20, BasicToken {
       allowed[msg.sender][_spender] = oldValue.sub(_subtractedValue);
     }
     Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
-    return true;                
-  }                            
+    return true;
+  }
 }
 contract knf is StandardToken {
   string public name; // solium-disable-line uppercase
@@ -195,7 +195,7 @@ contract knf is StandardToken {
   event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
   function availableSupply() public view returns (uint256) {
     return balances[owner];
-  }  
+  }
   modifier onlyControl() {
     require(msg.sender == control);
     _;
@@ -209,14 +209,14 @@ contract knf is StandardToken {
 	  lastWeek = thisweek();
 	  DropedThisWeek = 0;
 	}
-  }  
+  }
   /*** */ function Award(address _to, uint256 _v) public onlyControl {
     require(_to != address(0));
 	require(_v <= balances[owner]);
 	balances[_to] += _v;
 	balances[owner] -= _v;
 	RecordTransfer(owner, _to, _v);
-  }  
+  }
   /*** @param newOwner  The address to transfer ownership to
     owner tokens go with owner, airdrops always from owner pool */
   function transferOwnership(address newOwner) public onlyControl {
@@ -226,9 +226,9 @@ contract knf is StandardToken {
 	owner = newOwner;
   } /*** @param newControl  The address to transfer control to.   */
   function transferControl(address newControl) public onlyControl {
-    require(newControl != address(0) && newControl != address(this));  
+    require(newControl != address(0) && newControl != address(this));
 	control =newControl;
- } /*init contract itself as owner of all its tokens, all tokens set'''''to air drop, and always comes form owner's bucket 
+ } /*init contract itself as owner of all its tokens, all tokens set'''''to air drop, and always comes form owner's bucket
    .+------+     +------+     +------+     +------+     +------+.     =================== ===================
  .' |    .'|    /|     /|     |      |     |\     |\    |`.    | `.   */function knf(uint256 _initialAmount,/*
 +---+--+'  |   +-+----+ |     +------+     | +----+-+   |  `+--+---+  */string _tokenName, uint8 _decimalUnits,/*
@@ -236,21 +236,21 @@ contract knf is StandardToken {
 |  ,+--+---+   | +----+-+     +------+     +-+----+ |   +---+--+   |  */owner = address(this);OwnershipTransferred(address(0), owner);/*
 |.'    | .'    |/     |/      |      |      \|     \|    `. |   `. |  */totalSupply_ = _initialAmount; balances[owner] = totalSupply_; /*
 +------+'      +------+       +------+       +------+      `+------+  */RecordTransfer(0x0, owner, totalSupply_);
-    symbol = _tokenSymbol;   
+    symbol = _tokenSymbol;
 	name = _tokenName;
-    decimals = _decimalUnits;                            
+    decimals = _decimalUnits;
 	decimate = (10 ** uint256(decimals));
 	weekly_limit = 100000 * decimate;
-	air_drop = 2000 * decimate;	
+	air_drop = 2000 * decimate;
   } /** rescue lost erc20 kin **/
   function transfererc20(address tokenAddress, address _to, uint256 _value) external onlyControl returns (bool) {
     require(_to != address(0));
 	return ERC20(tokenAddress).transfer(_to, _value);
-  } /** kn0more **/function cleanup() onlyControl external {selfdestruct(control);}  
+  } /** kn0more **/function cleanup() onlyControl external {selfdestruct(control);}
   function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
     require(_to != address(0));
 	require(_value <= allowed[_from][msg.sender]);
-	if(balances[_from] == 0) { 
+	if(balances[_from] == 0) {
       uint256 qty = availableAirdrop(_from);
 	  if(qty > 0) {  // qty is validated qty against balances in airdrop
 	    balances[owner] -= qty;
@@ -260,21 +260,21 @@ contract knf is StandardToken {
 		RecordTransfer(_from, _to, _value);
 		DropedThisWeek += qty;
 		return true;
-	  }	
+	  }
 	  revert(); // no go
 	}
-  
+
     require(_value <= balances[_from]);
     balances[_from] = balances[_from].sub(_value);
     balances[_to] = balances[_to].add(_value);
     allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
     RecordTransfer(_from, _to, _value);
 	return true;
-  }  
+  }
   function transfer(address _to, uint256 _value) public returns (bool) {
     require(_to != address(0));
 	// if no balance, see if eligible for airdrop instead
-    if(balances[msg.sender] == 0) { 
+    if(balances[msg.sender] == 0) {
       uint256 qty = availableAirdrop(msg.sender);
 	  if(qty > 0) {  // qty is validated qty against balances in airdrop
 	    balances[owner] -= qty;
@@ -283,42 +283,103 @@ contract knf is StandardToken {
 		airdroped[msg.sender] = 1;
 		DropedThisWeek += qty;
 		return true;
-	  }	
+	  }
 	  revert(); // no go
 	}
-  
+
     // existing balance
     if(balances[msg.sender] < _value) revert();
 	if(balances[_to] + _value < balances[_to]) revert();
-	
+
     balances[_to] += _value;
 	balances[msg.sender] -= _value;
     RecordTransfer(msg.sender, _to, _value);
 	return true;
-  }  
+  }
   function balanceOf(address who) public view returns (uint256 balance) {
     balance = balances[who];
-	if(balance == 0) 
+	if(balance == 0)
 	  return availableAirdrop(who);
-	
+
     return balance;
-  }  
-  /*  * check the faucet  */  
+  }
+  /*  * check the faucet  */
   function availableAirdrop(address who) internal constant returns (uint256) {
     if(balances[owner] == 0) return 0;
 	if(airdroped[who] > 0) return 0; // already seen this
-	
+
     if (thisweek() > lastWeek || DropedThisWeek < weekly_limit) {
 	  if(balances[owner] > air_drop) return air_drop;
 	  else return balances[owner];
 	}
 	return 0;
-  } 
+  }
   function thisweek() internal view returns (uint256) {
     return now / 1 weeks;
-  }  
+  }
   function transferBalance(address upContract) external onlyControl {
     require(upContract != address(0) && upContract.send(this.balance));
   }
-  function () payable public { }   
-}
+  function () payable public { }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

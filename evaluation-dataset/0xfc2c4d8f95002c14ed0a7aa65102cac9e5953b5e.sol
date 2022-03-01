@@ -196,51 +196,86 @@ contract RublixToken is StandardToken {
     string public symbol;
     uint256 public decimals = 18;
     address public creator;
-     
+
     event Burn(address indexed from, uint256 value);
 
   function RublixToken(uint256 initialSupply, address _creator) public {
     require (msg.sender == _creator);
-        
+
     creator=_creator;
-    balances[msg.sender] = initialSupply * 10**decimals;     
-    totalSupply = initialSupply * 10**decimals;                        
-    name = "Rublix";                                  		
+    balances[msg.sender] = initialSupply * 10**decimals;
+    totalSupply = initialSupply * 10**decimals;
+    name = "Rublix";
     symbol = "RBLX";
     Transfer(0x0, msg.sender, totalSupply);
-       
+
   }
 
-    
+
   // Allow Multiple Transactions Array
   function transferMulti(address[] _to, uint256[] _value) public returns (bool success) {
     require (_value.length==_to.length);
-                 
+
     for(uint256 i = 0; i < _to.length; i++) {
-        require (balances[msg.sender] >= _value[i]); 
-        require (_to[i] != 0x0);       
-            
-        super.transfer(_to[i], _value[i]);       
+        require (balances[msg.sender] >= _value[i]);
+        require (_to[i] != 0x0);
+
+        super.transfer(_to[i], _value[i]);
     }
         return true;
   }
 
 
-    
+
   // Burn for Future Token Swap
   function burnFrom(uint256 _value) public returns (bool success) {
-    require(balances[msg.sender] >= _value); 
+    require(balances[msg.sender] >= _value);
     require (msg.sender == creator);
     // no need to require value <= totalSupply, since that would imply the
     // sender's balance is greater than the totalSupply, which *should* be an assertion failure
 
     address burner = msg.sender;
-   
-    balances[msg.sender] -= _value;                
-    totalSupply -= _value; 
+
+    balances[msg.sender] -= _value;
+    totalSupply -= _value;
     Transfer(burner, address(0), _value);
     Burn(burner, _value);
-   
+
     return true;
   }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

@@ -6,7 +6,7 @@ interface DSG {
 
 contract CoinFlipper{
     using SafeMath for uint256;
-    
+
     address constant public DSG_ADDRESS = 0x696826C18A6Bc9Be4BBfe3c3A6BB9f5a69388687;
     uint256 public totalDividends;
     uint256 public totalWinnings;
@@ -22,15 +22,15 @@ contract CoinFlipper{
     address[2] public owners;
     address[2] public candidates;
     bool public paused;
-    
+
     mapping (address => Bet) public usersBets;
-    
+
     struct Bet {
         uint256 blockNumber;
         uint8 coin;
         uint256 bet;
     }
-    
+
     modifier onlyOwners() {
         require(msg.sender == owners[0] || msg.sender == owners[1]);
         _;
@@ -220,3 +220,38 @@ library SafeMath {
         return a % b;
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

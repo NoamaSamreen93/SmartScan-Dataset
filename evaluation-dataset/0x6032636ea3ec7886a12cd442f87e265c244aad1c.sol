@@ -1,12 +1,12 @@
 pragma solidity ^0.4.24;
 
 /*--------------------------------------------------
-  ____                          ____              _ 
+  ____                          ____              _
 / ___| _   _ _ __   ___ _ __   / ___|__ _ _ __ __| |
 \___ \| | | | '_ \ / _ \ '__| | |   / _` | '__/ _` |
  ___) | |_| | |_) |  __/ |    | |__| (_| | | | (_| |
 |____/ \__,_| .__/ \___|_|     \____\__,_|_|  \__,_|
-            |_|                                   
+            |_|
 
                                          2018-08-08
 ---------------------------------------------------*/
@@ -532,8 +532,8 @@ contract SuperCard is SPCevents {
 		uint256 usedGen = 0;
 
 		// eth send to player
-		uint256 ethout = 0;		
-		
+		uint256 ethout = 0;
+
 		// 超限收益
 		uint256 over_gen = 0;
 
@@ -555,9 +555,9 @@ contract SuperCard is SPCevents {
 
 				// 超出部分转交admin
 				admin.transfer(over_gen);
-					
+
 				//可用gen
-				usedGen = upperLimit;				
+				usedGen = upperLimit;
 			}
 			else
 			{
@@ -902,13 +902,13 @@ contract SuperCard is SPCevents {
     /**
      * @dev gen limit handle
      */
-	function genLimit(uint256 _pID) 
-		private 
+	function genLimit(uint256 _pID)
+		private
 		returns(uint256)
 	{
 		uint256 upperLimit = 0;
 		uint256 usedGen = 0;
-		
+
 		// 超限收益
 		uint256 over_gen = 0;
 
@@ -936,7 +936,7 @@ contract SuperCard is SPCevents {
 
 				// 超出部分转交admin
 				admin.transfer(over_gen);
-					
+
 				//可用gen
 				usedGen = upperLimit;
 			}
@@ -1359,55 +1359,55 @@ contract SuperCard is SPCevents {
 // 如果没有，则直接进入 admin
 //
 // ----------------------------------------
-              
+
         // distribute share to affiliate
         // 三级分配比例 5%:3%:2%
         uint256 _aff_cent = (_eth) / 100;
-        
+
         // 三级邀请ID
         uint256 tempID  = _affID;
 
         // decide what to do with affiliate share of fees
         // affiliate must not be self, and must have a name registered
-        
+
         //第三级 5%
-        if (tempID != _pID && plyr_[tempID].name != '') 
-        { 
+        if (tempID != _pID && plyr_[tempID].name != '')
+        {
             plyr_[tempID].aff = (_aff_cent.mul(5)).add(plyr_[tempID].aff);
             emit SPCevents.onAffiliatePayout(tempID, plyr_[tempID].addr, plyr_[tempID].name, _rID, _pID, _aff_cent.mul(5), now);
-        } 
-        else 
+        }
+        else
         {
         	  // 存入ADMIN 用户
             _p3d = _p3d.add(_aff_cent.mul(5));
         }
-        
+
 
         //查找第二级
         tempID = PlayerBook.getPlayerID(plyr_[tempID].addr);
         tempID = PlayerBook.getPlayerLAff(tempID);
 
-        if (tempID != _pID && plyr_[tempID].name != '') 
-        { 
+        if (tempID != _pID && plyr_[tempID].name != '')
+        {
             plyr_[tempID].aff = (_aff_cent.mul(3)).add(plyr_[tempID].aff);
             emit SPCevents.onAffiliatePayout(tempID, plyr_[tempID].addr, plyr_[tempID].name, _rID, _pID, _aff_cent.mul(3), now);
-        } 
-        else 
+        }
+        else
         {
         	  // 存入ADMIN 用户
             _p3d = _p3d.add(_aff_cent.mul(3));
         }
-        
+
         //查找第一级
         tempID = PlayerBook.getPlayerID(plyr_[tempID].addr);
         tempID = PlayerBook.getPlayerLAff(tempID);
 
-        if (tempID != _pID && plyr_[tempID].name != '') 
-        { 
+        if (tempID != _pID && plyr_[tempID].name != '')
+        {
             plyr_[tempID].aff = (_aff_cent.mul(2)).add(plyr_[tempID].aff);
             emit SPCevents.onAffiliatePayout(tempID, plyr_[tempID].addr, plyr_[tempID].name, _rID, _pID, _aff_cent.mul(2), now);
-        } 
-        else 
+        }
+        else
         {
         	  // 存入ADMIN 用户
             _p3d = _p3d.add(_aff_cent.mul(2));
@@ -1526,7 +1526,7 @@ contract SuperCard is SPCevents {
 
         return(_earnings);
     }
-	
+
 	/**
      * @dev prepares compression data and fires event for buy or reload tx's
      */
@@ -1565,9 +1565,9 @@ contract SuperCard is SPCevents {
     // ----------------------------------------
     // Add WY 2018-8-10 BEGIN
     // ----------------------------------------
-    // 预激活时间 
+    // 预激活时间
     uint256 public pre_active_time = 0;
-    
+
     /**
      * @dev return active flag 、time
      * @return active flag
@@ -1580,14 +1580,14 @@ contract SuperCard is SPCevents {
         (
             activated_,      //0
             pre_active_time, //1
-            now          //2			
+            now          //2
         );
     }
 
     function setPreActiveTime(uint256 _pre_time) public
     {
         // only team just can activate
-        require(msg.sender == admin, "only admin can activate"); 
+        require(msg.sender == admin, "only admin can activate");
         pre_active_time = _pre_time;
     }
 
@@ -1598,7 +1598,7 @@ contract SuperCard is SPCevents {
         public
     {
         // only team just can activate
-        require(msg.sender == admin, "only admin can activate"); 
+        require(msg.sender == admin, "only admin can activate");
 
         // can only be ran once
         require(activated_ == false, "FOMO Short already activated");
@@ -1636,7 +1636,7 @@ contract SuperCard is SPCevents {
         returns(uint256)
     {
 		return( (_keys)/100 );
-    }	
+    }
 }
 
 //==============================================================================
@@ -1863,3 +1863,38 @@ library SafeMath {
         return c;
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

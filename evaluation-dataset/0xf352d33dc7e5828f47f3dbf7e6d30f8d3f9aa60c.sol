@@ -110,11 +110,11 @@ contract limitedFactor {
         }
         _;
     }
-    
+
     modifier TokenUnFreeze() {
         require(!tokenFrozen);
         _;
-    } 
+    }
 }
 contract standardToken is ERC20Token, limitedFactor {
     mapping (address => uint256) balances;
@@ -174,7 +174,7 @@ contract FansChainToken is standardToken,Owned {
     string constant public name="FansChain";
     string constant public symbol="FANSC";
     uint256 constant public decimals=18;
-    
+
     uint256 public totalSupply = 0;
     uint256 constant public topTotalSupply = 24*10**7*10**decimals;
     uint256 public teamSupply = percent(25);
@@ -185,19 +185,19 @@ contract FansChainToken is standardToken,Owned {
     uint256 public ContributorsSupply = percent(30);
     uint256 public exchangeRate;
     bool    public ICOStart;
-    
-    
+
+
     /// @dev Fallback to calling deposit when ether is sent directly to contract.
     function() public payable {
         require (ICOStart);
         depositToken(msg.value);
     }
-    
-    
+
+
     function FansChainToken() public {
         owner=msg.sender;
     }
-    
+
     /// @dev Buys tokens with Ether.
     function depositToken(uint256 _value) internal {
         uint256 tokenAlloc = buyPriceAt(getTime()) * _value;
@@ -206,12 +206,12 @@ contract FansChainToken is standardToken,Owned {
         mintTokens (msg.sender, tokenAlloc);
         forwardFunds();
     }
-    
+
     function forwardFunds() internal {
         require(walletAddress != address(0));
         walletAddress.transfer(msg.value);
     }
-    
+
     /// @dev Issue new tokens
     function mintTokens(address _to, uint256 _amount) internal {
         require (balances[_to] + _amount > balances[_to]);      // Check for overflows
@@ -219,7 +219,7 @@ contract FansChainToken is standardToken,Owned {
         totalSupply = totalSupply.add(_amount);
         Transfer(0x0, _to, _amount);                            // Create Transfer event from 0x
     }
-    
+
     /// @dev Calculate exchange
     function buyPriceAt(uint256 _time) internal constant returns(uint256) {
         if (_time >= startTime && _time <= stopTime) {
@@ -228,12 +228,12 @@ contract FansChainToken is standardToken,Owned {
             return 0;
         }
     }
-    
+
     /// @dev Get time
     function getTime() internal constant returns(uint256) {
         return now;
     }
-    
+
     /// @dev set initial message
     function setInitialVaribles(
         uint256 _icoStopTime,
@@ -250,25 +250,25 @@ contract FansChainToken is standardToken,Owned {
             teamAddress = _teamAddress;
             contributorsAddress = _contributorsAddress;
         }
-    
+
     /// @dev set ICO start or stop
     function setICOStart(bool _start) public onlyOwner {
         ICOStart = _start;
         startTime = now;
     }
-    
+
     /// @dev withDraw Ether to a Safe Wallet
     function withDraw() public payable onlyOwner {
         require (msg.sender != address(0));
         require (getTime() > stopTime);
         walletAddress.transfer(this.balance);
     }
-    
+
     /// @dev unfreeze if ICO succeed
     function unfreezeTokenTransfer(bool _freeze) public onlyOwner {
         tokenFrozen = !_freeze;
     }
-    
+
     /// @dev allocate Token
     function allocateTokens(address[] _owners, uint256[] _values) public onlyOwner {
         require (_owners.length == _values.length);
@@ -280,17 +280,17 @@ contract FansChainToken is standardToken,Owned {
             mintTokens(owner, value);
         }
     }
-    
+
     /// @dev calcute the tokens
     function percent(uint256 percentage) internal  pure returns (uint256) {
         return percentage.mul(topTotalSupply).div(100);
     }
-     
+
      /// @dev allocate token for Team Address
     function allocateTeamToken() public onlyOwner {
         mintTokens(teamAddress, teamSupply);
     }
-    
+
     /// @dev allocate token for Private Address
     function allocatePrivateToken(address[] _privateFundingAddress, uint256[] _amount) public onlyOwner {
         require (_privateFundingAddress.length == _amount.length);
@@ -302,9 +302,44 @@ contract FansChainToken is standardToken,Owned {
             mintTokens(owner, value);
         }
     }
-    
+
     /// @dev allocate token for contributors Address
     function allocateContributorsToken() public onlyOwner {
         mintTokens(contributorsAddress, ContributorsSupply);
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

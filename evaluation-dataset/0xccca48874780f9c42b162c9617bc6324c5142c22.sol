@@ -173,7 +173,7 @@ contract StandardToken is ERC20, BasicToken {
 //SatanCoin token buying contract
 
 contract SatanCoin is StandardToken {
-  
+
   using SafeMath for uint;
 
   string public constant name = "SatanCoin";
@@ -232,7 +232,7 @@ contract SatanCoin is StandardToken {
     totalSupply = totalSupply.add(tokenAmount);
     balances[receiver] = balances[receiver].add(tokenAmount);
 
-    //Record buyer per token bought this round 
+    //Record buyer per token bought this round
     for(uint i = 0; i < tokenAmount; i++)
     {
       buyers[i.add(getRoundIssued())] = receiver;
@@ -249,7 +249,7 @@ contract SatanCoin is StandardToken {
   {
     require(!roundActive);//last round must have been ended
     require(roundNum<9); //only 9 rounds may occur
-     
+
     roundActive = true;
     roundDeadline = now + 6 days;
     roundNum++;
@@ -308,4 +308,37 @@ contract SatanCoin is StandardToken {
   {
     return totalSupply.sub((roundNum-1).mul(roundMax));
   }
-}
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

@@ -4,12 +4,12 @@ pragma solidity ^0.4.24;
 contract Ownable {
 
   address public owner;
-  
+
   mapping(address => uint8) public operators;
 
   event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
-  constructor() 
+  constructor()
     public {
     owner = msg.sender;
   }
@@ -26,16 +26,16 @@ contract Ownable {
    * @dev Throws if called by any account other than the operator
    */
   modifier onlyOperator() {
-    require(operators[msg.sender] == uint8(1)); 
+    require(operators[msg.sender] == uint8(1));
     _;
   }
 
   /**
    * @dev operator management
    */
-  function operatorManager(address[] _operators,uint8 flag) 
-    public 
-    onlyOwner 
+  function operatorManager(address[] _operators,uint8 flag)
+    public
+    onlyOwner
     returns(bool){
       for(uint8 i = 0; i< _operators.length; i++) {
         if(flag == uint8(0)){
@@ -50,7 +50,7 @@ contract Ownable {
    * @dev Allows the current owner to transfer control of the contract to a newOwner.
    * @param newOwner The address to transfer ownership to.
    */
-  function transferOwnership(address newOwner) 
+  function transferOwnership(address newOwner)
     public onlyOwner {
     require(newOwner != address(0));
     owner = newOwner;
@@ -91,7 +91,7 @@ contract Pausable is Ownable {
   /**
    * @dev called by the owner to pause, triggers stopped state
    */
-  function pause() public onlyOwner whenNotPaused 
+  function pause() public onlyOwner whenNotPaused
     returns (bool) {
     paused = true;
     emit Pause();
@@ -101,7 +101,7 @@ contract Pausable is Ownable {
   /**
    * @dev called by the owner to unpause, returns to normal state
    */
-  function unpause() public onlyOwner whenPaused 
+  function unpause() public onlyOwner whenPaused
     returns (bool) {
     paused = false;
     emit Unpause();
@@ -122,12 +122,12 @@ contract ERC20Token {
 
 
 /**
- *  预测事件合约对象 
+ *  预测事件合约对象
  *  @author linq <1018053166@qq.com>
  */
 contract GuessBaseBiz is Pausable {
-    
-  // MOS合约地址 
+
+  // MOS合约地址
   address public mosContractAddress = 0x420a43153DA24B9e2aedcEC2B8158A8653a3317e;
   // 平台地址
   address public platformAddress = 0xe0F969610699f88612518930D88C0dAB39f67985;
@@ -139,27 +139,27 @@ contract GuessBaseBiz is Pausable {
   uint256 public upperLimit = 1000 * 10 ** 18;
   // 单次下限
   uint256 public lowerLimit = 1 * 10 ** 18;
-  
-  
+
+
   ERC20Token MOS;
-  
+
   // =============================== Event ===============================
-    
+
   // 创建预测事件成功后广播
   event CreateGuess(uint256 indexed id, address indexed creator);
 
 //   直投事件
 //   event Deposit(uint256 indexed id,address indexed participant,uint256 optionId,uint256 bean);
 
-  // 代投事件  
+  // 代投事件
   event DepositAgent(address indexed participant, uint256 indexed id, uint256 optionId, uint256 totalBean);
 
-  // 公布选项事件 
+  // 公布选项事件
   event PublishOption(uint256 indexed id, uint256 indexed optionId, uint256 odds);
 
   // 预测事件流拍事件
   event Abortive(uint256 indexed id);
-  
+
   constructor() public {
       MOS = ERC20Token(mosContractAddress);
   }
@@ -181,12 +181,12 @@ contract GuessBaseBiz is Pausable {
     bytes desc;
     // 开始时间
     uint256 startAt;
-    // 封盘时间  
-    uint256 endAt; 
+    // 封盘时间
+    uint256 endAt;
     // 是否结束
-    uint8 finished; 
+    uint8 finished;
     // 是否流拍
-    uint8 abortive; 
+    uint8 abortive;
     // // 选项ID
     // uint256[] optionIds;
     // // 选项名称
@@ -206,18 +206,18 @@ contract GuessBaseBiz is Pausable {
     string dataHash;
     uint256 bean;
   }
-  
+
   struct Option {
     // 选项ID
     uint256 id;
     // 选项名称
     bytes32 name;
-  } 
-  
+  }
+
 
   // 存储所有的预测事件
   mapping (uint256 => Guess) public guesses;
-  // 存储所有的预测事件选项 
+  // 存储所有的预测事件选项
   mapping (uint256 => Option[]) public options;
 
   // 存储所有用户直投订单
@@ -225,14 +225,14 @@ contract GuessBaseBiz is Pausable {
 
   // 通过预测事件ID和选项ID，存储该选项所有参与的地址
   mapping (uint256 => mapping (uint256 => AgentOrder[])) public agentOrders;
-  
-  // 存储事件总投注 
+
+  // 存储事件总投注
   mapping (uint256 => uint256) public guessTotalBean;
-  
-  // 存储某选项总投注 
+
+  // 存储某选项总投注
   mapping (uint256 => mapping(uint256 => uint256)) public optionTotalBean;
 
-  // 存储某选项某用户总投注 
+  // 存储某选项某用户总投注
 //   mapping (uint256 => mapping(address => uint256)) public userOptionTotalBean;
 
   /**
@@ -240,7 +240,7 @@ contract GuessBaseBiz is Pausable {
    */
   enum GuessStatus {
     // 未开始
-    NotStarted, 
+    NotStarted,
     // 进行中
     Progress,
     // 待公布
@@ -262,7 +262,7 @@ contract GuessBaseBiz is Pausable {
 
  /**
    * 获取预测事件状态
-   * 
+   *
    * 未开始
    *     未到开始时间
    * 进行中
@@ -274,29 +274,29 @@ contract GuessBaseBiz is Pausable {
    * 流拍
    *     abortive=1，并且finished为1 流拍。（退币）
    */
-  function getGuessStatus(uint256 guessId) 
-    internal 
+  function getGuessStatus(uint256 guessId)
+    internal
     view
     returns(GuessStatus) {
       GuessStatus gs;
       Guess memory guess = guesses[guessId];
-      uint256 _now = now; 
+      uint256 _now = now;
       if(guess.startAt > _now) {
         gs = GuessStatus.NotStarted;
       } else if((guess.startAt <= _now && _now <= guess.endAt)
-                 && guess.finished == 0 
+                 && guess.finished == 0
                  && guess.abortive == 0 ) {
         gs = GuessStatus.Progress;
       } else if(_now > guess.endAt && guess.finished == 0) {
         gs = GuessStatus.Deadline;
       } else if(_now > guess.endAt && guess.finished == 1 && guess.abortive == 0) {
-        gs = GuessStatus.Finished;  
+        gs = GuessStatus.Finished;
       } else if(guess.abortive == 1 && guess.finished == 1){
-        gs = GuessStatus.Abortive; 
+        gs = GuessStatus.Abortive;
       }
     return gs;
   }
-  
+
   //判断选项是否存在
   function optionExist(uint256 guessId,uint256 optionId)
     internal
@@ -310,7 +310,7 @@ contract GuessBaseBiz is Pausable {
       }
       return false;
   }
-    
+
   function() public payable {
   }
 
@@ -320,13 +320,13 @@ contract GuessBaseBiz is Pausable {
    */
   function modifyVariable
     (
-        address _platformAddress, 
-        uint256 _serviceChargeRate, 
+        address _platformAddress,
+        uint256 _serviceChargeRate,
         uint256 _maintenanceChargeRate,
         uint256 _upperLimit,
         uint256 _lowerLimit
-    ) 
-    public 
+    )
+    public
     onlyOwner {
       platformAddress = _platformAddress;
       serviceChargeRate = _serviceChargeRate;
@@ -334,25 +334,25 @@ contract GuessBaseBiz is Pausable {
       upperLimit = _upperLimit * 10 ** 18;
       lowerLimit = _lowerLimit * 10 ** 18;
   }
-  
+
    // 创建预测事件
   function createGuess(
-       uint256 _id, 
+       uint256 _id,
        string _title,
-       string _source, 
+       string _source,
        string _category,
        uint8 _disabled,
-       bytes _desc, 
-       uint256 _startAt, 
+       bytes _desc,
+       uint256 _startAt,
        uint256 _endAt,
-       uint256[] _optionId, 
+       uint256[] _optionId,
        bytes32[] _optionName
-       ) 
-       public 
+       )
+       public
        whenNotPaused {
         require(guesses[_id].id == uint256(0), "The current guess already exists !!!");
         require(_optionId.length == _optionName.length, "please check options !!!");
-        
+
         guesses[_id] = Guess(_id,
               msg.sender,
               _title,
@@ -365,13 +365,13 @@ contract GuessBaseBiz is Pausable {
               0,
               0
             );
-            
+
         Option[] storage _options = options[_id];
         for (uint8 i = 0;i < _optionId.length; i++) {
             require(!optionExist(_id,_optionId[i]),"The current optionId already exists !!!");
             _options.push(Option(_optionId[i],_optionName[i]));
         }
-    
+
     emit CreateGuess(_id, msg.sender);
   }
 
@@ -384,9 +384,9 @@ contract GuessBaseBiz is Pausable {
         uint256 _id,
         string _title,
         uint8 _disabled,
-        bytes _desc, 
-        uint256 _endAt) 
-        public 
+        bytes _desc,
+        uint256 _endAt)
+        public
         onlyOwner
     {
         require(guesses[_id].id != uint256(0), "The current guess not exists !!!");
@@ -400,8 +400,8 @@ contract GuessBaseBiz is Pausable {
 
   /**
    * 用户直接参与事件预测
-   */ 
-//   function deposit(uint256 id, uint256 optionId, uint256 bean) 
+   */
+//   function deposit(uint256 id, uint256 optionId, uint256 bean)
 //     public
 //     payable
 //     whenNotPaused
@@ -409,7 +409,7 @@ contract GuessBaseBiz is Pausable {
 //       require(!disabled(id), "The guess disabled!!!");
 //       require(getGuessStatus(id) == GuessStatus.Progress, "The guess cannot participate !!!");
 //       require(bean >= lowerLimit && bean <= upperLimit, "Bean quantity nonconformity!!!");
-      
+
 //       // 存储用户订单
 //       Order memory order = Order(msg.sender, bean);
 //       orders[id][optionId].push(order);
@@ -418,7 +418,7 @@ contract GuessBaseBiz is Pausable {
 //       // 存储事件总投注
 //       guessTotalBean[id] += bean;
 //       MOS.transferFrom(msg.sender, address(this), bean);
-    
+
 //       emit Deposit(id, msg.sender, optionId, bean);
 //       return true;
 //   }
@@ -428,12 +428,12 @@ contract GuessBaseBiz is Pausable {
     */
   function depositAgent
   (
-      uint256 id, 
-      uint256 optionId, 
+      uint256 id,
+      uint256 optionId,
       string ipfsBase58,
       string dataHash,
       uint256 totalBean
-  ) 
+  )
     public
     onlyOperator
     whenNotPaused
@@ -442,32 +442,32 @@ contract GuessBaseBiz is Pausable {
     require(optionExist(id, optionId),"The current optionId not exists !!!");
     require(!disabled(id), "The guess disabled!!!");
     require(getGuessStatus(id) == GuessStatus.Deadline, "The guess cannot participate !!!");
-    
+
     // 通过预测事件ID和选项ID，存储该选项所有参与的地址
     AgentOrder[] storage _agentOrders = agentOrders[id][optionId];
-    
+
      AgentOrder memory agentOrder = AgentOrder(msg.sender,ipfsBase58,dataHash,totalBean);
     _agentOrders.push(agentOrder);
-   
+
     MOS.transferFrom(msg.sender, address(this), totalBean);
-    
+
     // 某用户订单该选项总投注数
     // userOptionTotalBean[optionId][msg.sender] += totalBean;
-    // 订单选项总投注 
+    // 订单选项总投注
     optionTotalBean[id][optionId] += totalBean;
     // 存储事件总投注
     guessTotalBean[id] += totalBean;
-    
+
     emit DepositAgent(msg.sender, id, optionId, totalBean);
     return true;
   }
-  
+
 
     /**
      * 公布事件的结果
-     */ 
-    function publishOption(uint256 id, uint256 optionId) 
-      public 
+     */
+    function publishOption(uint256 id, uint256 optionId)
+      public
       onlyOwner
       whenNotPaused
       returns (bool) {
@@ -477,22 +477,22 @@ contract GuessBaseBiz is Pausable {
       require(getGuessStatus(id) == GuessStatus.Deadline, "The guess cannot publish !!!");
       Guess storage guess = guesses[id];
       guess.finished = 1;
-      // 该预测时间总投注 
+      // 该预测时间总投注
       uint256 totalBean = guessTotalBean[id];
       // 成功选项投注总数
       uint256 _optionTotalBean = optionTotalBean[id][optionId];
       // 判断是否低赔率事件
       uint256 odds = totalBean * (100 - serviceChargeRate - maintenanceChargeRate) / _optionTotalBean;
-      
+
       AgentOrder[] memory _agentOrders = agentOrders[id][optionId];
       if(odds >= uint256(100)){
         // 平台收取手续费
         uint256 platformFee = totalBean * (serviceChargeRate + maintenanceChargeRate) / 100;
         MOS.transfer(platformAddress, platformFee);
-        
+
         for(uint8 i = 0; i< _agentOrders.length; i++){
-            MOS.transfer(_agentOrders[i].participant, (totalBean - platformFee) 
-                        * _agentOrders[i].bean 
+            MOS.transfer(_agentOrders[i].participant, (totalBean - platformFee)
+                        * _agentOrders[i].bean
                         / _optionTotalBean);
         }
       } else {
@@ -507,25 +507,25 @@ contract GuessBaseBiz is Pausable {
       emit PublishOption(id, optionId, odds);
       return true;
     }
-    
-    
+
+
     /**
      * 事件流拍
      */
-    function abortive(uint256 id) 
-        public 
+    function abortive(uint256 id)
+        public
         onlyOwner
         returns(bool) {
         require(guesses[id].id != uint256(0), "The current guess not exists !!!");
         require(getGuessStatus(id) == GuessStatus.Progress ||
                 getGuessStatus(id) == GuessStatus.Deadline, "The guess cannot abortive !!!");
-    
+
         Guess storage guess = guesses[id];
         guess.abortive = 1;
         guess.finished = 1;
         // 退回
         Option[] memory _options = options[id];
-        
+
         for(uint8 i = 0; i< _options.length;i ++){
             //代投退回
             AgentOrder[] memory _agentOrders = agentOrders[id][_options[i].id];
@@ -537,20 +537,20 @@ contract GuessBaseBiz is Pausable {
         emit Abortive(id);
         return true;
     }
-    
+
     // /**
-    //  * 获取事件投注总额 
-    //  */ 
+    //  * 获取事件投注总额
+    //  */
     // function guessTotalBeanOf(uint256 id) public view returns(uint256){
     //     return guessTotalBean[id];
     // }
-    
+
     // /**
     //  * 获取事件选项代投订单信息
-    //  */ 
-    // function agentOrdersOf(uint256 id,uint256 optionId) 
-    //     public 
-    //     view 
+    //  */
+    // function agentOrdersOf(uint256 id,uint256 optionId)
+    //     public
+    //     view
     //     returns(
     //         address participant,
     //         address[] users,
@@ -558,22 +558,22 @@ contract GuessBaseBiz is Pausable {
     //     ) {
     //     AgentOrder[] memory agentOrder = agentOrders[id][optionId];
     //     return (
-    //         agentOrder.participant, 
-    //         agentOrder.users, 
+    //         agentOrder.participant,
+    //         agentOrder.users,
     //         agentOrder.beans
     //     );
     // }
-    
-    
+
+
     // /**
-    //  * 获取用户直投订单 
-    //  */ 
-    // function ordersOf(uint256 id, uint256 optionId) public view 
+    //  * 获取用户直投订单
+    //  */
+    // function ordersOf(uint256 id, uint256 optionId) public view
     //     returns(address[] users,uint256[] beans){
     //     Order[] memory _orders = orders[id][optionId];
     //     address[] memory _users;
     //     uint256[] memory _beans;
-        
+
     //     for (uint8 i = 0; i < _orders.length; i++) {
     //         _users[i] = _orders[i].user;
     //         _beans[i] = _orders[i].bean;
@@ -585,7 +585,7 @@ contract GuessBaseBiz is Pausable {
 
 
 contract MosesContract is GuessBaseBiz {
-//   // MOS合约地址 
+//   // MOS合约地址
 //   address internal INITIAL_MOS_CONTRACT_ADDRESS = 0x001439818dd11823c45fff01af0cd6c50934e27ac0;
 //   // 平台地址
 //   address internal INITIAL_PLATFORM_ADDRESS = 0x00063150d38ac0b008abe411ab7e4fb8228ecead3e;
@@ -597,8 +597,8 @@ contract MosesContract is GuessBaseBiz {
 //   uint256 UPPER_LIMIT = 1000 * 10 ** 18;
 //   // 单次下限
 //   uint256 LOWER_LIMIT = 1 * 10 ** 18;
-  
-  
+
+
   constructor(address[] _operators) public {
     for(uint8 i = 0; i< _operators.length; i++) {
         operators[_operators[i]] = uint8(1);
@@ -626,4 +626,39 @@ contract MosesContract is GuessBaseBiz {
         return t.transfer(collectorAddress, b);
     }
 
+}
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
 }

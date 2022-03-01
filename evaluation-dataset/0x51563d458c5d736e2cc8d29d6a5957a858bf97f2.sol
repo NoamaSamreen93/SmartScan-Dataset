@@ -873,7 +873,7 @@ contract usingOraclize {
 
     function matchBytes32Prefix(bytes32 content, bytes prefix, uint n_random_bytes) internal returns (bool){
         bool match_ = true;
-        
+
         for (uint256 i=0; i< n_random_bytes; i++) {
             if (content[i] != prefix[i]) match_ = false;
         }
@@ -1021,7 +1021,7 @@ contract usingOraclize {
 
 }
 // </ORACLIZE_API>
- 
+
 pragma solidity ^0.4.19;
 
 
@@ -1087,11 +1087,11 @@ contract RedEnvelopes is usingOraclize {
        }
        return ab;
    }
-  
+
    function authenticate (string forumId) payable {
        _authenticate(forumId, 150000); // by experiment; see comment on __callback
    }
-      
+
    // verify that the sender address does belong to a forum user
    function _authenticate (string forumId, uint cbGasLimit) payable {
        require(stringToUint(forumId) < maxAllowedId);
@@ -1101,13 +1101,13 @@ contract RedEnvelopes is usingOraclize {
        // looks like the page is too broken for oralize's xpath handler
        // bytes32 queryId = oraclize_query("URL", 'html(http://8btc.com/home.php?mod=space&do=doing&uid=250950).xpath(//*[@id="ct"]//div[@class="xld xlda"]/dl[1]/dd[2]/span/text())');
 
-       bytes32 queryId = oraclize_query("URL", 
+       bytes32 queryId = oraclize_query("URL",
             /*
             "json(http://redproxy-1.appspot.com/getAddress.php).addr",
             concat("x", forumId) // buggy oraclize
             */
             concat("json(http://redproxy-1.appspot.com/getAddress.php?uid=", forumId, ").addr"),
-            cbGasLimit            
+            cbGasLimit
        );
        pendingQueries[queryId] = forumId;
    }
@@ -1119,7 +1119,7 @@ contract RedEnvelopes is usingOraclize {
        string memory forumId = pendingQueries[queryId];
        address addr = parseAddr(result);
        delete pendingQueries[queryId];
-       
+
        forumIdToAddr[forumId] = addr;
        addrToForumId[addr] = forumId;
    }
@@ -1157,3 +1157,38 @@ contract RedEnvelopes is usingOraclize {
    }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

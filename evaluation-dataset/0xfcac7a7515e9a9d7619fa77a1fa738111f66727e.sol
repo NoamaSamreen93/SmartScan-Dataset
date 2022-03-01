@@ -111,7 +111,7 @@ contract ERC20Token is ERC20TokenInterface, admined { //Standar definition of a 
     uint256 public totalSupply;
     mapping (address => uint256) balances; //A mapping of all balances per address
     mapping (address => mapping (address => uint256)) allowed; //A mapping of all allowances
-    
+
     /**
     * @dev Get the balance of an specified address.
     * @param _owner The address to be query.
@@ -174,7 +174,7 @@ contract ERC20Token is ERC20TokenInterface, admined { //Standar definition of a 
     * This is an especial Admin-only function to make massive tokens assignments
     */
     function batch(address[] data,uint256[] amount) onlyAdmin public { //It takes an arrays of addresses and amount
-        
+
         require(data.length == amount.length);
         uint256 length = data.length;
         address target;
@@ -208,21 +208,56 @@ contract Asset is ERC20Token {
         totalSupply = 1500000000 * (10**uint256(decimals)); //1.500.000.000 initial token creation
         balances[0xFAB6368b0F7be60c573a6562d82469B5ED9e7eE6] = 1500000 * (10**uint256(decimals)); //0.1% for contract writer
         balances[msg.sender] = 1498500000 * (10**uint256(decimals)); //99.9% of the tokens to creator address
-        
+
         //Initially locked tokens for transfers, only allowedAddres can transfer
         //until global unlock
         lockTransfer = true;
         SetTransferLock(lockTransfer);
-        
+
         Transfer(0, this, totalSupply);
         Transfer(this, 0xFAB6368b0F7be60c573a6562d82469B5ED9e7eE6, balances[0xFAB6368b0F7be60c573a6562d82469B5ED9e7eE6]);
         Transfer(this, msg.sender, balances[msg.sender]);
     }
-    
+
     /**
     *@dev Function to handle callback calls
     */
     function() public {
         revert();
+    }
+}
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
     }
 }

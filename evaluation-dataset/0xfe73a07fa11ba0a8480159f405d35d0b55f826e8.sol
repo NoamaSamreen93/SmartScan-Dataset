@@ -290,7 +290,7 @@ contract MintableToken is StandardToken {
 
 
 contract HDN is MintableToken {
-  using SafeMath for uint256;    
+  using SafeMath for uint256;
   string public constant name = "HALADINAR";
   string public constant symbol = "HDN";
   uint32 public constant decimals = 18;
@@ -303,19 +303,87 @@ contract HDN is MintableToken {
   address public addressFounders4;
   uint256 public summFounders4;
   constructor() public {
-    addressFounders1 = 0x99D72C025DBDA9916788995a24D8c32d580AeAE6;  
-    summFounders1 = 300000000 * (10 ** uint256(decimals));  
+    addressFounders1 = 0x99D72C025DBDA9916788995a24D8c32d580AeAE6;
+    summFounders1 = 300000000 * (10 ** uint256(decimals));
     mint(addressFounders1, summFounders1);
-    addressFounders2 = 0x767B0dbe1d03BDbf2FD22112Ed779445E5B74FE4;  
-    summFounders2 = 300000000 * (10 ** uint256(decimals));  
+    addressFounders2 = 0x767B0dbe1d03BDbf2FD22112Ed779445E5B74FE4;
+    summFounders2 = 300000000 * (10 ** uint256(decimals));
     mint(addressFounders2, summFounders2);
-    addressFounders3 = 0x093A4A53D7BAEE802FdD76e60f01aaAB8E5410EC;  
-    summFounders3 = 200000000 * (10 ** uint256(decimals));  
+    addressFounders3 = 0x093A4A53D7BAEE802FdD76e60f01aaAB8E5410EC;
+    summFounders3 = 200000000 * (10 ** uint256(decimals));
     mint(addressFounders3, summFounders3);
-    addressFounders4 = 0xf61E022A87BB9F4d2Fd335e3fc5e26dc24f14f65;  
-    summFounders4 = 200000000 * (10 ** uint256(decimals));  
+    addressFounders4 = 0xf61E022A87BB9F4d2Fd335e3fc5e26dc24f14f65;
+    summFounders4 = 200000000 * (10 ** uint256(decimals));
     mint(addressFounders4, summFounders4);
     finishMinting();
-  }      
-      
+  }
+
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

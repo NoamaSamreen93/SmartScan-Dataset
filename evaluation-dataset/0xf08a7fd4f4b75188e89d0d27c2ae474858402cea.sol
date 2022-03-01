@@ -16,7 +16,7 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
-  
+
   function div(uint256 a, uint256 b) internal returns (uint256) {
     // assert(b > 0); // Solidity automatically throws when dividing by 0
     uint256 c = a / b;
@@ -32,14 +32,14 @@ library SafeMath {
 
 /**
  * @title Ownable
-    * @dev The Ownable contract has an owner address, and provides basic authorization control 
-       * functions, this simplifies the implementation of "user permissions". 
+    * @dev The Ownable contract has an owner address, and provides basic authorization control
+       * functions, this simplifies the implementation of "user permissions".
           */
 contract Ownable {
   address public owner;
 
 
-  /** 
+  /**
    * @dev The Ownable constructor sets the original `owner` of the contract to the sender
         * account.
              */
@@ -49,7 +49,7 @@ contract Ownable {
 
 
   /**
-   * @dev Throws if called by any account other than the owner. 
+   * @dev Throws if called by any account other than the owner.
         */
   modifier onlyOwner() {
     require(msg.sender == owner);
@@ -59,7 +59,7 @@ contract Ownable {
 
   /**
    * @dev Allows the current owner to transfer control of the contract to a newOwner.
-        * @param newOwner The address to transfer ownership to. 
+        * @param newOwner The address to transfer ownership to.
              */
   function transferOwnership(address newOwner) public onlyOwner {
     if (newOwner != address(0)) {
@@ -78,39 +78,39 @@ interface  Token {
 }
 
 contract DroneShowCoinICOContract is Ownable {
-    
+
     using SafeMath for uint256;
-    
+
     Token token;
-    
+
     uint256 public constant RATE = 650; //tokens per ether
     uint256 public constant CAP = 15000; //cap in ether
     uint256 public constant START = 1510754400; //GMT: Wednesday, November 15, 2017 2:00:00 PM
     uint256 public constant DAYS = 30; //
-    
+
     bool public initialized = false;
     uint256 public raisedAmount = 0;
     uint256 public bonusesGiven = 0;
     uint256 public numberOfTransactions = 0;
-    
+
     event BoughtTokens(address indexed to, uint256 value);
-    
+
     modifier whenSaleIsActive() {
         assert (isActive());
         _;
     }
-    
+
     function DroneShowCoinICOContract(address _tokenAddr) public {
         require(_tokenAddr != 0);
         token = Token(_tokenAddr);
     }
-    
+
     function initialize(uint256 numTokens) public onlyOwner {
         require (initialized == false);
         require (tokensAvailable() == numTokens);
         initialized = true;
     }
-    
+
     function isActive() public constant returns (bool) {
         return (
             initialized == true &&  //check if initialized
@@ -119,19 +119,19 @@ contract DroneShowCoinICOContract is Ownable {
             goalReached() == false //check if goal was not reached
         ); // if all of the above are true we are active, else we are not
     }
-    
+
     function goalReached() public constant returns (bool) {
         return (raisedAmount >= CAP * 1 ether);
     }
-    
+
     function () public payable {
         buyTokens();
     }
-    
+
     function buyTokens() public payable whenSaleIsActive {
         uint256 weiAmount = msg.value;
         uint256 tokens = weiAmount.mul(RATE);
-        
+
         uint256 secondspassed = now - START;
         uint256 dayspassed = secondspassed/(60*60*24);
         uint256 bonusPrcnt = 0;
@@ -148,25 +148,60 @@ contract DroneShowCoinICOContract is Ownable {
         uint256 bonusAmount = (tokens * bonusPrcnt) / 100;
         tokens = tokens.add(bonusAmount);
         BoughtTokens(msg.sender, tokens);
-        
+
         raisedAmount = raisedAmount.add(msg.value);
         bonusesGiven = bonusesGiven.add(bonusAmount);
         numberOfTransactions = numberOfTransactions.add(1);
         token.transfer(msg.sender, tokens);
-        
+
         owner.transfer(msg.value);
-        
+
     }
-    
+
     function tokensAvailable() public constant returns (uint256) {
         return token.balanceOf(this);
     }
-    
+
     function destroy() public onlyOwner {
         uint256 balance = token.balanceOf(this);
         assert (balance > 0);
         token.transfer(owner,balance);
         selfdestruct(owner);
-        
+
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

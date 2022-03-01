@@ -6,7 +6,7 @@ pragma solidity ^0.4.18;
  * @dev Math operations with safety checks that throw on error
  */
 library SafeMath {
-    
+
     function mul(uint256 a, uint256 b) internal pure returns (uint256) {
         uint256 c = a * b;
         assert(a == 0 || c / a == b);
@@ -30,7 +30,7 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
-  
+
 }
 
 
@@ -40,10 +40,10 @@ library SafeMath {
  * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
-    
+
     // Public variable with address of owner
     address public owner;
-    
+
     /**
      * Log ownership transference
      */
@@ -81,7 +81,7 @@ contract Ownable {
         // Set new owner
         owner = newOwner;
     }
-    
+
 }
 
 
@@ -111,7 +111,7 @@ contract MintableToken is ERC20Basic, Ownable {
         require(!mintingFinished);
         _;
     }
-    
+
     function mint(address _to, uint256 _amount) onlyOwner canMint public returns (bool);
 
     /**
@@ -123,7 +123,7 @@ contract MintableToken is ERC20Basic, Ownable {
         MintFinished();
         return true;
     }
-  
+
 }
 
 
@@ -132,7 +132,7 @@ contract MintableToken is ERC20Basic, Ownable {
  * @dev Custom Token (ERC20 Token) transactions.
  */
 contract StyrasToken is MintableToken {
-  
+
     using SafeMath for uint256;
 
     string public name = "Styras";
@@ -187,7 +187,7 @@ contract StyrasToken is MintableToken {
         Transfer(msg.sender, _to, _amount);
         return true;
     }
-  
+
     /**
      * @dev Transfer tokens from one address to another
      * @param _from address The address which you want to send tokens from
@@ -298,7 +298,7 @@ contract StyrasToken is MintableToken {
         Transfer(address(0), partnersWallet, amount);
         return true;
     }
-  
+
 }
 
 
@@ -309,7 +309,7 @@ contract StyrasToken is MintableToken {
  * and forwarding it if crowdsale is successful.
  */
 contract RefundVault is Ownable {
-  
+
     using SafeMath for uint256;
 
     enum State { Active, Refunding, Closed }
@@ -354,7 +354,7 @@ contract RefundVault is Ownable {
         investor.transfer(depositedValue);
         Refunded(investor, depositedValue);
     }
-  
+
 }
 
 
@@ -364,7 +364,7 @@ contract Withdrawable is Ownable {
     address public wallet;
 
     event Withdrawed(uint256 weiAmount);
-  
+
     function Withdrawable(address _to) public {
         require(_to != address(0));
         wallet = _to;
@@ -374,11 +374,11 @@ contract Withdrawable is Ownable {
         require(withdrawEnabled);
         _;
     }
-  
+
     function enableWithdraw() onlyOwner public {
         withdrawEnabled = true;
     }
-  
+
     // owner can withdraw ether here
     function withdraw(uint256 weiAmount) onlyOwner canWithdraw public {
         require(this.balance >= weiAmount);
@@ -390,17 +390,17 @@ contract Withdrawable is Ownable {
 
 
 contract StyrasVault is Withdrawable, RefundVault {
-  
+
     function StyrasVault(address wallet) public
         Withdrawable(wallet)
         RefundVault(wallet) {
         // NOOP
     }
-  
+
     function balanceOf(address investor) public constant returns (uint256 depositedByInvestor) {
         return deposited[investor];
     }
-  
+
     function enableWithdraw() onlyOwner public {
         require(state == State.Active);
         withdrawEnabled = true;
@@ -416,7 +416,7 @@ contract StyrasVault is Withdrawable, RefundVault {
 contract StyrasCrowdsale is Ownable {
 
     using SafeMath for uint256;
-  
+
     enum State { preSale, publicSale, hasFinalized }
 
     // how many token units a buyer gets per ether
@@ -432,7 +432,7 @@ contract StyrasCrowdsale is Ownable {
     uint256 public presaleDeadline = 1511827200; // GMT: Tuesday, November 28, 2017 00:00:00
     uint256 public presaleRate = 4000; // 1 ETH == 4000 STY 33% bonus
     uint256 public presaleCap = 50000000000000000000000000; // 50 millions STY
-  
+
     // pubsale treats
     uint256 public pubsaleDeadline = 1514678400; // GMT: Sunday, December 31, 2017 0:00:00
     uint256 public pubsaleRate = 3000; // 1 ETH == 3000 STY
@@ -497,7 +497,7 @@ contract StyrasCrowdsale is Ownable {
     function () public payable {
         buyTokens(msg.sender);
     }
-  
+
     // low level token purchase function
     function buyTokens(address beneficiary) public payable {
         require(beneficiary != address(0));
@@ -555,7 +555,7 @@ contract StyrasCrowdsale is Ownable {
         require(goalReached());
         vault.enableWithdraw();
     }
-  
+
     // if crowdsale is successful, owner can withdraw ether here
     function withdraw(uint256 _weiAmountToWithdraw) onlyOwner public {
         require(goalReached());
@@ -605,4 +605,65 @@ contract StyrasCrowdsale is Ownable {
         token.transferOwnership(owner);
     }
 
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

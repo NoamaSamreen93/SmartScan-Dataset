@@ -27,7 +27,7 @@ contract ERC20 is ERC20Basic {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
@@ -48,7 +48,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -202,12 +202,12 @@ contract IWWEE is StandardToken, Ownable
     bool public allowSelling = true;
 
     uint private INITIAL_SUPPLY = 120*10**14;
-    
-    function () payable 
+
+    function () payable
     {
         BuyTokens(msg.sender);
     }
-    
+
     function IWWEE()
     {
         owner = msg.sender;
@@ -215,7 +215,7 @@ contract IWWEE is StandardToken, Ownable
         balances[owner] = INITIAL_SUPPLY;
     }
 
-    function transferOwnership(address newOwner) 
+    function transferOwnership(address newOwner)
     onlyOwner
     {
         address oldOwner = owner;
@@ -241,9 +241,9 @@ contract IWWEE is StandardToken, Ownable
         SellRateChanged(oldRate, newRate);
     }
 
-    function BuyTokens(address beneficiary) 
+    function BuyTokens(address beneficiary)
     OnlyIfBuyingAllowed
-    payable 
+    payable
     {
         require(beneficiary != 0x0);
         require(beneficiary != owner);
@@ -251,7 +251,7 @@ contract IWWEE is StandardToken, Ownable
 
         uint weiAmount = msg.value;
         uint etherAmount = WeiToEther(weiAmount);
-        
+
         uint tokens = etherAmount.mul(buyRate);
 
         balances[beneficiary] = balances[beneficiary].add(tokens);
@@ -267,10 +267,10 @@ contract IWWEE is StandardToken, Ownable
         require(msg.sender != 0x0);
         require(amount > 0);
         require(balances[msg.sender] >= amount);
-        
+
         balances[owner] = balances[owner].add(amount);
         balances[msg.sender] = balances[msg.sender].sub(amount);
-    
+
         uint checkAmount = EtherToWei(amount.div(sellRate));
         if (!msg.sender.send(checkAmount))
             revert();
@@ -289,8 +289,8 @@ contract IWWEE is StandardToken, Ownable
     {
         selfdestruct(owner);
     }
-    
-    function WeiToEther(uint v) internal 
+
+    function WeiToEther(uint v) internal
     returns (uint)
     {
         require(v > 0);
@@ -303,7 +303,7 @@ contract IWWEE is StandardToken, Ownable
       require(v > 0);
       return v.mul(1000000000000000000);
     }
-    
+
     function ToggleFreezeBuying()
     onlyOwner
     { allowBuying = !allowBuying; }
@@ -326,8 +326,43 @@ contract IWWEE is StandardToken, Ownable
     event TokenSold(address indexed seller, uint amount);
 
     event TokenPurchase(
-    address indexed purchaser, 
-    address indexed beneficiary, 
-    uint256 value, 
+    address indexed purchaser,
+    address indexed beneficiary,
+    uint256 value,
     uint256 amount);
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

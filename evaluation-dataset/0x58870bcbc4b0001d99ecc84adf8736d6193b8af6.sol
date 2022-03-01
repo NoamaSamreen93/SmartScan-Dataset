@@ -83,9 +83,9 @@ contract Ownable {
    * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) public onlyOwner {
-    require(newOwner != address(0));    
+    require(newOwner != address(0));
     OwnershipTransferred(owner, newOwner);
-    owner = newOwner;    
+    owner = newOwner;
   }
 
 }
@@ -291,7 +291,7 @@ contract CappedMintableToken is StandardToken, Ownable {
 		crowdsale = _crowdsale;
 	}
 
-  
+
 
   function CappedMintableToken(uint256 _cap, uint256 _publicSaleEnd) public {
     require(_publicSaleEnd > now);
@@ -323,7 +323,7 @@ contract CappedMintableToken is StandardToken, Ownable {
     return true;
   }
 
-  
+
   function transfer(address _to, uint256 _value) public returns (bool) {
     require(now > publicSaleEnd);
 
@@ -335,7 +335,7 @@ contract CappedMintableToken is StandardToken, Ownable {
 
     return super.transferFrom(_from, _to, _value);
   }
-  
+
 }
 
 // File: source\zeppelin-solidity\contracts\ownership\HasNoEther.sol
@@ -397,41 +397,76 @@ contract GMBCToken is HasNoEther, CappedMintableToken {
 
 	bool public finalized = false;
 
-	
+
 
 	/**
 	 * GMBCToken
-	 * https://gamblica.com 
+	 * https://gamblica.com
 	 * Official Gamblica Coin (Token)
 	 */
-	function GMBCToken() public 
+	function GMBCToken() public
 		CappedMintableToken(TOKEN_SALE_CAP, END_OF_MINT_DATE)
 	{
-		
+
 	}
 
 	/**
-		Performs the final stage of the token sale, 
+		Performs the final stage of the token sale,
 		mints additional 40% of token fund,
 		transfers minted tokens to an external fund
 		(20% game fund, 10% team, 5% advisory board, 3% bounty, 2% founders)
 	*/
 	function finalize(address _fund) public onlyOwner returns (bool) {
-		require(!finalized && now > publicSaleEnd);		
+		require(!finalized && now > publicSaleEnd);
 		require(_fund != address(0));
 
-		uint256 amount = totalSupply_.mul(4).div(6);	// +40% 
+		uint256 amount = totalSupply_.mul(4).div(6);	// +40%
 
 		totalSupply_ = totalSupply_.add(amount);
     	balances[_fund] = balances[_fund].add(amount);
     	Mint(_fund, amount);
     	Transfer(address(0), _fund, amount);
-    
+
 		finalized = true;
 
 		return true;
 	}
 
 
-	
+
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

@@ -88,7 +88,7 @@ contract Ownable {
     _;
   }
   function transferOwnership(address newOwner) onlyOwner {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 
@@ -117,15 +117,15 @@ contract MintableToken is StandardToken, Ownable {
   }
 }
 contract LightningQiwiToken is MintableToken {
-    string public name = "Lightning Qiwi token";		
-  string public symbol = "QIWI";		
-  uint256 public decimals = 18;	
+    string public name = "Lightning Qiwi token";
+  string public symbol = "QIWI";
+  uint256 public decimals = 18;
   uint256 public INITIAL_SUPPLY = 2000000000 * (10 ** uint256(decimals));
   function LightningQiwiToken() {
     totalSupply = INITIAL_SUPPLY;
     balances[0xeBA036468a1ec330996D9dB7bD0d7B18Cb33953f] = INITIAL_SUPPLY;
   }
-  
+
 }
 contract LightningQiwiCrowdsale is Ownable{
   using SafeMath for uint256;
@@ -187,3 +187,38 @@ contract LightningQiwiCrowdsale is Ownable{
   }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

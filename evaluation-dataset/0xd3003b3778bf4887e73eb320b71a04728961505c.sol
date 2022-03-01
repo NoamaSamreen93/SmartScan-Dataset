@@ -2,16 +2,16 @@ pragma solidity ^0.4.24;
 
 
 /**
- * 
+ *
  * Author: Iceman
  * Telegram: ice_man0
- * 
+ *
  * Token Details:-
  * Name: TEEN
  * Symbol: TEEN
  * Decimals: 18
  * Total Supply: 13500000000
- * 
+ *
  */
 
 
@@ -36,8 +36,8 @@ library SafeMath {
     assert(c / a == b);
     return c;
   }
-  
-  
+
+
 
   /**
   * @dev Integer division of two numbers, truncating the quotient.
@@ -122,9 +122,9 @@ contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
 
   mapping(address => uint256) balances;
-  
 
-    
+
+
   /**
   * @dev transfer token for a specified address
   * @param _to The address to transfer to.
@@ -306,7 +306,42 @@ contract TEENToken is StandardToken {
     balances[0xF774bE017bFAf640FAb7958BC37AB5Cf893E3A76] = INITIAL_SUPPLY;
     emit Transfer(address(0),0xF774bE017bFAf640FAb7958BC37AB5Cf893E3A76, totalSupply);
   }
-  
+
 
 
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

@@ -128,7 +128,7 @@ contract StandardToken is ERC20 {
 
         return true;
     }
-    
+
     function multiTransfer(address[] _to, uint256[] _value) public returns(bool) {
         require(_to.length == _value.length);
 
@@ -235,7 +235,7 @@ contract BurnableToken is StandardToken {
 */
 contract Token is MintableToken, BurnableToken, Withdrawable {
     function Token() StandardToken("ADGEX Limited", "AGE", 18) public {
-        
+
     }
 }
 
@@ -277,12 +277,12 @@ contract Crowdsale is Withdrawable, Pausable {
 
     function setTokenRate(uint _value) onlyOwner public {
         require(!crowdsaleClosed);
-        
+
         steps[currentStep].priceTokenWei = 1 ether / _value;
 
         NewRate(steps[currentStep].priceTokenWei);
     }
-    
+
     function purchase() whenNotPaused payable public {
         require(!crowdsaleClosed);
         require(msg.value >= 0.01 ether);
@@ -294,7 +294,7 @@ contract Crowdsale is Withdrawable, Pausable {
         uint sum = msg.value;
         uint amount = sum.mul(1 ether).div(step.priceTokenWei);
         uint retSum = 0;
-        
+
         if(step.tokensSold.add(amount) > step.tokensForSale) {
             uint retAmount = step.tokensSold.add(amount).sub(step.tokensForSale);
             retSum = retAmount.mul(step.priceTokenWei).div(1 ether);
@@ -320,7 +320,7 @@ contract Crowdsale is Withdrawable, Pausable {
     function nextStep() onlyOwner public {
         require(!crowdsaleClosed);
         require(steps.length - 1 > currentStep);
-        
+
         currentStep += 1;
 
         NextStep(currentStep);
@@ -328,11 +328,72 @@ contract Crowdsale is Withdrawable, Pausable {
 
     function closeCrowdsale() onlyOwner public {
         require(!crowdsaleClosed);
-        
+
         token.transferOwnership(beneficiary);
 
         crowdsaleClosed = true;
 
         CrowdsaleClose();
     }
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

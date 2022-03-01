@@ -52,7 +52,7 @@ contract Agricoin is Owned
         require(payers[msg.sender]);
         _;
     }
-    
+
     // Can act only after token activation.
     modifier onlyActivated()
     {
@@ -61,7 +61,7 @@ contract Agricoin is Owned
     }
 
     // Transfer event.
-    event Transfer(address indexed _from, address indexed _to, uint _value);    
+    event Transfer(address indexed _from, address indexed _to, uint _value);
 
     // Approve event.
     event Approval(address indexed _owner, address indexed _spender, uint _value);
@@ -101,7 +101,7 @@ contract Agricoin is Owned
         startDate = now;// Save activation date.
 		isActive = true;// Make token active.
 		owner = 0x00;// Set owner to null.
-		
+
         if (icoSuccessful)
         {
             isSuccessfulIco = true;
@@ -146,7 +146,7 @@ contract Agricoin is Owned
         require(balanceOf(msg.sender) >= _value);
 
         recalculate(msg.sender);// Recalculate user's struct.
-        
+
         if (_to != 0x00)// For normal transfer.
         {
             recalculate(_to);// Recalculate recipient's struct.
@@ -160,7 +160,7 @@ contract Agricoin is Owned
         else// For redemption transfer.
         {
             require(payoutPeriodStart <= now && now >= payoutPeriodEnd);// Check redemption period.
-            
+
             uint amount = _value * redemptionPayouts[amountOfRedemptionPayouts].price;// Calculate amount of weis in redemption.
 
             require(amount <= balances[msg.sender].posibleRedemption);// Check redemption limits.
@@ -194,9 +194,9 @@ contract Agricoin is Owned
         // Change balances.
         balances[_from].balance -= _value;
         balances[_to].balance += _value;
-        
+
         Transfer(_from, _to, _value);// Call tranfer event.
-        
+
         return true;
     }
 
@@ -208,9 +208,9 @@ contract Agricoin is Owned
         recalculate(_spender);
 
         allowed[msg.sender][_spender] = _value;// Set allowed.
-        
+
         Approval(msg.sender, _spender, _value);// Call approval event.
-        
+
         return true;
     }
 
@@ -237,7 +237,7 @@ contract Agricoin is Owned
 
             Transfer(0x00, _to, _value);// Call transfer event.
         }
-        
+
         return true;
     }
 
@@ -248,7 +248,7 @@ contract Agricoin is Owned
 
         dividendPayouts[amountOfDividendsPayouts].amount = msg.value;// Set payout amount in weis.
         dividendPayouts[amountOfDividendsPayouts].momentTotalSupply = totalSupply;// Save total supply on that moment.
-        
+
         PayoutDividends(msg.value, amountOfDividendsPayouts);// Call dividend payout event.
 
         amountOfDividendsPayouts++;// Increment dividend payouts amount.
@@ -349,10 +349,10 @@ contract Agricoin is Owned
 
     // Token name.
     string public constant name = "Agricoin";
-    
+
     // Token market symbol.
     string public constant symbol = "AGR";
-    
+
     // Amount of digits after comma.
     uint public constant decimals = 2;
 
@@ -361,16 +361,16 @@ contract Agricoin is Owned
 
     // Total supply on ICO only;
     uint public totalSupplyOnIco;
-       
+
     // Activation date.
     uint public startDate;
-    
+
     // Payment period start date, setted by ICO contract before activation.
     uint public payoutPeriodStart;
-    
+
     // Payment period last date, setted by ICO contract before activation.
     uint public payoutPeriodEnd;
-    
+
     // Dividends DividendPayout counter.
     uint public amountOfDividendsPayouts = 0;
 
@@ -379,7 +379,7 @@ contract Agricoin is Owned
 
     // Dividend payouts.
     mapping (uint => DividendPayout) public dividendPayouts;
-    
+
     // Redemption payouts.
     mapping (uint => RedemptionPayout) public redemptionPayouts;
 
@@ -397,4 +397,133 @@ contract Agricoin is Owned
 
     // Set true for activate ico minted tokens.
     bool public isSuccessfulIco = false;
-}
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

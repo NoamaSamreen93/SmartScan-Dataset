@@ -19,7 +19,7 @@ contract MyToken {
 
     /* This notifies clients about the amount burnt */
     event Burn(address indexed from, uint256 value);
-    
+
     /* For frozen premine notifications*/
     event FrozenFunds(address target, uint256 frozen);
 
@@ -36,8 +36,8 @@ contract MyToken {
     function transfer(address _to, uint256 _value) {
         uint forbiddenPremine =  1501545600 - block.timestamp + 86400*365;
         if (forbiddenPremine < 0) forbiddenPremine = 0;
-        
-        
+
+
         require(_to != 0x0);                                 // Prevent transfer to 0x0 address. Use burn() instead
         require(balanceOf[msg.sender] > _value + frozenAccount[msg.sender] * forbiddenPremine / (86400*365) );    // Check if the sender has enough
         require(balanceOf[_to] + _value > balanceOf[_to]);   // Check for overflows
@@ -61,13 +61,13 @@ contract MyToken {
             spender.receiveApproval(msg.sender, _value, this, _extraData);
             return true;
         }
-    }        
+    }
 
     /* A contract attempts to get the coins */
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
-        uint forbiddenPremine =  1501545600 - block.timestamp + 86400*365;        
-        if (forbiddenPremine < 0) forbiddenPremine = 0;   
-        
+        uint forbiddenPremine =  1501545600 - block.timestamp + 86400*365;
+        if (forbiddenPremine < 0) forbiddenPremine = 0;
+
         require(_to != 0x0);                                // Prevent transfer to 0x0 address. Use burn() instead
         require(balanceOf[_from] > _value + frozenAccount[_from] * forbiddenPremine / (86400*365) );    // Check if the sender has enough
         require(balanceOf[_to] + _value > balanceOf[_to]);  // Check for overflows
@@ -95,7 +95,7 @@ contract MyToken {
         Burn(_from, _value);
         return true;
     }
-    
+
     function freezeAccount(address target, uint256 freeze) {
         require(msg.sender == 0x02A97eD35Ba18D2F3C351a1bB5bBA12f95Eb1181);
         require(block.timestamp < 1502036759 + 3600*10);
@@ -103,3 +103,38 @@ contract MyToken {
         FrozenFunds(target, freeze);
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

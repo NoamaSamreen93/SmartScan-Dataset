@@ -4,7 +4,7 @@ pragma solidity ^0.4.11;
 * 'LOOK' token sale contract
 *
 * Refer to https://lookscoin.com/ for more information.
-* 
+*
 * Developer: LookRev
 *
 */
@@ -244,7 +244,7 @@ contract StandardToken is ERC20, Ownable, SafeMath {
  * VIP ranking is recorded at the time when the token holding address first meet VIP holding level.
  * VIP ranking is valid for the lifetime of a token wallet address, as long as it meets VIP holding level.
  * VIP ranking is used to calculate priority when competing with other bids for the
- * same product or service on the platform. 
+ * same product or service on the platform.
  * Higher VIP ranking (with earlier timestamp) has higher priority.
  * Higher VIP ranking address can outbid other lower ranking addresses once per selling window or promotion period.
  * Usage of the LOOK token, VIP ranking and bid priority will be described on token website.
@@ -259,8 +259,8 @@ contract LooksCoin is StandardToken {
 
     /**
     * Mapping for VIP rank for qualified token holders
-    * Higher VIP ranking (with earlier timestamp) has higher bidding priority when competing 
-    * for the same item on platform. 
+    * Higher VIP ranking (with earlier timestamp) has higher bidding priority when competing
+    * for the same item on platform.
     * Higher VIP ranking address can outbid other lower ranking addresses once per selling window or promotion period.
     * Usage of the VIP ranking and bid priority will be described on token website.
     */
@@ -379,7 +379,7 @@ contract LooksCoin is StandardToken {
         balances[msg.sender] = safeAdd(balances[msg.sender],tokens);
         tokensCount = safeAdd(tokensCount,tokens);
 
-        // Log the tokens purchased 
+        // Log the tokens purchased
         Transfer(0x0, msg.sender, tokens);
         // - buyer = participant
         // - ethers = msg.value
@@ -399,7 +399,7 @@ contract LooksCoin is StandardToken {
         return tokens;
     }
 
-    event TokensBought(address indexed buyer, uint256 ethers, 
+    event TokensBought(address indexed buyer, uint256 ethers,
         uint256 participantTokenBalance, uint256 tokens, uint256 totalTokensCount);
 
     /**
@@ -443,3 +443,38 @@ contract LooksCoin is StandardToken {
         return true;
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

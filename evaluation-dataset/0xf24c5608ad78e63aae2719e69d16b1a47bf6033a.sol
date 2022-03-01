@@ -55,18 +55,18 @@ contract Owned {
 }
 
 /**
- * @title MapCoin 
+ * @title MapCoin
  */
 contract MapCoin is ERC20Interface, Owned {
   using SafeMath for uint256;
-  string  public symbol; 
+  string  public symbol;
   string  public name;
   uint8   public decimals;
   uint    internal _totalSupply;
-  
+
   mapping(address => uint) balances;
   mapping(address => mapping(address => uint)) allowed;
-  
+
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
@@ -79,7 +79,7 @@ contract MapCoin is ERC20Interface, Owned {
         balances[owner] = totalSupply();
         emit Transfer(address(0),owner, totalSupply());
     }
-    
+
     // donot accept any ethers
     function () external payable {
         revert();
@@ -89,7 +89,7 @@ contract MapCoin is ERC20Interface, Owned {
     function totalSupply() public constant returns (uint){
        return _totalSupply* 10**uint(decimals);
     }
-    
+
     // ------------------------------------------------------------------------
     // Get the token balance for account `tokenOwner`
     // ------------------------------------------------------------------------
@@ -112,7 +112,7 @@ contract MapCoin is ERC20Interface, Owned {
         emit Transfer(msg.sender,to,tokens);
         return true;
     }
-    
+
     // ------------------------------------------------------------------------
     // Token owner can approve for `spender` to transferFrom(...) `tokens`
     // from the token owner's account
@@ -125,7 +125,7 @@ contract MapCoin is ERC20Interface, Owned {
 
     // ------------------------------------------------------------------------
     // Transfer `tokens` from the `from` account to the `to` account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the `from` account and
     // - From account must have sufficient balance to transfer
@@ -150,3 +150,38 @@ contract MapCoin is ERC20Interface, Owned {
     }
 
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

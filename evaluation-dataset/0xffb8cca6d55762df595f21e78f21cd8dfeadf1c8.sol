@@ -2,19 +2,19 @@ pragma solidity ^0.4.25;
 
 /*
 *
-*  _____                  __          __   ______ _____ ______ 
+*  _____                  __          __   ______ _____ ______
 * |  __ \                / _|        / _| |  ____|_   _|  ____|
-* | |__) | __ ___   ___ | |_    ___ | |_  | |__    | | | |__   
-* |  ___/ '__/ _ \ / _ \|  _|  / _ \|  _| |  __|   | | |  __|  
-* | |   | | | (_) | (_) | |   | (_) | |   | |____ _| |_| |     
-* |_|   |_|  \___/ \___/|_|    \___/|_|   |______|_____|_|     
-*                                                              
+* | |__) | __ ___   ___ | |_    ___ | |_  | |__    | | | |__
+* |  ___/ '__/ _ \ / _ \|  _|  / _ \|  _| |  __|   | | |  __|
+* | |   | | | (_) | (_) | |   | (_) | |   | |____ _| |_| |
+* |_|   |_|  \___/ \___/|_|    \___/|_|   |______|_____|_|
+*
 *            Proof of EIF   -  ZERO DEV FEES!
 *
 * [✓] 5% EIF fee - 5% goes to EasyInvestForever (excluding the shared divs below)
-* [✓] 48%-8% Withdraw fee goes to Token Holders as divs 
+* [✓] 48%-8% Withdraw fee goes to Token Holders as divs
 *     (fee starts at 48% and reduces down to 8% over 30 day period to discourage early dumps)
-* [✓] 15% Deposit fee of which at least 5% goes to Token Holders as divs 
+* [✓] 15% Deposit fee of which at least 5% goes to Token Holders as divs
 *      (up to 10% to any referrers - referrers are sticky for better referral earnings)
 * [✓] 0% Token transfer fee enabling third party trading
 * [✓] Multi-level STICKY Referral System - 10% from total purchase
@@ -66,7 +66,7 @@ contract ProofofEIF {
         require(myDividends(true) > 0);
         _;
     }
-    
+
     modifier notGasbag() {
       require(tx.gasprice <= 200000000000); // max 200 gwei
       _;
@@ -77,8 +77,8 @@ contract ProofofEIF {
 
       _;
     }
-    
-    
+
+
        /// @dev Limit ambassador mine and prevent deposits before startTime
     modifier antiEarlyWhale {
         if (isPremine()) { //max 1ETH purchase premineLimit per ambassador
@@ -89,9 +89,9 @@ contract ProofofEIF {
         else require (isStarted());
         _;
     }
-    
-    
-    
+
+
+
     // administrators can:
     // -> change the name of the contract
     // -> change the name of the token
@@ -106,8 +106,8 @@ contract ProofofEIF {
         address _customerAddress = msg.sender;
         require(administrators[_customerAddress]);
         _;
-    }    
-    
+    }
+
     // administrator list (see above on what they can do)
     mapping(address => bool) public administrators;
     // ambassadors list (promoters who will get the contract started)
@@ -165,7 +165,7 @@ contract ProofofEIF {
     string public symbol = "EIF";
     uint8 constant public decimals = 18;
     uint8 constant internal entryFee_ = 15;
-    
+
     /// @dev 48% dividends for token selling
     uint8 constant internal startExitFee_ = 48;
 
@@ -174,28 +174,28 @@ contract ProofofEIF {
 
     /// @dev Exit fee falls over period of 30 days
     uint256 constant internal exitFeeFallDuration_ = 30 days;
-    
+
     /// @dev starting
     uint256 public startTime = 0; //  January 1, 1970 12:00:00
     mapping(address => uint256) internal bonusBalance_;
     uint256 public depositCount_;
     uint8 constant internal fundEIF_ = 5; // 5% goes to first EasyInvestForever contract
-    
+
     /// @dev anti-early-whale
     uint256 public maxEarlyStake = 2.5 ether;
     uint256 public whaleBalanceLimit = 75 ether;
     uint256 public premineLimit = 1 ether;
     uint256 public ambassadorCount = 1;
-    
+
     /// @dev PoEIF address
     address public PoEIF;
-    
+
     // Address to send the 5% EasyInvestForever Fee
     address public giveEthFundAddress = 0x35027a992A3c232Dd7A350bb75004aD8567561B2;
     uint256 public totalEthFundRecieved; // total ETH EasyInvestForever recieved from this contract
     uint256 public totalEthFundCollected; // total ETH collected in this contract for EasyInvestForever
-    
-    
+
+
     uint8 constant internal maxReferralFee_ = 10; // 10% from total sum (lev1 - 5%, lev2 - 3%, lev3 - 2%)
     uint256 constant internal tokenPriceInitial_ = 0.0000001 ether;
     uint256 constant internal tokenPriceIncremental_ = 0.00000001 ether;
@@ -206,12 +206,12 @@ contract ProofofEIF {
     mapping(address => int256) internal payoutsTo_;
     uint256 internal tokenSupply_;
     uint256 internal profitPerShare_;
-    
+
     // Special Platform control from scam game contracts on PoEIF platform
     mapping(address => bool) public canAcceptTokens_; // contracts, which can accept PoEIF tokens
 
     mapping(address => address) public stickyRef;
-    
+
     /*=======================================
     =            CONSTRUCTOR                =
     =======================================*/
@@ -221,8 +221,8 @@ contract ProofofEIF {
      // initially set only contract creator as ambassador and administrator but can be changed later
      ambassadors_[PoEIF] = true;
      administrators[PoEIF] = true;
-   }    
-    
+   }
+
 
     function buy(address _referredBy) notGasbag antiEarlyWhale public payable {
         purchaseInternal(msg.value, _referredBy);
@@ -231,19 +231,19 @@ contract ProofofEIF {
     function() payable notGasbag antiEarlyWhale public {
         purchaseInternal(msg.value, 0x0);
     }
-    
+
 /**
  * Sends FUND money to the Easy Invest Forever Contract
  * Contract address can also be updated by admin if required in the future
  */
- 
+
      function updateFundAddress(address _newAddress)
         onlyAdministrator()
         public
     {
         giveEthFundAddress = _newAddress;
     }
-    
+
     function payFund() public {
         uint256 ethToPay = SafeMath.sub(totalEthFundCollected, totalEthFundRecieved);
         require(ethToPay > 0);
@@ -262,17 +262,17 @@ contract ProofofEIF {
         uint256 _dividends = msg.value;
         // take the amount of dividends gained through this transaction, and allocates them evenly to each shareholder
         profitPerShare_ += (_dividends * magnitude / tokenSupply_);
-    } 
+    }
 
     // @dev Function setting the start time of the system  - can also be reset when contract balance is under 10ETH
     function setStartTime(uint256 _startTime) onlyAdministrator public {
         if (address(this).balance < 10 ether ) {
-            startTime = _startTime; 
+            startTime = _startTime;
             // If not already in premine, set premine to start again - remove default ambassador afterwards for zero premine
             if (!isPremine()) {depositCount_ = 0; ambassadorCount = 1; ambassadors_[PoEIF] = true;}
         }
     }
-    
+
     // @dev Function for find if premine
     function isPremine() public view returns (bool) {
       return depositCount_ < ambassadorCount;
@@ -281,7 +281,7 @@ contract ProofofEIF {
     // @dev Function for find if started
     function isStarted() public view returns (bool) {
       return startTime!=0 && now > startTime;
-    }    
+    }
 
     function reinvest() onlyStronghands public {
         uint256 _dividends = myDividends(false);
@@ -316,7 +316,7 @@ contract ProofofEIF {
         uint256 _tokens = _amountOfTokens;
         uint256 _ethereum = tokensToEthereum_(_tokens);
         uint256 _dividends = SafeMath.div(SafeMath.mul(_ethereum, exitFee()), 100);
-        
+
         uint256 _fundPayout = SafeMath.div(SafeMath.mul(_ethereum, fundEIF_), 100);
         // Take out dividends and then _fundPayout
         uint256 _taxedEthereum =  SafeMath.sub(SafeMath.sub(_ethereum, _dividends), _fundPayout);
@@ -404,7 +404,7 @@ contract ProofofEIF {
     {
         stakingRequirement = _amountOfTokens;
     }
-    
+
      /**
      * Set new Early limits (only appropriate at start of new game).
      */
@@ -416,7 +416,7 @@ contract ProofofEIF {
         maxEarlyStake = _maxEarlyStake;
         premineLimit = _premineLimit;
     }
-    
+
 
     /**
      * Add or remove game contract, which can accept PoEIF (EIF) tokens
@@ -476,7 +476,7 @@ contract ProofofEIF {
       success = true;
     }
   }
-  
+
     /**
    * @dev add an address to the administrators list
    * @param addr address
@@ -578,7 +578,7 @@ contract ProofofEIF {
         if (startTime==0 || now < startTime){
            return startExitFee_;
         }
-        
+
         uint256 secondsPassed = now - startTime;
         if (secondsPassed >= exitFeeFallDuration_) {
             return finalExitFee_;
@@ -606,18 +606,18 @@ contract ProofofEIF {
               excess = SafeMath.sub(_incomingEthereum, purchaseEthereum);
           }
       }
-    
+
       if (excess > 0) {
         msg.sender.transfer(excess);
       }
-    
+
       purchaseTokens(purchaseEthereum, _referredBy);
     }
 
     function handleReferrals(address _referredBy, uint _referralBonus, uint _undividedDividends) internal returns (uint){
         uint _dividends = _undividedDividends;
         address _level1Referrer = stickyRef[msg.sender];
-        
+
         if (_level1Referrer == address(0x0)){
             _level1Referrer = _referredBy;
         }
@@ -674,8 +674,8 @@ contract ProofofEIF {
         uint256 _fundPayout = SafeMath.div(SafeMath.mul(_incomingEthereum, fundEIF_), 100);
         uint256 _taxedEthereum = SafeMath.sub(SafeMath.sub(_incomingEthereum, _undividedDividends), _fundPayout);
         totalEthFundCollected = SafeMath.add(totalEthFundCollected, _fundPayout);
-        
-        
+
+
         uint256 _amountOfTokens = ethereumToTokens_(_taxedEthereum);
         uint256 _fee = _dividends * magnitude;
 
@@ -780,3 +780,71 @@ library SafeMath {
         return c;
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

@@ -6,7 +6,7 @@ pragma solidity ^0.4.16;
  * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
-    
+
     address public owner;
 
     /**
@@ -16,7 +16,7 @@ contract Ownable {
     function Ownable() public {
         owner = msg.sender;
     }
-    
+
     /**
     * @dev Throws if called by any account other than the owner.
     */
@@ -32,12 +32,12 @@ contract Ownable {
  * @dev An ERC20 token which doubles the balance each 2 million blocks.
  */
 contract TenTimesToken is Ownable {
-    
+
     uint256 public totalSupply;
     mapping(address => uint256) startBalances;
     mapping(address => mapping(address => uint256)) allowed;
     mapping(address => uint256) startBlocks;
-    
+
     string public constant name = "Ten Times";
     string public constant symbol = "TENT";
     uint32 public constant decimals = 10;
@@ -91,7 +91,7 @@ contract TenTimesToken is Ownable {
         return startBalances[tokenOwner] + compoundInterest(tokenOwner);
     }
 
-    
+
     /**
      * @dev Add the compound interest to the startBalance, update the start block,
      * and update totalSupply
@@ -105,7 +105,7 @@ contract TenTimesToken is Ownable {
         totalSupply = totalSupply + ci;
         startBlocks[tokenOwner] = block.number;
     }
-    
+
 
     /**
      * @dev Transfer the balance from token owner's account to `to` account
@@ -126,7 +126,7 @@ contract TenTimesToken is Ownable {
 
     /**
      * @dev Transfer `tokens` from the `from` account to the `to` account
-     * 
+     *
      * The calling account must already have sufficient tokens approve(...)-d
      * for spending from the `from` account and
      * - From account must have sufficient balance to transfer
@@ -158,9 +158,44 @@ contract TenTimesToken is Ownable {
     function allowance(address tokenOwner, address spender) public constant returns (uint256 remaining) {
         return allowed[tokenOwner][spender];
     }
-   
+
     event Transfer(address indexed from, address indexed to, uint256 tokens);
 
     event Approval(address indexed owner, address indexed spender, uint256 tokens);
 
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

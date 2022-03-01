@@ -316,7 +316,7 @@ contract UIWish is StandardToken, BurnableToken, Ownable {
     string  public constant name = "UIWish";
     string  public constant symbol = "UI";
     uint8   public constant decimals = 18;
-    string  public website = "www.ui-wish.com"; 
+    string  public website = "www.ui-wish.com";
     uint256 public constant INITIAL_SUPPLY      =  24680000 * (10 ** uint256(decimals));
     uint256 public constant CROWDSALE_ALLOWANCE =  12340000 * (10 ** uint256(decimals));
     uint256 public constant ADMIN_ALLOWANCE     =  12340000 * (10 ** uint256(decimals));
@@ -328,7 +328,7 @@ contract UIWish is StandardToken, BurnableToken, Ownable {
     address public crowdSaleAddr;           // the address of a crowdsale currently selling this token
     address public adminAddr;               // the address of a crowdsale currently selling this token
     //bool    public transferEnabled = false; // indicates if transferring tokens is enabled or not
-    bool    public transferEnabled = true;  // Enables everyone to transfer tokens 
+    bool    public transferEnabled = true;  // Enables everyone to transfer tokens
 
     // Modifiers
 
@@ -437,7 +437,42 @@ contract UIWish is StandardToken, BurnableToken, Ownable {
     }
 
     /**
-     * These helper functions are exposed for changing the website dynamically   
+     * These helper functions are exposed for changing the website dynamically
      */
     function changeWebsite(string _website) external onlyOwner {website = _website;}
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

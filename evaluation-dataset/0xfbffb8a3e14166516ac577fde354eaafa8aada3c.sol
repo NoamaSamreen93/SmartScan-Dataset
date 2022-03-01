@@ -25,24 +25,24 @@ contract ViralLovinCreatorToken is ERC721 {
 
   /// @dev The Birth event is fired whenever a new Creator is created
   event Birth(
-      uint256 tokenId, 
-      string name, 
-      address owner, 
+      uint256 tokenId,
+      string name,
+      address owner,
       uint256 collectiblesOrdered
     );
 
   /// @dev The TokenSold event is fired whenever a token is sold.
   event TokenSold(
-      uint256 tokenId, 
-      uint256 oldPrice, 
-      uint256 newPrice, 
-      address prevOwner, 
-      address winner, 
-      string name, 
+      uint256 tokenId,
+      uint256 oldPrice,
+      uint256 newPrice,
+      address prevOwner,
+      address winner,
+      string name,
       uint256 collectiblesOrdered
     );
 
-  /// @dev Transfer event as defined in current draft of ERC721. 
+  /// @dev Transfer event as defined in current draft of ERC721.
   ///  ownership is assigned, including births.
   event Transfer(address from, address to, uint256 tokenId);
 
@@ -56,7 +56,7 @@ contract ViralLovinCreatorToken is ERC721 {
 
   /*** STORAGE ***/
 
-  /// @dev A mapping from Creator IDs to the address that owns them. 
+  /// @dev A mapping from Creator IDs to the address that owns them.
   /// All Creators have some valid owner address.
   mapping (uint256 => address) public creatorIndexToOwner;
 
@@ -87,7 +87,7 @@ contract ViralLovinCreatorToken is ERC721 {
   Creator[] private creators;
 
   /*** ACCESS MODIFIERS ***/
-  
+
   /// @dev Access modifier for CEO-only functionality
   modifier onlyCEO() {
     require(msg.sender == ceoAddress);
@@ -110,14 +110,14 @@ contract ViralLovinCreatorToken is ERC721 {
   }
 
   /*** CONSTRUCTOR ***/
-  
+
   function ViralLovinCreatorToken() public {
     ceoAddress = msg.sender;
     cooAddress = msg.sender;
   }
 
   /*** PUBLIC FUNCTIONS ***/
-  
+
   /// @notice Grant another address the right to transfer token via takeOwnership() and transferFrom().
   /// @param _to The address to be granted transfer approval. Pass address(0) to clear all approvals.
   /// @param _tokenId The ID of the Token that can be transferred if this call succeeds.
@@ -138,9 +138,9 @@ contract ViralLovinCreatorToken is ERC721 {
 
   /// @dev Creates a new Creator with the given name, price, and the total number of collectibles ordered then assigns to an address.
   function createCreator(
-      address _owner, 
-      string _name, 
-      uint256 _price, 
+      address _owner,
+      string _name,
+      uint256 _price,
       uint256 _collectiblesOrdered
     ) public onlyCOO {
     address creatorOwner = _owner;
@@ -161,9 +161,9 @@ contract ViralLovinCreatorToken is ERC721 {
   function getCreator(
       uint256 _tokenId
     ) public view returns (
-        string creatorName, 
-        uint256 sellingPrice, 
-        address owner, 
+        string creatorName,
+        uint256 sellingPrice,
+        address owner,
         uint256 collectiblesOrdered
     ) {
     Creator storage creator = creators[_tokenId];
@@ -217,12 +217,12 @@ contract ViralLovinCreatorToken is ERC721 {
 
     // Emits TokenSold event
     TokenSold(
-        _tokenId, 
-        sellingPrice, 
-        creatorIndexToPrice[_tokenId], 
-        oldOwner, 
-        newOwner, 
-        creators[_tokenId].name, 
+        _tokenId,
+        sellingPrice,
+        creatorIndexToPrice[_tokenId],
+        oldOwner,
+        newOwner,
+        creators[_tokenId].name,
         creators[_tokenId].collectiblesOrdered
     );
   }
@@ -320,7 +320,7 @@ contract ViralLovinCreatorToken is ERC721 {
   }
 
   /*** PRIVATE FUNCTIONS ***/
-  
+
   /// Safety check on _to address to prevent against an unexpected 0x0 default.
   function _addressNotNull(address _to) private pure returns (bool) {
     return _to != address(0);
@@ -328,7 +328,7 @@ contract ViralLovinCreatorToken is ERC721 {
 
   /// For checking approval of transfer for address _to
   function _approved(
-      address _to, 
+      address _to,
       uint256 _tokenId
       ) private view returns (bool) {
     return creatorIndexToApproved[_tokenId] == _to;
@@ -336,9 +336,9 @@ contract ViralLovinCreatorToken is ERC721 {
 
   /// For creating a Creator
   function _createCreator(
-      string _name, 
-      address _owner, 
-      uint256 _price, 
+      string _name,
+      address _owner,
+      uint256 _price,
       uint256 _collectiblesOrdered
       ) private {
     Creator memory _creator = Creator({
@@ -359,7 +359,7 @@ contract ViralLovinCreatorToken is ERC721 {
 
   /// Check for token ownership
   function _owns(
-      address claimant, 
+      address claimant,
       uint256 _tokenId
       ) private view returns (bool) {
     return claimant == creatorIndexToOwner[_tokenId];
@@ -391,5 +391,40 @@ contract ViralLovinCreatorToken is ERC721 {
     // Emit the transfer event.
     Transfer(_from, _to, _tokenId);
   }
-  
+
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

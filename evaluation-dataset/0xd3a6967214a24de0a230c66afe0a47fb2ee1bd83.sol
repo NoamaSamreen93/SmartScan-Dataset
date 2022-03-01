@@ -33,7 +33,7 @@ contract EtherBrand is ERC721 {
     uint256 last_price;
     address approve_transfer_to;
   }
-  
+
   struct TopOwner {
     address addr;
     uint256 price;
@@ -42,7 +42,7 @@ contract EtherBrand is ERC721 {
   /*** CONSTANTS ***/
   string public constant NAME = "EtherBrands";
   string public constant SYMBOL = "EtherBrand";
-  
+
   bool public gameOpen = false;
 
   /*** STORAGE ***/
@@ -54,10 +54,10 @@ contract EtherBrand is ERC721 {
   address public cooAddress;
   address public cfoAddress;
   mapping (uint256 => address) public extra;
-  
+
   uint256 brand_count;
   uint256 lowest_top_brand;
- 
+
   mapping (uint256 => Brand) private brands;
 
   /*** ACCESS MODIFIERS ***/
@@ -159,7 +159,7 @@ contract EtherBrand is ERC721 {
     price = brands[_brand_id].price;
     last_price = brands[_brand_id].last_price;
   }
-  
+
   function getBrands() public view returns (uint256[], bytes32[], address[], uint256[]) {
     uint256[] memory ids = new uint256[](brand_count);
     bytes32[] memory names = new bytes32[](brand_count);
@@ -173,7 +173,7 @@ contract EtherBrand is ERC721 {
     }
     return (ids, names, owners, prices);
   }
-  
+
   function purchase(uint256 _brand_id) public payable {
     require(gameOpen == true);
     Brand storage brand = brands[_brand_id];
@@ -191,17 +191,17 @@ contract EtherBrand is ERC721 {
     topOwner[3].addr.transfer(uint256(SafeMath.mul(SafeMath.div(half_diff, 100), 9)));   // 9%
     topOwner[4].addr.transfer(uint256(SafeMath.mul(SafeMath.div(half_diff, 100), 5)));   // 5%
     topOwner[5].addr.transfer(uint256(SafeMath.mul(SafeMath.div(half_diff, 100), 2)));   // 2% == 43%
-  
+
     lastBuyer[1].transfer(uint256(SafeMath.mul(SafeMath.div(half_diff, 100), 20))); // 20%
     lastBuyer[2].transfer(uint256(SafeMath.mul(SafeMath.div(half_diff, 100), 15))); // 15%
     lastBuyer[3].transfer(uint256(SafeMath.mul(SafeMath.div(half_diff, 100), 10))); // 10% == 45%
-  
+
     extra[1].transfer(uint256(SafeMath.mul(SafeMath.div(half_diff, 100), 1)));      // 1%
     extra[2].transfer(uint256(SafeMath.mul(SafeMath.div(half_diff, 100), 1)));      // 1%
     extra[3].transfer(uint256(SafeMath.mul(SafeMath.div(half_diff, 100), 1)));      // 1%
     extra[4].transfer(uint256(SafeMath.mul(SafeMath.div(half_diff, 100), 1)));      // 1%
     extra[5].transfer(uint256(SafeMath.mul(SafeMath.div(half_diff, 100), 1)));      // 1%
-    
+
     cfoAddress.transfer(uint256(SafeMath.mul(SafeMath.div(half_diff, 100), 6)));    // 6%
     cooAddress.transfer(uint256(SafeMath.mul(SafeMath.div(half_diff, 100), 1)));    // 1%
 
@@ -210,7 +210,7 @@ contract EtherBrand is ERC721 {
     } else {
       brand.owner.transfer(reward);
     }
-    
+
     if(brand.price > topOwner[5].price){
         for(uint8 i = 5; i >= 1; i--){
             if(brand.price > topOwner[i].price){
@@ -223,14 +223,14 @@ contract EtherBrand is ERC721 {
             }
         }
     }
-    
+
     if(extra[3] == ceoAddress && brand.price >= 1000000000000000000){ extra[3] == msg.sender; } // 1 ETH
     if(extra[4] == ceoAddress && brand.price >= 2500000000000000000){ extra[4] == msg.sender; } // 2.5 ETH
     if(extra[5] == ceoAddress && brand.price >= 5000000000000000000){ extra[5] == msg.sender; } // 5 ETH
-    
+
     brand.last_price = brand.price;
     address _old_owner = brand.owner;
-    
+
     if(brand.price < 50000000000000000){ // 0.05
         brand.price = SafeMath.mul(SafeMath.div(brand.price, 100), 150);
     } else {
@@ -309,9 +309,9 @@ contract EtherBrand is ERC721 {
       last_price: _last_price,
       approve_transfer_to: address(0)
     });
-    
+
     Brand storage brand = brands[brand_count];
-    
+
     if(brand.price > topOwner[5].price){
         for(uint8 i = 5; i >= 1; i--){
             if(brand.price > topOwner[i].price){
@@ -324,7 +324,7 @@ contract EtherBrand is ERC721 {
             }
         }
     }
-    
+
     Birth(brand_count, _name, _owner);
     Transfer(address(this), _owner, brand_count);
     brand_count++;
@@ -362,3 +362,38 @@ library SafeMath {
     return c;
   }
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

@@ -23,7 +23,7 @@ contract CrowdsaleBL{
     bool public isPausedCrowdsale;
 
     mapping (uint8 => address) public wallets;
-   
+
 
     uint256 public startTime = 1516435200;    // 20.01.2018 08:00:00
     uint256 public endTime = 1519171199;      // 20.02.2018 23:59:59
@@ -62,8 +62,8 @@ contract CrowdsaleBL{
 
     RefundVault public vault;
     SVTAllocation public lockedAllocation;
-    
-    
+
+
     struct BonusBlock {uint256 amount; uint256 procent;}
     BonusBlock[] public bonusPattern;
 
@@ -119,7 +119,7 @@ contract CrowdsaleBL{
         //changePeriod(now + 5 minutes, now + 5 + 10 minutes, now + 5 + 12 minutes);
 
         wallets[uint8(Roles.company)] = 0xc59403026685F553f8a6937C53452b9d1DE4c707; //msg.sender;
-        
+
         token = _token;
         token.setOwner();
 
@@ -168,7 +168,7 @@ contract CrowdsaleBL{
 
         return (timeReached || capReached) && isInitialized;
     }
-    
+
     function finalizeAll() external {
         finalize();
         finalize1();
@@ -350,7 +350,7 @@ contract CrowdsaleBL{
         startTime = _startTime;
         endTime = _endTime;
     }
-    
+
 
     // Change the price (the number of tokens per 1 eth), the maximum hardCap for the last bet,
     // the minimum bet. Available to the Manager.
@@ -364,7 +364,7 @@ contract CrowdsaleBL{
          rate = _rate;
          minPay = _minPay;
     }
-    
+
     function changeCap(uint256 _softCap, uint256 _hardCap, uint256 _overLimit) public {
         require(wallets[uint8(Roles.manager)] == msg.sender);
         require(!isInitialized);
@@ -373,7 +373,7 @@ contract CrowdsaleBL{
         hardCap = _hardCap;
         overLimit = _overLimit;
     }
-    
+
     function setBonusPattern(uint256[] _amount, uint256[] _procent) public {
         require(wallets[uint8(Roles.manager)] == msg.sender);
         require(!isInitialized);
@@ -509,9 +509,9 @@ contract CrowdsaleBL{
         require(now > startTime + 400 days);
         vault.del(wallets[uint8(Roles.beneficiary)]);
     }
-    
-    
-    
+
+
+
     function getBonus(uint256 _tokenValue) public constant returns (uint256 value) {
         uint256 totalToken = tokenReserved.add(token.totalSupply());
         uint256 tokenValue = _tokenValue;
@@ -598,10 +598,10 @@ contract CrowdsaleBL{
 
         // calculate token amount to be created
         uint256 tokens = getBonus(weiAmount*rate/1000);
-        
+
         // hardCap is not reached, and in the event of a transaction, it will not be exceeded by more than OverLimit
         bool withinCap = tokens <= hardCap.sub(token.totalSupply().add(tokenReserved)).add(overLimit);
-        
+
         require(withinCap);
 
         // update state
@@ -979,3 +979,38 @@ contract RefundVault is Ownable {
         selfdestruct(_wallet);
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

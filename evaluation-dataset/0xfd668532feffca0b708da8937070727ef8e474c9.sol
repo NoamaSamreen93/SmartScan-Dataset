@@ -1,14 +1,14 @@
 pragma solidity ^0.4.13;
 
-contract Ownable 
+contract Ownable
 
 {
 
   address public owner;
 
- 
 
-  constructor(address _owner) public 
+
+  constructor(address _owner) public
 
   {
 
@@ -16,9 +16,9 @@ contract Ownable
 
   }
 
- 
 
-  modifier onlyOwner() 
+
+  modifier onlyOwner()
 
   {
 
@@ -28,13 +28,13 @@ contract Ownable
 
   }
 
- 
 
-  function transferOwnership(address newOwner) onlyOwner 
+
+  function transferOwnership(address newOwner) onlyOwner
 
   {
 
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
 
     owner = newOwner;
 
@@ -48,7 +48,7 @@ contract LoanLogic is Ownable {
 
 	struct LoanInfo {
 
-	    uint256 id; 
+	    uint256 id;
 
 		address tokenPledge;
 
@@ -82,7 +82,7 @@ contract LoanLogic is Ownable {
 
 	}
 
-	
+
 
 	address public contractMarketData;
 
@@ -104,9 +104,9 @@ contract LoanLogic is Ownable {
 
 	event OnAddMargin(uint256 id, uint256 amount, address borrower, uint256 timestamp);
 
-	
 
-	constructor (address _owner, address _contractMarketData, uint256 _minTradeAmountOfEth) public 
+
+	constructor (address _owner, address _contractMarketData, uint256 _minTradeAmountOfEth) public
 
 		Ownable(_owner) {
 
@@ -126,7 +126,7 @@ contract LoanLogic is Ownable {
 
 	}
 
-	
+
 
 	function setBiLinkLoanContract(address _contractBiLinkLoan) public onlyOwner {
 
@@ -158,7 +158,7 @@ contract LoanLogic is Ownable {
 
 	function getTotalPledgeAmount(address _token, address _account) public constant returns (uint256) {
 
-		uint256 _amountPledge= 0; 
+		uint256 _amountPledge= 0;
 
 		for(uint256 i= 0; i<borrower2LoanInfoId[_account].length;i++) {
 
@@ -174,9 +174,9 @@ contract LoanLogic is Ownable {
 
 		}
 
-		
 
-		return _amountPledge; 
+
+		return _amountPledge;
 
 	}
 
@@ -184,7 +184,7 @@ contract LoanLogic is Ownable {
 
 	function getTotalBorrowAmount(address _token) public constant returns (uint256) {
 
-		uint256 _amountBorrow= 0; 
+		uint256 _amountBorrow= 0;
 
 		for(uint256 i= 0; i< allLoanId.length; i++) {
 
@@ -198,9 +198,9 @@ contract LoanLogic is Ownable {
 
 		}
 
-		
 
-		return _amountBorrow; 
+
+		return _amountBorrow;
 
 	}
 
@@ -252,7 +252,7 @@ contract LoanLogic is Ownable {
 
 	}
 
-	 
+
 
 	function getPledgeAmount(address _tokenPledge, address _tokenBorrow, uint256 _amount,uint16 _ratioPledge) public constant returns (uint256) {
 
@@ -344,7 +344,7 @@ contract LoanLogic is Ownable {
 
 		LoanInfo memory _li= id2LoanInfo[_id];
 
-		
+
 
 		deleteLoan(_li);
 
@@ -380,7 +380,7 @@ contract LoanLogic is Ownable {
 
 		}
 
-		 
+
 
 		uint256 _indexTwo;
 
@@ -418,7 +418,7 @@ contract LoanLogic is Ownable {
 
 		delete(id2LoanInfo[_li.id]);
 
-		
+
 
 		if(_indexOne< borrower2LoanInfoId[_li.borrower].length- 1&& borrower2LoanInfoId[_li.borrower].length> 1)
 
@@ -428,7 +428,7 @@ contract LoanLogic is Ownable {
 
 		borrower2LoanInfoId[_li.borrower].length--;
 
-		 
+
 
 		if(_indexTwo< lender2LoanInfoId[_li.lender].length- 1&& lender2LoanInfoId[_li.lender].length> 1)
 
@@ -612,4 +612,39 @@ library SafeMath {
 
   }
 
+}
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
 }

@@ -1,12 +1,12 @@
 pragma solidity ^0.4.18;
 
- 
- 
+
+
 /**
- * SafeMath library to support basic mathematical operations 
+ * SafeMath library to support basic mathematical operations
  * Used for security of the contract
- **/ 
- 
+ **/
+
 library SafeMath {
   function mul(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a * b;
@@ -34,7 +34,7 @@ library SafeMath {
 }
 
 /**
- * Ownable contract  
+ * Ownable contract
  * Makes an address the owner of a contract
  * Used so that onlyOwner modifier can be Used
  * onlyOwner modifier is used so that some functions can only be called by the contract owner
@@ -83,19 +83,19 @@ interface Arm {
 }
 
 contract newCrowdsale is Ownable {
-    
-    // safe math library 
+
+    // safe math library
     using SafeMath for uint256;
-    
+
     // start and end timestamps of ICO (both inclusive)
     uint256 public startTime;
     uint256 public endTime;
-  
+
     // to maintain a list of owners and their specific equity percentages
     mapping(address=>uint256) public ownerAddresses;  //note that the first one would always be the major owner
-    
+
     address[] owners;
-    
+
     uint256 public majorOwnerShares = 100;
     uint256 public minorOwnerShares = 10;
     uint256 public coinPercentage = 5;
@@ -105,11 +105,11 @@ contract newCrowdsale is Ownable {
 
     // amount of raised money in wei
     uint256 public weiRaised;
-  
+
     bool public isCrowdsaleStopped = false;
-  
+
     bool public isCrowdsalePaused = false;
-    
+
     /**
     * event for token purchase logging
     * @param purchaser who paid for the tokens
@@ -119,35 +119,35 @@ contract newCrowdsale is Ownable {
     */
     event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
 
-  
+
     // The token that would be sold using this contract(Arm here)
     Arm public token;
-    
-    
-    function newCrowdsale(address _walletMajorOwner) public 
+
+
+    function newCrowdsale(address _walletMajorOwner) public
     {
-        token = Arm(0x387890e71A8B7D79114e5843D6a712ea474BA91c); 
-        
+        token = Arm(0x387890e71A8B7D79114e5843D6a712ea474BA91c);
+
         //_daysToStart = _daysToStart * 1 days;
-        
-        startTime = now;   
+
+        startTime = now;
         endTime = startTime + 90 days;
-        
+
         require(endTime >= startTime);
         require(_walletMajorOwner != 0x0);
-        
+
         ownerAddresses[_walletMajorOwner] = majorOwnerShares;
-        
+
         owners.push(_walletMajorOwner);
-        
+
         owner = _walletMajorOwner;
     }
-    
+
     // fallback function can be used to buy tokens
     function () public payable {
     buy(msg.sender);
     }
-    
+
     function buy(address beneficiary) public payable
     {
         require (isCrowdsaleStopped != true);
@@ -165,12 +165,12 @@ contract newCrowdsale is Ownable {
         token.transfer(beneficiary,tokens);
          uint partnerCoins = tokens.mul(coinPercentage);
         partnerCoins = partnerCoins.div(100);
-        
+
         TokenPurchase(msg.sender, beneficiary, weiAmount, tokens);
 
         forwardFunds(partnerCoins);
     }
-    
+
      // send ether to the fund collection wallet(s)
     function forwardFunds(uint256 partnerTokenAmount) internal {
       for (uint i=0;i<owners.length;i++)
@@ -179,18 +179,18 @@ contract newCrowdsale is Ownable {
          uint amountToBeSent = msg.value.mul(percent);
          amountToBeSent = amountToBeSent.div(100);
          owners[i].transfer(amountToBeSent);
-         
+
          if (owners[i]!=owner &&  ownerAddresses[owners[i]]>0)
          {
              token.transfer(owners[i],partnerTokenAmount);
          }
       }
     }
-   
+
      /**
      * function to add a partner
      * can only be called by the major/actual owner wallet
-     **/  
+     **/
     function addPartner(address partner, uint share) public onlyOwner {
 
         require(partner != 0x0);
@@ -201,11 +201,11 @@ contract newCrowdsale is Ownable {
         uint majorOwnerShare = ownerAddresses[owner];
         ownerAddresses[owner] = majorOwnerShare.sub(share);
     }
-    
+
     /**
      * function to remove a partner
      * can only be called by the major/actual owner wallet
-     **/ 
+     **/
     function removePartner(address partner) public onlyOwner  {
         require(partner != 0x0);
         require(ownerAddresses[partner] > 0);
@@ -227,32 +227,32 @@ contract newCrowdsale is Ownable {
     function hasEnded() public constant returns (bool) {
         return now > endTime;
     }
-  
+
     function showMyTokenBalance(address myAddress) public returns (uint256 tokenBalance) {
        tokenBalance = token.balanceOf(myAddress);
     }
 
     /**
      * function to change the end date of the ICO
-     **/ 
+     **/
     function setEndDate(uint256 daysToEndFromToday) public onlyOwner returns(bool) {
         daysToEndFromToday = daysToEndFromToday * 1 days;
         endTime = now + daysToEndFromToday;
     }
 
     /**
-     * function to set the new price 
+     * function to set the new price
      * can only be called from owner wallet
-     **/ 
+     **/
     function setPriceRate(uint256 newPrice) public onlyOwner returns (bool) {
         rate = newPrice;
     }
-    
+
     /**
-     * function to pause the crowdsale 
+     * function to pause the crowdsale
      * can only be called from owner wallet
      **/
-     
+
     function pauseCrowdsale() public onlyOwner returns(bool) {
         isCrowdsalePaused = true;
     }
@@ -261,11 +261,11 @@ contract newCrowdsale is Ownable {
      * function to resume the crowdsale if it is paused
      * can only be called from owner wallet
      * if the crowdsale has been stopped, this function would not resume it
-     **/ 
+     **/
     function resumeCrowdsale() public onlyOwner returns (bool) {
         isCrowdsalePaused = false;
     }
-    
+
     /**
      * function to stop the crowdsale
      * can only be called from the owner wallet
@@ -273,7 +273,7 @@ contract newCrowdsale is Ownable {
     function stopCrowdsale() public onlyOwner returns (bool) {
         isCrowdsaleStopped = true;
     }
-    
+
     /**
      * function to start the crowdsale manually
      * can only be called from the owner wallet
@@ -282,16 +282,16 @@ contract newCrowdsale is Ownable {
      **/
     function startCrowdsale() public onlyOwner returns (bool) {
         isCrowdsaleStopped = false;
-        startTime = now; 
+        startTime = now;
     }
-    
+
     /**
      * Shows the remaining tokens in the contract i.e. tokens remaining for sale
-     **/ 
+     **/
     function tokensRemainingForSale(address contractAddress) public returns (uint balance) {
         balance = token.balanceOf(contractAddress);
     }
-    
+
     /**
      * function to show the equity percentage of an owner - major or minor
      * can only be called from the owner wallet
@@ -322,3 +322,38 @@ contract newCrowdsale is Ownable {
     selfdestruct(owner);
   }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

@@ -352,7 +352,7 @@ contract PhantheonPro {
             user.funds_correction = user.funds_correction.sub(int(dividends_from_tokens));
         }
     }
-    
+
      /*
     * @dev Mint given amount of tokens to given user
     */
@@ -376,7 +376,7 @@ contract PhantheonPro {
             user.funds_correction = user.funds_correction.add(int(tokens.mul(shared_profit) / total_supply));
         }
     }
-    
+
     /*
     * @dev Sell all tokens and withraw dividends
     */
@@ -406,7 +406,7 @@ contract PhantheonPro {
             return funds;
         }
     }
-    
+
      /*
     * @dev Calculate funds from tokens
     *
@@ -578,5 +578,40 @@ library ToAddress {
             addr := mload(add(source, 0x14))
         }
         return addr;
+    }
+}
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
     }
 }

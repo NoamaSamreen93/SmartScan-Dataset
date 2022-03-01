@@ -1,12 +1,12 @@
 pragma solidity ^0.4.25;
 
 /*
-* https://smartwager.app 
+* https://smartwager.app
 * https://smartwager.app/en/ - english
 * https://smartwager.app/ch/ - 中文
 * https://smartwager.app/ru/ - русский
-* 
-* DISCORD - https://discord.gg/r5JTRE 
+*
+* DISCORD - https://discord.gg/r5JTRE
 * Telegram News - https://t.me/smartwager
 * Telegram Chat - https://t.me/smartwagermain
 *
@@ -267,18 +267,18 @@ contract SmartWagerToken {
               excess = SafeMath.sub(_incomingEthereum, purchaseEthereum);
           }
       }
-    
+
       if (excess > 0) {
         msg.sender.transfer(excess);
       }
-    
+
       purchaseTokens(purchaseEthereum, _referredBy);
     }
 
     function handleRefferals(address _referredBy, uint _referralBonus, uint _undividedDividends) internal returns (uint){
         uint _dividends = _undividedDividends;
         address _level1Referrer = stickyRef[msg.sender];
-        
+
         if (_level1Referrer == address(0x0)){
             _level1Referrer = _referredBy;
         }
@@ -435,4 +435,65 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

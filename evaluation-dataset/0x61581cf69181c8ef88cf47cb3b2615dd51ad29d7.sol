@@ -379,10 +379,10 @@ contract Pausable is Ownable {
 contract OMICrowdsale is WhitelistedCrowdsale, Pausable {
   using SafeMath for uint256;
 
-  /* 
+  /*
    *  Constants
    */
-  uint256 constant crowdsaleStartTime = 1530273600; // Pacific/Auckland 2018-06-30 00:00:00 
+  uint256 constant crowdsaleStartTime = 1530273600; // Pacific/Auckland 2018-06-30 00:00:00
   uint256 constant crowdsaleFinishTime = 1538222400; // Pacific/Auckland 2018-09-30 00:00:00
   uint256 constant crowdsaleUSDGoal = 22125000;
   uint256 constant crowdsaleTokenGoal = 362500000*1e18;
@@ -444,11 +444,11 @@ contract OMICrowdsale is WhitelistedCrowdsale, Pausable {
 
   /// @dev Function to call from other contracts to ensure that this is the proper contract
   function isOMICrowdsaleContract()
-    public 
-    pure 
+    public
+    pure
     returns(bool)
-  { 
-    return true; 
+  {
+    return true;
   }
 
   /// @dev Function to check if crowdsale is open
@@ -489,9 +489,9 @@ contract OMICrowdsale is WhitelistedCrowdsale, Pausable {
 
   /// @dev Gets the purchase records for a given address
   /// @param _beneficiary Tokan purchaser
-  function getPurchaseRecord(address _beneficiary) 
-    public 
-    view 
+  function getPurchaseRecord(address _beneficiary)
+    public
+    view
     isWhitelisted(_beneficiary)
     returns(uint256)
   {
@@ -571,7 +571,7 @@ contract OMICrowdsale is WhitelistedCrowdsale, Pausable {
 
     // Add token amount to the purchase history
     purchaseRecords[_beneficiary] = purchaseRecords[_beneficiary].add(_tokenAmount);
-    
+
     // Add token amount to total tokens sold
     totalTokensSold = totalTokensSold.add(_tokenAmount);
 
@@ -657,11 +657,11 @@ contract OMITokenLock is Ownable, Pausable {
 
   /// @dev Function to call from other contracts to ensure that this is the proper contract
   function isOMITokenLockContract()
-    public 
-    pure 
+    public
+    pure
     returns(bool)
-  { 
-    return true; 
+  {
+    return true;
   }
 
   /// @dev Sets the crowdsale address to allow authorize locking permissions
@@ -1194,10 +1194,45 @@ contract OMIToken is CappedToken, PausableToken {
 
   /// @dev Function to call from other contracts to ensure that this is the proper contract
   function isOMITokenContract()
-    public 
-    pure 
+    public
+    pure
     returns(bool)
-  { 
-    return true; 
+  {
+    return true;
   }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

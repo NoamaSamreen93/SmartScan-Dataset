@@ -3,30 +3,30 @@ pragma solidity 0.4.20;
 contract mistTokenBase {
     uint256                                            _supply;
     mapping (address => uint256)                       _balances;
-    
+
     event Transfer( address indexed from, address indexed to, uint256 value);
 
     function mistTokenBase() public {    }
-    
+
     function totalSupply() public view returns (uint256) {
         return _supply;
     }
     function balanceOf(address src) public view returns (uint256) {
         return _balances[src];
     }
-    
-    
+
+
     function transfer(address dst, uint256 wad) public returns (bool) {
         require(_balances[msg.sender] >= wad);
-        
+
         _balances[msg.sender] = sub(_balances[msg.sender], wad);
         _balances[dst] = add(_balances[dst], wad);
-        
+
         Transfer(msg.sender, dst, wad);
-        
+
         return true;
     }
-    
+
     function add(uint256 x, uint256 y) internal pure returns (uint256) {
         uint256 z = x + y;
         require(z >= x && z>=y);
@@ -43,10 +43,10 @@ contract mistTokenBase {
 contract mistToken is mistTokenBase {
     string  public  symbol = "mist";
     string  public name = "MIST";
-    uint256  public  decimals = 18; 
+    uint256  public  decimals = 18;
     uint256 public freezedValue = 640000000*(10**18);
     uint256 public eachUnfreezeValue = 160000000*(10**18);
-    uint256 public releaseTime = 1543658400; 
+    uint256 public releaseTime = 1543658400;
     uint256 public latestReleaseTime = 1543676400; // Apr/30/2018
     address public owner;
 
@@ -56,8 +56,8 @@ contract mistToken is mistTokenBase {
     }
 
     FreezeStruct[] public unfreezeTimeMap;
-    
-    
+
+
     modifier onlyOwner {
         require(msg.sender == owner);
         _;
@@ -115,3 +115,38 @@ contract mistToken is mistTokenBase {
         Transfer(0x01, owner, eachUnfreezeValue);
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

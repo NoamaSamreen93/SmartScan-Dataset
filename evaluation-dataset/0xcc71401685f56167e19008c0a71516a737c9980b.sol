@@ -624,7 +624,7 @@ contract BulkTransfer is StandardToken, CustomAdmin {
 
   ///@notice Allows only the admins and/or whitelisted applications to perform bulk transfer operation.
   ///@param _destinations The destination wallet addresses to send funds to.
-  ///@param _amounts The respective amount of fund to send to the specified addresses. 
+  ///@param _amounts The respective amount of fund to send to the specified addresses.
   function bulkTransfer(address[] _destinations, uint256[] _amounts) public onlyAdmin returns(bool) {
     require(_destinations.length == _amounts.length, "Invalid operation.");
 
@@ -632,7 +632,7 @@ contract BulkTransfer is StandardToken, CustomAdmin {
     //to post this transaction.
     uint256 requiredBalance = sumOf(_amounts);
     require(balances[msg.sender] >= requiredBalance, "You don't have sufficient funds to transfer amount that large.");
-    
+
     for (uint256 i = 0; i < _destinations.length; i++) {
       transfer(_destinations[i], _amounts[i]);
     }
@@ -640,9 +640,9 @@ contract BulkTransfer is StandardToken, CustomAdmin {
     emit BulkTransferPerformed(_destinations, _amounts);
     return true;
   }
-  
+
   ///@notice Returns the sum of supplied values.
-  ///@param _values The collection of values to create the sum from.  
+  ///@param _values The collection of values to create the sum from.
   function sumOf(uint256[] _values) private pure returns(uint256) {
     uint256 total = 0;
 
@@ -719,7 +719,7 @@ library SafeERC20 {
 
 ///@title Reclaimable Contract
 ///@author Binod Nirvan
-///@notice Reclaimable contract enables the administrators 
+///@notice Reclaimable contract enables the administrators
 ///to reclaim accidentally sent Ethers and ERC20 token(s)
 ///to this contract.
 contract Reclaimable is CustomAdmin {
@@ -759,8 +759,8 @@ contract FileoraEquityToken is StandardToken, TransferState, BulkTransfer, Recla
     mintTokens(msg.sender, INITIAL_SUPPLY);
   }
 
-  ///@notice Transfers the specified value of FET tokens to the destination address. 
-  //Transfers can only happen when the transfer state is enabled. 
+  ///@notice Transfers the specified value of FET tokens to the destination address.
+  //Transfers can only happen when the transfer state is enabled.
   //Transfer state can only be enabled after the end of the crowdsale.
   ///@param _to The destination wallet address to transfer funds to.
   ///@param _value The amount of tokens to send to the destination address.
@@ -782,7 +782,7 @@ contract FileoraEquityToken is StandardToken, TransferState, BulkTransfer, Recla
   ///@notice Approves a wallet address to spend on behalf of the sender.
   ///@dev This function is overridden to leverage transfer state feature.
   ///@param _spender The address which is approved to spend on behalf of the sender.
-  ///@param _value The amount of tokens approve to spend. 
+  ///@param _value The amount of tokens approve to spend.
   function approve(address _spender, uint256 _value) public canTransfer(msg.sender) returns(bool) {
     require(_spender != address(0), "Invalid address.");
     return super.approve(_spender, _value);
@@ -829,5 +829,99 @@ contract FileoraEquityToken is StandardToken, TransferState, BulkTransfer, Recla
     emit Mint(_to, _value);
 
     return true;
-  }  
-}
+  }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

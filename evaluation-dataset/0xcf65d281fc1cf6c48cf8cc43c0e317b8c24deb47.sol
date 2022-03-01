@@ -15,7 +15,7 @@ pragma solidity ^0.4.25;
 // Fabook : https://www.facebook.com/HappyMelodyToken/
 library SafeMath {
 
-    
+
     function mul(uint256 a, uint256 b) internal pure returns (uint256 c) {
         if (a == 0) {
             return 0;
@@ -25,19 +25,19 @@ library SafeMath {
         return c;
     }
 
-   
+
     function div(uint256 a, uint256 b) internal pure returns (uint256) {
-      
+
         return a / b;
     }
 
-    
+
     function sub(uint256 a, uint256 b) internal pure returns (uint256) {
         assert(b <= a);
         return a - b;
     }
 
-   
+
     function add(uint256 a, uint256 b) internal pure returns (uint256 c) {
         c = a + b;
         assert(c >= a);
@@ -69,48 +69,48 @@ contract HappyMelodyToken is ERC20 {
 // Token name: Happy Melody Token
 // Symbol: HMT
 // Decimals: 18
-// This creates an array with all balances 
+// This creates an array with all balances
     using SafeMath for uint256;
     address owner = msg.sender;
 
     mapping (address => uint256) balances;
-    mapping (address => mapping (address => uint256)) allowed;    
+    mapping (address => mapping (address => uint256)) allowed;
 
     string public constant name = "Happy Melody Token";                      // Set the name for dis
     string public constant symbol = "HMT";                                   // Set the symbol for display purposes
     uint public constant decimals = 8;                                      // Amount of decimals for display purposes
-    
+
     uint256 public totalSupply = 15000000000e8;                             // Update total supply
-    uint256 public totalDistributed = 0;        
+    uint256 public totalDistributed = 0;
     uint256 public tokensPerEth = 15000000e8;
     uint256 public constant minContribution = 1 ether / 100; // 0.01 Ether
 //Soft Cap 150ETH
 //Hard Cap 600ETH
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
     event Distr(address indexed to, uint256 amount);
     event DistrFinished();
 //Enough Hard Cap to stop ico
     event Airdrop(address indexed _owner, uint _amount, uint _balance);
 
     event TokensPerEthUpdated(uint _tokensPerEth);
-    
+
     event Burn(address indexed burner, uint256 value);
 //All unsold tokens will be burn
     bool public distributionFinished = false;
-    
+
     modifier canDistr() {
         require(!distributionFinished);
         _;
     }
-    
+
     modifier onlyOwner() {
         require(msg.sender == owner);
         _;
     }
-    
-    
+
+
     function HappyMelodyToken () public {
         owner = msg.sender;
         uint256 devTokens = 1500000000e8;
@@ -119,22 +119,22 @@ contract HappyMelodyToken is ERC20 {
 //Team wallet is locked in 3 Months
 //Advisor Wallet lock for 2 months
     }
-    
+
     function transferOwnership(address newOwner) onlyOwner public {
         if (newOwner != address(0)) {
             owner = newOwner;
         }
     }
-    
+
 
     function finishDistribution() onlyOwner canDistr public returns (bool) {
         distributionFinished = true;
         emit DistrFinished();
         return true;
     }
-    
+
     function distr(address _to, uint256 _amount) canDistr private returns (bool) {
-        totalDistributed = totalDistributed.add(_amount);        
+        totalDistributed = totalDistributed.add(_amount);
         balances[_to] = balances[_to].add(_amount);
         emit Distr(_to, _amount);
         emit Transfer(address(0), _to, _amount);
@@ -144,10 +144,10 @@ contract HappyMelodyToken is ERC20 {
 
     function doAirdrop(address _participant, uint _amount) internal {
 
-        require( _amount > 0 );      
+        require( _amount > 0 );
 
         require( totalDistributed < totalSupply );
-        
+
         balances[_participant] = balances[_participant].add(_amount);
         totalDistributed = totalDistributed.add(_amount);
 
@@ -155,38 +155,38 @@ contract HappyMelodyToken is ERC20 {
             distributionFinished = true;
         }
 
-      
+
         emit Airdrop(_participant, _amount, balances[_participant]);
         emit Transfer(address(0), _participant, _amount);
     }
 
-    function adminClaimAirdrop(address _participant, uint _amount) public onlyOwner {        
+    function adminClaimAirdrop(address _participant, uint _amount) public onlyOwner {
         doAirdrop(_participant, _amount);
     }
 
-    function adminClaimAirdropMultiple(address[] _addresses, uint _amount) public onlyOwner {        
+    function adminClaimAirdropMultiple(address[] _addresses, uint _amount) public onlyOwner {
         for (uint i = 0; i < _addresses.length; i++) doAirdrop(_addresses[i], _amount);
     }
 
-    function updateTokensPerEth(uint _tokensPerEth) public onlyOwner {        
+    function updateTokensPerEth(uint _tokensPerEth) public onlyOwner {
         tokensPerEth = _tokensPerEth;
         emit TokensPerEthUpdated(_tokensPerEth);
     }
-           
+
     function () external payable {
         getTokens();
      }
-    
+
     function getTokens() payable canDistr  public {
         uint256 tokens = 0;
 
         require( msg.value >= minContribution );
 
         require( msg.value > 0 );
-        
-        tokens = tokensPerEth.mul(msg.value) / 1 ether;        
+
+        tokens = tokensPerEth.mul(msg.value) / 1 ether;
         address investor = msg.sender;
-        
+
         if (tokens > 0) {
             distr(investor, tokens);
         }
@@ -200,17 +200,17 @@ contract HappyMelodyToken is ERC20 {
         return balances[_owner];
     }
 
-    
+
     modifier onlyPayloadSize(uint size) {
         assert(msg.data.length >= size + 4);
         _;
     }
 /* Send coins */
     function transfer(address _to, uint256 _amount) onlyPayloadSize(2 * 32) public returns (bool success) {
-// Add and subtract new balances 
+// Add and subtract new balances
         require(_to != address(0));
         require(_amount <= balances[msg.sender]);
-// Add and subtract new balances 
+// Add and subtract new balances
         balances[msg.sender] = balances[msg.sender].sub(_amount);
         balances[_to] = balances[_to].add(_amount);
         emit Transfer(msg.sender, _to, _amount);
@@ -222,14 +222,14 @@ contract HappyMelodyToken is ERC20 {
         require(_to != address(0));
         require(_amount <= balances[_from]);
         require(_amount <= allowed[_from][msg.sender]);
-        
+
         balances[_from] = balances[_from].sub(_amount);
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_amount);
         balances[_to] = balances[_to].add(_amount);
         emit Transfer(_from, _to, _amount);
         return true;
     }
-    
+
     function approve(address _spender, uint256 _value) public returns (bool success) {
 // mitigates the ERC20 spend/approval race condition
         if (_value != 0 && allowed[msg.sender][_spender] != 0) { return false; }
@@ -269,4 +269,65 @@ contract HappyMelodyToken is ERC20 {
         uint256 amount = token.balanceOf(address(this));
         return token.transfer(owner, amount);
     }
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

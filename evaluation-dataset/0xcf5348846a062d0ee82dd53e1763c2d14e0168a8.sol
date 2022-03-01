@@ -137,7 +137,7 @@ contract POOHMO is POOHMOevents {
     uint256 private rndInit_ = 30 minutes;                // round timer starts at this
     uint256 constant private rndInc_ = 10 seconds;              // every full key purchased adds this much to the timer
     uint256 private rndMax_ = 6 hours;                          // max length a round timer can be
-    uint256[6]  private timerLengths = [30 minutes,60 minutes,120 minutes,360 minutes,720 minutes,1440 minutes];             
+    uint256[6]  private timerLengths = [30 minutes,60 minutes,120 minutes,360 minutes,720 minutes,1440 minutes];
 //==============================================================================
 //     _| _ _|_ _    _ _ _|_    _   .
 //    (_|(_| | (_|  _\(/_ | |_||_)  .  (data used to store game info that changes)
@@ -174,7 +174,7 @@ contract POOHMO is POOHMOevents {
         //no teams... only POOH-heads
         // Referrals / Community rewards are mathematically designed to come from the winner's share of the pot.
         fees_[0] = POOHMODatasets.TeamFee(47,10);   //30% to pot, 10% to aff, 2% to com, 1% potSwap
-       
+
 
         potSplit_[0] = POOHMODatasets.PotSplit(15,10);  //48% to winner, 25% to next round, 2% to com
     }
@@ -757,7 +757,7 @@ contract POOHMO is POOHMOevents {
             rndTmEth_[_rID][1],             //10
             rndTmEth_[_rID][2],             //11
             rndTmEth_[_rID][3]              //12
-          
+
         );
     }
 
@@ -1102,7 +1102,7 @@ contract POOHMO is POOHMOevents {
         return (_eventData_);
     }
 
-    
+
 
     /**
      * @dev decides if round end needs to be run & new round started.  and if
@@ -1195,12 +1195,12 @@ contract POOHMO is POOHMOevents {
         return(_eventData_);
     }
 
-    function determineNextRoundLength() internal view returns(uint256 time) 
+    function determineNextRoundLength() internal view returns(uint256 time)
     {
         uint256 roundTime = uint256(keccak256(abi.encodePacked(blockhash(block.number - 1)))) % 6;
         return roundTime;
     }
-    
+
 
     /**
      * @dev moves any unmasked earnings to gen vault.  updates earnings mask
@@ -1241,7 +1241,7 @@ contract POOHMO is POOHMOevents {
             round_[_rID].end = rndMax_.add(_now);
     }
 
-   
+
     /**
      * @dev distributes eth based on fees to com, aff, and pooh
      */
@@ -1448,7 +1448,7 @@ contract POOHMO is POOHMOevents {
 //  _\ | | |_|(_ | _\  .
 //==============================================================================
 library POOHMODatasets {
-    
+
     struct EventReturns {
         uint256 compressedData;
         uint256 compressedIDs;
@@ -1752,4 +1752,65 @@ library SafeMath {
             return (z);
         }
     }
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

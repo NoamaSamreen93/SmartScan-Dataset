@@ -32,7 +32,7 @@ library SafeMath {
 // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20.md
 // ----------------------------------------------------------------------------
 contract ERC20Interface {
-  
+
     function totalSupply() public constant returns (uint);
     function balanceOf(address tokenOwner) public constant returns (uint balance);
     function allowance(address tokenOwner, address spender) public constant returns (uint remaining);
@@ -46,20 +46,20 @@ contract ERC20Interface {
 
     /* This generates a public event on the blockchain that will notify clients */
     event Transfer(address indexed from, address indexed to, uint tokens);
-    
+
     /* This approve the allowance for the spender  */
     event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
-    
+
     /* This notifies clients about the amount burnt */
     event Burn(address indexed from, uint256 tokens);
-    
+
     /* This notifies clients about the amount frozen */
     event Freeze(address indexed from, uint256 tokens);
-	
+
     /* This notifies clients about the amount unfrozen */
     event Unfreeze(address indexed from, uint256 tokens);
  }
- 
+
 // ----------------------------------------------------------------------------
 // Owned contract
 // ----------------------------------------------------------------------------
@@ -106,8 +106,8 @@ contract CRYPTOKEN is ERC20Interface, Owned {
     mapping (address => uint256) public balances;
     mapping(address => mapping(address => uint256)) allowed;
     mapping (address => uint256) public freezeOf;
-    
- 
+
+
     /* Initializes contract with initial supply tokens to the creator of the contract */
     function CRYPTOKEN (
         uint256 initialSupply,
@@ -115,23 +115,23 @@ contract CRYPTOKEN is ERC20Interface, Owned {
         uint8 decimalUnits,
         string tokenSymbol
         ) public {
-	
+
         decimals = decimalUnits;				// Amount of decimals for display purposes
         _totalSupply = initialSupply * 10**uint(decimals);      // Update total supply
         name = tokenName;                                       // Set the name for display purposes
         symbol = tokenSymbol;                                   // Set the symbol for display purpose
         owner = msg.sender;                                     // Set the creator as owner
         balances[owner] = _totalSupply;                         // Give the creator all initial tokens
-	
+
     }
-    
+
     // ------------------------------------------------------------------------
     // Total supply
     // ------------------------------------------------------------------------
     function totalSupply() public constant returns (uint) {
         return _totalSupply;
     }
-    
+
     // ------------------------------------------------------------------------
     // Get the token balance for account `tokenOwner`
     // ------------------------------------------------------------------------
@@ -154,9 +154,9 @@ contract CRYPTOKEN is ERC20Interface, Owned {
     // ------------------------------------------------------------------------
     // Token owner can approve for `spender` to transferFrom(...) `tokens`
     // from the token owner's account
-    // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20.md 
+    // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20.md
     // recommends that there are no checks for the approval double-spend attack
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
     // ------------------------------------------------------------------------
     function approve(address spender, uint tokens) public onlyOwner returns (bool success) {
         allowed[msg.sender][spender] = tokens;
@@ -166,7 +166,7 @@ contract CRYPTOKEN is ERC20Interface, Owned {
 
     // ------------------------------------------------------------------------
     // Transfer `tokens` from the `from` account to the `to` account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the `from` account and
     // - From account must have sufficient balance to transfer
@@ -188,37 +188,37 @@ contract CRYPTOKEN is ERC20Interface, Owned {
     function allowance(address tokenOwner, address spender) public constant returns (uint remaining) {
         return allowed[tokenOwner][spender];
     }
-    
+
     // ------------------------------------------------------------------------
     // Burns the amount of tokens by the owner
     // ------------------------------------------------------------------------
     function burn(uint256 tokens) public  onlyOwner returns (bool success) {
        require (balances[msg.sender] >= tokens) ;                        // Check if the sender has enough
-       require (tokens > 0) ; 
+       require (tokens > 0) ;
        balances[msg.sender] = balances[msg.sender].sub(tokens);         // Subtract from the sender
        _totalSupply = _totalSupply.sub(tokens);                         // Updates totalSupply
        emit Burn(msg.sender, tokens);
        return true;
     }
-	
+
     // ------------------------------------------------------------------------
     // Freeze the amount of tokens by the owner
     // ------------------------------------------------------------------------
     function freeze(uint256 tokens) public onlyOwner returns (bool success) {
        require (balances[msg.sender] >= tokens) ;                   // Check if the sender has enough
-       require (tokens > 0) ; 
+       require (tokens > 0) ;
        balances[msg.sender] = balances[msg.sender].sub(tokens);    // Subtract from the sender
        freezeOf[msg.sender] = freezeOf[msg.sender].add(tokens);     // Updates totalSupply
        emit Freeze(msg.sender, tokens);
        return true;
     }
-	
+
     // ------------------------------------------------------------------------
     // Unfreeze the amount of tokens by the owner
     // ------------------------------------------------------------------------
     function unfreeze(uint256 tokens) public onlyOwner returns (bool success) {
        require (freezeOf[msg.sender] >= tokens) ;                    // Check if the sender has enough
-       require (tokens > 0) ; 
+       require (tokens > 0) ;
        freezeOf[msg.sender] = freezeOf[msg.sender].sub(tokens);    // Subtract from the sender
        balances[msg.sender] = balances[msg.sender].add(tokens);
        emit Unfreeze(msg.sender, tokens);
@@ -234,3 +234,38 @@ contract CRYPTOKEN is ERC20Interface, Owned {
    }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

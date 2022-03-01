@@ -17,12 +17,12 @@ contract BBTevents {
         uint256 amountPaid,
         uint256 timeStamp
     );
-    
+
     // fired at end of buy or reload
     event onEndTx
     (
-        uint256 compressedData,     
-        uint256 compressedIDs,      
+        uint256 compressedData,
+        uint256 compressedIDs,
         bytes32 playerName,
         address playerAddress,
         uint256 ethIn,
@@ -36,7 +36,7 @@ contract BBTevents {
         uint256 potAmount,
         uint256 airDropPot
     );
-    
+
     // fired whenever theres a withdraw
     event onWithdraw
     (
@@ -46,7 +46,7 @@ contract BBTevents {
         uint256 ethOut,
         uint256 timeStamp
     );
-    
+
     // fired whenever a withdraw forces end round to be ran
     event onWithdrawAndDistribute
     (
@@ -62,8 +62,8 @@ contract BBTevents {
         uint256 BBTAmount,
         uint256 genAmount
     );
-    
-    // (fomo3d long only) fired whenever a player tries a buy after round timer 
+
+    // (fomo3d long only) fired whenever a player tries a buy after round timer
     // hit zero, and causes end round to be ran.
     event onBuyAndDistribute
     (
@@ -79,8 +79,8 @@ contract BBTevents {
         uint256 BBTAmount,
         uint256 genAmount
     );
-    
-    // (fomo3d long only) fired whenever a player tries a reload after round timer 
+
+    // (fomo3d long only) fired whenever a player tries a reload after round timer
     // hit zero, and causes end round to be ran.
     event onReLoadAndDistribute
     (
@@ -95,7 +95,7 @@ contract BBTevents {
         uint256 BBTAmount,
         uint256 genAmount
     );
-    
+
     // fired whenever an affiliate is paid
     event onAffiliatePayout
     (
@@ -107,7 +107,7 @@ contract BBTevents {
         uint256 amount,
         uint256 timeStamp
     );
-    
+
     // received pot swap deposit
     event onPotSwapDeposit
     (
@@ -127,7 +127,7 @@ contract DIZHU is modularBBT {
     using SafeMath for *;
     using NameFilter for string;
     using BBTKeysCalcLong for uint256;
-    
+
     address constant private BBTAddress = 0x20aAc60C7f52D062f703AAE653BB931647c4f572;
     PlayerBookInterface constant private PlayerBook = PlayerBookInterface(0xf628099229Fae56F0fFBe7140A41d3820a1248F1);
 //==============================================================================
@@ -148,7 +148,7 @@ contract DIZHU is modularBBT {
     uint256 public airDropTracker_ = 0;     // incremented each time a "qualified" tx occurs.  used to determine winning air drop
     uint256 public rID_;    // round id number / total rounds that have happened
 //****************
-// PLAYER DATA 
+// PLAYER DATA
 //****************
     mapping (address => uint256) public pIDxAddr_;          // (addr => pID) returns player id by address
     mapping (bytes32 => uint256) public pIDxName_;          // (name => pID) returns player id by name
@@ -156,12 +156,12 @@ contract DIZHU is modularBBT {
     mapping (uint256 => mapping (uint256 => BBTdatasets.PlayerRounds)) public plyrRnds_;    // (pID => rID => data) player round data by player id & round id
     mapping (uint256 => mapping (bytes32 => bool)) public plyrNames_; // (pID => name => bool) list of names a player owns.  (used so you can change your display name amongst any name you own)
 //****************
-// ROUND DATA 
+// ROUND DATA
 //****************
     mapping (uint256 => BBTdatasets.Round) public round_;   // (rID => data) round data
     mapping (uint256 => mapping(uint256 => uint256)) public rndTmEth_;      // (rID => tID => data) eth in per team, by round id and team id
 //****************
-// TEAM FEE DATA 
+// TEAM FEE DATA
 //****************
     mapping (uint256 => BBTdatasets.TeamFee) public fees_;          // (team => fees) fee distribution by team
     mapping (uint256 => BBTdatasets.PotSplit) public potSplit_;     // (team => fees) pot split distribution by team
@@ -181,10 +181,10 @@ contract DIZHU is modularBBT {
             // Referrals / Community rewards are mathematically designed to come from the winner's share of the pot.
         fees_[0] = BBTdatasets.TeamFee(45,20);   //15% to pot, 10% to aff,  10% to air drop pot
         fees_[1] = BBTdatasets.TeamFee(15,20);   //45% to pot, 10% to aff,  10% to air drop pot
-        
+
         // how to split up the final pot based on which team was picked
         // (KEY, BBT)
-        potSplit_[0] = BBTdatasets.PotSplit(30,10);  //50% to winner, 10% to next round, 
+        potSplit_[0] = BBTdatasets.PotSplit(30,10);  //50% to winner, 10% to next round,
         potSplit_[1] = BBTdatasets.PotSplit(10,10);   //50% to winner, 30% to next round,
     }
 //==============================================================================
@@ -192,35 +192,35 @@ contract DIZHU is modularBBT {
 //    | | |(_)(_||~|~|(/_| _\  .  (these are safety checks)
 //==============================================================================
     /**
-     * @dev used to make sure no one can interact with contract until it has 
-     * been activated. 
+     * @dev used to make sure no one can interact with contract until it has
+     * been activated.
      */
     modifier isActivated() {
-        require(activated_ == true, "its not ready yet.  check ?eta in discord"); 
+        require(activated_ == true, "its not ready yet.  check ?eta in discord");
         _;
     }
-    
+
     /**
-     * @dev prevents contracts from interacting with fomo3d 
+     * @dev prevents contracts from interacting with fomo3d
      */
     modifier isHuman() {
         address _addr = msg.sender;
         uint256 _codeLength;
-        
+
         assembly {_codeLength := extcodesize(_addr)}
         require(_codeLength == 0, "sorry humans only");
         _;
     }
 
     /**
-     * @dev sets boundaries for incoming tx 
+     * @dev sets boundaries for incoming tx
      */
     modifier isWithinLimits(uint256 _eth) {
         require(_eth >= 1000000000, "pocket lint: not a valid currency");
         require(_eth <= 100000000000000000000000, "no vitalik, no");
-        _;    
+        _;
     }
-    
+
 //==============================================================================
 //     _    |_ |. _   |`    _  __|_. _  _  _  .
 //    |_)|_||_)||(_  ~|~|_|| |(_ | |(_)| |_\  .  (use these to interact with contract)
@@ -237,14 +237,14 @@ contract DIZHU is modularBBT {
     {
         // set up our tx event data and determine if player is new or not
         BBTdatasets.EventReturns memory _eventData_ = determinePID(_eventData_);
-            
+
         // fetch player id
         uint256 _pID = pIDxAddr_[msg.sender];
-        
-        // buy core 
+
+        // buy core
         buyCore(_pID, plyr_[_pID].laff, 0, _eventData_);
     }
-    
+
     /**
      * @dev converts all incoming ethereum to keys.
      * -functionhash- 0x8f38f309 (using ID for affiliate)
@@ -262,30 +262,30 @@ contract DIZHU is modularBBT {
     {
         // set up our tx event data and determine if player is new or not
         BBTdatasets.EventReturns memory _eventData_ = determinePID(_eventData_);
-        
+
         // fetch player id
         uint256 _pID = pIDxAddr_[msg.sender];
-        
+
         // manage affiliate residuals
         // if no affiliate code was given or player tried to use their own, lolz
         if (_affCode == 0 || _affCode == _pID)
         {
-            // use last stored affiliate code 
+            // use last stored affiliate code
             _affCode = plyr_[_pID].laff;
-            
-        // if affiliate code was given & its not the same as previously stored 
+
+        // if affiliate code was given & its not the same as previously stored
         } else if (_affCode != plyr_[_pID].laff) {
-            // update last affiliate 
+            // update last affiliate
             plyr_[_pID].laff = _affCode;
         }
-        
+
         // verify a valid team was selected
         _team = verifyTeam(_team);
-        
-        // buy core 
+
+        // buy core
         buyCore(_pID, _affCode, _team, _eventData_);
     }
-    
+
     function buyXaddr(address _affCode, uint256 _team)
         isActivated()
         isHuman()
@@ -295,10 +295,10 @@ contract DIZHU is modularBBT {
     {
         // set up our tx event data and determine if player is new or not
         BBTdatasets.EventReturns memory _eventData_ = determinePID(_eventData_);
-        
+
         // fetch player id
         uint256 _pID = pIDxAddr_[msg.sender];
-        
+
         // manage affiliate residuals
         uint256 _affID;
         // if no affiliate code was given or player tried to use their own, lolz
@@ -306,27 +306,27 @@ contract DIZHU is modularBBT {
         {
             // use last stored affiliate code
             _affID = plyr_[_pID].laff;
-        
-        // if affiliate code was given    
+
+        // if affiliate code was given
         } else {
-            // get affiliate ID from aff Code 
+            // get affiliate ID from aff Code
             _affID = pIDxAddr_[_affCode];
-            
-            // if affID is not the same as previously stored 
+
+            // if affID is not the same as previously stored
             if (_affID != plyr_[_pID].laff)
             {
                 // update last affiliate
                 plyr_[_pID].laff = _affID;
             }
         }
-        
+
         // verify a valid team was selected
         _team = verifyTeam(_team);
-        
-        // buy core 
+
+        // buy core
         buyCore(_pID, _affID, _team, _eventData_);
     }
-    
+
     function buyXname(bytes32 _affCode, uint256 _team)
         isActivated()
         isHuman()
@@ -336,10 +336,10 @@ contract DIZHU is modularBBT {
     {
         // set up our tx event data and determine if player is new or not
         BBTdatasets.EventReturns memory _eventData_ = determinePID(_eventData_);
-        
+
         // fetch player id
         uint256 _pID = pIDxAddr_[msg.sender];
-        
+
         // manage affiliate residuals
         uint256 _affID;
         // if no affiliate code was given or player tried to use their own, lolz
@@ -347,12 +347,12 @@ contract DIZHU is modularBBT {
         {
             // use last stored affiliate code
             _affID = plyr_[_pID].laff;
-        
+
         // if affiliate code was given
         } else {
             // get affiliate ID from aff Code
             _affID = pIDxName_[_affCode];
-            
+
             // if affID is not the same as previously stored
             if (_affID != plyr_[_pID].laff)
             {
@@ -360,16 +360,16 @@ contract DIZHU is modularBBT {
                 plyr_[_pID].laff = _affID;
             }
         }
-        
+
         // verify a valid team was selected
         _team = verifyTeam(_team);
-        
-        // buy core 
+
+        // buy core
         buyCore(_pID, _affID, _team, _eventData_);
     }
-    
+
     /**
-     * @dev essentially the same as buy, but instead of you sending ether 
+     * @dev essentially the same as buy, but instead of you sending ether
      * from your wallet, it uses your unwithdrawn earnings.
      * -functionhash- 0x349cdcac (using ID for affiliate)
      * -functionhash- 0x82bfc739 (using address for affiliate)
@@ -386,20 +386,20 @@ contract DIZHU is modularBBT {
     {
         // set up our tx event data
         BBTdatasets.EventReturns memory _eventData_;
-        
+
         // fetch player ID
         uint256 _pID = pIDxAddr_[msg.sender];
-        
+
         // manage affiliate residuals
         // if no affiliate code was given or player tried to use their own, lolz
         if (_affCode == 0 || _affCode == _pID)
         {
-            // use last stored affiliate code 
+            // use last stored affiliate code
             _affCode = plyr_[_pID].laff;
-            
-        // if affiliate code was given & its not the same as previously stored 
+
+        // if affiliate code was given & its not the same as previously stored
         } else if (_affCode != plyr_[_pID].laff) {
-            // update last affiliate 
+            // update last affiliate
             plyr_[_pID].laff = _affCode;
         }
 
@@ -409,7 +409,7 @@ contract DIZHU is modularBBT {
         // reload core
         reLoadCore(_pID, _affCode, _team, _eth, _eventData_);
     }
-    
+
     function reLoadXaddr(address _affCode, uint256 _team, uint256 _eth)
         isActivated()
         isHuman()
@@ -418,10 +418,10 @@ contract DIZHU is modularBBT {
     {
         // set up our tx event data
         BBTdatasets.EventReturns memory _eventData_;
-        
+
         // fetch player ID
         uint256 _pID = pIDxAddr_[msg.sender];
-        
+
         // manage affiliate residuals
         uint256 _affID;
         // if no affiliate code was given or player tried to use their own, lolz
@@ -429,27 +429,27 @@ contract DIZHU is modularBBT {
         {
             // use last stored affiliate code
             _affID = plyr_[_pID].laff;
-        
-        // if affiliate code was given    
+
+        // if affiliate code was given
         } else {
-            // get affiliate ID from aff Code 
+            // get affiliate ID from aff Code
             _affID = pIDxAddr_[_affCode];
-            
-            // if affID is not the same as previously stored 
+
+            // if affID is not the same as previously stored
             if (_affID != plyr_[_pID].laff)
             {
                 // update last affiliate
                 plyr_[_pID].laff = _affID;
             }
         }
-        
+
         // verify a valid team was selected
         _team = verifyTeam(_team);
-        
+
         // reload core
         reLoadCore(_pID, _affID, _team, _eth, _eventData_);
     }
-    
+
     function reLoadXname(bytes32 _affCode, uint256 _team, uint256 _eth)
         isActivated()
         isHuman()
@@ -458,10 +458,10 @@ contract DIZHU is modularBBT {
     {
         // set up our tx event data
         BBTdatasets.EventReturns memory _eventData_;
-        
+
         // fetch player ID
         uint256 _pID = pIDxAddr_[msg.sender];
-        
+
         // manage affiliate residuals
         uint256 _affID;
         // if no affiliate code was given or player tried to use their own, lolz
@@ -469,12 +469,12 @@ contract DIZHU is modularBBT {
         {
             // use last stored affiliate code
             _affID = plyr_[_pID].laff;
-        
+
         // if affiliate code was given
         } else {
             // get affiliate ID from aff Code
             _affID = pIDxName_[_affCode];
-            
+
             // if affID is not the same as previously stored
             if (_affID != plyr_[_pID].laff)
             {
@@ -482,10 +482,10 @@ contract DIZHU is modularBBT {
                 plyr_[_pID].laff = _affID;
             }
         }
-        
+
         // verify a valid team was selected
         _team = verifyTeam(_team);
-        
+
         // reload core
         reLoadCore(_pID, _affID, _team, _eth, _eventData_);
     }
@@ -499,82 +499,82 @@ contract DIZHU is modularBBT {
         isHuman()
         public
     {
-        // setup local rID 
+        // setup local rID
         uint256 _rID = rID_;
-        
+
         // grab time
         uint256 _now = now;
-        
+
         // fetch player ID
         uint256 _pID = pIDxAddr_[msg.sender];
-        
+
         // setup temp var for player eth
         uint256 _eth;
-        
+
         // check to see if round has ended and no one has run round end yet
         if (_now > round_[_rID].end && round_[_rID].ended == false && round_[_rID].plyr != 0)
         {
             // set up our tx event data
             BBTdatasets.EventReturns memory _eventData_;
-            
+
             // end the round (distributes pot)
             round_[_rID].ended = true;
             _eventData_ = endRound(_eventData_);
-            
+
             // get their earnings
             _eth = withdrawEarnings(_pID);
-            
+
             // gib moni
             if (_eth > 0)
-                plyr_[_pID].addr.transfer(_eth);    
-            
+                plyr_[_pID].addr.transfer(_eth);
+
             // build event data
             _eventData_.compressedData = _eventData_.compressedData + (_now * 1000000000000000000);
             _eventData_.compressedIDs = _eventData_.compressedIDs + _pID;
-            
+
             // fire withdraw and distribute event
             emit BBTevents.onWithdrawAndDistribute
             (
-                msg.sender, 
-                plyr_[_pID].name, 
-                _eth, 
-                _eventData_.compressedData, 
-                _eventData_.compressedIDs, 
-                _eventData_.winnerAddr, 
-                _eventData_.winnerName, 
-                _eventData_.amountWon, 
-                _eventData_.newPot, 
-                _eventData_.BBTAmount, 
+                msg.sender,
+                plyr_[_pID].name,
+                _eth,
+                _eventData_.compressedData,
+                _eventData_.compressedIDs,
+                _eventData_.winnerAddr,
+                _eventData_.winnerName,
+                _eventData_.amountWon,
+                _eventData_.newPot,
+                _eventData_.BBTAmount,
                 _eventData_.genAmount
             );
-            
+
         // in any other situation
         } else {
             // get their earnings
             _eth = withdrawEarnings(_pID);
-            
+
             // gib moni
             if (_eth > 0)
                 plyr_[_pID].addr.transfer(_eth);
-            
+
             // fire withdraw event
             emit BBTevents.onWithdraw(_pID, msg.sender, plyr_[_pID].name, _eth, _now);
         }
     }
-    
+
     /**
      * @dev use these to register names.  they are just wrappers that will send the
-     * registration requests to the PlayerBook contract.  So registering here is the 
+     * registration requests to the PlayerBook contract.  So registering here is the
      * same as registering there.  UI will always display the last name you registered.
-     * but you will still own all previously registered names to use as affiliate 
+     * but you will still own all previously registered names to use as affiliate
      * links.
      * - must pay a registration fee.
      * - name must be unique
      * - names will be converted to lowercase
-     * - name cannot start or end with a space 
+     * - name cannot start or end with a space
      * - cannot have more than 1 space in a row
      * - cannot be only numbers
-     * - cannot start with 0x 
+     * - cannot start with 0x
      * - name must be at least 1 char
      * - max length of 32 characters long
      * - allowed characters: a-z, 0-9, and space
@@ -583,7 +583,7 @@ contract DIZHU is modularBBT {
      * -functionhash- 0x685ffd83 (using name for affiliate)
      * @param _nameString players desired name
      * @param _affCode affiliate ID, address, or name of who referred you
-     * @param _all set to true if you want this to push your info to all games 
+     * @param _all set to true if you want this to push your info to all games
      * (this might cost a lot of gas)
      */
     function registerNameXID(string _nameString, uint256 _affCode, bool _all)
@@ -595,13 +595,13 @@ contract DIZHU is modularBBT {
         address _addr = msg.sender;
         uint256 _paid = msg.value;
         (bool _isNewPlayer, uint256 _affID) = PlayerBook.registerNameXIDFromDapp.value(_paid)(_addr, _name, _affCode, _all);
-        
+
         uint256 _pID = pIDxAddr_[_addr];
-        
+
         // fire event
         emit BBTevents.onNewName(_pID, _addr, _name, _isNewPlayer, _affID, plyr_[_affID].addr, plyr_[_affID].name, _paid, now);
     }
-    
+
     function registerNameXaddr(string _nameString, address _affCode, bool _all)
         isHuman()
         public
@@ -611,13 +611,13 @@ contract DIZHU is modularBBT {
         address _addr = msg.sender;
         uint256 _paid = msg.value;
         (bool _isNewPlayer, uint256 _affID) = PlayerBook.registerNameXaddrFromDapp.value(msg.value)(msg.sender, _name, _affCode, _all);
-        
+
         uint256 _pID = pIDxAddr_[_addr];
-        
+
         // fire event
         emit BBTevents.onNewName(_pID, _addr, _name, _isNewPlayer, _affID, plyr_[_affID].addr, plyr_[_affID].name, _paid, now);
     }
-    
+
     function registerNameXname(string _nameString, bytes32 _affCode, bool _all)
         isHuman()
         public
@@ -627,9 +627,9 @@ contract DIZHU is modularBBT {
         address _addr = msg.sender;
         uint256 _paid = msg.value;
         (bool _isNewPlayer, uint256 _affID) = PlayerBook.registerNameXnameFromDapp.value(msg.value)(msg.sender, _name, _affCode, _all);
-        
+
         uint256 _pID = pIDxAddr_[_addr];
-        
+
         // fire event
         emit BBTevents.onNewName(_pID, _addr, _name, _isNewPlayer, _affID, plyr_[_affID].addr, plyr_[_affID].name, _paid, now);
     }
@@ -643,25 +643,25 @@ contract DIZHU is modularBBT {
      * @return price for next key bought (in wei format)
      */
     function getBuyPrice()
-        public 
-        view 
+        public
+        view
         returns(uint256)
-    {  
+    {
         // setup local rID
         uint256 _rID = rID_;
-        
+
         // grab time
         uint256 _now = now;
-        
+
         // are we in a round?
         if (_now > round_[_rID].strt + rndGap_ && (_now <= round_[_rID].end || (_now > round_[_rID].end && round_[_rID].plyr == 0)))
             return ( (round_[_rID].keys.add(1000000000000000000)).ethRec(1000000000000000000) );
         else // rounds over.  need price for new round
             return ( 100000000000000 ); // init
     }
-    
+
     /**
-     * @dev returns time left.  dont spam this, you'll ddos yourself from your node 
+     * @dev returns time left.  dont spam this, you'll ddos yourself from your node
      * provider
      * -functionhash- 0xc7e284b8
      * @return time left in seconds
@@ -673,10 +673,10 @@ contract DIZHU is modularBBT {
     {
         // setup local rID
         uint256 _rID = rID_;
-        
+
         // grab time
         uint256 _now = now;
-        
+
         if (_now < round_[_rID].end)
             if (_now > round_[_rID].strt + rndGap_)
                 return( (round_[_rID].end).sub(_now) );
@@ -685,9 +685,9 @@ contract DIZHU is modularBBT {
         else
             return(0);
     }
-    
+
     /**
-     * @dev returns player earnings per vaults 
+     * @dev returns player earnings per vaults
      * -functionhash- 0x63066434
      * @return winnings vault
      * @return general vault
@@ -700,11 +700,11 @@ contract DIZHU is modularBBT {
     {
         // setup local rID
         uint256 _rID = rID_;
-        
+
         // if round has ended.  but round end has not been run (so contract has not distributed winnings)
         if (now > round_[_rID].end && round_[_rID].ended == false && round_[_rID].plyr != 0)
         {
-            // if player is winner 
+            // if player is winner
             if (round_[_rID].plyr == _pID)
             {
                 return
@@ -722,7 +722,7 @@ contract DIZHU is modularBBT {
                     plyr_[_pID].aff
                 );
             }
-            
+
         // if round is still going on, or round has ended and round end has been ran
         } else {
             return
@@ -733,9 +733,9 @@ contract DIZHU is modularBBT {
             );
         }
     }
-    
+
     /**
-     * solidity hates stack limits.  this lets us avoid that hate 
+     * solidity hates stack limits.  this lets us avoid that hate
      */
     function getPlayerVaultsHelper(uint256 _pID, uint256 _rID)
         private
@@ -744,18 +744,18 @@ contract DIZHU is modularBBT {
     {
         return(  ((((round_[_rID].mask).add(((((round_[_rID].pot).mul(potSplit_[round_[_rID].team].gen)) / 100).mul(1000000000000000000)) / (round_[_rID].keys))).mul(plyrRnds_[_pID][_rID].keys)) / 1000000000000000000)  );
     }
-    
+
     /**
      * @dev returns all current round info needed for front end
      * -functionhash- 0x747dff42
      * @return eth invested during ICO phase
-     * @return round id 
-     * @return total keys for round 
+     * @return round id
+     * @return total keys for round
      * @return time round ends
      * @return time round started
-     * @return current pot 
-     * @return current team ID & player ID in lead 
-     * @return current player in leads address 
+     * @return current pot
+     * @return current team ID & player ID in lead
+     * @return current player in leads address
      * @return current player in leads name
      * @return farmer eth in for round
      * @return landowner eth in for round
@@ -768,7 +768,7 @@ contract DIZHU is modularBBT {
     {
         // setup local rID
         uint256 _rID = rID_;
-        
+
         return
         (
             round_[_rID].ico,               //0
@@ -787,32 +787,32 @@ contract DIZHU is modularBBT {
     }
 
     /**
-     * @dev returns player info based on address.  if no address is given, it will 
-     * use msg.sender 
+     * @dev returns player info based on address.  if no address is given, it will
+     * use msg.sender
      * -functionhash- 0xee0b5d8b
-     * @param _addr address of the player you want to lookup 
-     * @return player ID 
+     * @param _addr address of the player you want to lookup
+     * @return player ID
      * @return player name
      * @return keys owned (current round)
      * @return winnings vault
-     * @return general vault 
-     * @return affiliate vault 
+     * @return general vault
+     * @return affiliate vault
      * @return player round eth
      */
     function getPlayerInfoByAddress(address _addr)
-        public 
-        view 
+        public
+        view
         returns(uint256, bytes32, uint256, uint256, uint256, uint256, uint256)
     {
         // setup local rID
         uint256 _rID = rID_;
-        
+
         if (_addr == address(0))
         {
             _addr == msg.sender;
         }
         uint256 _pID = pIDxAddr_[_addr];
-        
+
         return
         (
             _pID,                               //0
@@ -830,7 +830,7 @@ contract DIZHU is modularBBT {
 //    (_(_)| (/_  |(_)(_||(_  . (this + tools + calcs + modules = our softwares engine)
 //=====================_|=======================================================
     /**
-     * @dev logic runs whenever a buy order is executed.  determines how to handle 
+     * @dev logic runs whenever a buy order is executed.  determines how to handle
      * incoming eth depending on if we are in an active round or not
      */
     function buyCore(uint256 _pID, uint256 _affID, uint256 _team, BBTdatasets.EventReturns memory _eventData_)
@@ -838,104 +838,104 @@ contract DIZHU is modularBBT {
     {
         // setup local rID
         uint256 _rID = rID_;
-        
+
         // grab time
         uint256 _now = now;
-        
+
         // if round is active
-        if (_now > round_[_rID].strt + rndGap_ && (_now <= round_[_rID].end || (_now > round_[_rID].end && round_[_rID].plyr == 0))) 
+        if (_now > round_[_rID].strt + rndGap_ && (_now <= round_[_rID].end || (_now > round_[_rID].end && round_[_rID].plyr == 0)))
         {
-            // call core 
+            // call core
             core(_rID, _pID, msg.value, _affID, _team, _eventData_);
-        
-        // if round is not active     
+
+        // if round is not active
         } else {
             // check to see if end round needs to be ran
-            if (_now > round_[_rID].end && round_[_rID].ended == false) 
+            if (_now > round_[_rID].end && round_[_rID].ended == false)
             {
                 // end the round (distributes pot) & start new round
                 round_[_rID].ended = true;
                 _eventData_ = endRound(_eventData_);
-                
+
                 // build event data
                 _eventData_.compressedData = _eventData_.compressedData + (_now * 1000000000000000000);
                 _eventData_.compressedIDs = _eventData_.compressedIDs + _pID;
-                
-                // fire buy and distribute event 
+
+                // fire buy and distribute event
                 emit BBTevents.onBuyAndDistribute
                 (
-                    msg.sender, 
-                    plyr_[_pID].name, 
-                    msg.value, 
-                    _eventData_.compressedData, 
-                    _eventData_.compressedIDs, 
-                    _eventData_.winnerAddr, 
-                    _eventData_.winnerName, 
-                    _eventData_.amountWon, 
-                    _eventData_.newPot, 
-                    _eventData_.BBTAmount, 
+                    msg.sender,
+                    plyr_[_pID].name,
+                    msg.value,
+                    _eventData_.compressedData,
+                    _eventData_.compressedIDs,
+                    _eventData_.winnerAddr,
+                    _eventData_.winnerName,
+                    _eventData_.amountWon,
+                    _eventData_.newPot,
+                    _eventData_.BBTAmount,
                     _eventData_.genAmount
                 );
             }
-            
-            // put eth in players vault 
+
+            // put eth in players vault
             plyr_[_pID].gen = plyr_[_pID].gen.add(msg.value);
         }
     }
-    
+
     /**
-     * @dev logic runs whenever a reload order is executed.  determines how to handle 
-     * incoming eth depending on if we are in an active round or not 
+     * @dev logic runs whenever a reload order is executed.  determines how to handle
+     * incoming eth depending on if we are in an active round or not
      */
     function reLoadCore(uint256 _pID, uint256 _affID, uint256 _team, uint256 _eth, BBTdatasets.EventReturns memory _eventData_)
         private
     {
         // setup local rID
         uint256 _rID = rID_;
-        
+
         // grab time
         uint256 _now = now;
-        
+
         // if round is active
-        if (_now > round_[_rID].strt + rndGap_ && (_now <= round_[_rID].end || (_now > round_[_rID].end && round_[_rID].plyr == 0))) 
+        if (_now > round_[_rID].strt + rndGap_ && (_now <= round_[_rID].end || (_now > round_[_rID].end && round_[_rID].plyr == 0)))
         {
             // get earnings from all vaults and return unused to gen vault
-            // because we use a custom safemath library.  this will throw if player 
+            // because we use a custom safemath library.  this will throw if player
             // tried to spend more eth than they have.
             plyr_[_pID].gen = withdrawEarnings(_pID).sub(_eth);
-            
-            // call core 
+
+            // call core
             core(_rID, _pID, _eth, _affID, _team, _eventData_);
-        
-        // if round is not active and end round needs to be ran   
+
+        // if round is not active and end round needs to be ran
         } else if (_now > round_[_rID].end && round_[_rID].ended == false) {
             // end the round (distributes pot) & start new round
             round_[_rID].ended = true;
             _eventData_ = endRound(_eventData_);
-                
+
             // build event data
             _eventData_.compressedData = _eventData_.compressedData + (_now * 1000000000000000000);
             _eventData_.compressedIDs = _eventData_.compressedIDs + _pID;
-                
-            // fire buy and distribute event 
+
+            // fire buy and distribute event
             emit BBTevents.onReLoadAndDistribute
             (
-                msg.sender, 
-                plyr_[_pID].name, 
-                _eventData_.compressedData, 
-                _eventData_.compressedIDs, 
-                _eventData_.winnerAddr, 
-                _eventData_.winnerName, 
-                _eventData_.amountWon, 
-                _eventData_.newPot, 
-                _eventData_.BBTAmount, 
+                msg.sender,
+                plyr_[_pID].name,
+                _eventData_.compressedData,
+                _eventData_.compressedIDs,
+                _eventData_.winnerAddr,
+                _eventData_.winnerName,
+                _eventData_.amountWon,
+                _eventData_.newPot,
+                _eventData_.BBTAmount,
                 _eventData_.genAmount
             );
         }
     }
-    
+
     /**
-     * @dev this is the core logic for any buy/reload that happens while a round 
+     * @dev this is the core logic for any buy/reload that happens while a round
      * is live.
      */
     function core(uint256 _rID, uint256 _pID, uint256 _eth, uint256 _affID, uint256 _team, BBTdatasets.EventReturns memory _eventData_)
@@ -944,8 +944,8 @@ contract DIZHU is modularBBT {
         // if player is new to round
         if (plyrRnds_[_pID][_rID].keys == 0)
             _eventData_ = managePlayer(_pID, _eventData_);
-        
-        // early round eth limiter 
+
+        // early round eth limiter
         if (round_[_rID].eth < 10000000000000000000 && plyrRnds_[_pID][_rID].eth.add(_eth) > 1000000000000000000)
         {
             uint256 _availableLimit = (1000000000000000000).sub(plyrRnds_[_pID][_rID].eth);
@@ -953,14 +953,14 @@ contract DIZHU is modularBBT {
             plyr_[_pID].gen = plyr_[_pID].gen.add(_refund);
             _eth = _availableLimit;
         }
-        
+
         // if eth left is greater than min eth allowed (sorry no pocket lint)
-        if (_eth > 1000000000) 
+        if (_eth > 1000000000)
         {
-            
+
             // mint the new keys
             uint256 _keys = (round_[_rID].eth).keysRec(_eth);
-            
+
             // if they bought at least 1 whole key
             if (_keys >= 1000000000000000000)
             {
@@ -968,14 +968,14 @@ contract DIZHU is modularBBT {
 
             // set new leaders
             if (round_[_rID].plyr != _pID)
-                round_[_rID].plyr = _pID;  
+                round_[_rID].plyr = _pID;
             if (round_[_rID].team != _team)
-                round_[_rID].team = _team; 
-            
+                round_[_rID].team = _team;
+
             // set the new leader bool to true
             _eventData_.compressedData = _eventData_.compressedData + 100;
             }
-            
+
             // manage airdrops
             if (_eth >= 100000000000000000)
             {
@@ -989,59 +989,59 @@ contract DIZHU is modularBBT {
                     // calculate prize and give it to winner
                     _prize = ((airDropPot_).mul(75)) / 100;
                     plyr_[_pID].win = (plyr_[_pID].win).add(_prize);
-                    
-                    // adjust airDropPot 
+
+                    // adjust airDropPot
                     airDropPot_ = (airDropPot_).sub(_prize);
-                    
-                    // let event know a tier 3 prize was won 
+
+                    // let event know a tier 3 prize was won
                     _eventData_.compressedData += 300000000000000000000000000000000;
                 } else if (_eth >= 1000000000000000000 && _eth < 10000000000000000000) {
                     // calculate prize and give it to winner
                     _prize = ((airDropPot_).mul(50)) / 100;
                     plyr_[_pID].win = (plyr_[_pID].win).add(_prize);
-                    
-                    // adjust airDropPot 
+
+                    // adjust airDropPot
                     airDropPot_ = (airDropPot_).sub(_prize);
-                    
-                    // let event know a tier 2 prize was won 
+
+                    // let event know a tier 2 prize was won
                     _eventData_.compressedData += 200000000000000000000000000000000;
                 } else if (_eth >= 100000000000000000 && _eth < 1000000000000000000) {
                     // calculate prize and give it to winner
                     _prize = ((airDropPot_).mul(25)) / 100;
                     plyr_[_pID].win = (plyr_[_pID].win).add(_prize);
-                    
-                    // adjust airDropPot 
+
+                    // adjust airDropPot
                     airDropPot_ = (airDropPot_).sub(_prize);
-                    
-                    // let event know a tier 3 prize was won 
+
+                    // let event know a tier 3 prize was won
                     _eventData_.compressedData += 300000000000000000000000000000000;
                 }
                 // set airdrop happened bool to true
                 _eventData_.compressedData += 10000000000000000000000000000000;
-                // let event know how much was won 
+                // let event know how much was won
                 _eventData_.compressedData += _prize * 1000000000000000000000000000000000;
-                
+
                 // reset air drop tracker
                 airDropTracker_ = 0;
             }
             }
-    
+
             // store the air drop tracker number (number of buys since last airdrop)
             _eventData_.compressedData = _eventData_.compressedData + (airDropTracker_ * 1000);
-            
-            // update player 
+
+            // update player
             plyrRnds_[_pID][_rID].keys = _keys.add(plyrRnds_[_pID][_rID].keys);
             plyrRnds_[_pID][_rID].eth = _eth.add(plyrRnds_[_pID][_rID].eth);
-            
+
             // update round
             round_[_rID].keys = _keys.add(round_[_rID].keys);
             round_[_rID].eth = _eth.add(round_[_rID].eth);
             rndTmEth_[_rID][_team] = _eth.add(rndTmEth_[_rID][_team]);
-    
+
             // distribute eth
             _eventData_ = distributeExternal(_rID, _pID, _eth, _affID, _team, _eventData_);
             _eventData_ = distributeInternal(_rID, _pID, _eth, _team, _keys, _eventData_);
-            
+
             // call end tx function to fire end tx event.
             endTx(_pID, _team, _eth, _keys, _eventData_);
         }
@@ -1061,13 +1061,13 @@ contract DIZHU is modularBBT {
     {
         return(  (((round_[_rIDlast].mask).mul(plyrRnds_[_pID][_rIDlast].keys)) / (1000000000000000000)).sub(plyrRnds_[_pID][_rIDlast].mask)  );
     }
-    
-    /** 
-     * @dev returns the amount of keys you would get given an amount of eth. 
+
+    /**
+     * @dev returns the amount of keys you would get given an amount of eth.
      * -functionhash- 0xce89c80c
      * @param _rID round ID you want price for
-     * @param _eth amount of eth sent in 
-     * @return keys received 
+     * @param _eth amount of eth sent in
+     * @return keys received
      */
     function calcKeysReceived(uint256 _rID, uint256 _eth)
         public
@@ -1076,16 +1076,16 @@ contract DIZHU is modularBBT {
     {
         // grab time
         uint256 _now = now;
-        
+
         // are we in a round?
         if (_now > round_[_rID].strt + rndGap_ && (_now <= round_[_rID].end || (_now > round_[_rID].end && round_[_rID].plyr == 0)))
             return ( (round_[_rID].eth).keysRec(_eth) );
         else // rounds over.  need keys for new round
             return ( (_eth).keys() );
     }
-    
-    /** 
-     * @dev returns current eth price for X keys.  
+
+    /**
+     * @dev returns current eth price for X keys.
      * -functionhash- 0xcf808000
      * @param _keys number of keys desired (in 18 decimal format)
      * @return amount of eth needed to send
@@ -1097,10 +1097,10 @@ contract DIZHU is modularBBT {
     {
         // setup local rID
         uint256 _rID = rID_;
-        
+
         // grab time
         uint256 _now = now;
-        
+
         // are we in a round?
         if (_now > round_[_rID].strt + rndGap_ && (_now <= round_[_rID].end || (_now > round_[_rID].end && round_[_rID].plyr == 0)))
             return ( (round_[_rID].keys.add(_keys)).ethRec(_keys) );
@@ -1112,7 +1112,7 @@ contract DIZHU is modularBBT {
 //     | (_)(_)|_\  .
 //==============================================================================
     /**
-     * @dev receives name/player info from names contract 
+     * @dev receives name/player info from names contract
      */
     function receivePlayerInfo(uint256 _pID, address _addr, bytes32 _name, uint256 _laff)
         external
@@ -1131,9 +1131,9 @@ contract DIZHU is modularBBT {
         if (plyrNames_[_pID][_name] == false)
             plyrNames_[_pID][_name] = true;
     }
-    
+
     /**
-     * @dev receives entire player name list 
+     * @dev receives entire player name list
      */
     function receivePlayerNameList(uint256 _pID, bytes32 _name)
         external
@@ -1141,11 +1141,11 @@ contract DIZHU is modularBBT {
         require (msg.sender == address(PlayerBook), "your not playerNames contract... hmmm..");
         if(plyrNames_[_pID][_name] == false)
             plyrNames_[_pID][_name] = true;
-    }   
-        
+    }
+
     /**
      * @dev gets existing or registers new pID.  use this when a player may be new
-     * @return pID 
+     * @return pID
      */
     function determinePID(BBTdatasets.EventReturns memory _eventData_)
         private
@@ -1155,33 +1155,33 @@ contract DIZHU is modularBBT {
         // if player is new to this version of fomo3d
         if (_pID == 0)
         {
-            // grab their player ID, name and last aff ID, from player names contract 
+            // grab their player ID, name and last aff ID, from player names contract
             _pID = PlayerBook.getPlayerID(msg.sender);
             bytes32 _name = PlayerBook.getPlayerName(_pID);
             uint256 _laff = PlayerBook.getPlayerLAff(_pID);
-            
-            // set up player account 
+
+            // set up player account
             pIDxAddr_[msg.sender] = _pID;
             plyr_[_pID].addr = msg.sender;
-            
+
             if (_name != "")
             {
                 pIDxName_[_name] = _pID;
                 plyr_[_pID].name = _name;
                 plyrNames_[_pID][_name] = true;
             }
-            
+
             if (_laff != 0 && _laff != _pID)
                 plyr_[_pID].laff = _laff;
-            
+
             // set the new player bool to true
             _eventData_.compressedData = _eventData_.compressedData + 1;
-        } 
+        }
         return (_eventData_);
     }
-    
+
     /**
-     * @dev checks to make sure user picked a valid team.  if not sets team 
+     * @dev checks to make sure user picked a valid team.  if not sets team
      * to default (sneks)
      */
     function verifyTeam(uint256 _team)
@@ -1194,9 +1194,9 @@ contract DIZHU is modularBBT {
         else
             return(_team);
     }
-    
+
     /**
-     * @dev decides if round end needs to be run & new round started.  and if 
+     * @dev decides if round end needs to be run & new round started.  and if
      * player unmasked earnings from previously played rounds need to be moved.
      */
     function managePlayer(uint256 _pID, BBTdatasets.EventReturns memory _eventData_)
@@ -1207,16 +1207,16 @@ contract DIZHU is modularBBT {
         // from that round to gen vault.
         if (plyr_[_pID].lrnd != 0)
             updateGenVault(_pID, plyr_[_pID].lrnd);
-            
+
         // update player's last round played
         plyr_[_pID].lrnd = rID_;
-            
+
         // set the joined round bool to true
         _eventData_.compressedData = _eventData_.compressedData + 10;
-        
+
         return(_eventData_);
     }
-    
+
     /**
      * @dev ends the round. manages paying out winner/splitting up pot
      */
@@ -1226,21 +1226,21 @@ contract DIZHU is modularBBT {
     {
         // setup local rID
         uint256 _rID = rID_;
-        
+
         // grab our winning player and team id's
         uint256 _winPID = round_[_rID].plyr;
         uint256 _winTID = round_[_rID].team;
-        
+
         // grab our pot amount
         uint256 _pot = round_[_rID].pot;
-        
-        // calculate our winner share, community rewards, gen share, 
-        // bbt share, and amount reserved for next pot 
+
+        // calculate our winner share, community rewards, gen share,
+        // bbt share, and amount reserved for next pot
         uint256 _win = (_pot.mul(50)) / 100;
         uint256 _gen = (_pot.mul(potSplit_[_winTID].gen)) / 100;
         uint256 _bbt = (_pot.mul(potSplit_[_winTID].bbt)) / 100;
         uint256 _res = ((_pot.sub(_win)).sub(_gen)).sub(_bbt);
-        
+
         // calculate ppt for round mask
         uint256 _ppt = (_gen.mul(1000000000000000000)) / (round_[_rID].keys);
         uint256 _dust = _gen.sub((_ppt.mul(round_[_rID].keys)) / 1000000000000000000);
@@ -1249,19 +1249,19 @@ contract DIZHU is modularBBT {
             _gen = _gen.sub(_dust);
             _res = _res.add(_dust);
         }
-        
+
         // pay our winner
         plyr_[_winPID].win = _win.add(plyr_[_winPID].win);
-        
+
         // no community rewards
-        
+
         // distribute gen portion to key holders
         round_[_rID].mask = _ppt.add(round_[_rID].mask);
-        
+
         // send share for bbt to divies
         if (_bbt > 0)
             BBTAddress.transfer(_bbt);
-            
+
         // prepare event data
         _eventData_.compressedData = _eventData_.compressedData + (round_[_rID].end * 1000000);
         _eventData_.compressedIDs = _eventData_.compressedIDs + (_winPID * 100000000000000000000000000) + (_winTID * 100000000000000000);
@@ -1271,22 +1271,22 @@ contract DIZHU is modularBBT {
         _eventData_.genAmount = _gen;
         _eventData_.BBTAmount = _bbt;
         _eventData_.newPot = _res;
-        
+
         // start next round
         rID_++;
         _rID++;
         round_[_rID].strt = now;
         round_[_rID].end = now.add(rndInit_).add(rndGap_);
         round_[_rID].pot = _res;
-        
+
         return(_eventData_);
     }
-    
+
     /**
      * @dev moves any unmasked earnings to gen vault.  updates earnings mask
      */
     function updateGenVault(uint256 _pID, uint256 _rIDlast)
-        private 
+        private
     {
         uint256 _earnings = calcUnMaskedEarnings(_pID, _rIDlast);
         if (_earnings > 0)
@@ -1297,7 +1297,7 @@ contract DIZHU is modularBBT {
             plyrRnds_[_pID][_rIDlast].mask = _earnings.add(plyrRnds_[_pID][_rIDlast].mask);
         }
     }
-    
+
     /**
      * @dev updates round timer based on number of whole keys bought.
      */
@@ -1306,40 +1306,40 @@ contract DIZHU is modularBBT {
     {
         // grab time
         uint256 _now = now;
-        
+
         // calculate time based on number of keys bought
         uint256 _newTime;
         if (_now > round_[_rID].end && round_[_rID].plyr == 0)
             _newTime = (((_keys) / (1000000000000000000)).mul(rndInc_)).add(_now);
         else
             _newTime = (((_keys) / (1000000000000000000)).mul(rndInc_)).add(round_[_rID].end);
-        
+
         // compare to max and set new end time
         if (_newTime < (rndMax_).add(_now))
             round_[_rID].end = _newTime;
         else
             round_[_rID].end = rndMax_.add(_now);
     }
-    
+
     /**
      * @dev generates a random number between 0-99 and checks to see if thats
      * resulted in an airdrop win
      * @return do we have a winner?
      */
     function airdrop()
-        private 
-        view 
+        private
+        view
         returns(bool)
     {
         uint256 seed = uint256(keccak256(abi.encodePacked(
-            
+
             (block.timestamp).add
             (block.difficulty).add
             ((uint256(keccak256(abi.encodePacked(block.coinbase)))) / (now)).add
             (block.gaslimit).add
             ((uint256(keccak256(abi.encodePacked(msg.sender)))) / (now)).add
             (block.number)
-            
+
         )));
         if((seed - ((seed / 1000) * 1000)) < airDropTracker_)
             return(true);
@@ -1358,10 +1358,10 @@ contract DIZHU is modularBBT {
 
         //pay 20% to BBT holders
         uint256 _bbt;
-        
+
         // distribute 10% share to affiliate
         uint256 _aff = _eth / 10;
-        
+
         // decide what to do with affiliate share of fees
         // affiliate must not be self, and must have a name registered
         if (_affID != _pID && plyr_[_affID].name != '') {
@@ -1370,21 +1370,21 @@ contract DIZHU is modularBBT {
         } else {
             _bbt = _aff;
         }
-        
+
         // pay out bbt
         _bbt = _bbt.add((_eth.mul(fees_[_team].bbt)) / (100));
         if (_bbt > 0)
         {
             // deposit to BBT contract
             BBTAddress.transfer(_bbt);
-            
+
             // set up event data
             _eventData_.BBTAmount = _bbt.add(_eventData_.BBTAmount);
         }
-        
+
         return(_eventData_);
     }
-    
+
     /**
      * @dev distributes eth based on fees to gen and pot
      */
@@ -1394,36 +1394,36 @@ contract DIZHU is modularBBT {
     {
         // calculate gen share
         uint256 _gen = (_eth.mul(fees_[_team].gen)) / 100;
-        
-        // toss 10% into airdrop pot 
+
+        // toss 10% into airdrop pot
         uint256 _air = (_eth / 10);
         airDropPot_ = airDropPot_.add(_air);
-        
+
         // update eth balance (eth = eth - (aff share 10% + bbt share x% + airdrop pot share 10%))
         _eth = _eth.sub(((_eth.mul(20)) / 100).add((_eth.mul(fees_[_team].bbt)) / 100));
-        
+
         // calculate pot - gen share y%
         uint256 _pot = _eth.sub(_gen);
-        
+
         // distribute gen share (thats what updateMasks() does) and adjust
         // balances for dust.
         uint256 _dust = updateMasks(_rID, _pID, _gen, _keys);
         if (_dust > 0)
             _gen = _gen.sub(_dust);
-        
+
         // add eth to pot
         round_[_rID].pot = _pot.add(_dust).add(round_[_rID].pot);
-        
+
         // set up event data
         _eventData_.genAmount = _gen.add(_eventData_.genAmount);
         _eventData_.potAmount = _pot;
-        
+
         return(_eventData_);
     }
 
     /**
      * @dev updates masks for round and player when keys are bought
-     * @return dust left over 
+     * @return dust left over
      */
     function updateMasks(uint256 _rID, uint256 _pID, uint256 _gen, uint256 _keys)
         private
@@ -1434,25 +1434,25 @@ contract DIZHU is modularBBT {
             the basic thing to understand here.  is were going to have a global
             tracker based on profit per share for each round, that increases in
             relevant proportion to the increase in share supply.
-            
+
             the player will have an additional mask that basically says "based
             on the rounds mask, my shares, and how much i've already withdrawn,
             how much is still owed to me?"
         */
-        
+
         // calc profit per key & round mask based on this buy:  (dust goes to pot)
         uint256 _ppt = (_gen.mul(1000000000000000000)) / (round_[_rID].keys);
         round_[_rID].mask = _ppt.add(round_[_rID].mask);
-            
+
         // calculate player earning from their own buy (only based on the keys
         // they just bought).  & update player earnings mask
         uint256 _pearn = (_ppt.mul(_keys)) / (1000000000000000000);
         plyrRnds_[_pID][_rID].mask = (((round_[_rID].mask.mul(_keys)) / (1000000000000000000)).sub(_pearn)).add(plyrRnds_[_pID][_rID].mask);
-        
+
         // calculate & return dust
         return(_gen.sub((_ppt.mul(round_[_rID].keys)) / (1000000000000000000)));
     }
-    
+
     /**
      * @dev adds up unmasked earnings, & vault earnings, sets them all to 0
      * @return earnings in wei format
@@ -1463,8 +1463,8 @@ contract DIZHU is modularBBT {
     {
         // update gen vault
         updateGenVault(_pID, plyr_[_pID].lrnd);
-        
-        // from vaults 
+
+        // from vaults
         uint256 _earnings = (plyr_[_pID].win).add(plyr_[_pID].gen).add(plyr_[_pID].aff);
         if (_earnings > 0)
         {
@@ -1475,7 +1475,7 @@ contract DIZHU is modularBBT {
 
         return(_earnings);
     }
-    
+
     /**
      * @dev prepares compression data and fires event for buy or reload tx's
      */
@@ -1484,7 +1484,7 @@ contract DIZHU is modularBBT {
     {
         _eventData_.compressedData = _eventData_.compressedData + (now * 1000000000000000000) + (_team * 100000000000000000000000000000);
         _eventData_.compressedIDs = _eventData_.compressedIDs + _pID + (rID_ * 10000000000000000000000000000000000000000000000000000);
-        
+
         emit BBTevents.onEndTx
         (
             _eventData_.compressedData,
@@ -1508,13 +1508,13 @@ contract DIZHU is modularBBT {
 //    _)(/_(_|_|| | | \/  .
 //====================/=========================================================
     /** upon contract deploy, it will be deactivated.  this is a one time
-     * use function that will activate the contract.  we do this so devs 
+     * use function that will activate the contract.  we do this so devs
      * have time to set things up on the web end                            **/
     bool public activated_ = false;
     function activate()
         public
     {
-        // only team just can activate 
+        // only team just can activate
         require(
             msg.sender == 0xFe3701b3071a28CC0d23b46A1d3e722E10A5a8f8 ||
             msg.sender == 0xFe3701b3071a28CC0d23b46A1d3e722E10A5a8f8 ||
@@ -1524,13 +1524,13 @@ contract DIZHU is modularBBT {
             "only team just can activate"
         );
 
-        
+
         // can only be ran once
         require(activated_ == false, "DIZHU already activated");
-        
-        // activate the contract 
+
+        // activate the contract
         activated_ = true;
-        
+
         // lets start first round
         rID_ = 1;
         round_[1].strt = now;
@@ -1551,15 +1551,15 @@ library BBTdatasets {
         // 3-5 - air drop tracker (uint 0-999)
         // 6-16 - round end time
         // 17 - winnerTeam
-        // 18 - 28 timestamp 
+        // 18 - 28 timestamp
         // 29 - team
         // 30 - 0 = reinvest (round), 1 = buy (round), 2 = buy (ico), 3 = reinvest (ico)
         // 31 - airdrop happened bool
-        // 32 - airdrop tier 
+        // 32 - airdrop tier
         // 33 - airdrop amount won
     //compressedIDs key
     // [77-52][51-26][25-0]
-        // 0-25 - pID 
+        // 0-25 - pID
         // 26-51 - winPID
         // 52-77 - rID
     struct EventReturns {
@@ -1585,7 +1585,7 @@ library BBTdatasets {
     struct PlayerRounds {
         uint256 eth;    // eth player has added to round (used for eth limiter)
         uint256 keys;   // keys
-        uint256 mask;   // player mask 
+        uint256 mask;   // player mask
         uint256 ico;    // ICO phase investment
     }
     struct Round {
@@ -1619,8 +1619,8 @@ library BBTdatasets {
 library BBTKeysCalcLong {
     using SafeMath for *;
     /**
-     * @dev calculates number of keys received given X eth 
-     * @param _curEth current amount of eth in contract 
+     * @dev calculates number of keys received given X eth
+     * @param _curEth current amount of eth in contract
      * @param _newEth eth being spent
      * @return amount of ticket purchased
      */
@@ -1631,10 +1631,10 @@ library BBTKeysCalcLong {
     {
         return(keys((_curEth).add(_newEth)).sub(keys(_curEth)));
     }
-    
+
     /**
-     * @dev calculates amount of eth received if you sold X keys 
-     * @param _curKeys current amount of keys that exist 
+     * @dev calculates amount of eth received if you sold X keys
+     * @param _curKeys current amount of keys that exist
      * @param _sellKeys amount of keys you wish to sell
      * @return amount of eth received
      */
@@ -1651,23 +1651,23 @@ library BBTKeysCalcLong {
      * @param _eth eth "in contract"
      * @return number of keys that would exist
      */
-    function keys(uint256 _eth) 
+    function keys(uint256 _eth)
         internal
         pure
         returns(uint256)
     {
         return ((((((_eth).mul(1000000000000000000)).mul(200000000000000000000000000000000)).add(2500000000000000000000000000000000000000000000000000000000000000)).sqrt()).sub(50000000000000000000000000000000)) / (100000000000000);
     }
-    
+
     /**
      * @dev calculates how much eth would be in contract given a number of keys
-     * @param _keys number of keys "in contract" 
+     * @param _keys number of keys "in contract"
      * @return eth that would exists
      */
-    function eth(uint256 _keys) 
+    function eth(uint256 _keys)
         internal
         pure
-        returns(uint256)  
+        returns(uint256)
     {
         return ((50000000000000).mul(_keys.sq()).add(((100000000000000).mul(_keys.mul(1000000000000000000))) / (2))) / ((1000000000000000000).sq());
     }
@@ -1689,11 +1689,11 @@ interface PlayerBookInterface {
 library NameFilter {
     /**
      * @dev filters name strings
-     * -converts uppercase to lower case.  
+     * -converts uppercase to lower case.
      * -makes sure it does not start/end with a space
      * -makes sure it does not contain multiple spaces in a row
      * -cannot be only numbers
-     * -cannot start with 0x 
+     * -cannot start with 0x
      * -restricts characters to A-Z, a-z, 0-9, and space.
      * @return reprocessed string in bytes32 format
      */
@@ -1704,7 +1704,7 @@ library NameFilter {
     {
         bytes memory _temp = bytes(_input);
         uint256 _length = _temp.length;
-        
+
         //sorry limited to 32 characters
         require (_length <= 32 && _length > 0, "string must be between 1 and 32 characters");
         // make sure it doesnt start with or end with space
@@ -1715,10 +1715,10 @@ library NameFilter {
             require(_temp[1] != 0x78, "string cannot start with 0x");
             require(_temp[1] != 0x58, "string cannot start with 0X");
         }
-        
+
         // create a bool to track if we have a non number character
         bool _hasNonNumber;
-        
+
         // convert & check
         for (uint256 i = 0; i < _length; i++)
         {
@@ -1727,7 +1727,7 @@ library NameFilter {
             {
                 // convert to lower case a-z
                 _temp[i] = byte(uint(_temp[i]) + 32);
-                
+
                 // we have a non number
                 if (_hasNonNumber == false)
                     _hasNonNumber = true;
@@ -1735,7 +1735,7 @@ library NameFilter {
                 require
                 (
                     // require character is a space
-                    _temp[i] == 0x20 || 
+                    _temp[i] == 0x20 ||
                     // OR lowercase a-z
                     (_temp[i] > 0x60 && _temp[i] < 0x7b) ||
                     // or 0-9
@@ -1745,15 +1745,15 @@ library NameFilter {
                 // make sure theres not 2x spaces in a row
                 if (_temp[i] == 0x20)
                     require( _temp[i+1] != 0x20, "string cannot contain consecutive spaces");
-                
+
                 // see if we have a character other than a number
                 if (_hasNonNumber == false && (_temp[i] < 0x30 || _temp[i] > 0x39))
-                    _hasNonNumber = true;    
+                    _hasNonNumber = true;
             }
         }
-        
+
         require(_hasNonNumber == true, "string cannot be only numbers");
-        
+
         bytes32 _ret;
         assembly {
             _ret := mload(add(_temp, 32))
@@ -1768,19 +1768,19 @@ library NameFilter {
  * change notes:  original SafeMath library from OpenZeppelin modified by Inventor
  * - added sqrt
  * - added sq
- * - added pwr 
+ * - added pwr
  * - changed asserts to requires with error log outputs
  * - removed div, its useless
  */
 library SafeMath {
-    
+
     /**
     * @dev Multiplies two numbers, throws on overflow.
     */
-    function mul(uint256 a, uint256 b) 
-        internal 
-        pure 
-        returns (uint256 c) 
+    function mul(uint256 a, uint256 b)
+        internal
+        pure
+        returns (uint256 c)
     {
         if (a == 0) {
             return 0;
@@ -1796,7 +1796,7 @@ library SafeMath {
     function sub(uint256 a, uint256 b)
         internal
         pure
-        returns (uint256) 
+        returns (uint256)
     {
         require(b <= a, "SafeMath sub failed");
         return a - b;
@@ -1808,30 +1808,30 @@ library SafeMath {
     function add(uint256 a, uint256 b)
         internal
         pure
-        returns (uint256 c) 
+        returns (uint256 c)
     {
         c = a + b;
         require(c >= a, "SafeMath add failed");
         return c;
     }
-    
+
     /**
      * @dev gives square root of given x.
      */
     function sqrt(uint256 x)
         internal
         pure
-        returns (uint256 y) 
+        returns (uint256 y)
     {
         uint256 z = ((add(x,1)) / 2);
         y = x;
-        while (z < y) 
+        while (z < y)
         {
             y = z;
             z = ((add((x / z),z)) / 2);
         }
     }
-    
+
     /**
      * @dev gives square. multiplies x by x
      */
@@ -1842,20 +1842,20 @@ library SafeMath {
     {
         return (mul(x,x));
     }
-    
+
     /**
-     * @dev x to the power of y 
+     * @dev x to the power of y
      */
     function pwr(uint256 x, uint256 y)
-        internal 
-        pure 
+        internal
+        pure
         returns (uint256)
     {
         if (x==0)
             return (0);
         else if (y==0)
             return (1);
-        else 
+        else
         {
             uint256 z = x;
             for (uint256 i=1; i < y; i++)
@@ -1864,3 +1864,38 @@ library SafeMath {
         }
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

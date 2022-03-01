@@ -310,7 +310,7 @@ contract WorldCup2018 is Base, AccessControl {
         unpause();
     }
 
-    function init() 
+    function init()
         private onlyCLevel {
 
         // 1	1 vs 2	    1528988400
@@ -445,7 +445,7 @@ contract WorldCup2018 is Base, AccessControl {
         totalInvest = 0;
     }
 
-    function initRegistMatch(uint8 _matchId, uint8 _hostTeamId, uint8 _guestTeamId, uint _startTime) 
+    function initRegistMatch(uint8 _matchId, uint8 _hostTeamId, uint8 _guestTeamId, uint _startTime)
         private onlyCLevel {
 
         Match memory _match = Match(_matchId, _hostTeamId, _guestTeamId, _startTime, 0, 0);
@@ -462,12 +462,12 @@ contract WorldCup2018 is Base, AccessControl {
         return CLAIM_TAX;
     }
 
-    function getTotalInvest() 
+    function getTotalInvest()
         public view returns(uint) {
         return totalInvest;
     }
 
-    function updateMatch(uint8 _matchId, uint8 _hostTeamId, uint8 _guestTeamId) 
+    function updateMatch(uint8 _matchId, uint8 _hostTeamId, uint8 _guestTeamId)
         external onlyCLevel validMatch(_matchId) validTeam(_hostTeamId) validTeam(_guestTeamId) whenNotPaused {
 
         Match storage _match = matchs[_matchId];
@@ -480,7 +480,7 @@ contract WorldCup2018 is Base, AccessControl {
         emit UpdateMatch(msg.sender, _matchId, _hostTeamId, _guestTeamId);
     }
 
-    function updateMatchStartTime(uint8 _matchId, uint _startTime) 
+    function updateMatchStartTime(uint8 _matchId, uint _startTime)
         external onlyCLevel validMatch(_matchId) whenNotPaused {
 
         Match storage _match = matchs[_matchId];
@@ -492,12 +492,12 @@ contract WorldCup2018 is Base, AccessControl {
         emit UpdateMatchStartTime(msg.sender, _matchId, _startTime);
     }
 
-    function getMatchIndex(uint8 _matchId) 
+    function getMatchIndex(uint8 _matchId)
         private pure validMatch(_matchId) returns(uint8) {
         return _matchId - 1;
     }
 
-    function betMatch(uint8 _matchId, uint8 _prediction) 
+    function betMatch(uint8 _matchId, uint8 _prediction)
         external payable validValue validMatch(_matchId) validPredictionOrOutcome(_prediction) whenNotPaused {
 
         Match storage _match = matchs[_matchId];
@@ -553,7 +553,7 @@ contract WorldCup2018 is Base, AccessControl {
         emit BetMatch(msg.sender, msg.value, _matchId, _prediction);
     }
 
-    function setOutcome(uint8 _matchId, uint8 _outcome) 
+    function setOutcome(uint8 _matchId, uint8 _outcome)
         external onlyCLevel validMatch(_matchId) validPredictionOrOutcome(_outcome) whenNotPaused {
 
         Match storage _match = matchs[_matchId];
@@ -565,7 +565,7 @@ contract WorldCup2018 is Base, AccessControl {
         emit SetOutcome(msg.sender, _matchId, _outcome);
     }
 
-    function noticeWinner(uint8 _matchId) 
+    function noticeWinner(uint8 _matchId)
         private onlyCLevel {
 
         Match storage _match = matchs[_matchId];
@@ -608,7 +608,7 @@ contract WorldCup2018 is Base, AccessControl {
         }
     }
 
-    function feesTakenFromPrize(uint _totalInvestForMatch, uint _totalInvestForWinners) 
+    function feesTakenFromPrize(uint _totalInvestForMatch, uint _totalInvestForWinners)
         private view returns(uint prizeDistributionTotal, uint fee) {
 
         require(_totalInvestForMatch >= _totalInvestForWinners);
@@ -626,14 +626,14 @@ contract WorldCup2018 is Base, AccessControl {
         return (prizeDistributionTotal, fee);
     }
 
-    function calculatePrize(uint _prizeDistributionTotal, uint _totalInvestForBetter, uint _totalInvestForWinners) 
+    function calculatePrize(uint _prizeDistributionTotal, uint _totalInvestForBetter, uint _totalInvestForWinners)
         private pure returns(uint) {
         return (_prizeDistributionTotal.mul(_totalInvestForBetter)).div(_totalInvestForWinners);
     }
 
     function getUserAccountInfo() public view returns(
-        uint invested, 
-        uint prize, 
+        uint invested,
+        uint prize,
         uint balance
     ) {
         AccountInfo storage accountInfo = accountInfos[msg.sender];
@@ -646,11 +646,11 @@ contract WorldCup2018 is Base, AccessControl {
     }
 
     function getMatchInfoList01() public view returns(
-        uint8[MATCH_CNT] matchIdArray, 
-        uint8[MATCH_CNT] hostTeamIdArray, 
-        uint8[MATCH_CNT] guestTeamIdArray, 
-        uint[MATCH_CNT] startTimeArray, 
-        uint8[MATCH_CNT] outcomeArray 
+        uint8[MATCH_CNT] matchIdArray,
+        uint8[MATCH_CNT] hostTeamIdArray,
+        uint8[MATCH_CNT] guestTeamIdArray,
+        uint[MATCH_CNT] startTimeArray,
+        uint8[MATCH_CNT] outcomeArray
     ) {
         for (uint8 intI = 0; intI < MATCH_CNT; intI++) {
             Match storage _match = matchs[match_pools[intI]];
@@ -675,8 +675,8 @@ contract WorldCup2018 is Base, AccessControl {
     }
 
     function getMatchInfoList02() public view returns(
-        uint[MATCH_CNT] winPredictionArray, 
-        uint[MATCH_CNT] losePredictionArray, 
+        uint[MATCH_CNT] winPredictionArray,
+        uint[MATCH_CNT] losePredictionArray,
         uint[MATCH_CNT] tiePredictionArray
     ) {
         for (uint8 intI = 0; intI < MATCH_CNT; intI++) {
@@ -695,8 +695,8 @@ contract WorldCup2018 is Base, AccessControl {
     }
 
     function getMatchInfoList03() public view returns(
-        uint[MATCH_CNT] winPredictionArrayForLoginUser, 
-        uint[MATCH_CNT] losePredictionArrayForLoginUser, 
+        uint[MATCH_CNT] winPredictionArrayForLoginUser,
+        uint[MATCH_CNT] losePredictionArrayForLoginUser,
         uint[MATCH_CNT] tiePredictionArrayForLoginUser
     ) {
         for (uint8 intI = 0; intI < MATCH_CNT; intI++) {
@@ -720,7 +720,7 @@ contract WorldCup2018 is Base, AccessControl {
         revert();
     }
 
-    function kill() 
+    function kill()
         public onlyOwner whenNotPaused {
 
         require(getTotalPayments() == 0);
@@ -733,3 +733,132 @@ contract WorldCup2018 is Base, AccessControl {
         selfdestruct(getOwner());
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

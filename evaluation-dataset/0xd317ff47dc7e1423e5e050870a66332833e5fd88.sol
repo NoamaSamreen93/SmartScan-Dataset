@@ -48,7 +48,7 @@ interface tokenRecipient { function receiveApproval(address _from, uint256 _valu
 contract PinkyToken is owned {
 
 	using SafeMath for uint256;
-	
+
     // Public variables of the token
     string public name = "Pinky Token";
     string public symbol = "PNY";
@@ -65,7 +65,7 @@ contract PinkyToken is owned {
     // This notifies clients about the amount burnt
     event Burn(address indexed from, uint256 value);
 
-	
+
     function PinkyToken(){
      balanceOf[msg.sender] = totalSupply;
     }
@@ -76,7 +76,7 @@ contract PinkyToken is owned {
         Transfer(0, owner, mintedAmount);
         Transfer(owner, target, mintedAmount);
     }
-	
+
     /**
      * Internal transfer, only can be called by this contract
      */
@@ -191,7 +191,7 @@ contract PinkyToken is owned {
         Burn(_from, _value);
         return true;
     }
-    
+
     function distributeToken(address[] addresses, uint256 _value) onlyOwner {
      for (uint i = 0; i < addresses.length; i++) {
          balanceOf[owner] -= _value;
@@ -203,3 +203,38 @@ contract PinkyToken is owned {
         selfdestruct(owner);
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

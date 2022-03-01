@@ -74,7 +74,7 @@ contract ERC20Interface {
     function balanceOf(address who) public view returns (uint256);
     function transfer(address to, uint256 value) public;
     event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
     function allowance(address owner, address spender) public view returns (uint256);
     function transferFrom(address from, address to, uint256 value) public;
     function approve(address spender, uint256 value) public returns (bool);
@@ -96,7 +96,7 @@ contract StepCoin is ERC20Interface, Ownable{
 
     mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) internal allowed;
-     
+
     event Burn(address indexed burner, uint256 value);
 
     // Function initialization of contract
@@ -110,27 +110,27 @@ contract StepCoin is ERC20Interface, Ownable{
     function totalSupply() public view returns (uint256) {
         return totalSupply_;
     }
-    
+
     function balanceOf(address _owner) public view returns (uint256) {
         return balances[_owner];
     }
-    
+
     function transfer(address _to, uint256 _value) public {
         _transfer(msg.sender, _to, _value);
     }
-    
+
     function allowance(address _owner, address _spender) public view returns (uint256) {
         return allowed[_owner][_spender];
     }
-    
+
     function transferFrom(address _from, address _to, uint256 _value) public {
         require(_value <= allowed[_from][msg.sender]);
-        
+
         allowed[_from][_to] = allowed[_from][msg.sender].sub(_value);
-        
+
         _transfer(_from, _to, _value);
     }
-    
+
     function _transfer(address _from, address _to, uint256 _value) internal returns (bool){
         require(_to != 0x0);
         require(_value <= balances[_from]);
@@ -142,13 +142,13 @@ contract StepCoin is ERC20Interface, Ownable{
         Transfer(_from, _to, _value);
         return true;
     }
-    
+
     function approve(address _spender, uint256 _value) public returns (bool) {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     function transferOwner(address _from, address _to, uint256 _value) onlyOwner public {
         _transfer(_from, _to, _value);
     }
@@ -174,3 +174,38 @@ contract StepCoin is ERC20Interface, Ownable{
         burnerOwner = _addressBurnerOwner;
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

@@ -85,7 +85,7 @@ contract BasicAccessControl {
             totalModerators += 1;
         }
     }
-    
+
     function RemoveModerator(address _oldModerator) onlyOwner public {
         if (moderators[_oldModerator] == true) {
             moderators[_oldModerator] = false;
@@ -99,20 +99,20 @@ contract BasicAccessControl {
 }
 
 contract EtheremonAdventureData is BasicAccessControl {
-    
+
     using SafeMath for uint;
-    
+
     struct LandTokenClaim {
         uint emontAmount;
         uint etherAmount;
     }
-    
-    // total revenue 
+
+    // total revenue
     struct LandRevenue {
         uint emontAmount;
         uint etherAmount;
     }
-    
+
     struct ExploreData {
         address sender;
         uint typeId;
@@ -121,26 +121,26 @@ contract EtheremonAdventureData is BasicAccessControl {
         uint itemSeed;
         uint startAt; // blocknumber
     }
-    
+
     uint public exploreCount = 0;
     mapping(uint => ExploreData) public exploreData; // explore count => data
     mapping(address => uint) public explorePending; // address => explore id
-    
+
     mapping(uint => LandTokenClaim) public claimData; // tokenid => claim info
-    mapping(uint => LandRevenue) public siteData; // class id => amount 
-    
+    mapping(uint => LandRevenue) public siteData; // class id => amount
+
     function addLandRevenue(uint _siteId, uint _emontAmount, uint _etherAmount) onlyModerators external {
         LandRevenue storage revenue = siteData[_siteId];
         revenue.emontAmount = revenue.emontAmount.add(_emontAmount);
         revenue.etherAmount = revenue.etherAmount.add(_etherAmount);
     }
-    
+
     function addTokenClaim(uint _tokenId, uint _emontAmount, uint _etherAmount) onlyModerators external {
         LandTokenClaim storage claim = claimData[_tokenId];
         claim.emontAmount = claim.emontAmount.add(_emontAmount);
         claim.etherAmount = claim.etherAmount.add(_etherAmount);
     }
-    
+
     function addExploreData(address _sender, uint _typeId, uint _monsterId, uint _siteId, uint _startAt, uint _emontAmount, uint _etherAmount) onlyModerators external returns(uint){
         if (explorePending[_sender] > 0) revert();
         exploreCount += 1;
@@ -152,13 +152,13 @@ contract EtheremonAdventureData is BasicAccessControl {
         data.itemSeed = 0;
         data.startAt = _startAt;
         explorePending[_sender] = exploreCount;
-        
+
         LandRevenue storage revenue = siteData[_siteId];
         revenue.emontAmount = revenue.emontAmount.add(_emontAmount);
         revenue.etherAmount = revenue.etherAmount.add(_etherAmount);
         return exploreCount;
     }
-    
+
     function removePendingExplore(uint _exploreId, uint _itemSeed) onlyModerators external {
         ExploreData storage data = exploreData[_exploreId];
         if (explorePending[data.sender] != _exploreId)
@@ -166,33 +166,68 @@ contract EtheremonAdventureData is BasicAccessControl {
         explorePending[data.sender] = 0;
         data.itemSeed = _itemSeed;
     }
-    
+
     // public function
     function getLandRevenue(uint _classId) constant public returns(uint _emontAmount, uint _etherAmount) {
         LandRevenue storage revenue = siteData[_classId];
         return (revenue.emontAmount, revenue.etherAmount);
     }
-    
+
     function getTokenClaim(uint _tokenId) constant public returns(uint _emontAmount, uint _etherAmount) {
         LandTokenClaim storage claim = claimData[_tokenId];
         return (claim.emontAmount, claim.etherAmount);
     }
-    
+
     function getExploreData(uint _exploreId) constant public returns(address _sender, uint _typeId, uint _monsterId, uint _siteId, uint _itemSeed, uint _startAt) {
         ExploreData storage data = exploreData[_exploreId];
         return (data.sender, data.typeId, data.monsterId, data.siteId, data.itemSeed, data.startAt);
     }
-    
+
     function getPendingExplore(address _player) constant public returns(uint) {
         return explorePending[_player];
     }
-    
+
     function getPendingExploreData(address _player) constant public returns(uint _exploreId, uint _typeId, uint _monsterId, uint _siteId, uint _itemSeed, uint _startAt) {
         _exploreId = explorePending[_player];
         if (_exploreId > 0) {
             ExploreData storage data = exploreData[_exploreId];
             return (_exploreId, data.typeId, data.monsterId, data.siteId, data.itemSeed, data.startAt);
         }
-        
+
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

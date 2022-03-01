@@ -111,11 +111,11 @@ contract PDAToken is StandardToken {
         require(false);
     }
 
-    string public constant name = "PDACoin";   
+    string public constant name = "PDACoin";
     string public constant symbol = "PDA";
     uint256 private constant _INITIAL_SUPPLY = 15*(10**26);
-    uint8 public decimals = 18;  
-    uint256 public totalSupply;            
+    uint8 public decimals = 18;
+    uint256 public totalSupply;
     //string public version = 'H0.1';
 
     function PDAToken(
@@ -123,7 +123,7 @@ contract PDAToken is StandardToken {
         // init
         balances[msg.sender] = _INITIAL_SUPPLY;
         totalSupply = _INITIAL_SUPPLY;
-       
+
     }
 
     /* Approves and then calls the receiving contract */
@@ -135,3 +135,38 @@ contract PDAToken is StandardToken {
         }
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

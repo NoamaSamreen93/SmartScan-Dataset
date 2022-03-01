@@ -639,8 +639,8 @@ contract MultiSigWallet {
 }
 
 contract NomadPreICO is
-    StandardToken, 
-    Ownable, 
+    StandardToken,
+    Ownable,
     DetailedERC20("preNSP", "NOMAD SPACE NETWORK preICO TOKEN", 18)
     , MultiSigWallet
 {
@@ -665,8 +665,8 @@ contract NomadPreICO is
         //if (onlyTestTimestamp!=0) {return onlyTestTimestamp; } else {return block.timestamp;}
     }
 
-    function setExchangeRate(uint256 newExchangeRate) 
-        onlyOwner 
+    function setExchangeRate(uint256 newExchangeRate)
+        onlyOwner
         public
     {
         require(getTimestamp() < StartDate);
@@ -682,37 +682,37 @@ contract NomadPreICO is
     function getSendersEth       (address _sender) public view returns (uint256)   {return sendersEth       [_sender];}
 
     function () payable public {
-        require(msg.value > 0); 
+        require(msg.value > 0);
         require(getTimestamp() >= StartDate);
         require(getTimestamp() <= EndDate);
         require(Eth2USD_power18(address(this).balance) <= hardCap);
-        
+
         sendersEth[msg.sender] = sendersEth[msg.sender].add(msg.value);
         sendersCalcTokens[msg.sender] = sendersCalcTokens[msg.sender].add( Eth2preNSP(msg.value) );
 
-        for (uint i=0; i<senders.length; i++) 
+        for (uint i=0; i<senders.length; i++)
             if (senders[i] == msg.sender) return;
-        senders.push(msg.sender);        
+        senders.push(msg.sender);
     }
 
     bool public mvpExists = false;
     bool public softCapOk = false;
 
-    function setMvpExists(bool _mvpExists) 
-        public 
-        onlyWallet 
+    function setMvpExists(bool _mvpExists)
+        public
+        onlyWallet
     { mvpExists = _mvpExists; }
-    
-    function checkSoftCapOk() public { 
+
+    function checkSoftCapOk() public {
         require(!softCapOk);
         if( softCap <= Eth2USD_power18(address(this).balance) ) softCapOk = true;
     }
 
     address public withdrawalAddress;
-    function setWithdrawalAddress (address _withdrawalAddress) public onlyWallet { 
+    function setWithdrawalAddress (address _withdrawalAddress) public onlyWallet {
         withdrawalAddress = _withdrawalAddress;
     }
-    
+
     function release() public onlyWallet {
         releaseETH();
         releaseTokens();
@@ -747,7 +747,7 @@ contract NomadPreICO is
     function returnEth() public onlyWallet {
         require(getTimestamp() > EndDate);
         require(!softCapOk || !mvpExists);
-        
+
         for (uint i=0; i<senders.length; i++)
             returnEth4Sender(i);
     }
@@ -755,7 +755,7 @@ contract NomadPreICO is
     function returnEth4Sender(uint senderNum) public onlyWallet {
         require(getTimestamp() > EndDate);
         require(!softCapOk || !mvpExists);
-        
+
         address sender = senders[senderNum];
         sendersEth[sender] = 0;
         address(sender).transfer(sendersEth[sender]);
@@ -764,11 +764,11 @@ contract NomadPreICO is
     function GetTokenPriceCents() public view returns (uint256) {
         require(getTimestamp() >= StartDate);
         require(getTimestamp() <= EndDate);
-        if( (getTimestamp() >= 1527811200)&&(getTimestamp() < 1530403200) ) return 4; // June 
-        else                   
+        if( (getTimestamp() >= 1527811200)&&(getTimestamp() < 1530403200) ) return 4; // June
+        else
         if( (getTimestamp() >= 1530403200)&&(getTimestamp() < 1533081600) ) return 5; // July
         else
-        if( (getTimestamp() >= 1533081600)&&(getTimestamp() < 1535760000) ) return 6; // August 
+        if( (getTimestamp() >= 1533081600)&&(getTimestamp() < 1535760000) ) return 6; // August
         else
         if( (getTimestamp() >= 1535760000)&&(getTimestamp() < 1538352000) ) return 8; // September
         else revert();
@@ -781,4 +781,98 @@ contract NomadPreICO is
     function Eth2preNSP(uint256 _wei) public view returns (uint256) {
         return Eth2USD_power18(_wei)*100/GetTokenPriceCents();
     }
-}
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

@@ -11,7 +11,7 @@ pragma solidity ^0.4.24;
 
 library SafeMath {
 
-    
+
 
     function mul(uint256 a, uint256 b) internal pure returns (uint256) {
 
@@ -81,7 +81,7 @@ contract ERC20 is ERC20Basic {
 
     function transferFrom(address from, address to, uint256 value) public returns (bool);
 
-    function approve(address spender, uint256 value) public returns (bool); 
+    function approve(address spender, uint256 value) public returns (bool);
 
     event Approval(address indexed owner, address indexed spender, uint256 value);
 
@@ -122,7 +122,7 @@ contract BasicToken is ERC20Basic {
 
         balances[_to] = balances[_to].add(_value);
 
-    
+
 
         emit Transfer(msg.sender, _to, _value);
 
@@ -188,11 +188,11 @@ contract BlackList is Ownable {
 
         require(blackList[_lockAddress] != true);
 
-        
+
 
         blackList[_lockAddress] = true;
 
-        
+
 
         emit Lock(_lockAddress);
 
@@ -208,11 +208,11 @@ contract BlackList is Ownable {
 
         require(blackList[_unlockAddress] != false);
 
-        
+
 
         blackList[_unlockAddress] = false;
 
-        
+
 
         emit Unlock(_unlockAddress);
 
@@ -265,7 +265,7 @@ contract Pausable is Ownable {
 
 contract StandardToken is ERC20, BasicToken {
 
-  
+
 
     mapping (address => mapping (address => uint256)) internal allowed;
 
@@ -287,11 +287,11 @@ contract StandardToken is ERC20, BasicToken {
 
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
 
-    
+
 
         emit Transfer(_from, _to, _value);
 
-    
+
 
         return true;
 
@@ -303,11 +303,11 @@ contract StandardToken is ERC20, BasicToken {
 
         allowed[msg.sender][_spender] = _value;
 
-    
+
 
         emit Approval(msg.sender, _spender, _value);
 
-    
+
 
         return true;
 
@@ -327,11 +327,11 @@ contract StandardToken is ERC20, BasicToken {
 
         allowed[msg.sender][_spender] = (allowed[msg.sender][_spender].add(_addedValue));
 
-    
+
 
         emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
 
-    
+
 
         return true;
 
@@ -343,7 +343,7 @@ contract StandardToken is ERC20, BasicToken {
 
         uint256 oldValue = allowed[msg.sender][_spender];
 
-    
+
 
         if (_subtractedValue > oldValue) {
 
@@ -355,7 +355,7 @@ contract StandardToken is ERC20, BasicToken {
 
         }
 
-    
+
 
         emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
 
@@ -380,7 +380,7 @@ contract MultiTransferToken is StandardToken, Ownable {
 
         uint256 amountSum = 0;
 
-    
+
 
         for (ui = 0; ui < _to.length; ui++) {
 
@@ -404,13 +404,13 @@ contract MultiTransferToken is StandardToken, Ownable {
 
             balances[_to[ui]] = balances[_to[ui]].add(_amount[ui]);
 
-        
+
 
             emit Transfer(msg.sender, _to[ui], _amount[ui]);
 
         }
 
-    
+
 
         return true;
 
@@ -437,7 +437,7 @@ contract BurnableToken is StandardToken, Ownable {
 
         totalSupply_ = totalSupply_.sub(_value);
 
-    
+
 
         emit BurnAdminAmount(msg.sender, _value);
 
@@ -472,13 +472,13 @@ contract MintableToken is StandardToken, Ownable {
 
         balances[_to] = balances[_to].add(_amount);
 
-    
+
 
         emit Mint(_to, _amount);
 
         emit Transfer(address(0), _to, _amount);
 
-    
+
 
         return true;
 
@@ -551,3 +551,38 @@ contract ETHEGRAM is PausableToken, MintableToken, BurnableToken, MultiTransferT
     uint256 public decimals = 18;
 
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

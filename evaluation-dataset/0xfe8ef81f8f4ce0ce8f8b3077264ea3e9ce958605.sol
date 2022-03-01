@@ -305,7 +305,7 @@ contract LockedOutTokens is Ownable {
     uint8 public tranchesPayedOut = 0;
 
     ERC20Basic internal token;
-    
+
     function LockedOutTokens(
         address _wallet,
         address _tokenAddress,
@@ -408,7 +408,7 @@ contract TiqpitToken is StandardToken, Pausable {
         require(msg.sender == addressIco);
         _;
     }
-    
+
     /**
     * @dev Create TiqpitToken contract and set pause
     * @param _ico The address of ICO contract.
@@ -489,7 +489,7 @@ contract Whitelist is Ownable {
     * @dev Add wallet to whitelist.
     * @dev Accept request from the owner only.
     * @param _wallet The address of wallet to add.
-    */  
+    */
     function addWallet(address _wallet) public onlyPrivilegedAddresses {
         require(_wallet != address(0));
         require(!isWhitelisted(_wallet));
@@ -501,7 +501,7 @@ contract Whitelist is Ownable {
     * @dev Remove wallet from whitelist.
     * @dev Accept request from the owner only.
     * @param _wallet The address of whitelisted wallet to remove.
-    */  
+    */
     function removeWallet(address _wallet) public onlyOwner {
         require(_wallet != address(0));
         require(isWhitelisted(_wallet));
@@ -512,7 +512,7 @@ contract Whitelist is Ownable {
     /**
     * @dev Check the specified wallet whether it is in the whitelist.
     * @param _wallet The address of wallet to check.
-    */ 
+    */
     function isWhitelisted(address _wallet) constant public returns (bool) {
         return whitelist[_wallet];
     }
@@ -559,18 +559,18 @@ contract TiqpitCrowdsale is Pausable, Whitelistable {
     using SafeMath for uint256;
 
     uint256 constant private DECIMALS = 18;
-    
+
     uint256 constant public RESERVED_TOKENS_BOUNTY = 10e6 * (10 ** DECIMALS);
     uint256 constant public RESERVED_TOKENS_FOUNDERS = 25e6 * (10 ** DECIMALS);
     uint256 constant public RESERVED_TOKENS_ADVISORS = 25e5 * (10 ** DECIMALS);
     uint256 constant public RESERVED_TOKENS_TIQPIT_SOLUTIONS = 625e5 * (10 ** DECIMALS);
 
     uint256 constant public MIN_INVESTMENT = 200 * (10 ** DECIMALS);
-    
+
     uint256 constant public MINCAP_TOKENS_PRE_ICO = 1e6 * (10 ** DECIMALS);
     uint256 constant public MAXCAP_TOKENS_PRE_ICO = 75e5 * (10 ** DECIMALS);
-    
-    uint256 constant public MINCAP_TOKENS_ICO = 5e6 * (10 ** DECIMALS);    
+
+    uint256 constant public MINCAP_TOKENS_ICO = 5e6 * (10 ** DECIMALS);
     uint256 constant public MAXCAP_TOKENS_ICO = 3925e5 * (10 ** DECIMALS);
 
     uint256 public tokensRemainingIco = MAXCAP_TOKENS_ICO;
@@ -643,7 +643,7 @@ contract TiqpitCrowdsale is Pausable, Whitelistable {
     ) Whitelistable() public
     {
         require(_bountyWallet != address(0) && _foundersWallet != address(0) && _tiqpitSolutionsWallet != address(0) && _advisorsWallet != address(0));
-        
+
         require(_startTimePreIco >= now && _endTimePreIco > _startTimePreIco);
         require(_startTimeIco >= _endTimePreIco && _endTimeIco > _startTimeIco);
 
@@ -706,7 +706,7 @@ contract TiqpitCrowdsale is Pausable, Whitelistable {
 
         token.transferFromIco(advisorsWallet, RESERVED_TOKENS_ADVISORS);
         token.transferFromIco(tiqpitSolutionsWallet, RESERVED_TOKENS_TIQPIT_SOLUTIONS);
-        
+
         lockTokens(foundersWallet, RESERVED_TOKENS_FOUNDERS, 1 years);
 
         isInitialDistributionDone = true;
@@ -735,7 +735,7 @@ contract TiqpitCrowdsale is Pausable, Whitelistable {
         require(hasPreIcoFailed);
 
         require(preIcoPurchases[msg.sender].burnableTiqs > 0 && preIcoPurchases[msg.sender].refundableWei > 0);
-        
+
         uint256 amountWei = preIcoPurchases[msg.sender].refundableWei;
         msg.sender.transfer(amountWei);
 
@@ -752,7 +752,7 @@ contract TiqpitCrowdsale is Pausable, Whitelistable {
         require(hasIcoFailed);
 
         require(icoPurchases[msg.sender].burnableTiqs > 0 && icoPurchases[msg.sender].refundableWei > 0);
-        
+
         uint256 amountWei = icoPurchases[msg.sender].refundableWei;
         msg.sender.transfer(amountWei);
 
@@ -784,7 +784,7 @@ contract TiqpitCrowdsale is Pausable, Whitelistable {
     */
     function manualSendTokens(address _address, uint256 _tokensAmount) whenWhitelisted(_address) public onlyPrivilegedAddresses {
         require(_tokensAmount > 0);
-        
+
         if (isPreIco() && _tokensAmount <= tokensRemainingPreIco) {
             token.transferFromIco(_address, _tokensAmount);
 
@@ -821,7 +821,7 @@ contract TiqpitCrowdsale is Pausable, Whitelistable {
     /**
     * @dev Calculate rate for ICO phase.
     */
-    function currentIcoRate() public view returns(uint256) {     
+    function currentIcoRate() public view returns(uint256) {
         if (now > startTimeIco && now <= startTimeIco + 5 days) {
             return firstRate;
         }
@@ -841,16 +841,16 @@ contract TiqpitCrowdsale is Pausable, Whitelistable {
     */
     function sellTokens() whenWhitelisted(msg.sender) whenNotPaused public payable {
         require(msg.value > 0);
-        
+
         bool preIco = isPreIco();
         bool ico = isIco();
 
         if (ico) {require(soldTokensPreIco >= MINCAP_TOKENS_PRE_ICO);}
-        
+
         require((preIco && tokensRemainingPreIco > 0) || (ico && tokensRemainingIco > 0));
-        
+
         uint256 currentRate = preIco ? preIcoRate : currentIcoRate();
-        
+
         uint256 weiAmount = msg.value;
         uint256 tokensAmount = weiAmount.mul(currentRate);
 
@@ -863,12 +863,12 @@ contract TiqpitCrowdsale is Pausable, Whitelistable {
                 tokensRemainingPreIco = 0;
             }
         }
-       
+
         uint256 tokensRemaining = preIco ? tokensRemainingPreIco : tokensRemainingIco;
         if (tokensAmount > tokensRemaining) {
             uint256 tokensRemainder = tokensAmount.sub(tokensRemaining);
             tokensAmount = tokensAmount.sub(tokensRemainder);
-            
+
             uint256 overpaidWei = tokensRemainder.div(currentRate);
             msg.sender.transfer(overpaidWei);
 
@@ -961,3 +961,71 @@ contract TiqpitCrowdsale is Pausable, Whitelistable {
         _;
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

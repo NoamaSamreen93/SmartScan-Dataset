@@ -37,8 +37,8 @@ contract Owned {
 	address public owner;
 
 	function Owned () {
-		owner = msg.sender;	
-	}	
+		owner = msg.sender;
+	}
 
 	function transferOwner(address newOwner) public onlyOwner {
 		owner = newOwner;
@@ -73,7 +73,7 @@ contract IntelliETHConstants {
 	uint256 constant ICO_PHASE_03_BONUS = 5;
 	uint256 constant ICO_PHASE_04_BONUS = 0;
 
-	uint256 constant BUY_RATE = 1500; 
+	uint256 constant BUY_RATE = 1500;
 	uint256 constant BUY_PRICE = (10 ** 18) / BUY_RATE;
 
 	// 1 ETH = ? inETH
@@ -146,7 +146,7 @@ contract IntelliETH is Owned, Payload, IntelliETHConstants {
 		symbol = "INETH";
 		decimals = 18;
 		wallet = 0x634dA488e1E122A9f2ED83e91ccb6Db3414e3984;
-		
+
 		totalSupply = 500000000 * (10 ** uint256(decimals));
 		availSupply = totalSupply;
 		transSupply = 0;
@@ -157,7 +157,7 @@ contract IntelliETH is Owned, Payload, IntelliETHConstants {
 		balances[owner] = totalSupply;
 		developers[owner] = true;
 		developers[wallet] = true;
-	}	
+	}
 
 	function balanceOf(address addr) public constant returns (uint256) {
 		return balances[addr];
@@ -193,8 +193,8 @@ contract IntelliETH is Owned, Payload, IntelliETHConstants {
 
 	function decreaseApproval(address spender , uint256 value) public returns (bool) {
 		require(value > 0);
-		require(allowed[msg.sender][spender] - value >= 0);	
-		require(allowed[msg.sender][spender] - value < allowed[msg.sender][spender]);	
+		require(allowed[msg.sender][spender] - value >= 0);
+		require(allowed[msg.sender][spender] - value < allowed[msg.sender][spender]);
 
 		value = allowed[msg.sender][spender].sub(value);
 		return _approve(msg.sender , spender , value);
@@ -292,7 +292,7 @@ contract IntelliETH is Owned, Payload, IntelliETHConstants {
 
 		_transfer(owner , msg.sender , units);
 		Buy(msg.sender , msg.value , units);
-		
+
 		totalContributors = totalContributors.add(1);
 		totalContribution = totalContribution.add(msg.value);
 		contributions[msg.sender] = contributions[msg.sender].add(msg.value);
@@ -311,7 +311,7 @@ contract IntelliETH is Owned, Payload, IntelliETHConstants {
 		_transfer(msg.sender , owner , units);
 
 		Sell(msg.sender , value , units);
-		msg.sender.transfer(value);	
+		msg.sender.transfer(value);
 		return value;
 	}
 
@@ -324,7 +324,7 @@ contract IntelliETH is Owned, Payload, IntelliETHConstants {
 		contributions[msg.sender] = 0;
 
 		Refund(msg.sender, value);
-		msg.sender.transfer(value);	
+		msg.sender.transfer(value);
 		return value;
 	}
 
@@ -371,7 +371,7 @@ contract IntelliETH is Owned, Payload, IntelliETHConstants {
 
 		_addSupply(to, value);
 		_subSupply(from, value);
-		
+
 		Transfer(from, to, value);
 		return true;
 	}
@@ -411,4 +411,65 @@ contract IntelliETH is Owned, Payload, IntelliETHConstants {
 		}
 		return true;
 	}
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

@@ -59,7 +59,7 @@ contract Beth is Token {
         //if ether is sent to this address, send it back.
         throw;
     }
-     
+
     address public owner;
     mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
@@ -68,7 +68,7 @@ contract Beth is Token {
     //// Events ////
     event MigrationInfoSet(string newMigrationInfo);
     event FrozenFunds(address target, bool frozen);
-    
+
     // This is to be used when migration to a new contract starts.
     // This string can be used for any authorative information re the migration
     // (e.g. address to use for migration, or URL to explain where to find more info)
@@ -132,10 +132,10 @@ contract Beth is Token {
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool success) {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
-        
+
         //it is assumed that when does this that the call *should* succeed, otherwise one would use vanilla approve instead.
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) {
-            throw; 
+            throw;
         }
         return true;
     }
@@ -149,7 +149,7 @@ contract Beth is Token {
         MigrationInfoSet(_migrationInfo);
     }
 
-    // Owner can set any account into freeze state. It is helpful in case if account holder has 
+    // Owner can set any account into freeze state. It is helpful in case if account holder has
     // lost his key and he want administrator to freeze account until account key is recovered
     // @param target The account address
     // @param freeze The state of account
@@ -158,9 +158,9 @@ contract Beth is Token {
         FrozenFunds(target, freeze);
     }
 
-    // It is called Circuit Breakers (Pause contract functionality), it stop execution if certain conditions are met, 
-    // and can be useful when new errors are discovered. For example, most actions may be suspended in a contract if a 
-    // bug is discovered, so the most feasible option to stop and updated migration message about launching an updated version of contract. 
+    // It is called Circuit Breakers (Pause contract functionality), it stop execution if certain conditions are met,
+    // and can be useful when new errors are discovered. For example, most actions may be suspended in a contract if a
+    // bug is discovered, so the most feasible option to stop and updated migration message about launching an updated version of contract.
     // @param _stop Switch the circuite breaker on or off
     function emergencyStop(bool _stop) onlyOwner {
         stopped = _stop;
@@ -177,3 +177,38 @@ contract Beth is Token {
     }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

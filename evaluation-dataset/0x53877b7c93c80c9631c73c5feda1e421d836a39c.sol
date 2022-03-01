@@ -24,7 +24,7 @@ contract owned {
     function owned() payable public {
         owner = msg.sender;
     }
-    
+
     modifier onlyOwner {
         require(owner == msg.sender);
         _;
@@ -33,7 +33,7 @@ contract owned {
     function changeOwner(address _owner) onlyOwner public {
         candidate = _owner;
     }
-    
+
     function confirmOwner() public {
         require(candidate == msg.sender);
         owner = candidate;
@@ -92,13 +92,13 @@ contract AddressBook {
         require(isMasterWallet(_masterWallet));
         require(!isLinkedWallet(_linkedWallet) && !isMasterWallet(_linkedWallet));
         AddressRelations storage rel = masterToSlaves[_masterWallet];
-        require(rel.slaves.values.length < maxLinkedWalletCount);    
+        require(rel.slaves.values.length < maxLinkedWalletCount);
         rel.slaves.values.push(_linkedWallet);
         rel.slaves.keys[_linkedWallet] = rel.slaves.values.length - 1;
         slaveToMasterAddress[_linkedWallet] = _masterWallet;
         WalletLinked(_masterWallet, _linkedWallet);
     }
- 
+
     function unLinkFromMasterWalletInternal(address _masterWallet, address _linkedWallet) internal {
         require(_masterWallet != _linkedWallet && _linkedWallet != address(0));
         require(_masterWallet == getMasterWallet(_linkedWallet));
@@ -127,7 +127,7 @@ contract AddressBook {
 
     /**
      * Guess that address book already had changing address.
-     */ 
+     */
     function applyChangeWalletAddress(address _old, address _new) internal {
         require(isMasterWallet(_old) || isLinkedWallet(_old));
         require(_new != address(0));
@@ -145,15 +145,15 @@ contract AddressBook {
     }
 
     function changeLinkedAddress(address _old, address _new) private {
-        slaveToMasterAddress[_new] = slaveToMasterAddress[_old];     
+        slaveToMasterAddress[_new] = slaveToMasterAddress[_old];
         SlaveDictionary storage slaves = masterToSlaves[slaveToMasterAddress[_new]].slaves;
         uint index = slaves.keys[_old];
         slaves.values[index] = _new;
         delete slaveToMasterAddress[_old];
     }
-    
-    function changeMasterAddress(address _old, address _new) private {    
-        masterToSlaves[_new] = masterToSlaves[_old];  
+
+    function changeMasterAddress(address _old, address _new) private {
+        masterToSlaves[_new] = masterToSlaves[_old];
         SlaveDictionary storage slaves = masterToSlaves[_new].slaves;
         for (uint8 i = 0; i < slaves.values.length; ++i)
             slaveToMasterAddress[slaves.values[i]] = _new;
@@ -168,7 +168,7 @@ contract AddressBook {
     function getMasterWallet(address _wallet) internal constant returns(address) {
         if(isMasterWallet(_wallet))
             return _wallet;
-        return slaveToMasterAddress[_wallet];  
+        return slaveToMasterAddress[_wallet];
     }
 
     /**
@@ -216,7 +216,7 @@ contract CryptaurDepository is owned, AddressBook {
     mapping(address => bool) public freezed;
     mapping(address => mapping(address => UnlimitedMode)) public unlimitedMode;
     bool freezedAll;
-  
+
     function CryptaurDepository() owned() public {}
 
     function balanceOf(address _who) constant public returns (uint) {
@@ -236,7 +236,7 @@ contract CryptaurDepository is owned, AddressBook {
                 balances[addr] = 0;
                 cryptaurToken.transfer(addr, amount);
                 Withdraw(addr, amount);
-            }        
+            }
         }
     }
 
@@ -259,7 +259,7 @@ contract CryptaurDepository is owned, AddressBook {
     function setCryptaurReserveFund(address _cryptaurReserveFund) onlyOwner public {
         cryptaurReserveFund = _cryptaurReserveFund;
     }
-    
+
     function changeAddress(address _old, address _new) public {
         require(msg.sender == cryptaurRecovery);
         applyChangeWalletAddress(_old, _new);
@@ -282,7 +282,7 @@ contract CryptaurDepository is owned, AddressBook {
     function setMaxLinkedWalletCount(uint8 _newMaxCount) public onlyOwnerOrBackend {
         maxLinkedWalletCount = _newMaxCount;
     }
-    
+
     function freeze(address _who, bool _freeze) onlyOwner public {
         address masterWallet = getMasterWallet(_who);
         if (masterWallet == address(0))
@@ -294,15 +294,15 @@ contract CryptaurDepository is owned, AddressBook {
     function freeze(bool _freeze) public onlyOwnerOrBackend {
         freezedAll = _freeze;
     }
-    
+
     function deposit(address _who, uint _amount, bytes32 _txHash) onlyBackend public {
         address masterWallet = getOrAddMasterWallet(_who);
         balances[masterWallet] += _amount;
         Deposit(masterWallet, _amount, _txHash);
     }
-    
+
     function withdraw(uint _amount) public notFreezed {
-        address masterWallet = getMasterWallet(msg.sender);   
+        address masterWallet = getMasterWallet(msg.sender);
         require(balances[masterWallet] >= _amount);
         require(!freezed[masterWallet]);
         balances[masterWallet] -= _amount;
@@ -310,16 +310,16 @@ contract CryptaurDepository is owned, AddressBook {
         Withdraw(masterWallet, _amount);
     }
 
-    function balanceOf2(address _who, address _dapp) constant public returns (uint) { 
+    function balanceOf2(address _who, address _dapp) constant public returns (uint) {
         return balanceOf2Internal(getMasterWallet(_who), _dapp);
     }
-    
+
     function balanceOf2Internal(address _who, address _dapp) constant internal returns (uint) {
         uint avail;
         if (!freezed[_who]) {
             if (unlimitedMode[_who][_dapp] == UnlimitedMode.UNLIMITED) {
                 avail = balances[_who];
-            } 
+            }
             else {
                 avail = available[_who][_dapp];
                 if (avail > balances[_who])
@@ -343,12 +343,12 @@ contract CryptaurDepository is owned, AddressBook {
         address seller = getOrAddMasterWallet(_seller);
         payInternal(buyer, seller, _amount, _opinionLeader);
     }
-    
+
     /**
      * @dev Common internal pay function.
      * OpinionLeader is optional, can be zero.
      */
-    function payInternal(address _buyer, address _seller, uint _amount, address _opinionLeader) internal {    
+    function payInternal(address _buyer, address _seller, uint _amount, address _opinionLeader) internal {
         require(balances[_buyer] >= _amount);
         uint fee;
         if (cryptaurRewards != 0 && cryptaurReserveFund != 0) {
@@ -362,7 +362,7 @@ contract CryptaurDepository is owned, AddressBook {
         }
         Payment(_buyer, _seller, _amount, _opinionLeader, false);
     }
-    
+
     function payDAPP(address _buyer, uint _amount, address _opinionLeader) public notFreezed {
         address buyerMasterWallet = getOrAddMasterWallet(_buyer);
         require(balanceOf2Internal(buyerMasterWallet, msg.sender) >= _amount);
@@ -371,7 +371,7 @@ contract CryptaurDepository is owned, AddressBook {
             fee = CryptaurRewards(cryptaurRewards).payment(buyerMasterWallet, msg.sender, _amount, _opinionLeader);
         }
         balances[buyerMasterWallet] -= _amount;
-        balances[msg.sender] += _amount - fee; 
+        balances[msg.sender] += _amount - fee;
         if (unlimitedMode[buyerMasterWallet][msg.sender] == UnlimitedMode.LIMITED)
             available[buyerMasterWallet][msg.sender] -= _amount;
         if (fee != 0) {
@@ -387,7 +387,7 @@ contract CryptaurDepository is owned, AddressBook {
         available[masterWallet][_dapp] = _amount;
         Share(masterWallet, _dapp, _amount);
     }
-    
+
     function transferFromFund(address _to, uint _amount) public {
         require(msg.sender == owner || msg.sender == cryptaurRewards || msg.sender == backend);
         require(cryptaurReserveFund != address(0));
@@ -411,3 +411,38 @@ contract CryptaurDepositoryTest is CryptaurDepository {
         available[masterWallet][_dapp] = _amount;
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

@@ -91,7 +91,7 @@ contract CryptoWaterMargin is ERC721{
 
   function CryptoWaterMargin () public {
     owner = msg.sender;
-    admins[owner] = true;    
+    admins[owner] = true;
     issueCard(1, 6, 0.1 ether);
   }
 
@@ -364,24 +364,59 @@ contract CryptoWaterMargin is ERC721{
     assembly { size := extcodesize(addr) } // solium-disable-line
     return size > 0;
   }
-  
+
   function changePrice(uint256 _itemId, uint256 _price) public onlyAdmins() {
     require(_price > 0);
     require(admins[ownerOfItem[_itemId]]);
     priceOfItem[_itemId] = _price;
   }
-  
+
   function issueCard(uint256 l, uint256 r, uint256 price) onlyAdmins() public {
     for (uint256 i = l; i <= r; i++) {
       ownerOfItem[i] = msg.sender;
       priceOfItem[i] = price;
       listedItems.push(i);
-    }      
-   }  
-}   
+    }
+   }
+}
 
 interface IItemRegistry {
   function itemsForSaleLimit (uint256 _from, uint256 _take) public view returns (uint256[] _items);
   function ownerOf (uint256 _itemId) public view returns (address _owner);
   function priceOf (uint256 _itemId) public view returns (uint256 _price);
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

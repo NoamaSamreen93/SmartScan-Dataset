@@ -3,7 +3,7 @@ pragma solidity ^0.4.24;
 contract EthGods {
 
     // imported contracts
-    
+
     EthGodsName private eth_gods_name;
     function set_eth_gods_name_contract_address(address eth_gods_name_contract_address) public returns (bool) {
         require(msg.sender == admin);
@@ -17,12 +17,12 @@ contract EthGods {
         eth_gods_dice = EthGodsDice(eth_gods_dice_contract_address);
         return true;
     }
-    
+
     // end of imported contracts
- 
- 
+
+
      // start of database
-    
+
     //contract information & administration
     bool private contract_created; // in case constructor logic change in the future
     address private contract_address; //shown at the top of the home page
@@ -30,12 +30,12 @@ contract EthGods {
     string private official_url = "swarm-gateways.net/bzz:/ethgods.eth";
 
     address private  admin; // public when testing
-    address private controller1 = 0xcA5A9Db0EF9a0Bf5C38Fc86fdE6CB897d9d86adD; // controller can change admin at once; 
-    address private controller2 = 0x8396D94046a099113E5fe5CBad7eC95e96c2B796; // controller can change admin at once; 
+    address private controller1 = 0xcA5A9Db0EF9a0Bf5C38Fc86fdE6CB897d9d86adD; // controller can change admin at once;
+    address private controller2 = 0x8396D94046a099113E5fe5CBad7eC95e96c2B796; // controller can change admin at once;
 
     address private v_god = 0xfB6916095ca1df60bB79Ce92cE3Ea74c37c5d359;
     uint private block_hash_duration = 255; // can't get block hash, after 256 blocks, adjustable
-    
+
 
     // god
     struct god {
@@ -43,14 +43,14 @@ contract EthGods {
         uint level;
         uint exp;
         uint pet_type;// 12 animals or zodiacs
-        uint pet_level;   
+        uint pet_level;
         uint listed; // 0 not a god, 1 - ... rank_score in god list
         uint invite_price;
         uint free_rounds; // to check if has used free dice in this round
         uint paid_rounds; // to check if has paid for extra dice in this round
         bool hosted_pray; // auto waitlist, when enlisted. others can invite, once hosted pray
         uint bid_eth; // bid to host pray
-        
+
         uint credit; // gained from the amulet invitation spending of invited fellows
         uint count_amulets_generated;
         uint first_amulet_generated;
@@ -58,7 +58,7 @@ contract EthGods {
         uint count_amulets_selling;
         uint amulets_start_id;
         uint amulets_end_id;
-        
+
         uint count_token_orders;
         uint first_active_token_order;
 
@@ -67,10 +67,10 @@ contract EthGods {
 
         uint inviter_id; // who invited this fellow to this world
         uint count_gods_invited; // gods invited to this game by this god.
-        
-        
+
+
     }
-    uint private count_gods = 0; // Used when generating id for a new player, 
+    uint private count_gods = 0; // Used when generating id for a new player,
     mapping(address => god) private gods; // everyone is a god
     mapping(uint => address) private gods_address; // gods' address => god_id
 
@@ -84,7 +84,7 @@ contract EthGods {
 
     uint private list_level = 10; // start from level 10
     uint private max_gas_price = 100000000000; // 100 gwei for invite and pray, adjustable
-    
+
     // amulet
     struct amulet {
         uint god_id;
@@ -94,7 +94,7 @@ contract EthGods {
         uint start_selling_block; // can't bind & use in pk, if selling
         uint price; // set to 0, when withdraw from selling or bought
     }
-    uint private count_amulets = 0; 
+    uint private count_amulets = 0;
     mapping(uint => amulet) private amulets; // public when testing
     uint private bound_duration = 9000; // once bought, wait a while before sell it again, adjustable
     uint private order_duration = 20000; // valid for about 3 days, then not to show to public in selling amulets/token orders, but still show in my_selling amulets/token orders. adjustable
@@ -105,12 +105,12 @@ contract EthGods {
     uint private pray_start_block; // public when testing
     bool private rewarded_pray_winners = false;
 
-    uint private count_hosted_gods; // gods hosted pray (event started). If less than bidding gods, there are new gods waiting to host pray, 
+    uint private count_hosted_gods; // gods hosted pray (event started). If less than bidding gods, there are new gods waiting to host pray,
     mapping (uint => address) private bidding_gods; // every listed god and bid to host pray
     uint private initializer_reward = 60; // reward the god who burned gas to send pray rewards to community, adjustable
     uint private double_egst_fee = 0.006 ether; // adjustable
-    
-    mapping(uint => uint) private max_winners;  // max winners for each prize  
+
+    mapping(uint => uint) private max_winners;  // max winners for each prize
     uint private round_duration = 6666; // 6000, 600 in CBT, 60 in dev, adjustable
 
     // ticket
@@ -132,14 +132,14 @@ contract EthGods {
     mapping (uint => mapping(uint => address)) private listed_winners; // winners for 5 prizes
 
     bool private reEntrancyMutex = false; // for sendnig eth to msg.sender
-    
+
     uint private pray_egses = 0; // lottery treasury
     uint private pray_egst = 0;  // lottery treasury
     uint private reward_pool_egses = 0; // 10% of pray_egses, for top 3 winners
     uint private reward_pool_egst = 0; // 10% of pray_egst, for EGST floor winners
 
     mapping(address => uint) egses_balances;
-        
+
 
     // eth_gods_token (EGST)
     string public name = "EthGodsToken";
@@ -148,7 +148,7 @@ contract EthGods {
     uint private _totalSupply;
     mapping(address => uint) balances; // bought or gained from pray or revenue share
     mapping(address => mapping(address => uint)) allowed;
-  
+
 
     struct token_order {
         uint id;
@@ -165,11 +165,11 @@ contract EthGods {
     uint private max_unit_price = 200; // 1 egst max value is 0.002 ether, adjustable
     uint private max_egst_amount = 1000000 ether; // for create_token_order, adjustable
     uint private min_egst_amount = 0.00001 ether; // for create_token_order, adjustable
- 
- 
+
+
     //logs
     uint private count_rounds = 0;
-    
+
     struct winner_log { // win a prize and if pk
         address previous_winner;
         uint prize;
@@ -178,21 +178,21 @@ contract EthGods {
     }
     mapping (uint => uint) private count_rounds_winner_logs;
     mapping(uint => mapping(uint => winner_log)) private winner_logs;
-    
+
     struct change_log {
         uint block_number;
         uint asset_type; // 1 egst, 2 eth_surplus
-        
-        // egses change reasons:  
+
+        // egses change reasons:
             // 1 pray_reward, 2 god_reward for being invited, 3 inviter_reward,
             // 4 admin_deposit to reward_pool, 5 withdraw egses
             // 6 sell amulet, 7 sell egst, 8 withdraw bid
-        
-        // egst_change reasons: 
-            // 1 pray_reward, 2 top_gods_reward, 
-            // 3 create_token_order, 4 withdraw token_order, 5 buy token,  
+
+        // egst_change reasons:
+            // 1 pray_reward, 2 top_gods_reward,
+            // 3 create_token_order, 4 withdraw token_order, 5 buy token,
             // 6 upgrade pet, 7 upgrade amulet, 8 admin_reward
-        
+
         uint reason; // > 10 is buy token unit_price
         uint change_amount;
         uint after_amount;
@@ -203,8 +203,8 @@ contract EthGods {
     mapping(uint => mapping(uint => change_log)) private change_logs;
 
     // end of database
-  
-    
+
+
     // start of constructor
     constructor () public {
         require (contract_created == false);
@@ -216,7 +216,7 @@ contract EthGods {
         create_god(v_god, 0);
         gods[v_god].level = 10;
         enlist_god(v_god);
-        
+
         max_winners[1] = 1; // 1
         max_winners[2] = 2; // 2
         max_winners[3] = 6; // 6
@@ -224,41 +224,41 @@ contract EthGods {
         _totalSupply = 6000000 ether;
         pray_egst = 2000 ether;
         balances[admin] = sub(_totalSupply, pray_egst);
-  
+
         initialize_pray();
     }
-    
+
     // destruct for testing contracts. can't destruct since round 3
     function finalize() public {
         require(msg.sender == admin && count_rounds <= 3);
-        selfdestruct(admin); 
+        selfdestruct(admin);
     }
-    
+
 
     function () public payable {
         revert ();
-    }   
+    }
     // end of constructor
-     
-         
+
+
     //start of contract information & administration
-    
+
     function get_controller () public view returns (address, address){
         require (msg.sender == admin || msg.sender == controller1  || msg.sender == controller2);
         return (controller1, controller2);
     }
-    
+
     function set_controller (uint controller_index, address new_controller_address) public returns (bool){
         if (controller_index == 1){
             require(msg.sender == controller2);
             controller1 = new_controller_address;
         } else {
             require(msg.sender == controller1);
-            controller2 = new_controller_address;            
+            controller2 = new_controller_address;
         }
         return true;
     }
-     
+
     function set_admin (address new_admin_address) public returns (bool) {
         require (msg.sender == controller1 || msg.sender == controller2);
         // admin don't have game attributes, such as level'
@@ -269,8 +269,8 @@ contract EthGods {
         gods_address[0] = admin;
         gods[admin].god_id = 0;
         return true;
-    }  
-    
+    }
+
     // update system parameters
     function set_parameters (uint parameter_type, uint new_parameter) public returns (bool){
         require (msg.sender == admin);
@@ -307,13 +307,13 @@ contract EthGods {
             max_egst_amount = new_parameter;
         } else if (parameter_type == 16) {
             max_show_tickets = new_parameter;
-        } 
+        }
         return true;
-    }  
-        
+    }
+
     function set_strings (uint string_type, string new_string) public returns (bool){
         require (msg.sender == admin);
-        
+
         if (string_type == 1){
             official_url = new_string;
         } else if (string_type == 2){
@@ -326,12 +326,12 @@ contract EthGods {
             reEntrancyMutex = false; // repair contract, if blocked somehow in longlong future
         }
         return true;
-    } 
-    
-    // reset lottery event, if it's blocked 
+    }
+
+    // reset lottery event, if it's blocked
     function admin_reset_pray() public returns (bool){
         require (msg.sender == admin);
-        
+
         if (pray_start_block > block.number){
             pray_start_block = block.number;
         }  else if (check_event_completed() == true) {
@@ -342,12 +342,12 @@ contract EthGods {
             }
         }
     }
-    
+
     //end of contract information & administration
-    
+
 
     function query_contract () public view returns(address, address, address, uint, uint, bool, bool){
-        (uint highest_bid, address highest_bidder) = compare_bid_eth(); 
+        (uint highest_bid, address highest_bidder) = compare_bid_eth();
         return (admin,
                 pray_host_god,
                 highest_bidder,
@@ -357,11 +357,11 @@ contract EthGods {
                 rewarded_pray_winners
                );
     }
-    
+
     function query_contract2 () public view returns (string, string, address, bool){
         return (official_url, contact_email, v_god, reEntrancyMutex);
-    }    
-                    
+    }
+
     function query_uints () public view returns (uint[32] uints){
         uints[0] = max_invite_price;
         uints[1] = list_level;
@@ -398,13 +398,13 @@ contract EthGods {
 
         return uints;
     }
-    
-  
+
+
     //end of contract information & administration
 
-    
+
     // god related functions: create_god, upgrade_pet, add_exp, invite, enlist
-    
+
     function create_god (address god_address, uint inviter_id) private returns(uint god_id){ // created by the contract // public when testing
         // check if the god is already created
         if (gods[god_address].credit == 0) { // create admin as god[0]
@@ -414,15 +414,15 @@ contract EthGods {
             gods_address[god_id] = god_address;
             gods[god_address].god_id = god_id;
             gods[god_address].credit = 0.001 ether; // give 0.001 ether credit, so we know this address has a god
-                       
+
             if (god_id > 0 && inviter_id > 0 && inviter_id < count_gods){ // not admin
                 set_inviter(inviter_id);
             }
-            
+
             return god_id;
         }
     }
-    
+
     function set_inviter (uint inviter_id) private returns (bool){
         if (inviter_id > 0 && gods_address[inviter_id] != address(0)
         && gods[msg.sender].inviter_id == 0
@@ -472,14 +472,14 @@ contract EthGods {
                 enlist_god(god_address);
             }
         }
-        
+
         return (new_level, new_exp);
     }
 
-   
+
     function enlist_god (address god_address) private returns (uint) { // public when testing
         require(gods[god_address].level >= list_level && god_address != admin);
-                
+
         // if the god is not listed yet, enlist and add level requirement for the next enlist
         if (gods[god_address].listed == 0) {
             uint god_id = gods[god_address].god_id;
@@ -491,11 +491,11 @@ contract EthGods {
 
             list_level = add(list_level, 1);
             bidding_gods[listed_gods.length] = god_address;
-            
+
         }
         return list_level;
     }
-    
+
     function sort_gods_admin(uint god_id) public returns (bool){
         require (msg.sender == admin);
         sort_gods(god_id);
@@ -504,7 +504,7 @@ contract EthGods {
 
 
     // when a listed god level up and is not top 1 of the list, compare power with higher god, if higher than the higher god, swap position
-    function sort_gods (uint god_id) private returns (uint){ 
+    function sort_gods (uint god_id) private returns (uint){
         require (god_id > 0);
         uint list_length = listed_gods.length;
         if (list_length > 1) {
@@ -530,7 +530,7 @@ contract EthGods {
 
     function invite (uint god_id) public payable returns (uint new_invite_price)  {
         address god_address = gods_address[god_id];
-        require(god_id > 0 
+        require(god_id > 0
                 && god_id <= count_gods
                 && gods[god_address].hosted_pray == true
                 && tx.gasprice <= max_gas_price
@@ -538,16 +538,16 @@ contract EthGods {
 
         uint invite_price = gods[god_address].invite_price;
 
-        require(msg.value >= invite_price); 
+        require(msg.value >= invite_price);
 
         if (add(invite_price, invite_price_increase) <= max_invite_price) {
             gods[god_address].invite_price = add(invite_price, invite_price_increase);
         }
-        
+
         uint exp_up = div(invite_price, (10 ** 15)); // 1000 exp for each eth
         add_exp(god_address, exp_up);
         add_exp(msg.sender, exp_up);
-       
+
         //generate a new amulet of this god for the inviter
         count_amulets = add(count_amulets, 1);
         amulets[count_amulets].god_id = god_id;
@@ -561,7 +561,7 @@ contract EthGods {
         update_amulets_count(msg.sender, count_amulets, true);
 
         // invite_price to egses: 60% to pray_egses, 20% to god, 20 to promoter/admin
-        pray_egses = add(pray_egses, div(mul(60, invite_price), 100)); 
+        pray_egses = add(pray_egses, div(mul(60, invite_price), 100));
         egses_from_contract(god_address, div(mul(20, invite_price), 100), 2); //2 reward god for being invited
 
         reward_inviter(msg.sender, invite_price);
@@ -570,7 +570,7 @@ contract EthGods {
         return gods[god_address].invite_price;
     }
     event invited_god (address msg_sender, uint god_id);
-    
+
 
     function reward_inviter (address inviter_address, uint invite_price) private returns (bool){
         // the player spending eth also get credit and share
@@ -578,7 +578,7 @@ contract EthGods {
         uint inviter_share = 0;
         uint share_diff;
         address rewarding_inviter = inviter_address;
-        
+
         for (uint i = 0; i < 9; i++){ // max trace 9 layers of inviter
             if (rewarding_inviter != address(0) && rewarding_inviter != admin){ // admin doesn't get reward or credit
                 share_diff = 0;
@@ -592,23 +592,23 @@ contract EthGods {
                     }
                     previous_share = inviter_share;
                 }
-                
+
                 if (share_diff > 0) {
                     egses_from_contract(rewarding_inviter, div(mul(share_diff, invite_price), 100), 3); // 3 inviter_reward
                 }
-                
+
                 rewarding_inviter = gods_address[gods[rewarding_inviter].inviter_id]; // get the address of inviter's inviter'
             } else{
                 break;
             }
         }
         // invite_price to egses: sub(20%, previous_share) to admin
-        share_diff = sub(20, inviter_share); 
+        share_diff = sub(20, inviter_share);
         egses_from_contract(admin, div(mul(share_diff, invite_price), 100), 2); // remaining goes to admin, 2 god_reward for being invited
-        
+
         return true;
     }
-    
+
 
     function upgrade_pet () public returns(bool){
         //use egst to level up pet;
@@ -619,7 +619,7 @@ contract EthGods {
         pray_egst = add(pray_egst, egst_cost);
 
         emit upgradeAmulet(msg.sender, 0, gods[msg.sender].pet_level);
-        
+
         return true;
     }
     event upgradeAmulet (address owner, uint amulet_id, uint new_level);
@@ -630,11 +630,11 @@ contract EthGods {
             return true;
         }
     }
-  
-      
+
+
     function get_vip_level (address god_address) public view returns (uint vip_level){
         uint inviter_credit = gods[god_address].credit;
-        
+
         if (inviter_credit > 500 ether){
             vip_level = 18;
         } else if (inviter_credit > 200 ether){
@@ -663,12 +663,12 @@ contract EthGods {
 
 
     // view god's information
-    
+
     function get_god_id (address god_address) public view returns (uint god_id){
         return gods[god_address].god_id;
     }
-    
-    
+
+
     function get_god_address(uint god_id) public view returns (address){
         return gods_address[god_id];
     }
@@ -702,9 +702,9 @@ contract EthGods {
                 gods[god_address].bid_eth,
                 gods[god_address].count_tickets
                 );
-    }    
-    
-    
+    }
+
+
     function get_my_info () public view returns(uint, uint, uint, uint, uint, uint, uint) { //private information
 
         return (gods[msg.sender].god_id,
@@ -715,7 +715,7 @@ contract EthGods {
                 gods[msg.sender].inviter_id,
                 gods[msg.sender].count_gods_invited
                 );
-    }   
+    }
 
 
     function get_my_invited () public view returns (uint[]){
@@ -729,7 +729,7 @@ contract EthGods {
                 if (gods[gods_address[i]].inviter_id == my_id) {
                     invited_players[count_elements] = i;
                     count_elements ++;
-                    
+
                     if (count_elements >= count_gods_invited){
                         break;
                     }
@@ -741,15 +741,15 @@ contract EthGods {
 
 
     function get_listed_gods (uint page_number) public view returns (uint[]){
-        
+
         uint count_listed_gods = listed_gods.length;
         require(count_listed_gods <= mul(page_number, 20));
-        
+
         uint[] memory tempArray = new uint[] (20);
 
         if (page_number < 1) {
             page_number = 1;
-        } 
+        }
 
         for (uint i = 0; i < 20; i++){
             if(count_listed_gods > add(i, mul(20, sub(page_number, 1)))) {
@@ -758,27 +758,27 @@ contract EthGods {
                 break;
             }
         }
-        
+
         return tempArray;
     }
 
 
     // amulets
-   
+
     function upgrade_amulet (uint amulet_id) public returns(uint){
         require(amulets[amulet_id].owner == msg.sender);
         uint egst_cost = mul(add(amulets[amulet_id].level, 1), 10 ether);
         egst_to_contract(msg.sender, egst_cost, 7);// reason 7, upgrade_amulet
         pray_egst = add(pray_egst, egst_cost);
-        
+
         amulets[amulet_id].level = add(amulets[amulet_id].level, 1);
         add_exp(msg.sender, div(egst_cost, 1 ether));
         emit upgradeAmulet(msg.sender, amulet_id, amulets[amulet_id].level);
-        
+
         return amulets[amulet_id].level;
     }
-    
-    
+
+
     function create_amulet_order (uint amulet_id, uint price) public returns (uint) {
         require(msg.sender == amulets[amulet_id].owner
                 && amulet_id >= 1 && amulet_id <= count_amulets
@@ -790,7 +790,7 @@ contract EthGods {
         amulets[amulet_id].price = price;
         gods[msg.sender].count_amulets_at_hand = sub(gods[msg.sender].count_amulets_at_hand, 1);
         gods[msg.sender].count_amulets_selling = add(gods[msg.sender].count_amulets_selling, 1);
-        
+
         return gods[msg.sender].count_amulets_selling;
 
     }
@@ -801,7 +801,7 @@ contract EthGods {
         && amulets[amulet_id].start_selling_block > 0
         && amulets[amulet_id].owner != msg.sender
         && price > 0);
-        
+
         address seller = amulets[amulet_id].owner;
         amulets[amulet_id].owner = msg.sender;
         amulets[amulet_id].bound_start_block = block.number;
@@ -822,14 +822,14 @@ contract EthGods {
         require(msg.sender == amulets[amulet_id].owner
                 && amulet_id >= 1 && amulet_id <= count_amulets
                 && amulets[amulet_id].start_selling_block > 0);
-                
+
         amulets[amulet_id].start_selling_block = 0;
         gods[msg.sender].count_amulets_at_hand = add(gods[msg.sender].count_amulets_at_hand, 1);
         gods[msg.sender].count_amulets_selling = sub(gods[msg.sender].count_amulets_selling, 1);
 
         return gods[msg.sender].count_amulets_selling;
     }
-    
+
     function update_amulets_count (address god_address, uint amulet_id, bool obtained) private returns (uint){
         if (obtained == true){
             if (amulet_id < gods[god_address].amulets_start_id) {
@@ -847,12 +847,12 @@ contract EthGods {
         }
         return gods[god_address].amulets_start_id;
     }
-    
+
 
     function get_amulets_generated (uint god_id) public view returns (uint[]) {
         address god_address = gods_address[god_id];
         uint count_amulets_generated = gods[god_address].count_amulets_generated;
-        
+
         uint [] memory temp_list = new uint[](count_amulets_generated);
         if (count_amulets_generated > 0) {
             uint count_elements = 0;
@@ -860,7 +860,7 @@ contract EthGods {
                 if (amulets[i].god_id == god_id){
                     temp_list [count_elements] = i;
                     count_elements++;
-                    
+
                     if (count_elements >= count_amulets_generated){
                         break;
                     }
@@ -870,7 +870,7 @@ contract EthGods {
         return temp_list;
     }
 
-    
+
     function get_amulets_at_hand (address god_address) public view returns (uint[]) {
         uint count_amulets_at_hand = gods[god_address].count_amulets_at_hand;
         uint [] memory temp_list = new uint[] (count_amulets_at_hand);
@@ -880,7 +880,7 @@ contract EthGods {
                 if (amulets[i].owner == god_address && amulets[i].start_selling_block == 0){
                     temp_list[count_elements] = i;
                     count_elements++;
-                    
+
                     if (count_elements >= count_amulets_at_hand){
                         break;
                     }
@@ -890,8 +890,8 @@ contract EthGods {
 
         return temp_list;
     }
-    
-    
+
+
     function get_my_amulets_selling () public view returns (uint[]){
 
         uint count_amulets_selling = gods[msg.sender].count_amulets_selling;
@@ -899,11 +899,11 @@ contract EthGods {
         if (count_amulets_selling > 0) {
             uint count_elements = 0;
             for (uint i = gods[msg.sender].amulets_start_id; i <= count_amulets; i++){
-                if (amulets[i].owner == msg.sender 
+                if (amulets[i].owner == msg.sender
                 && amulets[i].start_selling_block > 0){
                     temp_list[count_elements] = i;
                     count_elements++;
-                    
+
                     if (count_elements >= count_amulets_selling){
                         break;
                     }
@@ -921,8 +921,8 @@ contract EthGods {
             if (add(amulets[i].start_selling_block, order_duration) > block.number && amulets[i].owner != msg.sender){
                 count_amulets_selling = add(count_amulets_selling, 1);
             }
-        }        
-        
+        }
+
         return count_amulets_selling; // to show page numbers when getting amulet_orders
     }
 
@@ -939,27 +939,27 @@ contract EthGods {
 
         for (uint i = 1; i <= count_amulets; i++){
             if (add(amulets[i].start_selling_block, order_duration) > block.number && amulets[i].owner != msg.sender){
-                
+
                 if (count_amulets_selling <= start_amulets_count) {
                     count_amulets_selling ++;
                 }
                 if (count_amulets_selling > start_amulets_count){
-                    
+
                     temp_list[count_list_elements] = i;
                     count_list_elements ++;
-                    
+
                     if (count_list_elements >= 20){
                         break;
                     }
                 }
-                
+
             }
         }
-        
+
         return temp_list;
     }
-    
-    
+
+
     function get_amulet (uint amulet_id) public view returns(address, string, uint, uint, uint, uint, uint){
         uint god_id = amulets[amulet_id].god_id;
         // address god_address = gods_address[god_id];
@@ -984,7 +984,7 @@ contract EthGods {
     }
 
     // end of amulet
-    
+
     // start of pray
     function admin_deposit (uint egst_amount) public payable returns (bool) {
         require (msg.sender == admin);
@@ -994,17 +994,17 @@ contract EthGods {
         }
         if (egst_amount > 0){
             pray_egst = add(pray_egst, egst_amount);
-            egst_to_contract(admin, egst_amount, 4); // 4 admin_deposit to reward_pool            
+            egst_to_contract(admin, egst_amount, 4); // 4 admin_deposit to reward_pool
         }
         return true;
     }
-        
+
     function initialize_pray () private returns (bool){
         if (pray_start_block > 0) { // double safeguard
             require (check_event_completed() == true
             && rewarded_pray_winners == true);
         }
-        
+
         count_rounds = add(count_rounds, 1);
         count_rounds_winner_logs[count_rounds] = 0;
         pray_start_block = block.number;
@@ -1030,14 +1030,14 @@ contract EthGods {
             pray_reward_top100 = false;
 
         }
-        
+
         // set_up reward pool
         reward_pool_egses = div(pray_egses, 10);
         // pray_egses = sub(pray_egses, reward_pool_egses);
 
         reward_pool_egst = div(pray_egst, 10);
         pray_egst = sub(pray_egst, reward_pool_egst); // reduce sum for less calculation, burn, if not used
-                
+
         return true;
 
     }
@@ -1049,7 +1049,7 @@ contract EthGods {
 
         return true;
     }
-    
+
 
     function withdraw_bid () public returns (bool) {
         uint bid_eth = gods[msg.sender].bid_eth;
@@ -1058,29 +1058,29 @@ contract EthGods {
         egses_from_contract(msg.sender, bid_eth, 8); // 8  withdraw bid
         return true;
     }
-    
-    
+
+
     function create_ticket(address owner_address) private returns (uint) {
         count_tickets = add(count_tickets, 1);
         tickets[count_tickets].block_number = add(block.number, 1);
         tickets[count_tickets].owner = owner_address;
         gods[owner_address].last_ticket_number = count_tickets;
         gods[owner_address].count_tickets = add(gods[owner_address].count_tickets, 1);
-        
+
         return count_tickets;
     }
-    
-    
+
+
     function pray (uint inviter_id) public payable returns (bool){
         require (tx.gasprice <= max_gas_price);
-  
+
         if (gods[msg.sender].credit == 0) {
             create_god(msg.sender, inviter_id);
         }
-        
+
         if (gods[msg.sender].free_rounds >= count_rounds){
             require (msg.value == double_egst_fee);
-            
+
             if (gods[msg.sender].paid_rounds != count_rounds){
                 gods[msg.sender].paid_rounds = count_rounds;
             }
@@ -1090,9 +1090,9 @@ contract EthGods {
             require (msg.value == 0);
             gods[msg.sender].free_rounds = count_rounds; // 1 free dice in each round
         }
-        
+
         create_ticket(msg.sender);
-        
+
         if (used_tickets < count_tickets) {
 
             ticket storage using_ticket = tickets[add(used_tickets, 1)];
@@ -1101,13 +1101,13 @@ contract EthGods {
             if (block_number < block.number) {// can only get previous block hash
                 used_tickets = add(used_tickets, 1);
                 address waiting_prayer = using_ticket.owner;
-                
+
                 if (add(block_number, block_hash_duration) <= block.number) {// this ticket should have a valid block_number to generate block hash
                     using_ticket.new_ticket_number = create_ticket(waiting_prayer); //void this ticket and create a new ticket
                 } else {// throw dice
                     bytes32 block_hash = keccak256(abi.encodePacked(blockhash(block_number)));
                     using_ticket.block_hash = block_hash;
-    
+
                     uint dice_result = eth_gods_dice.throw_dice (block_hash)[0];
                     using_ticket.dice_result = dice_result;
 
@@ -1120,8 +1120,8 @@ contract EthGods {
                 }
             }
         }
-        
-   
+
+
         add_exp(pray_host_god, 1);
 
         if (check_event_completed() == true && rewarded_pray_winners == false) {
@@ -1130,7 +1130,7 @@ contract EthGods {
 
         return true;
     }
-    
+
 
     function set_winner (uint prize, uint ticket_number) private returns (uint){
 
@@ -1142,13 +1142,13 @@ contract EthGods {
 
         if (count_listed_winners[prize] >= max_winners[prize]){ // winner_list maxed, so the new prayer challenge previous winners
            	uint pk_position = pk_positions[prize];
-        	address previous_winner = listed_winners[prize][pk_position];  
+        	address previous_winner = listed_winners[prize][pk_position];
 
             bool pk_result = pk(waiting_prayer, previous_winner, block_hash);
 
 			winner_logs[count_rounds][count_rounds_winner_logs[count_rounds]].pk_result = pk_result;
 			winner_logs[count_rounds][count_rounds_winner_logs[count_rounds]].previous_winner = previous_winner;
-            
+
             if (pk_result == true) {
                 listed_winners[prize][pk_position] = waiting_prayer; // attacker defeat defender
             }
@@ -1157,13 +1157,13 @@ contract EthGods {
                     pk_positions[prize] = sub(pk_positions[prize], 1);
                 } else {
                     pk_positions[prize] = max_winners[prize];
-                }               
+                }
             }
         } else {
             count_listed_winners[prize] = add(count_listed_winners[prize], 1);
             listed_winners[prize][count_listed_winners[prize]] = waiting_prayer;
         }
-     
+
         return count_listed_winners[prize];
     }
 
@@ -1174,7 +1174,7 @@ contract EthGods {
 
         uint this_reward_egses = 0; // this reward for a specific winner
         uint this_reward_egst = 0;  // this reward for a specific winner
-        
+
         for (uint i = 1; i<=3; i++){
             if (i == 1) {
                 this_reward_egses = mul(div(reward_pool_egses, 100), 60);
@@ -1182,8 +1182,8 @@ contract EthGods {
                 this_reward_egses = mul(div(reward_pool_egses, 100), 20);
             } else if (i == 3){
                 this_reward_egst = mul(div(reward_pool_egst, 100), 8);
-            } 
-            
+            }
+
             for (uint reward_i = 1; reward_i <= count_listed_winners[i]; reward_i++){
                 address rewarding_winner = listed_winners[i][reward_i];
 
@@ -1193,15 +1193,15 @@ contract EthGods {
                 } else if (this_reward_egst > 0) {
                     if (gods[rewarding_winner].paid_rounds < count_rounds){
                         egst_from_contract(rewarding_winner, this_reward_egst, 1); // 1 pray_reward
-                    } else { 
+                    } else {
                         egst_from_contract(rewarding_winner, mul(this_reward_egst, 2), 1); // 1 pray_reward
                         _totalSupply = add(_totalSupply, this_reward_egst);
 
                         if (gods[rewarding_winner].paid_rounds > count_rounds){// just in case of any error
                             gods[rewarding_winner].paid_rounds = count_rounds;
-                        } 
+                        }
                     }
-                }  
+                }
 
             }
 
@@ -1210,17 +1210,17 @@ contract EthGods {
         // burn egst, 2% fixed amount, plus wasted EGST floor prizes
         uint burn_egst = div(reward_pool_egst, 50);
         if (count_listed_winners[3] < max_winners[3]) {
-            burn_egst = add(burn_egst,  mul(this_reward_egst, sub(max_winners[3], count_listed_winners[3]))); 
+            burn_egst = add(burn_egst,  mul(this_reward_egst, sub(max_winners[3], count_listed_winners[3])));
         }
         _totalSupply = sub(_totalSupply, burn_egst);
-                    
+
         if(pray_reward_top100 == true) {
             reward_top_gods();
         }
-            
+
         // a small gift of exp & egst to the god who burned gas to send rewards to the community
         egst_from_contract(msg.sender, mul(initializer_reward, 1 ether), 1); // 1 pray_reward
-        _totalSupply = add(_totalSupply, mul(initializer_reward, 1 ether));  
+        _totalSupply = add(_totalSupply, mul(initializer_reward, 1 ether));
         add_exp(msg.sender, initializer_reward);
 
         rewarded_pray_winners = true;
@@ -1231,16 +1231,16 @@ contract EthGods {
 
     // more listed gods, more reward to the top gods, highest reward 600 egst
     function reward_top_gods () private returns (bool){ // public when testing
-        
+
         uint count_listed_gods = listed_gods.length;
         uint last_god_index;
-        
+
         if (count_listed_gods > 100) {
             last_god_index = sub(count_listed_gods, 100);
         } else {
             last_god_index = 0;
         }
-        
+
         uint reward_egst = 0;
         uint base_reward = 6 ether;
         if (count_rounds == 6){
@@ -1249,9 +1249,9 @@ contract EthGods {
         for (uint i = last_god_index; i < count_listed_gods; i++) {
             reward_egst = mul(base_reward, sub(add(i, 1), last_god_index));
             egst_from_contract(gods_address[listed_gods[i]], reward_egst, 2);// 2 top_gods_reward
-            _totalSupply = add(_totalSupply, reward_egst);   
+            _totalSupply = add(_totalSupply, reward_egst);
         }
-        
+
         return true;
     }
 
@@ -1272,9 +1272,9 @@ contract EthGods {
 
     function check_event_completed () public view returns (bool){
         if (add(pray_start_block, round_duration) < block.number){
-            return true;   
+            return true;
         } else {
-            return false;   
+            return false;
         }
     }
 
@@ -1283,15 +1283,15 @@ contract EthGods {
 
         (uint attacker_sum_god_levels, uint attacker_sum_amulet_levels) = get_sum_levels_pk(attacker);
         (uint defender_sum_god_levels, uint defender_sum_amulet_levels) = get_sum_levels_pk(defender);
-    
+
         pk_result = eth_gods_dice.pk(block_hash, attacker_sum_god_levels, attacker_sum_amulet_levels, defender_sum_god_levels, defender_sum_amulet_levels);
-        
+
         return pk_result;
     }
-    
-    
+
+
     function get_sum_levels_pk (address god_address) public view returns (uint sum_gods_level, uint sum_amulets_level){
-             
+
         sum_gods_level =  gods[god_address].level;
         sum_amulets_level = gods[god_address].pet_level; // add pet level to the sum
 		uint amulet_god_id;
@@ -1304,10 +1304,10 @@ contract EthGods {
                 sum_amulets_level = add(sum_amulets_level, amulets[i].level);
             }
         }
-                
+
         return (sum_gods_level, sum_amulets_level);
     }
-        
+
     //admin need this function
     function get_listed_winners (uint prize) public view returns (address[]){
         address [] memory temp_list = new address[] (count_listed_winners[prize]);
@@ -1318,7 +1318,7 @@ contract EthGods {
         }
         return temp_list;
     }
-    
+
     function get_ticket (uint ticket_number) public view returns (uint, bytes32, address, uint, uint){
         return (tickets[ticket_number].block_number,
             tickets[ticket_number].block_hash,
@@ -1326,7 +1326,7 @@ contract EthGods {
             tickets[ticket_number].new_ticket_number,
             tickets[ticket_number].dice_result);
     }
-    
+
     function get_my_tickets() public view returns (uint[]) {
         uint count_my_tickets = gods[msg.sender].count_tickets;
         if (count_my_tickets > max_show_tickets) {
@@ -1339,7 +1339,7 @@ contract EthGods {
                 if (tickets[i].owner == msg.sender){
                     temp_list[count_elements] = i;
                     count_elements++;
-                    
+
                     if (count_elements >= count_my_tickets){
                         break;
                     }
@@ -1347,10 +1347,10 @@ contract EthGods {
             }
         }
 
-        return temp_list;       
+        return temp_list;
     }
 
- 
+
     // end of pray
 
     // start of egses
@@ -1365,8 +1365,8 @@ contract EthGods {
 
         create_change_log(1, reason, tokens, egses_balances[to], contract_address, to);
         return true;
-    } 
-    
+    }
+
     function egses_withdraw () public returns (uint tokens){
         tokens = egses_balances[msg.sender];
         require (tokens > 0 && contract_address.balance >= tokens && reEntrancyMutex == false);
@@ -1375,7 +1375,7 @@ contract EthGods {
         egses_balances[msg.sender] = 0;
         msg.sender.transfer(tokens);
         reEntrancyMutex = false;
-        
+
         emit withdraw_egses(msg.sender, tokens);
         create_change_log(1, 5, tokens, 0, contract_address, msg.sender); // 5 withdraw egses
 
@@ -1384,7 +1384,7 @@ contract EthGods {
     event withdraw_egses (address receiver, uint tokens);
 
    // end of egses
-   
+
 
     // start of erc20 for egst
     function totalSupply () public view returns (uint){
@@ -1406,8 +1406,8 @@ contract EthGods {
         balances[to] = add(balances[to], tokens);
         emit Transfer(msg.sender, to, tokens);
         create_change_log(2, 9, tokens, balances[to], msg.sender, to);
-        
-        return true;    
+
+        return true;
     }
     event Transfer (address indexed from, address indexed to, uint tokens);
 
@@ -1416,7 +1416,7 @@ contract EthGods {
 
         require (balances[msg.sender] >= tokens);
         allowed[msg.sender][spender] = tokens;
-        
+
         emit Approval(msg.sender, spender, tokens);
         return true;
     }
@@ -1428,28 +1428,28 @@ contract EthGods {
         allowed[from][msg.sender] = sub(allowed[from][msg.sender], tokens);
         balances[from] = sub(balances[from], tokens);
         balances[to] = add(balances[to], tokens);
-        
+
         emit Transfer(from, to, tokens);
         create_change_log(2, 10, tokens, balances[to], from, to);
-        return true;    
+        return true;
     }
 
     // end of erc20 for egst
-    
-    
+
+
     // egst
-  
+
     function egst_from_contract (address to, uint tokens, uint reason) private returns (bool) { // public when testing
         balances[to] = add(balances[to], tokens);
 
-        create_change_log(2, reason, tokens, balances[to], contract_address, to); 
+        create_change_log(2, reason, tokens, balances[to], contract_address, to);
         return true;
     }
 
     function egst_to_contract (address from, uint tokens, uint reason) private returns (bool) { // public when testing
         require (balances[from] >= tokens);
         balances[from] = sub(balances[from], tokens);
-        
+
 
         emit spend_egst(from, tokens, reason);
         create_change_log(2, reason, tokens, balances[from], from, contract_address);
@@ -1458,8 +1458,8 @@ contract EthGods {
     event spend_egst (address from, uint tokens, uint reason);
 
 
-    function create_token_order (uint unit_price, uint egst_amount) public returns (uint) {      
-        require(unit_price >= min_unit_price && unit_price <= max_unit_price 
+    function create_token_order (uint unit_price, uint egst_amount) public returns (uint) {
+        require(unit_price >= min_unit_price && unit_price <= max_unit_price
         && balances[msg.sender] >= egst_amount
         && egst_amount <= max_egst_amount
         && egst_amount >= min_egst_amount);
@@ -1467,20 +1467,20 @@ contract EthGods {
         count_token_orders = add(count_token_orders, 1);
 
         egst_to_contract(msg.sender, egst_amount, 3); // 3 create_token_order
-        
-        token_orders[count_token_orders].start_selling_block = block.number;    
+
+        token_orders[count_token_orders].start_selling_block = block.number;
         token_orders[count_token_orders].seller = msg.sender;
         token_orders[count_token_orders].unit_price = unit_price;
         token_orders[count_token_orders].egst_amount = egst_amount;
         gods[msg.sender].count_token_orders = add(gods[msg.sender].count_token_orders, 1);
-        
+
         update_first_active_token_order(msg.sender);
 
         return gods[msg.sender].count_token_orders;
     }
 
 
-    function withdraw_token_order (uint order_id) public returns (bool) { 
+    function withdraw_token_order (uint order_id) public returns (bool) {
         require (msg.sender == token_orders[order_id].seller
                 && token_orders[order_id].egst_amount > 0);
 
@@ -1489,7 +1489,7 @@ contract EthGods {
         token_orders[order_id].egst_amount = 0;
         egst_from_contract(msg.sender, egst_amount, 4); // 4  withdraw token_order
         gods[msg.sender].count_token_orders = sub(gods[msg.sender].count_token_orders, 1);
-        
+
         update_first_active_token_order(msg.sender);
         emit WithdrawTokenOrder(msg.sender, order_id);
 
@@ -1497,14 +1497,14 @@ contract EthGods {
     }
     event WithdrawTokenOrder (address seller, uint order_id);
 
-    function buy_token (uint order_id, uint egst_amount) public payable returns (uint) { 
+    function buy_token (uint order_id, uint egst_amount) public payable returns (uint) {
 
-        require(order_id >= first_active_token_order 
+        require(order_id >= first_active_token_order
                 && order_id <= count_token_orders
                 && egst_amount <= token_orders[order_id].egst_amount
                 && token_orders[order_id].egst_amount > 0
                 && token_orders[order_id].seller != msg.sender);
-        
+
         // unit_price 100 means 1 egst = 0.001 ether
         uint eth_cost = div(mul(token_orders[order_id].unit_price, egst_amount), 100000);
         require(msg.value >= eth_cost && msg.value < add(eth_cost, max_extra_eth) );
@@ -1514,23 +1514,23 @@ contract EthGods {
 
         address seller = token_orders[order_id].seller;
         egses_from_contract(seller, eth_cost, 7); // 7 sell egst
-        
-        
+
+
         if (token_orders[order_id].egst_amount <= 0){
             token_orders[order_id].start_selling_block = 0;
             gods[seller].count_token_orders = sub(gods[seller].count_token_orders, 1);
             update_first_active_token_order(seller);
         }
-        
+
         emit BuyToken(msg.sender, order_id, egst_amount);
 
         return token_orders[order_id].egst_amount;
     }
     event BuyToken (address buyer, uint order_id, uint egst_amount);
 
-  
+
     function update_first_active_token_order (address god_address) private returns (uint, uint){ // public when testing
-        if (count_token_orders > 0 
+        if (count_token_orders > 0
         && first_active_token_order == 0){
             first_active_token_order = 1;
         } else {
@@ -1542,15 +1542,15 @@ contract EthGods {
                     }
                     break;
                 }
-            }    
+            }
         }
-            
+
         if (gods[god_address].count_token_orders > 0
         && gods[god_address].first_active_token_order == 0){
             gods[god_address].first_active_token_order = 1; // may not be 1, but it will correct next time
         } else {
             for (uint j = gods[god_address].first_active_token_order; j < count_token_orders; j++){
-                if (token_orders[j].seller == god_address 
+                if (token_orders[j].seller == god_address
                 && token_orders[j].start_selling_block > 0){ // don't check duration, show it to selling, even if expired
                     // find the first active order and compare with the currect index
                     if(j > gods[god_address].first_active_token_order){
@@ -1560,7 +1560,7 @@ contract EthGods {
                 }
             }
         }
-        
+
         return (first_active_token_order, gods[msg.sender].first_active_token_order);
     }
 
@@ -1578,7 +1578,7 @@ contract EthGods {
     function get_token_orders () public view returns(uint, uint, uint, uint, uint) {
         uint lowest_price = max_unit_price;
         for (uint i = first_active_token_order; i <= count_token_orders; i++){
-            if (token_orders[i].unit_price < lowest_price 
+            if (token_orders[i].unit_price < lowest_price
             && token_orders[i].egst_amount > 0
             && add(token_orders[i].start_selling_block, order_duration) > block.number){
                 lowest_price = token_orders[i].unit_price;
@@ -1586,7 +1586,7 @@ contract EthGods {
         }
         return (count_token_orders, first_active_token_order, order_duration, max_unit_price, lowest_price);
     }
-    
+
 
     function get_my_token_orders () public view returns(uint []) {
         uint my_count_token_orders = gods[msg.sender].count_token_orders;
@@ -1598,7 +1598,7 @@ contract EthGods {
                 && token_orders[i].start_selling_block > 0){
                     temp_list[count_list_elements] = i;
                     count_list_elements++;
-                    
+
                     if (count_list_elements >= my_count_token_orders){
                         break;
                     }
@@ -1611,15 +1611,15 @@ contract EthGods {
 
 
     // end of egst
-    
-   
+
+
     // logs
     function get_winner_log (uint pray_round, uint log_id) public view returns (uint, bytes32, address, address, uint, bool, uint){
         require(log_id >= 1 && log_id <= count_rounds_winner_logs[pray_round]);
         winner_log storage this_winner_log = winner_logs[pray_round][log_id];
-        
+
         uint ticket_number = this_winner_log.ticket_number;
-        
+
         return (tickets[ticket_number].block_number,
                 tickets[ticket_number].block_hash,
                 tickets[ticket_number].owner,
@@ -1627,40 +1627,40 @@ contract EthGods {
                 this_winner_log.prize,
                 this_winner_log.pk_result,
                 this_winner_log.ticket_number);
-    }    
+    }
 
     function get_count_rounds_winner_logs (uint pray_round) public view returns (uint){
         return count_rounds_winner_logs[pray_round];
     }
 
 
-    // egses change reasons:  
+    // egses change reasons:
         // 1 pray_reward, 2 god_reward for being invited, 3 inviter_reward,
         // 4 admin_deposit to reward_pool, 5 withdraw egses
         // 6 sell amulet, 7 sell egst, 8 withdraw bid
-    
-    // egst_change reasons: 
-        // 1 pray_reward, 2 top_gods_reward, 
-        // 3 create_token_order, 4 withdraw token_order, 5 buy token (> 10),  
-        // 6 upgrade pet, 7 upgrade amulet, 8 admin_reward, 
+
+    // egst_change reasons:
+        // 1 pray_reward, 2 top_gods_reward,
+        // 3 create_token_order, 4 withdraw token_order, 5 buy token (> 10),
+        // 6 upgrade pet, 7 upgrade amulet, 8 admin_reward,
         // 9 transfer, 10 transferFrom(owner & receiver)
 
-        
+
     function create_change_log (uint asset_type, uint reason, uint change_amount, uint after_amount, address _from, address _to) private returns (uint) {
         count_rounds_change_logs[count_rounds] = add(count_rounds_change_logs[count_rounds], 1);
         uint log_id = count_rounds_change_logs[count_rounds];
- 
+
         change_logs[count_rounds][log_id].block_number = block.number;
         change_logs[count_rounds][log_id].asset_type = asset_type;
         change_logs[count_rounds][log_id].reason = reason;
         change_logs[count_rounds][log_id].change_amount = change_amount;
-        change_logs[count_rounds][log_id].after_amount = after_amount; 
+        change_logs[count_rounds][log_id].after_amount = after_amount;
         change_logs[count_rounds][log_id]._from = _from;
         change_logs[count_rounds][log_id]._to = _to;
-        
+
         return log_id;
     }
-          
+
     function get_change_log (uint pray_round, uint log_id) public view returns (uint, uint, uint, uint, uint, address, address){ // public
         change_log storage this_log = change_logs[pray_round][log_id];
         return (this_log.block_number,
@@ -1670,13 +1670,13 @@ contract EthGods {
                 this_log.after_amount, // god's after amount. transfer or transferFrom doesn't record log
                 this_log._from,
                 this_log._to);
-        
+
     }
-    
+
     function get_count_rounds_change_logs (uint pray_round) public view returns(uint){
         return count_rounds_change_logs[pray_round];
     }
-    
+
     // end of logs
 
 
@@ -1706,15 +1706,15 @@ contract EthGodsName {
 
     // EthGods
     EthGods private eth_gods;
-    address private ethgods_contract_address;   
+    address private ethgods_contract_address;
     function set_eth_gods_contract_address (address eth_gods_contract_address) public returns (bool){
         require (msg.sender == admin);
-        
+
         ethgods_contract_address = eth_gods_contract_address;
-        eth_gods = EthGods(ethgods_contract_address); 
+        eth_gods = EthGods(ethgods_contract_address);
         return true;
     }
-  
+
     address private admin; // manually update to ethgods' admin
     function update_admin () public returns (bool){
         (address new_admin,,,,,,) = eth_gods.query_contract();
@@ -1725,8 +1725,8 @@ contract EthGodsName {
 
     //contract information & administration
     bool private contract_created; // in case constructor logic change in the future
-    address private contract_address; //shown at the top of the home page   
-    
+    address private contract_address; //shown at the top of the home page
+
     string private invalid_chars = "\\\"";
     bytes private invalid_bytes = bytes(invalid_chars);
     function set_invalid_chars (string new_invalid_chars) public returns (bool) {
@@ -1735,14 +1735,14 @@ contract EthGodsName {
         invalid_bytes = bytes(invalid_chars);
         return true;
     }
-    
-    uint private valid_length = 16;    
+
+    uint private valid_length = 16;
     function set_valid_length (uint new_valid_length) public returns (bool) {
         require(msg.sender == admin);
         valid_length = new_valid_length;
         return true;
     }
-    
+
     struct god_name {
         string god_name;
         uint block_number;
@@ -1751,12 +1751,12 @@ contract EthGodsName {
     mapping (address => god_name) private gods_name;
 
     // start of constructor and destructor
-    
-    constructor () public {    
+
+    constructor () public {
         require (contract_created == false);
         contract_created = true;
         contract_address = address(this);
-        admin = msg.sender;     
+        admin = msg.sender;
         address v_god = 0xfB6916095ca1df60bB79Ce92cE3Ea74c37c5d359;
         gods_name[v_god].god_name = "V";
     }
@@ -1767,24 +1767,24 @@ contract EthGodsName {
 
     function finalize() public {
         require (msg.sender == admin);
-        selfdestruct(msg.sender); 
+        selfdestruct(msg.sender);
     }
-    
+
     // end of constructor and destructor
-    
-    
+
+
     function set_god_name (string new_name) public returns (bool){
         address god_address = msg.sender;
         require (add(gods_name[god_address].block_number, gods_name[god_address].block_duration) < block.number );
 
         bytes memory bs = bytes(new_name);
         require (bs.length <= valid_length);
-        
+
         for (uint i = 0; i < bs.length; i++){
             for (uint j = 0; j < invalid_bytes.length; j++) {
                 if (bs[i] == invalid_bytes[j]){
                     return false;
-                } 
+                }
             }
         }
 
@@ -1805,7 +1805,7 @@ contract EthGodsName {
         gods_name[god_address].block_number = block.number;
         gods_name[god_address].block_duration = block_duration;
     }
-    
+
     function add (uint a, uint b) internal pure returns (uint c) {
         c = a + b;
         require(c >= a);
@@ -1814,12 +1814,12 @@ contract EthGodsName {
 
 
 contract EthGodsDice {
-    
+
     //contract information & administration
     bool private contract_created; // in case constructor logic change in the future
     address private contract_address; //shown at the top of the home page
     address private admin;
-    
+
     // start of constructor and destructor
     constructor () public {
         require (contract_created == false);
@@ -1831,13 +1831,13 @@ contract EthGodsDice {
 
     function finalize () public {
         require (msg.sender == admin);
-        selfdestruct(msg.sender); 
+        selfdestruct(msg.sender);
     }
-    
+
     function () public payable {
         revert();  // if received eth for no reason, reject
     }
-    
+
     // end of constructor and destructor
 
 
@@ -1846,7 +1846,7 @@ contract EthGodsDice {
         uint hash_number;
         uint[] memory count_dice_numbers = new uint[](7);
         uint i; // for loop
-  
+
         for (i = 1; i <= 6; i++) {
             hash_number = uint(block_hash[i]);
             if (hash_number >= 214) { // 214
@@ -1882,18 +1882,18 @@ contract EthGodsDice {
                     dice_numbers[0] = 2; // super_eth
                     won_super_prize = true;
                 }
-            } 
+            }
         }
 
         if (won_super_prize == false) {
             dice_numbers[0] = 4;
         }
-        
+
         return dice_numbers;
     }
-    
+
     function pk (bytes32 block_hash, uint attacker_sum_god_levels, uint attacker_sum_amulet_levels, uint defender_sum_god_levels, uint defender_sum_amulet_levels) public pure returns (bool){
-     
+
         uint god_win_chance;
         attacker_sum_god_levels = add(attacker_sum_god_levels, 10);
         if (attacker_sum_god_levels < defender_sum_god_levels){
@@ -1905,9 +1905,9 @@ contract EthGodsDice {
             } else { // equal level, 50% chance to win
                 god_win_chance = mul(god_win_chance, 5);
             }
-        }        
-        
-        
+        }
+
+
         uint amulet_win_chance;
         attacker_sum_amulet_levels = add(attacker_sum_amulet_levels, 10);
         if (attacker_sum_amulet_levels < defender_sum_amulet_levels){
@@ -1921,17 +1921,17 @@ contract EthGodsDice {
             }
         }
 
-        
+
         uint attacker_win_chance = div(add(god_win_chance, amulet_win_chance), 2);
         if (attacker_win_chance >= div(mul(uint(block_hash[3]),2),5)){
             return true;
         } else {
             return false;
         }
-        
+
     }
-    
-    
+
+
     // common functions
 
      function add (uint a, uint b) internal pure returns (uint c) {
@@ -1950,5 +1950,66 @@ contract EthGodsDice {
          require(b > 0);
          c = a / b;
      }
-        
-}
+
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

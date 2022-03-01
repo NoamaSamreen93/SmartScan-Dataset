@@ -54,7 +54,7 @@ pragma solidity ^0.4.18;
 //
 // ----------------------------------------------------------------------------------------------------
 //
-// Website: https://skorch.io 
+// Website: https://skorch.io
 // Reddit: https://reddit.com/r/SkorchToken
 // Twitter: https://twitter.com/SkorchToken
 
@@ -156,8 +156,8 @@ contract SkorchToken is ERC20Interface, Owned {
     uint public  _MAXIMUM_TARGET = 2**234;
 
     uint public miningTarget;
-    
-    uint256 public MinimumPoStokens = 20000 * 10**uint(decimals); // set minimum tokens to stake 
+
+    uint256 public MinimumPoStokens = 20000 * 10**uint(decimals); // set minimum tokens to stake
 
     bytes32 public challengeNumber;   //generate a new one when a new reward is minted
 
@@ -175,30 +175,30 @@ contract SkorchToken is ERC20Interface, Owned {
     mapping(address => uint) balances;
 
     mapping(address => mapping(address => uint)) allowed;
-    
-    mapping(address => uint256) timer; // timer to check PoS 
-    
-    // how to calculate doubleUnit: 
-    // specify how much percent increase you want per year 
-    // e.g. 130% -> 2.3 multiplier every year 
+
+    mapping(address => uint256) timer; // timer to check PoS
+
+    // how to calculate doubleUnit:
+    // specify how much percent increase you want per year
+    // e.g. 130% -> 2.3 multiplier every year
     // now divide (1 years) by LOG(2.3) where LOG is the natural logarithm (not LOG10)
     // in this case LOG(2.3) is 0.83290912293
-    // hence multiplying by 1/0.83290912293 is the same 
+    // hence multiplying by 1/0.83290912293 is the same
     // 31536000 = 1 years (to prevent deprecated warning in solc)
     uint256 doubleUnit = (31536000) * 1.2;
 
     event Mint(address indexed from, uint reward_amount, uint epochCount, bytes32 newChallengeNumber);
 
     constructor()
-        public 
+        public
         onlyOwner()
     {
         symbol = "SKO";
         name = "Skorch Token";
         decimals = 18;
-        // uncomment this to test 
-        //balances[msg.sender] = (20000) * (10 ** uint(decimals)); // change 20000 to some lower number than 20000 
-        //to see you will not get PoS tokens if you have less than 20000 tokens 
+        // uncomment this to test
+        //balances[msg.sender] = (20000) * (10 ** uint(decimals)); // change 20000 to some lower number than 20000
+        //to see you will not get PoS tokens if you have less than 20000 tokens
         //timer[msg.sender] = now - (1 years);
         _totalSupply = 21000000 * 10**uint(decimals);
         tokensMinted = 0;
@@ -207,17 +207,17 @@ contract SkorchToken is ERC20Interface, Owned {
         miningTarget = _MAXIMUM_TARGET;
         latestDifficultyPeriodStarted = block.number;
         _startNewMiningEpoch();
-        
-        
+
+
     }
-    
+
     function setPosTokens(uint256 newTokens)
-        public 
+        public
         onlyOwner
     {
         require(newTokens >= 100000);
         // note: newTokens should be multiplied with 10**uint(decimals) (10^18);
-        // require is in place to prevent fuck up. for 1000 tokens you need to enter 1000* 10^18 
+        // require is in place to prevent fuck up. for 1000 tokens you need to enter 1000* 10^18
         MinimumPoStokens = newTokens;
     }
 
@@ -257,7 +257,7 @@ contract SkorchToken is ERC20Interface, Owned {
 
     function _reAdjustDifficulty() internal {
         uint ethBlocksSinceLastDifficultyPeriod = block.number - latestDifficultyPeriodStarted;
-        uint epochsMined = _BLOCKS_PER_READJUSTMENT; 
+        uint epochsMined = _BLOCKS_PER_READJUSTMENT;
         uint targetEthBlocksPerDiffPeriod = epochsMined * 60; //should be 60 times slower than ethereum
         if( ethBlocksSinceLastDifficultyPeriod < targetEthBlocksPerDiffPeriod )
         {
@@ -300,7 +300,7 @@ contract SkorchToken is ERC20Interface, Owned {
         bytes32 digest = keccak256(challenge_number,msg.sender,nonce);
         return digest;
       }
-      
+
       function checkMintSolution(uint256 nonce, bytes32 challenge_digest, bytes32 challenge_number, uint testTarget) public view returns (bool success) {
           bytes32 digest = keccak256(challenge_number,msg.sender,nonce);
           if(uint256(digest) > testTarget) revert();
@@ -312,7 +312,7 @@ contract SkorchToken is ERC20Interface, Owned {
     }
 
     function balanceOf(address tokenOwner) public constant returns (uint balance) {
-        return balances[tokenOwner];// + _getPoS(tokenOwner); // add unclaimed pos tokens 
+        return balances[tokenOwner];// + _getPoS(tokenOwner); // add unclaimed pos tokens
     }
 
     function transfer(address to, uint tokens) public returns (bool success) {
@@ -353,46 +353,46 @@ contract SkorchToken is ERC20Interface, Owned {
 
     function () public payable {
         revert();
-    } 
+    }
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
-    
+
     function claimTokens() public {
-        _claimTokens(msg.sender);        
+        _claimTokens(msg.sender);
     }
-    
+
     function _claimTokens(address target) internal{
         if (timer[target] == 0){
             // russian hackers BTFO
             return;
         }
         if (timer[target] == now){
-            // 0 seconds passed, 0 tokens gotten via PoS 
-            // return so no gas waste 
+            // 0 seconds passed, 0 tokens gotten via PoS
+            // return so no gas waste
             return;
         }
-        
+
         uint256 totalTkn = _getPoS(target);
         balances[target] = balances[target].add(totalTkn);
         _totalSupply.add(totalTkn);
         timer[target] = now;
         emit Transfer(address(0x0), target, totalTkn);
     }
-    
+
     function _getPoS(address target) internal view returns (uint256){
         if (balances[target] <= MinimumPoStokens){
             return 0;
         }
         int ONE_SECOND = 0x10000000000000000;
-        int PORTION_SCALED = (int(now - timer[target]) * ONE_SECOND) / int(doubleUnit); 
+        int PORTION_SCALED = (int(now - timer[target]) * ONE_SECOND) / int(doubleUnit);
         uint256 exp = fixedExp(PORTION_SCALED);
-        
-        return ((balances[target].mul(exp)) / uint(one)).sub(balances[target]); 
+
+        return ((balances[target].mul(exp)) / uint(one)).sub(balances[target]);
     }
-    
-    
-    
+
+
+
     int256 constant ln2       = 0x0b17217f7d1cf79ac;
     int256 constant ln2_64dot5= 0x2cb53f09f05cc627c8;
     int256 constant one       = 0x10000000000000000;
@@ -418,3 +418,71 @@ contract SkorchToken is ERC20Interface, Owned {
 	}
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

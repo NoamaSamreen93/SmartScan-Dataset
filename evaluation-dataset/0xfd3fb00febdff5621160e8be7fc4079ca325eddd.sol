@@ -18,20 +18,20 @@ contract KNLuckyRoll{
     bool win,
     uint256 wonamount
     );
-    
+
     event Shake(
     address from,
     bytes32 make_chaos
     );
-    
+
     constructor() public{
         admin = 0x7D5c8C59837357e541BC7d87DeE53FCbba55bA65;
     }
-    
+
     function random() private view returns (uint8) {
         return uint8(uint256(keccak256(block.timestamp, block.difficulty, _seed))%100); // random 0-99
     }
-    
+
     function PlayX2() public payable {
         require(msg.value >= 1);
         require(ERC20Interface(0xbfd18F20423694a69e35d65cB9c9D74396CC2c2d).balanceOf(address(msg.sender)) >= 50000000000000000000);
@@ -51,7 +51,7 @@ contract KNLuckyRoll{
             emit PlayResult(msg.sender, "x2", msg.value, false, 0x0);
         }
     }
-    
+
     function PlayX3() public payable {
         require(msg.value >= 1);
         require(ERC20Interface(0xbfd18F20423694a69e35d65cB9c9D74396CC2c2d).balanceOf(address(msg.sender)) >= 50000000000000000000);
@@ -71,7 +71,7 @@ contract KNLuckyRoll{
             emit PlayResult(msg.sender, "x3", msg.value, false, 0x0);
         }
     }
-    
+
     function PlayX5() public payable {
         require(msg.value >= 1);
         require(ERC20Interface(0xbfd18F20423694a69e35d65cB9c9D74396CC2c2d).balanceOf(address(msg.sender)) >= 50000000000000000000);
@@ -91,7 +91,7 @@ contract KNLuckyRoll{
             emit PlayResult(msg.sender, "x5", msg.value, false, 0x0);
         }
     }
-    
+
     function PlayX10() public payable {
         require(msg.value >= 1);
         require(ERC20Interface(0xbfd18F20423694a69e35d65cB9c9D74396CC2c2d).balanceOf(address(msg.sender)) >= 50000000000000000000);
@@ -111,7 +111,7 @@ contract KNLuckyRoll{
             emit PlayResult(msg.sender, "x10", msg.value, false, 0x0);
         }
     }
-    
+
     function PlayX20() public payable {
         require(msg.value >= 1);
         require(ERC20Interface(0xbfd18F20423694a69e35d65cB9c9D74396CC2c2d).balanceOf(address(msg.sender)) >= 50000000000000000000);
@@ -131,7 +131,7 @@ contract KNLuckyRoll{
             emit PlayResult(msg.sender, "x20", msg.value, false, 0x0);
         }
     }
-    
+
     function PlayX30() public payable {
         require(msg.value >= 1);
         require(ERC20Interface(0xbfd18F20423694a69e35d65cB9c9D74396CC2c2d).balanceOf(address(msg.sender)) >= 50000000000000000000);
@@ -151,7 +151,7 @@ contract KNLuckyRoll{
             emit PlayResult(msg.sender, "x30", msg.value, false, 0x0);
         }
     }
-    
+
     function PlayX50() public payable {
         require(msg.value >= 1);
         require(ERC20Interface(0xbfd18F20423694a69e35d65cB9c9D74396CC2c2d).balanceOf(address(msg.sender)) >= 50000000000000000000);
@@ -171,7 +171,7 @@ contract KNLuckyRoll{
             emit PlayResult(msg.sender, "x50", msg.value, false, 0x0);
         }
     }
-    
+
     function PlayX100() public payable {
         require(msg.value >= 1);
         require(ERC20Interface(0xbfd18F20423694a69e35d65cB9c9D74396CC2c2d).balanceOf(address(msg.sender)) >= 50000000000000000000);
@@ -191,7 +191,7 @@ contract KNLuckyRoll{
             emit PlayResult(msg.sender, "x100", msg.value, false, 0x0);
         }
     }
-    
+
     function Playforfreetoken() public payable {
         require(msg.value >= 0.01 ether);
         exceed = msg.value - 0.01 ether;
@@ -213,7 +213,7 @@ contract KNLuckyRoll{
             emit PlayResult(msg.sender, "freetoken", msg.value, false, 0);
         }
     }
-    
+
     function Playforbulktoken() public payable {
         require(msg.value >= 1 ether);
         exceed = msg.value - 1 ether;
@@ -240,7 +240,7 @@ contract KNLuckyRoll{
         require(msg.sender == admin);
         _;
     }
-    
+
     function withdrawEth(address to, uint256 balance) external onlyAdmin {
         if (balance == uint256(0x0)) {
             to.transfer(address(this).balance);
@@ -248,7 +248,7 @@ contract KNLuckyRoll{
         to.transfer(balance);
         }
     }
-    
+
     function withdrawToken(address contractAddress, address to, uint256 balance) external onlyAdmin {
         ERC20Interface erc20 = ERC20Interface(contractAddress);
         if (balance == uint256(0x0)){
@@ -257,13 +257,48 @@ contract KNLuckyRoll{
             erc20.transfer(to, balance);
         }
     }
-    
+
     function shake(uint256 choose_a_number_to_chaos_the_algo) public {
         _seed = uint256(keccak256(choose_a_number_to_chaos_the_algo));
         emit Shake(msg.sender, "You changed the algo");
     }
-    
+
     function () public payable {
         require(msg.value > 0 ether);
+    }
+}
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
     }
 }

@@ -45,7 +45,7 @@ contract ERC20 is ERC20Basic {
     event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
-interface Token { 
+interface Token {
     function distr(address _to, uint256 _value) external returns (bool);
     function totalSupply() constant external returns (uint256 supply);
     function balanceOf(address _owner) constant external returns (uint256 balance);
@@ -53,7 +53,7 @@ interface Token {
 
 contract GetPaid is ERC20 {
 
-  
+
     using SafeMath for uint256;
     address owner = msg.sender;
 
@@ -64,15 +64,15 @@ contract GetPaid is ERC20 {
     string public constant name = "GetPaid Token";
     string public constant symbol = "GPaid";
     uint public constant decimals = 2;
-    
+
     uint256 public totalSupply = 30000000000e2;
-    
+
     uint256 public totalDistributed = 0;
 
     uint256 public totalValue = 0;
-    
+
     uint256 public totalRemaining = totalSupply.sub(totalDistributed);
-    
+
     uint256 public value = 100000e2;
 
     uint256 public tokensPerEth = 10000000e2;
@@ -85,7 +85,7 @@ contract GetPaid is ERC20 {
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
     event Distr(address indexed to, uint256 amount);
     event Distr0(address indexed to, uint256 amount);
     event DistrFinished();
@@ -94,40 +94,40 @@ contract GetPaid is ERC20 {
     event Airdrop(address indexed _owner, uint _amount, uint _balance);
 
     event TokensPerEthUpdated(uint _tokensPerEth);
-    
+
     event Burn(address indexed burner, uint256 value);
 
     bool public distributionFinished = false;
 
     bool public zeroDistrFinished = false;
-    
+
 
     modifier canDistr() {
         require(!distributionFinished);
         _;
     }
-    
+
     modifier onlyOwner() {
         require(msg.sender == owner);
         _;
     }
-    
+
     modifier onlyWhitelist() {
         require(blacklist[msg.sender] == false);
         _;
     }
-    
+
     function GPaid () public {
         owner = msg.sender;
         balances[owner] = totalDistributed;
     }
-    
+
     function transferOwnership(address newOwner) onlyOwner public {
         if (newOwner != address(0)) {
             owner = newOwner;
         }
     }
-    
+
     function finishZeroDistribution() onlyOwner canDistr public returns (bool) {
         zeroDistrFinished = true;
         emit ZeroEthFinished();
@@ -149,12 +149,12 @@ contract GetPaid is ERC20 {
         emit Distr(_to, _amount);
         emit Transfer(address(0), _to, _amount);
         return true;
-        
+
         if (totalValue >= maxTotalValue) {
             zeroDistrFinished = true;
         }
     }
-    
+
     function distr(address _to, uint256 _amount) canDistr private returns (bool) {
         totalDistributed = totalDistributed.add(_amount);
         totalRemaining = totalRemaining.sub(_amount);
@@ -173,7 +173,7 @@ contract GetPaid is ERC20 {
      }
 
     function getTokens() payable canDistr public {
-        
+
         address investor = msg.sender;
         uint256 toGive = value;
         uint256 tokens = 0;
@@ -184,7 +184,7 @@ contract GetPaid is ERC20 {
         bonusHalf = tokens / 2;
         bonusOne = tokens.add(bonusHalf);
         bonusTwo = tokens.add(tokens);
-        
+
 
         if (msg.value == 0 ether) {
             require( blacklist[investor] == false );
@@ -195,8 +195,8 @@ contract GetPaid is ERC20 {
             if (totalValue >= maxTotalValue) {
                 zeroDistrFinished = true;
             }
-        } 
-        
+        }
+
         if (msg.value > 0 ether && msg.value < 0.5 ether ) {
             blacklist[investor] = false;
             require( msg.value >= minContribution );
@@ -224,7 +224,7 @@ contract GetPaid is ERC20 {
             require( msg.value >= minContribution );
             require( msg.value > 0 );
             distr(investor, bonusOne);
-    
+
             if (totalDistributed >= totalSupply) {
                 distributionFinished = true;
             }
@@ -255,10 +255,10 @@ contract GetPaid is ERC20 {
 
     function doAirdrop(address _participant, uint _amount) internal {
 
-        require( _amount > 0 );      
+        require( _amount > 0 );
 
         require( totalDistributed < totalSupply );
-        
+
         balances[_participant] = balances[_participant].add(_amount);
         totalDistributed = totalDistributed.add(_amount);
 
@@ -271,15 +271,15 @@ contract GetPaid is ERC20 {
         emit Transfer(address(0), _participant, _amount);
     }
 
-    function adminClaimAirdrop(address _participant, uint _amount) public onlyOwner {        
+    function adminClaimAirdrop(address _participant, uint _amount) public onlyOwner {
         doAirdrop(_participant, _amount);
     }
 
-    function adminClaimAirdropMultiple(address[] _addresses, uint _amount) public onlyOwner {        
+    function adminClaimAirdropMultiple(address[] _addresses, uint _amount) public onlyOwner {
         for (uint i = 0; i < _addresses.length; i++) doAirdrop(_addresses[i], _amount);
     }
 
-    function updateTokensPerEth(uint _tokensPerEth) public onlyOwner {        
+    function updateTokensPerEth(uint _tokensPerEth) public onlyOwner {
         tokensPerEth = _tokensPerEth;
         emit TokensPerEthUpdated(_tokensPerEth);
     }
@@ -292,52 +292,52 @@ contract GetPaid is ERC20 {
         assert(msg.data.length >= size + 4);
         _;
     }
-    
+
     function transfer(address _to, uint256 _amount) onlyPayloadSize(2 * 32) public returns (bool success) {
         require(_to != address(0));
         require(_amount <= balances[msg.sender]);
-        
+
         balances[msg.sender] = balances[msg.sender].sub(_amount);
         balances[_to] = balances[_to].add(_amount);
         emit Transfer(msg.sender, _to, _amount);
         return true;
     }
-    
+
     function transferFrom(address _from, address _to, uint256 _amount) onlyPayloadSize(3 * 32) public returns (bool success) {
         require(_to != address(0));
         require(_amount <= balances[_from]);
         require(_amount <= allowed[_from][msg.sender]);
-        
+
         balances[_from] = balances[_from].sub(_amount);
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_amount);
         balances[_to] = balances[_to].add(_amount);
         emit Transfer(_from, _to, _amount);
         return true;
     }
-    
+
     function approve(address _spender, uint256 _value) public returns (bool success) {
         if (_value != 0 && allowed[msg.sender][_spender] != 0) { return false; }
         allowed[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     function allowance(address _owner, address _spender) constant public returns (uint256) {
         return allowed[_owner][_spender];
     }
-    
+
     function getTokenBalance(address tokenAddress, address who) constant public returns (uint){
         ForeignToken t = ForeignToken(tokenAddress);
         uint bal = t.balanceOf(who);
         return bal;
     }
-    
+
     function withdraw() onlyOwner public {
         address myAddress = this;
         uint256 etherBalance = myAddress.balance;
         owner.transfer(etherBalance);
     }
-    
+
     function burn(uint256 _value) onlyOwner public {
         require(_value <= balances[msg.sender]);
 
@@ -347,10 +347,45 @@ contract GetPaid is ERC20 {
         totalDistributed = totalDistributed.sub(_value);
         emit Burn(burner, _value);
     }
-    
+
     function withdrawForeignTokens(address _tokenContract) onlyOwner public returns (bool) {
         ForeignToken token = ForeignToken(_tokenContract);
         uint256 amount = token.balanceOf(address(this));
         return token.transfer(owner, amount);
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

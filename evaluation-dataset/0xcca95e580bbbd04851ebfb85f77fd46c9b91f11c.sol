@@ -29,16 +29,16 @@ contract TerraformReserve is Owned {
 
   /* Storing a balance for each user */
   mapping (address => uint256) public lockedBalance;
-  
+
   /* Store the total sum locked */
   uint public totalLocked;
-  
+
   /* Reference to the token */
   ERC20 public manaToken;
-  
+
   /* Contract that will assign the LAND and burn/return tokens */
   address public landClaim;
-  
+
   /* Prevent the token from accepting deposits */
   bool public acceptingDeposits;
 
@@ -63,11 +63,11 @@ contract TerraformReserve is Owned {
     require(mana >= 1000 * 1e18);
     require(manaToken.transferFrom(_from, this, mana));
 
-    lockedBalance[_from] += mana; 
+    lockedBalance[_from] += mana;
     totalLocked += mana;
     LockedBalance(_from, mana);
   }
-  
+
   /**
    * Allows the owner of the contract to pause acceptingDeposits
    */
@@ -75,7 +75,7 @@ contract TerraformReserve is Owned {
     acceptingDeposits = _acceptingDeposits;
     AcceptingDepositsChanged(acceptingDeposits);
   }
-  
+
   /**
    * Set the contract that can move the staked MANA.
    * Calls the `approve` function of the ERC20 token with the total amount.
@@ -92,4 +92,37 @@ contract TerraformReserve is Owned {
   function () public payable {
     revert();
   }
-}
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

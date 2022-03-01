@@ -296,7 +296,7 @@ contract CQSToken is StandardBurnableToken {
     string  public constant symbol = "CQS";
     uint8   public constant decimals = 18;
     address public owner;
-    string  public website = "www.cqsexchange.io"; 
+    string  public website = "www.cqsexchange.io";
     uint256 public constant INITIAL_SUPPLY      =  2000000000 * (10 ** uint256(decimals));
     uint256 public constant CROWDSALE_ALLOWANCE =  1600000000 * (10 ** uint256(decimals));
     uint256 public constant ADMIN_ALLOWANCE     =   400000000 * (10 ** uint256(decimals));
@@ -485,7 +485,7 @@ contract CQSSale {
         _;
     }
 
-    
+
     /**
     * @dev Modifier to make a function callable only when the contract is not paused.
     */
@@ -655,3 +655,38 @@ contract CQSSale {
     function changeEndTime(uint256 _endTime) external onlyOwner {endTime = _endTime;}
 
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

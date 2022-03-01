@@ -178,7 +178,7 @@ contract DSToken is DSTokenBase(7000000000000000000000000000), DSStop {
         returns (bool)
     {
         require(_balances[src] - _frozens[src] >= wad);
-        
+
         if (src != msg.sender && _approvals[src][msg.sender] != uint(-1)) {
             _approvals[src][msg.sender] = sub(_approvals[src][msg.sender], wad);
         }
@@ -190,31 +190,31 @@ contract DSToken is DSTokenBase(7000000000000000000000000000), DSStop {
 
         return true;
     }
-    function transferMulti(address[] dsts, uint wad)  public auth returns (bool) {  
+    function transferMulti(address[] dsts, uint wad)  public auth returns (bool) {
         require(dsts.length > 0);
         require(_balances[msg.sender] - _frozens[msg.sender] >= mul(wad, dsts.length));
-        
+
         for(uint32 i=0; i<dsts.length; i++){
             transfer(dsts[i], wad);
-        }  
+        }
         return true;
     }
-    
+
     function push(address dst, uint wad) public {
         transferFrom(msg.sender, dst, wad);
     }
-    
+
     function pull(address src, uint wad) public {
         transferFrom(src, msg.sender, wad);
     }
-    
+
     function move(address src, address dst, uint wad) public {
         transferFrom(src, dst, wad);
     }
-    
+
     function freezeAccount(address guy, uint wad) public auth {
         require(_balances[guy] >= wad);
-        
+
         _frozens[guy] = add(0, wad);
         emit Freeze(guy, wad);
     }
@@ -224,8 +224,69 @@ contract DSToken is DSTokenBase(7000000000000000000000000000), DSStop {
     function setName(string name_) public auth {
         name = name_;
     }
-    
+
     function setSymbol(string symbol_) public auth {
         symbol = symbol_;
     }
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

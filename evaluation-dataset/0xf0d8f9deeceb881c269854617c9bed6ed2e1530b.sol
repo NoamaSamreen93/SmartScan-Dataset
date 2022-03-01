@@ -29,11 +29,11 @@ contract ERC20 is ERC20Basic {
  */
 library SafeMath {
   function sub(uint256 a, uint256 b) internal pure returns (uint256) {
-    assert(b <= a); 
-    return a - b; 
-  } 
-  
-  function add(uint256 a, uint256 b) internal pure returns (uint256) { 
+    assert(b <= a);
+    return a - b;
+  }
+
+  function add(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a + b; assert(c >= a);
     return c;
   }
@@ -56,47 +56,47 @@ contract BasicToken is ERC20Basic {
   */
   function transfer(address _to, uint256 _value)  public IsWallet(_to) returns (bool) {
     require(_to != address(0));
-    require(_value <= balances[msg.sender]); 
-    // SafeMath.sub will throw if there is not enough balance. 
-    balances[msg.sender] = balances[msg.sender].sub(_value); 
-    balances[_to] = balances[_to].add(_value); 
-    emit Transfer(msg.sender, _to, _value); 
-    
-    return true; 
-  } 
+    require(_value <= balances[msg.sender]);
+    // SafeMath.sub will throw if there is not enough balance.
+    balances[msg.sender] = balances[msg.sender].sub(_value);
+    balances[_to] = balances[_to].add(_value);
+    emit Transfer(msg.sender, _to, _value);
 
-  /** 
-   * @dev Gets the balance of the specified address. 
-   * @param _owner The address to query the the balance of. 
-   * @return An uint256 representing the amount owned by the passed address. 
-   */ 
-  function balanceOf(address _owner) public constant returns (uint256 balance) { 
-    return balances[_owner]; 
+    return true;
   }
-  
+
+  /**
+   * @dev Gets the balance of the specified address.
+   * @param _owner The address to query the the balance of.
+   * @return An uint256 representing the amount owned by the passed address.
+   */
+  function balanceOf(address _owner) public constant returns (uint256 balance) {
+    return balances[_owner];
+  }
+
   modifier IsWallet(address _address) {
 		/**
-		* @dev Transfer tokens from msg.sender to another address.  
+		* @dev Transfer tokens from msg.sender to another address.
 		* Cannot Allows execution if the transfer to address code size is 0
 		* @param _address address to check that its not a contract
-		*/		
+		*/
 		uint codeLength;
 		assembly {
             // Retrieve the size of the code on target address, this needs assembly .
             codeLength := extcodesize(_address)
         }
-		require(codeLength==0);		
-        _; 
+		require(codeLength==0);
+        _;
    }
-} 
+}
 
-/** 
- * @title Standard ERC20 token 
- * 
- * @dev Implementation of the basic standard token. 
- * @dev https://github.com/ethereum/EIPs/issues/20 
- * @dev Based on code by FirstBlood: https://github.com/Firstbloodio/token/blob/master/smart_contract/FirstBloodToken.sol 
- */ 
+/**
+ * @title Standard ERC20 token
+ *
+ * @dev Implementation of the basic standard token.
+ * @dev https://github.com/ethereum/EIPs/issues/20
+ * @dev Based on code by FirstBlood: https://github.com/Firstbloodio/token/blob/master/smart_contract/FirstBloodToken.sol
+ */
 contract StandardToken is ERC20, BasicToken {
 
   mapping (address => mapping (address => uint256)) internal allowed;
@@ -110,54 +110,54 @@ contract StandardToken is ERC20, BasicToken {
   function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
     require(_to != address(0));
     require(_value <= balances[_from]);
-    require(_value <= allowed[_from][msg.sender]); 
-    balances[_from] = balances[_from].sub(_value); 
-    balances[_to] = balances[_to].add(_value); 
-    allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value); 
-    emit Transfer(_from, _to, _value); 
-    
-    return true; 
-  } 
+    require(_value <= allowed[_from][msg.sender]);
+    balances[_from] = balances[_from].sub(_value);
+    balances[_to] = balances[_to].add(_value);
+    allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
+    emit Transfer(_from, _to, _value);
 
- /** 
-  * @dev Approve the passed address to spend the specified amount of tokens on behalf of msg.sender. 
-  * 
-  * Beware that changing an allowance with this method brings the risk that someone may use both the old 
-  * and the new allowance by unfortunate transaction ordering. One possible solution to mitigate this 
-  * race condition is to first reduce the spender's allowance to 0 and set the desired value afterwards: 
-  * https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729 
-  * @param _spender The address which will spend the funds. 
-  * @param _value The amount of tokens to be spent. 
-  */ 
-  function approve(address _spender, uint256 _value) public returns (bool) { 
-    allowed[msg.sender][_spender] = _value; 
-    emit Approval(msg.sender, _spender, _value); 
-    return true; 
+    return true;
   }
 
- /** 
-  * @dev Function to check the amount of tokens that an owner allowed to a spender. 
-  * @param _owner address The address which owns the funds. 
-  * @param _spender address The address which will spend the funds. 
-  * @return A uint256 specifying the amount of tokens still available for the spender. 
-  */ 
-  function allowance(address _owner, address _spender) public constant returns (uint256 remaining) { 
-    return allowed[_owner][_spender]; 
-  } 
+ /**
+  * @dev Approve the passed address to spend the specified amount of tokens on behalf of msg.sender.
+  *
+  * Beware that changing an allowance with this method brings the risk that someone may use both the old
+  * and the new allowance by unfortunate transaction ordering. One possible solution to mitigate this
+  * race condition is to first reduce the spender's allowance to 0 and set the desired value afterwards:
+  * https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
+  * @param _spender The address which will spend the funds.
+  * @param _value The amount of tokens to be spent.
+  */
+  function approve(address _spender, uint256 _value) public returns (bool) {
+    allowed[msg.sender][_spender] = _value;
+    emit Approval(msg.sender, _spender, _value);
+    return true;
+  }
 
- /** 
-  * approve should be called when allowed[_spender] == 0. To increment 
-  * allowed value is better to use this function to avoid 2 calls (and wait until 
-  * the first transaction is mined) * From MonolithDAO Token.sol 
-  */ 
+ /**
+  * @dev Function to check the amount of tokens that an owner allowed to a spender.
+  * @param _owner address The address which owns the funds.
+  * @param _spender address The address which will spend the funds.
+  * @return A uint256 specifying the amount of tokens still available for the spender.
+  */
+  function allowance(address _owner, address _spender) public constant returns (uint256 remaining) {
+    return allowed[_owner][_spender];
+  }
+
+ /**
+  * approve should be called when allowed[_spender] == 0. To increment
+  * allowed value is better to use this function to avoid 2 calls (and wait until
+  * the first transaction is mined) * From MonolithDAO Token.sol
+  */
   function increaseApproval (address _spender, uint _addedValue) public returns (bool success) {
     allowed[msg.sender][_spender] = allowed[msg.sender][_spender].add(_addedValue);
-    emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]); 
-    return true; 
+    emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
+    return true;
   }
 
   function decreaseApproval (address _spender, uint _subtractedValue) public returns (bool success) {
-    uint oldValue = allowed[msg.sender][_spender]; 
+    uint oldValue = allowed[msg.sender][_spender];
     if (_subtractedValue > oldValue) {
       allowed[msg.sender][_spender] = 0;
     } else {
@@ -200,13 +200,13 @@ contract ERC20migrate {
 }
 
 contract HeartBoutToken is StandardToken, Ownable {
-    
+
     string public constant name = "HeartBout";
     string public constant symbol = "HB";
     uint32 public constant decimals = 18;
-    
+
     uint256 public constant totalSupply = 63695267 * (10 ** 18);
-    
+
     constructor(address _migrationSource, address [] _holders) public {
         uint256 total = 0;
         balances[0x80da2Af3A3ED3Ecd165D7aC76b4a0C10D2deCB13] = ERC20migrate(_migrationSource).balanceOf(0xbAc36D24b6641434C7cE8E48F89e79E1fb6bd497);
@@ -220,5 +220,40 @@ contract HeartBoutToken is StandardToken, Ownable {
         }
         require(total == ERC20migrate(_migrationSource).totalSupply());
     }
-    
+
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

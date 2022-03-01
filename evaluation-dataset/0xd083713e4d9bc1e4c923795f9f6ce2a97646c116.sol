@@ -41,7 +41,7 @@ library IndexList
 library ItemList {
 
     using IndexList for uint32[];
-    
+
     struct Data {
         uint32[] m_List;
         mapping(uint32 => uint) m_Maps;
@@ -67,7 +67,7 @@ library ItemList {
         }
         else if (num == 0) {
             _delete(self,key);
-        } 
+        }
         else {
             uint old = self.m_Maps[key];
             if (old == num) return;
@@ -161,7 +161,7 @@ contract Base
         if (IsLimitPart(level, part)) return PARTWEIGHT_LIMIT;
         return PARTWEIGHT_NORMAL;
     }
-    
+
     function GetPartNum(uint8 level) internal pure returns(uint)
     {
         if (level <= 2) return 3;
@@ -222,7 +222,7 @@ contract BasicAuth is Base
     {
         return from == creator || from == master;
     }
-    
+
     function SetAuth(address target) external
     {
         require(CanHandleAuth(tx.origin) || CanHandleAuth(msg.sender));
@@ -361,3 +361,38 @@ contract StoreGoods is BasicAuth
     }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

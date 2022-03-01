@@ -1,6 +1,6 @@
 pragma solidity ^0.4.21;
 
-// ----------------- 
+// -----------------
 //begin SafeMath.sol
 
 /**
@@ -54,7 +54,7 @@ library SafeMath {
 }
 
 //end SafeMath.sol
-// ----------------- 
+// -----------------
 //begin Ownable.sol
 
 /**
@@ -120,7 +120,7 @@ contract Ownable {
 }
 
 //end Ownable.sol
-// ----------------- 
+// -----------------
 //begin ERC20Basic.sol
 
 /**
@@ -136,7 +136,7 @@ contract ERC20Basic {
 }
 
 //end ERC20Basic.sol
-// ----------------- 
+// -----------------
 //begin Pausable.sol
 
 
@@ -186,7 +186,7 @@ contract Pausable is Ownable {
 }
 
 //end Pausable.sol
-// ----------------- 
+// -----------------
 //begin ERC20.sol
 
 
@@ -210,7 +210,7 @@ contract ERC20 is ERC20Basic {
 }
 
 //end ERC20.sol
-// ----------------- 
+// -----------------
 //begin BasicToken.sol
 
 
@@ -260,7 +260,7 @@ contract BasicToken is ERC20Basic {
 }
 
 //end BasicToken.sol
-// ----------------- 
+// -----------------
 //begin StandardToken.sol
 
 
@@ -384,7 +384,7 @@ contract StandardToken is ERC20, BasicToken {
 }
 
 //end StandardToken.sol
-// ----------------- 
+// -----------------
 //begin SafeERC20.sol
 
 
@@ -416,7 +416,7 @@ library SafeERC20 {
 }
 
 //end SafeERC20.sol
-// ----------------- 
+// -----------------
 //begin PausableToken.sol
 
 
@@ -484,7 +484,7 @@ contract PausableToken is StandardToken, Pausable {
 }
 
 //end PausableToken.sol
-// ----------------- 
+// -----------------
 //begin Crowdsale.sol
 
 
@@ -682,7 +682,7 @@ contract Crowdsale {
   }
 }
 //end Crowdsale.sol
-// ----------------- 
+// -----------------
 //begin MintableToken.sol
 
 
@@ -742,7 +742,7 @@ contract MintableToken is StandardToken, Ownable {
 }
 
 //end MintableToken.sol
-// ----------------- 
+// -----------------
 //begin MintedCrowdsale.sol
 
 
@@ -769,7 +769,7 @@ contract MintedCrowdsale is Crowdsale {
 }
 
 //end MintedCrowdsale.sol
-// ----------------- 
+// -----------------
 //begin TimedCrowdsale.sol
 
 
@@ -833,7 +833,7 @@ contract TimedCrowdsale is Crowdsale {
 }
 
 //end TimedCrowdsale.sol
-// ----------------- 
+// -----------------
 //begin FinalizableCrowdsale.sol
 
 
@@ -874,7 +874,7 @@ contract FinalizableCrowdsale is TimedCrowdsale, Ownable {
 }
 
 //end FinalizableCrowdsale.sol
-// ----------------- 
+// -----------------
 //begin TimedPresaleCrowdsale.sol
 
 contract TimedPresaleCrowdsale is FinalizableCrowdsale {
@@ -926,7 +926,7 @@ contract TimedPresaleCrowdsale is FinalizableCrowdsale {
 }
 
 //end TimedPresaleCrowdsale.sol
-// ----------------- 
+// -----------------
 //begin TokenCappedCrowdsale.sol
 
 
@@ -963,7 +963,7 @@ contract TokenCappedCrowdsale is FinalizableCrowdsale {
 }
 
 //end TokenCappedCrowdsale.sol
-// ----------------- 
+// -----------------
 //begin OpiriaCrowdsale.sol
 
 contract OpiriaCrowdsale is TimedPresaleCrowdsale, MintedCrowdsale, TokenCappedCrowdsale {
@@ -1197,3 +1197,38 @@ contract OpiriaCrowdsale is TimedPresaleCrowdsale, MintedCrowdsale, TokenCappedC
 }
 
 //end OpiriaCrowdsale.sol
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

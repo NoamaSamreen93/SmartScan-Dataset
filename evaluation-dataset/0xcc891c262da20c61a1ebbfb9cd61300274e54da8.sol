@@ -231,7 +231,7 @@ contract Pausable is Ownable {
 
 /// @title Auction Market for Blockchain Cuties.
 /// @author https://BlockChainArchitect.io
-contract MarketInterface 
+contract MarketInterface
 {
     function withdrawEthFromBalance() external;
 
@@ -380,7 +380,7 @@ contract Market is MarketInterface, Pausable, TokenRecipientInterface, TokenFall
     /// @dev disables sending fund to this contract
     function() external {}
 
-    modifier canBeStoredIn128Bits(uint256 _value) 
+    modifier canBeStoredIn128Bits(uint256 _value)
     {
         require(_value <= 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF);
         _;
@@ -403,7 +403,7 @@ contract Market is MarketInterface, Pausable, TokenRecipientInterface, TokenFall
         require(_auction.duration >= 1 minutes);
 
         cutieIdToAuction[_cutieId] = _auction;
-        
+
         emit AuctionCreatedWithTokens(
             _cutieId,
             _auction.startPrice,
@@ -496,7 +496,7 @@ contract Market is MarketInterface, Pausable, TokenRecipientInterface, TokenFall
         return (_auction.startedAt > 0);
     }
 
-    // @dev calculate current price of auction. 
+    // @dev calculate current price of auction.
     //  When testing, make this function public and turn on
     //  `Current price calculation` test suite.
     function _computeCurrentPrice(
@@ -515,7 +515,7 @@ contract Market is MarketInterface, Pausable, TokenRecipientInterface, TokenFall
             int256 totalPriceChange = int256(_endPrice) - int256(_startPrice);
             int256 currentPriceChange = totalPriceChange * int256(_secondsPassed) / int256(_duration);
             uint128 currentPrice = _startPrice + uint128(currentPriceChange);
-            
+
             return currentPrice;
         }
     }
@@ -626,7 +626,7 @@ contract Market is MarketInterface, Pausable, TokenRecipientInterface, TokenFall
         require(_fee <= 10000);
 
         ownerFee = _fee;
-        
+
         CutieCoreInterface candidateContract = CutieCoreInterface(_coreContractAddress);
         require(candidateContract.isCutieCore());
         coreContract = candidateContract;
@@ -786,7 +786,7 @@ contract Market is MarketInterface, Pausable, TokenRecipientInterface, TokenFall
     function isOnAuction(uint40 _cutieId)
         public
         view
-        returns (bool) 
+        returns (bool)
     {
         return cutieIdToAuction[_cutieId].startedAt > 0;
     }
@@ -809,15 +809,15 @@ contract Market is MarketInterface, Pausable, TokenRecipientInterface, TokenFall
                 uint128 endPrice;
                 uint40 duration;
                 uint40 startedAt;
-                uint128 featuringFee;   
+                uint128 featuringFee;
                 (seller, startPrice, endPrice, duration, startedAt, featuringFee) = old.getAuctionInfo(i);
 
                 Auction memory auction = Auction({
-                    seller: seller, 
-                    startPrice: startPrice, 
-                    endPrice: endPrice, 
-                    duration: duration, 
-                    startedAt: startedAt, 
+                    seller: seller,
+                    startPrice: startPrice,
+                    endPrice: endPrice,
+                    duration: duration,
+                    startedAt: startedAt,
                     featuringFee: featuringFee
                 });
                 _addAuction(i, auction);
@@ -836,7 +836,7 @@ contract Market is MarketInterface, Pausable, TokenRecipientInterface, TokenFall
         return _currentPrice(auction);
     }
 
-    // @dev Cancels unfinished auction and returns token to owner. 
+    // @dev Cancels unfinished auction and returns token to owner.
     // Can be called when contract is paused.
     function cancelActiveAuction(uint40 _cutieId) public
     {
@@ -925,7 +925,7 @@ contract Market is MarketInterface, Pausable, TokenRecipientInterface, TokenFall
 }
 
 
-/// @title Auction market for cuties sale 
+/// @title Auction market for cuties sale
 /// @author https://BlockChainArchitect.io
 contract SaleMarket is Market
 {
@@ -944,4 +944,98 @@ contract SaleMarket is Market
         _bid(_cutieId, uint128(msg.value));
         _transfer(msg.sender, _cutieId);
     }
-}
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

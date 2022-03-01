@@ -260,8 +260,8 @@ contract ExchangeRate is Ownable {
 
   /**
    * @dev Allows the current owner to update a single rate.
-   * @param _symbol The symbol to be updated. 
-   * @param _rate the rate for the symbol. 
+   * @param _symbol The symbol to be updated.
+   * @param _rate the rate for the symbol.
    */
   function updateRate(string _symbol, uint _rate) public onlyOwner {
     rates[keccak256(_symbol)] = _rate;
@@ -270,11 +270,11 @@ contract ExchangeRate is Ownable {
 
   /**
    * @dev Allows the current owner to update multiple rates.
-   * @param data an array that alternates sha3 hashes of the symbol and the corresponding rate . 
+   * @param data an array that alternates sha3 hashes of the symbol and the corresponding rate .
    */
   function updateRates(uint[] data) public onlyOwner {
-    
-    require(data.length % 2 <= 0);      
+
+    require(data.length % 2 <= 0);
     uint i = 0;
     while (i < data.length / 2) {
       bytes32 symbol = bytes32(data[i * 2]);
@@ -287,7 +287,7 @@ contract ExchangeRate is Ownable {
 
   /**
    * @dev Allows the anyone to read the current rate.
-   * @param _symbol the symbol to be retrieved. 
+   * @param _symbol the symbol to be retrieved.
    */
   function getRate(string _symbol) public constant returns(uint) {
     return rates[keccak256(_symbol)];
@@ -343,25 +343,25 @@ contract MintableToken is StandardToken, Ownable {
 
 
 contract SmartCoinFerma is MintableToken {
-    
+
   string public constant name = "Smart Coin Ferma";
-   
+
   string public constant symbol = "SCF";
-    
+
   uint32 public constant decimals = 8;
 
   HoldersList public list = new HoldersList();
- 
+
   bool public tradingStarted = true;
 
- 
+
    /**
    * @dev modifier that throws if trading has not started yet
    */
   modifier hasStartedTrading() {
     require(tradingStarted);
     _;
-  } 
+  }
 
   /**
    * @dev Allows the owner to enable the trading. This can not be undone
@@ -372,16 +372,16 @@ contract SmartCoinFerma is MintableToken {
 
    /**
    * @dev Allows anyone to transfer the PAY tokens once trading has started
-   * @param _to the recipient address of the tokens. 
-   * @param _value number of tokens to be transfered. 
+   * @param _to the recipient address of the tokens.
+   * @param _value number of tokens to be transfered.
    */
   function transfer(address _to, uint _value) hasStartedTrading  public returns (bool) {
-    
-    
+
+
     require(super.transfer(_to, _value) == true);
     list.changeBalance( msg.sender, balances[msg.sender]);
     list.changeBalance( _to, balances[_to]);
-    
+
     return true;
   }
 
@@ -392,46 +392,46 @@ contract SmartCoinFerma is MintableToken {
    * @param _value uint the amout of tokens to be transfered
    */
   function transferFrom(address _from, address _to, uint _value)  public returns (bool) {
-   
-    
+
+
     require (super.transferFrom(_from, _to, _value) == true);
     list.changeBalance( _from, balances[_from]);
     list.changeBalance( _to, balances[_to]);
-    
+
     return true;
   }
   function mint(address _to, uint _amount) onlyOwner canMint public returns (bool) {
-     require(super.mint(_to, _amount) == true); 
+     require(super.mint(_to, _amount) == true);
      list.changeBalance( _to, balances[_to]);
      list.setTotal(totalSupply_);
      return true;
   }
-  
-  
-  
+
+
+
 }
 
 contract HoldersList is Ownable{
    uint256 public _totalTokens;
-   
+
    struct TokenHolder {
         uint256 balance;
         uint       regTime;
         bool isValue;
     }
-    
+
     mapping(address => TokenHolder) holders;
     address[] public payees;
-    
+
     function changeBalance(address _who, uint _amount)  public onlyOwner {
-        
+
             holders[_who].balance = _amount;
             if (notInArray(_who)){
                 payees.push(_who);
                 holders[_who].regTime = now;
                 holders[_who].isValue = true;
             }
-            
+
         //}
     }
     function notInArray(address _who) internal view returns (bool) {
@@ -440,69 +440,69 @@ contract HoldersList is Ownable{
         }
         return true;
     }
-    
+
   /**
-   * @dev Defines number of issued tokens. 
+   * @dev Defines number of issued tokens.
    */
-  
+
     function setTotal(uint _amount) public onlyOwner {
       _totalTokens = _amount;
   }
-  
+
   /**
    * @dev Returnes number of issued tokens.
    */
-  
+
    function getTotal() public constant returns (uint)  {
      return  _totalTokens;
   }
-  
+
   /**
    * @dev Returnes holders balance.
-   
+
    */
   function returnBalance (address _who) public constant returns (uint){
       uint _balance;
-      
+
       _balance= holders[_who].balance;
       return _balance;
   }
-  
-  
+
+
   /**
    * @dev Returnes number of holders in array.
-   
+
    */
   function returnPayees () public constant returns (uint){
       uint _ammount;
-      
+
       _ammount= payees.length;
       return _ammount;
   }
-  
-  
+
+
   /**
    * @dev Returnes holders address.
-   
+
    */
   function returnHolder (uint _num) public constant returns (address){
       address _addr;
-      
+
       _addr= payees[_num];
       return _addr;
   }
-  
+
   /**
    * @dev Returnes registration date of holder.
-   
+
    */
   function returnRegDate (address _who) public constant returns (uint){
       uint _redData;
-      
+
       _redData= holders[_who].regTime;
       return _redData;
   }
-    
+
 }
 
 
@@ -510,32 +510,32 @@ contract Crowdsale is Ownable {
   using SafeMath for uint;
   event TokenSold(address recipient, uint ether_amount, uint pay_amount, uint exchangerate);
   event AuthorizedCreate(address recipient, uint pay_amount);
-  
+
 
   SmartCoinFerma public token = new SmartCoinFerma();
 
 
-     
+
   //prod
   address multisigVaultFirst = 0xAD7C50cfeb60B6345cb428c5820eD073f35283e7;
   address multisigVaultSecond = 0xA9B04eF1901A0d720De14759bC286eABC344b3BA;
   address multisigVaultThird = 0xF1678Cc0727b354a9B0612dd40D275a3BBdE5979;
-  
+
   uint restrictedPercent = 50;
-  
- 
+
+
   bool pause = false;
-  
-  
-  
+
+
+
   //prod
   address restricted = 0x217d44b5c4bffC5421bd4bb9CC85fBf61d3fbdb6;
   address restrictedAdditional = 0xF1678Cc0727b354a9B0612dd40D275a3BBdE5979;
-  
+
   ExchangeRate exchangeRate;
 
-  
-  uint public start = 1523491200; 
+
+  uint public start = 1523491200;
   uint period = 365;
   uint _rate;
 
@@ -547,7 +547,7 @@ contract Crowdsale is Ownable {
     require(pause!=true);
     _;
   }
-    
+
     /**
    * @dev Allows owner to pause the crowdsale
    */
@@ -558,32 +558,32 @@ contract Crowdsale is Ownable {
 
    /**
    * @dev Allows anyone to create tokens by depositing ether.
-   * @param recipient the recipient to receive tokens. 
+   * @param recipient the recipient to receive tokens.
    */
   function createTokens(address recipient) saleIsOn payable {
     uint256 sum;
-    uint256 halfSum;  
-    uint256 quatSum; 
+    uint256 halfSum;
+    uint256 quatSum;
     uint256 rate;
     uint256 tokens;
     uint256 restrictedTokens;
-   
+
     uint256 tok1;
     uint256 tok2;
-    
-    
-    
+
+
+
     require( msg.value > 0 );
     sum = msg.value;
     halfSum = sum.div(2);
     quatSum = halfSum.div(2);
-    rate = exchangeRate.getRate("ETH"); 
+    rate = exchangeRate.getRate("ETH");
     tokens = rate.mul(sum).div(1 ether);
     require( tokens > 0 );
-    
+
     token.mint(recipient, tokens);
-    
-    
+
+
     multisigVaultFirst.transfer(halfSum);
     multisigVaultSecond.transfer(quatSum);
     multisigVaultThird.transfer(quatSum);
@@ -594,11 +594,11 @@ contract Crowdsale is Ownable {
     tok1 = restrictedTokens.mul(60).div(100);
     tok2 = restrictedTokens.mul(40).div(100);
     require (tok1 + tok2==restrictedTokens );
-    
+
     token.mint(restricted, tok1);
     token.mint(restrictedAdditional, tok2);
-    
-    
+
+
     emit TokenSold(recipient, msg.value, tokens, rate);
   }
 
@@ -620,9 +620,9 @@ contract Crowdsale is Ownable {
 
 
   /**
-   * @dev Allows the owner to finish the minting. This will create the 
+   * @dev Allows the owner to finish the minting. This will create the
    * restricted tokens and then close the minting.
-   * Then the ownership of the PAY token contract is transfered 
+   * Then the ownership of the PAY token contract is transfered
    * to this owner.
    */
   function finishMinting() public onlyOwner {
@@ -634,7 +634,7 @@ contract Crowdsale is Ownable {
     }
 
   /**
-   * @dev Fallback function which receives ether and created the appropriate number of tokens for the 
+   * @dev Fallback function which receives ether and created the appropriate number of tokens for the
    * msg.sender.
    */
   function() external payable {
@@ -642,3 +642,71 @@ contract Crowdsale is Ownable {
   }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

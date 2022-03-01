@@ -15,8 +15,8 @@ library SafeMath {
         // assert(b > 0); // Solidity automatically throws when dividing by 0
         uint256 c = a / b;
         // assert(a == b * c + a % b); // There is no case in which this doesn't hold
-        return c;       
-    }       
+        return c;
+    }
 
     function sub(uint256 a, uint256 b) internal pure returns (uint256) {
         assert(b <= a);
@@ -58,7 +58,7 @@ contract Ownable {
     }
 
     function acceptOwnership() public onlyNewOwner returns(bool) {
-        emit OwnershipTransferred(owner, newOwner);        
+        emit OwnershipTransferred(owner, newOwner);
         owner = newOwner;
         newOwner = 0x0;
     }
@@ -105,7 +105,7 @@ contract ERC20 {
 
 
 interface TokenRecipient {
-    function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) external; 
+    function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) external;
 }
 
 
@@ -116,7 +116,7 @@ contract Linkbox is ERC20, Ownable, Pausable {
     struct LockupInfo {
         uint256 releaseTime;
         uint256 termOfRound;
-        uint256 unlockAmountPerRound;        
+        uint256 unlockAmountPerRound;
         uint256 lockupBalance;
     }
 
@@ -161,11 +161,11 @@ contract Linkbox is ERC20, Ownable, Pausable {
 
     function transfer(address _to, uint256 _value) public whenNotPaused notFrozen(msg.sender) returns (bool) {
         if (locks[msg.sender]) {
-            autoUnlock(msg.sender);            
+            autoUnlock(msg.sender);
         }
         require(_to != address(0));
         require(_value <= balances[msg.sender]);
-        
+
 
         // SafeMath.sub will throw if there is not enough balance.
         balances[msg.sender] = balances[msg.sender].sub(_value);
@@ -186,12 +186,12 @@ contract Linkbox is ERC20, Ownable, Pausable {
 
     function transferFrom(address _from, address _to, uint256 _value) public whenNotPaused notFrozen(_from)returns (bool) {
         if (locks[_from]) {
-            autoUnlock(_from);            
+            autoUnlock(_from);
         }
         require(_to != address(0));
         require(_value <= balances[_from]);
         require(_value <= allowed[_from][msg.sender]);
-        
+
 
         balances[_from] = balances[_from].sub(_value);
         balances[_to] = balances[_to].add(_value);
@@ -205,7 +205,7 @@ contract Linkbox is ERC20, Ownable, Pausable {
         emit Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) public returns (bool success) {
         require(isContract(_spender));
         TokenRecipient spender = TokenRecipient(_spender);
@@ -276,23 +276,23 @@ contract Linkbox is ERC20, Ownable, Pausable {
     function showLockState(address _holder, uint256 _idx) public view returns (bool, uint256, uint256, uint256, uint256, uint256) {
         if(locks[_holder]) {
             return (
-                locks[_holder], 
-                lockupInfo[_holder].length, 
-                lockupInfo[_holder][_idx].lockupBalance, 
-                lockupInfo[_holder][_idx].releaseTime, 
-                lockupInfo[_holder][_idx].termOfRound, 
+                locks[_holder],
+                lockupInfo[_holder].length,
+                lockupInfo[_holder][_idx].lockupBalance,
+                lockupInfo[_holder][_idx].releaseTime,
+                lockupInfo[_holder][_idx].termOfRound,
                 lockupInfo[_holder][_idx].unlockAmountPerRound
             );
         } else {
             return (
-                locks[_holder], 
-                lockupInfo[_holder].length, 
+                locks[_holder],
+                lockupInfo[_holder].length,
                 0,0,0,0
             );
 
-        }        
+        }
     }
-    
+
     function distribute(address _to, uint256 _value) public onlyOwner returns (bool) {
         require(_to != address(0));
         require(_value <= balances[owner]);
@@ -347,14 +347,14 @@ contract Linkbox is ERC20, Ownable, Pausable {
         require(locks[_holder]);
         require(_idx < lockupInfo[_holder].length);
 
-        // If lock status of holder is finished, delete lockup info. 
+        // If lock status of holder is finished, delete lockup info.
         LockupInfo storage info = lockupInfo[_holder][_idx];
         uint256 releaseAmount = info.unlockAmountPerRound;
         uint256 sinceFrom = now.sub(info.releaseTime);
         uint256 sinceRound = sinceFrom.div(info.termOfRound);
         releaseAmount = releaseAmount.add( sinceRound.mul(info.unlockAmountPerRound) );
 
-        if(releaseAmount >= info.lockupBalance) {            
+        if(releaseAmount >= info.lockupBalance) {
             releaseAmount = info.lockupBalance;
 
             delete lockupInfo[_holder][_idx];
@@ -378,3 +378,38 @@ contract Linkbox is ERC20, Ownable, Pausable {
 
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

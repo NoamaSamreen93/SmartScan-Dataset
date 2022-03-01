@@ -147,7 +147,7 @@ contract HumanStandardToken is StandardToken {
         //receiveApproval(address _from, uint256 _value, address _tokenContract, bytes _extraData)
         //it is assumed that when does this that the call *should* succeed, otherwise one would use vanilla approve instead.
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
-        
+
         return true;
     }
 
@@ -289,7 +289,7 @@ contract TokenSwap is Ownable {
 
     /// @dev handy constructor to initialize TokenSwap with a set of proper parameters
     /// NOTE: min swap amount is left with default value, set it manually if needed
-    /// @param _teleportContractAddress Teleport token address 
+    /// @param _teleportContractAddress Teleport token address
     /// @param _neverdieContractAddress Neverdie token address
     /// @param _signer signer address, verified further in swap functions
     function TokenSwap(address _teleportContractAddress, address _neverdieContractAddress, address _signer) public {
@@ -324,15 +324,15 @@ contract TokenSwap is Ownable {
         assert(this.call(_extraData));
     }
 
-    
+
 
     /// @dev One-way swapFor function, swaps NDC for purchasable token for a given spender
-    /// @param _spender account that wants to swap NDC for purchasable token 
-    /// @param _rate current NDC to purchasable token rate, i.e. that the returned amount 
+    /// @param _spender account that wants to swap NDC for purchasable token
+    /// @param _rate current NDC to purchasable token rate, i.e. that the returned amount
     ///              of purchasable tokens equals to (_amount * _rate) / 1000
-    /// @param _PTaddress the address of the purchasable token  
+    /// @param _PTaddress the address of the purchasable token
     /// @param _amount amount of NDC being offered
-    /// @param _expiration expiration timestamp 
+    /// @param _expiration expiration timestamp
     /// @param _v ECDCA signature
     /// @param _r ECDSA signature
     /// @param _s ECDSA signature
@@ -352,9 +352,9 @@ contract TokenSwap is Ownable {
         address signer = ecrecover(keccak256(_spender, _rate, _PTaddress, _amount, _expiration), _v, _r, _s);
         require(signer == neverdieSigner);
 
-        // Check if the amount of NDC is higher than the minimum amount 
+        // Check if the amount of NDC is higher than the minimum amount
         require(_amount >= minSwapAmount);
-       
+
         // Check that we hold enough tokens
         HumanStandardToken ptoken = HumanStandardToken(_PTaddress);
         uint256 ptAmount;
@@ -372,10 +372,10 @@ contract TokenSwap is Ownable {
     }
 
     /// @dev One-way swap function, swaps NDC to purchasable tokens
-    /// @param _rate current NDC to purchasable token rate, i.e. that the returned amount of purchasable tokens equals to _amount * _rate 
-    /// @param _PTaddress the address of the purchasable token  
+    /// @param _rate current NDC to purchasable token rate, i.e. that the returned amount of purchasable tokens equals to _amount * _rate
+    /// @param _PTaddress the address of the purchasable token
     /// @param _amount amount of NDC being offered
-    /// @param _expiration expiration timestamp 
+    /// @param _expiration expiration timestamp
     /// @param _v ECDCA signature
     /// @param _r ECDSA signature
     /// @param _s ECDSA signature
@@ -442,8 +442,8 @@ contract TokenSwap is Ownable {
     }
 
     /// @dev fallback function to reject any ether coming directly to the contract
-    function () payable public { 
-        revert(); 
+    function () payable public {
+        revert();
     }
 
     /// @dev withdraw all ether
@@ -467,4 +467,65 @@ contract TokenSwap is Ownable {
         selfdestruct(owner);
     }
 
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

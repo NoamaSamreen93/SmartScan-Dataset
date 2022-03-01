@@ -911,9 +911,9 @@ contract Consts {
     string public constant TOKEN_SYMBOL = "GNP";
     bool public constant PAUSED = true;
     address public constant TARGET_USER = 0xD66d698d2367896bA7Eb0a20335C0c2A0E64Fbf2;
-    
+
     uint public constant START_TIME = 1544468400;
-    
+
     bool public constant CONTINUE_MINTING = true;
 }
 
@@ -1025,9 +1025,9 @@ contract MintedCrowdsale is Crowdsale {
 
 
 contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
-    
+
 {
-    
+
 
     function name() public pure returns (string _name) {
         return TOKEN_NAME;
@@ -1051,7 +1051,7 @@ contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
         return super.transfer(_to, _value);
     }
 
-    
+
 }
 
 
@@ -1121,7 +1121,7 @@ contract BonusableCrowdsale is Consts, Crowdsale {
     function getBonusRate(uint256 _weiAmount) internal view returns (uint256) {
         uint256 bonusRate = rate;
 
-        
+
         // apply bonus for time & weiRaised
         uint[1] memory weiRaisedStartsBounds = [uint(0)];
         uint[1] memory weiRaisedEndsBounds = [uint(400000000000000000000)];
@@ -1136,9 +1136,9 @@ contract BonusableCrowdsale is Consts, Crowdsale {
                 bonusRate += bonusRate * weiRaisedAndTimeRates[i] / 1000;
             }
         }
-        
 
-        
+
+
 
         return bonusRate;
     }
@@ -1224,14 +1224,14 @@ contract WhitelistedCrowdsale is Crowdsale, Ownable {
 
 
 contract TemplateCrowdsale is Consts, MainCrowdsale
-    
+
     , BonusableCrowdsale
-    
-    
-    
-    
+
+
+
+
     , WhitelistedCrowdsale
-    
+
 {
     event Initialized();
     event TimesChanged(uint startTime, uint endTime, uint oldStartTime, uint oldEndTime);
@@ -1241,7 +1241,7 @@ contract TemplateCrowdsale is Consts, MainCrowdsale
         Crowdsale(2500000 * TOKEN_DECIMAL_MULTIPLIER, 0xD66d698d2367896bA7Eb0a20335C0c2A0E64Fbf2, _token)
         TimedCrowdsale(START_TIME > now ? START_TIME : now, 1544900400)
         CappedCrowdsale(400000000000000000000)
-        
+
     {
     }
 
@@ -1253,22 +1253,57 @@ contract TemplateCrowdsale is Consts, MainCrowdsale
             MainToken(token).pause();
         }
 
-        
+
 
         transferOwnership(TARGET_USER);
 
         emit Initialized();
     }
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

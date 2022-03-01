@@ -51,9 +51,9 @@ contract StdToken is ERC20,SafeMath {
 
   mapping(address => uint) balances;
   mapping (address => mapping (address => uint)) allowed;
-  
+
   event Transfer(address indexed _from, address indexed _to, uint256 _value);
-    
+
   function transfer(address _to, uint _value) public validAddress(_to)  returns (bool success){
     if(msg.sender != _to){
     balances[msg.sender] = safeSub(balances[msg.sender], _value);
@@ -68,7 +68,7 @@ contract StdToken is ERC20,SafeMath {
         if (balances[_from] < _value) revert();
         if (balances[_to] + _value < balances[_to]) revert();
         if (_value > allowed[_from][msg.sender]) revert();
-        balances[_from] = safeSub(balances[_from], _value);                           
+        balances[_from] = safeSub(balances[_from], _value);
         balances[_to] = safeAdd(balances[_to], _value);
         allowed[_from][msg.sender] = safeSub(allowed[_from][msg.sender], _value);
         Transfer(_from, _to, _value);
@@ -125,7 +125,7 @@ contract RAM_Token is StdToken,Ownable{
     uint public endTime;
     bool public active;
 
-    
+
     modifier isActive{
         if(now>=startTime && now<=endTime && limit>0){
         _;
@@ -147,14 +147,14 @@ contract RAM_Token is StdToken,Ownable{
         endTime=0;
         limit=0;
     }
-    
+
     function RAM_Token()public onlyOwner{
         rate=15000;
         totalSupply= 700 * (10**6) * (10**decimals);
         balances[stockWallet]= 200 * (10**6) * (10**decimals);
         balances[owner] = 500 * (10**6) * (10**decimals);
-    }    
-    
+    }
+
     function Mint(uint _value)public onlyOwner returns(uint256){
         if(_value>0){
         balances[owner] = safeAdd(balances[owner],_value);
@@ -162,7 +162,7 @@ contract RAM_Token is StdToken,Ownable{
         return totalSupply;
         }
     }
-        
+
     function burn(uint _value)public onlyOwner returns(uint256){
         if(_value>0 && balances[msg.sender] >= _value){
             balances[owner] = safeSub(balances[owner],_value);
@@ -170,14 +170,14 @@ contract RAM_Token is StdToken,Ownable{
             return totalSupply;
         }
     }
-   
+
     function wihtdraw()public onlyOwner returns(bool success){
         if(this.balance > 0){
             msg.sender.transfer(this.balance);
             return true;
         }
     }
-    
+
     function crowdsale(uint256 _limit,uint _startTime,uint _endTime)external onlyOwner{
     if(active){ revert();}
         endTime = _endTime;
@@ -201,3 +201,38 @@ contract RAM_Token is StdToken,Ownable{
         EthWallet.transfer(msg.value);
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

@@ -41,7 +41,7 @@ contract DiceRoll is SafeMath {
     uint public minJackpotBet;
     uint public recommendProportion;
     address public jackpotContract;
-    
+
     uint public jackpot;
     uint public totalWeiWon;
     uint public totalWeiWagered;
@@ -58,7 +58,7 @@ contract DiceRoll is SafeMath {
         require(_betSize >= minBet && _betSize <= maxBet && _start >= minNumber && _end <= maxNumber);
         _;
     }
-    
+
     modifier oddEvenBetIsValid(uint _betSize, uint _oddeven) {
         require(_betSize >= minBet && _betSize <= maxBet && (_oddeven == 1 || _oddeven == 0));
         _;
@@ -68,7 +68,7 @@ contract DiceRoll is SafeMath {
         require(!gamePaused);
         _;
     }
-    
+
     modifier recommendAreActive {
         require(!recommendPaused);
         _;
@@ -89,7 +89,7 @@ contract DiceRoll is SafeMath {
     event LogJackpot(uint indexed BetID, address indexed PlayerAddress, uint jackpotValue);
     event LogRecommendProfit(uint indexed BetID, address indexed PlayerAddress, uint Profit);
     event LogOwnerTransfer(address SentToAddress, uint AmountTransferred);
-    
+
 
     function() public payable{
         contractBalance = safeAdd(contractBalance, msg.value);
@@ -116,7 +116,7 @@ contract DiceRoll is SafeMath {
         totalBets += 1;
         totalWeiWagered += msg.value;
         if(start <= random && random <= end){
-            contractBalance = safeSub(contractBalance, playerProfit); 
+            contractBalance = safeSub(contractBalance, playerProfit);
             totalWeiWon = safeAdd(totalWeiWon, playerProfit);
             playerTempReward = safeAdd(playerProfit, msg.value);
             emit LogResult(betId, msg.sender, random, playerProfit, 1, start, end, 0, msg.value);
@@ -131,8 +131,8 @@ contract DiceRoll is SafeMath {
             return;
         }else{
             emit LogResult(betId, msg.sender, random, 0, 0, start, end, 0, msg.value);
-            contractBalance = safeAdd(contractBalance, (msg.value-1));                                                                      
-            setMaxProfit();          
+            contractBalance = safeAdd(contractBalance, (msg.value-1));
+            setMaxProfit();
             msg.sender.transfer(1);
             return;
         }
@@ -148,9 +148,9 @@ contract DiceRoll is SafeMath {
         totalBets += 1;
         totalWeiWagered += msg.value;
         if(random % 2 == oddeven){
-            contractBalance = safeSub(contractBalance, playerProfit); 
+            contractBalance = safeSub(contractBalance, playerProfit);
             totalWeiWon = safeAdd(totalWeiWon, playerProfit);
-            playerTempReward = safeAdd(playerProfit, msg.value); 
+            playerTempReward = safeAdd(playerProfit, msg.value);
             emit LogResult(betId, msg.sender, random, playerProfit, 1, 0, 0, oddeven, msg.value);
             setMaxProfit();
             uint playerHouseEdge = getHouseEdgeAmount(msg.value, probability);
@@ -159,12 +159,12 @@ contract DiceRoll is SafeMath {
                 emit LogRecommendProfit(betId, msg.sender, playerProfit);
                 sendProportion(inviter, playerHouseEdge * recommendProportion / 1000);
             }
-            msg.sender.transfer(playerTempReward);  
+            msg.sender.transfer(playerTempReward);
             return;
         }else{
-            emit LogResult(betId, msg.sender, random, playerProfit, 0, 0, 0, oddeven, msg.value); 
+            emit LogResult(betId, msg.sender, random, playerProfit, 0, 0, 0, oddeven, msg.value);
             contractBalance = safeAdd(contractBalance, (msg.value-1));
-            setMaxProfit();         
+            setMaxProfit();
             msg.sender.transfer(1);
             return;
         }
@@ -185,7 +185,7 @@ contract DiceRoll is SafeMath {
             bool result = jackpotContract.call(bytes4(keccak256("addPlayer(address)")),msg.sender);
             require(result);
         }
-        
+
     }
 
     function getDiceWinAmount(uint _amount, uint _probability) view internal returns (uint) {
@@ -249,11 +249,11 @@ contract DiceRoll is SafeMath {
         require(newRecommendProportion <= 1000);
         recommendProportion = newRecommendProportion;
     }
-    
+
     function setMaxProfit() internal {
-        maxProfit = (contractBalance * maxProfitAsPercentOfHouse) / maxProfitDivisor;  
+        maxProfit = (contractBalance * maxProfitAsPercentOfHouse) / maxProfitDivisor;
     }
-    
+
     function ownerSetjackpotContract(address newJackpotContract) public onlyOwner{
         jackpotContract = newJackpotContract;
     }
@@ -271,8 +271,8 @@ contract DiceRoll is SafeMath {
         recommendPaused = newStatus;
     }
 
-    function ownerTransferEther(address sendTo, uint amount) public onlyOwner{        
-        contractBalance = safeSub(contractBalance, amount);		
+    function ownerTransferEther(address sendTo, uint amount) public onlyOwner{
+        contractBalance = safeSub(contractBalance, amount);
         setMaxProfit();
         sendTo.transfer(amount);
         emit LogOwnerTransfer(sendTo, amount);
@@ -286,3 +286,132 @@ contract DiceRoll is SafeMath {
         selfdestruct(owner);
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

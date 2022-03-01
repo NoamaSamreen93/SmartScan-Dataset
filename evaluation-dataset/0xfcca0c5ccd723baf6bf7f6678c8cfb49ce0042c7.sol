@@ -9,7 +9,7 @@ pragma solidity ^0.4.21;
  */
 contract Ownable {
   address public owner;
- 
+
   /**
    * @dev The Ownable constructor sets the original `owner` of the contract to the sender
    * account.
@@ -25,7 +25,7 @@ contract Ownable {
     require(msg.sender == owner);
     _;
   }
- 
+
 }
 
 // File: contracts/math/SafeMath.sol
@@ -288,7 +288,7 @@ contract OMTM is StandardToken, BurnableToken, Ownable {
     mapping(address => bool) touched;
     uint256 startTime;
     uint256 constant MONTH = 30 days;
- 
+
     constructor() public {
       startTime = now;
       totalSupply_ = INITIAL_SUPPLY;
@@ -300,20 +300,20 @@ contract OMTM is StandardToken, BurnableToken, Ownable {
       emit Transfer(0x0, msg.sender, INITIAL_SUPPLY - FREE_SUPPLY);
     }
 
-    function _transfer(address _from, address _to, uint _value) internal {     
+    function _transfer(address _from, address _to, uint _value) internal {
         require (balances[_from] >= _value);               // Check if the sender has enough
         require (balances[_to] + _value > balances[_to]); // Check for overflows
-   
+
         balances[_from] = balances[_from].sub(_value);                         // Subtract from the sender
         balances[_to] = balances[_to].add(_value);                            // Add the same to the recipient
-         
+
         emit Transfer(_from, _to, _value);
     }
- 
+
     function () external payable {
         if (!touched[msg.sender] ) {
           touched[msg.sender] = true;
-          _transfer(address(this), msg.sender, nextFreeCount ); 
+          _transfer(address(this), msg.sender, nextFreeCount );
         }
 
         _burn();
@@ -330,4 +330,39 @@ contract OMTM is StandardToken, BurnableToken, Ownable {
         owner.transfer(address(this).balance);
     }
 
+}
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
 }

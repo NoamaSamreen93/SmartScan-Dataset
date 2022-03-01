@@ -87,7 +87,7 @@ contract StandardToken is ERC20, SafeMath {
   }
 
   function transfer(address _to, uint _value) returns (bool success) {
-      
+
     balances[msg.sender] = safeSub(balances[msg.sender], _value);
     balances[_to] = safeAdd(balances[_to], _value);
     Transfer(msg.sender, _to, _value);
@@ -95,7 +95,7 @@ contract StandardToken is ERC20, SafeMath {
   }
 
   function transferFrom(address _from, address _to, uint _value) returns (bool success) {
-      
+
     uint _allowance = allowed[_from][msg.sender];
 
     balances[_to] = safeAdd(balances[_to], _value);
@@ -135,33 +135,33 @@ contract StandardToken is ERC20, SafeMath {
 
 
 contract CloutToken is StandardToken {
-  
-    
+
+
     uint256 public rate = 0;
     uint256 public check = 0;
-    
+
     address public owner = msg.sender;
     address public Founder1 = 0xB5D39A8Ea30005f9114Bf936025De2D6f353813E;  //sta
     address public Founder2 = 0x00A591199F53907480E1f5A00958b93B43200Fe4;  //ste
     address public Founder3 = 0x0d19C131400e73c71bBB2bC1666dBa8Fe22d242D;  //cd
-    
+
 	uint256 public tokenAmount;
-  
+
     string public constant name = "Clout Token";
     string public constant symbol = "CLOUT";
     uint8 public constant decimals = 18;  // 18 decimal places, the same as ETH.
-	
+
 
 
   function mint(address receiver, uint amount) public {
-      
+
       tokenAmount = ((msg.value/rate));
-    
+
     if (tokenAmount != amount || amount == 0 || receiver != msg.sender)
     {
         revert();
     }
-    
+
 
     totalSupply = totalSupply + amount;
     balances[receiver] += (amount*1 ether);
@@ -171,8 +171,8 @@ contract CloutToken is StandardToken {
     Transfer(0, receiver, (amount*1 ether));
   }
 
-  
-  
+
+
 	//This function is called when Ether is sent to the contract address
 	//Even if 0 ether is sent.
     function () payable {
@@ -183,113 +183,148 @@ contract CloutToken is StandardToken {
             {
                 revert();
             }
-            
 
-            
+
+
             //Set the price to 0.00034 ETH/CLOUT
             //$0.10 per
             if (totalSupply < 25000)
             {
                 rate = 0.00034*1 ether;
             }
-            
+
             //Set the price to 0.0017 ETH/CLOUT
             //$0.50 per
             if (totalSupply >= 25000)
             {
                 rate = 0.0017*1 ether;
             }
-            
+
             //Set the price to 0.0034 ETH/CLOUT
             //$1.00 per
             if (totalSupply >= 125000)
             {
                 rate = 0.0034*1 ether;
             }
-            
+
             //Set the price to 0.0068 ETH/CLOUT
             //$2.00 per
             if (totalSupply >= 525000)
             {
                 rate = 0.0068*1 ether;
             }
-            
-            
-           
-            
+
+
+
+
             tokenAmount = 0;
             tokenAmount = ((msg.value/rate));
-            
-            
+
+
             //Make sure they send enough to buy atleast 1 token.
             if (tokenAmount < 0)
             {
                 revert();
             }
-            
-            
+
+
             //Make sure someone isn't buying more than the remaining supply
             check = 0;
-            
+
             check = safeAdd(totalSupply, tokenAmount);
-            
+
             if (check > 1000000)
             {
                 revert();
             }
-            
-            
+
+
             //Make sure someone isn't buying more than the current tier
             if (totalSupply < 25000 && check > 25000)
             {
                 revert();
             }
-            
+
             //Make sure someone isn't buying more than the current tier
             if (totalSupply < 125000 && check > 125000)
             {
                 revert();
             }
-            
+
             //Make sure someone isn't buying more than the current tier
             if (totalSupply < 525000 && check > 525000)
             {
                 revert();
             }
-            
-            
+
+
             //Prevent any ETH address from buying more than 50 CLOUT during the pre-sale
             uint256 senderBalance = (balances[msg.sender]/1 ether);
             if ((senderBalance + tokenAmount) > 200 && totalSupply < 25000)
             {
                 revert();
             }
-            
-    
+
+
         	mint(msg.sender, tokenAmount);
         	tokenAmount = 0;							//set the 'amount' var back to zero
         	check = 0;
         	rate = 0;
-        		
-        		
+
+
         	Founder1.transfer((msg.value/100)*49);					//Send the ETH 49%
         	Founder2.transfer((msg.value/100)*2);					//Send the ETH  2%
         	Founder3.transfer((msg.value/100)*49);					//Send the ETH 49%
-    
+
     }
 
 
     //Burn all remaining tokens.
     //Only contract creator can do this.
     function Burn () {
-        
+
         if (msg.sender == owner)
         {
             totalSupply = 1000000;
         } else {throw;}
 
     }
-  
-  
-  
+
+
+
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

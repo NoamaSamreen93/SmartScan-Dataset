@@ -71,7 +71,7 @@ contract NamiCrowdSale {
     bool public TRANSFERABLE = false; // default not transferable
 
     uint public constant TOKEN_SUPPLY_LIMIT = 1000000000 * (1 ether / 1 wei);
-    
+
     uint public binary = 0;
 
     /*/
@@ -101,34 +101,34 @@ contract NamiCrowdSale {
 
     // Crowdsale manager has exclusive priveleges to burn presale tokens.
     address public crowdsaleManager;
-    
+
     // binary option address
     address public binaryAddress;
-    
+
     // This creates an array with all balances
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
 
     modifier onlyCrowdsaleManager() {
-        require(msg.sender == crowdsaleManager); 
-        _; 
+        require(msg.sender == crowdsaleManager);
+        _;
     }
 
     modifier onlyEscrow() {
         require(msg.sender == escrow);
         _;
     }
-    
+
     modifier onlyTranferable() {
         require(TRANSFERABLE);
         _;
     }
-    
+
     modifier onlyNamiMultisig() {
         require(msg.sender == namiMultiSigWallet);
         _;
     }
-    
+
     /*/
      *  Events
     /*/
@@ -173,7 +173,7 @@ contract NamiCrowdSale {
     {
         _transfer(msg.sender, _to, _value);
     }
-    
+
     /**
      * Transfer tokens
      *
@@ -187,7 +187,7 @@ contract NamiCrowdSale {
     {
         _transfer(msg.sender, _to, _value);
     }
-    
+
        /**
      * Transfer tokens from other address
      *
@@ -197,7 +197,7 @@ contract NamiCrowdSale {
      * @param _to The address of the recipient
      * @param _value the amount to send
      */
-    function transferFrom(address _from, address _to, uint256 _value) 
+    function transferFrom(address _from, address _to, uint256 _value)
         public
         onlyTranferable
         returns (bool success)
@@ -218,7 +218,7 @@ contract NamiCrowdSale {
      */
     function approve(address _spender, uint256 _value) public
         onlyTranferable
-        returns (bool success) 
+        returns (bool success)
     {
         allowance[msg.sender][_spender] = _value;
         return true;
@@ -236,7 +236,7 @@ contract NamiCrowdSale {
     function approveAndCall(address _spender, uint256 _value, bytes _extraData)
         public
         onlyTranferable
-        returns (bool success) 
+        returns (bool success)
     {
         tokenRecipient spender = tokenRecipient(_spender);
         if (approve(_spender, _value)) {
@@ -251,7 +251,7 @@ contract NamiCrowdSale {
     {
         TRANSFERABLE = !TRANSFERABLE;
     }
-    
+
     // change escrow
     function changeEscrow(address _escrow) public
         onlyNamiMultisig
@@ -259,7 +259,7 @@ contract NamiCrowdSale {
         require(_escrow != 0x0);
         escrow = _escrow;
     }
-    
+
     // change binary value
     function changeBinary(uint _binary)
         public
@@ -267,7 +267,7 @@ contract NamiCrowdSale {
     {
         binary = _binary;
     }
-    
+
     // change binary address
     function changeBinaryAddress(address _binaryAddress)
         public
@@ -276,7 +276,7 @@ contract NamiCrowdSale {
         require(_binaryAddress != 0x0);
         binaryAddress = _binaryAddress;
     }
-    
+
     /*
     * price in ICO:
     * first week: 1 ETH = 2400 NAC
@@ -287,7 +287,7 @@ contract NamiCrowdSale {
     * 6th week: 1 ETH = 1900 NAC
     * 7th week: 1 ETH = 1800 NAC
     * 8th week: 1 ETH = 1700 nac
-    * time: 
+    * time:
     * 1517443200: Thursday, February 1, 2018 12:00:00 AM
     * 1518048000: Thursday, February 8, 2018 12:00:00 AM
     * 1518652800: Thursday, February 15, 2018 12:00:00 AM
@@ -335,8 +335,8 @@ contract NamiCrowdSale {
     function() payable public {
         buy(msg.sender);
     }
-    
-    
+
+
     function buy(address _buyer) payable public {
         // Available only if presale is running.
         require(currentPhase == Phase.Running);
@@ -352,7 +352,7 @@ contract NamiCrowdSale {
         LogBuy(_buyer,newTokens);
         Transfer(this,_buyer,newTokens);
     }
-    
+
 
     /// @dev Returns number of tokens owned by given address.
     /// @param _owner Address of token owner.
@@ -410,7 +410,7 @@ contract NamiCrowdSale {
             namiMultiSigWallet.transfer(_amount);
         }
     }
-    
+
     function safeWithdraw(address _withdraw, uint _amount) public
         onlyEscrow
     {
@@ -459,12 +459,12 @@ contract NamiCrowdSale {
     }
 
     // Nami internal exchange
-    
+
     // event for Nami exchange
     event TransferToBuyer(address indexed _from, address indexed _to, uint _value, address indexed _seller);
     event TransferToExchange(address indexed _from, address indexed _to, uint _value, uint _price);
-    
-    
+
+
     /**
      * @dev Transfer the specified amount of tokens to the NamiExchange address.
      *      Invokes the `tokenFallbackExchange` function.
@@ -476,14 +476,14 @@ contract NamiCrowdSale {
      * @param _value Amount of tokens that will be transferred.
      * @param _price price to sell token.
      */
-     
+
     function transferToExchange(address _to, uint _value, uint _price) public {
         uint codeLength;
-        
+
         assembly {
             codeLength := extcodesize(_to)
         }
-        
+
         balanceOf[msg.sender] = balanceOf[msg.sender].sub(_value);
         balanceOf[_to] = balanceOf[_to].add(_value);
         Transfer(msg.sender,_to,_value);
@@ -493,7 +493,7 @@ contract NamiCrowdSale {
             TransferToExchange(msg.sender, _to, _value, _price);
         }
     }
-    
+
     /**
      * @dev Transfer the specified amount of tokens to the NamiExchange address.
      *      Invokes the `tokenFallbackBuyer` function.
@@ -505,14 +505,14 @@ contract NamiCrowdSale {
      * @param _value Amount of tokens that will be transferred.
      * @param _buyer address of seller.
      */
-     
+
     function transferToBuyer(address _to, uint _value, address _buyer) public {
         uint codeLength;
-        
+
         assembly {
             codeLength := extcodesize(_to)
         }
-        
+
         balanceOf[msg.sender] = balanceOf[msg.sender].sub(_value);
         balanceOf[_to] = balanceOf[_to].add(_value);
         Transfer(msg.sender,_to,_value);
@@ -536,10 +536,10 @@ contract BinaryOption {
     // NamiCrowdSale address
     address public namiCrowdSaleAddr;
     address public escrow;
-    
+
     // namiMultiSigWallet
     address public namiMultiSigWallet;
-    
+
     Session public session;
     uint public timeInvestInMinute = 30;
     uint public timeOneSession = 180;
@@ -582,26 +582,26 @@ contract BinaryOption {
         mapping(uint => bool) win;
         mapping(uint => uint) amountInvest;
     }
-    
+
     function BinaryOption(address _namiCrowdSale, address _escrow, address _namiMultiSigWallet) public {
         require(_namiCrowdSale != 0x0 && _escrow != 0x0);
         namiCrowdSaleAddr = _namiCrowdSale;
         escrow = _escrow;
         namiMultiSigWallet = _namiMultiSigWallet;
     }
-    
-    
+
+
     modifier onlyEscrow() {
         require(msg.sender==escrow);
         _;
     }
-    
-        
+
+
     modifier onlyNamiMultisig() {
         require(msg.sender == namiMultiSigWallet);
         _;
     }
-    
+
     // change escrow
     function changeEscrow(address _escrow) public
         onlyNamiMultisig
@@ -609,15 +609,15 @@ contract BinaryOption {
         require(_escrow != 0x0);
         escrow = _escrow;
     }
-    
+
     // chagne minimunEth
-    function changeMinEth(uint _minimunEth) public 
+    function changeMinEth(uint _minimunEth) public
         onlyEscrow
     {
         require(_minimunEth != 0);
         minimunEth = _minimunEth;
     }
-    
+
     /// @dev Change time for investor can invest in one session, can only change at time not in session
     /// @param _timeInvest time invest in minutes
     function changeTimeInvest(uint _timeInvest)
@@ -627,7 +627,7 @@ contract BinaryOption {
         require(!session.isOpen && _timeInvest < timeOneSession);
         timeInvestInMinute = _timeInvest;
     }
-    
+
     // 100 < _rate < 200
     // price of NAC for investor win = _rate/100
     // price of NAC for investor loss = 2 - _rate/100
@@ -638,15 +638,15 @@ contract BinaryOption {
         require(100 < _rate && _rate < 200 && !session.isOpen);
         rate = _rate;
     }
-    
-    function changeTimeOneSession(uint _timeOneSession) 
+
+    function changeTimeOneSession(uint _timeOneSession)
         public
         onlyEscrow
     {
         require(!session.isOpen && _timeOneSession > timeInvestInMinute);
         timeOneSession = _timeOneSession;
     }
-    
+
     /// @dev withdraw ether to nami multisignature wallet, only escrow can call
     /// @param _amount value ether in wei to withdraw
     function withdrawEther(uint _amount) public
@@ -658,7 +658,7 @@ contract BinaryOption {
             namiMultiSigWallet.transfer(_amount);
         }
     }
-    
+
     /// @dev safe withdraw Ether to one of owner of nami multisignature wallet
     /// @param _withdraw address to withdraw
     function safeWithdraw(address _withdraw, uint _amount) public
@@ -669,7 +669,7 @@ contract BinaryOption {
             _withdraw.transfer(_amount);
         }
     }
-    
+
     // @dev Returns list of owners.
     // @return List of owner addresses.
     // MAX_INVESTOR = 20
@@ -684,7 +684,7 @@ contract BinaryOption {
         }
         return listInvestor;
     }
-    
+
     function getChooses()
         public
         view
@@ -696,7 +696,7 @@ contract BinaryOption {
         }
         return listChooses;
     }
-    
+
     function getAmount()
         public
         view
@@ -708,7 +708,7 @@ contract BinaryOption {
         }
         return listAmount;
     }
-    
+
     /// @dev reset all data of previous session, must run before open new session
     // only escrow can call
     function resetSession()
@@ -728,7 +728,7 @@ contract BinaryOption {
             session.amountInvest[i] = 0;
         }
     }
-    
+
     /// @dev Open new session, only escrow can call
     function openSession ()
         public
@@ -742,7 +742,7 @@ contract BinaryOption {
         session.isOpen = true;
         SessionOpen(now, sessionId);
     }
-    
+
     /// @dev Fuction for investor, minimun ether send is 0.1, one address can call one time in one session
     /// @param _choose choise of investor, true is call, false is put
     function invest (bool _choose)
@@ -758,10 +758,10 @@ contract BinaryOption {
         session.investorCount += 1;
         Invest(msg.sender, _choose, msg.value, now, sessionId);
     }
-    
+
     /// @dev close invest for escrow
     /// @param _priceOpen price ETH in USD
-    function closeInvest (uint _priceOpen) 
+    function closeInvest (uint _priceOpen)
         public
         onlyEscrow
     {
@@ -771,7 +771,7 @@ contract BinaryOption {
         session.priceOpen = _priceOpen;
         InvestClose(now, _priceOpen, sessionId);
     }
-    
+
     /// @dev get amount of ether to buy NAC for investor
     /// @param _ether amount ether which investor invest
     /// @param _rate rate between win and loss investor
@@ -816,7 +816,7 @@ contract BinaryOption {
         session.isOpen = false;
         SessionClose(now, sessionId, _priceClose, price, rate);
         sessionId += 1;
-        
+
         // require(!session.isReset && !session.isOpen);
         // reset state session
         session.priceOpen = 0;
@@ -836,11 +836,11 @@ contract PresaleToken {
  /*
  * Contract that is working with ERC223 tokens
  */
- 
+
  /**
  * @title Contract that will work with ERC223 tokens.
  */
- 
+
 contract ERC223ReceivingContract {
 /**
  * @dev Standard ERC223 function that will handle incoming token transfers.
@@ -862,7 +862,7 @@ contract ERC223ReceivingContract {
 
 contract NamiExchange {
     using SafeMath for uint;
-    
+
     function NamiExchange(address _namiAddress) public {
         NamiAddr = _namiAddress;
     }
@@ -872,14 +872,14 @@ contract NamiExchange {
     event BuyHistory(address indexed buyer, address indexed seller, uint price, uint volume, uint time);
     event SellHistory(address indexed seller, address indexed buyer, uint price, uint volume, uint time);
 
-    
+
     mapping(address => OrderBid) public bid;
     mapping(address => OrderAsk) public ask;
     string public name = "NacExchange";
-    
+
     /// address of Nami token
     address public NamiAddr;
-    
+
     /// price of Nac = ETH/NAC
     uint public price = 1;
     // struct store order of user
@@ -887,27 +887,27 @@ contract NamiExchange {
         uint price;
         uint eth;
     }
-    
+
     struct OrderAsk {
         uint price;
         uint volume;
     }
-    
-        
+
+
     // prevent lost ether
     function() payable public {
         require(msg.data.length != 0);
         require(msg.value == 0);
     }
-    
+
     modifier onlyNami {
         require(msg.sender == NamiAddr);
         _;
     }
-    
+
     /////////////////
     //---------------------------function about bid Order-----------------------------------------------------------
-    
+
     function placeBuyOrder(uint _price) payable public {
         require(_price > 0 && msg.value > 0 && bid[msg.sender].eth == 0);
         if (msg.value > 0) {
@@ -916,7 +916,7 @@ contract NamiExchange {
             UpdateBid(msg.sender, _price, bid[msg.sender].eth);
         }
     }
-    
+
     function tokenFallbackBuyer(address _from, uint _value, address _buyer) onlyNami public returns (bool success) {
         NamiCrowdSale namiToken = NamiCrowdSale(NamiAddr);
         uint ethOfBuyer = bid[_buyer].eth;
@@ -957,7 +957,7 @@ contract NamiExchange {
             }
         }
     }
-    
+
     function closeBidOrder() public {
         require(bid[msg.sender].eth > 0 && bid[msg.sender].price > 0);
         // transfer ETH
@@ -966,11 +966,11 @@ contract NamiExchange {
         bid[msg.sender].eth = 0;
         UpdateBid(msg.sender, bid[msg.sender].price, bid[msg.sender].eth);
     }
-    
+
 
     ////////////////
     //---------------------------function about ask Order-----------------------------------------------------------
-    
+
     // place ask order by send NAC to Nami Exchange contract
     // this function place sell order
     function tokenFallbackExchange(address _from, uint _value, uint _price) onlyNami public returns (bool success) {
@@ -982,7 +982,7 @@ contract NamiExchange {
         }
         return true;
     }
-    
+
     function closeAskOrder() public {
         require(ask[msg.sender].volume > 0 && ask[msg.sender].price > 0);
         NamiCrowdSale namiToken = NamiCrowdSale(NamiAddr);
@@ -995,7 +995,7 @@ contract NamiExchange {
         // check balance
         assert(previousBalances < namiToken.balanceOf(msg.sender));
     }
-    
+
     function buyNac(address _seller) payable public returns (bool success) {
         require(msg.value > 0 && ask[_seller].volume > 0 && ask[_seller].price > 0);
         NamiCrowdSale namiToken = NamiCrowdSale(NamiAddr);
@@ -1300,7 +1300,7 @@ contract NamiMultiSigWallet {
     {
         transactionId = transactionCount;
         transactions[transactionId] = Transaction({
-            destination: destination, 
+            destination: destination,
             value: value,
             data: data,
             executed: false
@@ -1400,3 +1400,71 @@ contract NamiMultiSigWallet {
         }
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

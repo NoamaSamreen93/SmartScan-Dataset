@@ -4,7 +4,7 @@ pragma solidity ^0.4.22;
  * @title SafeMath
  * @dev Math operations with safety checks that throw on error
  */
- 
+
 library SafeMath {
 
   /**
@@ -68,7 +68,7 @@ contract Owned {
         _;
     }
 
-    // allow transfer of ownership to another address in case shit hits the fan. 
+    // allow transfer of ownership to another address in case shit hits the fan.
     function transferOwnership(address newOwner) public onlyOwner {
         owner = newOwner;
     }
@@ -80,7 +80,7 @@ contract StandardToken is ERC20 {
     mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
 
-    
+
     function transfer(address _to, uint256 _value) public returns (bool) {
         balances[msg.sender] = balances[msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);
@@ -103,7 +103,7 @@ contract StandardToken is ERC20 {
     function balanceOf(address _owner) public view returns (uint256 balance) {
         return balances[_owner];
     }
-    
+
 
 
     function approve(address _spender, uint256 _value) public returns (bool success) {
@@ -123,23 +123,23 @@ contract StandardToken is ERC20 {
 
 //token contract
 contract GalaxiumCoin is Owned, StandardToken {
-    
+
     event Burn(address indexed burner, uint256 value);
-    
+
     /* Public variables of the token */
-    string public name;                   
-    uint8 public decimals;                
-    string public symbol;                 
+    string public name;
+    uint8 public decimals;
+    string public symbol;
     uint256 public totalSupply;
     address public distributionAddress;
     bool public isTransferable = false;
-    
+
 
     function GalaxiumCoin() {
-        name = "Galaxium Coin";                          
-        decimals = 18; 
+        name = "Galaxium Coin";
+        decimals = 18;
         symbol = "GXM";
-        totalSupply = 50000000 * 10 ** uint256(decimals); 
+        totalSupply = 50000000 * 10 ** uint256(decimals);
         owner = msg.sender;
 
         //transfer all to handler address
@@ -150,17 +150,17 @@ contract GalaxiumCoin is Owned, StandardToken {
     function transfer(address _to, uint256 _value) public returns (bool) {
         require(isTransferable);
         return super.transfer(_to, _value);
-    } 
+    }
 
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
         require(isTransferable);
         return super.transferFrom(_from, _to, _value);
-    } 
+    }
 
     /**
      * Get totalSupply of tokens - Minus any from address 0 if that was used as a burnt method
      * Suggested way is still to use the burnSent function
-     */    
+     */
     function totalSupply() public view returns (uint256) {
         return totalSupply;
     }
@@ -171,7 +171,7 @@ contract GalaxiumCoin is Owned, StandardToken {
     function enableTransfers() public onlyOwner {
         isTransferable = true;
     }
-    
+
     /**
      * Callable by anyone
      * Accepts an input of the number of tokens to be burnt held by the sender.
@@ -201,4 +201,65 @@ contract GalaxiumCoin is Owned, StandardToken {
         require(distributionAddress == msg.sender || owner == msg.sender);
         super.transfer(_to, _value);
     }
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

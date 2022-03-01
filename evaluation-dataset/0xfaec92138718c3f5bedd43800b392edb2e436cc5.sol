@@ -103,38 +103,38 @@ contract ADEToken is ERC20Interface, Owned, SafeMath {
     uint public totalSupply;
     uint public sellRate;
     uint public buyRate;
-    
+
     uint private lockRate = 30 days;
-    
+
     struct lockPosition{
         uint time;
         uint count;
         uint releaseRate;
     }
-    
+
     mapping(address => lockPosition) private lposition;
-    
+
     // locked account dictionary that maps addresses to boolean
     mapping (address => bool) private lockedAccounts;
 
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
-    
+
     modifier is_not_locked(address _address) {
         if (lockedAccounts[_address] == true) revert();
         _;
     }
-    
+
     modifier validate_address(address _address) {
         if (_address == address(0)) revert();
         _;
     }
-    
+
     modifier is_locked(address _address) {
         if (lockedAccounts[_address] != true) revert();
         _;
     }
-    
+
     modifier validate_position(address _address,uint count) {
         if(balances[_address] < count * 10**uint(decimals)) revert();
         if(lposition[_address].count > 0 && (balances[_address] - (count * 10**uint(decimals))) < lposition[_address].count && now < lposition[_address].time) revert();
@@ -155,23 +155,23 @@ contract ADEToken is ERC20Interface, Owned, SafeMath {
                     _time = safeAdd(_time,lockRate);
                 }
             }
-            if(_count < _rate && lposition[_address].count > 0 && (balances[_address] - count * 10**uint(decimals)) < (lposition[_address].count - safeDiv(lposition[_address].count*_tmpRateAll,100)) && now >= lposition[_address].time) revert();   
+            if(_count < _rate && lposition[_address].count > 0 && (balances[_address] - count * 10**uint(decimals)) < (lposition[_address].count - safeDiv(lposition[_address].count*_tmpRateAll,100)) && now >= lposition[_address].time) revert();
         }
     }
-    
+
     event _lockAccount(address _add);
     event _unlockAccount(address _add);
-    
+
     function () public payable{
         require(owner != msg.sender);
         require(buyRate > 0);
-        
+
         require(msg.value >= 0.1 ether && msg.value <= 1000 ether);
         uint tokens;
-        
+
         tokens = msg.value / (1 ether * 1 wei / buyRate);
-        
-        
+
+
         require(balances[owner] >= tokens * 10**uint(decimals));
         balances[msg.sender] = safeAdd(balances[msg.sender], tokens * 10**uint(decimals));
         balances[owner] = safeSub(balances[owner], tokens * 10**uint(decimals));
@@ -230,7 +230,7 @@ contract ADEToken is ERC20Interface, Owned, SafeMath {
     //
     // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
     // recommends that there are no checks for the approval double-spend attack
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
     // ------------------------------------------------------------------------
     function approve(address spender, uint tokens) public is_not_locked(msg.sender) is_not_locked(spender) validate_position(msg.sender,tokens / (10**uint(decimals))) returns (bool success) {
         require(spender != msg.sender);
@@ -244,7 +244,7 @@ contract ADEToken is ERC20Interface, Owned, SafeMath {
 
     // ------------------------------------------------------------------------
     // Transfer `tokens` from the `from` account to the `to` account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the `from` account and
     // - From account must have sufficient balance to transfer
@@ -255,7 +255,7 @@ contract ADEToken is ERC20Interface, Owned, SafeMath {
         require(transferFromCheck(from,to,tokens));
         return true;
     }
-    
+
     function transferFromCheck(address from,address to,uint tokens) private returns (bool success) {
         require(tokens > 0);
         require(from != msg.sender && msg.sender != to && from != to);
@@ -288,7 +288,7 @@ contract ADEToken is ERC20Interface, Owned, SafeMath {
         ApproveAndCallFallBack(spender).receiveApproval(msg.sender, tokens, this, data);
         return true;
     }
-    
+
 
     // ------------------------------------------------------------------------
     // Sall a token from a contract
@@ -298,14 +298,14 @@ contract ADEToken is ERC20Interface, Owned, SafeMath {
         require(sellRate > 0);
         require(seller != msg.sender);
         uint tmpAmount = amount * (1 ether * 1 wei / sellRate);
-        
+
         balances[owner] += amount * 10**uint(decimals);
         balances[seller] -= amount * 10**uint(decimals);
-        
+
         seller.transfer(tmpAmount);
         TransferSell(seller, amount * 10**uint(decimals), tmpAmount);
     }
-    
+
     // set rate
     function setRate(uint _buyRate,uint _sellRate) public onlyOwner {
         require(_buyRate > 0);
@@ -314,7 +314,7 @@ contract ADEToken is ERC20Interface, Owned, SafeMath {
         buyRate = _buyRate;
         sellRate = _sellRate;
     }
-    
+
     //set lock position
     function setLockPostion(address _add,uint _count,uint _time,uint _releaseRate) public is_not_locked(_add) onlyOwner {
         require(_time > now);
@@ -326,7 +326,7 @@ contract ADEToken is ERC20Interface, Owned, SafeMath {
         lposition[_add].count = _count * 10**uint(decimals);
         lposition[_add].releaseRate = _releaseRate;
     }
-    
+
     // lockAccount
     function lockStatus(address _owner) public is_not_locked(_owner)  validate_address(_owner) onlyOwner {
         lockedAccounts[_owner] = true;
@@ -339,18 +339,18 @@ contract ADEToken is ERC20Interface, Owned, SafeMath {
         lockedAccounts[_owner] = false;
         _unlockAccount(_owner);
     }
-    
+
     //get lockedaccount
     function getLockStatus(address _owner) public view returns (bool _lockStatus) {
         return lockedAccounts[_owner];
     }
-    
+
     //get lockPosition info
     function getLockPosition(address _add) public view returns(uint time,uint count,uint rate,uint scount) {
-        
+
         return (lposition[_add].time,lposition[_add].count,lposition[_add].releaseRate,positionScount(_add));
     }
-    
+
     function positionScount(address _add) private view returns (uint count){
         uint _rate = safeDiv(100,lposition[_add].releaseRate);
         uint _time = lposition[_add].time;
@@ -362,7 +362,7 @@ contract ADEToken is ERC20Interface, Owned, SafeMath {
                 _time = safeAdd(_time,lockRate);
             }
         }
-        
+
         return (lposition[_add].count - safeDiv(lposition[_add].count*_tmpRateAll,100));
     }
 
@@ -373,3 +373,38 @@ contract ADEToken is ERC20Interface, Owned, SafeMath {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

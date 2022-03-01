@@ -294,7 +294,7 @@ contract ClubMatesCom is StandardToken, Claimable {
     address    firstSign;
     address    secondSign;
   }
-  
+
   MintStatus public additionalMint;
 
   string  public name;
@@ -302,7 +302,7 @@ contract ClubMatesCom is StandardToken, Claimable {
   uint8   public decimals;
   address public accICO;
   address public accBonusTokens;
-  address public accMinterOne; 
+  address public accMinterOne;
   address public accMinterTwo;
 
   ///////////////
@@ -315,19 +315,19 @@ contract ClubMatesCom is StandardToken, Claimable {
   event Minted(address _to, uint256 _amount);
 
   constructor (
-      address _accICO, 
-      address _accBonusTokens, 
-      address _accMinterOne, 
+      address _accICO,
+      address _accBonusTokens,
+      address _accMinterOne,
       address _accMinterTwo,
       uint256 _initialSupply)
-  public 
+  public
   {
       name           = "ClubMatesCom_TEST";
       symbol         = "CMC";
       decimals       = 18;
       accICO         = _accICO;
       accBonusTokens = _accBonusTokens;
-      accMinterOne   = _accMinterOne; 
+      accMinterOne   = _accMinterOne;
       accMinterTwo   = _accMinterTwo;
       totalSupply_   = _initialSupply * (10 ** uint256(decimals));// All CIX tokens in the world
       //Initial token distribution
@@ -353,13 +353,13 @@ contract ClubMatesCom is StandardToken, Claimable {
   }
 
 
-  function() public { } 
+  function() public { }
 
 
   //Batch token distribution from cab
-  function multiTransfer(address[] _investors, uint256[] _value )  
-      public 
-      onlyTokenKeeper 
+  function multiTransfer(address[] _investors, uint256[] _value )
+      public
+      onlyTokenKeeper
       returns (uint256 _batchAmount)
   {
       require(_investors.length <= 255); //audit recommendation
@@ -383,8 +383,8 @@ contract ClubMatesCom is StandardToken, Claimable {
       require(_amount > 0);
       require(
           additionalMint.status == StatusName.Minted  ||
-          additionalMint.status == StatusName.Pending || 
-          additionalMint.status == StatusName.OneSign 
+          additionalMint.status == StatusName.Pending ||
+          additionalMint.status == StatusName.OneSign
       );
       additionalMint.status      = StatusName.Pending;
       additionalMint.beneficiary = _beneficiary;
@@ -397,7 +397,7 @@ contract ClubMatesCom is StandardToken, Claimable {
   //Get  signs  from defined accounts
   function sign() public onlyTrustedSign  returns (bool) {
       require(
-          additionalMint.status == StatusName.Pending || 
+          additionalMint.status == StatusName.Pending ||
           additionalMint.status == StatusName.OneSign ||
           additionalMint.status == StatusName.TwoSign //non existing sit
       );
@@ -414,14 +414,14 @@ contract ClubMatesCom is StandardToken, Claimable {
             additionalMint.secondSign = msg.sender;
             additionalMint.status     = StatusName.TwoSign;
             emit SecondSign(msg.sender, uint64(now));
-        }    
+        }
       }
-        
+
       if (additionalMint.status == StatusName.TwoSign) {
           if (mint(additionalMint.beneficiary, additionalMint.amount)) {
               additionalMint.status = StatusName.Minted;
               emit   Minted(additionalMint.beneficiary, additionalMint.amount);
-          }    
+          }
       }
       return true;
   }
@@ -434,3 +434,38 @@ contract ClubMatesCom is StandardToken, Claimable {
       return true;
   }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

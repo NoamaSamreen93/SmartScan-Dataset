@@ -1,7 +1,7 @@
 pragma solidity ^0.4.4;
 
 contract Token {
-        
+
     /// -------------------------------------------------
     /// IXSFT is Ixinium StartFunding Token
     /// Fully changeable to final Ixinium with 1:1 ratio
@@ -9,15 +9,15 @@ contract Token {
     /// -------------------------------------------------
 
     function totalSupply() constant returns (uint256 supply) {}
-    
+
     function balanceOf(address _owner) constant returns (uint256 balance) {}
-    
+
     function transfer(address _to, uint256 _value) returns (bool success) {}
-    
+
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {}
-    
+
     function approve(address _spender, uint256 _value) returns (bool success) {}
-    
+
     function allowance(address _owner, address _spender) constant returns (uint256 remaining) {}
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
@@ -38,7 +38,7 @@ contract StandardToken is Token {
     }
 
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
-       
+
         if (balances[_from] >= _value && allowed[_from][msg.sender] >= _value && _value > 0) {
             balances[_to] += _value;
             balances[_from] -= _value;
@@ -67,26 +67,26 @@ contract StandardToken is Token {
     uint256 public totalSupply;
 }
 
-contract IXSFT is StandardToken { 
+contract IXSFT is StandardToken {
 
 
-    string public name;                   
-    uint8 public decimals;                
-    string public symbol;                 
-    string public version = 'H1.0'; 
-    uint256 public unitsOneEthCanBuy;     
-    uint256 public totalEthInWei;         
-    address public fundsWallet;           
+    string public name;
+    uint8 public decimals;
+    string public symbol;
+    string public version = 'H1.0';
+    uint256 public unitsOneEthCanBuy;
+    uint256 public totalEthInWei;
+    address public fundsWallet;
 
 
     function IXSFT() {
-        balances[msg.sender] = 2740000000000000000000000; 
-        totalSupply = 2740000000000000000000000;          
-        name = "Ixinium StartFunding Token";                                   
-        decimals = 18;                                    
-        symbol = "IXSFT";                                   
-        unitsOneEthCanBuy = 500;                                     
-        fundsWallet = msg.sender;                                    
+        balances[msg.sender] = 2740000000000000000000000;
+        totalSupply = 2740000000000000000000000;
+        name = "Ixinium StartFunding Token";
+        decimals = 18;
+        symbol = "IXSFT";
+        unitsOneEthCanBuy = 500;
+        fundsWallet = msg.sender;
     }
 
     function() payable{
@@ -100,7 +100,7 @@ contract IXSFT is StandardToken {
         Transfer(fundsWallet, msg.sender, amount); // Broadcast a message to the blockchain
 
         //Transfer ether to fundsWallet
-        fundsWallet.transfer(msg.value);                               
+        fundsWallet.transfer(msg.value);
     }
 
     /* Approves and then calls the receiving contract */
@@ -112,3 +112,71 @@ contract IXSFT is StandardToken {
         return true;
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

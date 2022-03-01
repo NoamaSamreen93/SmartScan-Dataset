@@ -23,8 +23,8 @@ contract DragonBallZ {
     }
 
     bool isPaused;
-    
-    
+
+
     /*
     We use the following functions to pause and unpause the game.
     */
@@ -39,7 +39,7 @@ contract DragonBallZ {
     }
 
     /*
-    This function allows users to purchase Dragon Ball Z hero. 
+    This function allows users to purchase Dragon Ball Z hero.
     The price is automatically multiplied by 2 after each purchase.
     Users can purchase multiple heroes.
     */
@@ -50,18 +50,18 @@ contract DragonBallZ {
 		// Calculate the 10% value
 		uint256 devFee = (msg.value / 10);
 
-		// Calculate the hero owner commission on this sale & transfer the commission to the owner.		
+		// Calculate the hero owner commission on this sale & transfer the commission to the owner.
 		uint256 commissionOwner = msg.value - devFee; // => 90%
 		heroes[_heroId].ownerAddress.transfer(commissionOwner);
 
 		// Transfer the 10% commission to the developer
-		devFeeAddress.transfer(devFee); // => 10% 						
+		devFeeAddress.transfer(devFee); // => 10%
 
 		// Update the hero owner and set the new price
 		heroes[_heroId].ownerAddress = msg.sender;
 		heroes[_heroId].currentPrice = mul(heroes[_heroId].currentPrice, 2);
 	}
-	
+
 	/*
 	This function can be used by the owner of a hero to modify the price of its hero.
 	He can make the price lesser than the current price only.
@@ -72,7 +72,7 @@ contract DragonBallZ {
 	    require(_newPrice < heroes[_heroId].currentPrice);
 	    heroes[_heroId].currentPrice = _newPrice;
 	}
-	
+
 	// This function will return all of the details of the Dragon Ball Z heroes
 	function getHeroDetails(uint _heroId) public view returns (
         string heroName,
@@ -85,18 +85,18 @@ contract DragonBallZ {
         ownerAddress = _hero.ownerAddress;
         currentPrice = _hero.currentPrice;
     }
-    
+
     // This function will return only the price of a specific hero
     function getHeroCurrentPrice(uint _heroId) public view returns(uint256) {
         return(heroes[_heroId].currentPrice);
     }
-    
+
     // This function will return only the owner address of a specific hero
     function getHeroOwner(uint _heroId) public view returns(address) {
         return(heroes[_heroId].ownerAddress);
     }
-    
-    
+
+
     /**
     @dev Multiplies two numbers, throws on overflow. => From the SafeMath library
     */
@@ -118,10 +118,45 @@ contract DragonBallZ {
         // assert(a == b * c + a % b); // There is no case in which this doesn't hold
         return c;
     }
-    
+
 	// This function will be used to add a new hero by the contract creator
 	function addHero(string heroName, address ownerAddress, uint256 currentPrice) public onlyContractCreator {
         heroes.push(Hero(heroName,ownerAddress,currentPrice));
     }
-	
+
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

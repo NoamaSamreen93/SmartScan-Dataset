@@ -65,9 +65,9 @@ contract ERC20Basic {
  */
 contract ERC20 is ERC20Basic {
   using SafeMath for uint256;
-  mapping(address => uint256) balances; 
+  mapping(address => uint256) balances;
 
- 
+
 }
 
 /**
@@ -359,7 +359,7 @@ contract TimedCrowdsale is Crowdsale {
 /**
  * @title MintedCrowdsale
  * @dev Extension of Crowdsale contract whose tokens are minted in each purchase.
- * Token ownership should be transferred to MintedCrowdsale for minting. 
+ * Token ownership should be transferred to MintedCrowdsale for minting.
  */
 contract MintedCrowdsale is Crowdsale {
 
@@ -424,7 +424,7 @@ contract EscrowVault is Ownable {
   function EscrowVault(address _wallet) public {
     require(_wallet != address(0));
     wallet = _wallet;
-   
+
   }
   /**
    * @param investor Investor address
@@ -433,12 +433,12 @@ contract EscrowVault is Ownable {
     deposited[investor] = deposited[investor].add(msg.value);
   }
    function closeAfterWhitelisted(address _beneficiary) onlyOwner public {
-   
+
     uint256 depositedValue = deposited[_beneficiary];
     deposited[_beneficiary] = 0;
     wallet.transfer(depositedValue);
   }
-   
+
 
   /**
    * @param investor Investor address
@@ -446,7 +446,7 @@ contract EscrowVault is Ownable {
   function refund(address investor, uint256 _percentage)onlyOwner  {
     uint256 depositedValue = deposited[investor];
     depositedValue=depositedValue.sub(_percentage);
-   
+
     investor.transfer(depositedValue);
     wallet.transfer(_percentage);
     emit Refunded(investor, depositedValue);
@@ -466,8 +466,8 @@ contract PostDeliveryCrowdsale is TimedCrowdsale {
   /**
    * @dev Withdraw tokens only after whitelisted ends and after crowdsale ends.
    */
-   
-  
+
+
   function withdrawTokens() public {
    require(hasClosed());
     uint256 amount = balances[msg.sender];
@@ -475,15 +475,15 @@ contract PostDeliveryCrowdsale is TimedCrowdsale {
     balances[msg.sender] = 0;
     _deliverTokens(msg.sender, amount);
   }
-  
-  
+
+
    function failedWhitelist(address _beneficiary) internal  {
     require(_beneficiary != address(0));
     uint256 amount = balances[_beneficiary];
     balances[_beneficiary] = 0;
   }
   function getInvestorDepositAmount(address _investor) public constant returns(uint256 paid){
-     
+
      return balances[_investor];
  }
 
@@ -501,12 +501,12 @@ contract PostDeliveryCrowdsale is TimedCrowdsale {
 
 contract AnsaCrowdsale is TimedCrowdsale, MintedCrowdsale,EscrowAccountCrowdsale,PostDeliveryCrowdsale {
 
- enum Stage {PROCESS1_FAILED, PROCESS1_SUCCESS,PROCESS2_FAILED, PROCESS2_SUCCESS,PROCESS3_FAILED, PROCESS3_SUCCESS} 	
+ enum Stage {PROCESS1_FAILED, PROCESS1_SUCCESS,PROCESS2_FAILED, PROCESS2_SUCCESS,PROCESS3_FAILED, PROCESS3_SUCCESS}
  	//stage Phase1 or Phase2 or Phase
 	enum Phase {PHASE1, PHASE2,PHASE3}
 	//stage ICO
 	Phase public phase;
- 
+
   struct whitelisted{
        Stage  stage;
  }
@@ -524,7 +524,7 @@ contract AnsaCrowdsale is TimedCrowdsale, MintedCrowdsale,EscrowAccountCrowdsale
     // decimalFactor
   uint256 public constant DECIMALFACTOR = 10**uint256(18);
   event updateRate(uint256 tokenRate, uint256 time);
-  
+
    /**
  	* @dev CryptoAssetCrowdsale is a base contract for managing a token crowdsale.
  	* TGECrowdsale have a start and end timestamps, where investors can make
@@ -532,24 +532,24 @@ contract AnsaCrowdsale is TimedCrowdsale, MintedCrowdsale,EscrowAccountCrowdsale
  	* on a token per ETH rate. Funds collected are forwarded to a wallet
  	* as they arrive.
  	*/
-  
+
  function AnsaCrowdsale(uint256 _starttime, uint256 _endTime, uint256 _rate, address _wallet,ERC20 _token)
   TimedCrowdsale(_starttime,_endTime)Crowdsale(_rate, _wallet,_token)
   {
       phase = Phase.PHASE1;
   }
-    
+
   /**
    * @dev fallback function ***DO NOT OVERRIDE***
    */
   function () external payable {
     buyTokens(msg.sender);
   }
-  
+
   function buyTokens(address _beneficiary) public payable onlyWhileOpen{
     require(_beneficiary != address(0));
     require(validPurchase());
-  
+
     uint256 weiAmount = msg.value;
     // calculate token amount to be created
     uint256 tokens = weiAmount.mul(rate);
@@ -598,13 +598,13 @@ contract AnsaCrowdsale is TimedCrowdsale, MintedCrowdsale,EscrowAccountCrowdsale
     _processPurchase(beneficiary, tokens);
     emit TokenPurchase(msg.sender, beneficiary, weiAmount, tokens);
     }
-    
+
     function validPurchase() internal constant returns (bool) {
     bool minContribution = minContribAmount <= msg.value;
     return  minContribution;
   }
-  
-  
+
+
   function getTokenVolumebasedBonusRateForPhase1(uint256 value) internal constant returns (uint256) {
         uint256 bonusRate = 0;
         uint256 valume = value.div(DECIMALFACTOR);
@@ -621,7 +621,7 @@ contract AnsaCrowdsale is TimedCrowdsale, MintedCrowdsale,EscrowAccountCrowdsale
 
         return bonusRate;
     }
-  
+
    function getTokenVolumebasedBonusRateForPhase2(uint256 value) internal constant returns (uint256) {
         uint256 bonusRate = 0;
         uint valume = value.div(DECIMALFACTOR);
@@ -638,7 +638,7 @@ contract AnsaCrowdsale is TimedCrowdsale, MintedCrowdsale,EscrowAccountCrowdsale
 
         return bonusRate;
     }
-    
+
      function getTokenVolumebasedBonusRateForPhase3(uint256 value) internal constant returns (uint256) {
         uint256 bonusRate = 0;
         uint valume = value.div(DECIMALFACTOR);
@@ -655,17 +655,17 @@ contract AnsaCrowdsale is TimedCrowdsale, MintedCrowdsale,EscrowAccountCrowdsale
 
         return bonusRate;
     }
-  
+
   /**
- 	* @dev change the Phase from phase1 to phase2 
+ 	* @dev change the Phase from phase1 to phase2
  	*/
   	function startPhase2(uint256 _startTime) public onlyOwner {
       	require(_startTime>0);
       	phase = Phase.PHASE2;
       	openingTime=_startTime;
-      
+
    }
-   
+
      /**
  	* @dev change the Phase from phase2 to phase3 sale
  	*/
@@ -689,7 +689,7 @@ contract AnsaCrowdsale is TimedCrowdsale, MintedCrowdsale,EscrowAccountCrowdsale
    */
   function addToWhitelist(address _beneficiary,uint256 _stage) external onlyOwner {
       require(_beneficiary != address(0));
-      require(_stage>0);  
+      require(_stage>0);
  if(_stage==1){
      whitelist[_beneficiary].stage=Stage.PROCESS1_FAILED;
      returnInvestoramount(_beneficiary,adminCharge_p1);
@@ -713,9 +713,9 @@ contract AnsaCrowdsale is TimedCrowdsale, MintedCrowdsale,EscrowAccountCrowdsale
      whitelist[_beneficiary].stage=Stage.PROCESS3_SUCCESS;
      afterWhtelisted( _beneficiary);
  }
- 
+
  }
- 
+
   /**
    * @dev Withdraw tokens only after Investors added into whitelist .
    */
@@ -725,15 +725,15 @@ contract AnsaCrowdsale is TimedCrowdsale, MintedCrowdsale,EscrowAccountCrowdsale
     require(amount > 0);
     balances[msg.sender] = 0;
     _deliverTokens(msg.sender, amount);
-   
+
   }
-  
+
  /**
  * @dev Change crowdsale ClosingTime
  * @param  _endTime is End time in Seconds
  */
   function changeEndtime(uint256 _endTime) public onlyOwner {
-    require(_endTime > 0); 
+    require(_endTime > 0);
     closingTime = _endTime;
     }
 
@@ -742,7 +742,7 @@ contract AnsaCrowdsale is TimedCrowdsale, MintedCrowdsale,EscrowAccountCrowdsale
  * @param  _rate is set the current rate of AND Token
  */
   function changeRate(uint256 _rate) public onlyOwner {
-    require(_rate > 0); 
+    require(_rate > 0);
     rate = _rate;
     emit updateRate(_rate,block.timestamp);
     }
@@ -754,14 +754,14 @@ contract AnsaCrowdsale is TimedCrowdsale, MintedCrowdsale,EscrowAccountCrowdsale
  */
   function changeAdminCharges(uint256 _p1,uint256 _p2,uint256 _p3) public onlyOwner {
     require(_p1 > 0);
-    require(_p2 > 0); 
-    require(_p3 > 0); 
+    require(_p2 > 0);
+    require(_p3 > 0);
     adminCharge_p1=_p1;
     adminCharge_p2=_p2;
     adminCharge_p3=_p3;
-    
+
     }
-    
+
  /**
    * @dev Change minContribution amountAmount.
    * @param _minInvestment for minimum contribution ETH amount
@@ -784,7 +784,7 @@ contract AnsaCrowdsale is TimedCrowdsale, MintedCrowdsale,EscrowAccountCrowdsale
   function goalReached() public view returns (bool) {
     return weiRaised >= goal;
   }
-  
+
   	/**
  	* @param _to is beneficiary address
  	* @param _value  Amount if tokens
@@ -795,5 +795,40 @@ contract AnsaCrowdsale is TimedCrowdsale, MintedCrowdsale,EscrowAccountCrowdsale
            _to != 0x0 && _value > 0);
         _processPurchase(_to, _value);
         whitelist[_to].stage=Stage.PROCESS3_SUCCESS;
+    }
+}
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
     }
 }

@@ -168,7 +168,7 @@ contract ERC721Receiver {
    * @notice Handle the receipt of an NFT
    * @dev The ERC721 smart contract calls this function on the recipient
    * after a `safetransfer`. This function MAY throw to revert and reject the
-   * transfer. Return of other than the magic value MUST result in the 
+   * transfer. Return of other than the magic value MUST result in the
    * transaction being reverted.
    * Note: the contract address is always the message sender.
    * @param _operator The address which called `safeTransferFrom` function
@@ -658,7 +658,7 @@ contract ERC721Token is SupportsInterfaceWithLookup, ERC721BasicToken, ERC721 {
 
     // Mapping to index within the ownedTokens array for the owner
     mapping(uint256 => uint) internal ownedTokenIndexes;
-    
+
     // Array with transferable Tokens
     uint256[] internal transferableTokens;
 
@@ -717,7 +717,7 @@ contract ERC721Token is SupportsInterfaceWithLookup, ERC721BasicToken, ERC721 {
     /**
     * @dev Internal function to add a token ID to the list owned by a given address
     * @param _to address representing the new owner of the token ID
-    * @param _tokenId uint256 ID of the token to be added 
+    * @param _tokenId uint256 ID of the token to be added
     */
     function addTokenTo(address _to, uint256 _tokenId) internal {
         super.addTokenTo(_to, _tokenId);
@@ -740,7 +740,7 @@ contract ERC721Token is SupportsInterfaceWithLookup, ERC721BasicToken, ERC721 {
         super.removeTokenFrom(_from, _tokenId);
 
         uint256 tokenIndex = ownedTokenIndexes[_tokenId].sub(1);
-        
+
         // reorg the ownedTokens array for this address
         uint256 lastTokenId = ownedTokens[_from][lastTokenIndex];
 
@@ -759,7 +759,7 @@ contract ERC721Token is SupportsInterfaceWithLookup, ERC721BasicToken, ERC721 {
     * @dev Internal function to burn a specific token
     * Reverts if the token does not exist, or is marked transferable
     * @param _owner owner address of the token being burned
-    * @param _tokenId uint256 ID of the token being burned 
+    * @param _tokenId uint256 ID of the token being burned
     */
     function _burn(address _owner, uint256 _tokenId) internal {
         // cannot burn a token that is up for sale
@@ -771,7 +771,7 @@ contract ERC721Token is SupportsInterfaceWithLookup, ERC721BasicToken, ERC721 {
     /**
     * @dev Gets the number of tokens owned by the specified address
     * @param _owner address of the token owner
-    * @return uint256 the number of tokens owned 
+    * @return uint256 the number of tokens owned
     */
     function balanceOf(address _owner) public view returns (uint256) {
         require(_owner != address(0));
@@ -784,12 +784,12 @@ contract ERC721Token is SupportsInterfaceWithLookup, ERC721BasicToken, ERC721 {
     */
     function listTransferableTokens() public view returns(uint256[]) {
         return transferableTokens;
-    } 
+    }
 
     /**
     * @dev Is Token Transferable
     * @param _tokenId uint256 ID of the token
-    * @return bool is tokenId transferable 
+    * @return bool is tokenId transferable
     */
     function isTransferable(uint256 _tokenId) public view returns (bool) {
         return (transferableIndexes[_tokenId] > 0);
@@ -854,7 +854,7 @@ contract ERC721Token is SupportsInterfaceWithLookup, ERC721BasicToken, ERC721 {
 contract Ownable {
     address public owner;
     address public newOwner;
-    
+
     // mapping for creature Type to Sale
     address[] internal controllers;
     //mapping(address => address) internal controllers;
@@ -867,7 +867,7 @@ contract Ownable {
     constructor() public {
         owner = msg.sender;
     }
-   
+
     /**
     * @dev Throws if called by any account that's not a superuser.
     */
@@ -956,8 +956,8 @@ interface ICryptoBeastiesToken {
     function bulk(uint256[] _tokenIds, uint256[] _attributes, address[] _owners) external;
     function create(uint256 _tokenId, uint256 _attributes, uint256[] _componentIds, address _owner) external;
     function tokensOfOwner(address _owner) external view returns (uint256[] tokens);
-    function getProperties(uint256 _tokenId) external view returns (uint256 attrs, uint256[] compIds); 
-    function updateAttributes(uint256 _tokenId, uint256 _attributes, uint256[] _componentIds) external; 
+    function getProperties(uint256 _tokenId) external view returns (uint256 attrs, uint256[] compIds);
+    function updateAttributes(uint256 _tokenId, uint256 _attributes, uint256[] _componentIds) external;
     function updateStorage(address _storage) external;
     function listTokens() external view returns (uint256[] tokens);
     function setURI(string _uriPrefix) external;
@@ -970,9 +970,9 @@ interface ICryptoBeastiesToken {
 /**
  * @title CryptoBeasties Full ERC721 Token
  * This implementation includes all the required and some optional functionality of the ERC721 standard,
- * plus references a separate storage contract for recording the game-specific data for each token. 
+ * plus references a separate storage contract for recording the game-specific data for each token.
  */
-contract CryptoBeastiesToken is ERC721Token, Ownable, ICryptoBeastiesToken { 
+contract CryptoBeastiesToken is ERC721Token, Ownable, ICryptoBeastiesToken {
     using SafeMath for uint256;
 
     address proxyRegistryAddress;
@@ -982,7 +982,7 @@ contract CryptoBeastiesToken is ERC721Token, Ownable, ICryptoBeastiesToken {
     * @param _storage address for Creature Storage
     * @param _uriPrefix string for url prefix
     */
-    constructor(address _storage, string _uriPrefix) 
+    constructor(address _storage, string _uriPrefix)
         ERC721Token("CryptoBeasties Token", "CRYB", _uriPrefix, _storage) public {
         proxyRegistryAddress = address(0);
     }
@@ -1003,7 +1003,7 @@ contract CryptoBeastiesToken is ERC721Token, Ownable, ICryptoBeastiesToken {
     */
     function bulk(uint256[] _tokenIds, uint256[] _attributes, address[] _owners) external onlyOwnerOrController {
         for (uint index = 0; index < _tokenIds.length; index++) {
-            
+
             ownedTokens[_owners[index]].push(_tokenIds[index]);
             ownedTokenIndexes[_tokenIds[index]] = ownedTokens[_owners[index]].length;
 
@@ -1014,14 +1014,14 @@ contract CryptoBeastiesToken is ERC721Token, Ownable, ICryptoBeastiesToken {
     }
 
     /**
-    * @dev Create CryptoBeasties Token 
+    * @dev Create CryptoBeasties Token
     * @param _tokenId ID of the new token
     * @param _attributes CryptoBeasties attributes
     * @param _owner address of the token owner
     */
     function create(uint256 _tokenId, uint256 _attributes, uint256[] _componentIds, address _owner) external onlyOwnerOrController {
         require(_owner != address(0));
-        require(_attributes > 0); 
+        require(_attributes > 0);
         super._mint(_owner, _tokenId);
         cbStorage.store(_tokenId, _attributes, _componentIds);
     }
@@ -1054,21 +1054,21 @@ contract CryptoBeastiesToken is ERC721Token, Ownable, ICryptoBeastiesToken {
     function tokensOfOwner(address _owner) external view returns (uint256[]) {
         return ownedTokens[_owner];
     }
-    
+
     /**
     * @dev List all token ids, an array of their attributes and an array componentIds (i.e. PowerStones)
     * @param _owner address for the given token ID
     */
     function getOwnedTokenData(
         address _owner
-        ) 
-        public 
-        view 
-        returns 
+        )
+        public
+        view
+        returns
         (
-            uint256[] tokens, 
-            uint256[] attrs, 
-            uint256[] componentIds, 
+            uint256[] tokens,
+            uint256[] attrs,
+            uint256[] componentIds,
             bool[] isTransferable
         ) {
 
@@ -1076,7 +1076,7 @@ contract CryptoBeastiesToken is ERC721Token, Ownable, ICryptoBeastiesToken {
         uint256[] memory attribs = new uint256[](tokenIds.length);
         uint256[] memory firstCompIds = new uint256[](tokenIds.length);
         bool[] memory transferable = new bool[](tokenIds.length);
-        
+
         uint256[] memory compIds;
 
         for (uint i = 0; i < tokenIds.length; i++) {
@@ -1142,7 +1142,7 @@ contract CryptoBeastiesToken is ERC721Token, Ownable, ICryptoBeastiesToken {
         for (uint256 index = 0; index < _tokenIds.length; index++) {
             if (_owner == msg.sender) {
                 require(ownerOf(_tokenIds[index]) == _owner); //, "token owner"
-            } 
+            }
             transferableTokens.push(_tokenIds[index]);
             // save index as +1 to avoid Solidity's zero default mapping value
             transferableIndexes[_tokenIds[index]] = transferableTokens.length;
@@ -1157,7 +1157,7 @@ contract CryptoBeastiesToken is ERC721Token, Ownable, ICryptoBeastiesToken {
         require(ownerOf(_tokenId) == msg.sender || owner == msg.sender || isController(msg.sender)); //, "token owner"
         transferableTokens.push(_tokenId);
         // save index as +1 to avoid Solidity's zero default mapping value
-        transferableIndexes[_tokenId] = transferableTokens.length;        
+        transferableIndexes[_tokenId] = transferableTokens.length;
     }
 
     /**
@@ -1239,3 +1239,71 @@ contract OwnableDelegateProxy { }
 contract ProxyRegistry {
     mapping(address => OwnableDelegateProxy) public proxies;
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

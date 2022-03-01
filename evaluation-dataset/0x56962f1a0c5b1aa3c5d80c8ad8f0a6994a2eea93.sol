@@ -11,7 +11,7 @@ contract OwnedI {
         returns (address);
 
     function setOwner(address newOwner)
-        returns (bool success); 
+        returns (bool success);
 }
 
 /**
@@ -41,7 +41,7 @@ contract Owned is OwnedI {
     }
 
     function setOwner(address newOwner)
-        fromOwner 
+        fromOwner
         returns (bool success) {
         if (newOwner == 0) {
             throw;
@@ -55,7 +55,7 @@ contract Owned is OwnedI {
 }
 
 contract BalanceFixable is OwnedI {
-    function fixBalance() 
+    function fixBalance()
         returns (bool success) {
         if (!getOwner().send(this.balance)) {
             throw;
@@ -81,7 +81,7 @@ contract CertifierDbI {
         returns (uint count);
 
     function getCertifierStatus(address certifierAddr)
-        constant 
+        constant
         returns (bool authorised, uint256 index);
 
     function getCertifierAtIndex(uint256 index)
@@ -106,7 +106,7 @@ contract CertifierDb is Owned, CertifierDbI, BalanceFixable {
      * @notice Addresses of the account or contract that are entitled to certify students.
      */
     mapping(address => Certifier) private certifierStatuses;
-    
+
     /**
      * @notice The potentially long list of all certifiers.
      */
@@ -160,7 +160,7 @@ contract CertifierDb is Owned, CertifierDbI, BalanceFixable {
     }
 
     function getCertifierStatus(address certifierAddr)
-        constant 
+        constant
         returns (bool authorised, uint256 index) {
         Certifier certifier = certifierStatuses[certifierAddr];
         return (certifier.authorised,
@@ -179,3 +179,38 @@ contract CertifierDb is Owned, CertifierDbI, BalanceFixable {
         isIndeed = certifierStatuses[certifier].authorised;
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

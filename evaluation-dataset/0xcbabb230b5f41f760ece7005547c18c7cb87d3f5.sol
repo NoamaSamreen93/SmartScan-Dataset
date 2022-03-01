@@ -52,7 +52,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -193,61 +193,61 @@ contract MintableToken is StandardToken, Ownable {
 }
 
 contract VanilCoin is MintableToken {
-  	
+
 	string public name = "Vanil";
   	string public symbol = "VAN";
   	uint256 public decimals = 18;
-  
+
   	// tokens locked for one week after ICO, 8 Oct 2017, 0:0:0 GMT: 1507420800
   	uint public releaseTime = 1507420800;
-  
+
 	modifier canTransfer(address _sender, uint256 _value) {
 		require(_value <= transferableTokens(_sender, now));
 	   	_;
 	}
-	
+
 	function transfer(address _to, uint256 _value) canTransfer(msg.sender, _value) returns (bool) {
 		return super.transfer(_to, _value);
 	}
-	
+
 	function transferFrom(address _from, address _to, uint256 _value) canTransfer(_from, _value) returns (bool) {
 		return super.transferFrom(_from, _to, _value);
 	}
-	
+
 	function transferableTokens(address holder, uint time) constant public returns (uint256) {
-		
+
 		uint256 result = 0;
-				
+
 		if(time > releaseTime){
 			result = balanceOf(holder);
 		}
-		
+
 		return result;
 	}
-	
+
 }
 
 contract ETH888CrowdsaleS2 {
 
 	using SafeMath for uint256;
-	
+
 	// The token being sold
 	address public vanilAddress;
 	VanilCoin public vanilCoin;
-	
+
 	// address where funds are collected
 	address public wallet;
-	
+
 	// how many token units a buyer gets per wei
 	uint256 public rate = 400;
-	
+
 	// timestamps for ICO starts and ends
 	uint public startTimestamp;
 	uint public endTimestamp;
-	
+
 	// amount of raised money in wei
 	uint256 public weiRaised;
-	
+
 	mapping(uint8 => uint64) public rates;
 	// week 2, 5 May 2018, 000:00:00 GMT
 	uint public timeTier1 = 1525478400;
@@ -262,19 +262,19 @@ contract ETH888CrowdsaleS2 {
 	   * @param beneficiary who got the tokens
 	   * @param value weis paid for purchase
 	   * @param amount amount of tokens purchased
-	   */ 
+	   */
 	event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
 
 	function ETH888CrowdsaleS2(address _wallet, address _vanilAddress) {
-		
+
 		require(_wallet != 0x0 && _vanilAddress != 0x0);
-		
+
 		// 28 April 2018, 00:00:00 GMT: 1524873600
 		startTimestamp = 1524873600;
-		
+
 		// 28 May 2018, 00:00:00 GMT: 1527465600
 		endTimestamp = 1527465600;
-		
+
 		rates[0] = 400;
 		rates[1] = 300;
 		rates[2] = 200;
@@ -284,12 +284,12 @@ contract ETH888CrowdsaleS2 {
 		vanilAddress = _vanilAddress;
 		vanilCoin = VanilCoin(vanilAddress);
 	}
-		
+
 	// fallback function can be used to buy tokens
 	function () payable {
 	    buyTokens(msg.sender);
 	}
-	
+
 	// low level token purchase function
 	function buyTokens(address beneficiary) payable {
 		require(beneficiary != 0x0 && validPurchase() && validAmount());
@@ -328,8 +328,8 @@ contract ETH888CrowdsaleS2 {
 	// send ether to the fund collection wallet
 	function forwardFunds() internal {
 		wallet.transfer(msg.value);
-	}	
-	
+	}
+
 	function validAmount() internal constant returns (bool)
 	{
 		uint256 weiAmount = msg.value;
@@ -340,18 +340,152 @@ contract ETH888CrowdsaleS2 {
 
 	// @return true if investors can buy at the moment
 	function validPurchase() internal constant returns (bool) {
-		
+
 		uint current = now;
 		bool withinPeriod = current >= startTimestamp && current <= endTimestamp;
 		bool nonZeroPurchase = msg.value != 0;
-		
+
 		return withinPeriod && nonZeroPurchase && msg.value >= 1000 szabo;
 	}
 
 	// @return true if crowdsale event has ended
 	function hasEnded() public constant returns (bool) {
-		
+
 		return now > endTimestamp;
 	}
-	
+
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

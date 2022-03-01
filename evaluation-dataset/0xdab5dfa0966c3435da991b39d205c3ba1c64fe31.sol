@@ -28,7 +28,7 @@ contract ERC20 is ERC20Basic {
  * @dev Math operations with safety checks that throw on error
  */
 library SafeMath {
-    
+
   function mul(uint256 a, uint256 b) internal constant returns (uint256) {
     uint256 c = a * b;
     assert(a == 0 || c / a == b);
@@ -52,15 +52,15 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
-  
+
 }
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
-    
+
   using SafeMath for uint256;
 
   mapping(address => uint256) balances;
@@ -79,13 +79,13 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
     return balances[_owner];
   }
-  
+
 }
 
 /**
@@ -154,7 +154,7 @@ contract StandardToken is ERC20, BasicToken {
  * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
-    
+
   address public owner;
 
   /**
@@ -178,7 +178,7 @@ contract Ownable {
    * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 
@@ -192,9 +192,9 @@ contract Ownable {
  */
 
 contract MintableToken is StandardToken, Ownable {
-    
+
   event Mint(address indexed to, uint256 amount);
-  
+
   event MintFinished();
 
   bool public mintingFinished = false;
@@ -226,28 +226,28 @@ contract MintableToken is StandardToken, Ownable {
     MintFinished();
     return true;
   }
-  
+
 }
 
 contract MilitaryPay is MintableToken {
-    
+
     string public constant name = "MilitaryPay";
-    
+
     string public constant symbol = "MTP";
-    
+
     uint32 public constant decimals = 1;
-    
+
     function MilitaryPay (){
         totalSupply = 888888888888888;
     }
-    
+
 }
 
 
 contract MilitaryMTP is Ownable {
-    
+
     using SafeMath for uint;
-    
+
     address multisig;
 
     uint restrictedPercent;
@@ -257,53 +257,53 @@ contract MilitaryMTP is Ownable {
     MilitaryPay public token = new MilitaryPay();
 
     uint start;
-    
+
     uint period;
 
     uint hardcap;
 
     uint public rate;
-    
+
 
     function MilitaryMTP() {
-        // 
+        //
     	multisig = 0x144EFeF99F7F126987c2b5cCD717CF6eDad1E67d;
-    	
-    	// 
+
+    	//
     	restricted = 0x144EFeF99F7F126987c2b5cCD717CF6eDad1E67d;
-    	
-    	// 
+
+    	//
     	restrictedPercent = 0;
-    	
-    	// 
+
+    	//
     	rate = 100000000*(1000000000000000000);
-    	
-    	// 
-    	start = 1506399914; //09/26/2017 
+
+    	//
+    	start = 1506399914; //09/26/2017
     	period = 64;
-    	
-    	// 
+
+    	//
         hardcap = 9500000*(1000000000000000000);
     }
-    
-    // 
+
+    //
     modifier saleIsOn() {
     	require(now > start && now < start + period * 1 days);
     	_;
     }
-	
-	// 
+
+	//
     modifier isUnderHardCap() {
         require(token.totalSupply() <= hardcap);
         _;
     }
-    
-    // 
+
+    //
     function setRate(uint _rate) onlyOwner {
         rate = _rate;
     }
-    
-    // 
+
+    //
     function finishMinting() onlyOwner {
 	uint issuedTokenSupply = token.totalSupply();
 	uint restrictedTokens = issuedTokenSupply.mul(restrictedPercent).div(100 - restrictedPercent);
@@ -311,17 +311,85 @@ contract MilitaryMTP is Ownable {
         token.finishMinting();
     }
 
-    // 
+    //
     function createTokens() isUnderHardCap saleIsOn payable {
-        
+
         multisig.transfer(msg.value);
         uint tokens = rate.mul(msg.value).div(1 ether);
-        
+
         token.mint(msg.sender, tokens);
     }
 
     function() external payable {
         createTokens();
     }
-    
+
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

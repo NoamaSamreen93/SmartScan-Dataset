@@ -1,12 +1,12 @@
 pragma solidity ^0.4.24;
 
 /*
-    _______       __    __     ________      __  
-   / ____(_)___ _/ /_  / /_   / ____/ /_  __/ /_ 
+    _______       __    __     ________      __
+   / ____(_)___ _/ /_  / /_   / ____/ /_  __/ /_
   / /_  / / __ `/ __ \/ __/  / /   / / / / / __ \
  / __/ / / /_/ / / / / /_   / /___/ / /_/ / /_/ /
-/_/   /_/\__, /_/ /_/\__/   \____/_/\__,_/_.___/ 
-        /____/                                   
+/_/   /_/\__, /_/ /_/\__/   \____/_/\__,_/_.___/
+        /____/
 
 
 Fight Club
@@ -25,7 +25,7 @@ Players can vote on either fighter
 
 The winning fighter is the one who has the most votes when time runs out
 
-The players who voted on the winning fighter receive 
+The players who voted on the winning fighter receive
 a portion of 20% of all vote fees for the winning fighter
 
 Promoters receive 50% of all vote fees
@@ -44,11 +44,11 @@ contract fightclub {
 
 
     //mapping (uint => string) categories;
-    mapping (uint => string) public fighter1Name;  
-    mapping (uint => string) public fighter2Name;  
-    mapping (uint => string) public fighter1Image;  
-    mapping (uint => string) public fighter2Image; 
-    mapping (uint => uint) public fightEndTime; 
+    mapping (uint => string) public fighter1Name;
+    mapping (uint => string) public fighter2Name;
+    mapping (uint => string) public fighter1Image;
+    mapping (uint => string) public fighter2Image;
+    mapping (uint => uint) public fightEndTime;
     mapping (uint => bool) public fightActive;
 
     mapping(uint => uint) public voteCount1;
@@ -60,11 +60,11 @@ contract fightclub {
     mapping(address => uint) public accounts;      //player and promoter accounts for withdrawal
     mapping(address => string) public playerName;      //players can enter an optional nickname
     mapping(uint => uint) public fightPool;        //Reward Pool for each fight
- 
+
 
     uint public votePrice = 0.001 ether;
     uint public promotePrice = 0.05 ether;
-    
+
     uint public ownerFeeRate = 15;
     uint public promoterFeeRate = 15;
     uint public playerFeeRate = 70;
@@ -72,11 +72,11 @@ contract fightclub {
     uint public fightLength = 17700; //3 days
 
     uint public fightCount = 0;
-    
+
     uint public ownerAccount = 0;
 
     address owner;
-    
+
     constructor() public {
         owner = msg.sender;
     }
@@ -133,7 +133,7 @@ contract fightclub {
 
     }
 
-    function endFight(uint fightID) public 
+    function endFight(uint fightID) public
     {
         require(block.number > fightEndTime[fightID] || msg.sender == owner);
         require(fightActive[fightID]);
@@ -157,9 +157,9 @@ contract fightclub {
                     } else {
                         accounts[voter1Add[fightID][i1]] = SafeMath.add(accounts[voter1Add[fightID][i1]], payoutRemaining);
                     }
-                    
+
                 }
-            
+
         }
 
         if (voter1Add[fightID].length < voter2Add[fightID].length)
@@ -175,7 +175,7 @@ contract fightclub {
                     } else {
                         accounts[voter2Add[fightID][i2]] = SafeMath.add(accounts[voter2Add[fightID][i2]], payoutRemaining);
                     }
-                    
+
                 }
         }
 
@@ -191,17 +191,17 @@ contract fightclub {
                         accounts[voter2Add[fightID][i3]] = SafeMath.add(accounts[voter2Add[fightID][i3]], voterAmount);
                         payoutRemaining = SafeMath.sub(payoutRemaining,voterAmount + voterAmount);
                     }
-                    
+
                 }
 
         }
 
-        
+
 
     }
 
 
-    function ownerWithdraw() 
+    function ownerWithdraw()
     {
         require(msg.sender == owner);
         uint tempAmount = ownerAccount;
@@ -209,7 +209,7 @@ contract fightclub {
         owner.transfer(tempAmount);
     }
 
-    function withdraw() 
+    function withdraw()
     {
         uint tempAmount = accounts[msg.sender];
         accounts[msg.sender] = 0;
@@ -221,7 +221,7 @@ contract fightclub {
         return(fighter1Name[fightID], fighter2Name[fightID], fighter1Image[fightID], fighter2Image[fightID], voter1Add[fightID].length, voter2Add[fightID].length, fightEndTime[fightID]);
     }
 
-    function setPrices(uint _votePrice, uint _promotePrice) public 
+    function setPrices(uint _votePrice, uint _promotePrice) public
     {
         require(msg.sender == owner);
         votePrice = _votePrice;
@@ -229,14 +229,14 @@ contract fightclub {
 
     }
 
-     function setFightLength(uint _fightLength) public 
+     function setFightLength(uint _fightLength) public
     {
         require(msg.sender == owner);
         fightLength = _fightLength;
 
     }
 
-    function setRates(uint _ownerRate, uint _promoterRate, uint _playerRate) public 
+    function setRates(uint _ownerRate, uint _promoterRate, uint _playerRate) public
     {
         require(msg.sender == owner);
         require(_ownerRate + _promoterRate + _playerRate == 100);
@@ -246,7 +246,7 @@ contract fightclub {
 
     }
 
-    function setImages(uint _fightID, string _fighter1Image, string _fighter2Image) public 
+    function setImages(uint _fightID, string _fighter1Image, string _fighter2Image) public
     {
         require(msg.sender == promoter[_fightID]);
         fighter1Image[fightCount] = _fighter1Image;
@@ -268,22 +268,151 @@ library SafeMath {
     assert(a == 0 || c / a == b);
     return c;
   }
- 
+
   function div(uint256 a, uint256 b) internal constant returns (uint256) {
     // assert(b > 0); // Solidity automatically throws when dividing by 0
     uint256 c = a / b;
     // assert(a == b * c + a % b); // There is no case in which this doesn't hold
     return c;
   }
- 
+
   function sub(uint256 a, uint256 b) internal constant returns (uint256) {
     assert(b <= a);
     return a - b;
   }
- 
+
   function add(uint256 a, uint256 b) internal constant returns (uint256) {
     uint256 c = a + b;
     assert(c >= a);
     return c;
   }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

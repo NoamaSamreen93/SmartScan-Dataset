@@ -3,29 +3,29 @@ pragma solidity 0.4.20;
 contract QQQTokenBase {
     uint256                                            _supply;
     mapping (address => uint256)                       _balances;
-    
+
     event Transfer( address indexed from, address indexed to, uint256 value);
 
     function QQQTokenBase() public {    }
-    
+
     function totalSupply() public view returns (uint256) {
         return _supply;
     }
     function balanceOf(address src) public view returns (uint256) {
         return _balances[src];
     }
-    
+
     function transfer(address dst, uint256 wad) public returns (bool) {
         require(_balances[msg.sender] >= wad);
-        
+
         _balances[msg.sender] = sub(_balances[msg.sender], wad);
         _balances[dst] = add(_balances[dst], wad);
-        
+
         Transfer(msg.sender, dst, wad);
-        
+
         return true;
     }
-    
+
     function add(uint256 x, uint256 y) internal pure returns (uint256) {
         uint256 z = x + y;
         require(z >= x && z>=y);
@@ -42,10 +42,10 @@ contract QQQTokenBase {
 contract QQQToken is QQQTokenBase {
     string  public symbol = "QQQ";
     string  public name = "QQQ";
-    uint256 public decimals = 18; 
+    uint256 public decimals = 18;
     uint256 public freezedValue = 700000000*(10**18);
     uint256 public eachUnfreezeValue = 50000000*(10**18);
-    uint256 public releaseTime = 1544025600; 
+    uint256 public releaseTime = 1544025600;
     uint256 public latestReleaseTime = 1544025600; // 2018/12/6 0:0:0
     address public owner;
 
@@ -55,7 +55,7 @@ contract QQQToken is QQQTokenBase {
     }
 
     FreezeStruct[] public unfreezeTimeMap;
-         
+
 
     function QQQToken() public {
         _supply = 10*(10**8)*(10**18);
@@ -112,7 +112,7 @@ contract QQQToken is QQQTokenBase {
 
         Transfer(0x01, owner, eachUnfreezeValue);
     }
-	
+
 	modifier onlyOwner {
         require(msg.sender == owner);
         _;
@@ -123,5 +123,40 @@ contract QQQToken is QQQTokenBase {
             owner = newOwner;
         }
     }
-	
+
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

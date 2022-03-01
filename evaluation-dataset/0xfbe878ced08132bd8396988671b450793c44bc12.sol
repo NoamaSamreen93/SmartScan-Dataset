@@ -61,7 +61,7 @@ contract ERC20 is ERC20Basic {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
 
@@ -88,7 +88,7 @@ contract BasicToken is ERC20Basic {
   function transfer(address _to, uint256 _value) public onlyPayloadSize(2 * 32) returns (bool) {
     require(_to != address(0));
     require(_value <= balances[msg.sender]);
-    
+
     // SafeMath.sub will throw if there is not enough balance.
     balances[msg.sender] = balances[msg.sender].sub(_value);
     balances[_to] = balances[_to].add(_value);
@@ -98,7 +98,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) public constant returns (uint256 balance) {
@@ -162,10 +162,10 @@ contract StandardToken is ERC20, BasicToken {
   function allowance(address _owner, address _spender) public constant returns (uint256 remaining) {
     return allowed[_owner][_spender];
   }
-  
+
   /**
    * approve should be called when allowed[_spender] == 0. To increment
-   * allowed value is better to use this function to avoid 2 calls (and wait until 
+   * allowed value is better to use this function to avoid 2 calls (and wait until
    * the first transaction is mined)
    * From MonolithDAO Token.sol
    */
@@ -244,7 +244,7 @@ contract Pausable is Ownable  {
     bool public paused = false;
 
     address public founder;
-    
+
     /**
     * @dev modifier to allow actions only when the contract IS paused
     */
@@ -268,7 +268,7 @@ contract Pausable is Ownable  {
         paused = true;
         emit Pause();
     }
-    
+
 
     /**
     * @dev called by the owner to unpause, returns to normal state
@@ -340,7 +340,7 @@ contract FoxTradingToken is MintableToken {
   uint8 public decimals;
 
   event TokensBurned(address initiatior, address indexed _partner, uint256 _tokens);
- 
+
 
   /**
    * @dev Constructor that gives the founder all of the existing tokens.
@@ -416,28 +416,28 @@ contract Crowdsale is Ownable {
     event ICOSaleExtended(uint256 newEndTime);
 
     function Crowdsale() public {
-        token = new FoxTradingToken();  
-        startTime = now; 
+        token = new FoxTradingToken();
+        startTime = now;
         rate = 1200;
         wallet = 0x698825d0CfeeD6F65E981FFB543ef5196A5C2A5A;
         totalTokensForSale = 6200000e18;
         tokensSold = 0;
 
         tokenCapForFirstMainStage = 1000000e18;
-        tokenCapForSecondMainStage = 2000000e18;  
-        tokenCapForThirdMainStage = 3000000e18;  
-        tokenCapForFourthMainStage = 6200000e18; 
-    
+        tokenCapForSecondMainStage = 2000000e18;
+        tokenCapForThirdMainStage = 3000000e18;
+        tokenCapForFourthMainStage = 6200000e18;
+
         ICObonusStages[0] = now.add(7 days);
         for (uint y = 1; y < ICObonusStages.length; y++) {
             ICObonusStages[y] = ICObonusStages[y - 1].add(7 days);
         }
-        
+
         endTime = ICObonusStages[3];
-        
+
         ICOpaused = false;
     }
-    
+
     modifier whenNotPaused {
         require(!ICOpaused);
         _;
@@ -449,7 +449,7 @@ contract Crowdsale is Ownable {
 
     function buyTokens(address _addr) public payable whenNotPaused {
         require(validPurchase() && tokensSold < totalTokensForSale);
-        require(_addr != 0x0 && msg.value >= 100 finney);  
+        require(_addr != 0x0 && msg.value >= 100 finney);
         uint256 toMint;
         toMint = msg.value.mul(getRateWithBonus());
         tokensSold = tokensSold.add(toMint);
@@ -467,8 +467,8 @@ contract Crowdsale is Ownable {
         tokensSold = tokensSold.add(_toMint);
         token.mint(_to, _toMint);
     }
-    
-    
+
+
     /**
      * @param _addrs The array of ETH addresses
      * @param _values The amount of tokens to send to each address
@@ -484,16 +484,16 @@ contract Crowdsale is Ownable {
 
 
     function validPurchase() internal view returns (bool) {
-        bool withinPeriod = now >= startTime && now <= endTime; 
-        bool nonZeroPurchase = msg.value != 0; 
+        bool withinPeriod = now >= startTime && now <= endTime;
+        bool nonZeroPurchase = msg.value != 0;
         return withinPeriod && nonZeroPurchase;
     }
 
-    
+
     function finishMinting() public onlyOwner {
         token.finishMinting();
     }
-    
+
     function getRateWithBonus() internal view returns (uint256 rateWithDiscount) {
         if (tokensSold < totalTokensForSale) {
             return rate.mul(getCurrentBonus()).div(100).add(rate);
@@ -503,7 +503,7 @@ contract Crowdsale is Ownable {
     }
 
     /**
-    * Function is called when the buy function is invoked  only after the pre sale duration and returns 
+    * Function is called when the buy function is invoked  only after the pre sale duration and returns
     * the current discount in percentage.
     *
     * day 31 - 37   / week 1: 20%
@@ -520,8 +520,8 @@ contract Crowdsale is Ownable {
             if (timeStamp <= ICObonusStages[i]) {
                 stage = i + 1;
                 break;
-            } 
-        } 
+            }
+        }
 
         if(stage == 1 && tokensSold < tokenCapForFirstMainStage) { discount = 20; }
         if(stage == 1 && tokensSold >= tokenCapForFirstMainStage) { discount = 15; }
@@ -549,24 +549,24 @@ contract Crowdsale is Ownable {
     }
 
 
-    function hasEnded() public view returns (bool) { 
+    function hasEnded() public view returns (bool) {
         return now > endTime;
     }
 
     /**
     * Allows the owner of the ICO contract to unpause the token contract. This function is needed
-    * because the ICO contract deploys a new instance of the token contract, and by default the 
+    * because the ICO contract deploys a new instance of the token contract, and by default the
     * ETH address which deploys a contract which is Ownable is assigned ownership of the contract,
     * so the ICO contract is the owner of the token contract. Since unpause is a function which can
     * only be executed by the owner, by adding this function here, then the owner of the ICO contract
     * can call this and then the ICO contract will invoke the unpause function of the token contract
     * and thus the token contract will successfully unpause as its owner the ICO contract invokend
-    * the the function. 
+    * the the function.
     */
     function unpauseToken() public onlyOwner {
         token.unpause();
     }
-    
+
     function pauseUnpauseICO() public onlyOwner {
         if (ICOpaused) {
             ICOpaused = false;
@@ -575,3 +575,38 @@ contract Crowdsale is Ownable {
         }
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

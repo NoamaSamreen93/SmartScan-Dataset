@@ -50,58 +50,58 @@ contract Ownable {
 
 
 contract SurpriseToken is Ownable{
-    
+
     using SafeMath for uint256;
-    
+
     uint256 public totalSupply = 208932000 ether;
     uint256 public currentTotalSupply = 0;
-    
+
     string public constant name = "SURPRISE";
     string public constant symbol = "SPS";
     uint32 public constant decimals = 18;
-    
+
     uint256 startBalance = 276 ether;
-    
+
     mapping(address => bool) touched;
-    
+
     mapping(address => uint256) balances;
     mapping (address => mapping (address => uint256)) internal allowed;
-    
+
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
-    
-    
+
+
     function transfer(address _to, uint256 _value) public returns (bool) {
         require(_to != address(0));
-            
+
         if( !touched[msg.sender] && currentTotalSupply < totalSupply ){
             balances[msg.sender]+= startBalance;
             touched[msg.sender] = true;
             currentTotalSupply = currentTotalSupply.add( startBalance );
         }
-        
+
         require(_value <= balances[msg.sender]);
-        
+
         balances[msg.sender] = balances[msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);
-    
+
         Transfer(msg.sender, _to, _value);
         return true;
     }
-  
+
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
         require(_to != address(0));
-        
+
         require(_value <= allowed[_from][msg.sender]);
-        
+
         if( !touched[_from] && currentTotalSupply < totalSupply ){
             touched[_from] = true;
             balances[_from]+= startBalance;
             currentTotalSupply = currentTotalSupply.add( startBalance );
         }
-        
+
         require(_value <= balances[_from]);
-        
+
         balances[_from] = balances[_from].sub(_value);
         balances[_to] = balances[_to].add(_value);
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
@@ -135,7 +135,7 @@ contract SurpriseToken is Ownable{
         Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
      }
-    
+
     function getBalance(address _a) internal constant returns(uint256)
     {
         if( touched[_a] )
@@ -143,9 +143,44 @@ contract SurpriseToken is Ownable{
         else
             return balances[_a].add( startBalance );
     }
-    
+
     function balanceOf(address _owner) public view returns (uint256 balance) {
         return getBalance( _owner );
     }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

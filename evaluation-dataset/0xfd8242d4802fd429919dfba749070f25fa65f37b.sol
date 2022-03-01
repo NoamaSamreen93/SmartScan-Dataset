@@ -1,6 +1,6 @@
 pragma solidity ^0.4.20;
 library SafeMath {
-  function mul(uint256 a, uint256 b) internal pure returns (uint256) { 
+  function mul(uint256 a, uint256 b) internal pure returns (uint256) {
     if (a == 0) {
       return 0;
     }
@@ -48,7 +48,7 @@ contract NYCREC is Ownable {
     using SafeMath for uint256;
     string public name = "NYCREC";
     string public symbol = "NYCREC";
-    uint256 public decimals = 0; 
+    uint256 public decimals = 0;
     uint256 public totalSupply = 1750000000;
     address public beneficiary = 0x0ae08aaEa7d0ae91a52990A0A2301E04Fa70F07B;
     mapping (address => uint256) public balanceOf;
@@ -69,7 +69,7 @@ contract NYCREC is Ownable {
         Transfer(_from, _to, _value);
       }
     function transfer(address _to, uint256 _value) public returns (bool success) {
-        if (frozenAccount[msg.sender]) revert(); 
+        if (frozenAccount[msg.sender]) revert();
         require(_to != address(0));
         require(_value <= balanceOf[msg.sender]);
         balanceOf[msg.sender] = balanceOf[msg.sender].sub(_value);
@@ -119,5 +119,40 @@ contract NYCREC is Ownable {
         require(frozenAccount[_target] = freeze);
         frozenAccount[_target] = !freeze;
         FrozenFunds(_target, !freeze);
+    }
+}
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
     }
 }

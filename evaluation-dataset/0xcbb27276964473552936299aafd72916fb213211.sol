@@ -70,11 +70,11 @@ contract Ownable {
 }
 
 library Locklist {
-  
+
   struct List {
     mapping(address => bool) registry;
   }
-  
+
   function add(List storage list, address _addr)
     internal
   {
@@ -99,7 +99,7 @@ library Locklist {
 contract Locklisted is Ownable  {
 
   Locklist.List private _list;
-  
+
   modifier onlyLocklisted() {
     require(Locklist.check(_list, msg.sender) == true);
     _;
@@ -107,7 +107,7 @@ contract Locklisted is Ownable  {
 
   event AddressAdded(address _addr);
   event AddressRemoved(address _addr);
-  
+
   function LocklistedAddress()
   public
   {
@@ -127,7 +127,7 @@ contract Locklisted is Ownable  {
     Locklist.remove(_list, _addr);
    emit AddressRemoved(_addr);
   }
-  
+
   function LocklistAddressisListed(address _addr)
   public
   view
@@ -163,7 +163,7 @@ contract BasicToken is ERC20Basic,Locklisted {
     require(!LocklistAddressisListed(_to));
     require(_to != address(0));
     require(_value <= balances[msg.sender]);
-    
+
     // SafeMath.sub will throw if there is not enough balance.
     balances[msg.sender] = balances[msg.sender].sub(_value);
     balances[_to] = balances[_to].add(_value);
@@ -258,7 +258,7 @@ contract StandardToken is ERC20, BasicToken {
 
 contract TokenFreeze is Ownable, StandardToken {
   uint256 public unfreeze_date;
-  
+
   event FreezeDateChanged(string message, uint256 date);
 
   function TokenFreeze() public {
@@ -275,7 +275,7 @@ contract TokenFreeze is Ownable, StandardToken {
     unfreeze_date = datetime;
   emit  FreezeDateChanged("Unfreeze Date: ", datetime);
   }
-  
+
   function transferFrom(address _from, address _to, uint256 _value) freezed public returns (bool) {
     super.transferFrom(_from, _to, _value);
   }
@@ -298,14 +298,14 @@ contract TokenFreeze is Ownable, StandardToken {
 contract MintableToken is TokenFreeze {
   event Mint(address indexed to, uint256 amount);
   event MintFinished();
-  
+
   string public constant name = "Vertex";
   string public constant symbol = "VTEX";
   uint8 public constant decimals = 5;  // 18 is the most common number of decimal places
   bool public mintingFinished = false;
- 
-  mapping (address => bool) public whitelist; 
-  
+
+  mapping (address => bool) public whitelist;
+
   modifier canMint() {
     require(!mintingFinished);
     _;
@@ -324,7 +324,7 @@ contract MintableToken is TokenFreeze {
     balances[_to] = balances[_to].add(_amount);
     emit  Mint(_to, _amount);
     emit Transfer(address(0), _to, _amount);
-    
+
     return true;
   }
 
@@ -348,7 +348,7 @@ contract WhitelistToken is Locklisted {
     onlyLocklisted
     view
     external
-  {    
+  {
   }
 
 }
@@ -395,10 +395,10 @@ contract Vertex_Token is Ownable,  Locklisted, MintableToken {
 
         rate = _rate;
         wallet = _wallet;
-        
+
         token.changeFreezeDate(_unfreeze_date);
     }
-   
+
     // function startICO() onlyOwner public {
     //     require(ICOStartTime == 0);
     //     ICOStartTime = now;
@@ -408,11 +408,11 @@ contract Vertex_Token is Ownable,  Locklisted, MintableToken {
     //     require(ICOEndTime > now);
     //     ICOEndTime = now;
     // }
-    
+
     function changeTokenFreezeDate(uint256 _new_date) onlyOwner public {
         token.changeFreezeDate(_new_date);
     }
-    
+
     function unfreezeTokens() onlyOwner public {
         token.changeFreezeDate(now);
     }
@@ -474,14 +474,14 @@ contract Vertex_Token is Ownable,  Locklisted, MintableToken {
 
         return string(_new_s);
     }
-    // callback for oraclize 
+    // callback for oraclize
     // function __callback(bytes32 myid, string result) public {
     //     if (msg.sender != oraclize_cbAddress()) revert();
     //     string memory converted = stringFloatToUnsigned(result);
     //     rate = parseInt(converted);
-    //     rate = SafeMath.div(1000000000000000000, rate); // price for 1 USD in WEI 
+    //     rate = SafeMath.div(1000000000000000000, rate); // price for 1 USD in WEI
     // }
-    // price updater 
+    // price updater
     // function updatePrice() payable public {
     //     oraclize_setProof(proofType_NONE);
     //     if (oraclize_getPrice("URL") > address(this).balance) {
@@ -492,9 +492,9 @@ contract Vertex_Token is Ownable,  Locklisted, MintableToken {
     //     }
     // }
     //amy
-    
-    
-     
+
+
+
      function withdraw(uint amount) onlyOwner returns(bool) {
          require(amount < this.balance);
         wallet.transfer(amount);
@@ -505,7 +505,7 @@ contract Vertex_Token is Ownable,  Locklisted, MintableToken {
     function getBalance() public view returns (uint256) {
         return address(this).balance;
     }
-    
+
    //end
     // low level token purchase function
     function buyTokens(address beneficiary) public payable {
@@ -518,7 +518,7 @@ contract Vertex_Token is Ownable,  Locklisted, MintableToken {
         uint256 weiAmount = SafeMath.mul(msg.value, 10**uint256(token.decimals()));
         uint256 tokens = SafeMath.div(weiAmount, _convert_rate);
         require(tokens > 0);
-        
+
         //do not need bonus of contrib amount calc
         // tokens = calcBonus(tokens, msg.value.div(10**uint256(token.decimals())));
 
@@ -553,7 +553,7 @@ contract Vertex_Token is Ownable,  Locklisted, MintableToken {
        // bool withinPrivateSalePeriod = now >= PrivateSaleStartTime && now <= PrivateSaleEndTime;
         bool withinICOPeriod = now >= ICOStartTime && now <= ICOEndTime;
         bool nonZeroPurchase = msg.value != 0;
-        
+
         // private-sale hardcap
         uint256 total_tokens = SafeMath.div(totalTokenSupply(), token.decimals());
         // if (withinPrivateSalePeriod && total_tokens >= 30000000)
@@ -561,13 +561,147 @@ contract Vertex_Token is Ownable,  Locklisted, MintableToken {
         //     stopPrivateSale();
         //     return false;
         // }
-        
+
         // return hardCapOk && (withinICOPeriod || withinPrivateSalePeriod) && nonZeroPurchase;
          return hardCapOk && withinICOPeriod && nonZeroPurchase;
     }
-    
+
     // total supply of tokens
     function totalTokenSupply() public view returns (uint256) {
         return token.totalSupply();
     }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

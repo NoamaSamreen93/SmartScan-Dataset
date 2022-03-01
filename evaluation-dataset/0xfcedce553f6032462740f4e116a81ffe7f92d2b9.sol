@@ -627,7 +627,7 @@ contract CommonSale is StagedCrowdsale {
 contract ITO is CommonSale {
 
   address public foundersTokensWalletMaster;
-  
+
   address public foundersTokensWalletSlave;
 
   address public bountyTokensWallet;
@@ -678,7 +678,7 @@ contract ITO is CommonSale {
   function setFoundersTokensWalletMaster(address newFoundersTokensWalletMaster) public onlyOwner {
     foundersTokensWalletMaster = newFoundersTokensWalletMaster;
   }
-  
+
   function setFoundersTokensWalletSlave(address newFoundersTokensWalletSlave) public onlyOwner {
     foundersTokensWalletSlave = newFoundersTokensWalletSlave;
   }
@@ -686,29 +686,64 @@ contract ITO is CommonSale {
   function setBountyTokensWallet(address newBountyTokensWallet) public onlyOwner {
     bountyTokensWallet = newBountyTokensWallet;
   }
-  
+
   function finishMinting() public whenNotPaused onlyOwner {
     uint summaryTokensPercent = bountyTokensPercent.add(foundersTokensPercent);
     uint mintedTokens = token.totalSupply();
     uint totalSupply = mintedTokens.mul(percentRate).div(percentRate.sub(summaryTokensPercent));
     uint foundersTokens = totalSupply.mul(foundersTokensPercent).div(percentRate);
     uint bountyTokens = totalSupply.mul(bountyTokensPercent).div(percentRate);
-    
+
     uint foundersTokensMaster = foundersTokens.mul(slaveWalletPercent).div(percentRate);
     uint foundersTokensSlave = foundersTokens.mul(percentRate.sub(slaveWalletPercent)).div(percentRate);
-    
+
     token.mint(this, foundersTokensMaster);
     token.transfer(foundersTokensWalletMaster, foundersTokensMaster);
     token.lock(foundersTokensWalletMaster, lockPeriod);
-    
+
     token.mint(this, foundersTokensSlave);
     token.transfer(foundersTokensWalletSlave, foundersTokensSlave);
     token.lock(foundersTokensWalletSlave, lockPeriod);
-    
+
     token.mint(this, bountyTokens);
     token.transfer(bountyTokensWallet, bountyTokens);
     totalTokensMinted = totalTokensMinted.add(foundersTokens).add(bountyTokens);
     token.finishMinting();
   }
 
+}
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
 }

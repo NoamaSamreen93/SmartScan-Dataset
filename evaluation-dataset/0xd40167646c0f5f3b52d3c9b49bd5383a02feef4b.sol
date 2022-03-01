@@ -68,7 +68,7 @@ contract TokenERC20 is SafeMath {
 
     // This generates a public event on the blockchain that will notify clients
     event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
     // This generates a public event on the blockchain that will notify clients
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
@@ -102,7 +102,7 @@ contract TokenERC20 is SafeMath {
         // Check for overflows
         require(SafeMath.safeAdd(balanceOf[_to], _value) > balanceOf[_to]);
         // Save this for an assertion in the future
-        uint previousBalances = SafeMath.safeAdd(balanceOf[_from], balanceOf[_to]); 
+        uint previousBalances = SafeMath.safeAdd(balanceOf[_from], balanceOf[_to]);
         balanceOf[_from] = SafeMath.safeSub(balanceOf[_from], _value);                     // Subtract from the sender
         balanceOf[_to] = SafeMath.safeAdd(balanceOf[_to], _value);                            // Add the same to the recipient
         emit Transfer(_from, _to, _value);
@@ -212,12 +212,12 @@ contract TokenERC20 is SafeMath {
 /******************************************/
 
 contract GASSToken is owned, TokenERC20 {
-    
+
     /// The full name of the GASSToken token.
     string public constant tokenName = "GASS";
     /// Symbol of the GASSToken token.
     string public constant tokenSymbol = "GASS";
-    
+
     uint256 public initialSupply = 1000000000;
 
     mapping (address => bool) public frozenAccount;
@@ -249,3 +249,38 @@ contract GASSToken is owned, TokenERC20 {
     }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

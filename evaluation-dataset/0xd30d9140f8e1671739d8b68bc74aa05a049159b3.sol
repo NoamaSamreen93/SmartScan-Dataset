@@ -1,29 +1,29 @@
 pragma solidity ^0.4.25;
 
 
-contract Ownable 
+contract Ownable
 {
     address public owner;
     address public newOwner;
-    
-    constructor() public 
+
+    constructor() public
     {
         owner = msg.sender;
     }
 
-    modifier onlyOwner() 
+    modifier onlyOwner()
     {
         require(msg.sender == owner, "Can used only by owner");
         _;
     }
 
-    function changeOwner(address _owner) onlyOwner public 
+    function changeOwner(address _owner) onlyOwner public
     {
         require(_owner != 0, "Please provide new owner address");
         newOwner = _owner;
     }
-    
-    function confirmOwner() public 
+
+    function confirmOwner() public
     {
         require(newOwner == msg.sender, "Please call from new owner");
         owner = newOwner;
@@ -31,10 +31,10 @@ contract Ownable
     }
 }
 
-library SafeMath 
+library SafeMath
 {
 
-    function mul(uint256 _a, uint256 _b) internal pure returns (uint256 c) 
+    function mul(uint256 _a, uint256 _b) internal pure returns (uint256 c)
     {
         if (_a == 0) { return 0; }
 
@@ -43,20 +43,20 @@ library SafeMath
         return c;
     }
 
-    function div(uint256 _a, uint256 _b) internal pure returns (uint256) 
+    function div(uint256 _a, uint256 _b) internal pure returns (uint256)
     {
         return _a / _b;
     }
 
 
-    function sub(uint256 _a, uint256 _b) internal pure returns (uint256) 
+    function sub(uint256 _a, uint256 _b) internal pure returns (uint256)
     {
         assert(_b <= _a);
         return _a - _b;
     }
 
 
-    function add(uint256 _a, uint256 _b) internal pure returns (uint256 c) 
+    function add(uint256 _a, uint256 _b) internal pure returns (uint256 c)
     {
         c = _a + _b;
         assert(c >= _a);
@@ -65,7 +65,7 @@ library SafeMath
 }
 
 
-contract KassaNetwork is Ownable 
+contract KassaNetwork is Ownable
 {
     using SafeMath for uint;
 
@@ -134,7 +134,7 @@ contract KassaNetwork is Ownable
 
     mapping (uint => uint) private usedDeposit;
 
-    function getInteres(address addr) private view returns(uint interes) 
+    function getInteres(address addr) private view returns(uint interes)
     {
         uint diffDays = getNDay(user[addr].timestamp);
 
@@ -143,7 +143,7 @@ contract KassaNetwork is Ownable
         interes = user[addr].balance.mul(perDay).mul(diffDays).div(procKoef);
     }
 
-    function getUser(address addr) public view returns(uint balance, uint timestamp, uint paidInteres, uint totalInteres, uint countReferrals, uint earnOnReferrals, uint paidReferrals, address referrer) 
+    function getUser(address addr) public view returns(uint balance, uint timestamp, uint paidInteres, uint totalInteres, uint countReferrals, uint earnOnReferrals, uint paidReferrals, address referrer)
     {
         address a = addr;
         return (
@@ -158,26 +158,26 @@ contract KassaNetwork is Ownable
         );
     }
 
-    function getCurrentDay() public view returns(uint nday) 
+    function getCurrentDay() public view returns(uint nday)
     {
         nday = getNDay(startTimestamp);
     }
 
-    function getNDay(uint date) public view returns(uint nday) 
+    function getNDay(uint date) public view returns(uint nday)
     {
         uint diffTime = date > 0 ? now.sub(date) : 0;
 
         nday = diffTime.div(24 hours);
     }
 
-    function getCurrentDayDepositLimit() public view returns(uint limit) 
+    function getCurrentDayDepositLimit() public view returns(uint limit)
     {
         uint nDay = getCurrentDay();
 
         limit = getDayDepositLimit(nDay);
     }
 
-    function calcProgress(uint start, uint proc, uint nDay) public pure returns(uint res) 
+    function calcProgress(uint start, uint proc, uint nDay) public pure returns(uint res)
     {
         uint s = start;
 
@@ -189,36 +189,36 @@ contract KassaNetwork is Ownable
         return s;
     }
 
-    function getDayDepositLimit(uint nDay) public pure returns(uint limit) 
-    {                         
+    function getDayDepositLimit(uint nDay) public pure returns(uint limit)
+    {
         return calcProgress(dayLimitStart, dayLimitProgressProc, nDay );
     }
 
-    function getMaximalDeposit(uint nDay) public pure returns(uint limit) 
-    {                 
+    function getMaximalDeposit(uint nDay) public pure returns(uint limit)
+    {
         return calcProgress(maximalDepositStart, maxDepositProgressProc, nDay );
     }
 
-    function getCurrentDayRestDepositLimit() public view returns(uint restLimit) 
+    function getCurrentDayRestDepositLimit() public view returns(uint restLimit)
     {
         uint nDay = getCurrentDay();
 
         restLimit = getDayRestDepositLimit(nDay);
     }
 
-    function getDayRestDepositLimit(uint nDay) public view returns(uint restLimit) 
+    function getDayRestDepositLimit(uint nDay) public view returns(uint restLimit)
     {
         restLimit = getCurrentDayDepositLimit().sub(usedDeposit[nDay]);
     }
 
-    function getCurrentMaximalDeposit() public view returns(uint maximalDeposit) 
+    function getCurrentMaximalDeposit() public view returns(uint maximalDeposit)
     {
         uint nDay = getCurrentDay();
 
         maximalDeposit = getMaximalDeposit(nDay);
     }
 
-    function() external payable 
+    function() external payable
     {
         emit LogInvestment(msg.sender, msg.value, msg.data);
         processPayment(msg.value, msg.data);
@@ -226,37 +226,37 @@ contract KassaNetwork is Ownable
 
     function processPayment(uint moneyValue, bytes refData) private
     {
-        if (msg.sender == owner) 
-        { 
+        if (msg.sender == owner)
+        {
             totalSelfInvest = totalSelfInvest.add(moneyValue);
             emit LogSelfInvestment(moneyValue);
-            return; 
+            return;
         }
 
-        if (moneyValue == 0) 
-        { 
+        if (moneyValue == 0)
+        {
             preparePayment();
-            return; 
+            return;
         }
 
-        if (moneyValue < minimalDeposit) 
-        { 
+        if (moneyValue < minimalDeposit)
+        {
             totalPenalty = totalPenalty.add(moneyValue);
             emit LogMinimalDepositPayment(msg.sender, moneyValue, totalPenalty);
-            return; 
+            return;
         }
 
         address referrer = bytesToAddress(refData);
 
-        if (user[msg.sender].balance > 0 || 
-            refData.length != 20 || 
+        if (user[msg.sender].balance > 0 ||
+            refData.length != 20 ||
             moneyValue > getCurrentMaximalDeposit() ||
             referrer != owner &&
               (
-                 user[referrer].balance <= 0 || 
-                 referrer == msg.sender) 
+                 user[referrer].balance <= 0 ||
+                 referrer == msg.sender)
               )
-        { 
+        {
             uint amount = moneyValue.mul(procReturn).div(procKoef);
 
             totalPenalty = totalPenalty.add(moneyValue.sub(amount));
@@ -265,7 +265,7 @@ contract KassaNetwork is Ownable
 
             msg.sender.transfer(amount);
 
-            return; 
+            return;
         }
 
 
@@ -304,7 +304,7 @@ contract KassaNetwork is Ownable
     }
 
 
-    function registerInvestor(address referrer) private 
+    function registerInvestor(address referrer) private
     {
         user[msg.sender].timestamp = now;
         countInvestors++;
@@ -313,12 +313,12 @@ contract KassaNetwork is Ownable
         user[referrer].countReferrals++;
     }
 
-    function sendOwnerFee(uint addDeposit) private 
+    function sendOwnerFee(uint addDeposit) private
     {
         transfer(owner, addDeposit.mul(ownerFee).div(procKoef));
     }
 
-    function calcBonusReferrers(address referrer, uint addDeposit) private 
+    function calcBonusReferrers(address referrer, uint addDeposit) private
     {
         for (uint i = 0; i < bonusReferrer.length && referrer != 0; i++)
         {
@@ -335,7 +335,7 @@ contract KassaNetwork is Ownable
     }
 
 
-    function preparePaymentReferrer(address referrer, uint amountReferrer) private 
+    function preparePaymentReferrer(address referrer, uint amountReferrer) private
     {
         user[referrer].earnOnReferrals = user[referrer].earnOnReferrals.add(amountReferrer);
 
@@ -343,7 +343,7 @@ contract KassaNetwork is Ownable
         uint paidReferrals = user[referrer].paidReferrals;
 
 
-        if (totalReferrals >= paidReferrals.add(minimalDepositForBonusReferrer)) 
+        if (totalReferrals >= paidReferrals.add(minimalDepositForBonusReferrer))
         {
             uint amount = totalReferrals.sub(paidReferrals);
 
@@ -361,11 +361,11 @@ contract KassaNetwork is Ownable
     }
 
 
-    function preparePayment() public 
+    function preparePayment() public
     {
         uint totalInteres = getInteres(msg.sender);
         uint paidInteres = user[msg.sender].paidInteres;
-        if (totalInteres > paidInteres) 
+        if (totalInteres > paidInteres)
         {
             uint amount = totalInteres.sub(paidInteres);
 
@@ -380,15 +380,15 @@ contract KassaNetwork is Ownable
         }
     }
 
-    function updateInvestBalance(uint addDeposit) private 
+    function updateInvestBalance(uint addDeposit) private
     {
         user[msg.sender].balance = user[msg.sender].balance.add(addDeposit);
         totalInvest = totalInvest.add(addDeposit);
     }
 
-    function transfer(address receiver, uint amount) private 
+    function transfer(address receiver, uint amount) private
     {
-        if (amount > 0) 
+        if (amount > 0)
         {
             if (receiver != owner) { totalPaid = totalPaid.add(amount); }
 
@@ -402,29 +402,29 @@ contract KassaNetwork is Ownable
         }
     }
 
-    function bytesToAddress(bytes source) private pure returns(address addr) 
+    function bytesToAddress(bytes source) private pure returns(address addr)
     {
         assembly { addr := mload(add(source,0x14)) }
         return addr;
     }
 
-    function getTotals() public view returns(uint _maxDepositDays, 
-                                             uint _perDay, 
-                                             uint _startTimestamp, 
+    function getTotals() public view returns(uint _maxDepositDays,
+                                             uint _perDay,
+                                             uint _startTimestamp,
 
-                                             uint _minimalDeposit, 
-                                             uint _maximalDeposit, 
-                                             uint[1] _bonusReferrer, 
-                                             uint _minimalDepositForBonusReferrer, 
-                                             uint _ownerFee, 
+                                             uint _minimalDeposit,
+                                             uint _maximalDeposit,
+                                             uint[1] _bonusReferrer,
+                                             uint _minimalDepositForBonusReferrer,
+                                             uint _ownerFee,
 
-                                             uint _countInvestors, 
-                                             uint _totalInvest, 
-                                             uint _totalPenalty, 
-//                                             uint _totalSelfInvest, 
-                                             uint _totalPaid, 
+                                             uint _countInvestors,
+                                             uint _totalInvest,
+                                             uint _totalPenalty,
+//                                             uint _totalSelfInvest,
+                                             uint _totalPaid,
 
-                                             uint _currentDayDepositLimit, 
+                                             uint _currentDayDepositLimit,
                                              uint _currentDayRestDepositLimit)
     {
         return (
@@ -450,3 +450,38 @@ contract KassaNetwork is Ownable
     }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

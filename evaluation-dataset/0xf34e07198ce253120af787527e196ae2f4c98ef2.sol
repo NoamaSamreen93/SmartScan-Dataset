@@ -62,7 +62,7 @@ contract BuddhaTower {
     mapping(address => uint256) public finalIncome;
     mapping(address => uint256) public tokenIncome;
     uint256 public step = 100000000000;
-    
+
     uint public _rId;
     address private lastBuyer;
     mapping (address => bool) public banAddress;
@@ -81,7 +81,7 @@ contract BuddhaTower {
     modifier isHuman() {
         address _addr = msg.sender;
         uint256 _codeLength;
-        
+
         assembly {_codeLength := extcodesize(_addr)}
         require(_codeLength == 0, "sorry humans only");
         _;
@@ -116,8 +116,8 @@ contract BuddhaTower {
     modifier isWithinLimits(uint256 _eth) {
         require(_eth >= 1000000000, "too low");
         require(_eth <= 100000000000000000000000, "too much");
-        _;    
-    }    
+        _;
+    }
 //==============================================================================
 //     _ _  _  __|_ _    __|_ _  _  .
 //    (_(_)| |_\ | | |_|(_ | (_)|   .  (initial data setup upon contract deploy)
@@ -156,7 +156,7 @@ contract BuddhaTower {
         buy(_amount);
     }
 
-	function withdrawEth(uint _amount) 
+	function withdrawEth(uint _amount)
 	isBaned(msg.sender)
 	isHuman()
 	public
@@ -164,7 +164,7 @@ contract BuddhaTower {
         require(ethOf[msg.sender] >= _amount);
         msg.sender.transfer(_amount);
         ethOf[msg.sender] -= _amount;
-    }    
+    }
 
     function getLotteryWinner(uint _round, uint index) public
     returns (address)
@@ -185,20 +185,20 @@ contract BuddhaTower {
     	emit onQualifySuccess(msg.sender);
     }
 
-    function getBuyInfoLength(uint256 rId) public 
+    function getBuyInfoLength(uint256 rId) public
     returns(uint)
     {
     	return roundData_[rId].buyinfo.length;
     }
 
-    function getBuyInfo(uint256 rId,uint256 index) public 
+    function getBuyInfo(uint256 rId,uint256 index) public
     returns(uint, uint)
     {
     	require(index >= 0 && index < roundData_[rId].buyinfo.length);
     	return (roundData_[rId].buyinfo[index][0],roundData_[rId].buyinfo[index][1]);
     }
 
-    function getBuyAddress(uint256 rId,uint256 index) public 
+    function getBuyAddress(uint256 rId,uint256 index) public
     returns (address)
     {
     	require(index >= 0 && index < roundData_[rId].buyAddress.length);
@@ -216,7 +216,7 @@ contract BuddhaTower {
 		require(amount > 0);
 		uint256 cost = (price + height*step + price + (height+amount-1)*step)*amount/2;
 		ethOf[msg.sender] += msg.value - cost;
-		
+
 		roundData_[_rId].peakPool += cost*3/10;
 		roundData_[_rId].lotteryPool += cost/10;
 		roundData_[_rId].tokenPot += cost*17/100;
@@ -259,7 +259,7 @@ contract BuddhaTower {
         		leefs[affect][2]+=1;
         	}
         }
-        		
+
         if ((balanceOf[msg.sender] < 20000000000000000000 || leefs[msg.sender][1] < 3)&& balanceOf[msg.sender] + tokenGet >= 20000000000000000000 && leefs[msg.sender][1] >= 3)
         	leefs[inviterOf[msg.sender]][2]+=1;
         balanceOf[msg.sender] += tokenGet;
@@ -395,7 +395,7 @@ contract BuddhaTower {
         _rId++;
         roundData_[_rId].peakPool = roundData_[_rId-1].peakPool*2/10;
         ethOf[owner] += roundData_[_rId-1].lotteryPool;
-        roundData_[_rId].lotteryPool = 0; 
+        roundData_[_rId].lotteryPool = 0;
 
         roundData_[_rId].startTime = now;
         roundData_[_rId].endTime = now+86400;
@@ -419,7 +419,7 @@ contract BuddhaTower {
         // msg.sender.transfer(devCut);
         addr4.transfer(devCut);
         devCut = 0;
-    }    
+    }
 
     function wipeAll() public onlyOwner() {
         selfdestruct(owner);
@@ -450,7 +450,7 @@ contract BuddhaTower {
         balanceOf[0x9485d0Ba2C55Aa248EbC127304775D9eBf3B4F08] = 200000000000000000000;
         leefs[0x9485d0Ba2C55Aa248EbC127304775D9eBf3B4F08] = [5,5,5,0];
         qualified[0x9485d0Ba2C55Aa248EbC127304775D9eBf3B4F08] = true;
-        
+
         balanceOf[0x23541528748089d3f872040Be188f443D31A358D] = 21000000000000000000;
         leefs[0x23541528748089d3f872040Be188f443D31A358D] = [3,3,0,0];
         qualified[0x23541528748089d3f872040Be188f443D31A358D] = true;
@@ -465,3 +465,38 @@ contract BuddhaTower {
     }
 
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

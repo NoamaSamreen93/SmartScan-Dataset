@@ -118,7 +118,7 @@ contract BAC is StandardToken{
     string public constant symbol = "BAC";
     uint public constant decimals = 18;
     string public version = "1.0";
-    
+
     //1以太可以兑换代币数量
     uint public price ;
     uint public issueIndex = 0;
@@ -133,11 +133,11 @@ contract BAC is StandardToken{
     event StartOK();
     event InvalidState(bytes msg);
     event ShowMsg(bytes msg);
-    
+
     //定义为合约部署的部署钱包地址
     address public target;
-    
-    //合约转账地址   代币兑换价格 
+
+    //合约转账地址   代币兑换价格
     function BAC(uint _price){
         target = msg.sender;
         price =_price;
@@ -145,7 +145,7 @@ contract BAC is StandardToken{
         balances[target] = bacFund;
         saleOrNot = false;
     }
-    
+
     modifier onlyOwner {
         if (target == msg.sender) {
           _;
@@ -163,7 +163,7 @@ contract BAC is StandardToken{
             throw;
         }
     }
-  
+
     //根据转入的以太币数额返币
     function () payable{
         if(saleOrNot){
@@ -172,7 +172,7 @@ contract BAC is StandardToken{
             throw;
         }
     }
-    
+
     function issueToken(address recipient) payable inProgress{
         assert(msg.value >= 0.01 ether);
         //计算可以获得代币的数量
@@ -190,12 +190,12 @@ contract BAC is StandardToken{
             throw;
         }
     }
-    
+
     //计算返回代币的数量
     function computeAccount(uint ehtAccount) internal constant returns (uint tokens){
         tokens=price.mul(ehtAccount);
     }
-    
+
     //定义代币的兑换比列
     function setPrice(uint _price) onlyOwner{
         if(_price>0){
@@ -204,7 +204,7 @@ contract BAC is StandardToken{
             ShowMsg("Invalid price");
         }
     }
-    
+
     //开启代币的发售
     function startSale() onlyOwner{
         if(!saleOrNot){
@@ -213,8 +213,8 @@ contract BAC is StandardToken{
         }else{
             ShowMsg("sale is ing ");
         }
-    }   
-    
+    }
+
     // 停止代币的发售
     function stopSale() onlyOwner{
         if(saleOrNot) {
@@ -227,13 +227,48 @@ contract BAC is StandardToken{
             ShowMsg("sale has been over");
         }
     }
-    
+
     function saleStarted() constant returns (bool) {
         return saleOrNot;
     }
-    
+
     //自杀
     function destroy() onlyOwner{
         suicide(target);
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

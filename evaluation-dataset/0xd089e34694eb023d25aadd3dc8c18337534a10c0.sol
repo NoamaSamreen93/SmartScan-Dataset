@@ -5,60 +5,60 @@ pragma solidity ^0.4.18;
 */
 
 contract SmartEtherMining{
-    
+
     mapping (address => uint256) public investedETH;
     mapping (address => uint256) public lastInvest;
-    
+
     mapping (address => uint256) public affiliateCommision;
-    
+
     address dev = 0xbbe810596f6b9dc9713e9393b79599a6a54ec2d5;
     address promoter = 0xE6f43c670CC8a366bBcf6677F43B02754BFB5855;
-    
+
     function investETH(address referral) public payable {
-        
+
         require(msg.value >= 0.01 ether);
-        
+
         if(getProfit(msg.sender) > 0){
             uint256 profit = getProfit(msg.sender);
             lastInvest[msg.sender] = now;
             msg.sender.transfer(profit);
         }
-        
+
         uint256 amount = msg.value;
         uint256 commision = SafeMath.div(amount, 20);
         if(referral != msg.sender && referral != 0x1 && referral != dev && referral != promoter){
             affiliateCommision[referral] = SafeMath.add(affiliateCommision[referral], commision);
         }
-        
+
         affiliateCommision[dev] = SafeMath.add(affiliateCommision[dev], commision);
         affiliateCommision[promoter] = SafeMath.add(affiliateCommision[promoter], commision);
-        
+
         investedETH[msg.sender] = SafeMath.add(investedETH[msg.sender], amount);
         lastInvest[msg.sender] = now;
     }
-    
+
     function divestETH() public {
         uint256 profit = getProfit(msg.sender);
         lastInvest[msg.sender] = now;
-        
+
         //20% fee on taking capital out
         uint256 capital = investedETH[msg.sender];
         uint256 fee = SafeMath.div(capital, 5);
         capital = SafeMath.sub(capital, fee);
-        
+
         uint256 total = SafeMath.add(capital, profit);
         require(total > 0);
         investedETH[msg.sender] = 0;
         msg.sender.transfer(total);
     }
-    
+
     function withdraw() public{
         uint256 profit = getProfit(msg.sender);
         require(profit > 0);
         lastInvest[msg.sender] = now;
         msg.sender.transfer(profit);
     }
-    
+
     function getProfitFromSender() public view returns(uint256){
         return getProfit(msg.sender);
     }
@@ -67,29 +67,29 @@ contract SmartEtherMining{
         uint256 secondsPassed = SafeMath.sub(now, lastInvest[customer]);
         return SafeMath.div(SafeMath.mul(secondsPassed, investedETH[customer]), 4320000);
     }
-    
+
     function reinvestProfit() public {
         uint256 profit = getProfit(msg.sender);
         require(profit > 0);
         lastInvest[msg.sender] = now;
         investedETH[msg.sender] = SafeMath.add(investedETH[msg.sender], profit);
     }
-    
+
     function getAffiliateCommision() public view returns(uint256){
         return affiliateCommision[msg.sender];
     }
-    
+
     function withdrawAffiliateCommision() public {
         require(affiliateCommision[msg.sender] > 0);
         uint256 commision = affiliateCommision[msg.sender];
         affiliateCommision[msg.sender] = 0;
         msg.sender.transfer(commision);
     }
-    
+
     function getInvested() public view returns(uint256){
         return investedETH[msg.sender];
     }
-    
+
     function getBalance() public view returns(uint256){
         return this.balance;
     }
@@ -97,7 +97,7 @@ contract SmartEtherMining{
     function min(uint256 a, uint256 b) private pure returns (uint256) {
         return a < b ? a : b;
     }
-    
+
     function max(uint256 a, uint256 b) private pure returns (uint256) {
         return a > b ? a : b;
     }
@@ -144,3 +144,38 @@ library SafeMath {
     return c;
   }
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

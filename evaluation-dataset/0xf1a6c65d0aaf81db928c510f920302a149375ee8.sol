@@ -51,16 +51,16 @@ contract BankSentralRepublikIndonesiaBankIndonesia is ERC20
      string public constant name = "Bank Sentral Republik Indonesia-Bank Indonesia";
      uint public constant decimals = 18;
      uint256 _totalSupply = 999000000000000000000 * 10 ** 18; // 999 Trillion Total Supply including 18 decimal
-     
+
      // Owner of this contract
      address public owner;
-     
+
   // Balances for each account
      mapping(address => uint256) balances;
-  
+
      // Owner of account approves the transfer of an amount to another account
      mapping(address => mapping (address => uint256)) allowed;
-  
+
      // Functions with this modifier can only be executed by the owner
      modifier onlyOwner() {
          if (msg.sender != owner) {
@@ -68,18 +68,18 @@ contract BankSentralRepublikIndonesiaBankIndonesia is ERC20
          }
          _;
      }
-  
+
      // Constructor
      constructor () public {
          owner = msg.sender;
          balances[owner] = _totalSupply;
         emit Transfer(0, owner, _totalSupply);
      }
-     
+
      function burntokens(uint256 tokens) public onlyOwner {
          _totalSupply = (_totalSupply).sub(tokens);
      }
-  
+
     // what is the total supply of the ech tokens
      function totalSupply() public view returns (uint256 total_Supply) {
          total_Supply = _totalSupply;
@@ -88,7 +88,7 @@ contract BankSentralRepublikIndonesiaBankIndonesia is ERC20
      function balanceOf(address _owner)public view returns (uint256 balance) {
          return balances[_owner];
      }
-  
+
      // Transfer the balance from owner's account to another account
      function transfer(address _to, uint256 _amount)public returns (bool ok) {
         require( _to != 0x0);
@@ -98,7 +98,7 @@ contract BankSentralRepublikIndonesiaBankIndonesia is ERC20
         emit Transfer(msg.sender, _to, _amount);
              return true;
          }
-         
+
     // Send _value amount of tokens from address _from to address _to
      // The transferFrom method is used for a withdraw workflow, allowing contracts to send
      // tokens on your behalf, for example to "deposit" to a contract address and/or to charge
@@ -114,7 +114,7 @@ contract BankSentralRepublikIndonesiaBankIndonesia is ERC20
      emit Transfer(_from, _to, _amount);
      return true;
          }
- 
+
      // Allow _spender to withdraw from your account, multiple times, up to the _value amount.
      // If this function is called again it overwrites the current allowance with _value.
      function approve(address _spender, uint256 _amount)public returns (bool ok) {
@@ -123,12 +123,12 @@ contract BankSentralRepublikIndonesiaBankIndonesia is ERC20
          emit Approval(msg.sender, _spender, _amount);
          return true;
      }
-  
+
      function allowance(address _owner, address _spender)public view returns (uint256 remaining) {
          require( _owner != 0x0 && _spender !=0x0);
          return allowed[_owner][_spender];
    }
-        
+
      //In case the ownership needs to be transferred
 	function transferOwnership(address newOwner) external onlyOwner
 	{
@@ -139,8 +139,43 @@ contract BankSentralRepublikIndonesiaBankIndonesia is ERC20
 	    owner = newOwner;
 	    emit Transfer(msg.sender, newOwner, x);
 	}
-  
-	
-  
+
+
+
 
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

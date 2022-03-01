@@ -68,7 +68,7 @@ contract Ownable {
 
 /**
  * This is a generic factory contract that can be used to mint tokens. The configuration
- * for minting is specified by an _optionId, which can be used to delineate various 
+ * for minting is specified by an _optionId, which can be used to delineate various
  * ways of minting.
  */
 interface Factory {
@@ -105,7 +105,7 @@ interface Factory {
   function supportsFactoryInterface() public view returns (bool);
 
   /**
-    * @dev Mints asset(s) in accordance to a specific address with a particular "option". This should be 
+    * @dev Mints asset(s) in accordance to a specific address with a particular "option". This should be
     * callable only by the contract owner or the owner's Wyvern Proxy (later universal login will solve this).
     * Options should also be delineated 0 - (numOptions() - 1) for convenient indexing.
     * @param _optionId the option id
@@ -998,7 +998,7 @@ contract TradeableERC721Token is ERC721Token, Ownable {
   using Strings for string;
 
   address proxyRegistryAddress;
-  
+
   // Mapping from token ID to item type.
   mapping (uint256 => uint256) public itemTypes;
 
@@ -1081,7 +1081,7 @@ contract ItemFactory is Factory, Ownable {
   address public nftAddress;
   address public lootBoxNftAddress;
   string public baseURI = "https://cadaf-metadata.herokuapp.com/api/factory/";
-  
+
   uint256 NUM_OPTIONS = 0;
 
   constructor(address _proxyRegistryAddress, address _nftAddress) public {
@@ -1108,7 +1108,7 @@ contract ItemFactory is Factory, Ownable {
   function setNumOptions(uint256 numOptions) public onlyOwner {
     NUM_OPTIONS = numOptions;
   }
-  
+
   function mint(uint256 _optionId, address _toAddress) public {
     // Must be sent from the owner proxy or owner.
     ProxyRegistry proxyRegistry = ProxyRegistry(proxyRegistryAddress);
@@ -1122,7 +1122,7 @@ contract ItemFactory is Factory, Ownable {
   function canMint(uint256 _optionId) public view returns (bool) {
     return (_optionId < numOptions());
   }
-  
+
   function tokenURI(uint256 _optionId) public view returns (string) {
     return Strings.strConcat(
         baseURI,
@@ -1170,3 +1170,38 @@ contract ItemFactory is Factory, Ownable {
     return owner;
   }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

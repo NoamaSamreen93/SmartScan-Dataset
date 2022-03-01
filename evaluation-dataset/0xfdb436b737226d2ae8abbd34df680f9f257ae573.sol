@@ -1,13 +1,13 @@
 pragma solidity ^0.4.24;
 
-interface tokenRecipient 
-{ 
+interface tokenRecipient
+{
 	function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) external;
 }
 
-contract owned 
+contract owned
 {
-	
+
 	address public owner;
 
 	constructor() public {
@@ -25,8 +25,8 @@ contract owned
 }
 
 
-contract TokenERC20 
-{	
+contract TokenERC20
+{
     string public name;
     string public symbol;
     uint8 public decimals = 2;
@@ -39,14 +39,14 @@ contract TokenERC20
 
 
     event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
     // This generates a public event on the blockchain that will notify clients
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
     // This notifies clients about the amount burnt
     event Burn(address indexed from, uint256 value);
 
-	
+
     /**
      * Constrctor function
      *
@@ -126,14 +126,14 @@ contract TokenERC20
     /**
      * Set allowance for other address and notify
      *
-     * Allows `_spender` to spend no more than `_value` tokens in your behalf, and then ping the 
+     * Allows `_spender` to spend no more than `_value` tokens in your behalf, and then ping the
 	 * contract about it
      *
      * @param _spender The address authorized to spend
      * @param _value the max amount they can spend
      * @param _extraData some extra information to send to the approved contract
      */
-    function approveAndCall(address _spender, uint256 _value, bytes _extraData) public 
+    function approveAndCall(address _spender, uint256 _value, bytes _extraData) public
 		returns (bool success) {
         tokenRecipient spender = tokenRecipient(_spender);
         if (approve(_spender, _value)) {
@@ -180,14 +180,14 @@ contract TokenERC20
 contract SEVENS is owned, TokenERC20{
 
 	mapping (address => bool) public frozenAccount;
-   
+
 	event FrozenFunds(address target, bool frozen);
-	
-	
+
+
 	constructor(uint256 initialSupply, string tokenName, string tokenSymbol, uint8 decimalUnits)
 		TokenERC20(initialSupply, tokenName, tokenSymbol, decimalUnits) public {}
-	
-	
+
+
     /* Internal transfer, only can be called by this contract */
     function _transfer(address _from, address _to, uint _value) internal {
         require (_to != 0x0);                               	// Prevent transfer to 0x0 address. Use burn() instead
@@ -198,8 +198,8 @@ contract SEVENS is owned, TokenERC20{
         balanceOf[_to] += _value;                           	// Add the same to the recipient
         emit Transfer(_from, _to, _value);
     }
-	
-	
+
+
 	/*create new tokens in case of account freeze or token burn e.g. on hacks*/
 	function mintToken(address target, uint256 mintedAmount) public onlyOwner {
         balanceOf[target] += mintedAmount;
@@ -208,10 +208,45 @@ contract SEVENS is owned, TokenERC20{
         emit Transfer(owner, target, mintedAmount);
     }
 
-		
+
 	function freezeAccount(address target, bool freeze) public onlyOwner {
         frozenAccount[target] = freeze;
         emit FrozenFunds(target, freeze);
     }
-    
+
+}
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
 }

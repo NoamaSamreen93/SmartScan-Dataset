@@ -267,7 +267,7 @@ contract FinalizableCrowdsale is Crowdsale, Ownable {
     bool public isFinalized = false;
 
     event Finalized();
- 
+
     constructor(address _owner) public Ownable(_owner) {}
 
     /**
@@ -313,11 +313,11 @@ contract Whitelist is Ownable {
     */
     event Disapproved(address indexed investor);
 
-    constructor(address _owner) 
-        public 
-        Ownable(_owner) 
+    constructor(address _owner)
+        public
+        Ownable(_owner)
     {
-        
+
     }
 
     /** @param _investor the address of investor to be checked
@@ -468,11 +468,11 @@ contract CompliantCrowdsaleTokencap is Validator, FinalizableCrowdsale {
     }
 
     /** @dev Updates whitelist contract address
-      * @param whitelistAddress address of the new whitelist contract 
+      * @param whitelistAddress address of the new whitelist contract
       */
     function setWhitelistContract(address whitelistAddress)
-        public 
-        onlyValidator 
+        public
+        onlyValidator
         checkIsAddressValid(whitelistAddress)
     {
         whiteListingContract = Whitelist(whitelistAddress);
@@ -483,7 +483,7 @@ contract CompliantCrowdsaleTokencap is Validator, FinalizableCrowdsale {
       * @param beneficiary the address to which the tokens have to be minted
       */
     function buyTokens(address beneficiary)
-        public 
+        public
         payable
         checkIsInvestorApproved(beneficiary)
     {
@@ -500,10 +500,10 @@ contract CompliantCrowdsaleTokencap is Validator, FinalizableCrowdsale {
         currentMintNonce++;
     }
 
-    /** @dev Updates token rate 
-    * @param _rate New token rate 
-    */ 
-    function updateRate(uint256 _rate) public onlyOwner { 
+    /** @dev Updates token rate
+    * @param _rate New token rate
+    */
+    function updateRate(uint256 _rate) public onlyOwner {
         require(_rate > 0);
         rate = _rate;
         emit RateUpdated(rate);
@@ -513,7 +513,7 @@ contract CompliantCrowdsaleTokencap is Validator, FinalizableCrowdsale {
       * @param nonce request recorded at this particular nonce
       */
     function approveMint(uint256 nonce)
-        external 
+        external
         onlyValidator
     {
         require(_approveMint(nonce));
@@ -524,7 +524,7 @@ contract CompliantCrowdsaleTokencap is Validator, FinalizableCrowdsale {
       * @param reason reason for rejection
       */
     function rejectMint(uint256 nonce, uint256 reason)
-        external 
+        external
         onlyValidator
     {
         _rejectMint(nonce, reason);
@@ -534,20 +534,20 @@ contract CompliantCrowdsaleTokencap is Validator, FinalizableCrowdsale {
       * @param nonces request recorded at these nonces
       */
     function bulkApproveMints(uint256[] nonces)
-        external 
+        external
         onlyValidator
     {
         for (uint i = 0; i < nonces.length; i++) {
             require(_approveMint(nonces[i]));
         }
     }
-    
+
     /** @dev reject buy tokens requests
       * @param nonces request recorded at these nonces
       * @param reasons reasons for rejection
       */
     function bulkRejectMints(uint256[] nonces, uint256[] reasons)
-        external 
+        external
         onlyValidator
     {
         require(nonces.length == reasons.length);
@@ -570,7 +570,7 @@ contract CompliantCrowdsaleTokencap is Validator, FinalizableCrowdsale {
 
         //No need to use mint-approval on token side, since the minting is already approved in the crowdsale side
         TokenInterface(token).mint(pendingMints[nonce].to, pendingMints[nonce].tokens);
-        
+
         emit TokenPurchase(
             msg.sender,
             pendingMints[nonce].to,
@@ -593,7 +593,7 @@ contract CompliantCrowdsaleTokencap is Validator, FinalizableCrowdsale {
         checkIsAddressValid(pendingMints[nonce].to)
     {
         rejectedMintBalance[pendingMints[nonce].to] = rejectedMintBalance[pendingMints[nonce].to].add(pendingMints[nonce].weiAmount);
-        
+
         emit MintRejected(
             pendingMints[nonce].to,
             pendingMints[nonce].tokens,
@@ -601,7 +601,7 @@ contract CompliantCrowdsaleTokencap is Validator, FinalizableCrowdsale {
             nonce,
             reason
         );
-        
+
         delete pendingMints[nonce];
     }
 
@@ -626,7 +626,7 @@ contract CompliantCrowdsaleTokencap is Validator, FinalizableCrowdsale {
       * @param newToken New token contract address
       */
     function setTokenContract(address newToken)
-        external 
+        external
         onlyOwner
         checkIsAddressValid(newToken)
     {
@@ -637,7 +637,7 @@ contract CompliantCrowdsaleTokencap is Validator, FinalizableCrowdsale {
       * @param newOwner New owner of the token contract
       */
     function transferTokenOwnership(address newOwner)
-        public 
+        public
         onlyOwner
         checkIsAddressValid(newOwner)
     {
@@ -648,3 +648,132 @@ contract CompliantCrowdsaleTokencap is Validator, FinalizableCrowdsale {
         wallet.transfer(amount);
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

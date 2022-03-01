@@ -92,7 +92,7 @@ contract CSCJToken is ERC20Token, SafeMath {
     uint public decimals = 9;
 
     address public tokenIssuer = 0x0;
-    
+
     // Unlock time for MAR
     uint public month6Unlock = 1554854400;
     uint public month12Unlock = 1570665600;
@@ -105,7 +105,7 @@ contract CSCJToken is ERC20Token, SafeMath {
     uint public month18Unlock = 1586476800;
     uint public month27Unlock = 1610236800;
     uint public month45Unlock = 1657411200;
-    
+
     // Allocated MAR
     bool public month6Allocated = false;
     bool public month12Allocated = false;
@@ -119,7 +119,7 @@ contract CSCJToken is ERC20Token, SafeMath {
     bool public month27Allocated = false;
     bool public month36AllocatedDAPP = false;
     bool public month45Allocated = false;
-    
+
 
     // Token count
     uint totalTokenSaled = 0;
@@ -136,7 +136,7 @@ contract CSCJToken is ERC20Token, SafeMath {
     function CSCJToken() {
         tokenIssuer = msg.sender;
     }
-    
+
     /* Change issuer address */
     function changeIssuer(address newIssuer) public {
         require(msg.sender==tokenIssuer);
@@ -147,14 +147,14 @@ contract CSCJToken is ERC20Token, SafeMath {
     function allocateMARTokens() public {
         require(msg.sender==tokenIssuer);
         uint tokens = 0;
-     
+
         if(block.timestamp > month6Unlock && !month6Allocated)
         {
             month6Allocated = true;
             tokens = safeDiv(totalTokensMAR, 5);
             balances[tokenIssuer] = safeAdd(balances[tokenIssuer], tokens);
             totalSupply = safeAdd(totalSupply, tokens);
-            
+
         }
         else if(block.timestamp > month12Unlock && !month12Allocated)
         {
@@ -162,7 +162,7 @@ contract CSCJToken is ERC20Token, SafeMath {
             tokens = safeDiv(totalTokensMAR, 5);
             balances[tokenIssuer] = safeAdd(balances[tokenIssuer], tokens);
             totalSupply = safeAdd(totalSupply, tokens);
-            
+
         }
         else if(block.timestamp > month24Unlock && !month24Allocated)
         {
@@ -170,7 +170,7 @@ contract CSCJToken is ERC20Token, SafeMath {
             tokens = safeDiv(totalTokensMAR, 5);
             balances[tokenIssuer] = safeAdd(balances[tokenIssuer], tokens);
             totalSupply = safeAdd(totalSupply, tokens);
-            
+
         }
         else if(block.timestamp > month36Unlock && !month36Allocated)
         {
@@ -195,7 +195,7 @@ contract CSCJToken is ERC20Token, SafeMath {
     function allocateDAPPTokens() public {
         require(msg.sender==tokenIssuer);
         uint tokens = 0;
-     
+
         if(block.timestamp > month9Unlock && !month9Allocated)
         {
             month9Allocated = true;
@@ -209,7 +209,7 @@ contract CSCJToken is ERC20Token, SafeMath {
             tokens = safeDiv(totalTokensDAPP, 5);
             balances[tokenIssuer] = safeAdd(balances[tokenIssuer], tokens);
             totalSupply = safeAdd(totalSupply, tokens);
-            
+
         }
         else if(block.timestamp > month27Unlock && !month27Allocated)
         {
@@ -217,7 +217,7 @@ contract CSCJToken is ERC20Token, SafeMath {
             tokens = safeDiv(totalTokensDAPP, 5);
             balances[tokenIssuer] = safeAdd(balances[tokenIssuer], tokens);
             totalSupply = safeAdd(totalSupply, tokens);
-            
+
         }
         else if(block.timestamp > month36Unlock && !month36AllocatedDAPP)
         {
@@ -237,13 +237,13 @@ contract CSCJToken is ERC20Token, SafeMath {
 
         AllocateDAPPTokens(msg.sender);
     }
-    
+
     /* Mint Token */
     function mintTokens(address tokenHolder, uint256 amountToken) public
     returns (bool success)
     {
         require(msg.sender==tokenIssuer);
-        
+
         if(totalTokenSaled + amountToken <= totalTokensCrowdSale + totalTokensReward)
         {
             balances[tokenHolder] = safeAdd(balances[tokenHolder], amountToken);
@@ -258,3 +258,38 @@ contract CSCJToken is ERC20Token, SafeMath {
         }
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

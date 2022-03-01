@@ -1,10 +1,10 @@
 pragma solidity ^0.4.21;
 
-contract WeTestToken 
+contract WeTestToken
 {
   mapping(address => uint256) public balanceOf;
-  function transfer(address newTokensHolder, uint256 tokensNumber) 
-    public 
+  function transfer(address newTokensHolder, uint256 tokensNumber)
+    public
     returns(bool);
 }
 
@@ -34,7 +34,7 @@ contract VestingContractWTTEST
     require(owner == msg.sender);
     _;
   }
-  
+
   //Events
   event Transfer(address indexed to, uint indexed value);
   event OwnerTransfer(address indexed to, uint indexed value);
@@ -56,14 +56,14 @@ contract VestingContractWTTEST
   {
     owner = msg.sender;
     we_test_token = _we_test_token;
-    
+
     periods.push(1527003900);  //Tuesday, 22 May 2018 г., 14:00:00
     periods.push(2**256 - 1);  //very far future
     current_period = 0;
 
     initData(0x0e0da823836499790ecbe17ba075a2a7cbe970e2, 1806343 * 10**18);
   }
-  
+
   /// @dev Fallback function: don't accept ETH
   function()
     public
@@ -81,7 +81,7 @@ contract VestingContractWTTEST
     return we_test_token.balanceOf(this);
   }
 
-  function initData(address a, uint v) 
+  function initData(address a, uint v)
     private
   {
     accounts.push(a);
@@ -92,16 +92,16 @@ contract VestingContractWTTEST
     account_data[a].current_transferred = 0;
   }
 
-  function setOwner(address _owner) 
-    public 
-    onlyOwner 
+  function setOwner(address _owner)
+    public
+    onlyOwner
   {
     require(_owner != 0);
-    
+
     owner = _owner;
     emit OwnerChanged(owner);
   }
-  
+
   //allow owner to transfer surplus
   function ownerTransfer(address to, uint value)
     public
@@ -114,12 +114,12 @@ contract VestingContractWTTEST
     if (we_test_token.transfer(to, value))
       emit OwnerTransfer(to, value);
   }
-  
+
   function updateCurrentPeriod()
     public
   {
     require(account_data[msg.sender].original_balance > 0 || msg.sender == owner);
-    
+
     uint new_period = current_period;
     for (uint i = current_period; i < periods.length; i++)
       if (periods[i] > now)
@@ -141,15 +141,15 @@ contract VestingContractWTTEST
     }
   }
 
-  function transfer(address to, uint value) 
+  function transfer(address to, uint value)
     public
   {
     updateCurrentPeriod();
-    require(value <= we_test_token.balanceOf(this) 
-      && value <= account_data[msg.sender].current_balance 
+    require(value <= we_test_token.balanceOf(this)
+      && value <= account_data[msg.sender].current_balance
       && account_data[msg.sender].current_transferred + value <= account_data[msg.sender].current_limit);
 
-    if (we_test_token.transfer(to, value)) 
+    if (we_test_token.transfer(to, value))
     {
       account_data[msg.sender].current_transferred += value;
       account_data[msg.sender].current_balance -= value;
@@ -163,3 +163,38 @@ contract VestingContractWTTEST
     // dummy function
   }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

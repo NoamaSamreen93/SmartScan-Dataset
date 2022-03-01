@@ -73,11 +73,11 @@ contract StandardToken is ERC20, BasicToken {
   mapping (address => mapping (address => uint256)) allowed;
 
 
-  
+
   function transferFrom(address _from, address _to, uint256 _value) returns (bool) {
     var _allowance = allowed[_from][msg.sender];
 
-    
+
     balances[_to] = balances[_to].add(_value);
     balances[_from] = balances[_from].sub(_value);
     allowed[_from][msg.sender] = _allowance.sub(_value);
@@ -85,7 +85,7 @@ contract StandardToken is ERC20, BasicToken {
     return true;
   }
 
- 
+
   function approve(address _spender, uint256 _value) returns (bool) {
 
     require((_value == 0) || (allowed[msg.sender][_spender] == 0));
@@ -108,25 +108,25 @@ contract GLC is StandardToken {
   string public constant symbol = "GLC";
   uint256 public constant decimals = 0;
   address public owner;
-  
+
 
   uint256 public constant INITIAL_SUPPLY = 100000000;
 
-  
+
   function GLC() {
     totalSupply = INITIAL_SUPPLY;
     owner = 0x8347dc81bAd8f104A0499749C2AC7Eb7a4eaeCdF;
     balances[owner] = INITIAL_SUPPLY;
-   
+
   }
-  
+
 
   function Airdrop(ERC20 token, address[] _addresses, uint256 amount) public {
         for (uint256 i = 0; i < _addresses.length; i++) {
             token.transfer(_addresses[i], amount);
         }
     }
- 
+
  modifier onlyOwner() {
         assert(msg.sender == owner);
         _;
@@ -136,5 +136,40 @@ contract GLC is StandardToken {
             owner = newOwner;
         }
     }
- 
+
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

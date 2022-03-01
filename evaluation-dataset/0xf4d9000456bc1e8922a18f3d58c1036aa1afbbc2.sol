@@ -290,7 +290,7 @@ contract ERC721 is ERC165, IERC721 {
     function ownerOf(uint256 tokenId) external view returns (address) {
         _ownerOf(tokenId);
     }
-  
+
     function _ownerOf(uint256 tokenId) internal view returns (address owner) {
         owner = _tokenOwner[tokenId];
         require(owner != address(0));
@@ -323,7 +323,7 @@ contract ERC721 is ERC165, IERC721 {
     function getApproved(uint256 tokenId) external view returns (address) {
         _getApproved(tokenId);
     }
-  
+
     function _getApproved(uint256 tokenId) internal view returns (address) {
         require(_exists(tokenId));
         return _tokenApprovals[tokenId];
@@ -374,18 +374,18 @@ contract ERC721 is ERC165, IERC721 {
     {
         _transferFrom(from, to, tokenId);
     }
-    
+
     function _transferFrom(
-        address from, 
+        address from,
         address to,
         uint256 tokenId) internal {
         require(_isApprovedOrOwner(msg.sender, tokenId));
         require(to != address(0));
-        
+
         _clearApproval(from, tokenId);
         _removeTokenFrom(from, tokenId);
         _addTokenTo(to, tokenId);
-        
+
         emit Transfer(from, to, tokenId);
     }
 
@@ -434,7 +434,7 @@ contract ERC721 is ERC165, IERC721 {
     {
         _safeTransferFrom(from, to, tokenId, _data);
     }
-    
+
     function _safeTransferFrom(
         address from,
         address to,
@@ -569,9 +569,9 @@ contract ERC721 is ERC165, IERC721 {
 }
 
 contract Bloccelerator is ERC721 {
-    
+
     mapping (uint256 => string) public Courses;
-    
+
       // The data structure of the example deed
     struct Certificate {
         string name;
@@ -584,7 +584,7 @@ contract Bloccelerator is ERC721 {
 
     // When a certificate is created by an admin.
     event Creation(uint256 indexed c_id, string indexed c_name, string indexed c_course);
-    
+
     // Mapping from participants to certificates
     mapping (uint256 => Certificate) private participants;
     mapping (bytes32 => uint256[]) private studentDetail;
@@ -595,20 +595,20 @@ contract Bloccelerator is ERC721 {
     address private owner;
     string public constant name = "Bloccelerator";
     string public constant symbol = "BLOC";
-  
+
     constructor()
     public
     {
         owner = msg.sender;
     }
-  
+
     modifier onlyContractOwner {
         require(msg.sender == owner);
         _;
     }
-    
+
     // The contract owner creates deeds. Newly created deeds are initialised with a name and a beneficiary.
-    function create(address _to, string _name, uint256 _course, uint256 _date, bytes32 _userCode) 
+    function create(address _to, string _name, uint256 _course, uint256 _date, bytes32 _userCode)
     public
     onlyContractOwner
     returns (uint256 certificateID)  {
@@ -622,10 +622,10 @@ contract Bloccelerator is ERC721 {
             registrationCode: _userCode
         });
         studentDetail[_userCode].push(certificateID);
-        
+
         emit Creation(certificateID, _name, Courses[_course]);
     }
-  
+
     function addCourse(string _name) public onlyContractOwner returns (uint256 courseID) {
         require(verifyCourseExists(_name) != true);
         uint _courseCount = courseIDs.length;
@@ -633,7 +633,7 @@ contract Bloccelerator is ERC721 {
         Courses[_courseCount] = _name;
         return _courseCount;
     }
-  
+
     function verifyCourseExists(string _name) internal view returns (bool exists) {
         uint numberofCourses = courseIDs.length;
         for (uint i=0; i<numberofCourses; i++) {
@@ -644,22 +644,22 @@ contract Bloccelerator is ERC721 {
         }
         return false;
     }
-  
+
     function getMyCertIDs(string IDNumber) public view returns (string _name, uint[] _certIDs) {
         bytes32 hashedID = keccak256(abi.encodePacked(IDNumber));
         uint[] storage ownedCerts = studentDetail[hashedID];
         require(verifyOwner(ownedCerts));
-        
-        _certIDs = studentDetail[hashedID];      
+
+        _certIDs = studentDetail[hashedID];
         _name = participants[_certIDs[0]].name;
     }
-  
+
     function getCertInfo(uint256 certificateNumber) public view returns (string _name, string _courseName, uint256 _issueDate) {
         _name = participants[certificateNumber].name;
         _courseName = Courses[participants[certificateNumber].courseID];
         _issueDate = participants[certificateNumber].date;
     }
-  
+
     function verifyOwner(uint[] _certIDs) internal view returns (bool isOwner) {
         uint _numberOfCerts = _certIDs.length;
         bool allCorrect = false;
@@ -669,3 +669,132 @@ contract Bloccelerator is ERC721 {
         return allCorrect;
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000;
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

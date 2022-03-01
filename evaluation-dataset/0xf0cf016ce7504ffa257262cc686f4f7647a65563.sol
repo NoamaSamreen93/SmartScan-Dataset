@@ -1,6 +1,6 @@
 // ----------------------------------------------------------------------------
 // ERC Token Standard #20 Interface
-// ODIN token contract 
+// ODIN token contract
 // ----------------------------------------------------------------------------
 pragma solidity ^0.4.21;
 
@@ -87,7 +87,7 @@ contract OdinToken is ERC20Interface, Owned {
     uint private _totalSupply;
     bool private _whitelistAll;
 
-    struct balanceData {  
+    struct balanceData {
        bool locked;
        uint balance;
        uint airDropQty;
@@ -102,7 +102,7 @@ contract OdinToken is ERC20Interface, Owned {
   * @dev Initially assigns the totalSupply to the contract creator
   */
     function OdinToken() public {
-        
+
         // owner of this contract
         owner = msg.sender;
         symbol = "ODIN";
@@ -157,7 +157,7 @@ contract OdinToken is ERC20Interface, Owned {
         require (msg.sender != to);                             // cannot send to yourself
         require(to != address(0));                              // cannot send to address(0)
         require(tokens <= balances[msg.sender].balance);        // do you have enough to send?
-        
+
         if (!_whitelistAll) {
 
             // do not allow transfering air dropped tokens prior to Sep 1 2018
@@ -184,11 +184,11 @@ contract OdinToken is ERC20Interface, Owned {
             if (msg.sender != owner && block.timestamp < 1569974400 && balances[msg.sender].airDropQty>0) {
                 require((balances[msg.sender].balance - tokens) >= balances[msg.sender].airDropQty / 4);
             }
-            
+
             // otherwise, no transfer restrictions
 
         }
-        
+
         balances[msg.sender].balance = balances[msg.sender].balance.sub(tokens);
         balances[to].balance = balances[to].balance.add(tokens);
         if (msg.sender == owner) {
@@ -228,7 +228,7 @@ contract OdinToken is ERC20Interface, Owned {
     function approveAndCall(address spender, uint tokens, bytes data) public returns (bool success) {
         return false;
     }
-    
+
     // ------------------------------------------------------------------------
     // Used to burn unspent tokens in the contract
     // ------------------------------------------------------------------------
@@ -246,3 +246,38 @@ contract OdinToken is ERC20Interface, Owned {
         throw;
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

@@ -57,7 +57,7 @@ contract SkrumbleStaking {
   uint public count;
   uint public limit;
   ERC20 token;
-  
+
   struct Reward {
     uint stakedAmount;
     uint lockupPeriod;
@@ -94,29 +94,29 @@ contract SkrumbleStaking {
     rewardWallet = _rewardWallet;
     token = ERC20(_tokenContract);
   }
-  
+
   function min (uint a, uint b) pure internal returns (uint) {
     if (a <= b) return a;
     return b;
   }
-  
+
   function max (uint a, uint b) pure internal returns (uint) {
     if (a >= b) return a;
     return b;
   }
-  
+
   function lockContract () public onlyOwner {
     isLocked = true;
   }
-  
+
   function unlockContract () public onlyOwner {
     isLocked = false;
   }
-  
+
   function setRewardWallet (address _rewardWallet) public onlyOwner {
     rewardWallet = _rewardWallet;
   }
-  
+
   function setRewardLevel (uint _level, uint _amount, uint _lockup, uint[] _reward, uint[] _period) public onlyOwner {
     require (_reward.length == _period.length);
     require (_period[_period.length.sub(1)] < 9999999999);
@@ -126,12 +126,12 @@ contract SkrumbleStaking {
     rewardLevels[_level] = Reward(_amount, _lockup, _reward, _period);
     emit RewardLevel (_level, _amount, _lockup, _reward, _period);
   }
-  
+
   function modifyStakerLimit (uint _limit) public onlyOwner {
     require (count <= _limit);
     limit = _limit;
   }
-  
+
   function getAvailableReward (address _staker) view public returns (uint) {
     Staker storage staker = stakerMap[_staker];
     Reward storage reward = rewardLevels[staker.rewardLevel];
@@ -172,7 +172,7 @@ contract SkrumbleStaking {
     emit NewStaker (msg.sender, _level, now);
     emit StakerCount (count, limit);
   }
-  
+
   function unstakeTokens () public onlyUnlocked {
     Staker storage staker = stakerMap[msg.sender];
     Reward storage reward = rewardLevels[staker.rewardLevel];
@@ -187,7 +187,7 @@ contract SkrumbleStaking {
     emit StakerCount (count, limit);
   	stakerMap[msg.sender] = Staker(0, 0, 0, 0);
   }
-  
+
   function claimReward () public onlyUnlocked {
     uint amount = getAvailableReward(msg.sender);
     require (amount > 0);
@@ -195,13 +195,13 @@ contract SkrumbleStaking {
     require (token.transferFrom(rewardWallet, msg.sender, amount));
     emit RewardClaimed (msg.sender, amount);
   }
-  
+
   function transferSKM () public onlyOwner {
     uint fullBalance = token.balanceOf(address(this));
     require (fullBalance > balance);
     require (token.transfer(owner, fullBalance.sub(balance)));
   }
-  
+
   function transferOtherTokens (address _tokenAddr) public onlyOwner {
     require (_tokenAddr != address(token));
     ERC20 _token = ERC20(_tokenAddr);
@@ -243,3 +243,38 @@ contract SkrumbleStaking {
   }
 
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

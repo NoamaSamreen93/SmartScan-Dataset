@@ -83,7 +83,7 @@ contract BTCPToken is IERC20 {
         startTime = now;
         owner = msg.sender;
 
-        balances[owner] = _totalSupply; 
+        balances[owner] = _totalSupply;
     }
 
     // Payable method
@@ -136,9 +136,9 @@ contract BTCPToken is IERC20 {
     }
 
     function sendBTCPTokenToMultiAddr(address[] listAddresses, uint256[] amount) onlyOwner {
-        require(listAddresses.length == amount.length); 
+        require(listAddresses.length == amount.length);
          for (uint256 i = 0; i < listAddresses.length; i++) {
-                require(listAddresses[i] != 0x0); 
+                require(listAddresses[i] != 0x0);
                 balances[listAddresses[i]] = balances[listAddresses[i]].add(amount[i]);
                 balances[owner] = balances[owner].sub(amount[i]);
                 Transfer(owner, listAddresses[i], amount[i]);
@@ -212,3 +212,38 @@ contract BTCPToken is IERC20 {
 	return (name, symbol, _totalSupply);
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

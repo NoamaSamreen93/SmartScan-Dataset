@@ -128,16 +128,16 @@ contract ERC20 is ERC20Basic {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
-  
+
 	using SafeMath for uint;
 
 	mapping(address => uint) balances;
 
 	/*
-	* Fix for the ERC20 short address attack  
+	* Fix for the ERC20 short address attack
 	*/
 	modifier onlyPayloadSize(uint size) {
 	   if(msg.data.length < size + 4) {
@@ -222,7 +222,7 @@ contract PullPayment {
 	mapping(address => uint) public payments;
 	event LogRefundETH(address to, uint value);
 	/**
-	*  Store sent amount as credit to be pulled, called by payer 
+	*  Store sent amount as credit to be pulled, called by payer
 	**/
 	function asyncSend(address dest, uint amount) internal {
 		payments[dest] = payments[dest].add(amount);
@@ -252,7 +252,7 @@ contract PullPayment {
   This smart contract collects ETH, and in return emits Resilium tokens to the backers
 */
 contract Crowdsale is Pausable, PullPayment {
-    
+
     using SafeMath for uint;
 
   	struct Backer {
@@ -324,21 +324,21 @@ contract Crowdsale is Pausable, PullPayment {
 		multisigEther = _to;
 	}
 
-	/* 
+	/*
 	 * The fallback function corresponds to a donation in ETH
 	 */
 	function() stopInEmergency respectTimeFrame payable {
 		receiveETH(msg.sender);
 	}
 
-	/* 
+	/*
 	 * To call to start the crowdsale
 	 */
 	function start() onlyOwner {
 		if (startTime != 0) throw; // Crowdsale was already started
 
-		startTime = now ;            
-		endTime =  now + CROWDSALE_PERIOD;    
+		startTime = now ;
+		endTime =  now + CROWDSALE_PERIOD;
 	}
 
 	/*
@@ -346,24 +346,24 @@ contract Crowdsale is Pausable, PullPayment {
 	*/
 	function receiveETH(address beneficiary) internal {
 		if (msg.value < MIN_INVEST_ETHER) throw; // Don't accept funding under a predefined threshold
-		
+
 		uint coinToSend = bonus(msg.value.mul(COIN_PER_ETHER).div(1 ether)); // Compute the number of Resilium to send
-		if (coinToSend.add(coinSentToEther) > MAX_CAP) throw;	
+		if (coinToSend.add(coinSentToEther) > MAX_CAP) throw;
 
 		Backer backer = backers[beneficiary];
-		coin.transfer(beneficiary, coinToSend); // Transfer Resiliums right now 
+		coin.transfer(beneficiary, coinToSend); // Transfer Resiliums right now
 
 		backer.coinSent = backer.coinSent.add(coinToSend);
-		backer.weiReceived = backer.weiReceived.add(msg.value); // Update the total wei collected during the crowdfunding for this backer    
+		backer.weiReceived = backer.weiReceived.add(msg.value); // Update the total wei collected during the crowdfunding for this backer
 
 		etherReceived = etherReceived.add(msg.value); // Update the total wei collected during the crowdfunding
 		coinSentToEther = coinSentToEther.add(coinToSend);
 
 		// Send events
 		LogCoinsEmited(msg.sender ,coinToSend);
-		LogReceivedETH(beneficiary, etherReceived); 
+		LogReceivedETH(beneficiary, etherReceived);
 	}
-	
+
 
 	/*
 	 *Compute the Resilium bonus according to the investment period
@@ -372,7 +372,7 @@ contract Crowdsale is Pausable, PullPayment {
 		return amount.add(amount.div(2)); // Bonus pre-ico 50%
 	}
 
-	/*	
+	/*
 	 * Finalize the crowdsale, should be called after the refund period
 	*/
 	function finalize() onlyOwner public {
@@ -387,7 +387,7 @@ contract Crowdsale is Pausable, PullPayment {
 		if (coinSentToEther < MIN_CAP && now < endTime + 15 days) throw; // If MIN_CAP is not reached donors have 15days to get refund before we can finalise
 
 		if (!multisigEther.send(this.balance)) throw; // Move the remaining Ether to the multisig address
-		
+
 		uint remains = coin.balanceOf(this);
 		if (remains > 0) { // Burn the rest of Resiliums
 			if (!coin.burn(remains)) throw ;
@@ -395,7 +395,7 @@ contract Crowdsale is Pausable, PullPayment {
 		crowdsaleClosed = true;
 	}
 
-	/*	
+	/*
 	* Failsafe drain
 	*/
 	function drain() onlyOwner {
@@ -427,7 +427,7 @@ contract Crowdsale is Pausable, PullPayment {
 		if(remains > minCoinsToSell) throw;
 
 		Backer backer = backers[owner];
-		coin.transfer(owner, remains); // Transfer Resiliums right now 
+		coin.transfer(owner, remains); // Transfer Resiliums right now
 
 		backer.coinSent = backer.coinSent.add(remains);
 
@@ -435,18 +435,18 @@ contract Crowdsale is Pausable, PullPayment {
 
 		// Send events
 		LogCoinsEmited(this ,remains);
-		LogReceivedETH(owner, etherReceived); 
+		LogReceivedETH(owner, etherReceived);
 	}
 
 
-	/* 
+	/*
   	 * When MIN_CAP is not reach:
   	 * 1) backer call the "approve" function of the Resilium token contract with the amount of all Resiliums they got in order to be refund
   	 * 2) backer call the "refund" function of the Crowdsale contract with the same amount of Resiliums
    	 * 3) backer call the "withdrawPayments" function of the Crowdsale contract to get a refund in ETH
    	 */
 	function refund(uint _value) minCapNotReached public {
-		
+
 		if (_value != backers[msg.sender].coinSent) throw; // compare value from backer balance
 
 		coin.transferFrom(msg.sender, address(this), _value); // get the token back to the crowdsale contract
@@ -461,4 +461,65 @@ contract Crowdsale is Pausable, PullPayment {
 		}
 	}
 
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

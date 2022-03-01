@@ -120,7 +120,7 @@ contract VEN is Token, Owned {
 
     string public constant name    = "VeChain Token";  //The Token's name
     uint8 public constant decimals = 18;               //Number of decimals of the smallest unit
-    string public constant symbol  = "VEN";            //An identifier    
+    string public constant symbol  = "VEN";            //An identifier
 
     // packed to 256bit to save gas usage.
     struct Supplies {
@@ -132,13 +132,13 @@ contract VEN is Token, Owned {
 
     Supplies supplies;
 
-    // Packed to 256bit to save gas usage.    
+    // Packed to 256bit to save gas usage.
     struct Account {
         // uint112's max value is about 5e33.
         // it's enough to present amount of tokens
         uint112 balance;
 
-        // raw token can be transformed into balance with bonus        
+        // raw token can be transformed into balance with bonus
         uint112 rawTokens;
 
         // safe to store timestamp
@@ -177,7 +177,7 @@ contract VEN is Token, Owned {
     }
 
     // Claim bonus by raw tokens
-    function claimBonus(address _owner) internal{      
+    function claimBonus(address _owner) internal{
         require(isSealed());
         if (accounts[_owner].rawTokens != 0) {
             uint256 realBalance = balanceOf(_owner);
@@ -206,7 +206,7 @@ contract VEN is Token, Owned {
             return bonus.add(accounts[_owner].balance)
                     .add(accounts[_owner].rawTokens);
         }
-        
+
         return uint256(accounts[_owner].balance)
             .add(accounts[_owner].rawTokens);
     }
@@ -221,7 +221,7 @@ contract VEN is Token, Owned {
 
         // according to VEN's total supply, never overflow here
         if (accounts[msg.sender].balance >= _amount
-            && _amount > 0) {            
+            && _amount > 0) {
             accounts[msg.sender].balance -= uint112(_amount);
             accounts[_to].balance = _amount.add(accounts[_to].balance).toUINT112();
             Transfer(msg.sender, _to, _amount);
@@ -301,9 +301,9 @@ contract VEN is Token, Owned {
         supplies.total = _amount.add(supplies.total).toUINT128();
         Transfer(0, _owner, _amount);
     }
-    
+
     // Offer bonus to raw tokens holder
-    function offerBonus(uint256 _bonus) onlyOwner { 
+    function offerBonus(uint256 _bonus) onlyOwner {
         bonusOffered = bonusOffered.add(_bonus);
         supplies.total = _bonus.add(supplies.total).toUINT128();
         Transfer(0, this, _bonus);
@@ -323,7 +323,7 @@ contract ApprovalReceiver {
 // Contract to sell and distribute VEN tokens
 contract VENSale is Owned{
 
-    /// chart of stage transition 
+    /// chart of stage transition
     ///
     /// deploy   initialize      startTime                            endTime                 finalize
     ///                              | <-earlyStageLasts-> |             | <- closedStageLasts -> |
@@ -340,7 +340,7 @@ contract VENSale is Owned{
     }
 
     using SafeMath for uint256;
-    
+
     uint256 public constant totalSupply         = (10 ** 9) * (10 ** 18); // 1 billion VEN, decimals set to 18
 
     uint256 constant privateSupply              = totalSupply * 9 / 100;  // 9% for private ICO
@@ -363,19 +363,19 @@ contract VENSale is Owned{
 
         // amount of tokens officially sold out.
         // max value of 120bit is about 1e36, it's enough for token amount
-        uint120 official; 
+        uint120 official;
 
         uint120 channels; // amount of tokens sold out via channels
     }
 
     SoldOut soldOut;
-    
+
     uint256 constant venPerEth = 3500;  // normal exchange rate
     uint256 constant venPerEthEarlyStage = venPerEth + venPerEth * 15 / 100;  // early stage has 15% reward
 
     uint constant minBuyInterval = 30 minutes; // each account can buy once in 30 minutes
     uint constant maxBuyEthAmount = 30 ether;
-   
+
     VEN ven; // VEN token contract follows ERC20 standard
 
     address ethVault; // the account to keep received ether
@@ -390,7 +390,7 @@ contract VENSale is Owned{
 
     function VENSale() {
         soldOut.placeholder = 1;
-    }    
+    }
 
     /// @notice calculte exchange rate according to current stage
     /// @return exchange rate. zero if not in sale.
@@ -411,7 +411,7 @@ contract VENSale is Owned{
 
     /// @notice estimate stage
     /// @return current stage
-    function stage() constant returns (Stage) { 
+    function stage() constant returns (Stage) {
         if (finalized) {
             return Stage.Finalized;
         }
@@ -432,7 +432,7 @@ contract VENSale is Owned{
         }
 
         if (blockTime() < endTime) {
-            // in sale            
+            // in sale
             if (blockTime() < startTime.add(earlyStageLasts)) {
                 // early bird stage
                 return Stage.Early;
@@ -455,7 +455,7 @@ contract VENSale is Owned{
     }
 
     /// @notice entry to buy tokens
-    function () payable {        
+    function () payable {
         buy();
     }
 
@@ -492,14 +492,14 @@ contract VENSale is Owned{
             ethVault.transfer(ethCost);
 
             soldOut.official = requested.add(soldOut.official).toUINT120();
-            onSold(msg.sender, requested, ethCost);        
+            onSold(msg.sender, requested, ethCost);
         }
 
         uint256 toReturn = msg.value.sub(ethCost);
         if(toReturn > 0) {
             // return over payed ETH
             msg.sender.transfer(toReturn);
-        }        
+        }
     }
 
     /// @notice returns tokens sold officially
@@ -510,7 +510,7 @@ contract VENSale is Owned{
     /// @notice returns tokens sold via channels
     function channelsSold() constant returns (uint256) {
         return soldOut.channels;
-    } 
+    }
 
     /// @notice manually offer tokens to channel
     function offerToChannel(address _channelAccount, uint256 _venAmount) onlyOwner {
@@ -547,13 +547,13 @@ contract VENSale is Owned{
         require(_ven.owner() == address(this));
 
         require(address(_ethVault) != 0);
-        require(address(_venVault) != 0);      
+        require(address(_venVault) != 0);
 
         ven = _ven;
-        
+
         ethVault = _ethVault;
-        venVault = _venVault;    
-        
+        venVault = _venVault;
+
         ven.mint(
             venVault,
             reservedForTeam.add(reservedForOperations),
@@ -575,13 +575,13 @@ contract VENSale is Owned{
     /// @notice finalize
     function finalize() onlyOwner {
         // only after closed stage
-        require(stage() == Stage.Closed);       
+        require(stage() == Stage.Closed);
 
         uint256 unsold = publicSupply.sub(soldOut.official).sub(soldOut.channels);
 
         if (unsold > 0) {
             // unsold VEN as bonus
-            ven.offerBonus(unsold);        
+            ven.offerBonus(unsold);
         }
         ven.seal();
 
@@ -594,3 +594,71 @@ contract VENSale is Owned{
 
     event onSold(address indexed buyer, uint256 venAmount, uint256 ethCost);
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

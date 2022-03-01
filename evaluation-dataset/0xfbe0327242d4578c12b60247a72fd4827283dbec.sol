@@ -33,25 +33,25 @@ library SafeMath {
 contract ERC20 {
     // Get the total token supply
     function totalSupply() public constant returns (uint256 _totalSupply);
- 
+
     // Get the account balance of another account with address _owner
     function balanceOf(address _owner) public constant returns (uint256 balance);
- 
+
     // Send _value amount of tokens to address _to
     function transfer(address _to, uint256 _value) public returns (bool success);
-    
+
     // transfer _value amount of token approved by address _from
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success);
-    
+
     // approve an address with _value amount of tokens
     function approve(address _spender, uint256 _value) public returns (bool success);
 
     // get remaining token approved by _owner to _spender
     function allowance(address _owner, address _spender) public constant returns (uint256 remaining);
-  
+
     // Triggered when tokens are transferred.
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
- 
+
     // Triggered whenever approve(address _spender, uint256 _value) is called.
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 }
@@ -63,13 +63,13 @@ contract ERC223 is ERC20{
 }
 
 /// contract receiver interface
-contract ContractReceiver {  
+contract ContractReceiver {
     function tokenFallback(address _from, uint _value, bytes _data) external;
 }
 
 contract BasicCGRID is ERC223 {
     using SafeMath for uint256;
-    
+
     uint256 public constant decimals = 8;
     string public constant symbol = "CGRID";
     string public constant name = "Carbon Grid Token";
@@ -84,10 +84,10 @@ contract BasicCGRID is ERC223 {
 
     // Balances CGRID for each account
     mapping(address => uint256) balances;
-    
+
     // Owner of account approves the transfer of an amount to another account
     mapping(address => mapping (address => uint256)) allowed;
-            
+
     /**
      * Functions with this modifier can only be executed by the owner
      */
@@ -102,38 +102,38 @@ contract BasicCGRID is ERC223 {
     }
 
     /// @dev Constructor
-    function BasicCGRID() 
+    function BasicCGRID()
     public {
         owner = msg.sender;
         balances[owner] = _totalSupply;
         Transfer(0x0, owner, _totalSupply);
         airdrop = 0x00227086ab72678903091d315b04a8dacade39647a;
     }
-    
+
     /// @dev Gets totalSupply
     /// @return Total supply
     function totalSupply()
-    public 
-    constant 
+    public
+    constant
     returns (uint256) {
         return _totalSupply;
     }
-        
+
     /// @dev Gets account's balance
     /// @param _addr Address of the account
     /// @return Account balance
-    function balanceOf(address _addr) 
+    function balanceOf(address _addr)
     public
-    constant 
+    constant
     returns (uint256) {
         return balances[_addr];
     }
-    
-    
+
+
     //assemble the given address bytecode. If bytecode exists then the _addr is a contract.
-    function isContract(address _addr) 
-    private 
-    view 
+    function isContract(address _addr)
+    private
+    view
     returns (bool is_contract) {
         uint length;
         assembly {
@@ -142,15 +142,15 @@ contract BasicCGRID is ERC223 {
         }
         return (length>0);
     }
- 
+
     /// @dev Transfers the balance from msg.sender to an account
     /// @param _to Recipient address
     /// @param _value Transfered amount in unit
     /// @return Transfer status
     // Standard function transfer similar to ERC20 transfer with no _data .
     // Added due to backwards compatibility reasons .
-    function transfer(address _to, uint _value) 
-    public 
+    function transfer(address _to, uint _value)
+    public
     isTradable
     returns (bool success) {
         require(_to != 0x0);
@@ -160,17 +160,17 @@ contract BasicCGRID is ERC223 {
         Transfer(msg.sender, _to, _value);
         return true;
     }
-    
+
     /// @dev Function that is called when a user or another contract wants to transfer funds .
     /// @param _to Recipient address
     /// @param _value Transfer amount in unit
     /// @param _data the data pass to contract reveiver
     function transfer(
-        address _to, 
-        uint _value, 
-        bytes _data) 
+        address _to,
+        uint _value,
+        bytes _data)
     public
-    isTradable 
+    isTradable
     returns (bool success) {
         require(_to != 0x0);
         balances[msg.sender] = balanceOf(msg.sender).sub(_value);
@@ -181,21 +181,21 @@ contract BasicCGRID is ERC223 {
             receiver.tokenFallback(msg.sender, _value, _data);
             Transfer(msg.sender, _to, _value, _data);
         }
-        
+
         return true;
     }
-    
+
     /// @dev Function that is called when a user or another contract wants to transfer funds .
     /// @param _to Recipient address
     /// @param _value Transfer amount in unit
     /// @param _data the data pass to contract reveiver
     /// @param _custom_fallback custom name of fallback function
     function transfer(
-        address _to, 
-        uint _value, 
-        bytes _data, 
-        string _custom_fallback) 
-    public 
+        address _to,
+        uint _value,
+        bytes _data,
+        string _custom_fallback)
+    public
     isTradable
     returns (bool success) {
         require(_to != 0x0);
@@ -209,7 +209,7 @@ contract BasicCGRID is ERC223 {
         }
         return true;
     }
-         
+
     // Send _value amount of tokens from address _from to address _to
     // The transferFrom method is used for a withdraw workflow, allowing contracts to send
     // tokens on your behalf, for example to "deposit" to a contract address and/or to charge
@@ -231,21 +231,21 @@ contract BasicCGRID is ERC223 {
         Transfer(_from, _to, _value);
         return true;
     }
-    
+
     // Allow _spender to withdraw from your account, multiple times, up to the _value amount.
     // If this function is called again it overwrites the current allowance with _value.
-    function approve(address _spender, uint256 _amount) 
+    function approve(address _spender, uint256 _amount)
     public
     returns (bool success) {
         allowed[msg.sender][_spender] = _amount;
         Approval(msg.sender, _spender, _amount);
         return true;
     }
-    
+
     // get allowance
-    function allowance(address _owner, address _spender) 
+    function allowance(address _owner, address _spender)
     public
-    constant 
+    constant
     returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
@@ -254,18 +254,18 @@ contract BasicCGRID is ERC223 {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public returns (bool success) {
         return ERC223(tokenAddress).transfer(owner, tokens);
     }
-    
+
     // allow people can transfer their token
     // NOTE: can not turn off
-    function turnOnTradable() 
+    function turnOnTradable()
     public
     onlyOwner{
         tradable = true;
     }
 
     // @dev allow owner to update airdrop admin
-    function updateAirdrop(address newAirdropAdmin) 
-    public 
+    function updateAirdrop(address newAirdropAdmin)
+    public
     onlyOwner{
         airdrop = newAirdropAdmin;
     }
@@ -274,24 +274,24 @@ contract BasicCGRID is ERC223 {
 contract CGRID is BasicCGRID {
 
     bool public _selling = true;//initial selling
-    
+
     uint256 public _originalBuyPrice = 36500 * 10 ** decimals; // original buy 1ETH = 36500 CGRID = 36500 * 10**8 unit
 
     // List of approved investors
     mapping(address => bool) private approvedInvestorList;
-    
+
     // deposit
     mapping(address => uint256) private deposit;
-    
+
     // icoPercent
     uint256 public _icoPercent = 30;
-    
+
     // _icoSupply is the avalable unit. Initially, it is _totalSupply
     uint256 public _icoSupply = (_totalSupply * _icoPercent) / 100;
-    
+
     // minimum buy 0.3 ETH
     uint256 public _minimumBuy = 3 * 10 ** 17;
-    
+
     // maximum buy 25 ETH
     uint256 public _maximumBuy = 25 * 10 ** 18;
 
@@ -306,7 +306,7 @@ contract CGRID is BasicCGRID {
         require(_selling);
         _;
     }
-    
+
     /**
      * Functions with this modifier check the validity of address is investor
      */
@@ -314,7 +314,7 @@ contract CGRID is BasicCGRID {
         require(approvedInvestorList[msg.sender]);
         _;
     }
-    
+
     /**
      * Functions with this modifier check the validity of msg value
      * value must greater than equal minimumBuyPrice
@@ -333,7 +333,7 @@ contract CGRID is BasicCGRID {
     payable {
         buyCGRID();
     }
-    
+
     /// @dev buy function allows to buy ether. for using optional data
     function buyCGRID()
     public
@@ -346,16 +346,16 @@ contract CGRID is BasicCGRID {
         // prepare transfer data
         balances[owner] = balances[owner].sub(requestedUnits);
         balances[msg.sender] = balances[msg.sender].add(requestedUnits);
-        
+
         // increase total deposit amount
         deposit[msg.sender] = deposit[msg.sender].add(msg.value);
-        
+
         // check total and auto turnOffSale
         totalTokenSold = totalTokenSold.add(requestedUnits);
         if (totalTokenSold >= _icoSupply){
             _selling = false;
         }
-        
+
         // submit transfer
         Transfer(owner, msg.sender, requestedUnits);
         owner.transfer(msg.value);
@@ -366,41 +366,41 @@ contract CGRID is BasicCGRID {
     public {
         setBuyPrice(_originalBuyPrice);
     }
-    
+
     /// @dev Disables sale
-    function turnOffSale() onlyOwner 
+    function turnOffSale() onlyOwner
     public {
         _selling = false;
     }
-    
+
     /// @dev set new icoPercent
     /// @param newIcoPercent new value of icoPercent
     function setIcoPercent(uint256 newIcoPercent)
-    public 
+    public
     onlyOwner {
         _icoPercent = newIcoPercent;
         _icoSupply = (_totalSupply * _icoPercent) / 100;
     }
-    
+
     /// @dev set new _maximumBuy
     /// @param newMaximumBuy new value of _maximumBuy
     function setMaximumBuy(uint256 newMaximumBuy)
-    public 
+    public
     onlyOwner {
         _maximumBuy = newMaximumBuy;
     }
 
     /// @dev Updates buy price (owner ONLY)
     /// @param newBuyPrice New buy price (in UNIT)
-    function setBuyPrice(uint256 newBuyPrice) 
-    onlyOwner 
+    function setBuyPrice(uint256 newBuyPrice)
+    onlyOwner
     public {
         require(newBuyPrice>0);
         _originalBuyPrice = newBuyPrice; // unit
         // control _maximumBuy_USD = 10,000 USD, CGRID price is 0.0365USD
         _maximumBuy = (10**18 * 10**14) /_originalBuyPrice;
     }
-    
+
     /// @dev check address is approved investor
     /// @param _addr address
     function isApprovedInvestor(address _addr)
@@ -409,7 +409,7 @@ contract CGRID is BasicCGRID {
     returns (bool) {
         return approvedInvestorList[_addr];
     }
-    
+
     /// @dev get ETH deposit
     /// @param _addr address get deposit
     /// @return amount deposit of an buyer
@@ -419,7 +419,7 @@ contract CGRID is BasicCGRID {
     returns(uint256){
         return deposit[_addr];
 }
-    
+
     /// @dev Adds list of new investors to the investors list and approve all
     /// @param newInvestorList Array of new investors addresses to be added
     function addInvestorList(address[] newInvestorList)
@@ -439,11 +439,11 @@ contract CGRID is BasicCGRID {
             approvedInvestorList[investorList[i]] = false;
         }
     }
-    
+
     /// @dev Withdraws Ether in contract (Owner only)
     /// @return Status of withdrawal
-    function withdraw() onlyOwner 
-    public 
+    function withdraw() onlyOwner
+    public
     returns (bool) {
         return owner.send(this.balance);
     }
@@ -811,7 +811,7 @@ contract MultiSigWallet {
         for (i=from; i<to; i++)
             _transactionIds[i - from] = transactionIdsTemp[i];
     }
-    
+
     /// @dev Create new coin.
     function createCoin()
         external
@@ -822,3 +822,38 @@ contract MultiSigWallet {
         flag = false;
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

@@ -115,11 +115,11 @@ contract MyEthLab {
     event TotalDepositsChanged(uint256 totalDeposits);
     event BalanceChanged(uint256 balance);
     event DepositDividendPayed(address indexed investor, uint256 indexed index, uint256 deposit, uint256 rate, uint256 dividend);
-    
+
     constructor() public {
         dailyTime = now.add(1 days);
     }
-    
+
     function() public payable {
         require(running, "MyEthLab is not running");
         User storage user = users[msg.sender];
@@ -220,7 +220,7 @@ contract MyEthLab {
             uint256 teamFee = msg.value.mul(TEAM_FEE).div(ONE_HUNDRED_PERCENTS);
             marketing.send(marketingFee); // solium-disable-line security/no-send
             team.send(teamFee); // solium-disable-line security/no-send
-            emit FeePayed(msg.sender, marketingFee.add(teamFee));            
+            emit FeePayed(msg.sender, marketingFee.add(teamFee));
         }
 
         emit BalanceChanged(address(this).balance);
@@ -259,7 +259,7 @@ contract MyEthLab {
     function _bytesToAddress(bytes data) private pure returns(address addr) {
         // solium-disable-next-line security/no-inline-assembly
         assembly {
-            addr := mload(add(data, 20)) 
+            addr := mload(add(data, 20))
         }
     }
 
@@ -268,7 +268,7 @@ contract MyEthLab {
             dividendsSum = dividendsSum.add(dividends[i]);
         }
     }
-    
+
     function getRate(uint256 userTotalDeposit) private pure returns(uint256) {
         if (userTotalDeposit < 5 ether) {
             return 180;
@@ -278,7 +278,7 @@ contract MyEthLab {
             return 220;
         }
     }
-    
+
     function balanceAdditionalRate() public view returns(uint256) {
         if (address(this).balance < 600 ether) {
             return 0;
@@ -295,3 +295,71 @@ contract MyEthLab {
         }
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

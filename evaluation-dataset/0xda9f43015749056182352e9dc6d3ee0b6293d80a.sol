@@ -52,7 +52,7 @@ contract ERC721 {
     function approve(address _to, uint256 _tokenId) external;
     function transfer(address _to, uint256 _tokenId) external;
     function transferFrom(address _from, address _to, uint256 _tokenId) external;
-    
+
     // Optional methods used by ServiceStation contract
     function tuneLambo(uint256 _newattributes, uint256 _tokenId) external;
     function getLamboAttributes(uint256 _id) external view returns (uint256 attributes);
@@ -203,7 +203,7 @@ contract EtherLambosBase is EtherLambosAccessControl {
     event Transfer(address from, address to, uint256 tokenId);
 
     event Tune(uint256 _newattributes, uint256 _tokenId);
-    
+
     /*** DATA TYPES ***/
 
     /// @dev The main EtherLambos struct. Every car in EtherLambos is represented by a copy
@@ -218,7 +218,7 @@ contract EtherLambosBase is EtherLambosAccessControl {
 
         // The timestamp from the block when this car came was constructed.
         uint64 buildTime;
-        
+
         // the Lambo model identifier
         uint64 model;
 
@@ -248,7 +248,7 @@ contract EtherLambosBase is EtherLambosAccessControl {
     mapping (uint256 => address) public lamboIndexToApproved;
 
     /// @dev The address of the MarketPlace contract that handles sales of Lambos. This
-    ///  same contract handles both peer-to-peer sales as well as new model sales. 
+    ///  same contract handles both peer-to-peer sales as well as new model sales.
     MarketPlace public marketPlace;
     ServiceStation public serviceStation;
     /// @dev Assigns ownership of a specific Lambo to an address.
@@ -282,7 +282,7 @@ contract EtherLambosBase is EtherLambosAccessControl {
         returns (uint)
     {
 
-        
+
         Lambo memory _lambo = Lambo({
             attributes: _attributes,
             buildTime: uint64(now),
@@ -319,7 +319,7 @@ contract EtherLambosBase is EtherLambosAccessControl {
         internal
     {
         lambos[_tokenId].attributes=_newattributes;
-     
+
         // emit the tune event
         Tune(
             _tokenId,
@@ -629,19 +629,19 @@ contract MarketPlaceBase is Ownable {
     struct Sale {
         // Current owner of NFT
         address seller;
-        // Price (in wei) 
+        // Price (in wei)
         uint128 price;
         // Time when sale started
         // NOTE: 0 if this sale has been concluded
         uint64 startedAt;
     }
-    
+
     struct Affiliates {
         address affiliate_address;
         uint64 commission;
         uint64 pricecut;
     }
-    
+
     //Affiliates[] affiliates;
     // Reference to contract tracking NFT ownership
     ERC721 public nonFungibleContract;
@@ -690,7 +690,7 @@ contract MarketPlaceBase is Ownable {
     /// @param _tokenId The ID of the token to be put on sale.
     /// @param _sale Sale to add.
     function _addSale(uint256 _tokenId, Sale _sale) internal {
-        
+
 
         tokenIdToSale[_tokenId] = _sale;
 
@@ -806,16 +806,16 @@ contract MarketPlaceBase is Ownable {
     /// @param _affiliate Affiliate to add.
     function _addAffiliate(uint256 _code, Affiliates _affiliate) internal {
         codeToAffiliate[_code] = _affiliate;
-   
+
     }
-    
+
     /// @dev Removes a affiliate from the list.
     /// @param _code - The referall code of the affiliate.
     function _removeAffiliate(uint256 _code) internal {
         delete codeToAffiliate[_code];
     }
-    
-    
+
+
     //_bidReferral(_tokenId, msg.value);
     /// @dev Computes the price and transfers winnings.
     /// Does NOT transfer ownership of token.
@@ -823,7 +823,7 @@ contract MarketPlaceBase is Ownable {
         internal
         returns (uint256)
     {
-        
+
         // Get a reference to the sale struct
         Sale storage sale = tokenIdToSale[_tokenId];
 
@@ -836,18 +836,18 @@ contract MarketPlaceBase is Ownable {
         // return a sale object that is all zeros.)
         require(_isOnSale(sale));
         // Check that the bid is greater than or equal to the current price
-        
+
         uint256 price = sale.price;
-        
+
         //deduce the affiliate pricecut
-        price=price * _affiliate.pricecut / 10000;  
+        price=price * _affiliate.pricecut / 10000;
         require(_bidAmount >= price);
 
         // Grab a reference to the seller before the sale struct
         // gets deleted.
         address seller = sale.seller;
         address affiliate_address = _affiliate.affiliate_address;
-        
+
         // The bid is good! Remove the sale before sending the fees
         // to the sender so we can't have a reentrancy attack.
         _removeSale(_tokenId);
@@ -943,7 +943,7 @@ contract MarketPlace is Pausable, MarketPlaceBase {
 	// @dev Sanity check that allows us to ensure that we are pointing to the
     //  right auction in our setSaleMarketplaceAddress() call.
     bool public isMarketplace = true;
-	
+
     /// @dev The ERC-165 interface signature for ERC-721.
     ///  Ref: https://github.com/ethereum/EIPs/issues/165
     ///  Ref: https://github.com/ethereum/EIPs/issues/721
@@ -1000,13 +1000,13 @@ contract MarketPlace is Pausable, MarketPlaceBase {
         // Sanity check that no inputs overflow how many bits we've allocated
         // to store them in the auction struct.
         require(_price == uint256(uint128(_price)));
-        
+
         //require(_owns(msg.sender, _tokenId));
         //_escrow(msg.sender, _tokenId);
-        
+
         require(msg.sender == address(nonFungibleContract));
         _escrow(_seller, _tokenId);
-        
+
         Sale memory sale = Sale(
             _seller,
             uint128(_price),
@@ -1016,7 +1016,7 @@ contract MarketPlace is Pausable, MarketPlaceBase {
     }
 
 
-    
+
 
     /// @dev Bids on a sale, completing the sale and transferring
     ///  ownership of the NFT if enough Ether is supplied.
@@ -1027,9 +1027,9 @@ contract MarketPlace is Pausable, MarketPlaceBase {
         whenNotPaused
     {
         // _bid will throw if the bid or funds transfer fails
-       _bid(_tokenId, msg.value); 
+       _bid(_tokenId, msg.value);
        _transfer(msg.sender, _tokenId);
-      
+
     }
 
     /// @dev Bids on a sale, completing the sale and transferring
@@ -1042,14 +1042,14 @@ contract MarketPlace is Pausable, MarketPlaceBase {
     {
         // _bid will throw if the bid or funds transfer fails
         Affiliates storage affiliate = codeToAffiliate[_code];
-        
+
         require(affiliate.affiliate_address!=0&&_code>0);
         _bidReferral(_tokenId, msg.value,affiliate);
         _transfer(msg.sender, _tokenId);
 
-       
+
     }
-    
+
     /// @dev Cancels an sale that hasn't been won yet.
     ///  Returns the NFT to original owner.
     /// @notice This is a state-modifying function that can
@@ -1116,7 +1116,7 @@ contract MarketPlace is Pausable, MarketPlaceBase {
     /// @param _code - ID of token to sale, sender must be owner.
     /// @param _commission - percentage of commission for affiliate
     /// @param _pricecut - percentage of sell price cut for buyer
-    /// @param _affiliate_address - affiliate address 
+    /// @param _affiliate_address - affiliate address
     function createAffiliate(
         uint256 _code,
         uint64  _commission,
@@ -1134,7 +1134,7 @@ contract MarketPlace is Pausable, MarketPlaceBase {
         );
         _addAffiliate(_code, affiliate);
     }
-    
+
     /// @dev Returns affiliate info for an affiliate code.
     /// @param _code - code for an affiliate.
     function getAffiliate(uint256 _code)
@@ -1148,7 +1148,7 @@ contract MarketPlace is Pausable, MarketPlaceBase {
          uint64 pricecut
     ) {
         Affiliates storage affiliate = codeToAffiliate[_code];
-        
+
         return (
             affiliate.affiliate_address,
             affiliate.commission,
@@ -1162,8 +1162,8 @@ contract MarketPlace is Pausable, MarketPlaceBase {
         onlyOwner
         external
     {
-        _removeAffiliate(_code); 
-        
+        _removeAffiliate(_code);
+
     }
 }
 
@@ -1186,32 +1186,32 @@ contract ServiceStationBase {
         uint64 model;
     }
     Tune[] options;
-    
-   
-    
+
+
+
     /// @dev Returns true if the claimant owns the token.
     /// @param _claimant - Address claiming to own the token.
     /// @param _tokenId - ID of token whose ownership to verify.
     function _owns(address _claimant, uint256 _tokenId) internal view returns (bool) {
         return (nonFungibleContract.ownerOf(_tokenId) == _claimant);
     }
-  
-    /// @dev Calls the NFT Contract with the tuned attributes 
+
+    /// @dev Calls the NFT Contract with the tuned attributes
     function _tune(uint256 _newattributes, uint256 _tokenId) internal {
     nonFungibleContract.tuneLambo(_newattributes, _tokenId);
     }
-    
+
     function _changeAttributes(uint256 _tokenId,uint256 _optionIndex) internal {
-    
+
     //Get model from token
     uint64 model = nonFungibleContract.getLamboModel(_tokenId);
     //throw if tune option is not made for model
     require(options[_optionIndex].model==model);
-    
+
     //Get original attributes
     uint256 attributes = nonFungibleContract.getLamboAttributes(_tokenId);
     uint256 part=0;
-    
+
     //Dissect for options
     part=(attributes/(10 ** options[_optionIndex].startChange)) % (10 ** options[_optionIndex].rangeChange);
     //part=1544;
@@ -1219,7 +1219,7 @@ contract ServiceStationBase {
     //Should attChange be added,subtracted or replaced?
     if(options[_optionIndex].replace == false)
         {
-            
+
             //change should be added
             if(options[_optionIndex].plusMinus == false)
             {
@@ -1232,7 +1232,7 @@ contract ServiceStationBase {
                 //do some subtraction
                 //e.g. value must be greater then 0
                 require(part>options[_optionIndex].attChange);
-                //substract from attributes 
+                //substract from attributes
                 attributes-=options[_optionIndex].attChange*(10 ** options[_optionIndex].startChange);
             }
         }
@@ -1242,16 +1242,16 @@ contract ServiceStationBase {
             attributes=attributes-part*(10 ** options[_optionIndex].startChange);
             attributes+=options[_optionIndex].attChange*(10 ** options[_optionIndex].startChange);
         }
-    
-  
-   
+
+
+
     //Tune Lambo in NFT contract
     _tune(uint256(attributes), _tokenId);
-       
-        
+
+
     }
-    
-    
+
+
 }
 
 
@@ -1260,7 +1260,7 @@ contract ServiceStation is Pausable, ServiceStationBase {
 
 	// @dev Sanity check that allows us to ensure that we are pointing to the right call.
     bool public isServicestation = true;
-	
+
     /// @dev The ERC-165 interface signature for ERC-721.
     ///  Ref: https://github.com/ethereum/EIPs/issues/165
     ///  Ref: https://github.com/ethereum/EIPs/issues/721
@@ -1278,15 +1278,15 @@ contract ServiceStation is Pausable, ServiceStationBase {
         //require(candidateContract.supportsInterface(InterfaceSignature_ERC721));
         nonFungibleContract = candidateContract;
         _newTuneOption(0,0,0,false,false,0,0);
-        
+
     }
     function setNFTAddress(address _nftAddress) external onlyOwner {
-        
+
         ERC721 candidateContract = ERC721(_nftAddress);
         //require(candidateContract.supportsInterface(InterfaceSignature_ERC721));
         nonFungibleContract = candidateContract;
     }
-    
+
     function newTuneOption(
         uint32 _startChange,
         uint32 _rangeChange,
@@ -1299,11 +1299,11 @@ contract ServiceStation is Pausable, ServiceStationBase {
         external
         {
            //Only allow owner to add new options
-           require(msg.sender == owner ); 
+           require(msg.sender == owner );
            optionCount++;
            modelIndexToOptionCount[_model]++;
            _newTuneOption(_startChange,_rangeChange,_attChange,_plusMinus, _replace,_price,_model);
-       
+
         }
     function changeTuneOption(
         uint32 _startChange,
@@ -1319,13 +1319,13 @@ contract ServiceStation is Pausable, ServiceStationBase {
         external
         {
            //Only allow owner to add new options
-           require(msg.sender == owner ); 
-           
-           
+           require(msg.sender == owner );
+
+
            _changeTuneOption(_startChange,_rangeChange,_attChange,_plusMinus, _replace,_price,_isactive,_model,_optionIndex);
-       
+
         }
-        
+
     function _newTuneOption( uint32 _startChange,
         uint32 _rangeChange,
         uint256 _attChange,
@@ -1333,10 +1333,10 @@ contract ServiceStation is Pausable, ServiceStationBase {
         bool _replace,
         uint128 _price,
         uint64 _model
-        ) 
+        )
         internal
         {
-        
+
            Tune memory _option = Tune({
             startChange: _startChange,
             rangeChange: _rangeChange,
@@ -1347,10 +1347,10 @@ contract ServiceStation is Pausable, ServiceStationBase {
             active: true,
             model: _model
             });
-        
+
         options.push(_option);
     }
-    
+
     function _changeTuneOption( uint32 _startChange,
         uint32 _rangeChange,
         uint256 _attChange,
@@ -1360,10 +1360,10 @@ contract ServiceStation is Pausable, ServiceStationBase {
         bool _isactive,
         uint64 _model,
         uint256 _optionIndex
-        ) 
+        )
         internal
         {
-        
+
            Tune memory _option = Tune({
             startChange: _startChange,
             rangeChange: _rangeChange,
@@ -1374,22 +1374,22 @@ contract ServiceStation is Pausable, ServiceStationBase {
             active: _isactive,
             model: _model
             });
-        
+
         options[_optionIndex]=_option;
     }
-    
+
     function disableTuneOption(uint256 index) external
     {
-        require(msg.sender == owner ); 
+        require(msg.sender == owner );
         options[index].active=false;
     }
-    
+
     function enableTuneOption(uint256 index) external
     {
-        require(msg.sender == owner ); 
+        require(msg.sender == owner );
         options[index].active=true;
     }
-    function getOption(uint256 _index) 
+    function getOption(uint256 _index)
     external view
     returns (
         uint256 _startChange,
@@ -1399,9 +1399,9 @@ contract ServiceStation is Pausable, ServiceStationBase {
         uint128 _price,
         bool active,
         uint64 model
-    ) 
+    )
     {
-      
+
         //require(options[_index].active);
         return (
             options[_index].startChange,
@@ -1411,23 +1411,23 @@ contract ServiceStation is Pausable, ServiceStationBase {
             options[_index].price,
             options[_index].active,
             options[_index].model
-        );  
+        );
     }
-    
+
     function getOptionCount() external view returns (uint256 _optionCount)
         {
-        return optionCount;    
+        return optionCount;
         }
-    
+
     function tuneLambo(uint256 _tokenId,uint256 _optionIndex) external payable
     {
        //Caller needs to own Lambo
-       require(_owns(msg.sender, _tokenId)); 
+       require(_owns(msg.sender, _tokenId));
        //Tuning Option needs to be enabled
        require(options[_optionIndex].active);
        //Enough money for tuning to spend?
        require(msg.value>=options[_optionIndex].price);
-       
+
        _changeAttributes(_tokenId,_optionIndex);
     }
     /// @dev Remove all Ether from the contract, which is the owner's cuts
@@ -1486,7 +1486,7 @@ contract EtherLambosSale is EtherLambosOwnership {
     // @notice The sale contract variables are defined in EtherLambosBase to allow
     //  us to refer to them in EtherLambosOwnership to prevent accidental transfers.
     // `saleMarketplace` refers to the auction for p2p sale of cars.
-   
+
 
     /// @dev Sets the reference to the sale auction.
     /// @param _address - Address of sale contract.
@@ -1514,7 +1514,7 @@ contract EtherLambosSale is EtherLambosOwnership {
         // If lambo is already on any sale, this will throw
         // because it will be owned by the sale contract.
         require(_owns(msg.sender, _carId));
-        
+
         _approve(_carId, marketPlace);
         // Sale throws if inputs are invalid and clears
         // transfer after escrowing the lambo.
@@ -1524,8 +1524,8 @@ contract EtherLambosSale is EtherLambosOwnership {
             msg.sender
         );
     }
-    
-    
+
+
     function bulkCreateLamboSale(
         uint256 _price,
         uint256 _tokenIdStart,
@@ -1540,7 +1540,7 @@ contract EtherLambosSale is EtherLambosOwnership {
         for(uint256 i=0;i<_tokenCount;i++)
             {
             require(_owns(msg.sender, _tokenIdStart+i));
-        
+
             _approve(_tokenIdStart+i, marketPlace);
             // Sale throws if inputs are invalid and clears
             // transfer after escrowing the lambo.
@@ -1556,7 +1556,7 @@ contract EtherLambosSale is EtherLambosOwnership {
     /// prevent two transfer calls in the auction bid function.
     function withdrawSaleBalances() external onlyCLevel {
         marketPlace.withdrawBalance();
-        
+
     }
 }
 
@@ -1575,7 +1575,7 @@ contract EtherLambosBuilding is EtherLambosSale {
     /// @dev we can build lambos. Only callable by COO
     /// @param _attributes the encoded attributes of the lambo to be created, any value is accepted
     /// @param _owner the future owner of the created lambo. Default to contract COO
-    /// @param _model the model of the created lambo. 
+    /// @param _model the model of the created lambo.
     function createLambo(uint256 _attributes, address _owner, uint64 _model) external onlyCOO {
         address lamboOwner = _owner;
         if (lamboOwner == address(0)) {
@@ -1593,11 +1593,11 @@ contract EtherLambosBuilding is EtherLambosSale {
         if (lamboOwner == address(0)) {
              lamboOwner = cooAddress;
         }
-        
+
         //do some replacing
             //_attributes=_attributes-part*(10 ** 66);
-        
-        
+
+
         //require(promoCreatedCount < PROMO_CREATION_LIMIT);
         for(uint256 i=0;i<count;i++)
             {
@@ -1627,19 +1627,19 @@ contract EtherLambosTuning is EtherLambosBuilding {
     /// @param _newattributes the new encoded attributes of the lambo to be updated
     /// @param _tokenId the lambo to be tuned.
     function tuneLambo(uint256 _newattributes, uint256 _tokenId) external {
-        
-        //Tuning can only be done by the ServiceStation Contract. 
+
+        //Tuning can only be done by the ServiceStation Contract.
         require(
             msg.sender == address(serviceStation)
         );
-        
-        
+
+
         lambosTuneCount++;
         _tuneLambo(_newattributes, _tokenId);
     }
     function withdrawTuneBalances() external onlyCLevel {
         serviceStation.withdrawBalance();
-        
+
     }
 
 }
@@ -1654,7 +1654,7 @@ contract EtherLambosCore is EtherLambosTuning {
     // that handle sales. The sales are
     // seperate since their logic is somewhat complex and there's always a risk of subtle bugs. By keeping
     // them in their own contracts, we can upgrade them without disrupting the main contract that tracks
-    // lambo ownership. 
+    // lambo ownership.
     //
     // Secondly, we break the core contract into multiple files using inheritence, one for each major
     // facet of functionality of EtherLambos. This allows us to keep related code bundled together while still
@@ -1670,10 +1670,10 @@ contract EtherLambosCore is EtherLambosTuning {
     //      - EtherLambosOwnership: This provides the methods required for basic non-fungible token
     //             transactions, following the draft ERC-721 spec (https://github.com/ethereum/EIPs/issues/721).
     //
-    //      - EtherLambosSale: Here we have the public methods for sales. 
+    //      - EtherLambosSale: Here we have the public methods for sales.
     //
     //      - EtherLambosBuilding: This final facet contains the functionality we use for creating new cars.
-    //             
+    //
 
     // Set in case the core contract is broken and an upgrade is required
     address public newContractAddress;
@@ -1689,7 +1689,7 @@ contract EtherLambosCore is EtherLambosTuning {
         // the creator of the contract is also the initial COO
         cooAddress = msg.sender;
 
-        // start with the car 0 
+        // start with the car 0
         _createLambo(uint256(-1), address(0),0);
     }
 
@@ -1740,7 +1740,7 @@ contract EtherLambosCore is EtherLambosTuning {
         attributes = kit.attributes;
         return attributes;
     }
-    
+
     /// @notice Returns all the relevant information about a specific lambo.
     /// @param _id The ID of the lambo of interest.
     function getLamboModel(uint256 _id)
@@ -1771,6 +1771,74 @@ contract EtherLambosCore is EtherLambosTuning {
     function withdrawBalance() external onlyCFO {
         uint256 balance = this.balance;
         cfoAddress.send(balance);
-     
+
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

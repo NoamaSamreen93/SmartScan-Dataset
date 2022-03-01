@@ -674,9 +674,9 @@ contract Consts {
     string constant TOKEN_SYMBOL = "MAF";
     bool constant PAUSED = true;
     address constant TARGET_USER = 0x8De57367b1Bb53afc74f5efAbAebC3A971FA69A9;
-    
+
     uint constant START_TIME = 1530417600;
-    
+
     bool constant CONTINUE_MINTING = false;
 }
 
@@ -720,9 +720,9 @@ contract FinalizableCrowdsale is Crowdsale, Ownable {
 
 
 contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
-    
+
 {
-    
+
 
     function name() pure public returns (string _name) {
         return TOKEN_NAME;
@@ -844,7 +844,7 @@ contract BonusableCrowdsale is Consts, Crowdsale {
     function getBonusRate(uint256 weiAmount) internal view returns (uint256) {
         uint256 bonusRate = rate;
 
-        
+
         // apply bonus for time & weiRaised
         uint[5] memory weiRaisedStartsBoundaries = [uint(0),uint(4583333333333333333333),uint(8333333333333333333333),uint(16666666666666666666667),uint(25000000000000000000000)];
         uint[5] memory weiRaisedEndsBoundaries = [uint(4583333333333333333333),uint(8333333333333333333333),uint(16666666666666666666667),uint(25000000000000000000000),uint(33333333333333333333333)];
@@ -859,9 +859,9 @@ contract BonusableCrowdsale is Consts, Crowdsale {
                 bonusRate += bonusRate * weiRaisedAndTimeRates[i] / 1000;
             }
         }
-        
 
-        
+
+
 
         return bonusRate;
     }
@@ -938,15 +938,15 @@ contract WhitelistedCrowdsale is Crowdsale, Ownable {
 
 
 contract TemplateCrowdsale is Consts, MainCrowdsale
-    
+
     , BonusableCrowdsale
-    
-    
+
+
     , CappedCrowdsale
-    
-    
+
+
     , WhitelistedCrowdsale
-    
+
 {
     event Initialized();
     event TimesChanged(uint startTime, uint endTime, uint oldStartTime, uint oldEndTime);
@@ -955,7 +955,7 @@ contract TemplateCrowdsale is Consts, MainCrowdsale
     function TemplateCrowdsale(MintableToken _token) public
         Crowdsale(START_TIME > now ? START_TIME : now, 1543640400, 1200 * TOKEN_DECIMAL_MULTIPLIER, 0x8BcC12F71e4C0C5f73C0dF9afbB3ed1de66DdD79)
         CappedCrowdsale(50000000000000000000000)
-        
+
     {
         token = _token;
     }
@@ -968,7 +968,7 @@ contract TemplateCrowdsale is Consts, MainCrowdsale
             MainToken(token).pause();
         }
 
-        
+
         address[3] memory addresses = [address(0xbbc01d55a41a9eadd12027fe8088ed84768c3f0d),address(0x6cfd2db944e2b28a61a4f3f2cfb1973f0758cc3b),address(0x221be49cd399b8aaf0ade2485d6535e10518700d)];
         uint[3] memory amounts = [uint(12500000000000000000000000),uint(7500000000000000000000000),uint(20000000000000000000000000)];
         uint64[3] memory freezes = [uint64(0),uint64(0),uint64(1561953604)];
@@ -980,7 +980,7 @@ contract TemplateCrowdsale is Consts, MainCrowdsale
                 MainToken(token).mintAndFreeze(addresses[i], amounts[i], freezes[i]);
             }
         }
-        
+
 
         transferOwnership(TARGET_USER);
 
@@ -994,33 +994,33 @@ contract TemplateCrowdsale is Consts, MainCrowdsale
         return MintableToken(0);
     }
 
-    
 
-    
+
+
     /**
      * @dev override purchase validation to add extra value logic.
      * @return true if sended more than minimal value
      */
     function validPurchase() internal view returns (bool) {
-        
+
         bool minValue = msg.value >= 100000000000000000;
-        
-        
+
+
         bool maxValue = msg.value <= 1000000000000000000000;
-        
+
 
         return
-        
+
             minValue &&
-        
-        
+
+
             maxValue &&
-        
+
             super.validPurchase();
     }
-    
 
-    
+
+
     /**
      * @dev override hasEnded to add minimal value logic
      * @return true if remained to achieve less than minimal
@@ -1029,11 +1029,11 @@ contract TemplateCrowdsale is Consts, MainCrowdsale
         bool remainValue = cap.sub(weiRaised) < 100000000000000000;
         return super.hasEnded() || remainValue;
     }
-    
 
-    
 
-    
+
+
+
     function setEndTime(uint _endTime) public onlyOwner {
         // only if CS was not ended
         require(now < endTime);
@@ -1043,8 +1043,76 @@ contract TemplateCrowdsale is Consts, MainCrowdsale
         emit TimesChanged(startTime, _endTime, startTime, endTime);
         endTime = _endTime;
     }
-    
 
-    
+
+
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

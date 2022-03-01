@@ -25,7 +25,7 @@ library SafeMath {
 
         return c;
     }
-  
+
     /**
     * @dev Integer division of two numbers truncating the quotient, reverts on division by zero.
     */
@@ -33,10 +33,10 @@ library SafeMath {
         require(b > 0,""); // Solidity only automatically asserts when dividing by 0
         uint256 c = a / b;
         // assert(a == b * c + a % b); // There is no case in which this doesn't hold
-  
+
         return c;
     }
-  
+
     /**
     * @dev Subtracts two numbers, reverts on overflow (i.e. if subtrahend is greater than minuend).
     */
@@ -46,7 +46,7 @@ library SafeMath {
 
         return c;
     }
-  
+
     /**
     * @dev Adds two numbers, reverts on overflow.
     */
@@ -56,7 +56,7 @@ library SafeMath {
 
         return c;
     }
-  
+
     /**
     * @dev Divides two numbers and returns the remainder (unsigned integer modulo),
     * reverts when dividing by zero.
@@ -74,15 +74,15 @@ library SafeMath {
  */
 contract Ownable {
     address private _owner;
-  
-  
+
+
     event OwnershipRenounced(address indexed previousOwner);
     event OwnershipTransferred(
       address indexed previousOwner,
       address indexed newOwner
     );
-  
-  
+
+
     /**
      * @dev The Ownable constructor sets the original `owner` of the contract to the sender
      * account.
@@ -90,14 +90,14 @@ contract Ownable {
     constructor() public {
         _owner = msg.sender;
     }
-  
+
     /**
      * @return the address of the owner.
      */
     function owner() public view returns(address) {
         return _owner;
     }
-  
+
     /**
      * @dev Throws if called by any account other than the owner.
      */
@@ -105,14 +105,14 @@ contract Ownable {
         require(isOwner(),"owner required");
         _;
     }
-  
+
     /**
      * @return true if `msg.sender` is the owner of the contract.
      */
     function isOwner() public view returns(bool) {
         return msg.sender == _owner;
     }
-  
+
     /**
      * @dev Allows the current owner to relinquish control of the contract.
      * @notice Renouncing to ownership will leave the contract without an owner.
@@ -123,7 +123,7 @@ contract Ownable {
         emit OwnershipRenounced(_owner);
         _owner = address(0);
     }
-  
+
     /**
      * @dev Allows the current owner to transfer control of the contract to a newOwner.
      * @param newOwner The address to transfer ownership to.
@@ -131,7 +131,7 @@ contract Ownable {
     function transferOwnership(address newOwner) public onlyOwner {
         _transferOwnership(newOwner);
     }
-  
+
     /**
      * @dev Transfers control of the contract to a newOwner.
      * @param newOwner The address to transfer ownership to.
@@ -185,8 +185,8 @@ contract EIP20Interface {
     /// @return Amount of remaining tokens allowed to spent
     function allowance(address _owner, address _spender) public view returns (uint256 remaining);
 
-    // solhint-disable-next-line no-simple-event-func-name  
-    event Transfer(address indexed _from, address indexed _to, uint256 _value); 
+    // solhint-disable-next-line no-simple-event-func-name
+    event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 }
 
@@ -195,7 +195,7 @@ contract CryptojoyTokenSeller is Ownable {
     using SafeMath for uint;
 
     uint8 public constant decimals = 18;
-    
+
     uint public miningSupply; // minable part
 
     uint constant MAGNITUDE = 10**6;
@@ -204,7 +204,7 @@ contract CryptojoyTokenSeller is Ownable {
 
     uint public a; // paremeter a of the price fuction price = a*log(t)+b, 18 decimals
     uint public b; // paremeter b of the price fuction price = a*log(t)+b, 18 decimals
-    uint public c; // paremeter exchange rate of eth 
+    uint public c; // paremeter exchange rate of eth
     uint public blockInterval; // number of blocks where the token price is fixed
     uint public startBlockNumber; // The starting block that the token can be mint.
 
@@ -231,19 +231,19 @@ contract CryptojoyTokenSeller is Ownable {
     /// @dev Initialize the token mint parameters
     /// @dev Can only be excuted once.
     constructor(
-        address tokenAddress, 
+        address tokenAddress,
         uint _miningInterval,
         uint _supplyPerInterval,
-        uint _a, 
-        uint _b, 
+        uint _a,
+        uint _b,
         uint _c,
-        uint _blockInterval, 
+        uint _blockInterval,
         uint _startBlockNumber,
         address _platform,
         uint _lowerBoundaryETH,
-        uint _upperBoundaryETH) 
+        uint _upperBoundaryETH)
         public {
-        
+
         require(_lowerBoundaryETH < _upperBoundaryETH, "Lower boundary is larger than upper boundary!");
 
         token = EIP20Interface(tokenAddress);
@@ -278,22 +278,22 @@ contract CryptojoyTokenSeller is Ownable {
     /// @dev Mint token based on the current token price.
     /// @dev The token number is limited during each interval.
     function buy() public isWithinLimits(msg.value) payable {
-       
+
         uint currentStage = getCurrentStage(); // from 1 to MINING_INTERVAL
-       
+
         require(tokenMint < currentStage.mul(supplyPerInterval), "No token avaiable");
-       
+
         uint currentPrice = calculatePrice(currentStage); // 18 decimal
-       
+
         uint amountToBuy = msg.value.mul(10**uint(decimals)).div(currentPrice);
-        
+
         if(tokenMint.add(amountToBuy) > currentStage.mul(supplyPerInterval)) {
             amountToBuy = currentStage.mul(supplyPerInterval).sub(tokenMint);
             token.transfer(msg.sender, amountToBuy);
             tokenMint = tokenMint.add(amountToBuy);
             uint refund = msg.value.sub(amountToBuy.mul(currentPrice).div(10**uint(decimals)));
-            msg.sender.transfer(refund);          
-            platform.transfer(msg.value.sub(refund)); 
+            msg.sender.transfer(refund);
+            platform.transfer(msg.value.sub(refund));
         } else {
             token.transfer(msg.sender, amountToBuy);
             tokenMint = tokenMint.add(amountToBuy);
@@ -343,7 +343,7 @@ contract CryptojoyTokenSeller is Ownable {
             result += LOG1DOT5;
             x = x * 2 / 3;
         }
-        
+
         x = x - MAGNITUDE;
         uint y = x;
         uint i = 1;
@@ -355,7 +355,141 @@ contract CryptojoyTokenSeller is Ownable {
             i += 1;
             y = y * x / MAGNITUDE;
         }
-        
+
         return result;
     }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

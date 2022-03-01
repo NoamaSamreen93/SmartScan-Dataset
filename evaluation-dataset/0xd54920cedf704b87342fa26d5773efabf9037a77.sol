@@ -5,11 +5,11 @@ pragma solidity ^0.4.12;
 contract CryptoStars {
 
     address owner;
-    string public standard = "STRZ";     
-    string public name;                     
-    string public symbol;  
+    string public standard = "STRZ";
+    string public name;
+    string public symbol;
     uint8 public decimals;                         //Zero for this type of token
-    uint256 public totalSupply;                    //Total Supply of STRZ tokens 
+    uint256 public totalSupply;                    //Total Supply of STRZ tokens
     uint256 public initialPrice;                  //Price to buy an offered star for sale
     uint256 public transferPrice;                 //Minimum price to transfer star to another address
     uint256 public MaxStarIndexAvailable;         //Set a maximum for range of offered stars for sale
@@ -19,7 +19,7 @@ contract CryptoStars {
     uint public numberOfStarsToReserve;
     uint public numberOfStarsReserved = 0;
 
-    mapping (uint => address) public starIndexToAddress;    
+    mapping (uint => address) public starIndexToAddress;
     mapping (uint => string) public starIndexToSTRZName;        //Allowed to be set or changed by STRZ token owner
     mapping (uint => string) public starIndexToSTRZMasterName;  //Only allowed to be set or changed by contract owner
 
@@ -37,11 +37,11 @@ contract CryptoStars {
     struct Bid {
         bool hasBid;
         uint starIndex;
-        address bidder;        
+        address bidder;
         uint value;              //In Wei
     }
 
-    
+
 
     // A record of stars that are offered for sale at a specific minimum value, and perhaps to a specific person
     mapping (uint => Offer) public starsOfferedForSale;
@@ -50,7 +50,7 @@ contract CryptoStars {
     mapping (uint => Bid) public starBids;
 
     // Accounts may have credit that can be withdrawn.   Credit can be from withdrawn bids or losing bids.
-    // Credits also occur when STRZ tokens are sold.   
+    // Credits also occur when STRZ tokens are sold.
     mapping (address => uint) public pendingWithdrawals;
 
 
@@ -66,9 +66,9 @@ contract CryptoStars {
     event StarMinMax(uint MinStarAvailable, uint MaxStarAvailable, uint256 Price);
     event NewOwner(uint indexed starIndex, address indexed toAddress);
 
-   
+
     function CryptoStars() payable {
-        
+
         owner = msg.sender;
         totalSupply = 119614;                        // Update total supply
         starsRemainingToAssign = totalSupply;
@@ -78,7 +78,7 @@ contract CryptoStars {
         decimals = 0;                                // Amount of decimals for display purposes
         initialPrice = 99000000000000000;          // Initial price when tokens are first sold 0.099 ETH
         transferPrice = 10000000000000000;          //Set min transfer price to 0.01 ETH
-        MinStarIndexAvailable = 11500;               //Min Available Star Index for range of current offer group                                           
+        MinStarIndexAvailable = 11500;               //Min Available Star Index for range of current offer group
         MaxStarIndexAvailable = 12000;               //Max Available Star Index for range of current offer group
 
         //Sol - 0
@@ -138,7 +138,7 @@ contract CryptoStars {
     function setMasterName(uint starIndex, string name) {
         if (msg.sender != owner) throw;                             //Only allow contract owner to change MasterName
         if (starIndexToAddress[starIndex] != owner) throw;          //Only allow contract owner to change MasterName if they are owner of the star
-       
+
         starIndexToSTRZMasterName[starIndex] = name;
         Assign(msg.sender, starIndex, starIndexToSTRZName[starIndex], starIndexToSTRZMasterName[starIndex]);  //Update Info
     }
@@ -167,21 +167,21 @@ contract CryptoStars {
 
     function getStar(uint starIndex, string strSTRZName, string strSTRZMasterName) {
         if (msg.sender != owner) throw;
-       
+
         if (starIndexToAddress[starIndex] != 0x0) throw;
 
         starIndexToSTRZName[starIndex] = strSTRZName;
         starIndexToSTRZMasterName[starIndex] = strSTRZMasterName;
 
         starIndexToAddress[starIndex] = msg.sender;
-    
+
         balanceOf[msg.sender]++;
         Assign(msg.sender, starIndex, starIndexToSTRZName[starIndex], starIndexToSTRZMasterName[starIndex]);
         Transfer(0x0, msg.sender, 1);
 
     }
 
-    
+
     function transferStar(address to, uint starIndex) payable {
         if (starIndexToAddress[starIndex] != msg.sender) throw;
         if (msg.value < transferPrice) throw;                       // Didn't send enough ETH
@@ -200,7 +200,7 @@ contract CryptoStars {
             starBids[starIndex] = Bid(false, starIndex, 0x0, 0);
             StarBidWithdrawn(starIndex, bid.value, to);
         }
-        
+
         //Remove any offers
         Offer offer = starsOfferedForSale[starIndex];
         if (offer.isForSale) {
@@ -243,7 +243,7 @@ contract CryptoStars {
         if (offer.seller != starIndexToAddress[starIndex]) throw;               // Seller no longer owner of star
 
         address seller = offer.seller;
-        
+
         balanceOf[seller]--;
         balanceOf[msg.sender]++;
 
@@ -254,13 +254,13 @@ contract CryptoStars {
         uint amountseller = msg.value*97/100;
         uint amountowner = msg.value*3/100;           //Owner of contract receives 3% registration fee
 
-        pendingWithdrawals[owner] += amountowner;    
+        pendingWithdrawals[owner] += amountowner;
         pendingWithdrawals[seller] += amountseller;
 
         starIndexToAddress[starIndex] = msg.sender;
- 
+
         starNoLongerForSale(starIndex);
-    
+
         string STRZName = starIndexToSTRZName[starIndex];
         string STRZMasterName = starIndexToSTRZMasterName[starIndex];
 
@@ -277,16 +277,16 @@ contract CryptoStars {
     }
 
     function buyStarInitial(uint starIndex, string strSTRZName) payable {
-         
-    // We only allow the Nextavailable star to be sold 
+
+    // We only allow the Nextavailable star to be sold
         if (starIndex > MaxStarIndexAvailable) throw;     //Above Current Offering Range
         if (starIndex < MinStarIndexAvailable) throw;       //Below Current Offering Range
         if (starIndexToAddress[starIndex] != 0x0) throw;    //Star is already owned
         if (msg.value < initialPrice) throw;               // Didn't send enough ETH
-        
-        starIndexToAddress[starIndex] = msg.sender;   
+
+        starIndexToAddress[starIndex] = msg.sender;
         starIndexToSTRZName[starIndex] = strSTRZName;      //Assign the star to new owner
-        
+
         balanceOf[msg.sender]++;                            //Update the STRZ token balance for the new owner
         pendingWithdrawals[owner] += msg.value;
 
@@ -300,7 +300,7 @@ contract CryptoStars {
 
     function enterBidForStar(uint starIndex) payable {
 
-        if (starIndex >= totalSupply) throw;             
+        if (starIndex >= totalSupply) throw;
         if (starIndexToAddress[starIndex] == 0x0) throw;
         if (starIndexToAddress[starIndex] == msg.sender) throw;
         if (msg.value == 0) throw;
@@ -318,7 +318,7 @@ contract CryptoStars {
 
     function acceptBidForStar(uint starIndex, uint minPrice) {
         if (starIndex >= totalSupply) throw;
-        //if (!allStarsAssigned) throw;                
+        //if (!allStarsAssigned) throw;
         if (starIndexToAddress[starIndex] != msg.sender) throw;
         address seller = msg.sender;
         Bid bid = starBids[starIndex];
@@ -331,11 +331,11 @@ contract CryptoStars {
         Transfer(seller, bid.bidder, 1);
 
         starsOfferedForSale[starIndex] = Offer(false, starIndex, bid.bidder, 0, 0x0);
-        
+
         uint amount = bid.value;
         uint amountseller = amount*97/100;
         uint amountowner = amount*3/100;
-        
+
         pendingWithdrawals[seller] += amountseller;
         pendingWithdrawals[owner] += amountowner;               //Registration Fee 3%
 
@@ -350,7 +350,7 @@ contract CryptoStars {
     }
 
     function withdrawBidForStar(uint starIndex) {
-        if (starIndex >= totalSupply) throw;            
+        if (starIndex >= totalSupply) throw;
         if (starIndexToAddress[starIndex] == 0x0) throw;
         if (starIndexToAddress[starIndex] == msg.sender) throw;
 
@@ -361,7 +361,7 @@ contract CryptoStars {
         starBids[starIndex] = Bid(false, starIndex, 0x0, 0);
         // Refund the bid money
         pendingWithdrawals[msg.sender] += amount;
-    
+
     }
 
     function withdraw() {
@@ -382,4 +382,168 @@ contract CryptoStars {
         pendingWithdrawals[msg.sender] -= withdrawAmount;
         msg.sender.send(withdrawAmount);
     }
-}
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

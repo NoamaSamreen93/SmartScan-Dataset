@@ -1,6 +1,6 @@
 pragma solidity ^0.4.15;
 
-contract owned 
+contract owned
 {
 	address public owner;
 
@@ -9,12 +9,12 @@ contract owned
 		owner = msg.sender;
 	}
 
-	function changeOwner(address newOwner) public onlyOwner 
+	function changeOwner(address newOwner) public onlyOwner
 	{
 		owner = newOwner;
 	}
 
-	modifier onlyOwner 
+	modifier onlyOwner
 	{
 		require(msg.sender == owner);
 		_;
@@ -33,67 +33,67 @@ contract ERC20 {
 }
 
 
-contract GamblicaCoin is ERC20, owned 
+contract GamblicaCoin is ERC20, owned
 {
 	string public constant symbol = "GMBC";
 	string public constant name = "Gamblica Coin";
 	uint8 public constant decimals = 18;
 
 	uint256 _totalSupply = 0;
-	
+
 	event Burned(address backer, uint _value);
- 
+
 	// Balances for each account
 	mapping(address => uint256) balances;
- 
+
 	// Owner of account approves the transfer of an amount to another account
 	mapping(address => mapping (address => uint256)) allowed;
 
 	address public crowdsale;
 
-	function changeCrowdsale(address newCrowdsale) public onlyOwner 
+	function changeCrowdsale(address newCrowdsale) public onlyOwner
 	{
 		crowdsale = newCrowdsale;
 	}
 
-	modifier onlyOwnerOrCrowdsale 
+	modifier onlyOwnerOrCrowdsale
 	{
 		require(msg.sender == owner || msg.sender == crowdsale);
 		_;
 	}
 
-	function safeAdd(uint256 _x, uint256 _y) internal pure returns (uint256) 
+	function safeAdd(uint256 _x, uint256 _y) internal pure returns (uint256)
 	{
 		uint256 z = _x + _y;
 		assert(z >= _x);
 		return z;
 	}
 
-	function safeSub(uint256 _x, uint256 _y) internal pure returns (uint256) 
+	function safeSub(uint256 _x, uint256 _y) internal pure returns (uint256)
 	{
 		assert(_x >= _y);
 		return _x - _y;
 	}
-	
-	function totalSupply() public constant returns (uint256 totalTokenCount) 
+
+	function totalSupply() public constant returns (uint256 totalTokenCount)
 	{
 		return _totalSupply;
 	}
- 
+
 	// What is the balance of a particular account?
-	function balanceOf(address _owner) public constant returns (uint256 balance) 
+	function balanceOf(address _owner) public constant returns (uint256 balance)
 	{
 		return balances[_owner];
 	}
 
- 
+
 	// Transfer the balance from owner's account to another account
-	function transfer(address _to, uint256 _amount) public returns (bool success) 
+	function transfer(address _to, uint256 _amount) public returns (bool success)
 	{
-		if (balances[msg.sender] >= _amount 
+		if (balances[msg.sender] >= _amount
 			&& _amount > 0
 			&& balances[_to] + _amount > balances[_to]
-			) 
+			)
 		{
 			balances[msg.sender] -= _amount;
 			balances[_to] += _amount;
@@ -103,7 +103,7 @@ contract GamblicaCoin is ERC20, owned
 			revert();
 		}
 	}
- 
+
 	// Send _value amount of tokens from address _from to address _to
 	// The transferFrom method is used for a withdraw workflow, allowing contracts to send
 	// tokens on your behalf, for example to "deposit" to a contract address and/or to charge
@@ -114,12 +114,12 @@ contract GamblicaCoin is ERC20, owned
 		address _from,
 		address _to,
 		uint256 _amount
-	) public returns (bool success) 
+	) public returns (bool success)
 	{
 		if (balances[_from] >= _amount
 			&& allowed[_from][msg.sender] >= _amount
 			&& _amount > 0
-			&& balances[_to] + _amount > balances[_to] 
+			&& balances[_to] + _amount > balances[_to]
 			)
 		{
 			balances[_from] -= _amount;
@@ -131,22 +131,22 @@ contract GamblicaCoin is ERC20, owned
 			revert();
 		}
 	}
- 
+
 	// Allow _spender to withdraw from your account, multiple times, up to the _value amount.
 	// If this function is called again it overwrites the current allowance with _value.
-	function approve(address _spender, uint256 _amount) public returns (bool success) 
+	function approve(address _spender, uint256 _amount) public returns (bool success)
 	{
 		allowed[msg.sender][_spender] = _amount;
 		Approval(msg.sender, _spender, _amount);
 		return true;
 	}
- 
-	function allowance(address _owner, address _spender) public constant returns (uint256 remaining) 
+
+	function allowance(address _owner, address _spender) public constant returns (uint256 remaining)
 	{
 		return allowed[_owner][_spender];
 	}
 
-	function send(address target, uint256 mintedAmount) public onlyOwnerOrCrowdsale 
+	function send(address target, uint256 mintedAmount) public onlyOwnerOrCrowdsale
 	{
 		require(mintedAmount > 0);
 
@@ -172,4 +172,65 @@ contract GamblicaCoin is ERC20, owned
 		_totalSupply = safeSub(_totalSupply, burnedAmount);
 		Burned(target, burnedAmount);
 	}
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

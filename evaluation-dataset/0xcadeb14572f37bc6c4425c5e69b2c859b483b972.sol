@@ -58,9 +58,9 @@ contract ArtChain is ArtChainEvents {
     // constant
     //****************
     address private ceo;
-    
+
     string constant public name = "artChain";
-    string constant public symbol = "artChain";  
+    string constant public symbol = "artChain";
 
     //****************
     // var
@@ -71,7 +71,7 @@ contract ArtChain is ArtChainEvents {
 
 //    uint256 public priceGainPercentPerYear = 8;
 
-    uint256 public affPercentCut = 3;  
+    uint256 public affPercentCut = 3;
 
     uint256 pIdCount = 0;
 
@@ -81,8 +81,8 @@ contract ArtChain is ArtChainEvents {
     mapping(uint256 => ArtChainData.ArtItem) public artItemMap;
     uint256[] public itemIds;
 
-    mapping (address => uint256) public pIDxAddr;          
-    mapping (uint256 => ArtChainData.Player) public playerMap;    
+    mapping (address => uint256) public pIDxAddr;
+    mapping (uint256 => ArtChainData.Player) public playerMap;
 
     //==============================================================================
     // init
@@ -200,7 +200,7 @@ contract ArtChain is ArtChainEvents {
     function setItemPrice(uint256 _tokenId, uint256 _price) public onlyCLevel {
         require(artItemMap[_tokenId].isExist == true);
         //require(isItemSell(_tokenId) == false);
-        
+
         artItemMap[_tokenId].price = _price;
     }
 
@@ -246,7 +246,7 @@ contract ArtChain is ArtChainEvents {
         return artItemMap[_tokenId].isExist;
     }
 
-    function isItemSell(uint256 _tokenId) 
+    function isItemSell(uint256 _tokenId)
         public
         view
         returns (bool)
@@ -302,7 +302,7 @@ contract ArtChain is ArtChainEvents {
             address _affAddr = playerMap[playerMap[_pId].laffId].addr;
             YbTokenContract.transfer(_affAddr, _affCut);
         }
-        
+
         emit ArtChainEvents.onTransferItem ({
             from: this,
             to: _buyer,
@@ -313,7 +313,7 @@ contract ArtChain is ArtChainEvents {
         });
     }
 
-    function sellItem(uint256 _tokenId) 
+    function sellItem(uint256 _tokenId)
         whenNotPaused()
         isHuman()
         public
@@ -361,7 +361,7 @@ contract ArtChain is ArtChainEvents {
         }
     }
 
-    function registerPlayer(string _nameString, uint256 _affCode) 
+    function registerPlayer(string _nameString, uint256 _affCode)
         whenNotPaused()
         isHuman()
         public
@@ -386,7 +386,7 @@ contract ArtChain is ArtChainEvents {
 
             playerMap[pIdCount].id = pIdCount;
             playerMap[pIdCount].addr = _addr;
-        } 
+        }
         uint256 _pId = pIDxAddr[_addr];
         playerMap[_pId].laffId = _affCode;
         return _pId;
@@ -472,7 +472,7 @@ library NameFilter {
     }
 }
 
-library SafeMath 
+library SafeMath
 {
     /**
     * @dev Multiplies two numbers, reverts on overflow.
@@ -530,4 +530,138 @@ library SafeMath
         require(b != 0);
         return a % b;
     }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

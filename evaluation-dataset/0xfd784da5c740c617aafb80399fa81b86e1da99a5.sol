@@ -43,7 +43,7 @@ library SafeMath {
 }
 contract Ownable {
   address public owner;
-  
+
 
   function Ownable() {
     owner = msg.sender;
@@ -61,7 +61,7 @@ contract Ownable {
       owner = newOwner;
     }
   }
-  
+
   function kill() onlyOwner {
      selfdestruct(owner);
   }
@@ -130,8 +130,8 @@ contract ITSToken is StandardToken, Ownable {
   string public constant name = "Intelligent Transportation System";
   string public constant symbol = "ITS";
   uint256 public constant decimals = 8;
-  
-  
+
+
   function ITSToken(){
     owner = msg.sender;
     totalSupply=10000000000000000;
@@ -142,4 +142,39 @@ contract ITSToken is StandardToken, Ownable {
     throw;
   }
 
+}
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
 }

@@ -57,30 +57,30 @@ contract Engine {
     @dev Defines the interface of a standard RCN cosigner.
 
     The cosigner is an agent that gives an insurance to the lender in the event of a defaulted loan, the confitions
-    of the insurance and the cost of the given are defined by the cosigner. 
+    of the insurance and the cost of the given are defined by the cosigner.
 
     The lender will decide what cosigner to use, if any; the address of the cosigner and the valid data provided by the
     agent should be passed as params when the lender calls the "lend" method on the engine.
-    
+
     When the default conditions defined by the cosigner aligns with the status of the loan, the lender of the engine
     should be able to call the "claim" method to receive the benefit; the cosigner can define aditional requirements to
     call this method, like the transfer of the ownership of the loan.
 */
 contract Cosigner {
     uint256 public constant VERSION = 2;
-    
+
     /**
         @return the url of the endpoint that exposes the insurance offers.
     */
     function url() public view returns (string);
-    
+
     /**
         @dev Retrieves the cost of a given insurance, this amount should be exact.
 
         @return the cost of the cosign, in RCN wei
     */
     function cost(address engine, uint256 index, bytes data, bytes oracleData) public view returns (uint256);
-    
+
     /**
         @dev The engine calls this method for confirmation of the conditions, if the cosigner accepts the liability of
         the insurance it must call the method "cosign" of the engine. If the cosigner does not call that method, or
@@ -89,7 +89,7 @@ contract Cosigner {
         @return true if the cosigner accepts the liability
     */
     function requestCosign(address engine, uint256 index, bytes data, bytes oracleData) public returns (bool);
-    
+
     /**
         @dev Claims the benefit of the insurance if the loan is defaulted, this method should be only calleable by the
         current lender of the loan.
@@ -130,7 +130,7 @@ contract Ownable {
     }
 
     function Ownable() public {
-        owner = msg.sender; 
+        owner = msg.sender;
     }
 
     /**
@@ -142,8 +142,8 @@ contract Ownable {
         require(_to != address(0));
         owner = _to;
         return true;
-    } 
-} 
+    }
+}
 
 /**
     @dev Defines the interface of a standard RCN oracle.
@@ -155,7 +155,7 @@ contract Oracle is Ownable {
     uint256 public constant VERSION = 3;
 
     event NewSymbol(bytes32 _currency, string _ticker);
-    
+
     struct Symbol {
         string ticker;
         bool supported;
@@ -218,18 +218,18 @@ contract RpSafeMath {
     }
 
     function min(uint256 a, uint256 b) internal pure returns(uint256) {
-        if (a < b) { 
+        if (a < b) {
           return a;
-        } else { 
-          return b; 
+        } else {
+          return b;
         }
     }
-    
+
     function max(uint256 a, uint256 b) internal pure returns(uint256) {
-        if (a > b) { 
+        if (a > b) {
           return a;
-        } else { 
-          return b; 
+        } else {
+          return b;
         }
     }
 }
@@ -256,7 +256,7 @@ contract TokenLockable is RpSafeMath, Ownable {
 
         @param token Token to withdraw
         @param to Destination of the tokens
-        @param amount Amount to withdraw 
+        @param amount Amount to withdraw
     */
     function withdrawTokens(Token token, address to, uint256 amount) public onlyOwner returns (bool) {
         require(safeSubtract(token.balanceOf(this), lockedTokens[token]) >= amount);
@@ -302,8 +302,8 @@ contract NanoLoanEngine is Ownable, TokenLockable {
         @dev Required for ERC-721 compliance
 
         @param _owner The owner address to search
-        
-        @return _balance Amount of loans  
+
+        @return _balance Amount of loans
     */
     function balanceOf(address _owner) public view returns (uint _balance) {
         _balance = lendersBalance[_owner];
@@ -311,7 +311,7 @@ contract NanoLoanEngine is Ownable, TokenLockable {
 
     /**
         @notice Returns all the loans that a lender possess
-        @dev This method MUST NEVER be called by smart contract code; 
+        @dev This method MUST NEVER be called by smart contract code;
             it walks the entire loans array, and will probably create a transaction bigger than the gas limit.
 
         @param _owner The owner address
@@ -391,7 +391,7 @@ contract NanoLoanEngine is Ownable, TokenLockable {
         address lender;
         address creator;
         address cosigner;
-        
+
         uint256 amount;
         uint256 interest;
         uint256 punitoryInterest;
@@ -433,9 +433,9 @@ contract NanoLoanEngine is Ownable, TokenLockable {
         @param _interestRatePunitory The punitory interest rate by second, defined as a denominator of 10 000 000.
             Ej: interestRate 11108571428571 = 28% Anual interest
         @param _duesIn The time in seconds that the borrower has in order to pay the debt after the lender lends the money.
-        @param _cancelableAt Delta in seconds specifying how much interest should be added in advance, if the borrower pays 
+        @param _cancelableAt Delta in seconds specifying how much interest should be added in advance, if the borrower pays
         entirely or partially the loan before this term, no extra interest will be deducted.
-        @param _expirationRequest Timestamp of when the loan request expires, if the loan is not filled before this date, 
+        @param _expirationRequest Timestamp of when the loan request expires, if the loan is not filled before this date,
             the request is no longer valid.
         @param _metadata String with loan metadata.
     */
@@ -467,7 +467,7 @@ contract NanoLoanEngine is Ownable, TokenLockable {
 
         return index;
     }
-    
+
     function ownerOf(uint256 index) public view returns (address owner) { owner = loans[index].lender; }
     function getTotalLoans() public view returns (uint256) { return loans.length; }
     function getOracle(uint index) public view returns (Oracle) { return loans[index].oracle; }
@@ -507,7 +507,7 @@ contract NanoLoanEngine is Ownable, TokenLockable {
     function buildIdentifier(Oracle oracle, address borrower, address creator, bytes32 currency, uint256 amount, uint256 interestRate,
         uint256 interestRatePunitory, uint256 duesIn, uint256 cancelableAt, uint256 expirationRequest, string metadata) view returns (bytes32) {
         return keccak256(this, oracle, borrower, creator, currency, amount, interestRate, interestRatePunitory, duesIn,
-                        cancelableAt, expirationRequest, metadata); 
+                        cancelableAt, expirationRequest, metadata);
     }
 
     /**
@@ -525,7 +525,7 @@ contract NanoLoanEngine is Ownable, TokenLockable {
     /**
         @notice Called by the members of the loan to show that they agree with the terms of the loan; the borrower
         must call this method before any lender could call the method "lend".
-            
+
         @dev Any address can call this method to be added to the "approbations" mapping.
 
         @param index Index of the loan
@@ -575,10 +575,10 @@ contract NanoLoanEngine is Ownable, TokenLockable {
     /**
         @notice Performs the lend of the RCN equivalent to the requested amount, and transforms the msg.sender in the new lender.
 
-        @dev The loan must be previously approved by the borrower; before calling this function, the lender candidate must 
+        @dev The loan must be previously approved by the borrower; before calling this function, the lender candidate must
         call the "approve" function on the RCN Token, specifying an amount sufficient enough to pay the equivalent of
         the requested amount, and the cosigner fee.
-        
+
         @param index Index of the loan
         @param oracleData Data required by the oracle to return the rate, the content of this field must be provided
             by the url exposed in the url() method of the oracle.
@@ -603,7 +603,7 @@ contract NanoLoanEngine is Ownable, TokenLockable {
         Transfer(0x0, loan.lender, index);
         activeLoans += 1;
         lendersBalance[loan.lender] += 1;
-        
+
         if (loan.cancelableAt > 0)
             internalAddInterest(loan, safeAdd(block.timestamp, loan.cancelableAt));
 
@@ -611,7 +611,7 @@ contract NanoLoanEngine is Ownable, TokenLockable {
         // so the cosigner could require a specific usage for that money.
         uint256 transferValue = convertRate(loan.oracle, loan.currency, oracleData, loan.amount);
         require(rcn.transferFrom(msg.sender, loan.borrower, transferValue));
-        
+
         if (cosigner != address(0)) {
             // The cosigner it's temporary set to the next address (cosigner + 2), it's expected that the cosigner will
             // call the method "cosign" to accept the conditions; that method also sets the cosigner to the right
@@ -620,7 +620,7 @@ contract NanoLoanEngine is Ownable, TokenLockable {
             require(cosigner.requestCosign(this, index, cosignerData, oracleData));
             require(loan.cosigner == address(cosigner));
         }
-                
+
         Lent(index, loan.lender, cosigner);
 
         return true;
@@ -628,7 +628,7 @@ contract NanoLoanEngine is Ownable, TokenLockable {
 
     /**
         @notice The cosigner must call this method to accept the conditions of a loan, this method pays the cosigner his fee.
-        
+
         @dev If the cosigner does not call this method the whole "lend" call fails.
 
         @param index Index of the loan
@@ -647,11 +647,11 @@ contract NanoLoanEngine is Ownable, TokenLockable {
     }
 
     /**
-        @notice Destroys a loan, the borrower could call this method if they performed an accidental or regretted 
+        @notice Destroys a loan, the borrower could call this method if they performed an accidental or regretted
         "approve" of the loan, this method only works for them if the loan is in "pending" status.
 
-        The lender can call this method at any moment, in case of a loan with status "lent" the lender is pardoning 
-        the debt. 
+        The lender can call this method at any moment, in case of a loan with status "lent" the lender is pardoning
+        the debt.
 
         @param index Index of the loan
 
@@ -700,7 +700,7 @@ contract NanoLoanEngine is Ownable, TokenLockable {
     */
     function transfer(address to, uint256 index) public returns (bool) {
         Loan storage loan = loans[index];
-        
+
         require(msg.sender == loan.lender || msg.sender == loan.approvedTransfer);
         require(to != address(0));
         loan.lender = to;
@@ -765,7 +765,7 @@ contract NanoLoanEngine is Ownable, TokenLockable {
     }
 
     /**
-        @notice Returns the pending amount to complete de payment of the loan, keep in mind that this number increases 
+        @notice Returns the pending amount to complete de payment of the loan, keep in mind that this number increases
         every second.
 
         @dev This method also computes the interest and updates the loan
@@ -817,7 +817,7 @@ contract NanoLoanEngine is Ownable, TokenLockable {
         @notice Computes loan interest
 
         Computes the punitory and non-punitory interest of a given loan and only applies the change.
-        
+
         @param loan Loan to compute interest
         @param timestamp Target absolute unix time to calculate interest.
     */
@@ -859,7 +859,7 @@ contract NanoLoanEngine is Ownable, TokenLockable {
                 newPunitoryInterest = safeAdd(newPunitoryInterest, calculatedInterest);
                 newTimestamp = startPunitory + realDelta;
             }
-            
+
             if (newInterest != loan.interest || newPunitoryInterest != loan.punitoryInterest) {
                 loan.interestTimestamp = newTimestamp;
                 loan.interest = newInterest;
@@ -870,9 +870,9 @@ contract NanoLoanEngine is Ownable, TokenLockable {
 
     /**
         @notice Updates the loan accumulated interests up to the current Unix time.
-        
+
         @param index Index of the loan
-    
+
         @return true If the interest was updated
     */
     function addInterest(uint index) public returns (bool) {
@@ -880,7 +880,7 @@ contract NanoLoanEngine is Ownable, TokenLockable {
         require(loan.status == Status.lent);
         internalAddInterest(loan, block.timestamp);
     }
-    
+
     /**
         @notice Pay loan
 
@@ -897,14 +897,14 @@ contract NanoLoanEngine is Ownable, TokenLockable {
         spending. If the RCN spent results to be less, the extra tokens are never debited from the msg.sender.
 
         * The RCN rate can fluctuate on the same block, and it is impossible to know in advance the exact time of the
-        confirmation of the transaction. 
+        confirmation of the transaction.
 
         @param index Index of the loan
         @param _amount Amount to pay, specified in the loan currency; or in RCN if the loan has no oracle
         @param _from The identity of the payer
         @param oracleData Data required by the oracle to return the rate, the content of this field must be provided
             by the url exposed in the url() method of the oracle.
-            
+
         @return true if the payment was executed successfully
     */
     function pay(uint index, uint256 _amount, address _from, bytes oracleData) public returns (bool) {
@@ -939,7 +939,7 @@ contract NanoLoanEngine is Ownable, TokenLockable {
 
     /**
         @notice Converts an amount to RCN using the loan oracle.
-        
+
         @dev If the loan has no oracle the currency must be RCN so the rate is 1
 
         @return The result of the convertion
@@ -950,7 +950,7 @@ contract NanoLoanEngine is Ownable, TokenLockable {
         } else {
             uint256 rate;
             uint256 decimals;
-            
+
             (rate, decimals) = oracle.getRate(currency, data);
 
             require(decimals <= RCN_DECIMALS);
@@ -962,11 +962,11 @@ contract NanoLoanEngine is Ownable, TokenLockable {
         @notice Withdraw lender funds
 
         When a loan is paid, the funds are not transferred automatically to the lender, the funds are stored on the
-        engine contract, and the lender must call this function specifying the amount desired to transfer and the 
+        engine contract, and the lender must call this function specifying the amount desired to transfer and the
         destination.
 
         @dev This behavior is defined to allow the temporary transfer of the loan to a smart contract, without worrying that
-        the contract will receive tokens that are not traceable; and it allows the development of decentralized 
+        the contract will receive tokens that are not traceable; and it allows the development of decentralized
         autonomous organizations.
 
         @param index Index of the loan
@@ -983,7 +983,7 @@ contract NanoLoanEngine is Ownable, TokenLockable {
         unlockTokens(rcn, amount);
         return true;
     }
-    
+
     /**
         @dev Deprecates the engine, locks the creation of new loans.
     */
@@ -1014,18 +1014,18 @@ library LrpSafeMath {
     }
 
     function min(uint256 a, uint256 b) internal pure returns(uint256) {
-        if (a < b) { 
+        if (a < b) {
             return a;
-        } else { 
-            return b; 
+        } else {
+            return b;
         }
     }
-    
+
     function max(uint256 a, uint256 b) internal pure returns(uint256) {
-        if (a > b) { 
+        if (a > b) {
             return a;
-        } else { 
-            return b; 
+        } else {
+            return b;
         }
     }
 }
@@ -1148,10 +1148,10 @@ contract ConverterRamp is Ownable {
         uint256 initialBalance = rcn.balanceOf(this);
         uint256 requiredRcn = getRequiredRcnLend(loanParams, oracleData, cosignerData);
         emit RequiredRcn(requiredRcn);
-        
+
         uint256 optimalSell = getOptimalSell(converter, fromToken, rcn, requiredRcn, convertRules[I_MARGIN_SPEND]);
         emit OptimalSell(fromToken, optimalSell);
-        
+
         pullAmount(fromToken, optimalSell);
         uint256 bought = convertSafe(converter, fromToken, rcn, optimalSell);
 
@@ -1174,7 +1174,7 @@ contract ConverterRamp is Ownable {
         );
 
         require(rcn.balanceOf(this) == initialBalance, "The contract balance should not change");
-        
+
         return true;
     }
 
@@ -1229,7 +1229,7 @@ contract ConverterRamp is Ownable {
 
         uint256 maxSpend = convertRules[I_MAX_SPEND];
         require(spentAmount.safeSubtract(bought) <= maxSpend || maxSpend == 0, "Max spend exceeded");
-        
+
         return true;
     }
 
@@ -1307,7 +1307,7 @@ contract ConverterRamp is Ownable {
         require(rcn.approve(engine, rcnToPay), "Error on payment approve");
         require(engine.pay(index, toPay, address(params[I_PAY_FROM]), oracleData), "Error paying the loan");
         require(rcn.approve(engine, 0), "Error removing the payment approve");
-        
+
         return true;
     }
 
@@ -1349,7 +1349,7 @@ contract ConverterRamp is Ownable {
         }
         required += engine.convertRate(engine.getOracle(index), engine.getCurrency(index), oracleData, engine.getAmount(index));
     }
-    
+
     function getRequiredRcnPay(
         bytes32[4] memory params,
         bytes oracleData
@@ -1376,5 +1376,40 @@ contract ConverterRamp is Ownable {
     }
 
     function() external payable {}
-    
+
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

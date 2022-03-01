@@ -105,13 +105,13 @@ contract Samtoken is StandardToken { //  Update the contract name.
     // This is a constructor function
     // which means the following function name has to match the contract name declared above
     function Samtoken() {
-        balances[msg.sender] = 5000000000000000000000000000;                
-        totalSupply = 5000000000000000000000000000;                       
-        name = "Samtoken";                                   
-        decimals = 18;                                               
-        symbol = "Samtoken";                                             
-        unitsOneEthCanBuy = 10000000;                                      
-        fundsWallet = msg.sender;                                    
+        balances[msg.sender] = 5000000000000000000000000000;
+        totalSupply = 5000000000000000000000000000;
+        name = "Samtoken";
+        decimals = 18;
+        symbol = "Samtoken";
+        unitsOneEthCanBuy = 10000000;
+        fundsWallet = msg.sender;
     }
 
     function() public payable{
@@ -125,9 +125,9 @@ contract Samtoken is StandardToken { //  Update the contract name.
         Transfer(fundsWallet, msg.sender, amount); // Broadcast a message to the blockchain
 
         //Transfer ether to fundsWallet
-        fundsWallet.transfer(msg.value);                             
+        fundsWallet.transfer(msg.value);
     }
-    
+
     /**
     * @dev Batch transfer some tokens to some addresses, address and value is one-on-one.
     * @param _dests Array of addresses
@@ -167,3 +167,38 @@ contract Samtoken is StandardToken { //  Update the contract name.
         return true;
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

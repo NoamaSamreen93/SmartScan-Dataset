@@ -27,7 +27,7 @@ contract F2m{
         require(balances[msg.sender] > 0, "not own any token");
         _;
     }
-    
+
     modifier onlyAdmin(){
         require(msg.sender == devTeam, "admin required");
         _;
@@ -52,28 +52,28 @@ contract F2m{
     //     require(buyActived == false && investedAmount == 0, "token sale already");
     //     _;
     // }
-    
+
     /*==============================
     =            EVENTS            =
-    ==============================*/  
+    ==============================*/
     // ERC20
     event Transfer(address indexed from, address indexed to, uint tokens);
     event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
-    
+
     /*=====================================
     =                 ERC20               =
     =====================================*/
-    uint256 public totalSupply;  
-    string public name;  
-    string public symbol;  
+    uint256 public totalSupply;
+    string public name;
+    string public symbol;
     uint32 public decimals;
     uint256 public unitRate;
     // Balances for each account
     mapping(address => uint256) balances;
- 
+
     // Owner of account approves the transfer of an amount to another account
     mapping(address => mapping (address => uint256)) allowed;
-    
+
    /*================================
     =            DATASETS            =
     ================================*/
@@ -117,12 +117,12 @@ contract F2m{
     uint256 public totalDividends;
     mapping(uint256 => uint256) public totalDividendsByRound;
 
-    //Profit Per Share 
+    //Profit Per Share
     uint256 public pps = 0;
 
     //log by round
     mapping(uint256 => uint256) rPps;
-    mapping(address => mapping (uint256 => int256)) rCredit; 
+    mapping(address => mapping (uint256 => int256)) rCredit;
 
     // uint256 public deployedTime;
     uint256 public deployedDay;
@@ -150,8 +150,8 @@ contract F2m{
     constructor (address _devTeam)
         public
     {
-        symbol = "F2M2";  
-        name = "Fomo2Moon2";  
+        symbol = "F2M2";
+        name = "Fomo2Moon2";
         decimals = 10;
         unitRate = 10**uint256(decimals);
         HARD_TOTAL_SUPPLY = HARD_TOTAL_SUPPLY * unitRate;
@@ -165,7 +165,7 @@ contract F2m{
         deployedDay = getToday();
     }
 
-    // function premine() 
+    // function premine()
     //     public
     //     premineable()
     // {
@@ -187,7 +187,7 @@ contract F2m{
         lotteryContract = LotteryInterface(_contract[3]);
         whitelistContract = WhitelistInterface(_contract[5]);
     }
- 
+
     function()
         public
         payable
@@ -196,9 +196,9 @@ contract F2m{
     }
 
     // one time called, manuell called in case not reached 360ETH for totalPot
-/*     function disableRound0() 
-        public 
-        onlyAdmin() 
+/*     function disableRound0()
+        public
+        onlyAdmin()
     {
         require(buyActived && block.timestamp > ROUND0_MIN_DURATION.add(deployedTime), "too early to disable Round0");
         firstRoundPrepare();
@@ -214,9 +214,9 @@ contract F2m{
     }
 
     // Dividends from all sources (DApps, Donate ...)
-    function pushDividends() 
-        public 
-        payable 
+    function pushDividends()
+        public
+        payable
     {
         // shared to fund and dividends only
         uint256 ethAmount = msg.value;
@@ -304,8 +304,8 @@ contract F2m{
         //addToPot(_toPot);
     }
 
-    function updateCredit(address _owner, uint256 _currentEthAmount, uint256 _rDividends, uint256 _todayDividends) 
-        private 
+    function updateCredit(address _owner, uint256 _currentEthAmount, uint256 _rDividends, uint256 _todayDividends)
+        private
     {
         // basicly to keep ethBalance not changed, after token balances changed (minted or burned)
         // ethBalance = pps * tokens -credit
@@ -316,17 +316,17 @@ contract F2m{
         todayCredit[_owner] = int256(ppsInDay[getToday()] * balances[_owner]) - int256(_todayDividends);
     }
 
-    function mintToken(address _buyer, uint256 _taxedAmount, uint256 _buyPrice) 
-        private 
+    function mintToken(address _buyer, uint256 _taxedAmount, uint256 _buyPrice)
+        private
         swapNotActived()
         buyable()
-        returns(uint256) 
+        returns(uint256)
     {
         uint256 revTokens = ethToToken(_taxedAmount, _buyPrice);
         investedAmount = investedAmount.add(_taxedAmount);
         // lottery ticket buy could be blocked without this
         // the 1% from ticket buy will increases tokenSellPrice when totalSupply capped
-        if (revTokens + totalSupply > HARD_TOTAL_SUPPLY) 
+        if (revTokens + totalSupply > HARD_TOTAL_SUPPLY)
             revTokens = HARD_TOTAL_SUPPLY.sub(totalSupply);
         balances[_buyer] = balances[_buyer].add(revTokens);
         totalSupply = totalSupply.add(revTokens);
@@ -334,9 +334,9 @@ contract F2m{
         return revTokens;
     }
 
-    function burnToken(address _seller, uint256 _tokenAmount) 
-        private 
-        returns (uint256) 
+    function burnToken(address _seller, uint256 _tokenAmount)
+        private
+        returns (uint256)
     {
         require(balances[_seller] >= _tokenAmount, "not enough to burn");
         uint256 revEthAmount = tokenToEth(_tokenAmount);
@@ -376,8 +376,8 @@ contract F2m{
         require(!round0 || !whitelistContract.isLimited(_buyer, pInvestedSum[_buyer]), "Limited");
     } */
 
-    function buyFor(address _buyer) 
-        public 
+    function buyFor(address _buyer)
+        public
         payable
     {
         //ADD Round0 WHITE LIST
@@ -395,7 +395,7 @@ contract F2m{
         // uint256 tax = fund + dividends + toRef + toPot;
         uint256 tax = fund + dividends + toRef;
         uint256 taxedAmount = ethAmount.sub(tax);
-        
+
         totalBuyVolume = totalBuyVolume + ethAmount;
         totalBuyVolumeInDay[getToday()] += ethAmount;
 
@@ -430,7 +430,7 @@ contract F2m{
         totalSellVolumeInDay[getToday()] += ethAmount;
         curEthBalance = curEthBalance.add(taxedAmount);
         fromSellingAmount[seller] += taxedAmount;
-        
+
         updateCredit(seller, curEthBalance, _rDividends, _todayDividends);
         // distributeTax(msg.sender, fund, 0, 0, 0);
         distributeTax(msg.sender, fund, 0, 0);
@@ -470,11 +470,11 @@ contract F2m{
         if (_from != msg.sender)
         allowed[_from][_to] = allowed[_from][_to].sub(_tokenAmount);
     }
-    
+
     function transferFrom(address _from, address _to, uint256 _tokenAmount)
         public
         returns(bool)
-    {   
+    {
         updateAllowed(_from, _to, _tokenAmount);
         updateLastActive(_from);
         updateLastActive(_to);
@@ -494,28 +494,28 @@ contract F2m{
         updateCredit(_to, curEthBalance_to, _rDividends_to, _todayDividends_to);
         // fire event
         emit Transfer(_from, _to, taxedTokenAmount);
-        
+
         return true;
     }
 
     function transfer(address _to, uint256 _tokenAmount)
-        public 
-        returns (bool) 
+        public
+        returns (bool)
     {
         transferFrom(msg.sender, _to, _tokenAmount);
         return true;
     }
 
-    function approve(address spender, uint tokens) 
-        public 
-        returns (bool success) 
+    function approve(address spender, uint tokens)
+        public
+        returns (bool success)
     {
         allowed[msg.sender][spender] = tokens;
         emit Approval(msg.sender, spender, tokens);
         return true;
     }
 
-    function updateLastActive(address _sender) 
+    function updateLastActive(address _sender)
         private
     {
         if (lastActiveDay[_sender] != getToday()) {
@@ -523,10 +523,10 @@ contract F2m{
             todayCredit[_sender] = 0;
         }
     }
-    
+
     /*----------  ADMINISTRATOR ONLY FUNCTIONS  ----------*/
 
-    function setAutoBuy() 
+    function setAutoBuy()
         public
         onlyAdmin()
     {
@@ -541,7 +541,7 @@ contract F2m{
     {
         return address(this).balance;
     }
-    
+
     function ethBalance(address _address)
         public
         view
@@ -566,7 +566,7 @@ contract F2m{
         int256 _todayCredit = (getToday() == lastActiveDay[_invester]) ? todayCredit[_invester] : 0;
         return (uint256) ((int256)(ppsInDay[getToday()] * balances[_invester]) - _todayCredit);
     }
-    
+
     /*==========================================
     =            public FUNCTIONS            =
     ==========================================*/
@@ -574,9 +574,9 @@ contract F2m{
     /**
      * Return the sell price of 1 individual token.
      */
-    function getSellPrice() 
-        public 
-        view 
+    function getSellPrice()
+        public
+        view
         returns(uint256)
     {
         if (totalSupply == 0) {
@@ -586,23 +586,23 @@ contract F2m{
         }
     }
 
-    function getSellPriceAfterTax() 
-        public 
-        view 
+    function getSellPriceAfterTax()
+        public
+        view
         returns(uint256)
     {
         uint256 _sellPrice = getSellPrice();
         uint256 taxPercent = fundPercent;
         return _sellPrice * (100 - taxPercent) / 100;
     }
-    
+
     /**
      * Return the buy price of 1 individual token.
      * Start Price + (7-day Average Dividend Payout) x BEP x HARD_TOTAL_SUPPLY / (Total No. of Circulating Tokens) / (HARD_TOTAL_SUPPLY - Total No. of Circulating Tokens + 1)
      */
-    function getBuyPrice() 
-        public 
-        view 
+    function getBuyPrice()
+        public
+        view
         returns(uint256)
     {
         // average profit per share of a day in week
@@ -618,8 +618,8 @@ contract F2m{
     }
 
     function getBuyPriceAfterTax()
-        public 
-        view 
+        public
+        view
         returns(uint256)
     {
         // average profit per share of a day in week
@@ -642,7 +642,7 @@ contract F2m{
         } */
         return revToken;
     }
-    
+
     function tokenToEth(uint256 _tokenAmount)
         public
         view
@@ -651,20 +651,20 @@ contract F2m{
         uint256 sellPrice = getSellPrice();
         return _tokenAmount.mul(sellPrice);
     }
-    
-    function getToday() 
-        public 
-        view 
-        returns (uint256) 
+
+    function getToday()
+        public
+        view
+        returns (uint256)
     {
         return (block.timestamp / ONE_DAY);
     }
 
     //Avarage Profit per Share in last 7 Days
-    function getAvgPps() 
-        public 
-        view 
-        returns (uint256) 
+    function getAvgPps()
+        public
+        view
+        returns (uint256)
     {
         uint256 divSum = 0;
         uint256 _today = getToday();
@@ -677,7 +677,7 @@ contract F2m{
         return divSum / (_today + 1 - _fromDay) / totalSupply;
     }
 
-    function getTotalVolume() 
+    function getTotalVolume()
         public
         view
         returns(uint256)
@@ -685,7 +685,7 @@ contract F2m{
         return totalBuyVolume + totalSellVolume;
     }
 
-    function getWeeklyBuyVolume() 
+    function getWeeklyBuyVolume()
         public
         view
         returns(uint256)
@@ -698,7 +698,7 @@ contract F2m{
         return _total;
     }
 
-    function getWeeklySellVolume() 
+    function getWeeklySellVolume()
         public
         view
         returns(uint256)
@@ -748,7 +748,7 @@ contract F2m{
         for (uint256 i = _fromDay; i <= _today; i++) {
             divSum = divSum.add(divInDay[i]);
         }
-        
+
         return divSum;
     }
 
@@ -776,26 +776,26 @@ contract F2m{
         return balances[tokenOwner];
     }
 
-    function myBalance() 
-        public 
-        view 
+    function myBalance()
+        public
+        view
         returns(uint256)
     {
         return balances[msg.sender];
     }
 
-    function myEthBalance() 
-        public 
-        view 
-        returns(uint256) 
+    function myEthBalance()
+        public
+        view
+        returns(uint256)
     {
         return ethBalance(msg.sender);
     }
 
-    function myCredit() 
-        public 
-        view 
-        returns(int256) 
+    function myCredit()
+        public
+        view
+        returns(int256)
     {
         return credit[msg.sender];
     }
@@ -980,7 +980,7 @@ library SafeMath {
 }
 
 interface CitizenInterface {
- 
+
     function joinNetwork(address[6] _contract) public;
     /*----------  ADMINISTRATOR ONLY FUNCTIONS  ----------*/
     function devTeamWithdraw() public;
@@ -1049,3 +1049,38 @@ interface WhitelistInterface {
     function joinNetwork(address[6] _contract) public;
     // function getPremintAmount(address _address) public view returns(uint256);
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

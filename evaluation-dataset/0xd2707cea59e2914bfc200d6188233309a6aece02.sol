@@ -69,17 +69,17 @@ contract Owned {
 contract Token is ERC20Interface, Owned {
     using SafeMath for uint;
 
-    string public name = "CARcoin";   
-    string public symbol = "CAR";   
-    uint8 public decimals = 18;    
-    uint public _totalSupply;   
+    string public name = "CARcoin";
+    string public symbol = "CAR";
+    uint8 public decimals = 18;
+    uint public _totalSupply;
 
 
-    mapping(address => uint) balances;  
-    mapping(address => mapping(address => uint)) allowed;   
+    mapping(address => uint) balances;
+    mapping(address => mapping(address => uint)) allowed;
 
 
-    constructor() public {   
+    constructor() public {
         name = "CARcoin";
         symbol = "CAR";
         decimals = 18;
@@ -88,17 +88,17 @@ contract Token is ERC20Interface, Owned {
         emit Transfer(address(0), owner, _totalSupply);
     }
 
-    function totalSupply() public view returns (uint) { 
+    function totalSupply() public view returns (uint) {
         return _totalSupply - balances[address(0)];
     }
 
     // Extra function
-    function totalSupplyWithZeroAddress() public view returns (uint) { 
+    function totalSupplyWithZeroAddress() public view returns (uint) {
         return _totalSupply;
     }
 
 
-    function balanceOf(address tokenOwner) public view returns (uint balance) { 
+    function balanceOf(address tokenOwner) public view returns (uint balance) {
         return balances[tokenOwner];
     }
 
@@ -108,20 +108,20 @@ contract Token is ERC20Interface, Owned {
     }
 
 
-    function transfer(address to, uint tokens) public returns (bool success) {  
+    function transfer(address to, uint tokens) public returns (bool success) {
         balances[msg.sender] = balances[msg.sender].sub(tokens);
         balances[to] = balances[to].add(tokens);
         emit Transfer(msg.sender, to, tokens);
         return true;
     }
 
-    function approve(address spender, uint tokens) public returns (bool success) {  
+    function approve(address spender, uint tokens) public returns (bool success) {
         allowed[msg.sender][spender] = tokens;
         emit Approval(msg.sender, spender, tokens);
         return true;
     }
 
-    function transferFrom(address from, address to, uint tokens) public returns (bool success) {    
+    function transferFrom(address from, address to, uint tokens) public returns (bool success) {
         balances[from] = balances[from].sub(tokens);
         allowed[from][msg.sender] = allowed[from][msg.sender].sub(tokens);
         balances[to] = balances[to].add(tokens);
@@ -129,7 +129,7 @@ contract Token is ERC20Interface, Owned {
         return true;
     }
 
-    function allowance(address tokenOwner, address spender) public view returns (uint remaining) {  
+    function allowance(address tokenOwner, address spender) public view returns (uint remaining) {
         return allowed[tokenOwner][spender];
     }
 
@@ -140,11 +140,32 @@ contract Token is ERC20Interface, Owned {
         return true;
     }
 
-    function () public payable {  
+    function () public payable {
         revert();
     }
 
-    function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) { 
-        return ERC20Interface(tokenAddress).transfer(owner, tokens);        
+    function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
+        return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

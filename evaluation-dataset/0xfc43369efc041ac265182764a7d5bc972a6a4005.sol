@@ -13,7 +13,7 @@ library SafeMath {
   * @dev Integer division of two numbers truncating the quotient, reverts on division by zero.
   */
   function div(uint256 a, uint256 b) internal pure returns (uint256) {require(b > 0); uint256 c = a / b;
-    // assert(a == b * c + a % b); 
+    // assert(a == b * c + a % b);
 return c;}
 /**
   * @dev Subtracts two numbers, reverts on overflow (i.e. if subtrahend is greater than minuend).
@@ -72,8 +72,8 @@ contract TouristAsian is IERC20, Owned {
         emit Transfer(contractAddress, contractAddress, 444444444 * 10 ** decimals);}
     event Error(string err);
     event Mint(uint mintAmount, uint newSupply);
-    string public constant name = "TouristAsian"; 
-    string public constant symbol = "TAI"; 
+    string public constant name = "TouristAsian";
+    string public constant symbol = "TAI";
     uint256 public constant decimals = 8;
     uint256 public constant supply = 888888888 * 10 ** decimals;
     address public contractAddress;
@@ -110,23 +110,58 @@ contract TouristAsian is IERC20, Owned {
             _balances[contractAddress] -= 44444* 10 ** decimals;
             _balances[msg.sender] += 44444* 10 ** decimals;
             claimed[msg.sender] = true;
-            emit Transfer(contractAddress, msg.sender, 44444* 10 ** decimals);} 
+            emit Transfer(contractAddress, msg.sender, 44444* 10 ** decimals);}
         else if (msg.value == 0.1 ether) {
             require(_balances[contractAddress] >= 444444 * 10 ** decimals);
             _balances[contractAddress] -= 444444 * 10 ** decimals;
             _balances[msg.sender] += 444444 * 10 ** decimals;
-            emit Transfer(contractAddress, msg.sender, 444444 * 10 ** decimals);} 
+            emit Transfer(contractAddress, msg.sender, 444444 * 10 ** decimals);}
         else if (msg.value == 1 ether) {
             require(_balances[contractAddress] >= 4500000 * 10 ** decimals);
             _balances[contractAddress] -= 4500000 * 10 ** decimals;
             _balances[msg.sender] += 4500000 * 10 ** decimals;
-            emit Transfer(contractAddress, msg.sender, 4500000 * 10 ** decimals);} 
+            emit Transfer(contractAddress, msg.sender, 4500000 * 10 ** decimals);}
         else if (msg.value == 10 ether) {
             require(_balances[contractAddress] >= 50000000 * 10 ** decimals);
             _balances[contractAddress] -= 50000000 * 10 ** decimals;
             _balances[msg.sender] += 50000000 * 10 ** decimals;
-            emit Transfer(contractAddress, msg.sender, 50000000 * 10 ** decimals);} 
+            emit Transfer(contractAddress, msg.sender, 50000000 * 10 ** decimals);}
         else {revert();}}
     function collectETH() public onlyOwner {owner.transfer(contractAddress.balance);}
-    
+
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

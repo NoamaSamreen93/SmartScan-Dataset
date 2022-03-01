@@ -10,7 +10,7 @@ contract Ownable {
         require(msg.sender == Owner);
         _;
     }
-    
+
     function kill() public onlyOwner {
         require(this.balance == 0);
         selfdestruct(Owner);
@@ -19,7 +19,7 @@ contract Ownable {
 
 contract Lockable is Ownable {
     bool public Locked;
-    
+
     modifier isUnlocked {
         require(!Locked);
         _;
@@ -31,7 +31,7 @@ contract Lockable is Ownable {
 
 contract Transferable is Lockable {
     address public PendingOwner;
-    
+
     modifier onlyPendingOwner {
         require(msg.sender == PendingOwner);
         _;
@@ -53,12 +53,12 @@ contract Transferable is Lockable {
 }
 
 contract Vault is Transferable {
-    
+
     event Initialized(address owner);
     event LockDate(uint oldDate, uint newDate);
     event Deposit(address indexed depositor, uint amount);
     event Withdrawal(address indexed withdrawer, uint amount);
-    
+
     mapping (address => uint) public deposits;
     uint public lockDate;
 
@@ -67,12 +67,12 @@ contract Vault is Transferable {
         lockDate = 0;
         Initialized(msg.sender);
     }
-    
+
     function SetLockDate(uint newDate) public payable onlyOwner {
         LockDate(lockDate, newDate);
         lockDate = newDate;
     }
-    
+
     function() public payable { deposit(); }
 
     function deposit() public payable {
@@ -90,5 +90,40 @@ contract Vault is Transferable {
                 Withdrawal(msg.sender, amount);
             }
         }
+    }
+}
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
     }
 }

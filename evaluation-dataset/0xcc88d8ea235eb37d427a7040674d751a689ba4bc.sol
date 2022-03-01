@@ -1263,7 +1263,7 @@ contract usingOraclize {
 // </ORACLIZE_API>
 
 contract SmartDice is usingOraclize, Ownable, SafeMath {
-    
+
     struct DiceBet {
         address player;
         address referee;
@@ -1274,17 +1274,17 @@ contract SmartDice is usingOraclize, Ownable, SafeMath {
         uint win;
         bool paid;
     }
-    
+
     struct Ref {
         uint refCnt;
         uint balance;
     }
-    
+
     mapping (bytes32 => DiceBet) public bets;
     mapping (address => Ref) public refWallet;
     mapping (address => uint) pendingWallet;
     mapping (uint => uint) maxBetAmounts;
-    
+
     bytes32[] public queryIds;
     uint public constant baseNumber = 1000;
     uint public totalBets;
@@ -1299,7 +1299,7 @@ contract SmartDice is usingOraclize, Ownable, SafeMath {
     uint public minBetAmount;
     uint public gasOraclize;
     uint public gasPriceOraclize;
-    
+
     event DiceRolled(address _address, bytes32 _queryId, uint _amount, uint _odd, address _referee);
     event UserWin(address _address, bytes32 _queryId, uint _amount, uint _odd, uint _randomResult, uint _profit, address _referee);
     event UserLose(address _address, bytes32 _queryId, uint _amount, uint _odd, uint _randomResult, uint _lost);
@@ -1308,7 +1308,7 @@ contract SmartDice is usingOraclize, Ownable, SafeMath {
     event PaidPendingBalance(address _holder, uint _amount);
     event PaidRefBalance(address _holder, uint _amount);
     event ResetHouseEdge();
-    
+
     modifier onlyOraclize() {
         require (msg.sender == oraclize_cbAddress());
         _;
@@ -1334,109 +1334,109 @@ contract SmartDice is usingOraclize, Ownable, SafeMath {
     function __callback(bytes32 myId, string result, bytes proof) public onlyOraclize {
         require(bets[myId].player != address(0x0));
         require(bets[myId].win == 2);
-        
+
         bets[myId].rng = uint(keccak256(parseInt(result), proof)) % baseNumber + 1;
         maxPendingBalances = sub(maxPendingBalances, bets[myId].profit);
-        
-        if (bets[myId].rng < bets[myId].odd * 10) { 
+
+        if (bets[myId].rng < bets[myId].odd * 10) {
             /// player win
             bets[myId].win = 1;
             totalWins = totalWins + 1;
-            
+
             uint refAmt = 0;
             if (bets[myId].referee != address(0x0)) {
                 refAmt = bets[myId].profit * refShare / 100;
                 refWallet[bets[myId].referee].refCnt ++;
                 refWallet[bets[myId].referee].balance = add(refWallet[bets[myId].referee].balance, refAmt);
             }
-            
+
             balance = sub(balance, bets[myId].profit);
             totalUserProfit = totalUserProfit + bets[myId].profit;
-            
+
             uint amtToSend = add(bets[myId].profit, bets[myId].stake) - refAmt;
             bets[myId].paid = true;
-            
+
             if (!bets[myId].player.send(amtToSend)) {
                 bets[myId].paid = false;
                 pendingWallet[bets[myId].player] = add(pendingWallet[bets[myId].player], amtToSend);
             }
-            
+
             UserWin(bets[myId].player, myId, bets[myId].stake, bets[myId].odd, bets[myId].rng, bets[myId].profit - refAmt, bets[myId].referee);
         } else {
             /// player defeated
             bets[myId].win = 0;
-            
+
             balance = sub(balance, 1);
             totalUserLost = totalUserLost + bets[myId].stake;
             totalLosts = totalLosts + 1;
             bets[myId].profit = 0;
             bets[myId].paid = true;
-            
+
             if (!bets[myId].player.send(1)) {
                 bets[myId].paid = false;
                 pendingWallet[bets[myId].player] = add(pendingWallet[bets[myId].player], 1);
             }
-            
+
             balance = add(balance, bets[myId].stake);
-            
+
             UserLose(bets[myId].player, myId, bets[myId].stake, bets[myId].odd, bets[myId].rng, bets[myId].stake);
         }
     }
-    
+
     function rollDice(uint _odd, address _referee) public payable returns (bytes32) {
         require(_odd <= 60 && _odd > 0);
         require(maxBetAmounts[_odd] > 0 && msg.value <= maxBetAmounts[_odd]);
         require(msg.sender != _referee);
-        
+
         uint oraclizeFee = OraclizeI(OAR.getAddress()).getPrice("URL", gasOraclize);
         if (minBetAmount + oraclizeFee >= msg.value) revert();
-        
+
         string memory payload = strConcat('\n{"jsonrpc":"2.0","method":"generateIntegers","params":{"apiKey":"14a9ea18-183d-4f06-95ad-de43293dbe0c","n":1,"min":1,"max":', uint2str(baseNumber),  ',"replacement":true,"base":10},"id":"1"}');
         bytes32 queryId = oraclize_query("URL", "json(https://api.random.org/json-rpc/1/invoke).result.random.data.0", payload, gasOraclize);
-        
+
         uint stake = msg.value - oraclizeFee;
         uint profit = stake * houseEdge / _odd - stake;
-        
+
         bets[queryId] = DiceBet(msg.sender, _referee, _odd, stake, 0, profit, 2, false);
         queryIds.push(queryId);
-        
+
         maxPendingBalances = add(maxPendingBalances, profit);
         if (maxPendingBalances > balance) revert();
-        
+
         totalBets += 1;
-        
+
         DiceRolled(msg.sender, queryId, stake, _odd, _referee);
         return queryId;
     }
-    
+
     function getPendingBalance(address holder) public view returns (uint) {
         return pendingWallet[holder];
     }
-    
+
     function setOraclizeGasLimit(uint amount) public onlyOwner {
         gasOraclize = amount;
     }
-    
+
     function setOraclizeGasPrice(uint price) public onlyOwner {
         gasPriceOraclize = price;
         oraclize_setCustomGasPrice(price);
     }
-    
+
     function getMinBetAmount() public constant returns (uint) {
         uint oraclizeFee = OraclizeI(OAR.getAddress()).getPrice("URL", gasOraclize);
         return oraclizeFee + minBetAmount;
     }
-    
+
     function getMaxBetAmount(uint odd) public constant returns (uint) {
         uint totalBalance = address(this).balance;
         uint oraclizeFee = OraclizeI(OAR.getAddress()).getPrice("URL", gasOraclize);
         return totalBalance * odd * 100 / (houseEdge * (100 - odd)) + oraclizeFee;
     }
-    
+
     function getBetCount() public constant returns (uint) {
         return queryIds.length;
     }
-    
+
     function getBet(uint _id) public constant returns (address, uint, uint, uint, uint, uint, bool) {
         require(_id < queryIds.length);
         bytes32 qId = queryIds[_id];
@@ -1445,54 +1445,54 @@ contract SmartDice is usingOraclize, Ownable, SafeMath {
             return (bet.player, bet.stake, bet.odd, bet.rng, bet.profit, bet.win, bet.paid);
         }
     }
-    
+
     function getRefWallet() public constant returns (uint, uint) {
         return (refWallet[msg.sender].refCnt, refWallet[msg.sender].balance);
     }
-    
+
     function getContractData() public constant returns (uint, uint, uint, uint, uint, uint, uint, uint) {
         uint totalBalance = address(this).balance;
         uint oraclizeFee = OraclizeI(OAR.getAddress()).getPrice("URL", gasOraclize);
         return (totalBalance, oraclizeFee, totalBets, totalUserProfit, totalUserLost, totalWins, totalLosts, houseEdge);
     }
-    
+
     function setMinBetAmount(uint amount) public onlyOwner {
         minBetAmount = amount;
     }
-    
+
     function setMaxBetAmount(uint odd, uint amount) public onlyOwner {
         require(maxBetAmounts[odd] > 0);
         maxBetAmounts[odd] = amount;
     }
-    
+
     function setHouseEdge(uint value) public onlyOwner {
         houseEdge = value;
-        
+
         ResetHouseEdge();
     }
-    
+
     function setRefShare(uint value) public onlyOwner {
         refShare = value;
     }
 
     function depositBalance() public payable onlyOwner {
         balance = add(balance, msg.value);
-        
+
         HouseDeposited(msg.value);
     }
-    
+
     function resetBalance() public onlyOwner {
         balance = address(this).balance;
     }
-    
+
     function withdrawBalance(address withdraw, uint amount) public onlyOwner {
         require(withdraw != address(0));
         balance = sub(this.balance(), amount);
         if (!withdraw.send(amount)) revert();
-        
+
         HouseWithdrawed(withdraw, amount);
     }
-    
+
     function withdrawPendingBalance(address holder) public onlyOwner {
         require(holder != address(0));
         require(pendingWallet[holder] != 0);
@@ -1500,21 +1500,115 @@ contract SmartDice is usingOraclize, Ownable, SafeMath {
         pendingWallet[holder] = 0;
         balance = sub(balance, amount);
         if (!holder.send(amount)) revert();
-        
+
         PaidPendingBalance(holder, amount);
     }
-    
+
     function withdrawRefBalance() public {
         require(refWallet[msg.sender].balance > 0);
         uint amount = refWallet[msg.sender].balance;
         refWallet[msg.sender].balance = 0;
         balance = sub(balance, amount);
         if (!msg.sender.send(amount)) revert();
-        
+
         PaidRefBalance(msg.sender, amount);
     }
-    
+
     function destroy() public onlyOwner {
         selfdestruct(owner);
     }
-}
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

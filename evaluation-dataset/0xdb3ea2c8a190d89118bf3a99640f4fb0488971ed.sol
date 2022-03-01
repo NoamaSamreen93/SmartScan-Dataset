@@ -13,7 +13,7 @@ contract IBlockRandomLibrary {
     function setRandomBlock(uint blockNumber) internal;
     function updateRandom() public;
     function isRandomAvailable() public view returns(bool);
-    function randomBlockPassed() public view returns(bool); 
+    function randomBlockPassed() public view returns(bool);
     function getRandomValue() public view returns(uint);
     function canStoreRandom() public view returns(bool);
     function isRandomStored() public view returns(bool);
@@ -58,8 +58,8 @@ contract ICommonGame is IAdminContract {
     function setAutoCreation(bool allowed) public;
     function autoCreationAfterOwnAllowed() public view returns(bool);
     function setAutoCreationAfterOwn(bool allowed) public;
-    function transferInteractionsAllowed() public view returns(bool); 
-    function setTransferInteractions(bool allowed) public; 
+    function transferInteractionsAllowed() public view returns(bool);
+    function setTransferInteractions(bool allowed) public;
     function startOnlyMinPrizes() public view returns (bool);
     function setStartOnlyMinPrizes(bool minPrizes) public;
     function startProfitedGamesAllowed() public view returns (bool);
@@ -88,7 +88,7 @@ contract IFunctionPrize {
 
 contract IPrizeLibrary is ICommonGame {
     function calculatePrize(uint number, uint minPrize, uint maxPrize) public view returns(uint);
-    function prizeName() public view returns (string);    
+    function prizeName() public view returns (string);
 }
 
 contract IBalanceSharePrizeContract {
@@ -124,7 +124,7 @@ contract BlockRandomLibrary is IBlockRandomLibrary {
     uint public randomValue;
     uint public maxBlocks;
 
-    constructor(uint _maxBlocks) public 
+    constructor(uint _maxBlocks) public
         IBlockRandomLibrary()
     {
         assert(_maxBlocks <= 250);
@@ -144,7 +144,7 @@ contract BlockRandomLibrary is IBlockRandomLibrary {
     }
 
     event RandomValueCalculated(uint value, uint randomBlock);
-    
+
     function updateRandom() public {
         if (!isRandomStored() && canStoreRandom()) {
             randomValue = uint(blockhash(randomBlock));
@@ -161,7 +161,7 @@ contract BlockRandomLibrary is IBlockRandomLibrary {
             return randomValue;
         } else if (canStoreRandom()) {
             return uint(blockhash(randomBlock));
-        } 
+        }
 
         return 0;
     }
@@ -196,7 +196,7 @@ contract EllipticPrize16x is IFunctionPrize {
     function prizeFunctionName() public view returns (string) {
         return "E16x";
     }
-} 
+}
 
 contract BalanceSharePrizeContract is IBalanceSharePrizeContract, ICommonGame, IMinMaxPrize, IBalanceInfo {
     uint public minPrize;
@@ -229,7 +229,7 @@ contract BalanceSharePrizeContract is IBalanceSharePrizeContract, ICommonGame, I
     }
 
     function getMaxPrize() public view returns(uint) {
-        return (availableBalance() * maxPrizeShare) / (1 ether);        
+        return (availableBalance() * maxPrizeShare) / (1 ether);
     }
 
     function getWholePrize() public view returns(uint) {
@@ -278,7 +278,7 @@ contract CommonGame is ICommonGame {
 
     constructor(address _gameAdmin) public {
         assert(_gameAdmin != 0);
-        
+
         gameAdmin = _gameAdmin;
         blocks2Finish = 50000;
         totalV = 1000;
@@ -378,7 +378,7 @@ contract BalanceInfo is IBalanceInfo {
 
     function totalBalance() public view returns(uint) {
         return address(this).balance;
-    } 
+    }
 
     function reservedBalance() public view returns(uint) {
         return sm_reserved;
@@ -390,7 +390,7 @@ contract BalanceInfo is IBalanceInfo {
         } else {
             return 0;
         }
-    } 
+    }
 
     function reserveBalance(uint value) internal returns (uint) {
         uint balance = availableBalance();
@@ -455,7 +455,7 @@ contract IMoneyContract is ICommonGame, IBalanceInfo {
 
     event MoneyDeposited(address indexed sender, uint value);
     event MoneyWithdrawn(address indexed reciever, uint value);
-    event ProfitRecalculated(bool gameFinish, uint developerProfit, uint charityProfit, uint finalProfit, 
+    event ProfitRecalculated(bool gameFinish, uint developerProfit, uint charityProfit, uint finalProfit,
     uint developerCount, uint charityCount, bool dedicated, address dedicatedCharity);
     event CharityAdded(address charity, string name, string url);
     event DedicatedCharitySelected(address charity);
@@ -463,13 +463,13 @@ contract IMoneyContract is ICommonGame, IBalanceInfo {
 }
 
 contract MoneyContract is IMoneyContract {
-    uint public sm_developerShare; 
+    uint public sm_developerShare;
     uint public sm_charityShare;
     uint public sm_finalShare;
 
     ProfitInfo[] public sm_developers;
     uint public sm_maxDevelopers;
-    
+
     ProfitInfo[] public sm_charity;
     mapping(address => bool) public sm_reciever;
     mapping(address => uint) public sm_profits;
@@ -478,16 +478,16 @@ contract MoneyContract is IMoneyContract {
     uint public sm_lastProfitSync;
     uint public sm_profitSyncLength;
     uint public sm_afterFinishLength;
-    uint public sm_lastBalance; 
+    uint public sm_lastBalance;
     uint internal sm_reserved;
 
     struct ProfitInfo {
-        address receiver; 
+        address receiver;
         string description;
         string url;
     }
 
-    constructor(uint _developerShare, uint _maxDevelopers, 
+    constructor(uint _developerShare, uint _maxDevelopers,
             uint _charityShare, uint _finalShare, uint _profitSyncLength, uint _afterFinishLength) public {
         assert(_developerShare >= 0 && _developerShare <= 1 ether);
         assert(_charityShare >= 0 && _charityShare <= 1 ether);
@@ -562,7 +562,7 @@ contract MoneyContract is IMoneyContract {
         }
 
         sm_lastBalance = availableBalance();
-        emit ProfitRecalculated(gameFinished(), d_profit, c_profit, o_profit, 
+        emit ProfitRecalculated(gameFinished(), d_profit, c_profit, o_profit,
             sm_developers.length, sm_charity.length, dedicated, dedicated_charity);
     }
 
@@ -626,7 +626,7 @@ contract MoneyContract is IMoneyContract {
                 return int(i);
             }
         }
-        
+
         return -1;
     }
 
@@ -648,7 +648,7 @@ contract MoneyContract is IMoneyContract {
     function dedicatedCharityAddress() public view returns(address) {
         return sm_dedicatedCharity;
     }
-    
+
     function depositToBank() public payable {
         require(!gameFinished());
         require(msg.value > 0);
@@ -767,8 +767,8 @@ contract SignedContractId is ISignedContractId {
     bytes public contract_signature;
     address public info_address;
     address public info_admin;
-    uint8 public v; 
-    bytes32 public r; 
+    uint8 public v;
+    bytes32 public r;
     bytes32 public s;
     bool public signed;
 
@@ -850,7 +850,7 @@ contract LinearGameLibrary is IGameLengthLibrary {
     function calcGameLength(uint number) public view returns (uint) {
         return minLength + ((maxLength - minLength) * ((number % totalVariants()) + 1)) / totalVariants();
     }
-    
+
     function calcGameAddon(uint) public view returns (uint) {
         return addon;
     }
@@ -870,7 +870,7 @@ contract LinearGameLibrary is IGameLengthLibrary {
     function getMaxGameAddon() public view returns(uint) {
         return addon;
     }
-     
+
     function alterMaxGameLength(uint _maxGameLength) public admin {
         require(_maxGameLength > 0, "Max game length should be not zero");
         require(_maxGameLength >= minLength, "Max game length should be not more than min length");
@@ -890,7 +890,7 @@ contract LinearGameLibrary is IGameLengthLibrary {
         emit AddonAltered(addon);
     }
 }
- 
+
 contract IGameManager {
     function startGameInternal(uint gameId, uint length, uint addOn, uint prize) internal;
     function betInGameInternal(uint gameId, uint bet) internal;
@@ -948,11 +948,11 @@ contract GameManager is IBalanceInfo, IGameManager {
         require(gameExists(gameId), "No such game");
         require(!finishedGame(gameId), "Game is finished");
         uint newBet = bets[gameId][msg.sender] + bet;
-        
+
         if (newBet > bets[gameId][games[gameId].highestBidder]) {
             games[gameId].highestBidder = msg.sender;
             games[gameId].lastBetBlock = block.number;
-        } 
+        }
 
         bets[gameId][msg.sender] = newBet;
         games[gameId].totalBets += bet;
@@ -982,7 +982,7 @@ contract GameManager is IBalanceInfo, IGameManager {
     }
 
     function finishedGame(uint gameId) public view returns(bool) {
-        if (!gameExists(gameId)) 
+        if (!gameExists(gameId))
             return false;
         return addonEndsIn(gameId) < block.number;
     }
@@ -1091,7 +1091,7 @@ contract StartGame is IStartGame, ICommonGame, IPrizeLibrary, IMinMaxPrize, IGam
             emit GameProfitedEvent(gameId);
         }
     }
-        
+
     uint public repeatBlock;
     uint public addonBlock;
 
@@ -1184,8 +1184,8 @@ contract StartGame is IStartGame, ICommonGame, IPrizeLibrary, IMinMaxPrize, IGam
     function getStartGameStatus() public view returns(bool, uint, uint, uint, uint) {
         uint random = randomValueWithMinPrize();
         return (
-            canStartGame(), 
-            nextGameId, 
+            canStartGame(),
+            nextGameId,
             calculatePrize(random, getMinPrize(), getMaxPrize()),
             calcGameLength(random),
             calcGameAddon(random));
@@ -1195,7 +1195,7 @@ contract StartGame is IStartGame, ICommonGame, IPrizeLibrary, IMinMaxPrize, IGam
         if (finishedGame(defaultId) || !gameExists(defaultId)) {
             defaultId = gameId;
             emit DefaultGameUpdated(defaultId);
-        } 
+        }
     }
 
     function defaultGameId() public view returns(uint) {
@@ -1234,7 +1234,7 @@ contract StartGame is IStartGame, ICommonGame, IPrizeLibrary, IMinMaxPrize, IGam
         } else {
             transferGames[msg.sender] = 0;
             withdrawPrizeInternal(tpg, msg.value);
-        } 
+        }
 
         emit TransferBet(msg.sender, msg.value);
     }
@@ -1254,21 +1254,21 @@ contract ICharbetto is IMoneyContract, IStartGame, IBalanceSharePrizeContract,
     function stopGameFast() public;
 }
 
-contract Charbetto is CommonGame, BlockRandomLibrary, BalanceInfo, PrizeLibrary, EllipticPrize16x, 
+contract Charbetto is CommonGame, BlockRandomLibrary, BalanceInfo, PrizeLibrary, EllipticPrize16x,
         MoneyContract, StartGame, GameManager, LinearGameLibrary, BalanceSharePrizeContract {
     constructor(address _admin) public
-        CommonGame(_admin) 
+        CommonGame(_admin)
         BlockRandomLibrary(250)
         BalanceInfo()
         PrizeLibrary()
         EllipticPrize16x()
         MoneyContract(
-            10 finney /*1 percent*/, 
+            10 finney /*1 percent*/,
             5, /*5 developers at maximum*/
-            100 finney /*10 percent*/, 
-            100 finney /*10 percent*/, 
+            100 finney /*10 percent*/,
+            100 finney /*10 percent*/,
             20000, 200000)
-        StartGame(5, 3)  
+        StartGame(5, 3)
         GameManager()
         LinearGameLibrary(50, 1000, 3)
         BalanceSharePrizeContract(10 finney, 100 finney)
@@ -1304,10 +1304,10 @@ contract Charbetto is CommonGame, BlockRandomLibrary, BalanceInfo, PrizeLibrary,
 contract ISignedCharbetto is ISignedContractId, ICharbetto {}
 
 contract SignedCharbetto is Charbetto, SignedContractId {
-    constructor(address admin_, uint version_, address infoContract_, address infoAdminAddress_) public 
-        Charbetto(admin_) 
+    constructor(address admin_, uint version_, address infoContract_, address infoAdminAddress_) public
+        Charbetto(admin_)
         SignedContractId("charbetto", version_, infoContract_, infoAdminAddress_)
-    {} 
+    {}
 
     function recalculatePayoutValueAdmin() admin public {
         revert();
@@ -1321,3 +1321,71 @@ contract SignedCharbetto is Charbetto, SignedContractId {
         processTransferInteraction();
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

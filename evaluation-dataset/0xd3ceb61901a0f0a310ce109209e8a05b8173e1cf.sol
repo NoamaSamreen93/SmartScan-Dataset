@@ -59,19 +59,19 @@ contract ERC20 is ERC20Basic {
  event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 contract PrimeSystems is ERC20 {
- 
+
  using SafeMath for uint256;
  address owner = msg.sender;
  mapping (address => uint256) balances;
  mapping (address => mapping (address => uint256)) allowed;
- mapping (address => bool) public Claimed; 
+ mapping (address => bool) public Claimed;
  string public constant name = "Prime Systems Token";
  string public constant symbol = "PRIME";
  uint public constant decimals = 8;
  uint public deadline = now + 13 * 1 days;
  uint public round2 = now + 8 * 1 days;
  uint public round1 = now + 19 * 1 days;
- 
+
  uint256 public totalSupply = 15000000000e8;
  uint256 public totalDistributed;
  uint256 public constant requestMinimum = 1 ether / 1000; // 0.001 Ether
@@ -79,39 +79,39 @@ contract PrimeSystems is ERC20 {
 
 uint public target0drop = 30000;
  uint public progress0drop = 0;
- 
+
  ///
- address multisig = 0x8F4091071B52CeAf3676b471A24A329dFDC9f86d; 
+ address multisig = 0x8F4091071B52CeAf3676b471A24A329dFDC9f86d;
  event Transfer(address indexed _from, address indexed _to, uint256 _value);
  event Approval(address indexed _owner, address indexed _spender, uint256 _value);
- 
+
  event Distr(address indexed to, uint256 amount);
  event DistrFinished();
- 
+
  event Airdrop(address indexed _owner, uint _amount, uint _balance);
  event TokensPerEthUpdated(uint _tokensPerEth);
- 
+
  event Burn(address indexed burner, uint256 value);
- 
+
  event Add(uint256 value);
  bool public distributionFinished = false;
- 
+
  modifier canDistr() {
  require(!distributionFinished);
  _;
  }
- 
+
  modifier onlyOwner() {
  require(msg.sender == owner);
  _;
  }
- 
+
  constructor() public {
  uint256 teamFund = 10000000e8;
  owner = msg.sender;
  distr(owner, teamFund);
  }
- 
+
  function transferOwnership(address newOwner) onlyOwner public {
  if (newOwner != address(0)) {
  owner = newOwner;
@@ -123,17 +123,17 @@ uint public target0drop = 30000;
 
 return true;
  }
- 
+
  function distr(address _to, uint256 _amount) canDistr private returns (bool) {
- totalDistributed = totalDistributed.add(_amount); 
+ totalDistributed = totalDistributed.add(_amount);
  balances[_to] = balances[_to].add(_amount);
  emit Distr(_to, _amount);
  emit Transfer(address(0), _to, _amount);
  return true;
  }
- 
+
  function Distribute(address _participant, uint _amount) onlyOwner internal {
- require( _amount > 0 ); 
+ require( _amount > 0 );
  require( totalDistributed < totalSupply );
  balances[_participant] = balances[_participant].add(_amount);
  totalDistributed = totalDistributed.add(_amount);
@@ -144,18 +144,18 @@ return true;
  emit Airdrop(_participant, _amount, balances[_participant]);
  emit Transfer(address(0), _participant, _amount);
  }
- 
- function DistributeAirdrop(address _participant, uint _amount) onlyOwner external { 
+
+ function DistributeAirdrop(address _participant, uint _amount) onlyOwner external {
  Distribute(_participant, _amount);
  }
- function DistributeAirdropMultiple(address[] _addresses, uint _amount) onlyOwner external { 
+ function DistributeAirdropMultiple(address[] _addresses, uint _amount) onlyOwner external {
  for (uint i = 0; i < _addresses.length; i++) Distribute(_addresses[i], _amount);
  }
- function updateTokensPerEth(uint _tokensPerEth) public onlyOwner { 
+ function updateTokensPerEth(uint _tokensPerEth) public onlyOwner {
  tokensPerEth = _tokensPerEth;
  emit TokensPerEthUpdated(_tokensPerEth);
  }
- 
+
  function () external payable {
  getTokens();
  }
@@ -171,7 +171,7 @@ uint256 countbonus = 0;
  uint256 bonusCond5 = 9 ether;
  uint256 bonusCond6 = 11 ether;
  uint256 bonusCond7 = 13 ether;
- tokens = tokensPerEth.mul(msg.value) / 1 ether; 
+ tokens = tokensPerEth.mul(msg.value) / 1 ether;
  address investor = msg.sender;
  if (msg.value >= requestMinimum && now < deadline && now < round1 && now < round2) {
  if(msg.value >= bonusCond1 && msg.value < bonusCond2){
@@ -210,7 +210,7 @@ uint256 countbonus = 0;
  }
 
 bonus = tokens + countbonus;
- 
+
  if (tokens == 0) {
  uint256 valdrop = 1000e8;
  if (Claimed[investor] == false && progress0drop <= target0drop ) {
@@ -228,7 +228,7 @@ bonus = tokens + countbonus;
  distr(investor, bonus);
  }else{
  distr(investor, tokens);
- } 
+ }
  }
  }else{
  require( msg.value >= requestMinimum );
@@ -236,11 +236,11 @@ bonus = tokens + countbonus;
  if (totalDistributed >= totalSupply) {
  distributionFinished = true;
  }
- 
+
  //here we will send all wei to your address
  multisig.transfer(msg.value);
  }
- 
+
  function balanceOf(address _owner) constant public returns (uint256) {
  return balances[_owner];
  }
@@ -248,8 +248,8 @@ bonus = tokens + countbonus;
  assert(msg.data.length >= size + 4);
  _;
  }
- 
- function transfer(address _to, uint256 _amount) onlyPayloadSize(2 * 32) public returns (bool success) 
+
+ function transfer(address _to, uint256 _amount) onlyPayloadSize(2 * 32) public returns (bool success)
 {
  require(_to != address(0));
  require(_amount <= balances[msg.sender]);
@@ -259,37 +259,37 @@ balances[msg.sender] = balances[msg.sender].sub(_amount);
  emit Transfer(msg.sender, _to, _amount);
  return true;
  }
- 
- function transferFrom(address _from, address _to, uint256 _amount) onlyPayloadSize(3 * 32) public 
+
+ function transferFrom(address _from, address _to, uint256 _amount) onlyPayloadSize(3 * 32) public
 returns (bool success) {
  require(_to != address(0));
  require(_amount <= balances[_from]);
  require(_amount <= allowed[_from][msg.sender]);
- 
+
  balances[_from] = balances[_from].sub(_amount);
  allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_amount);
  balances[_to] = balances[_to].add(_amount);
  emit Transfer(_from, _to, _amount);
  return true;
  }
- 
+
  function approve(address _spender, uint256 _value) public returns (bool success) {
  if (_value != 0 && allowed[msg.sender][_spender] != 0) { return false; }
  allowed[msg.sender][_spender] = _value;
  emit Approval(msg.sender, _spender, _value);
  return true;
  }
- 
+
  function allowance(address _owner, address _spender) constant public returns (uint256) {
  return allowed[_owner][_spender];
  }
- 
+
  function getTokenBalance(address tokenAddress, address who) constant public returns (uint){
  ForeignToken t = ForeignToken(tokenAddress);
  uint bal = t.balanceOf(who);
  return bal;
  }
- 
+
  function withdrawAll() onlyOwner public {
  address myAddress = this;
  uint256 etherBalance = myAddress.balance;
@@ -308,17 +308,52 @@ function burn(uint256 _value) onlyOwner public {
  totalDistributed = totalDistributed.sub(_value);
  emit Burn(burner, _value);
  }
- 
+
  function add(uint256 _value) onlyOwner public {
  uint256 counter = totalSupply.add(_value);
- totalSupply = counter; 
+ totalSupply = counter;
  emit Add(_value);
  }
- 
- 
+
+
  function withdrawForeignTokens(address _tokenContract) onlyOwner public returns (bool) {
  ForeignToken token = ForeignToken(_tokenContract);
  uint256 amount = token.balanceOf(address(this));
  return token.transfer(owner, amount);
  }
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

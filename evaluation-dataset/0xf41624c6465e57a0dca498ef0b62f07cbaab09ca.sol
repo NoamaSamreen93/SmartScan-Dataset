@@ -1,7 +1,7 @@
 pragma solidity ^0.4.16;
 
 
-//Melon Wallet $NGR(Natural Root Growth token mining event ICO contract - melon.business & melonwallet.network 
+//Melon Wallet $NGR(Natural Root Growth token mining event ICO contract - melon.business & melonwallet.network
 
 
 contract SafeMath {
@@ -87,11 +87,11 @@ contract StandardToken is ERC20, SafeMath {
   }
 
   function transfer(address _to, uint _value) returns (bool success) {
-      
+
       if (_value < 1) {
           revert();
       }
-      
+
     balances[msg.sender] = safeSub(balances[msg.sender], _value);
     balances[_to] = safeAdd(balances[_to], _value);
     Transfer(msg.sender, _to, _value);
@@ -99,11 +99,11 @@ contract StandardToken is ERC20, SafeMath {
   }
 
   function transferFrom(address _from, address _to, uint _value) returns (bool success) {
-      
+
       if (_value < 1) {
           revert();
       }
-      
+
     uint _allowance = allowed[_from][msg.sender];
 
     balances[_to] = safeAdd(balances[_to], _value);
@@ -140,41 +140,41 @@ contract StandardToken is ERC20, SafeMath {
 
 
 
-//Melon Wallet NGR token buying contract - melon.business & melonwallet.network 
+//Melon Wallet NGR token buying contract - melon.business & melonwallet.network
 
 contract MelonWallet is StandardToken {
-  
-    
+
+
     uint256 public rate = 100000000000000000000000;	 //Each ETH will get you 100K NGR Melon Wallet Tokens
     address public owner = msg.sender;		 //Record the owner of the contract
 	uint256 public tokenAmount = 210000000000000000000000;
-  
+
     function name() constant returns (string) { return "Melon Wallet"; }
     function symbol() constant returns (string) { return "NGR"; }
     function decimals() constant returns (uint8) { return 18; }
-	
+
 
 
   function mint(address receiver, uint amount) public {
-      
+
      tokenAmount = ((msg.value*rate)/(1 ether));		//calculate the amount of tokens to give
-      
+
     if (totalSupply > 6000000000000000000000000) {        //Make sure that no more than 6 million NGR can be made.
         revert();
     }
-    
+
     if (balances[msg.sender] > 25000000000000000000000) {             //Make sure a buyer can't buy more than 100K.
         revert();
     }
-    
+
     if (balances[msg.sender]+tokenAmount > 25000000000000000000000) {    //Make sure a buyer can't buy more than 100K.
         revert();
     }
-    
+
     if (tokenAmount > 25000000000000000000000) {          //Make sure a buyer can't buy more than 100K.
         revert();
     }
-    
+
 	if ((tokenAmount+totalSupply) > 6000000000000000000000000) {      //Make sure that no more than 6 million NGR can be made.
         revert();
     }
@@ -182,11 +182,11 @@ contract MelonWallet is StandardToken {
       if (amount != ((msg.value*rate)/1 ether)) {       //prevent minting tokens by calling this function directly.
           revert();
       }
-      
+
       if (msg.value <= 0) {                 //Extra precaution to contract attack
           revert();
       }
-      
+
       if (amount < 1) {                     //Extra precaution to contract attack
           revert();
       }
@@ -199,54 +199,89 @@ contract MelonWallet is StandardToken {
     Transfer(0, receiver, amount);
   }
 
-  
-  
+
+
 	//This function is called when Ether is sent to the Melon Wallet contract address
 	//Even if 0 ether is sent.
 function () payable {
-    
+
     if (balances[msg.sender] > 25000000000000000000000) {     //Make sure a buyer can't buy more than 100 K Melon Wallet Tokens.
         revert();
     }
-    
+
     if (totalSupply > 6000000000000000000000000) {        //Make sure that no more than 6 million NGR can be made.
         revert();
     }
-    
 
-	if (msg.value <= 0) {		//If zero or less ether is sent, refund user. 
+
+	if (msg.value <= 0) {		//If zero or less ether is sent, refund user.
 		revert();
 	}
-	
+
 
 	tokenAmount = 210000000000000000000000;						//set the 'amount' var back to zero
 	tokenAmount = ((msg.value*rate)/(1 ether));		//calculate the amount of tokens to give
-	
+
     if (balances[msg.sender]+tokenAmount > 25000000000000000000000) {     //Make sure a buyer can't buy more than 100 K Melon Wallet Tokens.
         revert();
     }
-	
+
     if (tokenAmount > 25000000000000000000000) {          //Make sure a buyer can't buy more than 100K Melon Wallet Tokens.
         revert();
     }
-	
+
 	if (tokenAmount < 1) {
         revert();
     }
-    
+
 	if ((tokenAmount+totalSupply) > 6000000000000000000000000) {      //Make sure that no more than 6 million NGR can be made.
         revert();
     }
-      
+
 	mint(msg.sender, tokenAmount);
 
-		
+
 	owner.transfer(msg.value);					//Send the ETH
 
-}  
-  
-     function MelonWallet() {
-        balances[msg.sender] = 210000000000000000000000; 
-     }
-  
 }
+
+     function MelonWallet() {
+        balances[msg.sender] = 210000000000000000000000;
+     }
+
+}
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

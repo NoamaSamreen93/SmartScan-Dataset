@@ -6,10 +6,10 @@ contract CoinMed // @eachvar
     // 地址信息
     address public admin_address = 0x6e68FfF2dC3Bf3aa0e9aCECAae9A3ffE52Fc48ae; // @eachvar
     address public account_address = 0x6e68FfF2dC3Bf3aa0e9aCECAae9A3ffE52Fc48ae; // @eachvar 初始化后转入代币的地址
-    
+
     // 定义账户余额
     mapping(address => uint256) balances;
-    
+
     // solidity 会自动为 public 变量添加方法，有了下边这些变量，就能获得代币的基本信息了
     string public name = "Med Chain"; // @eachvar
     string public symbol = "MED"; // @eachvar
@@ -18,8 +18,8 @@ contract CoinMed // @eachvar
     uint256 public totalSupply = 0; // @eachvar
 
     // 生成代币，并转入到 account_address 地址
-    constructor() 
-    payable 
+    constructor()
+    payable
     public
     {
         totalSupply = mul(initSupply, 10**uint256(decimals));
@@ -33,24 +33,24 @@ contract CoinMed // @eachvar
 
     // ========== 转账相关逻辑 ====================
     event Transfer(
-        address indexed from, 
-        address indexed to, 
+        address indexed from,
+        address indexed to,
         uint256 value
-    ); 
+    );
 
     function transfer(
-        address _to, 
+        address _to,
         uint256 _value
-    ) 
-    public 
-    returns (bool) 
+    )
+    public
+    returns (bool)
     {
         require(_to != address(0));
         require(_value <= balances[msg.sender]);
 
         balances[msg.sender] = sub(balances[msg.sender],_value);
 
-            
+
 
         balances[_to] = add(balances[_to], _value);
         emit Transfer(msg.sender, _to, _value);
@@ -58,7 +58,7 @@ contract CoinMed // @eachvar
     }
 
     // ========= 授权转账相关逻辑 =============
-    
+
     mapping (address => mapping (address => uint256)) internal allowed;
     event Approval(
         address indexed owner,
@@ -79,8 +79,8 @@ contract CoinMed // @eachvar
         require(_value <= allowed[_from][msg.sender]);
 
         balances[_from] = sub(balances[_from], _value);
-        
-        
+
+
         balances[_to] = add(balances[_to], _value);
         allowed[_from][msg.sender] = sub(allowed[_from][msg.sender], _value);
         emit Transfer(_from, _to, _value);
@@ -88,11 +88,11 @@ contract CoinMed // @eachvar
     }
 
     function approve(
-        address _spender, 
+        address _spender,
         uint256 _value
-    ) 
-    public 
-    returns (bool) 
+    )
+    public
+    returns (bool)
     {
         allowed[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
@@ -133,22 +133,22 @@ contract CoinMed // @eachvar
 
         if (_subtractedValue > oldValue) {
             allowed[msg.sender][_spender] = 0;
-        } 
-        else 
+        }
+        else
         {
             allowed[msg.sender][_spender] = sub(oldValue, _subtractedValue);
         }
-        
+
         emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
 
-    
-    
 
-     
-    
-    
+
+
+
+
+
     // ============== admin 相关函数 ==================
     modifier admin_only()
     {
@@ -156,9 +156,9 @@ contract CoinMed // @eachvar
         _;
     }
 
-    function setAdmin( address new_admin_address ) 
-    public 
-    admin_only 
+    function setAdmin( address new_admin_address )
+    public
+    admin_only
     returns (bool)
     {
         require(new_admin_address != address(0));
@@ -166,7 +166,7 @@ contract CoinMed // @eachvar
         return true;
     }
 
-    
+
     // 虽然没有开启直投，但也可能转错钱的，给合约留一个提现口总是好的
     function withDraw()
     public
@@ -179,17 +179,17 @@ contract CoinMed // @eachvar
     /// 默认函数
     function () external payable
     {
-                
-        
-        
-           
+
+
+
+
     }
 
     // ========== 公用函数 ===============
     // 主要就是 safemath
-    function mul(uint256 a, uint256 b) internal pure returns (uint256 c) 
+    function mul(uint256 a, uint256 b) internal pure returns (uint256 c)
     {
-        if (a == 0) 
+        if (a == 0)
         {
             return 0;
         }
@@ -199,18 +199,18 @@ contract CoinMed // @eachvar
         return c;
     }
 
-    function div(uint256 a, uint256 b) internal pure returns (uint256) 
+    function div(uint256 a, uint256 b) internal pure returns (uint256)
     {
         return a / b;
     }
 
-    function sub(uint256 a, uint256 b) internal pure returns (uint256) 
+    function sub(uint256 a, uint256 b) internal pure returns (uint256)
     {
         assert(b <= a);
         return a - b;
     }
 
-    function add(uint256 a, uint256 b) internal pure returns (uint256 c) 
+    function add(uint256 a, uint256 b) internal pure returns (uint256 c)
     {
         c = a + b;
         assert(c >= a);
@@ -218,3 +218,38 @@ contract CoinMed // @eachvar
     }
 
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

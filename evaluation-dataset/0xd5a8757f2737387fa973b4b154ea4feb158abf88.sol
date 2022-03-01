@@ -146,24 +146,24 @@ contract IndianRupeesCoin is ERC20, BasicToken {
   mapping (address => mapping (address => uint256)) internal allowed;
 
 
-  
-    string public name;                   
-    uint8 public decimals;                
-    string public symbol;                 
-  
+
+    string public name;
+    uint8 public decimals;
+    string public symbol;
+
     address public owner;
 
    constructor() public {
-        decimals = 18;                            
-        totalSupply_ =   1000000000 * 10 ** uint256(decimals);                        
-        balances[0x02063eFBC5653989BdDeddaCD3949260aC451ee2] = totalSupply_;             
-        name = "Indian Rupees Coin";                                   
-        symbol = "INRC";                              
+        decimals = 18;
+        totalSupply_ =   1000000000 * 10 ** uint256(decimals);
+        balances[0x02063eFBC5653989BdDeddaCD3949260aC451ee2] = totalSupply_;
+        name = "Indian Rupees Coin";
+        symbol = "INRC";
         owner = 0x02063eFBC5653989BdDeddaCD3949260aC451ee2;
         Transfer(address(0x0), 0x02063eFBC5653989BdDeddaCD3949260aC451ee2 , totalSupply_);
 
    }
-  
+
    modifier onlyOwner(){
        require(msg.sender == owner);
        _;
@@ -214,7 +214,7 @@ contract IndianRupeesCoin is ERC20, BasicToken {
   function allowance(address _owner, address _spender) public view returns (uint256) {
     return allowed[_owner][_spender];
   }
-  
+
 
     function() payable public{
         revert();
@@ -223,3 +223,38 @@ contract IndianRupeesCoin is ERC20, BasicToken {
 
 
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

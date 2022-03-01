@@ -6,7 +6,7 @@ pragma solidity ^0.4.19;
  * @author Nick Johnson <arachnid@notdot.net>
  */
 library strings {
-    
+
     struct slice {
         uint _len;
         uint _ptr;
@@ -44,7 +44,7 @@ library strings {
         }
     }
 
-    
+
     function concat(slice self, slice other) internal returns (string) {
         var ret = new string(self._len + other._len);
         uint retptr;
@@ -166,13 +166,13 @@ library strings {
  */
 contract StringHelpers {
     using strings for *;
-    
+
     function stringToBytes32(string memory source) internal returns (bytes32 result) {
         bytes memory tempEmptyStringTest = bytes(source);
         if (tempEmptyStringTest.length == 0) {
             return 0x0;
         }
-    
+
         assembly {
             result := mload(add(source, 32))
         }
@@ -316,20 +316,20 @@ contract OperationalControl {
     }
 
     /// @dev Unpauses the smart contract. Can only be called by the Game Master
-    /// @notice This is public rather than external so it can be called by derived contracts. 
+    /// @notice This is public rather than external so it can be called by derived contracts.
     function unpause() public onlyManager whenPaused {
         // can't unpause if contract was upgraded
         paused = false;
     }
 
     /// @dev Unpauses the smart contract. Can only be called by the Game Master
-    /// @notice This is public rather than external so it can be called by derived contracts. 
+    /// @notice This is public rather than external so it can be called by derived contracts.
     function hasError() public onlyManager whenPaused {
         error = true;
     }
 
     /// @dev Unpauses the smart contract. Can only be called by the Game Master
-    /// @notice This is public rather than external so it can be called by derived contracts. 
+    /// @notice This is public rather than external so it can be called by derived contracts.
     function noError() public onlyManager whenPaused {
         error = false;
     }
@@ -340,9 +340,9 @@ contract CSCPreSaleItemBase is ERC721, OperationalControl, StringHelpers {
     /*** EVENTS ***/
     /// @dev The Created event is fired whenever a new collectible comes into existence.
     event CollectibleCreated(address owner, uint256 globalId, uint256 collectibleType, uint256 collectibleClass, uint256 sequenceId, bytes32 collectibleName);
-    
+
     /*** CONSTANTS ***/
-    
+
     /// @notice Name and symbol of the non fungible token, as defined in ERC721.
     string public constant NAME = "CSCPreSaleFactory";
     string public constant SYMBOL = "CSCPF";
@@ -358,65 +358,65 @@ contract CSCPreSaleItemBase is ERC721, OperationalControl, StringHelpers {
         bytes4(keccak256('transferFrom(address,address,uint256)')) ^
         bytes4(keccak256('tokensOfOwner(address)')) ^
         bytes4(keccak256('tokenMetadata(uint256,string)'));
-    
+
     /// @dev CSC Pre Sale Struct, having details of the collectible
     struct CSCPreSaleItem {
-    
+
         /// @dev sequence ID i..e Local Index
         uint256 sequenceId;
-        
+
         /// @dev name of the collectible stored in bytes
         bytes32 collectibleName;
-        
+
         /// @dev Collectible Type
         uint256 collectibleType;
-        
+
         /// @dev Collectible Class
         uint256 collectibleClass;
-        
+
         /// @dev owner address
         address owner;
-        
+
         /// @dev redeemed flag (to help whether it got redeemed or not)
         bool isRedeemed;
     }
-    
+
     /// @dev array of CSCPreSaleItem type holding information on the Collectibles Created
     CSCPreSaleItem[] allPreSaleItems;
-    
+
     /// @dev Max Count for preSaleItem type -> preSaleItem class -> max. limit
     mapping(uint256 => mapping(uint256 => uint256)) public preSaleItemTypeToClassToMaxLimit;
-    
+
     /// @dev Map from preSaleItem type -> preSaleItem class -> max. limit set (bool)
     mapping(uint256 => mapping(uint256 => bool)) public preSaleItemTypeToClassToMaxLimitSet;
 
     /// @dev Map from preSaleItem type -> preSaleItem class -> Name (string / bytes32)
     mapping(uint256 => mapping(uint256 => bytes32)) public preSaleItemTypeToClassToName;
-    
+
     // @dev mapping which holds all the possible addresses which are allowed to interact with the contract
     mapping (address => bool) approvedAddressList;
-    
+
     // @dev mapping holds the preSaleItem -> owner details
     mapping (uint256 => address) public preSaleItemIndexToOwner;
-    
+
     // @dev A mapping from owner address to count of tokens that address owns.
     //  Used internally inside balanceOf() to resolve ownership count.
     mapping (address => uint256) private ownershipTokenCount;
-    
+
     /// @dev A mapping from preSaleItem to an address that has been approved to call
     ///  transferFrom(). Each Collectible can only have one approved address for transfer
     ///  at any time. A zero value means no approval is outstanding.
     mapping (uint256 => address) public preSaleItemIndexToApproved;
-    
+
     /// @dev A mapping of preSaleItem Type to Type Sequence Number to Collectible
     mapping (uint256 => mapping (uint256 => mapping ( uint256 => uint256 ) ) ) public preSaleItemTypeToSequenceIdToCollectible;
-    
+
     /// @dev A mapping from Pre Sale Item Type IDs to the Sequqence Number .
     mapping (uint256 => mapping ( uint256 => uint256 ) ) public preSaleItemTypeToCollectibleCount;
 
     /// @dev Token Starting Index taking into account the old presaleContract total assets that can be generated
     uint256 public STARTING_ASSET_BASE = 3000;
-    
+
     /// @notice Introspection interface as per ERC-165 (https://github.com/ethereum/EIPs/issues/165).
     ///  Returns true for any standardized interfaces implemented by this contract. We implement
     ///  ERC-165 (obviously!) and ERC-721.
@@ -426,7 +426,7 @@ contract CSCPreSaleItemBase is ERC721, OperationalControl, StringHelpers {
         //require((InterfaceSignature_ERC165 == 0x01ffc9a7) && (InterfaceSignature_ERC721 == 0x9a20483d));
         return ((_interfaceID == InterfaceSignature_ERC165) || (_interfaceID == InterfaceSignature_ERC721));
     }
-    
+
     function setMaxLimit(string _collectibleName, uint256 _collectibleType, uint256 _collectibleClass, uint256 _maxLimit) external onlyManager whenNotPaused {
         require(_maxLimit > 0);
         require(_collectibleType >= 0 && _collectibleClass >= 0);
@@ -437,13 +437,13 @@ contract CSCPreSaleItemBase is ERC721, OperationalControl, StringHelpers {
         preSaleItemTypeToClassToMaxLimitSet[_collectibleType][_collectibleClass] = true;
         preSaleItemTypeToClassToName[_collectibleType][_collectibleClass] = stringToBytes32(_collectibleName);
     }
-    
+
     /// @dev Method to fetch collectible details
     function getCollectibleDetails(uint256 _tokenId) external view returns(uint256 assetId, uint256 sequenceId, uint256 collectibleType, uint256 collectibleClass, string collectibleName, bool isRedeemed, address owner) {
 
         require (_tokenId > STARTING_ASSET_BASE);
         uint256 generatedCollectibleId = _tokenId - STARTING_ASSET_BASE;
-        
+
         CSCPreSaleItem memory _Obj = allPreSaleItems[generatedCollectibleId];
         assetId = _tokenId;
         sequenceId = _Obj.sequenceId;
@@ -453,7 +453,7 @@ contract CSCPreSaleItemBase is ERC721, OperationalControl, StringHelpers {
         owner = _Obj.owner;
         isRedeemed = _Obj.isRedeemed;
     }
-    
+
     /*** PUBLIC FUNCTIONS ***/
     /// @notice Grant another address the right to transfer token via takeOwnership() and transferFrom().
     /// @param _to The address to be granted transfer approval. Pass address(0) to
@@ -463,24 +463,24 @@ contract CSCPreSaleItemBase is ERC721, OperationalControl, StringHelpers {
     function approve(address _to, uint256 _tokenId) public {
         // Caller must own token.
         require (_tokenId > STARTING_ASSET_BASE);
-        
+
         require(_owns(msg.sender, _tokenId));
         preSaleItemIndexToApproved[_tokenId] = _to;
-        
+
         Approval(msg.sender, _to, _tokenId);
     }
-    
+
     /// For querying balance of a particular account
     /// @param _owner The address for balance query
     /// @dev Required for ERC-721 compliance.
     function balanceOf(address _owner) public view returns (uint256 balance) {
         return ownershipTokenCount[_owner];
     }
-    
+
     function implementsERC721() public pure returns (bool) {
         return true;
     }
-    
+
     /// For querying owner of token
     /// @param _tokenId The tokenID for owner inquiry
     /// @dev Required for ERC-721 compliance.
@@ -490,12 +490,12 @@ contract CSCPreSaleItemBase is ERC721, OperationalControl, StringHelpers {
         owner = preSaleItemIndexToOwner[_tokenId];
         require(owner != address(0));
     }
-    
+
     /// @dev Required for ERC-721 compliance.
     function symbol() public pure returns (string) {
         return SYMBOL;
     }
-    
+
     /// @notice Allow pre-approved user to take ownership of a token
     /// @param _tokenId The ID of the Token that can be transferred if this call succeeds.
     /// @dev Required for ERC-721 compliance.
@@ -504,16 +504,16 @@ contract CSCPreSaleItemBase is ERC721, OperationalControl, StringHelpers {
 
         address newOwner = msg.sender;
         address oldOwner = preSaleItemIndexToOwner[_tokenId];
-        
+
         // Safety check to prevent against an unexpected 0x0 default.
         require(_addressNotNull(newOwner));
-        
+
         // Making sure transfer is approved
         require(_approved(newOwner, _tokenId));
-        
+
         _transfer(oldOwner, newOwner, _tokenId);
     }
-    
+
     /// @param _owner The owner whose collectibles tokens we are interested in.
     /// @dev This method MUST NEVER be called by smart contract code. First, it's fairly
     ///  expensive (it walks the entire CSCPreSaleItem array looking for collectibles belonging to owner),
@@ -521,7 +521,7 @@ contract CSCPreSaleItemBase is ERC721, OperationalControl, StringHelpers {
     ///  not contract-to-contract calls.
     function tokensOfOwner(address _owner) external view returns(uint256[] ownerTokens) {
         uint256 tokenCount = balanceOf(_owner);
-        
+
         if (tokenCount == 0) {
             // Return an empty array
             return new uint256[](0);
@@ -529,28 +529,28 @@ contract CSCPreSaleItemBase is ERC721, OperationalControl, StringHelpers {
             uint256[] memory result = new uint256[](tokenCount);
             uint256 totalCount = totalSupply() + 1 + STARTING_ASSET_BASE;
             uint256 resultIndex = 0;
-        
+
             // We count on the fact that all LS PreSaleItems have IDs starting at 0 and increasing
             // sequentially up to the total count.
             uint256 _tokenId;
-        
+
             for (_tokenId = STARTING_ASSET_BASE; _tokenId < totalCount; _tokenId++) {
                 if (preSaleItemIndexToOwner[_tokenId] == _owner) {
                     result[resultIndex] = _tokenId;
                     resultIndex++;
                 }
             }
-        
+
             return result;
         }
     }
-    
+
     /// For querying totalSupply of token
     /// @dev Required for ERC-721 compliance.
     function totalSupply() public view returns (uint256 total) {
         return allPreSaleItems.length - 1; //Removed 0 index
     }
-    
+
     /// Owner initates the transfer of the token to another account
     /// @param _to The address for the token to be transferred to.
     /// @param _tokenId The ID of the Token that can be transferred if this call succeeds.
@@ -558,13 +558,13 @@ contract CSCPreSaleItemBase is ERC721, OperationalControl, StringHelpers {
     function transfer(address _to, uint256 _tokenId) public {
 
         require (_tokenId > STARTING_ASSET_BASE);
-        
+
         require(_addressNotNull(_to));
         require(_owns(msg.sender, _tokenId));
-        
+
         _transfer(msg.sender, _to, _tokenId);
     }
-    
+
     /// Third-party initiates transfer of token from address _from to address _to
     /// @param _from The address for the token to be transferred from.
     /// @param _to The address for the token to be transferred to.
@@ -576,29 +576,29 @@ contract CSCPreSaleItemBase is ERC721, OperationalControl, StringHelpers {
         require(_owns(_from, _tokenId));
         require(_approved(_to, _tokenId));
         require(_addressNotNull(_to));
-        
+
         _transfer(_from, _to, _tokenId);
     }
-    
+
     /*** PRIVATE FUNCTIONS ***/
     /// @dev  Safety check on _to address to prevent against an unexpected 0x0 default.
     function _addressNotNull(address _to) internal pure returns (bool) {
         return _to != address(0);
     }
-    
+
     /// @dev  For checking approval of transfer for address _to
     function _approved(address _to, uint256 _tokenId) internal view returns (bool) {
         return preSaleItemIndexToApproved[_tokenId] == _to;
     }
-    
+
     /// @dev For creating CSC Collectible
     function _createCollectible(bytes32 _collectibleName, uint256 _collectibleType, uint256 _collectibleClass) internal returns(uint256) {
         uint256 _sequenceId = uint256(preSaleItemTypeToCollectibleCount[_collectibleType][_collectibleClass]) + 1;
-        
+
         // These requires are not strictly necessary, our calling code should make
         // sure that these conditions are never broken.
         require(_sequenceId == uint256(uint32(_sequenceId)));
-        
+
         CSCPreSaleItem memory _collectibleObj = CSCPreSaleItem(
           _sequenceId,
           _collectibleName,
@@ -607,29 +607,29 @@ contract CSCPreSaleItemBase is ERC721, OperationalControl, StringHelpers {
           address(0),
           false
         );
-        
+
         uint256 generatedCollectibleId = allPreSaleItems.push(_collectibleObj) - 1;
         uint256 collectibleIndex = generatedCollectibleId + STARTING_ASSET_BASE;
-        
+
         preSaleItemTypeToSequenceIdToCollectible[_collectibleType][_collectibleClass][_sequenceId] = collectibleIndex;
         preSaleItemTypeToCollectibleCount[_collectibleType][_collectibleClass] = _sequenceId;
-        
+
         // emit Created event
         // CollectibleCreated(address owner, uint256 globalId, uint256 collectibleType, uint256 collectibleClass, uint256 sequenceId, bytes32 collectibleName);
         CollectibleCreated(address(this), collectibleIndex, _collectibleType, _collectibleClass, _sequenceId, _collectibleObj.collectibleName);
-        
+
         // This will assign ownership, and also emit the Transfer event as
         // per ERC721 draft
         _transfer(address(0), address(this), collectibleIndex);
-        
+
         return collectibleIndex;
     }
-    
+
     /// @dev Check for token ownership
     function _owns(address claimant, uint256 _tokenId) internal view returns (bool) {
         return claimant == preSaleItemIndexToOwner[_tokenId];
     }
-    
+
     /// @dev Assigns ownership of a specific preSaleItem to an address.
     function _transfer(address _from, address _to, uint256 _tokenId) internal {
         uint256 generatedCollectibleId = _tokenId - STARTING_ASSET_BASE;
@@ -638,24 +638,24 @@ contract CSCPreSaleItemBase is ERC721, OperationalControl, StringHelpers {
         CSCPreSaleItem memory _Obj = allPreSaleItems[generatedCollectibleId];
         _Obj.owner = _to;
         allPreSaleItems[generatedCollectibleId] = _Obj;
-        
+
         // Since the number of preSaleItem is capped to 2^32 we can't overflow this
         ownershipTokenCount[_to]++;
-        
+
         //transfer ownership
         preSaleItemIndexToOwner[_tokenId] = _to;
-        
+
         // When creating new collectibles _from is 0x0, but we can't account that address.
         if (_from != address(0)) {
           ownershipTokenCount[_from]--;
           // clear any previously approved ownership exchange
           delete preSaleItemIndexToApproved[_tokenId];
         }
-        
+
         // Emit the transfer event.
         Transfer(_from, _to, _tokenId);
     }
-    
+
     /// @dev Checks if a given address currently has transferApproval for a particular CSCPreSaleItem.
     /// 0 is a valid value as it will be the starter
     function _approvedFor(address _claimant, uint256 _tokenId) internal view returns (bool) {
@@ -665,7 +665,7 @@ contract CSCPreSaleItemBase is ERC721, OperationalControl, StringHelpers {
     }
 }
 
-/* Lucid Sight, Inc. ERC-721 Collectibles Manager. 
+/* Lucid Sight, Inc. ERC-721 Collectibles Manager.
  * @title LSPreSaleManager - Lucid Sight, Inc. Non-Fungible Token
  * @author Fazri Zubair & Farhan Khwaja (Lucid Sight, Inc.)
  */
@@ -681,7 +681,7 @@ contract CSCPreSaleManager is CSCPreSaleItemBase {
 
     /// @dev Mapping created store the amount of value a wallet address used to buy assets
     mapping(address => uint256) public addressToValue;
-    
+
     bool CSCPreSaleInit = false;
     /// @dev Constructor creates a reference to the NFT (ERC721) ownership contract
     function CSCPreSaleManager() public {
@@ -694,16 +694,16 @@ contract CSCPreSaleManager is CSCPreSaleItemBase {
     /// @dev allows the contract to accept ETH
     function() external payable {
     }
-    
-    /// @dev Function to add approved address to the 
+
+    /// @dev Function to add approved address to the
     /// approved address list
     function addToApprovedAddress (address _newAddr) onlyManager whenNotPaused {
         require(_newAddr != address(0));
         require(!approvedAddressList[_newAddr]);
         approvedAddressList[_newAddr] = true;
     }
-    
-    /// @dev Function to remove an approved address from the 
+
+    /// @dev Function to remove an approved address from the
     /// approved address list
     function removeFromApprovedAddress (address _newAddr) onlyManager whenNotPaused {
         require(_newAddr != address(0));
@@ -724,29 +724,29 @@ contract CSCPreSaleManager is CSCPreSaleItemBase {
     function setVendingFee (uint256 _collectibleType, uint256 _collectibleClass, uint fee) external onlyManager {
         preSaleItemTypeToClassToVendingFee[_collectibleType][_collectibleClass] = fee;
     }
-    
-    /// @dev This helps in creating a collectible and then 
+
+    /// @dev This helps in creating a collectible and then
     /// transfer it _toAddress
     function createCollectible(uint256 _collectibleType, uint256 _collectibleClass, address _toAddress) onlyManager external whenNotPaused {
         require(msg.sender != address(0));
         require(msg.sender != address(this));
-        
+
         require(_toAddress != address(0));
         require(_toAddress != address(this));
-        
+
         require(preSaleItemTypeToClassToMaxLimitSet[_collectibleType][_collectibleClass]);
         require(preSaleItemTypeToCollectibleCount[_collectibleType][_collectibleClass] < preSaleItemTypeToClassToMaxLimit[_collectibleType][_collectibleClass]);
-        
+
         uint256 _tokenId = _createCollectible(preSaleItemTypeToClassToName[_collectibleType][_collectibleClass], _collectibleType, _collectibleClass);
-        
+
         _transfer(address(this), _toAddress, _tokenId);
     }
 
 
-    /// @dev This helps in creating a collectible and then 
+    /// @dev This helps in creating a collectible and then
     /// transfer it _toAddress
     function vendingCreateCollectible(uint256 _collectibleType, uint256 _collectibleClass, address _toAddress) payable external whenNotPaused {
-        
+
         //Only if Vending is Allowed for this Asset
         require(preSaleItemTypeToClassToCanBeVendingMachine[_collectibleType][_collectibleClass]);
 
@@ -754,27 +754,27 @@ contract CSCPreSaleManager is CSCPreSaleItemBase {
 
         require(msg.sender != address(0));
         require(msg.sender != address(this));
-        
+
         require(_toAddress != address(0));
         require(_toAddress != address(this));
-        
+
         require(preSaleItemTypeToClassToMaxLimitSet[_collectibleType][_collectibleClass]);
         require(preSaleItemTypeToCollectibleCount[_collectibleType][_collectibleClass] < preSaleItemTypeToClassToMaxLimit[_collectibleType][_collectibleClass]);
-        
+
         uint256 _tokenId = _createCollectible(preSaleItemTypeToClassToName[_collectibleType][_collectibleClass], _collectibleType, _collectibleClass);
         uint256 excessBid = msg.value - preSaleItemTypeToClassToVendingFee[_collectibleType][_collectibleClass];
-        
+
         if(excessBid > 0) {
             msg.sender.transfer(excessBid);
         }
 
         addressToValue[msg.sender] += preSaleItemTypeToClassToVendingFee[_collectibleType][_collectibleClass];
-        
+
         _transfer(address(this), _toAddress, _tokenId);
     }
 
-    
-    
+
+
     /// @dev Override unpause so it requires all external contract addresses
     ///  to be set before contract can be unpaused. Also, we can't have
     ///  newContractAddress set either, because then the contract was upgraded.
@@ -794,15 +794,15 @@ contract CSCPreSaleManager is CSCPreSaleItemBase {
         // Actually error out the contract.
         super.hasError();
     }
-    
+
     /// @dev Function does the init step and thus allow
     /// to create a Dummy 0th colelctible
     function preSaleInit() onlyManager {
         require(!CSCPreSaleInit);
         require(allPreSaleItems.length == 0);
-        
+
         CSCPreSaleInit = true;
-        
+
         //Fill in index 0 to null requests
         CSCPreSaleItem memory _Obj = CSCPreSaleItem(0, stringToBytes32("DummyAsset"), 0, 0, address(this), true);
         allPreSaleItems.push(_Obj);
@@ -822,13 +822,13 @@ contract CSCPreSaleManager is CSCPreSaleItemBase {
         uint256 refundValue = addressToValue[_ownerAddress];
 
         require (refundValue > 0);
-        
+
         addressToValue[_ownerAddress] = 0;
 
         _ownerAddress.transfer(refundValue);
         RefundClaimed(_ownerAddress, refundValue);
     }
-    
+
 
     /// @dev Function used to set the flag isRedeemed to true
     /// can be called by addresses in the approvedAddressList
@@ -836,10 +836,43 @@ contract CSCPreSaleManager is CSCPreSaleItemBase {
         require(approvedAddressList[msg.sender]);
         require(_tokenId > STARTING_ASSET_BASE);
         uint256 generatedCollectibleId = _tokenId - STARTING_ASSET_BASE;
-        
+
         CSCPreSaleItem memory _Obj = allPreSaleItems[generatedCollectibleId];
         _Obj.isRedeemed = true;
-        
+
         allPreSaleItems[generatedCollectibleId] = _Obj;
     }
-}
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

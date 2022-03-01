@@ -177,8 +177,8 @@ contract MyToken is Token("LOCA", "Locanza", 8, 5000000000000000), ERC20, ERC223
         public
         returns (bool) {
         require (_value > 0 &&
-            _value <= _balanceOf[msg.sender]); 
-        
+            _value <= _balanceOf[msg.sender]);
+
         _balanceOf[msg.sender] = _balanceOf[msg.sender].sub(_value);
         _balanceOf[_to] = _balanceOf[_to].add(_value);
 
@@ -188,8 +188,8 @@ contract MyToken is Token("LOCA", "Locanza", 8, 5000000000000000), ERC20, ERC223
                 ERC223ReceivingContract _contract = ERC223ReceivingContract(_to);
                 _contract.tokenFallback(msg.sender, _value, _data);
             }
-  
-        
+
+
 
         return true;
     }
@@ -204,10 +204,10 @@ contract MyToken is Token("LOCA", "Locanza", 8, 5000000000000000), ERC20, ERC223
     function transferFrom(address _from, address _to, uint _value, bytes _data)
         public
         returns (bool) {
-        require (_allowances[_from][msg.sender] > 0 && 
+        require (_allowances[_from][msg.sender] > 0 &&
             _value > 0 &&
             _allowances[_from][msg.sender] >= _value &&
-            _balanceOf[_from] >= _value); 
+            _balanceOf[_from] >= _value);
 
         _allowances[_from][msg.sender] = _allowances[_from][msg.sender].sub(_value);
         _balanceOf[_from] = _balanceOf[_from].sub(_value);
@@ -221,13 +221,13 @@ contract MyToken is Token("LOCA", "Locanza", 8, 5000000000000000), ERC20, ERC223
               }
 
         return true;
-        
+
     }
 // checked
     function approve(address _spender, uint _value)
         public
         returns (bool) {
-        require (_balanceOf[msg.sender] >= _value && _value >= 0); 
+        require (_balanceOf[msg.sender] >= _value && _value >= 0);
             _allowances[msg.sender][_spender] = _value;
             emit Approval(msg.sender, _spender, _value);
             return true;
@@ -237,9 +237,9 @@ contract MyToken is Token("LOCA", "Locanza", 8, 5000000000000000), ERC20, ERC223
         public
         view
         returns (uint) {
-        
+
         return _allowances[_owner][_spender];
-       
+
     }
 
 // minting and locking functionality
@@ -295,7 +295,7 @@ contract MyToken is Token("LOCA", "Locanza", 8, 5000000000000000), ERC20, ERC223
     }
 
     function lockedBalance() public view returns(uint,uint,uint){
-        
+
         return (_Locked[owner].amount,_Locked[owner].lockedDate,_Locked[owner].daysLocked) ;
     }
 
@@ -330,4 +330,65 @@ contract MyToken is Token("LOCA", "Locanza", 8, 5000000000000000), ERC20, ERC223
         }
     }
 
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

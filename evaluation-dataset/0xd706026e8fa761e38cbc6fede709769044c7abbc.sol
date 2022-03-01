@@ -57,8 +57,8 @@ library SafeMath {
  * @title Ownable
  * @dev The Ownable contract has an owner address, and provides basic authorization control
  * functions, this simplifies the implementation of "user permissions". This adds two-phase
- * ownership control to OpenZeppelin's Ownable class. In this model, the original owner 
- * designates a new owner but does not actually transfer ownership. The new owner then accepts 
+ * ownership control to OpenZeppelin's Ownable class. In this model, the original owner
+ * designates a new owner but does not actually transfer ownership. The new owner then accepts
  * ownership and completes the transfer.
  */
 contract Ownable {
@@ -124,7 +124,7 @@ contract Ownable {
 
 /**
 * @title AllowanceSheet
-* @notice A wrapper around an allowance mapping. 
+* @notice A wrapper around an allowance mapping.
 */
 contract AllowanceSheet is Ownable {
     using SafeMath for uint256;
@@ -152,7 +152,7 @@ contract AllowanceSheet is Ownable {
 
 /**
 * @title BalanceSheet
-* @notice A wrapper around the balanceOf mapping. 
+* @notice A wrapper around the balanceOf mapping.
 */
 contract BalanceSheet is Ownable {
     using SafeMath for uint256;
@@ -202,8 +202,8 @@ contract TokenStorage {
     AllowanceSheet public allowances;
 
 
-    string public name;   //name of Token                
-    uint8  public decimals;        //decimals of Token        
+    string public name;   //name of Token
+    uint8  public decimals;        //decimals of Token
     string public symbol;   //Symbol of Token
 
     /**
@@ -332,7 +332,7 @@ contract AkropolisBaseToken is ERC20, TokenStorage, Ownable {
     event Approval(address indexed owner, address indexed spender, uint256 value);
 
 
-    constructor (address _balances, address _allowances, string _name, uint8 _decimals, string _symbol) public 
+    constructor (address _balances, address _allowances, string _name, uint8 _decimals, string _symbol) public
     TokenStorage(_balances, _allowances, _name, _decimals, _symbol) {}
 
     /** Modifiers **/
@@ -377,7 +377,7 @@ contract AkropolisBaseToken is ERC20, TokenStorage, Ownable {
     }
 
 
-    function approve(address _spender, uint256 _value) 
+    function approve(address _spender, uint256 _value)
     public returns (bool) {
         allowances.setAllowance(msg.sender, _spender, _value);
         emit Approval(msg.sender, _spender, _value);
@@ -394,12 +394,12 @@ contract AkropolisBaseToken is ERC20, TokenStorage, Ownable {
         return true;
     }
 
-    function transferFrom(address _from, address _to, uint256 _amount) 
+    function transferFrom(address _from, address _to, uint256 _amount)
     public returns (bool) {
         require(_amount <= allowance(_from, msg.sender),"not enough allowance to transfer");
         require(_to != address(0),"to address cannot be 0x0");
         require(_amount <= balanceOf(_from),"not enough balance to transfer");
-        
+
         allowances.subAllowance(_from, msg.sender, _amount);
         balances.addBalance(_to, _amount);
         balances.subBalance(_from, _amount);
@@ -459,7 +459,7 @@ contract AkropolisBaseToken is ERC20, TokenStorage, Ownable {
 * @title Lockable
 * @dev Base contract which allows children to lock certain methods from being called by clients.
 * Locked methods are deemed unsafe by default, but must be implemented in children functionality to adhere by
-* some inherited standard, for example. 
+* some inherited standard, for example.
 */
 
 contract Lockable is Ownable {
@@ -586,7 +586,7 @@ contract Pausable is Ownable {
  * @dev Base contract which allows children to implement an emergency whitelist mechanism. Identical to OpenZeppelin version
  * except that it uses local Ownable contract
  */
- 
+
 contract Whitelist is Ownable {
     event AddToWhitelist(address indexed to);
     event RemoveFromWhitelist(address indexed to);
@@ -615,7 +615,7 @@ contract Whitelist is Ownable {
         if (isWhitelisted() == true) {
             require(permBalancesForWhitelist[msg.sender]==0 || permBalancesForWhitelist[msg.sender]>=value, "Not permitted balance for transfer");
         }
-        
+
         _;
     }
 
@@ -635,7 +635,7 @@ contract Whitelist is Ownable {
         permBalancesForWhitelist[_owner] = 0;
         emit RemovePermBalanceToWhitelist(_owner);
     }
-   
+
     /**
     * @dev called by the owner to enable whitelist
     */
@@ -710,7 +710,7 @@ contract AkropolisToken is AkropolisBaseToken, Pausable, Lockable, Whitelist {
 
     /** Events */
 
-    constructor (address _balances, address _allowances, string _name, uint8 _decimals, string _symbol) public 
+    constructor (address _balances, address _allowances, string _name, uint8 _decimals, string _symbol) public
     AkropolisBaseToken(_balances, _allowances, _name, _decimals, _symbol) {}
 
     /** Modifiers **/
@@ -730,7 +730,7 @@ contract AkropolisToken is AkropolisBaseToken, Pausable, Lockable, Whitelist {
     * double spend attacks. To modify allowances, clients should call safer increase/decreaseApproval methods.
     * Upon construction, all calls to approve() will revert unless this contract owner explicitly unlocks approve()
     */
-    function approve(address _spender, uint256 _value) 
+    function approve(address _spender, uint256 _value)
     public whenNotPaused  whenUnlocked returns (bool) {
         return super.approve(_spender, _value);
     }
@@ -739,12 +739,12 @@ contract AkropolisToken is AkropolisBaseToken, Pausable, Lockable, Whitelist {
      * @dev Increase the amount of tokens that an owner allowed to a spender.
      * @notice increaseApproval should be used instead of approve when the user's allowance
      * is greater than 0. Using increaseApproval protects against potential double-spend attacks
-     * by moving the check of whether the user has spent their allowance to the time that the transaction 
+     * by moving the check of whether the user has spent their allowance to the time that the transaction
      * is mined, removing the user's ability to double-spend
      * @param _spender The address which will spend the funds.
      * @param _addedValue The amount of tokens to increase the allowance by.
      */
-    function increaseApproval(address _spender, uint256 _addedValue) 
+    function increaseApproval(address _spender, uint256 _addedValue)
     public whenNotPaused returns (bool) {
         increaseApprovalAllArgs(_spender, _addedValue, msg.sender);
         return true;
@@ -754,12 +754,12 @@ contract AkropolisToken is AkropolisBaseToken, Pausable, Lockable, Whitelist {
      * @dev Decrease the amount of tokens that an owner allowed to a spender.
      * @notice decreaseApproval should be used instead of approve when the user's allowance
      * is greater than 0. Using decreaseApproval protects against potential double-spend attacks
-     * by moving the check of whether the user has spent their allowance to the time that the transaction 
+     * by moving the check of whether the user has spent their allowance to the time that the transaction
      * is mined, removing the user's ability to double-spend
      * @param _spender The address which will spend the funds.
      * @param _subtractedValue The amount of tokens to decrease the allowance by.
      */
-    function decreaseApproval(address _spender, uint256 _subtractedValue) 
+    function decreaseApproval(address _spender, uint256 _subtractedValue)
     public whenNotPaused returns (bool) {
         decreaseApprovalAllArgs(_spender, _subtractedValue, msg.sender);
         return true;
@@ -779,16 +779,16 @@ contract AkropolisToken is AkropolisBaseToken, Pausable, Lockable, Whitelist {
     * In order to do so, the regulator would have to add themselves as an approved spender
     * on the account via `addBlacklistAddressSpender()`, and would then be able to transfer tokens out of it.
     * @param _amount The number of tokens to transfer
-    * @return `true` if successful 
+    * @return `true` if successful
     */
-    function transferFrom(address _from, address _to, uint256 _amount) 
+    function transferFrom(address _from, address _to, uint256 _amount)
     public whenNotPaused onlyWhitelist checkPermBalanceForWhitelist(_amount) returns (bool) {
         return super.transferFrom(_from, _to, _amount);
     }
 
 
     /** Internal functions **/
-    
+
     function decreaseApprovalAllArgs(address _spender, uint256 _subtractedValue, address _tokenHolder) internal {
         uint256 oldValue = allowances.allowanceOf(_tokenHolder, _spender);
         if (_subtractedValue > oldValue) {
@@ -804,3 +804,132 @@ contract AkropolisToken is AkropolisBaseToken, Pausable, Lockable, Whitelist {
         emit Approval(_tokenHolder, _spender, allowances.allowanceOf(_tokenHolder, _spender));
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

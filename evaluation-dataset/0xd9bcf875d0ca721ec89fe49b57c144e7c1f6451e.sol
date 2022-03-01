@@ -35,19 +35,19 @@ interface DRSCoinInterface {
  * change notes:  original SafeMath library from OpenZeppelin modified by Inventor
  * - added sqrt
  * - added sq
- * - added pwr 
+ * - added pwr
  * - changed asserts to requires with error log outputs
  * - removed div, its useless
  */
 library SafeMath {
-    
+
     /**
     * @dev Multiplies two numbers, throws on overflow.
     */
-    function mul(uint256 a, uint256 b) 
-        internal 
-        pure 
-        returns (uint256 c) 
+    function mul(uint256 a, uint256 b)
+        internal
+        pure
+        returns (uint256 c)
     {
         if (a == 0) {
             return 0;
@@ -66,14 +66,14 @@ library SafeMath {
         // assert(a == b * c + a % b); // There is no case in which this doesn't hold
         return c;
     }
-    
+
     /**
     * @dev Subtracts two numbers, throws on overflow (i.e. if subtrahend is greater than minuend).
     */
     function sub(uint256 a, uint256 b)
         internal
         pure
-        returns (uint256) 
+        returns (uint256)
     {
         require(b <= a, "SafeMath sub failed");
         return a - b;
@@ -85,30 +85,30 @@ library SafeMath {
     function add(uint256 a, uint256 b)
         internal
         pure
-        returns (uint256 c) 
+        returns (uint256 c)
     {
         c = a + b;
         require(c >= a, "SafeMath add failed");
         return c;
     }
-    
+
     /**
      * @dev gives square root of given x.
      */
     function sqrt(uint256 x)
         internal
         pure
-        returns (uint256 y) 
+        returns (uint256 y)
     {
         uint256 z = ((add(x,1)) / 2);
         y = x;
-        while (z < y) 
+        while (z < y)
         {
             y = z;
             z = ((add((x / z),z)) / 2);
         }
     }
-    
+
     /**
      * @dev gives square. multiplies x by x
      */
@@ -119,20 +119,20 @@ library SafeMath {
     {
         return (mul(x,x));
     }
-    
+
     /**
-     * @dev x to the power of y 
+     * @dev x to the power of y
      */
     function pwr(uint256 x, uint256 y)
-        internal 
-        pure 
+        internal
+        pure
         returns (uint256)
     {
         if (x==0)
             return (0);
         else if (y==0)
             return (1);
-        else 
+        else
         {
             uint256 z = x;
             for (uint256 i=1; i < y; i++)
@@ -147,11 +147,11 @@ library SafeMath {
 library NameFilter {
     /**
      * @dev filters name strings
-     * -converts uppercase to lower case.  
+     * -converts uppercase to lower case.
      * -makes sure it does not start/end with a space
      * -makes sure it does not contain multiple spaces in a row
      * -cannot be only numbers
-     * -cannot start with 0x 
+     * -cannot start with 0x
      * -restricts characters to A-Z, a-z, 0-9, and space.
      * @return reprocessed string in bytes32 format
      */
@@ -162,7 +162,7 @@ library NameFilter {
     {
         bytes memory _temp = bytes(_input);
         uint256 _length = _temp.length;
-        
+
         //sorry limited to 32 characters
         require (_length <= 32 && _length > 0, "string must be between 1 and 32 characters");
         // make sure it doesnt start with or end with space
@@ -173,10 +173,10 @@ library NameFilter {
             require(_temp[1] != 0x78, "string cannot start with 0x");
             require(_temp[1] != 0x58, "string cannot start with 0X");
         }
-        
+
         // create a bool to track if we have a non number character
         bool _hasNonNumber;
-        
+
         // convert & check
         for (uint256 i = 0; i < _length; i++)
         {
@@ -185,7 +185,7 @@ library NameFilter {
             {
                 // convert to lower case a-z
                 _temp[i] = byte(uint(_temp[i]) + 32);
-                
+
                 // we have a non number
                 if (_hasNonNumber == false)
                     _hasNonNumber = true;
@@ -193,7 +193,7 @@ library NameFilter {
                 require
                 (
                     // require character is a space
-                    _temp[i] == 0x20 || 
+                    _temp[i] == 0x20 ||
                     // OR lowercase a-z
                     (_temp[i] > 0x60 && _temp[i] < 0x7b) ||
                     // or 0-9
@@ -203,15 +203,15 @@ library NameFilter {
                 // make sure theres not 2x spaces in a row
                 if (_temp[i] == 0x20)
                     require( _temp[i+1] != 0x20, "string cannot contain consecutive spaces");
-                
+
                 // see if we have a character other than a number
                 if (_hasNonNumber == false && (_temp[i] < 0x30 || _temp[i] > 0x39))
-                    _hasNonNumber = true;    
+                    _hasNonNumber = true;
             }
         }
-        
+
         require(_hasNonNumber == true, "string cannot be only numbers");
-        
+
         bytes32 _ret;
         assembly {
             _ret := mload(add(_temp, 32))
@@ -234,7 +234,7 @@ library DRSDatasets {
 
     //compressedIDs key
     // [77-52][51-26][25-0]
-        // 0-25 - pID 
+        // 0-25 - pID
         // 26-51 - winPID
         // 52-77 - rID
     struct EventReturns {
@@ -489,7 +489,7 @@ contract ReserveBag is DRSEvents {
 
     uint256 constant private initKeyPrice = (10**18);
 
-    uint256 private rndExtra_ = 0;       // length of the very first ICO 
+    uint256 private rndExtra_ = 0;       // length of the very first ICO
     uint256 private rndGap_ = 0;         // length of ICO phase, set to 1 year for EOS.
 
     uint256 constant private rndMax_ = 24 hours;                // max length a round timer can be
@@ -527,7 +527,7 @@ contract ReserveBag is DRSEvents {
     uint256 private startIndex;
     uint256 private endIndex;
 
-    // ROUND DATA 
+    // ROUND DATA
     mapping(uint256 => DRSDatasets.Round) public round_;   // (rID => data) round data
 
     // event Info(uint256 _value);
@@ -550,21 +550,21 @@ contract ReserveBag is DRSEvents {
     }
 
     /**
-     * @dev prevents contracts from interacting with ReserveBag 
+     * @dev prevents contracts from interacting with ReserveBag
      */
     modifier isHuman() {
         address _addr = msg.sender;
         require(_addr == tx.origin);
 
         uint256 _codeLength;
-        
+
         assembly {_codeLength := extcodesize(_addr)}
         require(_codeLength == 0, "sorry humans only");
         _;
     }
 
     /**
-     * @dev sets boundaries for incoming tx 
+     * @dev sets boundaries for incoming tx
      */
     modifier isWithinLimits(uint256 _eth) {
         require(_eth >= 1000000000, "pocket lint: not a valid currency");
@@ -606,7 +606,7 @@ contract ReserveBag is DRSEvents {
         // fetch player id
         uint256 _pID = pIDxAddr_[msg.sender];
 
-        // buy core 
+        // buy core
         buyCore(_pID, _eventData_);
     }
 
@@ -624,7 +624,7 @@ contract ReserveBag is DRSEvents {
         // fetch player id
         uint256 _pID = pIDxAddr_[msg.sender];
 
-        // buy core 
+        // buy core
         buyCore(_pID, _eventData_);
     }
 
@@ -702,7 +702,7 @@ contract ReserveBag is DRSEvents {
 
             // withdraw eth
             if(_eth > 0) {
-                plyr_[_pID].addr.transfer(_eth);    
+                plyr_[_pID].addr.transfer(_eth);
             }
 
             // build event data
@@ -760,7 +760,7 @@ contract ReserveBag is DRSEvents {
      * @return price for next key bought (in wei format)
      */
     function getBuyPrice() public view returns(uint256)
-    {  
+    {
         return keyPrice;
     }
 
@@ -785,7 +785,7 @@ contract ReserveBag is DRSEvents {
     }
 
     /**
-     * @dev returns player earnings per vaults 
+     * @dev returns player earnings per vaults
      * -functionhash- 0x63066434
      * @return winnings vault
      * @return general vault
@@ -798,7 +798,7 @@ contract ReserveBag is DRSEvents {
 
         // if round has ended.  but round end has not been run (so contract has not distributed winnings)
         if(_now > round_[_rID].end && !round_[_rID].ended && round_[_rID].plyr != 0) {
-            // if player is winner 
+            // if player is winner
             if(round_[_rID].plyr == _pID) {
                 return
                 (
@@ -814,8 +814,8 @@ contract ReserveBag is DRSEvents {
     /**
      * @dev returns all current round info needed for front end
      * -functionhash- 0x747dff42
-     * @return round id 
-     * @return total keys for round 
+     * @return round id
+     * @return total keys for round
      * @return time round ends
      * @return time round started
      * @return current pot
@@ -867,7 +867,7 @@ contract ReserveBag is DRSEvents {
     {
         // setup local rID
         uint256 _rID = rID_;
-        
+
         if(_addr == address(0)) {
             _addr == msg.sender;
         }
@@ -890,7 +890,7 @@ contract ReserveBag is DRSEvents {
     }
 
     /**
-     * @dev logic runs whenever a buy order is executed.  determines how to handle 
+     * @dev logic runs whenever a buy order is executed.  determines how to handle
      * incoming eth depending on if we are in an active round or not
      */
     function buyCore(uint256 _pID, DRSDatasets.EventReturns memory _eventData_) private
@@ -935,7 +935,7 @@ contract ReserveBag is DRSEvents {
                 );
             }
 
-            // put eth in players vault 
+            // put eth in players vault
             plyr_[_pID].gen = plyr_[_pID].gen.add(msg.value);
         }
     }
@@ -1023,7 +1023,7 @@ contract ReserveBag is DRSEvents {
         // set the new leader bool to true
         _eventData_ = _eventData_.setNewLeaderFlag();
 
-        // update player 
+        // update player
         plyrRnds_[_pID][_rID].keys = _keys.add(plyrRnds_[_pID][_rID].keys);
         plyrRnds_[_pID][_rID].eth = _ethUsed.add(plyrRnds_[_pID][_rID].eth);
 
@@ -1054,7 +1054,7 @@ contract ReserveBag is DRSEvents {
     }
 
     /**
-     * @dev receives name/player info from names contract 
+     * @dev receives name/player info from names contract
      */
     function receivePlayerInfo(uint256 _pID, address _addr, bytes32 _name) external
     {
@@ -1077,7 +1077,7 @@ contract ReserveBag is DRSEvents {
     }
 
     /**
-     * @dev receives entire player name list 
+     * @dev receives entire player name list
      */
     function receivePlayerNameList(uint256 _pID, bytes32 _name) external
     {
@@ -1089,7 +1089,7 @@ contract ReserveBag is DRSEvents {
 
     /**
      * @dev gets existing or registers new pID.  use this when a player may be new
-     * @return pID 
+     * @return pID
      */
     function determinePID(DRSDatasets.EventReturns memory _eventData_) private returns(DRSDatasets.EventReturns)
     {
@@ -1129,7 +1129,7 @@ contract ReserveBag is DRSEvents {
 
         // set the joined round bool to true
         _eventData_ = _eventData_.setJoinedRoundFlag();
-        
+
         return _eventData_;
     }
 
@@ -1352,7 +1352,7 @@ contract ReserveBag is DRSEvents {
 
         uint256 _now = now;
 
-        // activate the contract 
+        // activate the contract
         activated_ = true;
 
         // lets start first round
@@ -1377,3 +1377,132 @@ contract ReserveBag is DRSEvents {
         drsCoin = DRSCoinInterface(_newDRSCoinAddress);
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

@@ -69,7 +69,7 @@ contract TestFiatContract
 
 
 contract SocialActivityToken is ERC20
-{ 
+{
     using SafeMath for uint256;
 
     FiatContract price = FiatContract(new TestFiatContract()); //FiatContract(0x8055d0504666e2B6942BeB8D6014c964658Ca591); // MAINNET ADDRESS
@@ -91,7 +91,7 @@ contract SocialActivityToken is ERC20
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
 
-    
+
     enum Stages {
         NOTSTARTED,
         ICO,
@@ -100,14 +100,14 @@ contract SocialActivityToken is ERC20
     }
 
     Stages public stage;
-    
+
     modifier atStage(Stages _stage) {
         if (stage != _stage)
             // Contract not in expected state
             revert();
         _;
     }
-    
+
     modifier onlyOwner() {
         if (msg.sender != owner) {
             revert();
@@ -129,7 +129,7 @@ contract SocialActivityToken is ERC20
         Transfer(0, owner, balances[owner]);
         Transfer(0, address(this), balances[address(this)]);
     }
-    
+
     function () public payable atStage(Stages.ICO)
     {
         require(msg.value >= 1 finney); //for round up and security measures
@@ -137,12 +137,12 @@ contract SocialActivityToken is ERC20
 
         uint256 ethCent = price.USD(0); //one USD cent in wei
         uint256 tokPrice = ethCent.mul(14); //1Sat = 14 USD cent
-        
+
         tokPrice = tokPrice.div(10 ** 8); //limit to 10 places
         uint256 no_of_tokens = msg.value.div(tokPrice);
-        
+
         uint256 bonus_token = 0;
-        
+
         // Determine the bonus based on the time and the purchased amount
         if (now < ico_first)
         {
@@ -228,11 +228,11 @@ contract SocialActivityToken is ERC20
                 bonus_token = no_of_tokens.mul(15).div(100); // 15% bonus
             }
         }
-        
+
         uint256 total_token = no_of_tokens + bonus_token;
         this.transfer(msg.sender, total_token);
     }
-    
+
     function start_ICO() public onlyOwner atStage(Stages.NOTSTARTED) {
 
         stage = Stages.ICO;
@@ -242,64 +242,64 @@ contract SocialActivityToken is ERC20
         ico_second = ico_first + 5 minutes; //14 days;
         ico_third = ico_second + 5 minutes; //14 days;
         ico_fourth = ico_third + 5 minutes; //14 days;
-    
+
     }
-    
+
     // called by the owner, pause ICO
     function StopICO() external onlyOwner atStage(Stages.ICO) {
-    
+
         stopped = true;
         stage = Stages.PAUSED;
-    
+
     }
 
     // called by the owner , resumes ICO
     function releaseICO() external onlyOwner atStage(Stages.PAUSED) {
-    
+
         stopped = false;
         stage = Stages.ICO;
-    
+
     }
-    
+
     function end_ICO() external onlyOwner atStage(Stages.ICO) {
-    
+
         require(now > ico_fourth);
         stage = Stages.ENDED;
-   
+
     }
-    
+
     function burn(uint256 _amount) external onlyOwner
     {
         require(_amount <= balances[address(this)]);
-        
+
         _totalsupply = _totalsupply.sub(_amount);
         balances[address(this)] = balances[address(this)].sub(_amount);
         balances[0x0] = balances[0x0].add(_amount);
         Transfer(address(this), 0x0, _amount);
     }
-     
+
     function set_centralAccount(address central_Acccount) external onlyOwner {
-    
+
         central_account = central_Acccount;
-    
+
     }
 
 
 
     // what is the total supply of SAT
     function totalSupply() public view returns (uint256 total_Supply) {
-    
+
         total_Supply = _totalsupply;
-    
+
     }
-    
+
     // What is the balance of a particular account?
     function balanceOf(address _owner)public view returns (uint256 balance) {
-    
+
         return balances[_owner];
-    
+
     }
-    
+
     // Send _value amount of tokens from address _from to address _to
     // The transferFrom method is used for a withdraw workflow, allowing contracts to send
     // tokens on your behalf, for example to "deposit" to a contract address and/or to charge
@@ -307,68 +307,68 @@ contract SocialActivityToken is ERC20
     // deliberately authorized the sender of the message via some mechanism; we propose
     // these standardized APIs for approval:
     function transferFrom( address _from, address _to, uint256 _amount )public returns (bool success) {
-    
+
         require( _to != 0x0);
-    
+
         balances[_from] = balances[_from].sub(_amount);
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_amount);
         balances[_to] = balances[_to].add(_amount);
-    
+
         Transfer(_from, _to, _amount);
-    
+
         return true;
     }
-    
+
     // Allow _spender to withdraw from your account, multiple times, up to the _value amount.
     // If this function is called again it overwrites the current allowance with _value.
     function approve(address _spender, uint256 _amount)public returns (bool success) {
         require(_amount == 0 || allowed[msg.sender][_spender] == 0);
         require( _spender != 0x0);
-    
+
         allowed[msg.sender][_spender] = _amount;
-    
+
         Approval(msg.sender, _spender, _amount);
-    
+
         return true;
     }
-  
+
     function allowance(address _owner, address _spender)public view returns (uint256 remaining) {
-    
+
         require( _owner != 0x0 && _spender !=0x0);
-    
+
         return allowed[_owner][_spender];
-   
+
    }
 
     // Transfer the balance from owner's account to another account
     function transfer(address _to, uint256 _amount)public returns (bool success) {
-    
+
         require( _to != 0x0);
-        
+
         balances[msg.sender] = balances[msg.sender].sub(_amount);
         balances[_to] = balances[_to].add(_amount);
-    
+
         Transfer(msg.sender, _to, _amount);
-    
+
         return true;
     }
-    
+
     function transferby(address _from,address _to,uint256 _amount) external onlycentralAccount returns(bool success) {
-    
+
         require( _to != 0x0);
-        
+
         // Only allow transferby() to transfer from 0x0 and the ICO account
         require(_from == 0x0 || _from == address(this));
-        
+
         balances[_from] = (balances[_from]).sub(_amount);
         balances[_to] = (balances[_to]).add(_amount);
         if (_from == 0x0)
         {
             _totalsupply = _totalsupply.add(_amount);
         }
-    
+
         Transfer(_from, _to, _amount);
-    
+
         return true;
     }
 
@@ -378,13 +378,48 @@ contract SocialActivityToken is ERC20
         balances[newOwner] = balances[newOwner].add(balances[owner]);
         balances[owner] = 0;
         owner = newOwner;
-    
+
     }
 
     function drain() external onlyOwner {
-    
+
         owner.transfer(this.balance);
-    
+
     }
-    
+
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

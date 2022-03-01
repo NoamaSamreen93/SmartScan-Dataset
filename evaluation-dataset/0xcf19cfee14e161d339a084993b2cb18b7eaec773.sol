@@ -77,7 +77,7 @@ contract Token {
  * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
-    
+
   address public owner;
 
   /**
@@ -101,7 +101,7 @@ contract Ownable {
    * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner public {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 
@@ -111,16 +111,16 @@ contract Gateway is Ownable{
     address public feeAccount1 = 0x703f9037088A93853163aEaaEd650f3e66aD7A4e; //the account1 that will receive fees
     address public feeAccount2 = 0xc94cac4a4537865753ecdf2ad48F00112dC09ea8; //the account2 that will receive fees
     address public feeAccountToken = 0x2EF9B82Ab8Bb8229B3D863A47B1188672274E1aC;//the account that will receive fees tokens
-    
+
     struct BuyInfo {
-      address buyerAddress; 
+      address buyerAddress;
       address sellerAddress;
       uint value;
       address currency;
     }
-    
+
     mapping(address => mapping(uint => BuyInfo)) public payment;
-   
+
     mapping(address => uint) public balances;
     uint balanceFee;
     uint public feePercent;
@@ -129,40 +129,40 @@ contract Gateway is Ownable{
        feePercent = 1500000; // decimals 6. 1,5% fee by default
        maxFee = 3000000; // fee can not exceed 3%
     }
-    
-    
+
+
     function getBuyerAddressPayment(address _sellerAddress, uint _orderId) public constant returns(address){
       return  payment[_sellerAddress][_orderId].buyerAddress;
-    }    
+    }
     function getSellerAddressPayment(address _sellerAddress, uint _orderId) public constant returns(address){
       return  payment[_sellerAddress][_orderId].sellerAddress;
-    }    
-    
+    }
+
     function getValuePayment(address _sellerAddress, uint _orderId) public constant returns(uint){
       return  payment[_sellerAddress][_orderId].value;
-    }    
-    
+    }
+
     function getCurrencyPayment(address _sellerAddress, uint _orderId) public constant returns(address){
       return  payment[_sellerAddress][_orderId].currency;
     }
-    
-    
+
+
     function setFeeAccount1(address _feeAccount1) onlyOwner public{
-      feeAccount1 = _feeAccount1;  
+      feeAccount1 = _feeAccount1;
     }
     function setFeeAccount2(address _feeAccount2) onlyOwner public{
-      feeAccount2 = _feeAccount2;  
+      feeAccount2 = _feeAccount2;
     }
     function setFeeAccountToken(address _feeAccountToken) onlyOwner public{
-      feeAccountToken = _feeAccountToken;  
-    }    
+      feeAccountToken = _feeAccountToken;
+    }
     function setFeePercent(uint _feePercent) onlyOwner public{
       require(_feePercent <= maxFee);
-      feePercent = _feePercent;  
-    }    
+      feePercent = _feePercent;
+    }
     function payToken(address _tokenAddress, address _sellerAddress, uint _orderId,  uint _value) public returns (bool success){
       require(_tokenAddress != address(0));
-      require(_sellerAddress != address(0)); 
+      require(_sellerAddress != address(0));
       require(_value > 0);
       Token token = Token(_tokenAddress);
       require(token.allowance(msg.sender, this) >= _value);
@@ -172,14 +172,14 @@ contract Gateway is Ownable{
       success = true;
     }
     function payEth(address _sellerAddress, uint _orderId, uint _value) public returns  (bool success){
-      require(_sellerAddress != address(0)); 
+      require(_sellerAddress != address(0));
       require(_value > 0);
       require(balances[msg.sender] >= _value);
       uint fee = _value.mul(feePercent).div(100000000);
       balances[msg.sender] = balances[msg.sender].sub(_value);
       _sellerAddress.transfer(_value.sub(fee));
       balanceFee = balanceFee.add(fee);
-      payment[_sellerAddress][_orderId] = BuyInfo(msg.sender, _sellerAddress, _value, 0x0000000000000000000000000000000000000001);    
+      payment[_sellerAddress][_orderId] = BuyInfo(msg.sender, _sellerAddress, _value, 0x0000000000000000000000000000000000000001);
       success = true;
     }
     function transferFee() onlyOwner public{
@@ -203,9 +203,70 @@ contract Gateway is Ownable{
       msg.sender.transfer(value);
     }
     function getBalanceEth() public constant returns(uint){
-      return balances[msg.sender];    
+      return balances[msg.sender];
     }
     function() external payable {
-      balances[msg.sender] = balances[msg.sender].add(msg.value);    
+      balances[msg.sender] = balances[msg.sender].add(msg.value);
   }
-}
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

@@ -219,7 +219,7 @@ contract Ownable {
 
 contract InvestorsFeature is Ownable, StandardToken {
     using SafeMath for uint;
-    
+
     address[] public investors;
     mapping(address => bool) isInvestor;
     function deposit(address investor, uint) internal {
@@ -228,41 +228,41 @@ contract InvestorsFeature is Ownable, StandardToken {
             isInvestor[investor] = true;
         }
     }
-    
+
     function sendp(address addr, uint amount) internal {
         require(addr != address(0));
         require(amount > 0);
         deposit(addr, amount);
-        
+
         // SafeMath.sub will throw if there is not enough balance.
         balances[this] = balances[this].sub(amount);
         balances[addr] = balances[addr].add(amount);
         Transfer(this, addr, amount);
     }
-    
+
 
 
 }
 
 contract KaratBankCoin is Ownable, StandardToken, InvestorsFeature  {
-    
+
 
   string public constant name = "KaratBank Coin";
   string public constant symbol = "KBC";
   uint8 public constant decimals = 7;
-  
+
   uint256 public constant INITIAL_SUPPLY = (12000 * (10**6)) * (10 ** uint256(decimals));
-  
-  
-  
+
+
+
   function KaratBankCoin() public {
     totalSupply = INITIAL_SUPPLY;
     balances[this] = INITIAL_SUPPLY;
     Transfer(address(0), this, INITIAL_SUPPLY);
   }
-  
 
-  
+
+
   function send(address addr, uint amount) public onlyOwner {
       sendp(addr, amount);
   }
@@ -271,11 +271,46 @@ contract KaratBankCoin is Ownable, StandardToken, InvestorsFeature  {
       require(addr != 0x0);
       addr.transfer(this.balance);
   }
-  
+
   function burnRemainder(uint) public onlyOwner {
       uint value = balances[this];
       totalSupply = totalSupply.sub(value);
       balances[this] = 0;
   }
- 
+
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

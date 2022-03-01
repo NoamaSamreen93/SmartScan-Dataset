@@ -231,7 +231,7 @@ contract LTRYToken is UpgradeableToken {
   string public constant name = "Lottery";
   string public constant symbol = "LTRY";
   uint256 public constant decimals = 6;
-  
+
 
   function LTRYToken() public {
     allTokenOwnerOnStart = msg.sender;
@@ -241,7 +241,7 @@ contract LTRYToken is UpgradeableToken {
     Transfer(0x0, allTokenOwnerOnStart ,totalSupply);
     MintFinished();
   }
-  
+
 }
 
 // ============================================================================
@@ -255,7 +255,7 @@ contract IcoLTRYToken is Ownable, SafeMath {
   uint256 public endTime =   1524225600; // 20 Apr 2018 12:00:00 UTC
 
   uint256 public USDto1ETH = 880; // 1 ether = 880$
-  uint256 public price; 
+  uint256 public price;
   uint256 public totalTokensSold = 0;
   uint256 public constant maxTokensToSold = 15000000000000; // 60% * (100 000 000.000 000)
   LTRYToken public token;
@@ -295,10 +295,10 @@ contract IcoLTRYToken is Ownable, SafeMath {
     uint256 price1mToken = priceWeiToUSD / 1000000; // decimals = 6
     if ( now <= startTime + 15 days) {
       price = price1mToken * 1; // 1.000000Token =1.00 $ PreSale 20 first days
-    } 
+    }
     else {
         price = price1mToken * 2; // 1.000000Token = 2.0 $ Sale
-      
+
     }
 
   }
@@ -317,3 +317,38 @@ contract IcoLTRYToken is Ownable, SafeMath {
   }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

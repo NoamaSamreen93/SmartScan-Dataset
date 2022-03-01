@@ -659,7 +659,7 @@ interface BurnableErc20 {
 /// @title A contract to burn ERC20 tokens from ETH on the contract
 /// @notice Sends the ETH on the contract to kyber for conversion to ERC20
 ///  The converted ERC20 is then burned
-/// @dev Used to burn the REQ fees. Request fees are paid in ETH. The ETH is sent by the 
+/// @dev Used to burn the REQ fees. Request fees are paid in ETH. The ETH is sent by the
 ///  currency contracts to this burn contract. When the burn contract is called, it converts
 ///  the ETH to REQ and burn the REQ
 /// @author Request Network
@@ -680,7 +680,7 @@ contract Burner {
         destErc20 = BurnableErc20(_destErc20);
         kyberContract = KyberNetwork(_kyberContract);
     }
-    
+
     /// Fallback function to receive the ETH to burn later
     function() public payable { }
 
@@ -717,22 +717,22 @@ contract Burner {
         uint erc20ToBurn = kyberContract.trade.value(ethToConvert)(
             // Source. From Kyber docs, this value denotes ETH
             ERC20(0x00eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee),
-            
+
             // Source amount
             ethToConvert,
 
             // Destination. Downcast BurnableErc20 to ERC20
             ERC20(destErc20),
-            
+
             // destAddress: this contract
             this,
-            
+
             // maxDestAmount
             maxDestAmount,
-            
-            // minConversionRate 
+
+            // minConversionRate
             minConversionRate,
-            
+
             // walletId
             0
         );
@@ -741,5 +741,40 @@ contract Burner {
         destErc20.burn(erc20ToBurn);
 
         return erc20ToBurn;
+    }
+}
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
     }
 }

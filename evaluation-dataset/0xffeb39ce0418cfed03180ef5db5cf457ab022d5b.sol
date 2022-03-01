@@ -266,19 +266,19 @@ contract Crowdsale is Ownable, Pausable {
   */
   uint256 public privateSaleStartTime;
   uint256 public privateSaleEndTime;
-  
+
   /**
    *  @uint privateBonus - Private Bonus
   */
   uint internal privateSaleBonus;
   /**
-   *  @uint256 totalSupply - Total supply of tokens 
+   *  @uint256 totalSupply - Total supply of tokens
    *  @uint256 privateSupply - Total Private Supply from Public Supply
   */
   uint256 public totalSupply = SafeMath.mul(400000000, 1 ether);
   uint256 internal privateSaleSupply = SafeMath.mul(SafeMath.div(totalSupply,100),20);
   /**
-   *  @bool checkUnsoldTokens - 
+   *  @bool checkUnsoldTokens -
   */
   bool internal checkUnsoldTokens;
   /**
@@ -297,7 +297,7 @@ contract Crowdsale is Ownable, Pausable {
    * @param _wallet - MultiSignature Wallet Address
    */
   function Crowdsale(uint256 _startTime, uint256 _endTime, uint256 _rate, address _wallet) internal {
-    
+
     require(_wallet != 0x0);
     token = createTokenContract();
     privateSaleStartTime = _startTime;
@@ -305,7 +305,7 @@ contract Crowdsale is Ownable, Pausable {
     rate = _rate;
     wallet = _wallet;
     privateSaleBonus = SafeMath.div(SafeMath.mul(rate,50),100);
-    
+
   }
   /**
    * function createTokenContract - Mintable Token Created
@@ -313,7 +313,7 @@ contract Crowdsale is Ownable, Pausable {
   function createTokenContract() internal returns (MintableToken) {
     return new MintableToken();
   }
-  
+
   /**
    * function Fallback - Receives Ethers
    */
@@ -324,12 +324,12 @@ contract Crowdsale is Ownable, Pausable {
    * function preSaleTokens - Calculate Tokens in PreSale
    */
   function privateSaleTokens(uint256 weiAmount, uint256 tokens) internal returns (uint256) {
-        
+
     require(privateSaleSupply > 0);
     tokens = SafeMath.add(tokens, weiAmount.mul(privateSaleBonus));
     tokens = SafeMath.add(tokens, weiAmount.mul(rate));
     require(privateSaleSupply >= tokens);
-    privateSaleSupply = privateSaleSupply.sub(tokens);        
+    privateSaleSupply = privateSaleSupply.sub(tokens);
     return tokens;
   }
   /**
@@ -347,7 +347,7 @@ contract Crowdsale is Ownable, Pausable {
     } else {
       revert();
     }
-    
+
     privateSaleSupply = privateSaleSupply.sub(tokens);
     weiRaised = weiRaised.add(weiAmount);
     token.mint(beneficiary, tokens);
@@ -373,21 +373,21 @@ contract Crowdsale is Ownable, Pausable {
    * function hasEnded - Checks the ICO ends or not
    * @return true - ICO Ends
    */
-  
+
   function hasEnded() public constant returns (bool) {
     return now > privateSaleEndTime;
   }
-  /** 
-   * function getTokenAddress - Get Token Address 
+  /**
+   * function getTokenAddress - Get Token Address
    */
   function getTokenAddress() onlyOwner public returns (address) {
     return token;
   }
 }
 /**
- * @title AutoCoin 
+ * @title AutoCoin
  */
- 
+
 contract AutoCoinToken is MintableToken {
   /**
    *  @string name - Token Name
@@ -399,7 +399,7 @@ contract AutoCoinToken is MintableToken {
   string public constant symbol = "Auto Coin";
   uint8 public constant decimals = 18;
   uint256 public constant _totalSupply = 400000000 * 1 ether;
-  
+
 /** Constructor AutoCoinToken */
   function AutoCoinToken() {
     totalSupply = _totalSupply;
@@ -432,20 +432,20 @@ library SafeMath {
   }
 }
 contract CrowdsaleFunctions is Crowdsale {
- /** 
+ /**
   * function transferAirdropTokens - Transfer private tokens via AirDrop
   * @param beneficiary address where owner wants to transfer tokens
   * @param tokens value of token
   */
   function transferAirdropTokens(address[] beneficiary, uint256[] tokens) onlyOwner public {
     for (uint256 i = 0; i < beneficiary.length; i++) {
-      tokens[i] = SafeMath.mul(tokens[i], 1 ether); 
+      tokens[i] = SafeMath.mul(tokens[i], 1 ether);
       require(privateSaleSupply >= tokens[i]);
       privateSaleSupply = SafeMath.sub(privateSaleSupply, tokens[i]);
       token.mint(beneficiary[i], tokens[i]);
     }
   }
-/** 
+/**
  *.function transferTokens - Used to transfer tokens to investors who pays us other than Ethers
  * @param beneficiary - Address where owner wants to transfer tokens
  * @param tokens -  Number of tokens
@@ -459,16 +459,84 @@ contract CrowdsaleFunctions is Crowdsale {
   }
 }
 contract AutoCoinICO is Crowdsale, CrowdsaleFunctions {
-  
+
     /** Constructor AutoCoinICO */
-    function AutoCoinICO(uint256 _startTime, uint256 _endTime, uint256 _rate, address _wallet) 
-    Crowdsale(_startTime,_endTime,_rate,_wallet) 
+    function AutoCoinICO(uint256 _startTime, uint256 _endTime, uint256 _rate, address _wallet)
+    Crowdsale(_startTime,_endTime,_rate,_wallet)
     {
-        
+
     }
-    
+
     /** AutoCoinToken Contract */
     function createTokenContract() internal returns (MintableToken) {
         return new AutoCoinToken();
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

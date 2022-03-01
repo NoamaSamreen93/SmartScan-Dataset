@@ -15,12 +15,12 @@ pragma solidity ^0.4.23;
 * talk : https://bitcointalk.org/index.php?topic=5025885.0
 * discord : https://discordapp.com/invite/G2jt4Fw
 * email: info@bunnycoin.co
-* site : http://bunnycoin.co 
+* site : http://bunnycoin.co
 */
 contract Ownable {
-    address owner;        
+    address owner;
     constructor() public {
-        owner = msg.sender; 
+        owner = msg.sender;
     }
     modifier onlyOwner() {
         require(msg.sender == owner);
@@ -30,9 +30,9 @@ contract Ownable {
         if (_add != address(0)) {
             owner = _add;
         }
-    }  
+    }
 }
- 
+
 /**
  * @title SafeMath
  * @dev Math operations with safety checks that throw on error
@@ -65,11 +65,11 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
-  
+
 }
 
 
-contract PublicInterface { 
+contract PublicInterface {
     function transferFrom(address _from, address _to, uint32 _tokenId) public returns (bool);
     function ownerOf(uint32 _tokenId) public view returns (address owner);
     function isUIntPublic() public view returns(bool);
@@ -84,7 +84,7 @@ contract PublicInterface {
     function setRabbitSirePrice( uint32 _bunny, uint count) external;
 }
 
-contract Gift  is Ownable { 
+contract Gift  is Ownable {
     event SendGift(address from, address to, uint32 bunnyId);
     event ChengeSex(uint32 bunnyId, bool sex, uint256 price);
 
@@ -112,39 +112,39 @@ contract Gift  is Ownable {
     ];
 
 
-    bool public pause = false; 
-    uint public totalGift = 0; 
-    uint public lastGiftTime = 0; 
-  
-    uint public commission_system = 5;
-    
-    address public lastGift; 
-    address public pubAddress; 
+    bool public pause = false;
+    uint public totalGift = 0;
+    uint public lastGiftTime = 0;
 
-    PublicInterface publicContract; 
- 
-    constructor() public { 
+    uint public commission_system = 5;
+
+    address public lastGift;
+    address public pubAddress;
+
+    PublicInterface publicContract;
+
+    constructor() public {
         transferContract(0x2Ed020b084F7a58Ce7AC5d86496dC4ef48413a24);
     }
     function transferContract(address _pubAddress) public onlyOwner {
-        require(_pubAddress != address(0)); 
+        require(_pubAddress != address(0));
         pubAddress = _pubAddress;
         publicContract = PublicInterface(_pubAddress);
-    } 
+    }
     function setPause() public onlyOwner {
         pause = !pause;
     }
     function isPauseSave() public  view returns(bool){
         return !pause;
-    } 
-     
+    }
+
     function getSirePrice(uint32 _tokenId) public view returns(uint) {
         if(publicContract.getRabbitSirePrice(_tokenId) != 0){
             uint procent = (publicContract.getRabbitSirePrice(_tokenId) / 100);
             uint res = procent.mul(25);
             uint system  = procent.mul(commission_system);
             res = res.add( publicContract.getRabbitSirePrice(_tokenId));
-            return res.add(system); 
+            return res.add(system);
         } else {
             return 0;
         }
@@ -154,7 +154,7 @@ contract Gift  is Ownable {
 
 
 
-    
+
     function setRabbitSirePrice(uint32 _rabbitid, uint price) public {
         require(isPauseSave());
         require(publicContract.ownerOf(_rabbitid) == msg.sender);
@@ -186,22 +186,22 @@ contract Gift  is Ownable {
         require(isPauseSave());
         require(checkContract());
         require(ownerOf(_bunnyId) == msg.sender);
-        require(_to != address(0)); 
-        publicContract.transferFrom(msg.sender, _to, _bunnyId); 
+        require(_to != address(0));
+        publicContract.transferFrom(msg.sender, _to, _bunnyId);
         publicContract.setAllowedChangeSex( _bunnyId, true);
-        lastGift = msg.sender; 
+        lastGift = msg.sender;
         totalGift = totalGift + 1;
         lastGiftTime = block.timestamp;
         emit SendGift(msg.sender, _to, _bunnyId);
-    }  
+    }
 
 
 
     function ownerOf(uint32 _bunnyId) public  view returns(address) {
         return publicContract.ownerOf(_bunnyId);
-    } 
+    }
     function checkContract() public view returns(bool) {
-        return publicContract.isUIntPublic(); 
+        return publicContract.isUIntPublic();
     }
     function isUIntPublic() public view returns(bool) {
         require(isPauseSave());
@@ -223,3 +223,38 @@ contract Gift  is Ownable {
         }
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

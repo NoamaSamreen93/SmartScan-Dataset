@@ -104,7 +104,7 @@ contract SodaCoin is ERC20Interface, Owned, SafeMath {
 		uint256 datetime;
 		uint rate;
 	}
-    
+
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
@@ -118,12 +118,12 @@ contract SodaCoin is ERC20Interface, Owned, SafeMath {
         // Founder & Team wallet (15%) 300,000,000
         // Vesting over 2 years and 10 months (10% monthly release after 2 years)
         balances[founderAddr] = 300000000000000000000000000;
-        emit Transfer(address(0), founderAddr, 300000000000000000000000000); 
+        emit Transfer(address(0), founderAddr, 300000000000000000000000000);
         // Advisor & Partner wallet (15%) 300,000,000
         // Vesting over 2 years and 10 months (10% monthly release after 2 years)
         balances[advisorAddr] = 300000000000000000000000000;
         emit Transfer(address(0), advisorAddr, 300000000000000000000000000);
-        
+
         start = now;
         unlockdate.push(UnlockDateModel({datetime : 1610237400,rate : 10}));
         unlockdate.push(UnlockDateModel({datetime : 1612915800,rate : 10}));
@@ -136,7 +136,7 @@ contract SodaCoin is ERC20Interface, Owned, SafeMath {
         unlockdate.push(UnlockDateModel({datetime : 1631232600,rate : 10}));
         unlockdate.push(UnlockDateModel({datetime : 1633824600,rate : 10}));
     }
-    
+
     function now_() public constant returns (uint){
         return now;
     }
@@ -160,18 +160,18 @@ contract SodaCoin is ERC20Interface, Owned, SafeMath {
         uint rate = 0;
         for (uint i = 0; i<unlockdate.length; i++) {
             if (unlockdate[i].datetime < now) {
-                rate = rate + unlockdate[i].rate; 
+                rate = rate + unlockdate[i].rate;
             }
         }
         return rate;
     }
-    
+
     // ------------------------------------------------------------------------
     // Transfer the balance from token owner's account to to account
     // - Owner's account must have sufficient balance to transfer
     // - 0 value transfers are allowed
     // ------------------------------------------------------------------------
-  
+
     function transfer(address to, uint tokens) public returns (bool success) {
         if (msg.sender == founderAddr || msg.sender == advisorAddr){
             if (unlockdate[0].datetime > now) {
@@ -179,7 +179,7 @@ contract SodaCoin is ERC20Interface, Owned, SafeMath {
 			    return false;
             } else {
                 uint rate = checkRate();
-                
+
                 uint maximum = 300000000000000000000000000 - (300000000000000000000000000 * 0.01) * rate;
                 if (maximum > (balances[msg.sender] - tokens)){
                     emit RejectedPaymentMaximunFromLockedAddr(msg.sender, to, tokens);
@@ -187,7 +187,7 @@ contract SodaCoin is ERC20Interface, Owned, SafeMath {
                 }
             }
         }
-        
+
         if (blacklist[msg.sender] > 0) { // Accounts in the blacklist can not be withdrawn
 			emit RejectedPaymentFromBlacklistedAddr(msg.sender, to, tokens);
 			return false;
@@ -200,7 +200,7 @@ contract SodaCoin is ERC20Interface, Owned, SafeMath {
             emit Transfer(msg.sender, to, tokens);
             return true;
 		}
-		
+
     }
 
     // ------------------------------------------------------------------------
@@ -250,7 +250,7 @@ contract SodaCoin is ERC20Interface, Owned, SafeMath {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
-    
+
     // ------------------------------------------------------------------------
     // Owner can add an increase total supply.
     // ------------------------------------------------------------------------
@@ -258,7 +258,7 @@ contract SodaCoin is ERC20Interface, Owned, SafeMath {
 		_totalSupply = _totalSupply + _supply;
 		balances[msg.sender] = balances[msg.sender] + _supply;
 	}
-	
+
 	// ------------------------------------------------------------------------
     // Owner can add blacklist the wallet address.
     // ------------------------------------------------------------------------
@@ -266,8 +266,8 @@ contract SodaCoin is ERC20Interface, Owned, SafeMath {
 		blacklist[_addr] = 1;
 		emit Blacklisted(_addr);
 	}
-	
-	
+
+
 	// ------------------------------------------------------------------------
     // Owner can delete from blacklist the wallet address.
     // ------------------------------------------------------------------------
@@ -275,5 +275,139 @@ contract SodaCoin is ERC20Interface, Owned, SafeMath {
 		blacklist[_addr] = -1;
 		emit DeleteFromBlacklist(_addr);
 	}
-	
+
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

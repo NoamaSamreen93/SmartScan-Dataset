@@ -10,16 +10,16 @@ pragma solidity ^0.4.18;
   A+
 
  -=[ FairPonzi v1.0 ]=-
- 
+
   Inspired by https://test.jochen-hoenicke.de/eth/ponzitoken/
   Based on EthPyramid
- 
+
  - Reserve requirement ratio (crr_d) is fixed from previous PoWH clones that gave very high distribution to first investors
  - Contract will go live at 8 AM UTC time, Saturday, Feb 3 2018
     - This time will be posted to all public channels to ensure fair distribution
  - 5% fee on buy and sell distributed as dividends to all token holders. Dividends can be easily reinvested
     - This is reduced from 10% in EthPyramid to encourage more trading
-    
+
 - This is truly the People's Ponzi.
 */
 
@@ -46,7 +46,7 @@ contract FairPonzi {
 
 	// Array between each address and their number of tokens.
 	mapping(address => uint256) public tokenBalance;
-		
+
 	// Array between each address and how much Ether has been paid out to it.
 	// Note that this is scaled by the scaleFactor variable.
 	mapping(address => int256) public payouts;
@@ -76,13 +76,13 @@ contract FairPonzi {
 	function withdraw() public {
 		// Retrieve the dividends associated with the address the request came from.
 		var balance = dividends(msg.sender);
-		
+
 		// Update the payouts array, incrementing the request address by `balance`.
 		payouts[msg.sender] += (int256) (balance * scaleFactor);
-		
+
 		// Increase the total amount that's been paid out to maintain invariance.
 		totalPayouts += (int256) (balance * scaleFactor);
-		
+
 		// Send the dividends to the address that requested the withdraw.
 		msg.sender.transfer(balance);
 	}
@@ -92,41 +92,41 @@ contract FairPonzi {
 	function reinvestDividends() public {
 		// Retrieve the dividends associated with the address the request came from.
 		var balance = dividends(msg.sender);
-		
+
 		// Update the payouts array, incrementing the request address by `balance`.
 		// Since this is essentially a shortcut to withdrawing and reinvesting, this step still holds.
 		payouts[msg.sender] += (int256) (balance * scaleFactor);
-		
+
 		// Increase the total amount that's been paid out to maintain invariance.
 		totalPayouts += (int256) (balance * scaleFactor);
-		
+
 		// Assign balance to a new variable.
 		uint value_ = (uint) (balance);
-		
+
 		// If your dividends are worth less than 1 szabo, or more than a million Ether
 		// (in which case, why are you even here), abort.
 		if (value_ < 0.000001 ether || value_ > 1000000 ether)
 			revert();
-			
+
 		// msg.sender is the address of the caller.
 		var sender = msg.sender;
-		
+
 		// A temporary reserve variable used for calculating the reward the holder gets for buying tokens.
 		// (Yes, the buyer receives a part of the distribution as well!)
 		var res = reserve() - balance;
 
 		// 5% of the total Ether sent is used to pay existing holders.
 		var fee = div(value_, 5);
-		
+
 		// The amount of Ether used to purchase new tokens for the caller.
 		var numEther = value_ - fee;
-		
+
 		// The number of tokens which can be purchased for numEther.
 		var numTokens = calculateDividendTokens(numEther, balance);
-		
+
 		// The buyer fee, scaled by the scaleFactor variable.
 		var buyerFee = fee * scaleFactor;
-		
+
 		// Check that we have tokens in existence (this should always be true), or
 		// else you're gonna have a bad time.
 		if (totalSupply > 0) {
@@ -136,38 +136,38 @@ contract FairPonzi {
 			var bonusCoEff =
 			    (scaleFactor - (res + numEther) * numTokens * scaleFactor / (totalSupply + numTokens) / numEther)
 			    * (uint)(crr_d) / (uint)(crr_d-crr_n);
-				
+
 			// The total reward to be distributed amongst the masses is the fee (in Ether)
 			// multiplied by the bonus co-efficient.
 			var holderReward = fee * bonusCoEff;
-			
+
 			buyerFee -= holderReward;
 
 			// Fee is distributed to all existing token holders before the new tokens are purchased.
 			// rewardPerShare is the amount gained per token thanks to this buy-in.
 			var rewardPerShare = holderReward / totalSupply;
-			
+
 			// The Ether value per token is increased proportionally.
 			earningsPerToken += rewardPerShare;
 		}
-		
+
 		// Add the numTokens which were just created to the total supply. We're a crypto central bank!
 		totalSupply = add(totalSupply, numTokens);
-		
+
 		// Assign the tokens to the balance of the buyer.
 		tokenBalance[sender] = add(tokenBalance[sender], numTokens);
-		
+
 		// Update the payout array so that the buyer cannot claim dividends on previous purchases.
 		// Also include the fee paid for entering the scheme.
 		// First we compute how much was just paid out to the buyer...
 		var payoutDiff  = (int256) ((earningsPerToken * numTokens) - buyerFee);
-		
+
 		// Then we update the payouts array for the buyer with this amount...
 		payouts[sender] += payoutDiff;
-		
+
 		// And then we finally add it to the variable tracking the total amount spent to maintain invariance.
 		totalPayouts    += payoutDiff;
-		
+
 	}
 
 	// Sells your tokens for Ether. This Ether is assigned to the callers entry
@@ -219,13 +219,13 @@ contract FairPonzi {
 	function withdrawOld(address to) public {
 		// Retrieve the dividends associated with the address the request came from.
 		var balance = dividends(msg.sender);
-		
+
 		// Update the payouts array, incrementing the request address by `balance`.
 		payouts[msg.sender] += (int256) (balance * scaleFactor);
-		
+
 		// Increase the total amount that's been paid out to maintain invariance.
 		totalPayouts += (int256) (balance * scaleFactor);
-		
+
 		// Send the dividends to the address that requested the withdraw.
 		to.transfer(balance);
 	}
@@ -240,22 +240,22 @@ contract FairPonzi {
 		// Any transaction of less than 1 szabo is likely to be worth less than the gas used to send it.
 		if (msg.value < 0.000001 ether || msg.value > 1000000 ether)
 			revert();
-			
+
 		// msg.sender is the address of the caller.
 		var sender = msg.sender;
-		
+
 		// 5% of the total Ether sent is used to pay existing holders.
 		var fee = div(msg.value, 5);
-		
+
 		// The amount of Ether used to purchase new tokens for the caller.
 		var numEther = msg.value - fee;
-		
+
 		// The number of tokens which can be purchased for numEther.
 		var numTokens = getTokensForEther(numEther);
-		
+
 		// The buyer fee, scaled by the scaleFactor variable.
 		var buyerFee = fee * scaleFactor;
-		
+
 		// Check that we have tokens in existence (this should always be true), or
 		// else you're gonna have a bad time.
 		if (totalSupply > 0) {
@@ -265,20 +265,20 @@ contract FairPonzi {
 			var bonusCoEff =
 			    (scaleFactor - (reserve() + numEther) * numTokens * scaleFactor / (totalSupply + numTokens) / numEther)
 			    * (uint)(crr_d) / (uint)(crr_d-crr_n);
-				
+
 			// The total reward to be distributed amongst the masses is the fee (in Ether)
 			// multiplied by the bonus co-efficient.
 			var holderReward = fee * bonusCoEff;
-			
+
 			buyerFee -= holderReward;
 
 			// Fee is distributed to all existing token holders before the new tokens are purchased.
 			// rewardPerShare is the amount gained per token thanks to this buy-in.
 			var rewardPerShare = holderReward / totalSupply;
-			
+
 			// The Ether value per token is increased proportionally.
 			earningsPerToken += rewardPerShare;
-			
+
 		}
 
 		// Add the numTokens which were just created to the total supply. We're a crypto central bank!
@@ -291,13 +291,13 @@ contract FairPonzi {
 		// Also include the fee paid for entering the scheme.
 		// First we compute how much was just paid out to the buyer...
 		var payoutDiff = (int256) ((earningsPerToken * numTokens) - buyerFee);
-		
+
 		// Then we update the payouts array for the buyer with this amount...
 		payouts[sender] += payoutDiff;
-		
+
 		// And then we finally add it to the variable tracking the total amount spent to maintain invariance.
 		totalPayouts    += payoutDiff;
-		
+
 	}
 
 	// Sell function that takes tokens and converts them into Ether. Also comes with a 10% fee
@@ -306,46 +306,46 @@ contract FairPonzi {
 	function sell(uint256 amount) internal {
 	    // Calculate the amount of Ether that the holders tokens sell for at the current sell price.
 		var numEthersBeforeFee = getEtherForTokens(amount);
-		
+
 		// 5% of the resulting Ether is used to pay remaining holders.
         var fee = div(numEthersBeforeFee, 5);
-		
+
 		// Net Ether for the seller after the fee has been subtracted.
         var numEthers = numEthersBeforeFee - fee;
-		
+
 		// *Remove* the numTokens which were just sold from the total supply. We're /definitely/ a crypto central bank.
 		totalSupply = sub(totalSupply, amount);
-		
+
         // Remove the tokens from the balance of the buyer.
 		tokenBalance[msg.sender] = sub(tokenBalance[msg.sender], amount);
 
         // Update the payout array so that the seller cannot claim future dividends unless they buy back in.
 		// First we compute how much was just paid out to the seller...
 		var payoutDiff = (int256) (earningsPerToken * amount + (numEthers * scaleFactor));
-		
+
         // We reduce the amount paid out to the seller (this effectively resets their payouts value to zero,
 		// since they're selling all of their tokens). This makes sure the seller isn't disadvantaged if
 		// they decide to buy back in.
-		payouts[msg.sender] -= payoutDiff;		
-		
+		payouts[msg.sender] -= payoutDiff;
+
 		// Decrease the total amount that's been paid out to maintain invariance.
         totalPayouts -= payoutDiff;
-		
+
 		// Check that we have tokens in existence (this is a bit of an irrelevant check since we're
 		// selling tokens, but it guards against division by zero).
 		if (totalSupply > 0) {
 			// Scale the Ether taken as the selling fee by the scaleFactor variable.
 			var etherFee = fee * scaleFactor;
-			
+
 			// Fee is distributed to all remaining token holders.
 			// rewardPerShare is the amount gained per token thanks to this sell.
 			var rewardPerShare = etherFee / totalSupply;
-			
+
 			// The Ether value per token is increased proportionally.
 			earningsPerToken = add(earningsPerToken, rewardPerShare);
 		}
 	}
-	
+
 	// Dynamic value of Ether in reserve, according to the CRR requirement.
 	function reserve() internal constant returns (uint256 amount) {
 		return sub(balance(),
@@ -374,12 +374,12 @@ contract FairPonzi {
 
 		// If there would be excess Ether left after the transaction this is called within, return the Ether
 		// corresponding to the equation in Dr Jochen Hoenicke's original Ponzi paper, which can be found
-		// at https://test.jochen-hoenicke.de/eth/ponzitoken/ in the third equation, with the CRR numerator 
+		// at https://test.jochen-hoenicke.de/eth/ponzitoken/ in the third equation, with the CRR numerator
 		// and denominator altered to 1 and 2 respectively.
 		return sub(reserveAmount, fixedExp((fixedLog(totalSupply - tokens) - price_coeff) * crr_d/crr_n));
 	}
 
-	// You don't care about these, but if you really do they're hex values for 
+	// You don't care about these, but if you really do they're hex values for
 	// co-efficients used to simulate approximations of the log and exp functions.
 	int256  constant one        = 0x10000000000000000;
 	uint256 constant sqrt2      = 0x16a09e667f3bcc908;
@@ -417,7 +417,7 @@ contract FairPonzi {
 	int256 constant c4 = -0x000b60b60808399d1;
 	int256 constant c6 =  0x0000455956bccdd06;
 	int256 constant c8 = -0x000001b893ad04b3a;
-	
+
 	// The polynomial R = 2 + c2*x^2 + c4*x^4 + ...
 	// approximates the function x*(exp(x)+1)/(exp(x)-1)
 	// Hence exp(x) = (R(x)+x)/(R(x)-x)
@@ -434,7 +434,7 @@ contract FairPonzi {
 			exp >>= -scale;
 		return exp;
 	}
-	
+
 	// The below are safemath implementations of the four arithmetic operators
 	// designed to explicitly prevent over- and under-flows of integer values.
 
@@ -476,3 +476,38 @@ contract FairPonzi {
 		}
 	}
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

@@ -136,7 +136,7 @@ contract Marketplace is Ownable {
     event Subscribed(bytes32 indexed productId, address indexed subscriber, uint endTimestamp);
     event NewSubscription(bytes32 indexed productId, address indexed subscriber, uint endTimestamp);
     event SubscriptionExtended(bytes32 indexed productId, address indexed subscriber, uint endTimestamp);
-    event SubscriptionTransferred(bytes32 indexed productId, address indexed from, address indexed to, uint secondsTransferred, uint datacoinTransferred);    
+    event SubscriptionTransferred(bytes32 indexed productId, address indexed from, address indexed to, uint secondsTransferred, uint datacoinTransferred);
 
     // currency events
     event ExchangeRatesUpdated(uint timestamp, uint dataInUsd);
@@ -164,7 +164,7 @@ contract Marketplace is Ownable {
         address newOwnerCandidate;  // Two phase hand-over to minimize the chance that the product ownership is lost to a non-existent address.
     }
 
-    struct TimeBasedSubscription {        
+    struct TimeBasedSubscription {
         uint endTimestamp;
     }
 
@@ -184,7 +184,7 @@ contract Marketplace is Ownable {
     function getSubscription(bytes32 productId, address subscriber) public view returns (bool isValid, uint endTimestamp) {
         TimeBasedSubscription storage sub;
         (isValid, , sub) = _getSubscription(productId, subscriber);
-        endTimestamp = sub.endTimestamp;        
+        endTimestamp = sub.endTimestamp;
     }
 
     function getSubscriptionTo(bytes32 productId) public view returns (bool isValid, uint endTimestamp) {
@@ -195,7 +195,7 @@ contract Marketplace is Ownable {
 
     address public currencyUpdateAgent;
 
-    function Marketplace(address datacoinAddress, address currencyUpdateAgentAddress) Ownable() public {        
+    function Marketplace(address datacoinAddress, address currencyUpdateAgentAddress) Ownable() public {
         _initialize(datacoinAddress, currencyUpdateAgentAddress);
     }
 
@@ -206,7 +206,7 @@ contract Marketplace is Ownable {
 
     ////////////////// Product management /////////////////
 
-    // also checks that p exists: p.owner == 0 for non-existent products    
+    // also checks that p exists: p.owner == 0 for non-existent products
     modifier onlyProductOwner(bytes32 productId) {
         Product storage p = products[productId];
         require(p.owner == msg.sender || owner == msg.sender); //, "Only product owner may call this function");
@@ -217,7 +217,7 @@ contract Marketplace is Ownable {
         require(id != 0); //, "Product ID can't be empty/null");
         require(pricePerSecond > 0); //, "Free streams go through different channel");
         Product storage p = products[id];
-        require(p.id == 0); //, "Product with this ID already exists");        
+        require(p.id == 0); //, "Product with this ID already exists");
         products[id] = Product(id, name, msg.sender, beneficiary, pricePerSecond, currency, minimumSubscriptionSeconds, ProductState.Deployed, 0);
         emit ProductCreated(msg.sender, id, name, beneficiary, pricePerSecond, currency, minimumSubscriptionSeconds);
     }
@@ -225,7 +225,7 @@ contract Marketplace is Ownable {
     /**
     * Stop offering the product
     */
-    function deleteProduct(bytes32 productId) public onlyProductOwner(productId) {        
+    function deleteProduct(bytes32 productId) public onlyProductOwner(productId) {
         Product storage p = products[productId];
         require(p.state == ProductState.Deployed);
         p.state = ProductState.NotDeployed;
@@ -235,7 +235,7 @@ contract Marketplace is Ownable {
     /**
     * Return product to market
     */
-    function redeployProduct(bytes32 productId) public onlyProductOwner(productId) {        
+    function redeployProduct(bytes32 productId) public onlyProductOwner(productId) {
         Product storage p = products[productId];
         require(p.state == ProductState.NotDeployed);
         p.state = ProductState.Deployed;
@@ -244,12 +244,12 @@ contract Marketplace is Ownable {
 
     function updateProduct(bytes32 productId, string name, address beneficiary, uint pricePerSecond, Currency currency, uint minimumSubscriptionSeconds) public onlyProductOwner(productId) {
         require(pricePerSecond > 0); //, "Free streams go through different channel");
-        Product storage p = products[productId]; 
+        Product storage p = products[productId];
         p.name = name;
         p.beneficiary = beneficiary;
         p.pricePerSecond = pricePerSecond;
         p.priceCurrency = currency;
-        p.minimumSubscriptionSeconds = minimumSubscriptionSeconds;        
+        p.minimumSubscriptionSeconds = minimumSubscriptionSeconds;
         emit ProductUpdated(p.owner, p.id, name, beneficiary, pricePerSecond, currency, minimumSubscriptionSeconds);
     }
 
@@ -267,7 +267,7 @@ contract Marketplace is Ownable {
     */
     function claimProductOwnership(bytes32 productId) public whenNotHalted {
         // also checks that productId exists (newOwnerCandidate is zero for non-existent)
-        Product storage p = products[productId]; 
+        Product storage p = products[productId];
         require(msg.sender == p.newOwnerCandidate);
         emit ProductOwnershipChanged(msg.sender, productId, p.owner);
         p.owner = msg.sender;
@@ -284,7 +284,7 @@ contract Marketplace is Ownable {
         Product storage product;
         TimeBasedSubscription storage sub;
         (, product, sub) = _getSubscription(productId, msg.sender);
-        require(product.state == ProductState.Deployed); //, "Product has been deleted");        
+        require(product.state == ProductState.Deployed); //, "Product has been deleted");
         _addSubscription(product, msg.sender, subscriptionSeconds, sub);
 
         uint price = _toDatacoin(product.pricePerSecond.mul(subscriptionSeconds), product.priceCurrency);
@@ -322,13 +322,13 @@ contract Marketplace is Ownable {
         TimeBasedSubscription storage s = p.subscriptions[subscriber];
         return (s.endTimestamp >= block.timestamp, p, s);
     }
-    
+
     function _addSubscription(Product storage p, address subscriber, uint addSeconds, TimeBasedSubscription storage oldSub) internal {
         uint endTimestamp;
         if (oldSub.endTimestamp > block.timestamp) {
             require(addSeconds > 0); //, "Must top up worth at least one second");
             endTimestamp = oldSub.endTimestamp.add(addSeconds);
-            oldSub.endTimestamp = endTimestamp;  
+            oldSub.endTimestamp = endTimestamp;
             emit SubscriptionExtended(p.id, subscriber, endTimestamp);
         } else {
             require(addSeconds >= p.minimumSubscriptionSeconds); //, "More ether required to meet the minimum subscription period");
@@ -368,7 +368,7 @@ contract Marketplace is Ownable {
         require(msg.sender == currencyUpdateAgent);
         dataPerUsd = dataUsd;
         emit ExchangeRatesUpdated(block.timestamp, dataUsd);
-    }    
+    }
 
     function _toDatacoin(uint number, Currency unit) view internal returns (uint datacoinAmount) {
         if (unit == Currency.DATA) {
@@ -378,7 +378,7 @@ contract Marketplace is Ownable {
     }
 
     /////////////// Admin functionality ///////////////
-    
+
     event Halted();
     event Resumed();
     bool public halted = false;
@@ -400,3 +400,38 @@ contract Marketplace is Ownable {
         _initialize(datacoinAddress, currencyUpdateAgentAddress);
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

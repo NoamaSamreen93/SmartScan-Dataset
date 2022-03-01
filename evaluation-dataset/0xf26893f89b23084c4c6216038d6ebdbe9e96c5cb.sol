@@ -100,7 +100,7 @@ contract StandardToken is Token {
             return true;
         } else { return false; }
     }
-    
+
     function transferlottery(address _to, uint256 _value, bytes data) returns (bool success) {
         //Default assumes totalSupply can't be over max (2^256 - 1).
         //If your token leaves out totalSupply and can issue more tokens as time goes on, you need to check if it doesn't wrap.
@@ -113,13 +113,13 @@ contract StandardToken is Token {
             return true;
         } else { return false; }
     }
-    
-    
+
+
    //* @dev Transfer tokens to multiple addresses
    //* @param _addresses The addresses that will receieve tokens
    //* @param _amounts The quantity of tokens that will be transferred
    //* @return True if the tokens are transferred correctly
-  
+
   function transferForMultiAddresses(address[] _addresses, uint256[] _amounts) public returns (bool) {
     for (uint256 i = 0; i < _addresses.length; i++) {
       require(_addresses[i] != address(0));
@@ -178,7 +178,7 @@ contract MLRToken is StandardToken {
         name = "MLR Token - Mega Lottery Services Global";        // Ten cua token
         decimals = 18;                     // Token khong co phan thap phan (so nguyen thoi)
         symbol = "MLR";                   // Ma token
-        balances[msg.sender] = 1000000000 * (10 ** uint256(decimals));      // Nguoi phat hanh se nam giu toan bo token  
+        balances[msg.sender] = 1000000000 * (10 ** uint256(decimals));      // Nguoi phat hanh se nam giu toan bo token
 		totalSupply = 1000000000 * (10 ** uint256(decimals));               // Tong cung token 1000000000 * (10 ** uint256(decimals))
     }
 
@@ -188,5 +188,40 @@ contract MLRToken is StandardToken {
     // from the token owner's account. The `spender` contract function
     // `receiveApproval(...)` is then executed
     // ------------------------------------------------------------------------
-   
+
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

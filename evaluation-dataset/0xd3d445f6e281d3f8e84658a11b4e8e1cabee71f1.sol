@@ -333,7 +333,7 @@ contract StandardToken is ERC20, BasicToken {
 contract UnlimitedAllowanceToken is StandardToken {
 
     uint internal constant MAX_UINT = 2**256 - 1;
-    
+
     /// @dev ERC20 transferFrom, modified such that an allowance of MAX_UINT represents an unlimited allowance, and to add revert reasons.
     /// @param _from Address to transfer from.
     /// @param _to Address to transfer to.
@@ -366,7 +366,7 @@ contract UnlimitedAllowanceToken is StandardToken {
     function transfer(
         address _to,
         uint256 _value)
-        public 
+        public
         returns (bool)
     {
         require(_value <= balances[msg.sender], "insufficient balance");
@@ -409,7 +409,7 @@ contract BZRxToken is UnlimitedAllowanceToken, DetailedERC20, Ownable {
         public
         DetailedERC20(
             "BZRX Protocol Token",
-            "BZRX", 
+            "BZRX",
             18
         )
     {
@@ -444,9 +444,9 @@ contract BZRxToken is UnlimitedAllowanceToken, DetailedERC20, Ownable {
     /// @param _value Amount to transfer.
     /// @return Success of transfer.
     function transfer(
-        address _to, 
-        uint256 _value) 
-        public 
+        address _to,
+        uint256 _value)
+        public
         returns (bool)
     {
         if (lockingFinished || minters[msg.sender]) {
@@ -519,10 +519,10 @@ contract BZRxToken is UnlimitedAllowanceToken, DetailedERC20, Ownable {
     * @dev Function to stop minting new tokens.
     * @return True if the operation was successful.
     */
-    function finishMinting() 
-        public 
-        onlyOwner 
-        canMint 
+    function finishMinting()
+        public
+        onlyOwner
+        canMint
         returns (bool)
     {
         mintingFinished = true;
@@ -534,10 +534,10 @@ contract BZRxToken is UnlimitedAllowanceToken, DetailedERC20, Ownable {
     * @dev Function to stop locking token.
     * @return True if the operation was successful.
     */
-    function finishLocking() 
-        public 
-        onlyOwner 
-        isLocked 
+    function finishLocking()
+        public
+        onlyOwner
+        isLocked
         returns (bool)
     {
         lockingFinished = true;
@@ -550,10 +550,10 @@ contract BZRxToken is UnlimitedAllowanceToken, DetailedERC20, Ownable {
     * @return True if the operation was successful.
     */
     function addMinter(
-        address _minter) 
-        public 
-        onlyOwner 
-        canMint 
+        address _minter)
+        public
+        onlyOwner
+        canMint
         returns (bool)
     {
         minters[_minter] = true;
@@ -565,10 +565,10 @@ contract BZRxToken is UnlimitedAllowanceToken, DetailedERC20, Ownable {
     * @return True if the operation was successful.
     */
     function removeMinter(
-        address _minter) 
-        public 
-        onlyOwner 
-        canMint 
+        address _minter)
+        public
+        onlyOwner
+        canMint
         returns (bool)
     {
         minters[_minter] = false;
@@ -588,7 +588,7 @@ contract BZRxToken is UnlimitedAllowanceToken, DetailedERC20, Ownable {
         returns (bool)
     {
         return (
-            balances[_from] >= _value && 
+            balances[_from] >= _value &&
             (_spender == _from || allowed[_from][_spender] >= _value)
         );
     }
@@ -614,10 +614,10 @@ contract BZRxTokenSale is Ownable {
 
     event BonusChanged(uint oldBonus, uint newBonus);
     event TokenPurchase(address indexed buyer, uint ethAmount, uint ethRate, uint tokensReceived);
-    
+
     event SaleOpened(uint bonusMultiplier);
     event SaleClosed(uint bonusMultiplier);
-    
+
     bool public saleClosed = true;
 
     address public bZRxTokenContractAddress;    // BZRX Token
@@ -655,7 +655,7 @@ contract BZRxTokenSale is Ownable {
         public
     {
         require(_bonusMultiplier > 100);
-        
+
         bZRxTokenContractAddress = _bZRxTokenContractAddress;
         bZxVaultAddress = _bZxVaultAddress;
         wethContractAddress = _wethContractAddress;
@@ -663,22 +663,22 @@ contract BZRxTokenSale is Ownable {
         bonusMultiplier = _bonusMultiplier;
     }
 
-    function()  
+    function()
         public
-        payable 
+        payable
     {
         buyToken();
     }
 
     function buyToken()
         public
-        payable 
+        payable
         saleOpen
         whitelisted(msg.sender, msg.value)
         returns (bool)
     {
         require(msg.value > 0, "no ether sent");
-        
+
         uint ethRate = getEthRate();
 
         ethRaised += msg.value;
@@ -691,11 +691,11 @@ contract BZRxTokenSale is Ownable {
                                             .mul(bonusMultiplier).div(100);
 
         TokenPurchases storage purchase = purchases[msg.sender];
-        
+
         if (purchase.totalETH == 0) {
             purchasers.push(msg.sender);
         }
-        
+
         purchase.totalETH += msg.value;
         purchase.totalTokens += tokenAmountAndBonus;
         purchase.totalTokenBonus += tokenAmountAndBonus.sub(tokenAmount);
@@ -718,7 +718,7 @@ contract BZRxTokenSale is Ownable {
         returns (bool)
     {
         require(msg.sender == bZxVaultAddress, "only the bZx vault can call this function");
-        
+
         if (BZRxToken(bZRxTokenContractAddress).canTransfer(msg.sender, _from, _value)) {
             return BZRxToken(bZRxTokenContractAddress).minterTransferFrom(
                 msg.sender,
@@ -728,7 +728,7 @@ contract BZRxTokenSale is Ownable {
             );
         } else {
             uint ethRate = getEthRate();
-            
+
             uint wethValue = _value                             // amount of BZRX
                                 .mul(73).div(1000)              // fixed price per token $0.073
                                 .mul(10**18).div(ethRate);      // curent ETH/USD rate
@@ -763,9 +763,9 @@ contract BZRxTokenSale is Ownable {
     }
 
     function closeSale(
-        bool _closed) 
-        public 
-        onlyOwner 
+        bool _closed)
+        public
+        onlyOwner
         returns (bool)
     {
         saleClosed = _closed;
@@ -779,9 +779,9 @@ contract BZRxTokenSale is Ownable {
     }
 
     function changeBZRxTokenContract(
-        address _bZRxTokenContractAddress) 
-        public 
-        onlyOwner 
+        address _bZRxTokenContractAddress)
+        public
+        onlyOwner
         returns (bool)
     {
         bZRxTokenContractAddress = _bZRxTokenContractAddress;
@@ -789,9 +789,9 @@ contract BZRxTokenSale is Ownable {
     }
 
     function changeBZxVault(
-        address _bZxVaultAddress) 
-        public 
-        onlyOwner 
+        address _bZxVaultAddress)
+        public
+        onlyOwner
         returns (bool)
     {
         bZxVaultAddress = _bZxVaultAddress;
@@ -799,9 +799,9 @@ contract BZRxTokenSale is Ownable {
     }
 
     function changeWethContract(
-        address _wethContractAddress) 
-        public 
-        onlyOwner 
+        address _wethContractAddress)
+        public
+        onlyOwner
         returns (bool)
     {
         wethContractAddress = _wethContractAddress;
@@ -809,9 +809,9 @@ contract BZRxTokenSale is Ownable {
     }
 
     function changePriceContract(
-        address _priceContractAddress) 
-        public 
-        onlyOwner 
+        address _priceContractAddress)
+        public
+        onlyOwner
         returns (bool)
     {
         priceContractAddress = _priceContractAddress;
@@ -819,9 +819,9 @@ contract BZRxTokenSale is Ownable {
     }
 
     function changeBonusMultiplier(
-        uint _newBonusMultiplier) 
-        public 
-        onlyOwner 
+        uint _newBonusMultiplier)
+        public
+        onlyOwner
         returns (bool)
     {
         require(bonusMultiplier != _newBonusMultiplier && _newBonusMultiplier > 100);
@@ -830,9 +830,9 @@ contract BZRxTokenSale is Ownable {
         return true;
     }
 
-    function unwrapEth() 
-        public 
-        onlyOwner 
+    function unwrapEth()
+        public
+        onlyOwner
         returns (bool)
     {
         uint balance = StandardToken(wethContractAddress).balanceOf.gas(4999)(this);
@@ -859,9 +859,9 @@ contract BZRxTokenSale is Ownable {
     }
 
     function enforceWhitelist(
-        bool _isEnforced) 
-        public 
-        onlyOwner 
+        bool _isEnforced)
+        public
+        onlyOwner
         returns (bool)
     {
         whitelistEnforced = _isEnforced;
@@ -871,13 +871,13 @@ contract BZRxTokenSale is Ownable {
 
     function setWhitelist(
         address[] _users,
-        uint[] _values) 
-        public 
-        onlyOwner 
+        uint[] _values)
+        public
+        onlyOwner
         returns (bool)
     {
         require(_users.length == _values.length, "users and values count mismatch");
-        
+
         for (uint i=0; i < _users.length; i++) {
             whitelist[_users[i]] = _values[i];
         }
@@ -908,3 +908,38 @@ contract BZRxTokenSale is Ownable {
         }
     }
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

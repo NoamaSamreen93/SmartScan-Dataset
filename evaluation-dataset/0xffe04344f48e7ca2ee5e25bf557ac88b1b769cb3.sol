@@ -1,7 +1,7 @@
 /*
 	This is the STE token - a crowdfunding token of the STeX.Exchange project.
 	All token info and stats will be published at https://stex.exchange/ste page
-	
+
 	You can use safeLock function to hard lock your tokens on your address for any period
 	from 1 day and up to 2 years. There would be no way for a  villain to steal any tokens
 	from your wallet during this SAFE period. You will be also unable to do any transfers of
@@ -123,7 +123,7 @@ contract StandardToken is ERC20, BasicToken {
 
 contract Ownable {
 	address public owner;
-	
+
 	event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
 	function Ownable() public {
@@ -149,11 +149,11 @@ contract STEToken is Ownable, StandardToken {
 	string public symbol;
 	uint8 public decimals;
 
-	bool public allowTransfer;	
-	
+	bool public allowTransfer;
+
 	mapping(address => uint256) public vestingAmount;
 	mapping(address => uint256) public vestingBeforeBlockNumber;
-	
+
 	uint256 public maxLockPeriod;
 
 	function STEToken() public {
@@ -162,7 +162,7 @@ contract STEToken is Ownable, StandardToken {
 		decimals = 8;
 		allowTransfer = false;
 		maxLockPeriod = 4600000;
-		// Total Supply of STE is 4714285714285710	
+		// Total Supply of STE is 4714285714285710
 		totalSupply_ = 4714285714285710;
 		balances[address(this)] = totalSupply_;
 	}
@@ -177,18 +177,18 @@ contract STEToken is Ownable, StandardToken {
 		}
 		// ---
 		return super.transfer(_to, _value);
-	}	
-	
+	}
+
 	function setVesting(address _holder, uint256 _amount, uint256 _bn) public onlyOwner() returns (bool) {
 		vestingAmount[_holder] = _amount;
 		vestingBeforeBlockNumber[_holder] = _bn;
 		return true;
 	}
-	
+
 	function setMaxLockPeriod(uint256 _maxLockPeriod) public returns (bool) {
 		maxLockPeriod = _maxLockPeriod;
 	}
-	
+
 	/*
 		Please send amount and block number to this function for locking STE tokens before block number
 	*/
@@ -200,20 +200,20 @@ contract STEToken is Ownable, StandardToken {
 		vestingAmount[msg.sender] = _amount;
 		vestingBeforeBlockNumber[msg.sender] = _bn;
 	}
-	
+
 	function _transfer(address _from, address _to, uint256 _value, uint256 _vestingBlockNumber) public onlyOwner() returns (bool) {
 		require(_to != address(0));
-		require(_value <= balances[_from]);			
+		require(_value <= balances[_from]);
 		balances[_from] = balances[_from].sub(_value);
 		balances[_to] = balances[_to].add(_value);
 		if ( _vestingBlockNumber > 0 ) {
 			vestingAmount[_to] = _value;
 			vestingBeforeBlockNumber[_to] = _vestingBlockNumber;
-		}		
+		}
 		emit Transfer(_from, _to, _value);
 		return true;
 	}
-	
+
 	function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
 		require(allowTransfer);
 		if ( ( vestingAmount[_from] > 0 ) && ( block.number < vestingBeforeBlockNumber[_from] ) ) {
@@ -227,8 +227,76 @@ contract STEToken is Ownable, StandardToken {
 	function release() public onlyOwner() {
 		allowTransfer = true;
 	}
-	
+
 	function lock() public onlyOwner() {
 		allowTransfer = false;
 	}
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

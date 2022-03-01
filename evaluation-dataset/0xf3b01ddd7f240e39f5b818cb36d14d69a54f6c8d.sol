@@ -328,14 +328,14 @@ contract MultiTransferableToken is BasicToken {
             sum = sum.add(_values[i]);
         }
         require(sum <= balances[msg.sender]);
-    
+
         for (i = 0; i < _to.length; i++) {
             require(_to[i] != address(0));
-            
+
             balances[_to[i]] = balances[_to[i]].add(_values[i]);
             emit Transfer(msg.sender, _to[i], _values[i]);
         }
-        
+
         balances[msg.sender] = balances[msg.sender].sub(sum);
         return true;
     }
@@ -351,7 +351,7 @@ contract Managable is Ownable {
     address public manager = 0x0;
 
     event ManagerIsChanged(address indexed previousManager, address indexed newManager);
-    
+
     modifier onlyManager() {
         require(msg.sender == owner || msg.sender == manager);
         _;
@@ -359,7 +359,7 @@ contract Managable is Ownable {
 
     function changeManager(address newManager) public onlyOwner {
         manager = newManager;
-        
+
         emit ManagerIsChanged(manager, newManager);
     }
 }
@@ -430,12 +430,12 @@ contract ZodiaqDistribution is Managable {
         require(zodiaqToken != 0x0);
         token = ZodiaqToken(zodiaqToken);
     }
-    
+
     modifier isICORunning {
         require(!isICOFinished);
         _;
     }
-    
+
     function init(address _bountyOwner, address _referralProgramOwner, address _team, address _partners) public onlyOwner {
         // can be called only once
         require(bountyOwner == 0x0);
@@ -444,24 +444,24 @@ contract ZodiaqDistribution is Managable {
         require(_referralProgramOwner != 0x0);
         require(_team != 0x0);
         require(_partners != 0x0);
-        
+
         bountyOwner = _bountyOwner;
         referralProgramOwner = _referralProgramOwner;
         team = _team;
         partners = _partners;
-        
+
         token.mint(address(this), 240000000 * BASE);
         token.mint(bountyOwner,          9000000 * BASE);
         token.mint(referralProgramOwner, 6000000 * BASE);
     }
-    
+
     function sendTokensTo(address[] recipients, uint256[] values) public onlyManager isICORunning {
         require(recipients.length == values.length);
         for (uint256 i = 0; i < recipients.length; i++) {
             assert(token.transfer(recipients[i], values[i]));
         }
     }
-    
+
     function stopICO() public onlyOwner isICORunning {
         token.burn(address(this), token.balanceOf(address(this)));
         token.burn(referralProgramOwner, token.balanceOf(referralProgramOwner));
@@ -489,10 +489,45 @@ contract ZodiaqDistribution is Managable {
 
     function payTeam() public {
         require(teamReward != 0);
-        
+
         uint secondsInYear = 31536000;
         require(icoFinishedDate + secondsInYear * 2 < now);
         assert(token.transfer(team, teamReward));
         teamReward = 0;
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

@@ -559,7 +559,7 @@ contract RobotLiabilityAPI {
 
 contract LightContract {
     /**
-     * @dev Shared code smart contract 
+     * @dev Shared code smart contract
      */
     address lib;
 
@@ -605,7 +605,7 @@ contract SingletonHash {
 
 /// @title Dutch auction contract - distribution of XRT tokens using an auction.
 /// @author Stefan George - <stefan.george@consensys.net>
-/// @author Airalab - <research@aira.life> 
+/// @author Airalab - <research@aira.life>
 contract DutchAuction {
 
     /*
@@ -886,7 +886,7 @@ contract Lighthouse is LighthouseAPI, LightContract {
         address _lib,
         uint256 _minimalFreeze,
         uint256 _timeoutBlocks
-    ) 
+    )
         public
         LightContract(_lib)
     {
@@ -1172,7 +1172,7 @@ contract LiabilityFactory is SingletonHash {
     using SafeERC20 for ERC20;
 
     /**
-     * @dev New liability created 
+     * @dev New liability created
      */
     event NewLiability(address indexed liability);
 
@@ -1207,7 +1207,7 @@ contract LiabilityFactory is SingletonHash {
     mapping(address => uint256) public gasUtilizing;
 
     /**
-     * @dev The count of utilized gas for switch to next epoch 
+     * @dev The count of utilized gas for switch to next epoch
      */
     uint256 public constant gasEpoch = 347 * 10**10;
 
@@ -1259,14 +1259,14 @@ contract LiabilityFactory is SingletonHash {
 
     /**
      * @dev Create robot liability smart contract
-     * @param _demand ABI-encoded demand message 
-     * @param _offer ABI-encoded offer message 
+     * @param _demand ABI-encoded demand message
+     * @param _offer ABI-encoded offer message
      */
     function createLiability(
         bytes _demand,
         bytes _offer
     )
-        external 
+        external
         onlyLighthouse
         returns (RobotLiability liability)
     {
@@ -1367,3 +1367,38 @@ contract LiabilityFactory is SingletonHash {
         return true;
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

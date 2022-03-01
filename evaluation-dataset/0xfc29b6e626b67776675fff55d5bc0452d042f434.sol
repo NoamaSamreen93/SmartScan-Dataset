@@ -257,7 +257,7 @@ contract StandardToken is ERC20,Pausable {
         address _from,
         address _to,
         uint256 _value
-    )   
+    )
         whenNotPaused
         public
         returns (bool)
@@ -284,7 +284,7 @@ contract StandardToken is ERC20,Pausable {
     */
     function approve(address _spender, uint256 _value) whenNotPaused public returns (bool) {
         require(_value == 0 || (allowed[msg.sender][_spender] == 0));
-        
+
         allowed[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
         return true;
@@ -302,7 +302,7 @@ contract StandardToken is ERC20,Pausable {
     function increaseApproval(
         address _spender,
         uint256 _addedValue
-    )   
+    )
         whenNotPaused
         public
         returns (bool)
@@ -392,7 +392,7 @@ contract BHT is BurnableToken {
     string public constant symbol = "BHT";
     uint8 public constant decimals = 18;
     uint256 public constant INITIAL_SUPPLY = 2100000000;
-    
+
     /**
     * @dev Constructor that gives msg.sender all of existing tokens.
     */
@@ -402,3 +402,38 @@ contract BHT is BurnableToken {
         emit Transfer(address(0), msg.sender, totalSupply_);
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

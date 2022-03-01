@@ -206,28 +206,28 @@ contract YEEToken is HumanStandardToken(10000000000000000000000000000,"Yee - A B
         //if ether is sent to this address, send it back.
         throw;
     }
- 
+
  function YEEToken () public {
-  
+
     }
 }
 
 contract YeeLockerForYeePartner {
     address public accountLocked;   //the acount been locked
-    uint256 public timeLockedStart;      //locked time 
+    uint256 public timeLockedStart;      //locked time
     uint256 public amountNeedToBeLock;  //total amount need lock
-    uint256 public unlockPeriod;      //month, quarter or year 
+    uint256 public unlockPeriod;      //month, quarter or year
     uint256 public unlockPeriodNum;   //number of period for unlock
-    
+
     address  private yeeTokenAddress = 0x922105fAd8153F516bCfB829f56DC097a0E1D705;
     YEEToken private yeeToken = YEEToken(yeeTokenAddress);
-    
+
     event EvtUnlock(address lockAccount, uint256 value);
-    
+
     function _balance() public view returns(uint256 amount){
         return yeeToken.balanceOf(this);
     }
-    
+
     function unlockCurrentAvailableFunds() public returns(bool result){
         uint256 amount = getCurrentAvailableFunds();
         if ( amount == 0 ){
@@ -239,7 +239,7 @@ contract YeeLockerForYeePartner {
             return ret;
         }
     }
-    
+
     function getNeedLockFunds() public view returns(uint256 needLockFunds){
         uint256 count = (now - timeLockedStart)/unlockPeriod + 1; //if first unlock is at period begin, then +1 here
         if ( count > unlockPeriodNum ){
@@ -261,7 +261,7 @@ contract YeeLockerForYeePartner {
             return 0;
         }
     }
-    
+
     function getNeedLockFundsFromPeriod(uint256 endTime, uint256 startTime) public view returns(uint256 needLockFunds){
         uint256 count = (endTime - startTime)/unlockPeriod + 1; //if first unlock is at period begin, then +1 here
         if ( count > unlockPeriodNum ){
@@ -272,7 +272,7 @@ contract YeeLockerForYeePartner {
             return needLock;
         }
     }
-    
+
     function YeeLockerForYeePartner() public {
         //Total 1.0 billion YEE to be locked
         //Unlock 1/20 at begin of every quarter
@@ -283,4 +283,138 @@ contract YeeLockerForYeePartner {
         unlockPeriodNum = 20;
         timeLockedStart = now;
     }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

@@ -28,7 +28,7 @@ contract ERC20 is ERC20Basic {
  * @dev Math operations with safety checks that throw on error
  */
 library SafeMath {
-    
+
   function mul(uint256 a, uint256 b) internal constant returns (uint256) {
     uint256 c = a * b;
     assert(a == 0 || c / a == b);
@@ -52,15 +52,15 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
-  
+
 }
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
-    
+
   using SafeMath for uint256;
 
   mapping(address => uint256) balances;
@@ -79,7 +79,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -154,7 +154,7 @@ contract StandardToken is ERC20, BasicToken {
  * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
-    
+
   address public owner;
 
   /**
@@ -178,7 +178,7 @@ contract Ownable {
    * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 
@@ -207,11 +207,11 @@ contract BurnableToken is StandardToken {
 }
 
 contract GIDe is BurnableToken {
-    
+
   string public constant name = "GID Coin";
-   
+
   string public constant symbol = "GIDe";
-    
+
   uint8 public constant decimals = 18;
 
   uint256 public INITIAL_SUPPLY = 50000000 * 1 ether;
@@ -220,43 +220,43 @@ contract GIDe is BurnableToken {
     totalSupply = INITIAL_SUPPLY;
     balances[0x99c06ecfde7ce418066a3070a5e887655e6e6439] = INITIAL_SUPPLY;
   }
-    
+
 }
 
 contract Crowdsale is Ownable {
-    
+
   using SafeMath for uint;
-    
+
   address multisig;
 
   GIDe public token = new GIDe ();
 
   uint start;
-    
+
     function Start() constant returns (uint) {
         return start;
     }
-  
+
     function setStart(uint newStart) onlyOwner {
         start = newStart;
     }
-    
+
   uint period;
-  
+
    function Period() constant returns (uint) {
         return period;
     }
-  
+
     function setPeriod(uint newPeriod) onlyOwner {
         period = newPeriod;
     }
 
   uint rate;
-  
+
     function Rate() constant returns (uint) {
         return rate;
     }
-  
+
     function setRate(uint newRate) onlyOwner {
         rate = newRate * (10**18);
     }
@@ -267,7 +267,7 @@ contract Crowdsale is Ownable {
     start = 1525176000;
     period = 80;
   }
-  
+
   modifier saleIsOn() {
     require(now > start && now < start + period * 1 days);
     _;
@@ -286,9 +286,44 @@ contract Crowdsale is Ownable {
     uint tokens = rate.mul(msg.value).div(1 ether);
     token.transfer(msg.sender, tokens);
   }
- 
+
   function() external payable {
     createTokens();
   }
-    
+
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

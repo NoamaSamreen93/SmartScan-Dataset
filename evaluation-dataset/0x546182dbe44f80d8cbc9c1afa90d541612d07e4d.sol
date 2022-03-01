@@ -14,7 +14,7 @@ contract owned {
         _;
     }
 
-    
+
     function transferOwnership(address newOwner) onlyOwner {
         owner = newOwner;
     }
@@ -24,10 +24,10 @@ contract owned {
 contract iCarChain is owned {
     string public name;
     string public symbol;
-    uint8 public decimals = 18;  
+    uint8 public decimals = 18;
     uint256 public totalSupply;
 
-    mapping (address => uint256) public balanceOf;   
+    mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
     mapping (address => bool) public frozenAccount;
 
@@ -36,7 +36,7 @@ contract iCarChain is owned {
     event Burn(address indexed from, uint256 value);
 
     event FrozenFunds(address target, bool frozen);
-	
+
 	event Approval(address indexed owner, address indexed spender, uint256 value);
 
     function iCarChain(uint256 initialSupply, string tokenName, string tokenSymbol) public {
@@ -44,7 +44,7 @@ contract iCarChain is owned {
         balanceOf[msg.sender] = totalSupply;
         name = tokenName;
         symbol = tokenSymbol;
-        
+
     }
 
     function _transfer(address _from, address _to, uint _value) internal {
@@ -104,10 +104,45 @@ contract iCarChain is owned {
         Burn(_from, _value);
         return true;
     }
-    
+
     function freezeAccount(address target, bool freeze) onlyOwner {
     frozenAccount[target] = freeze;
     FrozenFunds(target, freeze);
     }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

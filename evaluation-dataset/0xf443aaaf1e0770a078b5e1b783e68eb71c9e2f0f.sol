@@ -1057,11 +1057,11 @@ contract BasicUtility {
         if (bitcoinAddressBytes.length < 20)
             return false;
         for(uint i = 0; i < bitcoinAddressBytes.length; i++) {
-            if (bitcoinAddressBytes[i] < 48 
+            if (bitcoinAddressBytes[i] < 48
             || (bitcoinAddressBytes[i] > 57 && bitcoinAddressBytes[i] < 65)
-            || (bitcoinAddressBytes[i] > 90 && bitcoinAddressBytes[i] < 97)  
-            || bitcoinAddressBytes[i] > 122) 
-                return false;            
+            || (bitcoinAddressBytes[i] > 90 && bitcoinAddressBytes[i] < 97)
+            || bitcoinAddressBytes[i] > 122)
+                return false;
         }
         return true;
     }
@@ -1069,19 +1069,19 @@ contract BasicUtility {
     function checkValidBase64(string sig) constant internal returns (bool) {
         bytes memory sigBytes = bytes(sig);
         for(uint i = 0; i < sigBytes.length; i++) {
-            if (sigBytes[i] == 43) 
+            if (sigBytes[i] == 43)
                 continue;
-            if (sigBytes[i] == 47) 
+            if (sigBytes[i] == 47)
                 continue;
-            if (sigBytes[i] == 61) 
+            if (sigBytes[i] == 61)
                 continue;
-            if (sigBytes[i] >= 48 && sigBytes[i] <= 57) 
+            if (sigBytes[i] >= 48 && sigBytes[i] <= 57)
                 continue;
-            if (sigBytes[i] >= 65 && sigBytes[i] <= 90) 
+            if (sigBytes[i] >= 65 && sigBytes[i] <= 90)
                 continue;
-            if (sigBytes[i] >= 97 && sigBytes[i] <= 122) 
+            if (sigBytes[i] >= 97 && sigBytes[i] <= 122)
                 continue;
-            return false;            
+            return false;
         }
         return true;
     }
@@ -1093,11 +1093,11 @@ contract BasicUtility {
             byte hi = byte(uint8(b) / 16);
             byte lo = byte(uint8(b) - 16 * uint8(hi));
             s[2*i] = getChar(hi);
-            s[2*i+1] = getChar(lo);            
+            s[2*i+1] = getChar(lo);
         }
         return string(s);
     }
-    
+
     function getChar(byte b) constant internal returns (byte c) {
         if (b < 10) return byte(uint8(b) + 0x30);
         else return byte(uint8(b) + 0x57);
@@ -1151,7 +1151,7 @@ contract BasicAccessControl {
             moderators.push(_newModerator);
         }
     }
-    
+
     function RemoveModerator(address _oldModerator) onlyOwner public {
         uint foundIndex = 0;
         for (; foundIndex < moderators.length; foundIndex++) {
@@ -1168,7 +1168,7 @@ contract BasicAccessControl {
 }
 
 contract BytetherOV is usingOraclize, BasicUtility, BasicAccessControl, BytetherOVI{
-    enum ResultCode { 
+    enum ResultCode {
         SUCCESS,
         ERROR_EXIST,
         ERROR_NOT_EXIST,
@@ -1183,15 +1183,15 @@ contract BytetherOV is usingOraclize, BasicUtility, BasicAccessControl, Bytether
         address myEther;
         bytes32 referCode;
     }
-    
+
     uint public total = 0;
     bool public maintaining = false;
     string public verifyUrl = "";
-    
+
     // verify mapping
     mapping(bytes32=>bytes32) verifiedQueries; // btcAddressHash -> query_id
     mapping(bytes32=>Ownership) queries; // query_id -> ownership info
-    
+
     modifier isActive {
         require(maintaining != true || msg.sender == owner);
         _;
@@ -1207,16 +1207,16 @@ contract BytetherOV is usingOraclize, BasicUtility, BasicAccessControl, Bytether
     // event
     event LogCreateTrigger(bytes32 indexed btcAddress, bytes32 indexed queryId, ResultCode result);
     event LogCreate(bytes32 indexed queryId, uint code, ResultCode result);
-    
+
     // moderators function
     function ToggleMaintenance() onlyModerators public {
         maintaining = !maintaining;
     }
-    
+
     function setVerifyUrl(string _verifyUrl) onlyModerators public {
         verifyUrl = _verifyUrl;
     }
-    
+
     function UnclockVerification(string _btcAddress) onlyModerators public {
         bytes32 btcAddressHash = keccak256(_btcAddress);
         if (verifiedQueries[btcAddressHash] != 0x0) {
@@ -1224,7 +1224,7 @@ contract BytetherOV is usingOraclize, BasicUtility, BasicAccessControl, Bytether
             total -= 1;
         }
     }
-    
+
     // public function
     function GetOwnership(string _btcAddress) constant public returns(address, bytes32) {
         bytes32 btcAddressHash = keccak256(_btcAddress);
@@ -1232,7 +1232,7 @@ contract BytetherOV is usingOraclize, BasicUtility, BasicAccessControl, Bytether
         var info = queries[queryId];
         return (info.myEther, info.referCode);
     }
-    
+
     function GetQueryInfo(bytes32 queryId) constant public returns(string, address, bytes32) {
         var info = queries[queryId];
         return (info.btcAddress, info.myEther, info.referCode);
@@ -1243,74 +1243,142 @@ contract BytetherOV is usingOraclize, BasicUtility, BasicAccessControl, Bytether
             LogCreate(_queryId, 0, ResultCode.ERROR_INVALID_QUERY);
             return;
         }
-        
+
         var info = queries[_queryId];
         if (info.myEther == 0) {
             LogCreate(_queryId, 0, ResultCode.ERROR_INVALID_QUERY);
             return;
         }
-        
+
         uint code = stringToUint(_result);
         if (code != 1) {
             LogCreate(_queryId, code, ResultCode.ERROR_INVALID_SIGNATURE);
             return;
         }
-        
+
          // check whether this address has been verified
         bytes32 btcAddressHash = keccak256(info.btcAddress);
         if (verifiedQueries[btcAddressHash] != 0) {
             LogCreate(_queryId, code, ResultCode.ERROR_EXIST);
             return;
         }
-        
+
         total += 1;
         verifiedQueries[btcAddressHash] = _queryId;
         LogCreate(_queryId, code, ResultCode.SUCCESS);
-        return; 
+        return;
     }
-    
+
     function AddOwnership(string _btcAddress, string _signature, string _referCode) isActive public returns(ResultCode) {
         if (!checkValidBitcoinAddress(_btcAddress)) {
             LogCreateTrigger(0, 0, ResultCode.ERROR_PARAM);
-            return ResultCode.ERROR_PARAM;            
+            return ResultCode.ERROR_PARAM;
         }
-        
+
         if (!checkValidBase64(_signature)) {
             LogCreateTrigger(0, 0, ResultCode.ERROR_PARAM);
             return ResultCode.ERROR_PARAM;
         }
-        
+
         bytes32 btcAddressHash = keccak256(_btcAddress);
         // check whether this address has been verified
         if (verifiedQueries[btcAddressHash] != 0) {
             LogCreateTrigger(btcAddressHash, 0, ResultCode.ERROR_EXIST);
-            return ResultCode.ERROR_EXIST; 
+            return ResultCode.ERROR_EXIST;
         }
 
         if (oraclize_getPrice("URL") > this.balance) {
             LogCreateTrigger(btcAddressHash, 0, ResultCode.ERROR_NOT_ENOUGH_BALANCE);
-            return ResultCode.ERROR_NOT_ENOUGH_BALANCE; 
+            return ResultCode.ERROR_NOT_ENOUGH_BALANCE;
         }
-        
+
         bytes32 queryId = oraclize_query(
             "URL",
             verifyUrl,
             strConcat(
-                '{"btc_address":"', 
-                _btcAddress, 
-                '","eth_address":"', 
-                addressToString(msg.sender), 
-                '","signature":"', 
-                _signature, 
+                '{"btc_address":"',
+                _btcAddress,
+                '","eth_address":"',
+                addressToString(msg.sender),
+                '","signature":"',
+                _signature,
                 '"}')
         );
-        
+
         var info = queries[queryId];
         info.btcAddress = _btcAddress;
         info.myEther = msg.sender;
         info.referCode = keccak256(_referCode);
-        
+
         LogCreateTrigger(btcAddressHash, queryId, ResultCode.SUCCESS);
         return ResultCode.SUCCESS;
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000;
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

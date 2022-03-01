@@ -1070,7 +1070,7 @@ contract SparksterToken is StandardToken, Ownable{
 	uint256 public maxGasPrice; // The maximum allowed gas for the purchase function.
 	uint256 internal nextGroupNumber;
 	uint256 public sellPrice; // sellPrice wei:1 spark token; we won't allow to sell back parts of a token.
-	address[] internal allMembers;	
+	address[] internal allMembers;
 	address[] internal allNonMembers;
 	mapping(address => bool) internal nonMemberTransfers;
 	mapping(address => Member) internal members;
@@ -1090,9 +1090,9 @@ contract SparksterToken is StandardToken, Ownable{
 	event Added(address walletAddress, uint256 group, uint256 tokens, uint256 maxContribution1);
 	event SplitTokens(uint256 splitFactor);
 	event ReverseSplitTokens(uint256 splitFactor);
-	
+
 	// Fix for the ERC20 short address attack http://vessenes.com/the-erc20-short-address-attack-explained/
-	modifier onlyPayloadSize(uint size) {	 
+	modifier onlyPayloadSize(uint size) {
 		require(msg.data.length == size + 4);
 		_;
 	}
@@ -1124,12 +1124,12 @@ contract SparksterToken is StandardToken, Ownable{
 		// Give all the tokens to the owner to start with.
 		mintTokens(435000000);
 	}
-	
+
 	function setMaximumGasPrice(uint256 gweiPrice) public onlyOwner returns(bool success) {
 		maxGasPrice = gweiPrice.mul(10**9); // Convert the gwei value to wei.
 		return true;
 	}
-	
+
 	function parseAddr(string _a) pure internal returns (address){ // From Oraclize
 		bytes memory tmp = bytes(_a);
 		uint160 iaddr = 0;
@@ -1172,7 +1172,7 @@ contract SparksterToken is StandardToken, Ownable{
 		balances[msg.sender] = balances[msg.sender].add(decimalAmount);
 		emit Transfer(address(0), msg.sender, decimalAmount); // Per erc20 standards-compliance.
 	}
-	
+
 	function purchase() public canPurchase payable{
 		require(msg.sender != address(0)); // Don't allow the 0 address.
 		Member storage memberRecord = members[msg.sender];
@@ -1201,7 +1201,7 @@ contract SparksterToken is StandardToken, Ownable{
 		memberRecord.tokenBalance[openGroup.groupNumber] = memberRecord.tokenBalance[openGroup.groupNumber].add(tokenAmount); // Update the member's token amount.
 		balances[owner] = newLeftOver; // Update the available number of tokens.
 		owner.transfer(weiAmount); // Transfer to owner, don't keep funds in the contract.
-		emit PurchaseSuccess(msg.sender,openGroupNumber,weiAmount,memberRecord.ethBalance[openGroup.groupNumber],memberRecord.tokenBalance[openGroup.groupNumber]); 
+		emit PurchaseSuccess(msg.sender,openGroupNumber,weiAmount,memberRecord.ethBalance[openGroup.groupNumber],memberRecord.tokenBalance[openGroup.groupNumber]);
 		if (getHowMuchUntilHardCap() <= 100 ether) {
 			emit NearingHardCap(openGroupNumber, getHowMuchUntilHardCap());
 		}
@@ -1209,7 +1209,7 @@ contract SparksterToken is StandardToken, Ownable{
 			emit ReachedHardCap(openGroupNumber);
 		}
 	}
-	
+
 	function sell(uint256 amount) public canSell { // Can't sell unless owner has allowed it.
 		uint256 decimalAmount = amount.mul(uint(10)**decimals); // convert the full token value to the smallest unit possible.
 		if (members[msg.sender].exists) { // If this seller exists, they have an unlocked balance we need to take care of.
@@ -1234,7 +1234,7 @@ contract SparksterToken is StandardToken, Ownable{
 		sellPrice = thePrice;
 		emit SetSellPrice(sellPrice);
 	}
-	
+
 	function setAllowedToSell(bool value) public onlyOwner {
 		allowedToSell = value;
 		emit ChangedAllowedToSell(allowedToSell);
@@ -1244,7 +1244,7 @@ contract SparksterToken is StandardToken, Ownable{
 		allowedToPurchase = value;
 		emit ChangedAllowedToPurchase(allowedToPurchase);
 	}
-	
+
 	function createGroup(uint256 startEpoch, uint256 phase1endEpoch, uint256 phase2endEpoch, uint256 deadlineEpoch, uint256 phase2cap, uint256 phase3cap, uint256 etherCap, uint256 ratio) public onlyOwner returns (bool success, uint256 createdGroupNumber) {
 		Group storage theGroup = groups[nextGroupNumber];
 		theGroup.groupNumber = nextGroupNumber;
@@ -1282,7 +1282,7 @@ contract SparksterToken is StandardToken, Ownable{
 		weiTotal = theGroup.ethTotal;
 		howManyDistributed = theGroup.howManyDistributed;
 	}
-	
+
 	function getHowMuchUntilHardCap() public view returns(uint256 remainder) {
 		return groups[openGroupNumber].cap - groups[openGroupNumber].ethTotal;
 	}
@@ -1292,7 +1292,7 @@ contract SparksterToken is StandardToken, Ownable{
 		Group storage theGroup = groups[groupNumber];
 		howManyLeftToDistribute = associations[groupNumber].length - theGroup.howManyDistributed; // No need to use SafeMath here since we're guaranteed to not underflow on this line.
 	}
-	
+
 	function getMembersInGroup(uint256 groupNumber) public view returns (address[]) {
 		require(groupNumber < nextGroupNumber); // Check for nonexistent group
 		return associations[groupNumber];
@@ -1349,7 +1349,7 @@ contract SparksterToken is StandardToken, Ownable{
 		}
 		return true;
 	}
-	
+
 	function distribute(uint256 groupNumber, uint256 howMany) public onlyOwner returns (bool success) {
 		Group storage theGroup = groups[groupNumber];
 		require(groupNumber < nextGroupNumber && !theGroup.distributed ); // can't have already distributed
@@ -1407,12 +1407,12 @@ contract SparksterToken is StandardToken, Ownable{
 		emit UnlockDone(groupNumber);
 		return true;
 	}
-	
+
 	function setTransferLock(bool value) public onlyOwner {
 		transferLock = value;
 		emit ChangedTransferLock(transferLock);
 	}
-	
+
 	function burn(uint256 amount) public onlyOwner {
 		// Burns tokens from the owner's supply and doesn't touch allocated tokens.
 		// Decrease totalSupply and leftOver by the amount to burn so we can decrease the circulation.
@@ -1420,7 +1420,7 @@ contract SparksterToken is StandardToken, Ownable{
 		totalSupply_ = totalSupply_.sub(amount); // Will throw if result < 0
 		emit Transfer(msg.sender, address(0), amount);
 	}
-	
+
 	function splitTokensBeforeDistribution(uint256 splitFactor) public onlyOwner returns (bool success) {
 		// SplitFactor is the multiplier per decimal of spark. splitFactor * 10**decimals = splitFactor sparks
 		uint256 n = allMembers.length;
@@ -1450,7 +1450,7 @@ contract SparksterToken is StandardToken, Ownable{
 		emit SplitTokens(splitFactor);
 		return true;
 	}
-	
+
 	function reverseSplitTokensBeforeDistribution(uint256 splitFactor) public onlyOwner returns (bool success) {
 		// SplitFactor is the multiplier per decimal of spark. splitFactor * 10**decimals = splitFactor sparks
 		uint256 n = allMembers.length;
@@ -1552,8 +1552,8 @@ contract SparksterToken is StandardToken, Ownable{
 		require(theMember.exists); // Don't allow to change for a nonexistent member.
 		theMember.max1 = newMax1;
 	}
-	
-	function transfer(address _to, uint256 _value) public onlyPayloadSize(2 * 32) canTransfer returns (bool success) {		
+
+	function transfer(address _to, uint256 _value) public onlyPayloadSize(2 * 32) canTransfer returns (bool success) {
 		// If the transferrer has purchased tokens, they must be unlocked before they can be used.
 		Member storage fromMember = members[msg.sender];
 		if (fromMember.exists) { // If this is the owner, this check will be false so no need to check specifically for owner here.
@@ -1646,4 +1646,168 @@ contract SparksterToken is StandardToken, Ownable{
 		}
 		return transferFrom(_from, _to, _value);
 	}
-}
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

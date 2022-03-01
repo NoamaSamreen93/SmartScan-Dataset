@@ -118,13 +118,13 @@ contract BasicToken is ERC20Basic, Ownable {
   mapping(address => uint256) balances;
 
   uint256 totalSupply_;
-  
+
   bool public stopped = false;
-  
+
   event Stop(address indexed from);
-  
+
   event Start(address indexed from);
-  
+
   modifier isRunning {
     assert (!stopped);
     _;
@@ -160,7 +160,7 @@ contract BasicToken is ERC20Basic, Ownable {
   function balanceOf(address _owner) public view returns (uint256 ownerBalance) {
     return balances[_owner];
   }
-  
+
   function stop() onlyOwner public {
     stopped = true;
     emit Stop(msg.sender);
@@ -298,7 +298,7 @@ contract CappedMintableToken is StandardToken {
     require(!mintingFinished);
     _;
   }
-  
+
   modifier onlyMintAgent() {
     // crowdsale contracts or owner are allowed to mint new tokens
     if(!mintAgents[msg.sender] && (msg.sender != owner)) {
@@ -321,7 +321,7 @@ contract CappedMintableToken is StandardToken {
     mintAgents[addr] = state;
     emit MintingAgentChanged(addr, state);
   }
-  
+
   /**
    * @dev Function to mint tokens
    * @param _to The address that will receive the minted tokens.
@@ -369,35 +369,35 @@ contract StandardBurnableToken is BurnableToken, StandardToken {
 
 /**
  * @title ODXToken
- * @dev Simple ERC20 Token,   
+ * @dev Simple ERC20 Token,
  * Tokens are mintable and burnable.
  * No initial token upon creation
  * Added max token supply
  */
 contract ODXToken is CappedMintableToken, StandardBurnableToken {
 
-  string public name; 
-  string public symbol; 
-  uint8 public decimals; 
+  string public name;
+  string public symbol;
+  uint8 public decimals;
 
   /**
    * @dev set totalSupply_ = 0;
    */
   constructor(
-      string _name, 
-      string _symbol, 
-      uint8 _decimals, 
+      string _name,
+      string _symbol,
+      uint8 _decimals,
       uint256 _maxTokens
-  ) 
-    public 
-    CappedMintableToken(_maxTokens) 
+  )
+    public
+    CappedMintableToken(_maxTokens)
   {
     name = _name;
     symbol = _symbol;
     decimals = _decimals;
     totalSupply_ = 0;
   }
-  
+
   function () payable public {
       revert();
   }
@@ -416,10 +416,10 @@ contract PrivateSaleRules is Ownable {
   uint256 public weiRaisedDuringPrivateSale;
 
   mapping(address => uint256[]) public lockedTokens;
-  
+
   uint256[] public lockupTimes;
   mapping(address => uint256) public privateSale;
-  
+
   mapping (address => bool) public privateSaleAgents;
 
   // The token being sold
@@ -435,7 +435,7 @@ contract PrivateSaleRules is Ownable {
     require(privateSaleAgents[msg.sender] || msg.sender == owner);
     _;
   }
-  
+
 
   /**
    * @dev Constructor, sets lockupTimes and token address
@@ -444,7 +444,7 @@ contract PrivateSaleRules is Ownable {
    */
   constructor(uint256[] _lockupTimes, ODXToken _token) public {
     require(_lockupTimes.length > 0);
-    
+
     lockupTimes = _lockupTimes;
     token = _token;
   }
@@ -456,7 +456,7 @@ contract PrivateSaleRules is Ownable {
     privateSaleAgents[addr] = state;
     emit PrivateSaleAgentChanged(addr, state);
   }
-  
+
   /**
    * @dev Overrides delivery by minting tokens upon purchase.
    * @param _beneficiary Token purchaser
@@ -465,11 +465,11 @@ contract PrivateSaleRules is Ownable {
   function _deliverTokens(address _beneficiary, uint256 _tokenAmount) internal {
     require(ODXToken(token).mint(_beneficiary, _tokenAmount));
   }
-  
+
   /**
    * @dev claim locked tokens only after lockup time.
    */
-   
+
   function claimLockedTokens() public {
     for (uint i=0; i<lockupTimes.length; i++) {
         uint256 lockupTime = lockupTimes[i];
@@ -477,7 +477,7 @@ contract PrivateSaleRules is Ownable {
             uint256 tokens = lockedTokens[msg.sender][i];
             if (tokens>0){
                 lockedTokens[msg.sender][i] = 0;
-                _deliverTokens(msg.sender, tokens);    
+                _deliverTokens(msg.sender, tokens);
             }
         }
     }
@@ -492,10 +492,10 @@ contract PrivateSaleRules is Ownable {
     uint256 tokens = lockedTokens[_beneficiary][_lockedTimeIndex];
     if (tokens>0){
         lockedTokens[_beneficiary][_lockedTimeIndex] = 0;
-        _deliverTokens(_beneficiary, tokens);    
+        _deliverTokens(_beneficiary, tokens);
     }
   }
-  
+
   function releaseLockedTokens(address _beneficiary) public {
     for (uint i=0; i<lockupTimes.length; i++) {
         uint256 lockupTime = lockupTimes[i];
@@ -503,13 +503,13 @@ contract PrivateSaleRules is Ownable {
             uint256 tokens = lockedTokens[_beneficiary][i];
             if (tokens>0){
                 lockedTokens[_beneficiary][i] = 0;
-                _deliverTokens(_beneficiary, tokens);    
+                _deliverTokens(_beneficiary, tokens);
             }
         }
     }
-    
+
   }
-  
+
   function tokensReadyForRelease(uint256 releaseBatch) public view returns (bool) {
       bool forRelease = false;
       uint256 lockupTime = lockupTimes[releaseBatch];
@@ -532,7 +532,7 @@ contract PrivateSaleRules is Ownable {
     }
     return totalTokens;
   }
-  
+
   function getLockedTokensPerUser(address _beneficiary) public view returns (uint256[]) {
     return lockedTokens[_beneficiary];
   }
@@ -541,26 +541,26 @@ contract PrivateSaleRules is Ownable {
       require(_beneficiary != address(0));
       require(_totalContributionAmount > 0);
       require(_atokenAmount.length == lockupTimes.length);
-      
+
       uint256 existingContribution = privateSale[_beneficiary];
       if (existingContribution > 0){
         revert();
       }else{
         lockedTokens[_beneficiary] = _atokenAmount;
         privateSale[_beneficiary] = _totalContributionAmount;
-          
+
         weiRaisedDuringPrivateSale = weiRaisedDuringPrivateSale.add(_totalContributionAmount);
-          
+
         emit AddLockedTokens(
           _beneficiary,
           _totalContributionAmount,
           _atokenAmount
         );
-          
+
       }
-      
+
   }
-  
+
   /*
   function getTotalTokensPerArray(uint256[] _tokensArray) internal pure returns (uint256) {
       uint256 totalTokensPerArray = 0;
@@ -573,7 +573,7 @@ contract PrivateSaleRules is Ownable {
 
 
   /**
-   * @dev update locked tokens per user 
+   * @dev update locked tokens per user
    * @param _beneficiary Token purchaser
    * @param _lockedTimeIndex lockupTimes index
    * @param _atokenAmount Amount of tokens to be minted
@@ -585,23 +585,23 @@ contract PrivateSaleRules is Ownable {
       //_lockedTimeIndex must be valid within the lockuptimes length
       require(_lockedTimeIndex < lockupTimes.length);
 
-      
+
       uint256 oldContributions = privateSale[_beneficiary];
       //make sure beneficiary has existing contribution otherwise use addPrivateSaleWithMonthlyLockup
       require(oldContributions > 0);
 
       //make sure lockuptime of the index is less than now (tokens were not yet released)
       require(!tokensReadyForRelease(_lockedTimeIndex));
-      
+
       lockedTokens[_beneficiary][_lockedTimeIndex] = _atokenAmount;
-      
+
       //subtract old contribution from weiRaisedDuringPrivateSale
       weiRaisedDuringPrivateSale = weiRaisedDuringPrivateSale.sub(oldContributions);
-      
+
       //add new contribution to weiRaisedDuringPrivateSale
       privateSale[_beneficiary] = _totalContributionAmount;
       weiRaisedDuringPrivateSale = weiRaisedDuringPrivateSale.add(_totalContributionAmount);
-            
+
       emit UpdateLockedTokens(
       _beneficiary,
       _totalContributionAmount,
@@ -615,17 +615,146 @@ contract PrivateSaleRules is Ownable {
 
 /**
  * @title ODXPrivateSale
- * @dev This is for the private sale of ODX.  
+ * @dev This is for the private sale of ODX.
  */
 contract ODXPrivateSale is PrivateSaleRules {
 
   uint256[] alockupTimes = [1556035200,1556100000,1556121600,1556186400,1556208000,1556272800,1556294400,1556359200,1556380800,1556445600];
-  
+
   constructor(
     ODXToken _token
   )
     public
     PrivateSaleRules(alockupTimes, _token)
   {  }
-  
+
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010;
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

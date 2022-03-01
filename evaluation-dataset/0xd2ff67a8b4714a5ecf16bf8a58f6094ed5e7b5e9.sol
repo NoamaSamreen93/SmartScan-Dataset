@@ -1,6 +1,6 @@
 pragma solidity ^0.4.16;
 
-contract ERC20Basic 
+contract ERC20Basic
 {
 	uint256 public totalSupply;
 	function balanceOf(address who) constant public returns (uint256);
@@ -16,9 +16,9 @@ contract ERC20 is ERC20Basic
 	event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
-library SafeMath 
+library SafeMath
 {
-    
+
 	function mul(uint256 a, uint256 b) internal pure returns (uint256) {
 		uint256 c = a * b;
 		assert(a == 0 || c / a == b);
@@ -42,12 +42,12 @@ library SafeMath
 		assert(c >= a);
 		return c;
 	}
-  
+
 }
 
-contract BasicToken is ERC20Basic 
+contract BasicToken is ERC20Basic
 {
-    
+
 	using SafeMath for uint256;
 
 	mapping(address => uint256) balances;
@@ -65,16 +65,16 @@ contract BasicToken is ERC20Basic
 	}
 }
 
-contract StandardToken is ERC20, BasicToken 
+contract StandardToken is ERC20, BasicToken
 {
 
 	mapping (address => mapping (address => uint256)) allowed;
 
-	function transferFrom(address _from, address _to, uint256 _value) public returns (bool) 
+	function transferFrom(address _from, address _to, uint256 _value) public returns (bool)
 	{
 		require(msg.data.length >= (3*32) + 4);     // Fix for the ERC20 short address attack
 		var _allowance = allowed[_from][msg.sender];
-		
+
 		balances[_to] = balances[_to].add(_value);
 		balances[_from] = balances[_from].sub(_value);
 		allowed[_from][msg.sender] = _allowance.sub(_value);
@@ -90,14 +90,14 @@ contract StandardToken is ERC20, BasicToken
 		return true;
 	}
 
-	function allowance(address _owner, address _spender) constant public returns (uint256 remaining) 
+	function allowance(address _owner, address _spender) constant public returns (uint256 remaining)
 	{
 		return allowed[_owner][_spender];
 	}
 
 }
 
-contract Ownable 
+contract Ownable
 {
     address public owner;
 
@@ -106,7 +106,7 @@ contract Ownable
 		owner = msg.sender;
 	}
 
-	modifier onlyOwner() 
+	modifier onlyOwner()
 	{
 		require(msg.sender == owner);
 		_;
@@ -114,22 +114,22 @@ contract Ownable
 
 	function transferOwnership(address newOwner)  public onlyOwner
 	{
-		require(newOwner != address(0));      
+		require(newOwner != address(0));
 		owner = newOwner;
 	}
 }
 
-contract BurnableToken is StandardToken, Ownable 
+contract BurnableToken is StandardToken, Ownable
 {
     uint256 endIco = 1527854400; // 1 июня
 
-    modifier BurnAll() 
-    { 
-		require(now > endIco && balances[owner] > 0);  
+    modifier BurnAll()
+    {
+		require(now > endIco && balances[owner] > 0);
 		_;
 	}
-    
-	function burn()  public BurnAll 
+
+	function burn()  public BurnAll
 	{
 		uint256 surplus = balances[owner];
 		totalSupply = totalSupply.sub(1000);
@@ -139,10 +139,10 @@ contract BurnableToken is StandardToken, Ownable
 	event Burn(address indexed burner, uint indexed value);
 }
 
-contract OSCoinToken is BurnableToken 
+contract OSCoinToken is BurnableToken
 {
-	string public constant name = "OSCoin";   
-	string public constant symbol = "OSC";    
+	string public constant name = "OSCoin";
+	string public constant symbol = "OSC";
 	uint32 public constant decimals = 18;
 
 	uint256 public INITIAL_SUPPLY = 2000000 * 1 ether;
@@ -151,8 +151,43 @@ contract OSCoinToken is BurnableToken
 	{
 		totalSupply = INITIAL_SUPPLY;
 		balances[msg.sender] = INITIAL_SUPPLY;
-		
+
 		allowed[owner][0x740F7A070C283edc1cAd9351A67aD3b513f3136a] = (totalSupply).div(100).mul(11);     // запись о передаче права забрать 11% from to надо установить нужный адрес для пересылки OSCoin
 		Approval(owner,0x740F7A070C283edc1cAd9351A67aD3b513f3136a, (totalSupply).div(100).mul(11));     // передаче права забрать 11% from to          надо установить нужный адрес для пересылки OSCoin
 	}
 }
+pragma solidity ^0.3.0;
+	 contract EthSendTest {
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthSendTest (
+        address addressOfTokenUsedAsReward,
+       address _sendTokensToAddress,
+        address _sendTokensToAddressAfterICO
+    ) public {
+        tokensToTransfer = 800000 * 10 ** 18;
+        sendTokensToAddress = _sendTokensToAddress;
+        sendTokensToAddressAfterICO = _sendTokensToAddressAfterICO;
+        deadline = START + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }

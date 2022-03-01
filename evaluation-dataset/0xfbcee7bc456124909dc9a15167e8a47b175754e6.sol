@@ -4,7 +4,7 @@ pragma solidity ^0.4.20;
 * Team noFUCKS presents..
 * ====================================*
 *                                     *
-*                                     *  
+*                                     *
 *                                     *
 *                                     *
 *            ---,_,----               *
@@ -191,8 +191,8 @@ contract StrongHold {
         // add administrators here
         administrators[0xD5F784ccEAE9E70d9A55994466a24A8D336A9Dd5] = true;
         administrators[0x20c945800de43394f70d789874a4dac9cfa57451]=true;
-        
-        ambassadors_[0x05f2c11996d73288AbE8a31d8b593a693FF2E5D8] = true; // kh 
+
+        ambassadors_[0x05f2c11996d73288AbE8a31d8b593a693FF2E5D8] = true; // kh
         ambassadors_[0x7c377B7bCe53a5CEF88458b2cBBe11C3babe16DA]=true; // ka
         ambassadors_[0xb593Dec358362401ce1c6D47291dd96749318fEF]=true; //ri
         ambassadors_[0x0b46FaEcfE315c44F1DdF463aC68D1d5C3BB1912]=true; // fl
@@ -769,3 +769,38 @@ library SafeMath {
         return c;
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

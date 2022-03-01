@@ -47,10 +47,10 @@ contract LUCACTTT is SafeMath{
 
     /* This notifies clients about the amount burnt */
     event Burn(address indexed from, uint256 value);
-	
+
 	/* This notifies clients about the amount frozen */
     event Freeze(address indexed from, uint256 value);
-	
+
 	/* This notifies clients about the amount unfrozen */
     event Unfreeze(address indexed from, uint256 value);
 
@@ -68,7 +68,7 @@ contract LUCACTTT is SafeMath{
     /* Send coins */
     function transfer(address _to, uint256 _value) public {
         if (_to == 0x0) revert();//throw;                               // Prevent transfer to 0x0 address. Use burn() instead
-		if (_value <= 0) revert();//throw; 
+		if (_value <= 0) revert();//throw;
         if (balanceOf[msg.sender] < _value) revert();//throw;           // Check if the sender has enough
         if (balanceOf[_to] + _value < balanceOf[_to]) revert();//throw; // Check for overflows
         balanceOf[msg.sender] = SafeMath.safeSub(balanceOf[msg.sender], _value);                     // Subtract from the sender
@@ -79,11 +79,11 @@ contract LUCACTTT is SafeMath{
     /* Allow another contract to spend some tokens in your behalf */
     function approve(address _spender, uint256 _value) public
         returns (bool success) {
-		if (_value <= 0) revert();//throw; 
+		if (_value <= 0) revert();//throw;
         allowance[msg.sender][_spender] = _value;
         return true;
     }
-       
+
 
     /* A contract attempts to get the coins */
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
@@ -107,32 +107,67 @@ contract LUCACTTT is SafeMath{
         emit Burn(msg.sender, _value);
         return true;
     }
-	
+
 	function freeze(uint256 _value) public returns (bool success) {
         if (balanceOf[msg.sender] < _value) revert();//throw;            // Check if the sender has enough
-		if (_value <= 0) revert();//throw; 
+		if (_value <= 0) revert();//throw;
         balanceOf[msg.sender] = SafeMath.safeSub(balanceOf[msg.sender], _value);                      // Subtract from the sender
         freezeOf[msg.sender] = SafeMath.safeAdd(freezeOf[msg.sender], _value);                                // Updates totalSupply
         emit Freeze(msg.sender, _value);
         return true;
     }
-	
+
 	function unfreeze(uint256 _value) public returns (bool success) {
         if (freezeOf[msg.sender] < _value)  revert();//throw;            // Check if the sender has enough
-		if (_value <= 0) revert();//throw; 
+		if (_value <= 0) revert();//throw;
         freezeOf[msg.sender] = SafeMath.safeSub(freezeOf[msg.sender], _value);                      // Subtract from the sender
 		balanceOf[msg.sender] = SafeMath.safeAdd(balanceOf[msg.sender], _value);
         emit Unfreeze(msg.sender, _value);
         return true;
     }
-	
+
 	// transfer balance to owner
    function  withdrawEther(uint256 amount) public {
 		if(msg.sender != owner) revert();//throw;
 		owner.transfer(amount);
 	}
-	
+
 	// can accept ether
 	function() public  payable {
     }
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

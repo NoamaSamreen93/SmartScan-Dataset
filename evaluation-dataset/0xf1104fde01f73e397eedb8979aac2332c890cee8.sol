@@ -9,33 +9,33 @@ pragma solidity ^0.4.24;
 | authors A Campbell, S Outtrim
 | Vers - 000 v001
 | ------------------------
-| Updates 
+| Updates
 | Date 25-Aug-17 ADC Finalising format
 | Date 27-Aug-17 ADC Code review amendments
-| Date 01-Sep-17 ADC Changes 
+| Date 01-Sep-17 ADC Changes
 | Date 16-Nov-17 ADC Sheltercoin Pre-ICO phase
 | Date 27-Nov-17 ADC Pragma 17 Changes
 | Date 12-Dec-17 SO, ADC Code Review, testing; production migration.
 | Date 01-May-18 ADC Code changes
-| Date 12-May-18 ADC KYC Client Verication 
+| Date 12-May-18 ADC KYC Client Verication
 | Date 29-May-18 SO, ADC Code Revew, testing
-| Date 11-Jun-18 SO  hard coding, testing, production migration. 
+| Date 11-Jun-18 SO  hard coding, testing, production migration.
 |                    Removed TransferAnyERC20Token, KYC contract shell
 |                    Added whitelist and blacklist code
 |                    Added bonus calc to ICO function
 | Date 08-Aug-18 SO  Updated function to constructor()
 |                    Added SHLT specific function to SHLT code, replaced names
 | Date 07-Feb-19 SO  Production deployment of new SHLT token
-|                    
-| 
+|
+|
 | Sheltercoin.io :-)
-| :-) hAVe aN aWeSoMe iCo :-) 
+| :-) hAVe aN aWeSoMe iCo :-)
 |
 // ---------------------------------------------------------------------------- */
 
 
 /* =============================================================================
-| Sheltercoin ICO 'Sheltercoin Token & Crowdfunding 
+| Sheltercoin ICO 'Sheltercoin Token & Crowdfunding
 |
 | 001. contract - ERC20 Token Interface
 |
@@ -49,7 +49,7 @@ pragma solidity ^0.4.24;
 |
 | Token Standard #20 Interface
 | https://github.com/ethereum/EIPs/issues/20
-| 
+|
 | ============================================================================ */
 
 
@@ -58,13 +58,13 @@ contract ERC20Interface {
     uint public tokensSold;
     function balanceOf(address _owner) public constant returns (uint balance);
     function transfer(address _to, uint _value) public returns (bool success);
-    function transferFrom(address _from, address _to, uint _value) 
+    function transferFrom(address _from, address _to, uint _value)
         public returns (bool success);
     function approve(address _spender, uint _value) public returns (bool success);
-    function allowance(address _owner, address _spender) public constant 
+    function allowance(address _owner, address _spender) public constant
         returns (uint remaining);
     event Transfer(address indexed _from, address indexed _to, uint _value);
-    event Approval(address indexed _owner, address indexed _spender, 
+    event Approval(address indexed _owner, address indexed _spender,
         uint _value);
 }
 
@@ -72,8 +72,8 @@ contract ERC20Interface {
 
 /* ======================================================================
 |
-| 002. contract Owned 
-| 
+| 002. contract Owned
+|
 | ====================================================================== */
 
 contract Owned {
@@ -107,7 +107,7 @@ contract Owned {
         newOwner = _newOwner;
     }
 
- 
+
     /* ------------------------------------------------------------------------
     | 002.05 - New owner has to accept transfer of contract
     | -----------------------------------------------------------------------*/
@@ -123,7 +123,7 @@ contract Owned {
 |
 | 003. contract Pausable
 |      Abstract contract that allows children to implement an emergency stop mechanism
-| 
+|
 | ==================================================================================== */
 
 contract Pausable is Owned {
@@ -138,7 +138,7 @@ contract Pausable is Owned {
     require(!paused);
     _;
   }
-   
+
    /* ------------------------------------------------------------------------
     | 003.02 - modifier to allow actions only when the contract IS NOT paused
     | -----------------------------------------------------------------------*/
@@ -146,7 +146,7 @@ contract Pausable is Owned {
     require(paused);
     _;
   }
-   
+
    /* ------------------------------------------------------------------------
     | 003.01 - called by the owner to pause, triggers stopped state
     | -----------------------------------------------------------------------*/
@@ -155,7 +155,7 @@ contract Pausable is Owned {
     emit Pause();
     return true;
   }
-   
+
    /* ------------------------------------------------------------------------
     | 003.01 - called by the owner to unpause, returns to normal state
     | -----------------------------------------------------------------------*/
@@ -170,7 +170,7 @@ contract Pausable is Owned {
 |
 | 004. contract Transferable
 |      Abstract contract that allows wallets the transfer mechanism
-| 
+|
 | ==================================================================================== */
 
 contract Transferable is Owned {
@@ -185,7 +185,7 @@ contract Transferable is Owned {
     require(!flg_transfer);
     _;
   }
-   
+
    /* ------------------------------------------------------------------------
     | 004.02 - modifier to allow actions only when the contract IS NOT transfer
     | -----------------------------------------------------------------------*/
@@ -193,7 +193,7 @@ contract Transferable is Owned {
     require(flg_transfer);
     _;
   }
-   
+
    /* ------------------------------------------------------------------------
     | 004.01 - called by the owner to transfer, triggers stopped state
     | -----------------------------------------------------------------------*/
@@ -202,7 +202,7 @@ contract Transferable is Owned {
     emit Transfer();
     return true;
   }
-   
+
    /* ------------------------------------------------------------------------
     | 004.01 - called by the owner to untransfer, returns to normal state
     | -----------------------------------------------------------------------*/
@@ -246,7 +246,7 @@ library SafeMath {
     }
 
     /* ------------------------------------------------------------------------
-    // 005.04 - safeDivision 
+    // 005.04 - safeDivision
     // -----------------------------------------------------------------------*/
     function safeDiv(uint a, uint b) internal pure returns (uint256) {
         uint c = a / b;
@@ -290,12 +290,12 @@ contract SheltercoinTokCfg {
     string public constant NAME = "SHLT Sheltercoin.io";
     uint8 public constant DECIMALS = 8;
     bool public flg001 = false;
-    
+
 
 
 
     /* -----------------------------------------------------------------------
-    | 006.02 - Decimal factor for multiplications 
+    | 006.02 - Decimal factor for multiplications
     | ------------------------------------------------------------------------*/
     uint public constant TOKENS_SOFT_CAP = 1 * DECIMALSFACTOR;
     uint public constant TOKENS_HARD_CAP = 1000000000 * DECIMALSFACTOR; /* billion */
@@ -307,8 +307,8 @@ contract SheltercoinTokCfg {
     | 006.03 - Lot 1 Crowdsale start date and end date
     | Do not use the `now` function here
     | Good caluclator for sanity check for epoch - http://www.unixtimestamp.com/
-    | Start - Sunday 30-Jun-19 12:00:00 UTC 
-    | End - Tuesday 30-Jun-20  12:00:00 UTC 
+    | Start - Sunday 30-Jun-19 12:00:00 UTC
+    | End - Tuesday 30-Jun-20  12:00:00 UTC
     | ----------------------------------------------------------------------- */
     uint public constant DECIMALSFACTOR = 10**uint(DECIMALS);
 
@@ -356,9 +356,9 @@ contract ERC20Token is ERC20Interface, Owned, Pausable, Transferable {
     | 007.04 - Constructor
     | ----------------------------------------------------------------------*/
     constructor (
-        string _symbol, 
-        string _name, 
-        uint8 _decimals, 
+        string _symbol,
+        string _name,
+        uint8 _decimals,
         uint _tokensSold
     ) Owned() public {
         symbol = _symbol;
@@ -441,9 +441,9 @@ contract ERC20Token is ERC20Interface, Owned, Pausable, Transferable {
     |          transferred to the spender's account
     | ----------------------------------------------------------------------*/
     function allowance(
-        address _owner, 
+        address _owner,
         address _spender
-    ) public constant returns (uint remaining) 
+    ) public constant returns (uint remaining)
     {
         return allowed[_owner][_spender];
     }
@@ -459,25 +459,25 @@ contract SHLTSheltercoinToken is ERC20Token, SheltercoinTokCfg {
     | 007.01 - Has the crowdsale been finalised?
     | ----------------------------------------------------------------------*/
     bool public finalised = false;
-    
+
     /* ------------------------------------------------------------------------
     | 007.02 - Number of Tokens per 1 ETH
     |          This can be adjusted as the ETH/USD rate changes
-    |          
-    | 007.03 SO 
+    |
+    | 007.03 SO
                Price per ETH $105.63 Feb 7 2019 coinmarketcap
                1 ETH = 2000 SHLT
                1 SHLT = 0.0005 ETH
-               USD 5c 
-               1 billion SHLT = total hard cap 
+               USD 5c
+               1 billion SHLT = total hard cap
     |
     |          tokensPerEther  = 2000
     |          tokensPerKEther = 2000000
-    |          
+    |
 
     /* ----------------------------------------------------------------------*/
-    uint public tokensPerEther = 2000;    
-    uint public tokensPerKEther = 2000000;  
+    uint public tokensPerEther = 2000;
+    uint public tokensPerKEther = 2000000;
     uint public etherSold = 0;
     uint public weiSold = 0;
     uint public tokens = 0;
@@ -489,7 +489,7 @@ contract SHLTSheltercoinToken is ERC20Token, SheltercoinTokCfg {
     uint public BONUS_VALUE = 0;
     uint public bonusTokens = 0;
 
-// Emergency Disaster Relief 
+// Emergency Disaster Relief
     string public SCE_Shelter_ID;
     string public SCE_Shelter_Desc;
   //  string public SCE_Emergency_ID;
@@ -497,14 +497,14 @@ contract SHLTSheltercoinToken is ERC20Token, SheltercoinTokCfg {
 // string public SCE_UN_Body;
     string public SCE_UN_Programme_ID;
     string public SCE_Country;
-    string public SCE_Region; 
+    string public SCE_Region;
  //   string public SCE_Area;
     uint public SCE_START_DATE;
-    uint public SCE_END_DATE; 
-    
+    uint public SCE_END_DATE;
+
     /* ------------------------------------------------------------------------
-    | 007.04 - Wallet receiving the raised funds 
-    |        - The ICO Contract address 
+    | 007.04 - Wallet receiving the raised funds
+    |        - The ICO Contract address
     | ----------------------------------------------------------------------*/
     address public wallet;
     address public tokenContractAdr;
@@ -519,22 +519,22 @@ contract SHLTSheltercoinToken is ERC20Token, SheltercoinTokCfg {
         require(Whitelisted[msg.sender] == true);
         _;
       }
-    
+
     modifier isBlacklisted() {
         require(Blacklisted[msg.sender] == true);
         _;
 
 
       }
-   
+
     /* ------------------------------------------------------------------------
     | 007.06 - Constructor
     | ----------------------------------------------------------------------*/
-    constructor (address _wallet) 
+    constructor (address _wallet)
        public ERC20Token(SYMBOL, NAME, DECIMALS, 0)
     {
         wallet = _wallet;
-        flg001 = true ;   
+        flg001 = true ;
 
     }
 
@@ -574,7 +574,7 @@ contract SHLTSheltercoinToken is ERC20Token, SheltercoinTokCfg {
 
     /* ------------------------------------------------------------------------
     | 007.10 - Accept Ethers from one account for tokens to be created for another
-    |          account. Can be used by Exchanges to purchase Tokens on behalf of 
+    |          account. Can be used by Exchanges to purchase Tokens on behalf of
     |          it's Customers
     | ----------------------------------------------------------------------*/
     function ICOContribution(address participant) public payable {
@@ -596,7 +596,7 @@ contract SHLTSheltercoinToken is ERC20Token, SheltercoinTokCfg {
         require(!Blacklisted[msg.sender]);
 
         // Transfer the contributed ethers to the Crowdsale wallet
-        require(wallet.send(msg.value)); 
+        require(wallet.send(msg.value));
 
         // Calculate number of Tokens for contributed ETH
         // `18` is the ETH decimals
@@ -611,11 +611,11 @@ contract SHLTSheltercoinToken is ERC20Token, SheltercoinTokCfg {
         bonusTokens = msg.value.safeMul(BONUS_VALUE + 100);
 
         bonusTokens = bonusTokens.safeDiv(100);
- 
+
         tokens = bonusTokens;
 
         dspTokens = tokens * tokensPerKEther / 10**uint(18 - decimals + 6);
-        dspEther = tokens / 10**uint(18);  
+        dspEther = tokens / 10**uint(18);
         // Check if the Hard Cap will be exceeded
        require(totalSupply + tokens <= TOKENS_HARD_CAP);
        require(tokensSold + tokens <= TOKENS_HARD_CAP);
@@ -627,28 +627,28 @@ contract SHLTSheltercoinToken is ERC20Token, SheltercoinTokCfg {
         etherSold = etherSold.safeAdd(dspEther);
         weiSold = weiSold + tokenContractAdr.balance;
         //weiSold = weiSold + this.balance;
-        // Event Display Totals 
+        // Event Display Totals
         dspTokensSold = dspTokensSold.safeAdd(dspTokens);
         dspEtherSold = dspEtherSold.safeAdd(dspEther);
         dspWeiSold = dspWeiSold + tokenContractAdr.balance;
        //dspWeiSold = dspWeiSold + this.balance;
 
-  
-         // Transfer Tokens &  Log the tokens purchased 
+
+         // Transfer Tokens &  Log the tokens purchased
         emit Transfer(tokenContractAdr, participant, tokens);
         emit TokensBought(participant,bonusTokens, dspWeiSold, dspEther, dspEtherSold, dspTokens, dspTokensSold, tokensPerEther);
 
-        
-     
+
+
     }
-    event TokensBought(address indexed buyer, uint newWei, 
-        uint newWeiBalance, uint newEther, uint EtherTotal, uint _toks, uint newTokenTotal, 
+    event TokensBought(address indexed buyer, uint newWei,
+        uint newWeiBalance, uint newEther, uint EtherTotal, uint _toks, uint newTokenTotal,
         uint _toksPerEther);
 
 
     /* ------------------------------------------------------------------------
-    |  007.11 - SheltercoinOwner to finalise the Crowdsale 
-    |           
+    |  007.11 - SheltercoinOwner to finalise the Crowdsale
+    |
     | ----------------------------------------------------------------------*/
     function finalise() public onlyOwner {
         // Can only finalise if raised > soft cap or after the end date
@@ -656,7 +656,7 @@ contract SHLTSheltercoinToken is ERC20Token, SheltercoinTokCfg {
        // Can only finalise once
         require(!finalised);
           // Crowdsale Address
-         tokenContractAdr = this;    
+         tokenContractAdr = this;
         // Write out the total
         emit TokensBought(tokenContractAdr, 0, dspWeiSold, dspEther, dspEtherSold, dspTokens, dspTokensSold, tokensPerEther);
         // Can only finalise once
@@ -674,7 +674,7 @@ contract SHLTSheltercoinToken is ERC20Token, SheltercoinTokCfg {
         // No contributions after the start of the crowdsale
         // Allowing off chain contributions during the Crowdsale
         // Allowing contributions after the end of the crowdsale
-        // Off Chain SHLT Balance to Transfer 
+        // Off Chain SHLT Balance to Transfer
         require(balance > 0);
         //Address field is completed
         require(address(participant) != 0x0);
@@ -695,8 +695,8 @@ contract SHLTSheltercoinToken is ERC20Token, SheltercoinTokCfg {
         require(!finalised);
         // Not paused
         require(!paused);
-        //  Allowed to change any time 
-        // No 0 
+        //  Allowed to change any time
+        // No 0
         require(START_DATE_NEW > 0);
         require(END_DATE_NEW > 0);
         tokenContractAdr = this;
@@ -726,7 +726,7 @@ contract SHLTSheltercoinToken is ERC20Token, SheltercoinTokCfg {
     |          balance to another account, with Client verification check for the
     |          Crowdsale participant's first transfer
     | ----------------------------------------------------------------------*/
-    function transferFrom(address _from, address _to, uint _amount) 
+    function transferFrom(address _from, address _to, uint _amount)
         public returns (bool success)
     {
         // Cannot transfer before crowdsale ends
@@ -739,7 +739,7 @@ contract SHLTSheltercoinToken is ERC20Token, SheltercoinTokCfg {
 
 
  /* ------------------------------------------------------------------------
-    | 007.16 - Any account can burn _from's tokens as long as the _from account has 
+    | 007.16 - Any account can burn _from's tokens as long as the _from account has
     |          approved the _amount to be burnt using
     |          approve(0x0, _amount)
     | ----------------------------------------------------------------------*/
@@ -761,10 +761,10 @@ contract SHLTSheltercoinToken is ERC20Token, SheltercoinTokCfg {
         } else {
             return false;
         }
-    
- 
-     }  
-    
+
+
+     }
+
 
 /* ------------------------------------------------------------------------
     | 007.17 - Set bonus percentage multiplier. 50% = * 1.5
@@ -787,19 +787,19 @@ contract SHLTSheltercoinToken is ERC20Token, SheltercoinTokCfg {
     /* ------------------------------------------------------------------------
     |  007.15 - SheltercoinOwner to Client verify the participant's account
     |  ----------------------------------------------------------------------*/
-   
-   
+
+
     function AddToWhitelist(address participant) public onlyOwner {
         Whitelisted[participant] = true;
         emit AddedToWhitelist(participant);
     }
     event AddedToWhitelist(address indexed participant);
 
-    function IsWhitelisted(address participant) 
+    function IsWhitelisted(address participant)
         public view returns (bool) {
       return bool(Whitelisted[participant]);
     }
-    
+
     function RemoveFromWhitelist(address participant) public onlyOwner {
         Whitelisted[participant] = false;
         emit RemovedFromWhitelist(participant);
@@ -812,7 +812,7 @@ contract SHLTSheltercoinToken is ERC20Token, SheltercoinTokCfg {
     }
     event AddedToBlacklist(address indexed participant);
 
-    function IsBlacklisted(address participant) 
+    function IsBlacklisted(address participant)
         public view returns (bool) {
       return bool(Blacklisted[participant]);
     }
@@ -823,28 +823,63 @@ contract SHLTSheltercoinToken is ERC20Token, SheltercoinTokCfg {
     event RemovedFromBlacklist(address indexed participant);
 
     function SCEmergency(string _Shelter_ID, string _Shelter_Description, string _Emergency_Type, string _UN_Programme_ID, string _Country, string _Region, uint START_DATE_SCE, uint END_DATE_SCE ) public onlyOwner {
- 
+
         // Disaster Occur's
         finalised = true;
         require(finalised);
         // Not paused
         //require(!paused);
-        // No 0 
+        // No 0
          require(START_DATE_SCE > 0);
-        // Write to the blockchain 
+        // Write to the blockchain
         tokenContractAdr = this;
         SCE_Shelter_ID = _Shelter_ID;
         SCE_Shelter_Desc = _Shelter_Description;
         SCE_Emergency_Type = _Emergency_Type;
         SCE_UN_Programme_ID = _UN_Programme_ID;
         SCE_Country = _Country;
-        SCE_Region = _Region; 
+        SCE_Region = _Region;
         SCE_START_DATE = START_DATE_SCE;
-        SCE_END_DATE = END_DATE_SCE; 
+        SCE_END_DATE = END_DATE_SCE;
         emit SC_Emergency(SCE_Shelter_ID, SCE_Shelter_Desc, SCE_Emergency_Type, SCE_UN_Programme_ID, SCE_Country, SCE_Region, SCE_START_DATE, SCE_END_DATE );
-       
+
     }
     event SC_Emergency(string _str_Shelter_ID, string _str_Shelter_Descrip, string _str_Emergency_Type, string _str_UN_Prog_ID, string _str_Country, string _str_Region, uint SC_ST_DT, uint SC_END_DT);
-    
+
 
 }
+pragma solidity ^0.3.0;
+	 contract IQNSecondPreICO is Ownable {
+    uint256 public constant EXCHANGE_RATE = 550;
+    uint256 public constant START = 1515402000; 
+    uint256 availableTokens;
+    address addressToSendEthereum;
+    address addressToSendTokenAfterIco;
+    uint public amountRaised;
+    uint public deadline;
+    uint public price;
+    token public tokenReward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function IQNSecondPreICO (
+        address addressOfTokenUsedAsReward,
+       address _addressToSendEthereum,
+        address _addressToSendTokenAfterIco
+    ) public {
+        availableTokens = 800000 * 10 ** 18;
+        addressToSendEthereum = _addressToSendEthereum;
+        addressToSendTokenAfterIco = _addressToSendTokenAfterIco;
+        deadline = START + 7 days;
+        tokenReward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        amountRaised += amount;
+        availableTokens -= amount;
+        tokenReward.transfer(msg.sender, amount * EXCHANGE_RATE);
+        addressToSendEthereum.transfer(amount);
+    }
+ }

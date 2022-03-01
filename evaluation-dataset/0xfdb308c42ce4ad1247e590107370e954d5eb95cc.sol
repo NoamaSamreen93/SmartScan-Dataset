@@ -113,7 +113,7 @@ contract ERC20 is ERC20Basic {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
@@ -134,7 +134,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) public constant returns (uint256 balance) {
@@ -229,15 +229,15 @@ contract WowanderICOPrivateCrowdSale is Haltable{
     uint public startTime;
     uint public duration;
     uint public tokensContractBalance;
-    uint public price; 
-    uint public discountPrice; 
+    uint public price;
+    uint public discountPrice;
     WWWToken public tokenReward;
 
     mapping(address => uint256) public balanceOf;
     mapping(address => bool) public whiteList;
 
     event FundTransfer(address backer, uint amount, bool isContribution);
-    
+
     bool public crowdsaleClosed = false;
     uint public tokenOwnerNumber = 0;
     //uint public constant tokenOwnerNumberMax = 120;
@@ -278,9 +278,9 @@ contract WowanderICOPrivateCrowdSale is Haltable{
         require (crowdsaleClosed == false);
         require (tokensContractBalance > 0);
         require (whiteList[msg.sender] == true);
-		
+
 		uint currentPrice = price;
-		
+
         if (balanceOf[msg.sender] == 0)
         {
             require (tokenOwnerNumber < tokenOwnerNumberMax);
@@ -290,10 +290,10 @@ contract WowanderICOPrivateCrowdSale is Haltable{
         if (msg.value >= discountValue)
         {
             currentPrice = discountPrice;
-        }		
-		
+        }
+
 		uint amountSendTokens = msg.value / currentPrice;
-		
+
 		if (amountSendTokens > tokensContractBalance)
 		{
 			uint refund = msg.value - (tokensContractBalance * currentPrice);
@@ -302,26 +302,26 @@ contract WowanderICOPrivateCrowdSale is Haltable{
 			FundTransfer(msg.sender, refund, true);
 			balanceOf[msg.sender] += (msg.value - refund);
 		}
-		else 
+		else
 		{
 			balanceOf[msg.sender] += msg.value;
 		}
-		
+
 		tokenReward.transfer(msg.sender, amountSendTokens);
 		FundTransfer(msg.sender, amountSendTokens, true);
-		
+
 		tokensContractBalance -= amountSendTokens;
 
     }
 
     function joinWhiteList (address _address) public onlyOwner
     {
-        if (_address != address(0)) 
+        if (_address != address(0))
         {
             whiteList[_address] = true;
         }
     }
-	
+
     function finalizeSale () public onlyOwner
     {
        require (crowdsaleClosed == false);
@@ -348,21 +348,56 @@ contract WowanderICOPrivateCrowdSale is Haltable{
             discountPrice = _discountPrice;
         }
     }
-	
+
     function fundWithdrawal (uint _amount) public onlyOwner
     {
         beneficiary.transfer(_amount);
     }
-   
+
     function tokenWithdrawal (uint _amount) public onlyOwner
     {
         tokenReward.transfer(beneficiary, _amount);
     }
-	
-    function changeBeneficiary(address _newBeneficiary) public onlyOwner 
+
+    function changeBeneficiary(address _newBeneficiary) public onlyOwner
 	{
         if (_newBeneficiary != address(0)) {
             beneficiary = _newBeneficiary;
         }
-	}	
+	}
+}
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
 }

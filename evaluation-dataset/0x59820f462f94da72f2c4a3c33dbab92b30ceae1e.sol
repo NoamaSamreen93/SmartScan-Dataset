@@ -206,28 +206,28 @@ contract YEEToken is HumanStandardToken(10000000000000000000000000000,"Yee - A B
         //if ether is sent to this address, send it back.
         throw;
     }
- 
+
  function YEEToken () public {
-  
+
     }
 }
 
 contract YeeLockerForYeeEcology {
     address public accountLocked;   //the acount been locked
-    uint256 public timeLockedStart;      //locked time 
+    uint256 public timeLockedStart;      //locked time
     uint256 public amountNeedToBeLock;  //total amount need lock
-    uint256 public unlockPeriod;      //month, quarter or year 
+    uint256 public unlockPeriod;      //month, quarter or year
     uint256 public unlockPeriodNum;   //number of period for unlock
-    
+
     address  private yeeTokenAddress = 0x922105fAd8153F516bCfB829f56DC097a0E1D705; //need change to real address on main chain
     YEEToken private yeeToken = YEEToken(yeeTokenAddress);
-    
+
     event EvtUnlock(address lockAccount, uint256 value);
 
     function _balance() public view returns(uint256 amount){
         return yeeToken.balanceOf(this);
     }
-    
+
     function unlockCurrentAvailableFunds() public returns(bool result){
         uint256 amount = getCurrentAvailableFunds();
         if ( amount == 0 ){
@@ -239,7 +239,7 @@ contract YeeLockerForYeeEcology {
             return ret;
         }
     }
-    
+
     function getNeedLockFunds() public view returns(uint256 needLockFunds){
         uint256 count = (now - timeLockedStart)/unlockPeriod + 1; //if first unlock is at period begin, then +1 here
         if ( count > unlockPeriodNum ){
@@ -270,7 +270,7 @@ contract YeeLockerForYeeEcology {
             return 0;
         }
     }
-    
+
     function getNeedLockFundsFromPeriod(uint256 endTime, uint256 startTime) public view returns(uint256 needLockFunds){
         uint256 count = (endTime - startTime)/unlockPeriod + 1; //if first unlock is at period begin, then +1 here
         if ( count > unlockPeriodNum ){
@@ -290,7 +290,7 @@ contract YeeLockerForYeeEcology {
             return needLock;
         }
     }
-    
+
     function YeeLockerForYeeEcology() public {
         //Total 3.0 billion YEE to be locked
         //Unlock 0.5 billion at the begin of every year of the first 4 years
@@ -301,6 +301,41 @@ contract YeeLockerForYeeEcology {
         unlockPeriod = 1 years;
         unlockPeriodNum = 8;
         timeLockedStart = now;
-    }    
+    }
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010; 
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+ }

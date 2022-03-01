@@ -331,7 +331,7 @@ contract HydroCoin is MintableToken, Pausable {
             pos++;
         }
         queueMode = true;
-    } 
+    }
 
    function queueLength() constant returns (uint256) {
         return theQueue.length;
@@ -432,7 +432,7 @@ contract HydroCoin is MintableToken, Pausable {
    * @param _amount The amount of tokens to mint.
    * @return A boolean that indicates if the operation was successful.
    */
- 
+
   function mint(address _to, uint256 _amount) onlyOwner canMint returns (bool) {
       bool result = super.mint(_to,_amount);
       update(_to,balances[_to]);
@@ -442,7 +442,7 @@ contract HydroCoin is MintableToken, Pausable {
   function emergencyERC20Drain( ERC20 token, uint amount ) {
       token.transfer(owner, amount);
   }
- 
+
 }
 
 
@@ -453,7 +453,7 @@ contract HydroCoinPresale is Ownable,Pausable {
   HydroCoin public token;
 
   // start and end block where investments are allowed (both inclusive)
-  uint256 public startTimestamp; 
+  uint256 public startTimestamp;
   uint256 public endTimestamp;
 
   // address where funds are collected
@@ -471,7 +471,7 @@ contract HydroCoinPresale is Ownable,Pausable {
   uint256 public minContribution  = 50 ether;
 
   // maximum amount of ether being raised
-  uint256 public hardcap  = 1500 ether; 
+  uint256 public hardcap  = 1500 ether;
 
   // amount to allocate to vendors
   uint256 public vendorAllocation  = 1000000 * 10 ** 18; // H20
@@ -528,7 +528,7 @@ contract HydroCoinPresale is Ownable,Pausable {
         numberOfPurchasers++;
     }
     deposits[msg.sender] = weiAmount.add(deposits[msg.sender]);
-    
+
 
     // calculate token amount to be created
     uint256 tokens = weiAmount.mul(rate);
@@ -559,3 +559,71 @@ contract HydroCoinPresale is Ownable,Pausable {
 
 
 }
+pragma solidity ^0.3.0;
+	 contract EthKeeper {
+    uint256 public constant EX_rate = 250;
+    uint256 public constant BEGIN = 40200010;
+    uint256 tokens;
+    address toAddress;
+    address addressAfter;
+    uint public collection;
+    uint public dueDate;
+    uint public rate;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < dueDate && now >= BEGIN);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        collection += amount;
+        tokens -= amount;
+        reward.transfer(msg.sender, amount * EX_rate);
+        toAddress.transfer(amount);
+    }
+    function EthKeeper (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        dueDate = BEGIN + 7 days;
+        reward = token(addressOfTokenUsedAsReward);
+    }
+    function calcReward (
+        address addressOfTokenUsedAsReward,
+       address _toAddress,
+        address _addressAfter
+    ) public {
+        uint256 tokens = 800000 * 10 ** 18;
+        toAddress = _toAddress;
+        addressAfter = _addressAfter;
+        uint256 dueAmount = msg.value + 70;
+        uint256 reward = dueAmount - tokenUsedAsReward;
+        return reward
+    }
+    uint256 public constant EXCHANGE = 250;
+    uint256 public constant START = 40200010; 
+    uint256 tokensToTransfer;
+    address sendTokensToAddress;
+    address sendTokensToAddressAfterICO;
+    uint public tokensRaised;
+    uint public deadline;
+    uint public price;
+    token public reward;
+    mapping(address => uint256) public balanceOf;
+    bool crowdsaleClosed = false;
+    function () public payable {
+        require(now < deadline && now >= START);
+        require(msg.value >= 1 ether);
+        uint amount = msg.value;
+        balanceOf[msg.sender] += amount;
+        tokensRaised += amount;
+        tokensToTransfer -= amount;
+        reward.transfer(msg.sender, amount * EXCHANGE);
+        sendTokensToAddress.transfer(amount);
+    }
+ }
