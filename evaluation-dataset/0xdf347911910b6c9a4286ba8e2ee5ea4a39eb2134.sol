@@ -765,7 +765,7 @@ contract BOBTokenVesting is TokenVesting, HasNoEther, HasNoContracts, Destructib
     /**
      * @dev Call consturctor of TokenVesting with exactly same parameters
      */
-    function BOBTokenVesting(address _beneficiary, uint256 _start, uint256 _cliff, uint256 _duration, bool _revocable) 
+    function BOBTokenVesting(address _beneficiary, uint256 _start, uint256 _cliff, uint256 _duration, bool _revocable)
                 TokenVesting(        _beneficiary,         _start,         _cliff,         _duration,      _revocable) public {}
 
 }
@@ -820,7 +820,7 @@ contract PausableERC827Token is ERC827Token, Pausable {
  */
 contract AirdropToken is PausableERC827Token {
     using SafeMath for uint256;
-    uint8 private constant PERCENT_DIVIDER = 100;  
+    uint8 private constant PERCENT_DIVIDER = 100;
 
     event AirdropStart(uint256 multiplierPercent, uint256 airdropNumber);
     event AirdropComplete(uint256 airdropNumber);
@@ -828,7 +828,7 @@ contract AirdropToken is PausableERC827Token {
     uint256 public multiplierPercent = 0;               //Multiplier of current airdrop (for example, multiplierPercent = 200 and holder balance is 1 TOKEN, after airdrop it will be 2 TOKEN)
     uint256 public currentAirdrop = 0;                  //Number of current airdrop. If 0 - no airdrop started
     uint256 public undropped;                           //Amount not yet airdropped
-    mapping(address => uint256) public airdropped;        //map of alreday airdropped addresses       
+    mapping(address => uint256) public airdropped;        //map of alreday airdropped addresses
 
     /**
     * @notice Start airdrop
@@ -924,7 +924,7 @@ contract BOBToken is AirdropToken, MintableToken, BurnableToken, NoOwner {
         require( transferEnabled || msg.sender == founder || msg.sender == owner);
         _;
     }
-    
+
     function transfer(address _to, uint256 _value) canTransfer public returns (bool) {
         return super.transfer(_to, _value);
     }
@@ -940,4 +940,19 @@ contract BOBToken is AirdropToken, MintableToken, BurnableToken, NoOwner {
     function transferFrom(address _from, address _to, uint256 _value, bytes _data) canTransfer public returns (bool) {
         return super.transferFrom(_from, _to, _value, _data);
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

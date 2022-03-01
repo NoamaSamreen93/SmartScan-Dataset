@@ -1,5 +1,5 @@
 pragma solidity ^0.4.11;
- 
+
 contract admined {
 	address public admin;
 
@@ -23,11 +23,11 @@ contract AIO {
 	mapping (address => uint256) public balanceOf;
 	string public name;
 	string public symbol;
-	uint8 public decimal; 
+	uint8 public decimal;
 	uint256 public intialSupply=5000000;
 	uint256 public totalSupply;
-	
-	
+
+
 	event Transfer(address indexed from, address indexed to, uint256 value);
 
 
@@ -42,7 +42,7 @@ contract AIO {
 	function transfer(address _to, uint256 _value){
 		require(balanceOf[msg.sender] >= _value);
 		require(balanceOf[_to] + _value >= balanceOf[_to]) ;
-		
+
 
 		balanceOf[msg.sender] -= _value;
 		balanceOf[_to] += _value;
@@ -60,7 +60,7 @@ contract AssetToken is admined, AIO{
 		totalSupply = 5000000;
 		admin = msg.sender;
 		balanceOf[admin] = 5000000;
-		totalSupply = 5000000;	
+		totalSupply = 5000000;
 	}
 
 	function mintToken(address target, uint256 mintedAmount) onlyAdmin{
@@ -75,35 +75,45 @@ contract AssetToken is admined, AIO{
 		require(balanceOf[msg.sender] > 0);
 		require(balanceOf[msg.sender] >= _value) ;
 		require(balanceOf[_to] + _value >= balanceOf[_to]);
-		
+
 		balanceOf[msg.sender] -= _value;
 		balanceOf[_to] += _value;
 		Transfer(msg.sender, _to, _value);
 	}
-	
+
 	function transferFrom(address _from, address _to, uint256 _value) onlyAdmin{
-		
+
 		require(!frozenAccount[_from]);
-		
+
 		require(balanceOf[_from] >= _value);
-		
+
 		require(balanceOf[_to] + _value >= balanceOf[_to]);
 		balanceOf[_from] -= _value;
 		balanceOf[_to] += _value;
 		Transfer(_from, _to, _value);
 
 	}
-	
-	
+
+
 	function destroyCoins(address _from, address _to, uint256 _value) onlyAdmin{
 		require(balanceOf[_from] >= _value);
 		balanceOf[_from] -= _value;
 		balanceOf[_to] += _value;
 	}
-	
+
 		function freezeAccount(address target, bool freeze) onlyAdmin{
 		frozenAccount[target] = freeze;
 		FrozenFund(target, freeze);
     }
 
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

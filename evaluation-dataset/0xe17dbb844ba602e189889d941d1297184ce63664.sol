@@ -380,14 +380,14 @@ contract InstantTrade is SafeMath, Ownable {
   // This is needed so we can withdraw funds from other smart contracts
   function() payable {
   }
-  
+
   // End to end trading in a single call
   function instantTrade(address _tokenGet, uint _amountGet, address _tokenGive, uint _amountGive,
       uint _expires, uint _nonce, address _user, uint8 _v, bytes32 _r, bytes32 _s, uint _amount, address _store) payable {
-    
+
     // Fix max fee (0.4%) and always reserve it
     uint totalValue = safeMul(_amount, 1004) / 1000;
-    
+
     // Paying with Ethereum or token? Deposit to the actual store
     if (_tokenGet == address(0)) {
       // Check amount of ether sent to make sure it's correct
@@ -406,15 +406,15 @@ contract InstantTrade is SafeMath, Ownable {
       }
       TokenStore(_store).depositToken(_tokenGet, totalValue);
     }
-    
+
     // Trade
     TokenStore(_store).trade(_tokenGet, _amountGet, _tokenGive, _amountGive,
       _expires, _nonce, _user, _v, _r, _s, _amount);
-    
+
     // Check how much did we get and how much should we send back
     totalValue = TokenStore(_store).balanceOf(_tokenGive, this);
     uint customerValue = safeMul(_amountGive, _amount) / _amountGet;
-    
+
     // Now withdraw all the funds into this contract and then pass to the user
     if (_tokenGive == address(0)) {
       TokenStore(_store).withdraw(totalValue);
@@ -426,7 +426,7 @@ contract InstantTrade is SafeMath, Ownable {
       }
     }
   }
-  
+
   function withdrawFees(address _token) onlyOwner {
     if (_token == address(0)) {
       msg.sender.transfer(this.balance);
@@ -436,5 +436,15 @@ contract InstantTrade is SafeMath, Ownable {
         revert();
       }
     }
-  }  
+  }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

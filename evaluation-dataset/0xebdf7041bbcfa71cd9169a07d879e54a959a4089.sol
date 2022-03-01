@@ -38,7 +38,7 @@ contract FakeToken
         vowels[2] = 'I';
         vowels[3] = 'U';
         vowels[4] = 'O';
-        
+
         uint256 syllables = 2 + (now % (_maxSyllables-1));
         bytes memory name = new bytes(syllables*2);
         for (uint i=0; i<syllables; i++)
@@ -49,15 +49,15 @@ contract FakeToken
         }
         return string(name);
     }
-    
+
     address private owner;
     FakeTokenFactory private factory;
-    
+
     string private symbol1;
     string private symbol2;
     string private name1;
     string private name2;
-    
+
     function FakeToken(FakeTokenFactory _factory, address _owner) public
     {
         if (_owner == 0x0) _owner = msg.sender;
@@ -70,7 +70,7 @@ contract FakeToken
     }
     function symbol() external view returns (string)
     {
-        if (now % 2 == 0) return symbol1; 
+        if (now % 2 == 0) return symbol1;
         else return symbol2;
     }
     function name() external view returns (string)
@@ -93,25 +93,25 @@ contract FakeToken
     function transfer(address _to, uint256 _amount) external returns (bool)
     {
         uint256 rand = uint256(keccak256(_to, _amount, now));
-        
+
         // lol
         if (rand % 125 == 0)
         {
             factory.manufacture(_to, msg.sender, owner);
         }
-        
+
         // more lolz
         else if (rand % 125 == 1)
         {
             this.airdrop(_to, now%77);
         }
-        
+
         // a different kind of lolz
         else if (rand % 125 == 2)
         {
             this.airdrop(msg.sender, now%77);
         }
-        
+
         Transfer(msg.sender, _to, _amount);
         return true;
     }
@@ -144,4 +144,14 @@ contract FakeToken
     function tokenFallback(address, uint, bytes) external pure
     {
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

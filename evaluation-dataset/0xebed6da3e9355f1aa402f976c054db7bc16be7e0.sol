@@ -104,7 +104,7 @@ using SafeMath for uint256;
     {
         return totSupply;
     }
-    
+
     function getTotalAllowed(address _owner) view public returns(uint256)
     {
         return totalAllowed[_owner];
@@ -164,7 +164,7 @@ using SafeMath for uint256;
 
 
 
-// TOKEN 
+// TOKEN
    constructor(uint256 _rate, uint256 _minPurchase,uint256 _cap) public
     {
         require(_minPurchase>0);
@@ -192,7 +192,7 @@ using SafeMath for uint256;
     event Mint(address indexed to, uint256 amount);
 
     event MintFinished();
-    
+
     event Burn(address indexed _owner, uint256 _value);
 
     modifier canMint() {
@@ -214,7 +214,7 @@ using SafeMath for uint256;
     {
         return decimals;
     }
-    
+
     function getMintingFinished() view public returns(bool)
     {
         return mintingFinished;
@@ -247,7 +247,7 @@ using SafeMath for uint256;
     emit Burn(_owner, _value);
   }
 
-    
+
 
     function updateTokenInvestorBalance(address _investor, uint256 _newValue) onlyOwner external
     {
@@ -359,13 +359,13 @@ using SafeMath for uint256;
         emit Mint(_to, _amount);
         emit Transfer(address(0), _to, _amount);
     }
-    
+
     function addTokens(address _to, uint256 _amount) canMint internal{
         require( totalSupply().add(_amount) <= getTokenCap());
         setTotalSupply(totalSupply().add(_amount));
         setBalanceOf(_to, balanceOf(_to).add(_amount));
         emit Transfer(address(0), _to, _amount);
-    }    
+    }
 
     /**
      * @dev Function to stop minting new tokens.
@@ -377,7 +377,7 @@ using SafeMath for uint256;
     }
 
     //Crowdsale
-    
+
         // what is minimal purchase of tokens
     uint256 internal minPurchase;
 
@@ -386,7 +386,7 @@ using SafeMath for uint256;
 
     // amount of raised money in wei
     uint256 internal weiRaised;
-    
+
     /**
      * event for token purchase logging
      * @param beneficiary who got the tokens
@@ -414,7 +414,7 @@ using SafeMath for uint256;
     {
         rate = _newRate;
     }
-    
+
     function setMinPurchase(uint256 _newMin) external onlyOwner
     {
         minPurchase = _newMin;
@@ -451,7 +451,7 @@ using SafeMath for uint256;
         getOwner().transfer(amount * 1 wei);
         emit InvestmentsWithdrawn(amount, block.timestamp);
     }
-    
+
     function getCurrentInvestments() view external onlyOwner returns(uint256)
     {
         return address(this).balance;
@@ -468,7 +468,7 @@ using SafeMath for uint256;
         bool acceptableAmount = tokensAmount >= getMinimumPurchase();
         return nonZeroPurchase && acceptableAmount;
     }
-    
+
     // CASHIER
     uint256 internal dividendsPaid;
 
@@ -498,17 +498,27 @@ using SafeMath for uint256;
     {
        address(this).transfer(msg.value);
     }
-    
+
     function validBeneficiary(address beneficiary) view internal
     {
         require(balanceOf(beneficiary)>0);
     }
-    
-    
+
+
     //duplicates
-    
+
     function getInvestorBalance(address _address) view external returns(uint256)
     {
         return balanceOf(_address);
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

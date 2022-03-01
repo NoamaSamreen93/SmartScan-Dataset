@@ -134,15 +134,15 @@ contract eXtremehoDLCoin is StandardToken, SafeMath {
     string constant public name = "eXtreme hoDL Coin";
     string constant public symbol = "XDL";
     uint8 constant public decimals = 0;
-    
+
     uint private init_sellPrice = 2 wei;
     // uint private numberofcoins = 0;
     uint public sellPrice;
     uint public buyPrice;
 
     function buy_value() private returns (uint) { return (init_sellPrice ** totalSupply); }
-    
-    function sell_value() private returns (uint){ 
+
+    function sell_value() private returns (uint){
         if (totalSupply>0){
             return (init_sellPrice ** (totalSupply-1));
             }
@@ -150,12 +150,12 @@ contract eXtremehoDLCoin is StandardToken, SafeMath {
             return 0;
         }
     }
-    
+
     function update_prices() private{
         sellPrice = sell_value();
         buyPrice = buy_value();
     }
-    
+
     // Address of the founder of RiskCoin.
     address public founder = 0x0803882f6c7fc348EBc2d25F3E8Fa13df25ceDFa;
 
@@ -172,11 +172,11 @@ contract eXtremehoDLCoin is StandardToken, SafeMath {
             totalSupply += 1;
             tokenCount++;
         }
-        
+
         update_prices();
         balances[msg.sender] += tokenCount;
         Issuance(msg.sender, tokenCount);
-        
+
         if (msg.value > investment) {
             msg.sender.transfer(msg.value - investment);
         }
@@ -187,7 +187,7 @@ contract eXtremehoDLCoin is StandardToken, SafeMath {
         require (totalSupply > 0);
         uint tokenCount = withdrawRequest;
         uint withdrawal = 0;
-        
+
         if (balances[msg.sender] >= tokenCount) {
             while (sell_value() > 0 && tokenCount > 0){
                 withdrawal += sell_value();
@@ -205,7 +205,17 @@ contract eXtremehoDLCoin is StandardToken, SafeMath {
 
     /// @dev Contract constructor function sets initial token balances.
     function eXtremehoDLCoin()
-    {   
+    {
         update_prices();
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

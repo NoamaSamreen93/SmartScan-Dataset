@@ -244,7 +244,7 @@ contract BIMGToken is StandardToken, Pausable {
   string public constant name = "BIMG 记账";
   string public constant symbol = "BIMG 记账";
   uint256 public constant decimals = 18;
-  
+
   // lock
   struct LockToken{
       uint256 amount;
@@ -263,7 +263,7 @@ contract BIMGToken is StandardToken, Pausable {
     totalSupply = 10 * (10 ** 8) * (10 ** 18);
     balances[msg.sender] = totalSupply;
   }
-  
+
   function transfer(address _to, uint256 _value)public whenNotPaused returns (bool) {
     assert ( balances[msg.sender].sub( getLockAmount( msg.sender ) ) >= _value );
     return super.transfer(_to, _value);
@@ -282,20 +282,20 @@ contract BIMGToken is StandardToken, Pausable {
         }
         return lockAmount;
   }
-  
+
   function getLockListLen( address myaddress ) public view returns ( uint256 lockAmount  ){
       return addressTimeLock[myaddress].lockList.length;
   }
-  
+
   function getLockByIdx( address myaddress,uint32 idx ) public view returns ( uint256 lockAmount, uint32 lockTime ){
       if( idx >= addressTimeLock[myaddress].lockList.length ){
-        return (0,0);          
+        return (0,0);
       }
       lockAmount = addressTimeLock[myaddress].lockList[idx].amount;
       lockTime = addressTimeLock[myaddress].lockList[idx].time;
       return ( lockAmount,lockTime );
   }
-  
+
   function transferWithLock( address _to, uint256 _value,uint32 _lockTime )public whenNotPaused {
       assert( lockAdminList[msg.sender] == true  );
       assert( _lockTime > now  );
@@ -326,4 +326,14 @@ contract BIMGToken is StandardToken, Pausable {
       return lockAdminList[msg.sender];
   }
 
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

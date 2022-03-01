@@ -43,11 +43,11 @@ contract ETHToken is ERC20Interface {
         fundingStart = 1511654250;
         fundingEnd = 1511663901;
     }
-    
+
     function getAmountofTotalParticipants() constant returns (uint){
         return totalParticipants;
     }
-    
+
     function getAmountSoldAfterPowerDay() constant external returns(uint256){
         return soldAfterPowerHour;
     }
@@ -59,9 +59,9 @@ contract ETHToken is ERC20Interface {
         if (senderBalance >= _value && _value > 0) {
             senderBalance -= _value;
             balances[msg.sender] = senderBalance;
-            
+
             balances[_to] += _value;
-            
+
             lastTransferred[msg.sender]=block.timestamp;
             Transfer(msg.sender, _to, _value);
             return true;
@@ -103,18 +103,18 @@ function migrate(uint256 _value) external {
 
     function setMigrationAgent(address _agent) external {
         if(funding) throw;
-        
+
         if(migrationAgent != 0) throw;
-        
+
         if(msg.sender != master) throw;
-        
+
         migrationAgent = 0x52918621C4bFcdb65Bb683ba5bDC03e398451Afd;
     }
-    
+
     function getExchangeRate() constant returns(uint){
-            return 30000; // 30000 
+            return 30000; // 30000
     }
-    
+
     function ICOopen() constant returns(bool){
         if(!funding) return false;
         else if(block.timestamp < fundingStart) return false;
@@ -131,7 +131,7 @@ function migrate(uint256 _value) external {
         if((msg.value  * getExchangeRate()) > (tokenCreationCap - totalTokens)) throw;
         var numTokens = msg.value * getExchangeRate();
         totalTokens += numTokens;
-        
+
         if(getExchangeRate()!=30000){
             soldAfterPowerHour += numTokens;
         }
@@ -167,7 +167,7 @@ function migrate(uint256 _value) external {
         Refund(msg.sender, ethValue);
         if (!msg.sender.send(ethValue)) throw;
     }
-  
+
      function transferFrom(address _from,address _to,uint256 _amount) returns (bool success) {
          if(funding) throw;
          if (balances[_from] >= _amount
@@ -183,15 +183,25 @@ function migrate(uint256 _value) external {
              return false;
          }
      }
-  
+
      function approve(address _spender, uint256 _amount) returns (bool success) {
          if(funding) throw;
          allowed[msg.sender][_spender] = _amount;
          Approval(msg.sender, _spender, _amount);
          return true;
      }
-  
+
      function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
          return allowed[_owner][_spender];
      }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

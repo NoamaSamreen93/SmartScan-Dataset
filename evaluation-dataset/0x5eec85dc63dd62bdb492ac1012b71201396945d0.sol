@@ -419,7 +419,6 @@ contract CrowdsaleToken is ReleasableToken, MintableToken {
 	super.addLockAddressInternal(addr, lock_time);
   }
 
-}
 function() payable external {
 	revert();
 }

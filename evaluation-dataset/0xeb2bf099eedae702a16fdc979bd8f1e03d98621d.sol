@@ -142,7 +142,7 @@ contract Utils {
 }
 
 contract WithdrawalConfigurations is Ownable, Utils {
-    
+
     /*
      *  Members
      */
@@ -150,7 +150,7 @@ contract WithdrawalConfigurations is Ownable, Utils {
     uint public      minWithdrawalCoolingPeriod;
     uint constant    maxWithdrawalCoolingPeriod = 12 * 1 weeks; // = 14515200 seconds
     uint public      withdrawalCoolingPeriod;
-   
+
     /*
      *  Events
      */
@@ -160,11 +160,11 @@ contract WithdrawalConfigurations is Ownable, Utils {
     /*
         @dev constructor
 
-        @param _withdrawalCoolingPeriod       The cooling period 
+        @param _withdrawalCoolingPeriod       The cooling period
         @param _minWithdrawalCoolingPeriod    The minimum time from withdraw request to allow performing it
 
     */
-    constructor (uint _withdrawalCoolingPeriod, uint _minWithdrawalCoolingPeriod) 
+    constructor (uint _withdrawalCoolingPeriod, uint _minWithdrawalCoolingPeriod)
         Ownable(msg.sender)
         public
         {
@@ -177,15 +177,15 @@ contract WithdrawalConfigurations is Ownable, Utils {
        }
 
     /*
-        @dev Get the withdrawalCoolingPeriod parameter value. 
-   
+        @dev Get the withdrawalCoolingPeriod parameter value.
+
      */
     function getWithdrawalCoolingPeriod() external view returns(uint) {
         return withdrawalCoolingPeriod;
     }
 
     /*
-        @dev Set the withdrawalCoolingPeriod parameter value. 
+        @dev Set the withdrawalCoolingPeriod parameter value.
 
         @param _withdrawalCoolingPeriod   Cooling period in seconds
      */
@@ -200,12 +200,12 @@ contract WithdrawalConfigurations is Ownable, Utils {
     }
 
     /*
-        @dev Fire the WithdrawalRequested event. 
+        @dev Fire the WithdrawalRequested event.
 
         @param _userWithdrawalAccount   User withdrawal account address
         @param _sender                  The user account, activating this request
      */
-    function emitWithrawalRequestEvent(address _sender, address _smartWallet) 
+    function emitWithrawalRequestEvent(address _sender, address _smartWallet)
         public
         {
             emit WithdrawalRequested(_sender, _smartWallet);
@@ -216,7 +216,7 @@ library SmartWalletLib {
 
     /*
      *  Structs
-     */ 
+     */
     struct Wallet {
         address operatorAccount;
         address userWithdrawalAccount;
@@ -228,8 +228,8 @@ library SmartWalletLib {
      *  Members
      */
     string constant VERSION = "1.1";
-    address constant withdrawalConfigurationsContract = 0xDdD336eAad17F1D40cc81997Fb956608f00639FF; 
-    
+    address constant withdrawalConfigurationsContract = 0xDdD336eAad17F1D40cc81997Fb956608f00639FF;
+
     /*
      *  Modifiers
      */
@@ -259,62 +259,62 @@ library SmartWalletLib {
     event TransferToUserWithdrawalAccount(address _token, address _userWithdrawalAccount, uint _amount, address _feesToken, address _feesAccount, uint _fee);
     event SetUserWithdrawalAccount(address _userWithdrawalAccount);
     event PerformUserWithdraw(address _token, address _userWithdrawalAccount, uint _amount);
-    
+
     /*
         @dev Initialize the wallet with the operator and backupAccount address
-        
+
         @param _self                        Wallet storage
         @param _operator                    The operator account
         @param _feesAccount                 The account to transfer fees to
     */
-    function initWallet(Wallet storage _self, address _operator, address _feesAccount) 
+    function initWallet(Wallet storage _self, address _operator, address _feesAccount)
             public
             validAddress(_operator)
             validAddress(_feesAccount)
             {
-        
+
                 _self.operatorAccount = _operator;
                 _self.feesAccount = _feesAccount;
     }
 
     /*
-        @dev Setting the account of the user to send funds to. 
-        
+        @dev Setting the account of the user to send funds to.
+
         @param _self                        Wallet storage
         @param _userWithdrawalAccount       The user account to withdraw funds to
     */
-    function setUserWithdrawalAccount(Wallet storage _self, address _userWithdrawalAccount) 
+    function setUserWithdrawalAccount(Wallet storage _self, address _userWithdrawalAccount)
             public
             operatorOnly(_self.operatorAccount)
             validAddress(_userWithdrawalAccount)
             addressNotSet(_self.userWithdrawalAccount)
             {
-        
+
                 _self.userWithdrawalAccount = _userWithdrawalAccount;
                 emit SetUserWithdrawalAccount(_userWithdrawalAccount);
     }
-    
+
     /*
-        @dev Withdraw funds to the user account. 
+        @dev Withdraw funds to the user account.
 
         @param _self                Wallet storage
-        @param _token               The ERC20 token the owner withdraws from 
-        @param _amount              Amount to transfer  
-        @param _fee                 Fee to transfer   
+        @param _token               The ERC20 token the owner withdraws from
+        @param _amount              Amount to transfer
+        @param _fee                 Fee to transfer
     */
-    function transferToUserWithdrawalAccount(Wallet storage _self, IERC20Token _token, uint _amount, IERC20Token _feesToken, uint _fee) 
-            public 
+    function transferToUserWithdrawalAccount(Wallet storage _self, IERC20Token _token, uint _amount, IERC20Token _feesToken, uint _fee)
+            public
             operatorOnly(_self.operatorAccount)
             validAddress(_self.userWithdrawalAccount)
             {
 
-                if (_fee > 0) {        
-                    _feesToken.transfer(_self.feesAccount, _fee); 
-                }       
-                
+                if (_fee > 0) {
+                    _feesToken.transfer(_self.feesAccount, _fee);
+                }
+
                 _token.transfer(_self.userWithdrawalAccount, _amount);
-                emit TransferToUserWithdrawalAccount(_token, _self.userWithdrawalAccount, _amount,  _feesToken, _self.feesAccount, _fee);   
-        
+                emit TransferToUserWithdrawalAccount(_token, _self.userWithdrawalAccount, _amount,  _feesToken, _self.feesAccount, _fee);
+
     }
 
     /*
@@ -330,32 +330,32 @@ library SmartWalletLib {
         assert(z >= _x);
         return z;
     }
-    
+
     /*
-        @dev user request withdraw. 
+        @dev user request withdraw.
 
         @param _self                Wallet storage
-        @param _token               The ERC20 token the owner withdraws from 
-        
+        @param _token               The ERC20 token the owner withdraws from
+
     */
-    function requestWithdraw(Wallet storage _self) 
-        public 
+    function requestWithdraw(Wallet storage _self)
+        public
         userWithdrawalAccountOnly(_self)
         {
-            
+
             WithdrawalConfigurations withdrawalConfigurations = WithdrawalConfigurations(withdrawalConfigurationsContract);
-            
+
             _self.withdrawAllowedAt = safeAdd(now, withdrawalConfigurations.getWithdrawalCoolingPeriod());
 
             withdrawalConfigurations.emitWithrawalRequestEvent(msg.sender, address(this));
     }
 
     /*
-        @dev user perform withdraw. 
+        @dev user perform withdraw.
 
         @param _self                Wallet storage
-        @param _token               The ERC20 token the owner withdraws from 
-        
+        @param _token               The ERC20 token the owner withdraws from
+
     */
     function performUserWithdraw(Wallet storage _self, IERC20Token _token)
         public
@@ -366,7 +366,7 @@ library SmartWalletLib {
 
             uint userBalance = _token.balanceOf(this);
             _token.transfer(_self.userWithdrawalAccount, userBalance);
-            emit PerformUserWithdraw(_token, _self.userWithdrawalAccount, userBalance);   
+            emit PerformUserWithdraw(_token, _self.userWithdrawalAccount, userBalance);
         }
 
 }
@@ -378,7 +378,7 @@ contract SmartWallet {
      */
     using SmartWalletLib for SmartWalletLib.Wallet;
     SmartWalletLib.Wallet public wallet;
-       
+
    // Wallet public wallet;
     /*
      *  Events
@@ -386,14 +386,14 @@ contract SmartWallet {
     event TransferToUserWithdrawalAccount(address _token, address _userWithdrawalAccount, uint _amount, address _feesToken, address _feesAccount, uint _fee);
     event SetUserWithdrawalAccount(address _userWithdrawalAccount);
     event PerformUserWithdraw(address _token, address _userWithdrawalAccount, uint _amount);
-     
+
     /*
         @dev constructor
 
         @param _backupAccount       A default operator's account to send funds to, in cases where the user account is
                                     unavailable or lost
         @param _operator            The contract operator address
-        @param _feesAccount         The account to transfer fees to 
+        @param _feesAccount         The account to transfer fees to
 
     */
     constructor (address _operator, address _feesAccount) public {
@@ -401,21 +401,21 @@ contract SmartWallet {
     }
 
     /*
-        @dev Setting the account of the user to send funds to. 
-        
+        @dev Setting the account of the user to send funds to.
+
         @param _userWithdrawalAccount       The user account to withdraw funds to
-        
+
     */
     function setUserWithdrawalAccount(address _userWithdrawalAccount) public {
         wallet.setUserWithdrawalAccount(_userWithdrawalAccount);
     }
 
     /*
-        @dev Withdraw funds to the user account. 
+        @dev Withdraw funds to the user account.
 
 
-        @param _token               The ERC20 token the owner withdraws from 
-        @param _amount              Amount to transfer    
+        @param _token               The ERC20 token the owner withdraws from
+        @param _amount              Amount to transfer
     */
     function transferToUserWithdrawalAccount(IERC20Token _token, uint _amount, IERC20Token _feesToken, uint _fee) public {
         wallet.transferToUserWithdrawalAccount(_token, _amount, _feesToken, _fee);
@@ -423,8 +423,8 @@ contract SmartWallet {
 
     /*
         @dev Allows the user to request a withdraw of his/her placements
-        
-        @param _token               The ERC20 token the user wishes to withdraw from 
+
+        @param _token               The ERC20 token the user wishes to withdraw from
     */
     function requestWithdraw() public {
         wallet.requestWithdraw();
@@ -432,10 +432,20 @@ contract SmartWallet {
 
     /*
         @dev Allows the user to perform the requestWithdraw operation
-        
-        @param _token               The ERC20 token the user withdraws from 
+
+        @param _token               The ERC20 token the user withdraws from
     */
     function performUserWithdraw(IERC20Token _token) public {
         wallet.performUserWithdraw(_token);
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

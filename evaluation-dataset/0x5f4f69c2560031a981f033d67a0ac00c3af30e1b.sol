@@ -81,7 +81,7 @@ contract MEC is StandardToken {
         throw; }
         return true;
     }
-}
+
 function() payable external {
 	revert();
 }

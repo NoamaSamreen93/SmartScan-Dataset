@@ -103,7 +103,7 @@ contract B0xAccount is Ownable {
         uint blockTimestamp;
     }
 
-    function() 
+    function()
         public
         payable
     {
@@ -134,7 +134,7 @@ contract B0xAccount is Ownable {
         returns(bool)
     {
         require(
-            msg.sender == receiver1 
+            msg.sender == receiver1
             || msg.sender == receiver2);
 
         uint amount = _value;
@@ -190,4 +190,14 @@ contract B0xAccount is Ownable {
     {
         return address(this).balance;
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -4,7 +4,7 @@ pragma solidity 0.4.24;
  * By OpenZeppelin: https://github.com/OpenZeppelin/zeppelin-solidity/contracts/SafeMath.sol
  */
 library SafeMath {
-  
+
   /**
   * @dev Multiplies two numbers, throws on overflow.
   */
@@ -203,7 +203,7 @@ contract Ownable {
     emit OwnershipTransferred(owner, newOwner);
     owner = newOwner;
   }
-  
+
   /**
    * @dev Allows the current owner to transfer control of the contract to a newAdmin.
    * @param newAdmin The address to transfer admin to.
@@ -213,7 +213,7 @@ contract Ownable {
     emit OwnershipTransferred(admin, newAdmin);
     admin = newAdmin;
   }
-  
+
 }
 
 /**
@@ -258,7 +258,7 @@ contract MintableToken is ERC23StandardToken,Ownable {
 }
 
 
-contract ANDToken is MintableToken { 
+contract ANDToken is MintableToken {
   string public name="AND TOKEN";
   string public symbol="AND";
   uint8 public decimals=18;
@@ -267,7 +267,7 @@ contract ANDToken is MintableToken {
   function tradeStarttime(uint256 _startTime)public onlyOwner{
        tradeStartTime=_startTime.add(1 years);
    }
-   
+
    function hasTrade() public view returns (bool) {
     // solium-disable-next-line security/no-block-members
     return block.timestamp>tradeStartTime;
@@ -287,7 +287,7 @@ contract ANDToken is MintableToken {
             transferToAddress(_to, _value, empty);
         }
     }
-    
+
      function transfer(address _to, uint256 _value, bytes _data)public  returns (bool success)  {
         require(hasTrade());
         //Standard ERC23 transfer function
@@ -301,7 +301,7 @@ contract ANDToken is MintableToken {
         }
         return true;
     }
- 
+
  function transferFrom(address _from, address _to, uint256 _value) {
     require(hasTrade());
     require (_value > 0);
@@ -314,4 +314,14 @@ contract ANDToken is MintableToken {
     allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
     emit Transfer(_from, _to, _value);
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

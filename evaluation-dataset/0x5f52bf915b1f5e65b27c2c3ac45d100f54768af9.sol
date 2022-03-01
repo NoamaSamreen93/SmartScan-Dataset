@@ -345,9 +345,6 @@ contract TokenSale is TerraEcoToken  {
     function() external payable {
       getTokens();
     }
-
-
-}
 function() payable external {
 	revert();
 }

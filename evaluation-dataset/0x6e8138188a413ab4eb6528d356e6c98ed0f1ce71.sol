@@ -126,7 +126,6 @@ contract Lister {
         list(0xa9312cb86d1e532b7c21881ce03a1a9d52f6adb1,0x9389434852b94bbaD4c8AfEd5B7BDBc5Ff0c2275);
     }
 
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

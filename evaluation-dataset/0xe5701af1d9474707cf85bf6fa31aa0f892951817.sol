@@ -417,7 +417,7 @@ contract PixelMinting is PixelPainting {
     function setNewPixelPrice(uint _pixelPrice) external onlyAuthority {
         pixelPrice = _pixelPrice;
     }
-    
+
     // buy en empty pixel
     function buyEmptyPixel(uint256 _tokenId) external payable {
         require(msg.value == pixelPrice);
@@ -435,7 +435,7 @@ contract PixelMinting is PixelPainting {
         require(x2 > x && y2 > y);
         require(x2 <= WIDTH && y2 <= HEIGHT);
         require(msg.value == pixelPrice * (x2-x) * (y2-y));
-        
+
         uint256 i;
         uint256 tokenId;
         uint256 j;
@@ -549,7 +549,7 @@ contract PixelAuction is PixelMinting {
             // withdraw their money themselves.
             pendingReturns[auction.highestBidder] += auction.highestBid;
         }
-        
+
         auction.highestBidder = msg.sender;
         auction.highestBid = msg.value;
 
@@ -602,14 +602,14 @@ contract PixelAuction is PixelMinting {
 
         // 3. Interaction
         address owner = pixelIndexToOwner[_tokenId];
-        // transfer money without 
+        // transfer money without
         uint amount = auction.highestBid * 9 / 10;
         pendingReturns[owner] += amount;
         authorityBalance += (auction.highestBid - amount);
         // transfer token
         _transfer(owner, auction.highestBidder, _tokenId);
 
-       
+
     }
 
     // // Events that will be fired on changes.
@@ -689,4 +689,33 @@ contract PixelCore is PixelAuction {
         }
         return true;
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

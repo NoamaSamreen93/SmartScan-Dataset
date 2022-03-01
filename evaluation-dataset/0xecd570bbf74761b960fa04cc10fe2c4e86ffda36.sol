@@ -10,7 +10,7 @@ interface ERC20Token {
     function transferFrom(address _from, address _to, uint _value) public returns (bool);
     function approve(address _spender, uint _value) public returns (bool);
     function balanceOf(address _owner) public view returns (uint);
-    function allowance(address _owner, address _spender) public view returns (uint);    
+    function allowance(address _owner, address _spender) public view returns (uint);
 }
 
 
@@ -53,12 +53,12 @@ contract Ownable {
 
     function Ownable()
         public
-    {        
+    {
         owner = msg.sender;
     }
- 
+
     modifier onlyOwner {
-        assert(msg.sender == owner);    
+        assert(msg.sender == owner);
         _;
     }
 
@@ -67,19 +67,19 @@ contract Ownable {
         onlyOwner
     {
         owner = newOwner;
-    } 
+    }
 }
 
 
 contract Freezable is Ownable {
 
-    mapping (address => bool) public frozenAccount;      
-    
+    mapping (address => bool) public frozenAccount;
+
     modifier onlyUnfrozen(address _target) {
         assert(!isFrozen(_target));
         _;
     }
-    
+
     // @dev Owners funds are frozen on token creation
     function isFrozen(address _target)
         public
@@ -95,12 +95,12 @@ contract Token is ERC20Token, Freezable {
      *  Storage
      */
     mapping (address => uint) balances;
-    mapping (address => mapping (address => uint)) allowances; 
+    mapping (address => mapping (address => uint)) allowances;
     mapping (address => string) public data;
     uint    public totalSupply;
     uint    public timeTransferbleUntil = 1538262000;                        // Transferable until 29/09/2018 23:00 pm UTC
     bool    public stopped = false;
- 
+
     event Burn(address indexed from, uint256 value, string data);
     event LogStop();
 
@@ -117,18 +117,18 @@ contract Token is ERC20Token, Freezable {
     /// @param _value Number of tokens to transfer
     /// @return Returns success of function call
     function transfer(address _to, uint _value)
-        public      
-        onlyUnfrozen(msg.sender)                                           
+        public
+        onlyUnfrozen(msg.sender)
         transferable()
-        returns (bool)        
-    {                         
+        returns (bool)
+    {
         assert(_to != 0x0);                                                // Prevent transfer to 0x0 address. Use burn() instead
         assert(balances[msg.sender] >= _value);                            // Check if the sender has enough
         assert(!isFrozen(_to));                                            // Do not allow transfers to frozen accounts
         balances[msg.sender] = SafeMath.sub(balances[msg.sender], _value); // Subtract from the sender
         balances[_to] = SafeMath.add(balances[_to], _value);               // Add the same to the recipient
         Transfer(msg.sender, _to, _value);                                 // Notify anyone listening that this transfer took place
-        return true;       
+        return true;
     }
 
     /// @dev Allows allowed third party to transfer tokens from one address to another. Returns success
@@ -137,18 +137,18 @@ contract Token is ERC20Token, Freezable {
     /// @param _value Number of tokens to transfer
     /// @return Returns success of function call
     function transferFrom(address _from, address _to, uint _value)
-        public    
+        public
         onlyUnfrozen(_from)                                               // Owners can never transfer funds
-        transferable()                 
+        transferable()
         returns (bool)
-    {        
+    {
         assert(_to != 0x0);                                               // Prevent transfer to 0x0 address. Use burn() instead
         assert(balances[_from] >= _value);                                // Check if the sender has enough
         assert(_value <= allowances[_from][msg.sender]);                  // Check allowance
         assert(!isFrozen(_to));                                           // Do not allow transfers to frozen accounts
         balances[_from] = SafeMath.sub(balances[_from], _value);          // Subtract from the sender
         balances[_to] = SafeMath.add(balances[_to], _value);              // Add the same to the recipient
-        allowances[_from][msg.sender] = SafeMath.sub(allowances[_from][msg.sender], _value); 
+        allowances[_from][msg.sender] = SafeMath.sub(allowances[_from][msg.sender], _value);
         Transfer(_from, _to, _value);
         return true;
     }
@@ -156,7 +156,7 @@ contract Token is ERC20Token, Freezable {
     /// @dev Sets approved amount of tokens for spender. Returns success
     /// @param _spender Address of allowed account
     /// @param _value Number of approved tokens
-    /// @return Returns success of function call    
+    /// @return Returns success of function call
     function approve(address _spender, uint _value)
         public
         returns (bool)
@@ -169,7 +169,7 @@ contract Token is ERC20Token, Freezable {
     /// @dev Returns number of allowed tokens for given address
     /// @param _owner Address of token owner
     /// @param _spender Address of token spender
-    /// @return Returns remaining allowance for spender    
+    /// @return Returns remaining allowance for spender
     function allowance(address _owner, address _spender)
         public
         view
@@ -180,7 +180,7 @@ contract Token is ERC20Token, Freezable {
 
     /// @dev Returns number of tokens owned by given address
     /// @param _owner Address of token owner
-    /// @return Returns balance of owner    
+    /// @return Returns balance of owner
     function balanceOf(address _owner)
         public
         view
@@ -190,11 +190,11 @@ contract Token is ERC20Token, Freezable {
     }
 
     // @title Burns tokens
-    // @dev remove `_value` tokens from the system irreversibly     
-    // @param _value the amount of tokens to burn   
-    function burn(uint256 _value, string _data) 
-        public 
-        returns (bool success) 
+    // @dev remove `_value` tokens from the system irreversibly
+    // @param _value the amount of tokens to burn
+    function burn(uint256 _value, string _data)
+        public
+        returns (bool success)
     {
         assert(_value > 0);                                                // Amount must be greater than zero
         assert(balances[msg.sender] >= _value);                            // Check if the sender has enough
@@ -202,13 +202,13 @@ contract Token is ERC20Token, Freezable {
         balances[msg.sender] = SafeMath.sub(balances[msg.sender], _value); // Subtract from the sender
         data[msg.sender] = _data;                                          // Additional data
         totalSupply = SafeMath.sub(totalSupply, _value);                   // Updates totalSupply
-        assert(previousTotal - _value == totalSupply);                     // End integrity check 
+        assert(previousTotal - _value == totalSupply);                     // End integrity check
         Burn(msg.sender, _value, _data);
         return true;
     }
 
     // Anyone can freeze the token after transfer time has expired
-    function stop() 
+    function stop()
         public
     {
         assert(now > timeTransferbleUntil);
@@ -216,40 +216,40 @@ contract Token is ERC20Token, Freezable {
         LogStop();
     }
 
-    function totalSupply() 
-        constant public 
-        returns (uint) 
+    function totalSupply()
+        constant public
+        returns (uint)
     {
         return totalSupply;
     }
 
-    function getData(address addr) 
-        public 
+    function getData(address addr)
+        public
         view
-        returns (string) 
+        returns (string)
     {
         return data[addr];
-    }    
+    }
 }
 
 
-// Contract Owner 0xb42db275AdCCd23e2cB52CfFc2D4Fe984fbF53B2     
+// Contract Owner 0xb42db275AdCCd23e2cB52CfFc2D4Fe984fbF53B2
 contract STP is Token {
     string  public name = "STASHPAY";
     string  public symbol = "STP";
     uint8   public decimals = 8;
     uint8   public publicKeySize = 65;
     address public sale = 0xB155c16c13FC1eD2F015e24D6C7Ae8Cc38cea74E;
-    address public adviserAndBounty = 0xf40bF198eD3bE9d3E1312d2717b964b377135728;    
+    address public adviserAndBounty = 0xf40bF198eD3bE9d3E1312d2717b964b377135728;
     mapping (address => string) public publicKeys;
-    uint256 constant D160 = 0x0010000000000000000000000000000000000000000;    
+    uint256 constant D160 = 0x0010000000000000000000000000000000000000000;
 
     event RegisterKey(address indexed _from, string _publicKey);
     event ModifyPublicKeySize(uint8 _size);
 
     function STP()
-    public 
-    {             
+    public
+    {
         uint256[29] memory owners = [
             uint256(0xb5e620f480007f0dfc26a56b0f7ccd8100eaf31b75dd40bae01f),
             uint256(0x162b3f376600078c63f73a2f46c19a4cd91e700203bbbe4084093),
@@ -282,7 +282,7 @@ contract STP is Token {
             uint256(0xb5e620f4800025b772bda67719d2ba404c04fa4390443bf993ed)
         ];
 
-        /* 
+        /*
             Token Distrubution
             -------------------
             500M Total supply
@@ -291,64 +291,64 @@ contract STP is Token {
             8% Bounty and advisters
         */
 
-        totalSupply = 500000000 * 10**uint256(decimals); 
-        balances[sale] = 360000000 * 10**uint256(decimals); 
+        totalSupply = 500000000 * 10**uint256(decimals);
+        balances[sale] = 360000000 * 10**uint256(decimals);
         balances[adviserAndBounty] = 40000000 * 10**uint256(decimals);
-            
+
         Transfer(0, sale, balances[sale]);
         Transfer(0, adviserAndBounty, balances[adviserAndBounty]);
-        
-        /* 
-            Founders are provably frozen for duration of contract            
+
+        /*
+            Founders are provably frozen for duration of contract
         */
         uint assignedTokens = balances[sale] + balances[adviserAndBounty];
         for (uint i = 0; i < owners.length; i++) {
             address addr = address(owners[i] & (D160 - 1));                    // get address
             uint256 amount = owners[i] / D160;                                 // get amount
-            balances[addr] = SafeMath.add(balances[addr], amount);             // update balance            
+            balances[addr] = SafeMath.add(balances[addr], amount);             // update balance
             assignedTokens = SafeMath.add(assignedTokens, amount);             // keep track of total assigned
             frozenAccount[addr] = true;                                        // Owners funds are provably frozen for duration of contract
             Transfer(0, addr, amount);                                         // transfer the tokens
-        }        
+        }
         /*
-            balance check 
+            balance check
         */
-        require(assignedTokens == totalSupply);             
-    }  
-    
+        require(assignedTokens == totalSupply);
+    }
+
     function registerKey(string publicKey)
     public
     transferable
-    { 
+    {
         assert(balances[msg.sender] > 0);
         assert(bytes(publicKey).length <= publicKeySize);
-              
-        publicKeys[msg.sender] = publicKey; 
-        RegisterKey(msg.sender, publicKey);    
-    }           
-  
+
+        publicKeys[msg.sender] = publicKey;
+        RegisterKey(msg.sender, publicKey);
+    }
+
     function modifyPublicKeySize(uint8 _publicKeySize)
     public
     onlyOwner
-    { 
+    {
         publicKeySize = _publicKeySize;
     }
 
-    function multiDistribute(uint256[] data) 
+    function multiDistribute(uint256[] data)
     public
     onlyUnfrozen(sale)
-    onlyOwner 
+    onlyOwner
     {
       for (uint256 i = 0; i < data.length; i++) {
         address addr = address(data[i] & (D160 - 1));
         uint256 amount = data[i] / D160;
-        balances[sale] -= amount;                        
-        balances[addr] += amount;                                       
-        Transfer(sale, addr, amount);    
+        balances[sale] -= amount;
+        balances[addr] += amount;
+        Transfer(sale, addr, amount);
       }
     }
 
-    function multiDistributeAdviserBounty(uint256[] data, bool freeze) 
+    function multiDistributeAdviserBounty(uint256[] data, bool freeze)
     public
     onlyOwner
     {
@@ -358,17 +358,17 @@ contract STP is Token {
             distributeAdviserBounty(addr, amount, freeze);
         }
     }
-   
+
     function distributeAdviserBounty(address addr, uint256 amount, bool freeze)
-    public        
-    onlyOwner 
-    {   
-        // can only freeze when no balance exists        
+    public
+    onlyOwner
+    {
+        // can only freeze when no balance exists
         frozenAccount[addr] = freeze && balances[addr] == 0;
 
         balances[addr] = SafeMath.add(balances[addr], amount);
         balances[adviserAndBounty] = SafeMath.sub(balances[adviserAndBounty], amount);
-        Transfer(adviserAndBounty, addr, amount);           
+        Transfer(adviserAndBounty, addr, amount);
     }
 
     /// @dev when token distrubution is complete freeze any remaining tokens
@@ -380,16 +380,26 @@ contract STP is Token {
     }
 
     function setName(string _name)
-    public 
-    onlyOwner 
+    public
+    onlyOwner
     {
         name = _name;
     }
 
     function setSymbol(string _symbol)
-    public 
-    onlyOwner 
+    public
+    onlyOwner
     {
         symbol = _symbol;
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

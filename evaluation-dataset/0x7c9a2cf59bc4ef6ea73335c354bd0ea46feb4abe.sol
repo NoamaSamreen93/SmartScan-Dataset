@@ -139,6 +139,7 @@ contract PreICO is Ownable {
         SalePreICO(msg.sender, msg.value);
         require(soldTokens<=hardCap1Stage);
         investedEther[msg.sender] = investedEther[msg.sender].add(msg.value);
+		revert();
     }
 
     // release of tokens during the pre-sale period
@@ -157,10 +158,4 @@ contract PreICO is Ownable {
     function transferEthFromContract(address _to, uint256 amount) public onlyOwner {
         _to.transfer(amount);
     }
-
-
-}
-function() payable external {
-	revert();
-}
 }

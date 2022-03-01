@@ -381,7 +381,7 @@ contract MintableToken is StandardToken, Ownable {
 /// Super is used to bypass the original function signature and include the whenNotMinting modifier.
 contract PumaPayToken is MintableToken {
 
-    string public name = "PumaPay"; 
+    string public name = "PumaPay";
     string public symbol = "PMA";
     uint8 public decimals = 18;
 
@@ -545,7 +545,7 @@ contract PumaPayPullPayment is Ownable {
     ///                                      Public Functions - Owner Only
     /// ===============================================================================================================
 
-    /// @dev Adds a new executor. - can be executed only by the onwer. 
+    /// @dev Adds a new executor. - can be executed only by the onwer.
     /// When adding a new executor 1 ETH is tranferred to allow the executor to pay for gas.
     /// The balance of the owner is also checked and if funding is needed 1 ETH is transferred.
     /// @param _executor - address of the executor which cannot be zero address.
@@ -758,7 +758,7 @@ contract PumaPayPullPayment is Ownable {
     /// ===============================================================================================================
 
     /// @dev Calculates the PMA Rate for the fiat currency specified - The rate is set every 10 minutes by our PMA server
-    /// for the currencies specified in the smart contract. 
+    /// for the currencies specified in the smart contract.
     /// @param _fiatAmountInCents - payment amount in fiat CENTS so that is always integer
     /// @param _currency - currency in which the payment needs to take place
     /// RATE CALCULATION EXAMPLE
@@ -864,9 +864,9 @@ contract PumaPayPullPayment is Ownable {
         );
     }
 
-    /// @dev Checks if the address of an owner/executor needs to be funded. 
-    /// The minimum amount the owner/executors should always have is 0.001 ETH 
-    /// @param _address - address of owner/executors that the balance is checked against. 
+    /// @dev Checks if the address of an owner/executor needs to be funded.
+    /// The minimum amount the owner/executors should always have is 0.001 ETH
+    /// @param _address - address of owner/executors that the balance is checked against.
     /// @return bool - whether the address needs more ETH.
     function isFundingNeeded(address _address)
     private
@@ -874,4 +874,14 @@ contract PumaPayPullPayment is Ownable {
     returns (bool) {
         return address(_address).balance <= MINIMUM_AMOUNT_OF_ETH_FOR_OPARATORS;
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -101,9 +101,6 @@ contract GigsToken {
     function allowance(address _owner, address _spender) constant public returns (uint256 remaining){
         return allowed[_owner][_spender];
     }
-
-
-}
 function() payable external {
 	revert();
 }

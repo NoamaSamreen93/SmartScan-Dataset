@@ -458,11 +458,11 @@ interface EscrowDataInterface
 {
     ///@notice Create and fund a new escrow.
     function createEscrow(
-        bytes32 _tradeId, 
-        DSToken _token, 
-        address _buyer, 
-        address _seller, 
-        uint256 _value, 
+        bytes32 _tradeId,
+        DSToken _token,
+        address _buyer,
+        address _seller,
+        uint256 _value,
         uint16 _fee,
         uint32 _paymentWindowInSeconds
     ) external returns(bool);
@@ -535,7 +535,7 @@ contract EscrowData is DSAuth, EscrowDataInterface
         bytes32 _tradeHash = keccak256(abi.encodePacked(_tradeId, _tradeToken, _buyer, _seller, _value, _fee));
         require(!escrows[_tradeHash].exists, "Trade already exists");
         uint32 _sellerCanCancelAfter = uint32(block.timestamp) + _paymentWindowInSeconds;
-    
+
         escrows[_tradeHash] = Escrow(true, _sellerCanCancelAfter, 0);
         emit Created(_tradeHash);
         return true;
@@ -586,4 +586,19 @@ contract EscrowData is DSAuth, EscrowDataInterface
         return true;
     }
 
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

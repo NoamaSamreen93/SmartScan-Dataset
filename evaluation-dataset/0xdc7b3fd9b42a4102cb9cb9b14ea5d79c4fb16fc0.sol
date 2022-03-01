@@ -17,7 +17,7 @@ contract StandardToken is ERC20 {
 	uint256 public totalSupply;
 	mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
-    
+
     modifier when_can_transfer(address _from, uint256 _value) {
         if (balances[_from] >= _value) _;
     }
@@ -93,4 +93,19 @@ contract LBToken is StandardToken {
 	{
 		return super.transferFrom(_from, _recipient, _amount);
 	}
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

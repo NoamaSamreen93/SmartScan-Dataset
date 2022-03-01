@@ -172,7 +172,7 @@ contract ItemsBase is Pausable {
         rocCoreAddress = _rocCoreAddress;
         rocCore = RocsCoreRe(rocCoreAddress);
     }
-    function getRocCoreAddress() 
+    function getRocCoreAddress()
         external
         view
         onlyOwner
@@ -189,9 +189,9 @@ contract ItemsBase is Pausable {
     // Huntingのmapping rocHuntingIndex[rocId][tokenId] = Hunting
     mapping(uint => mapping (uint => Hunting)) public rocHuntingIndex;
 
-    /// @notice Huntingを作成して保存する内部メソッド。 
-    /// @param _rocId 
-    /// @param _huntingId 
+    /// @notice Huntingを作成して保存する内部メソッド。
+    /// @param _rocId
+    /// @param _huntingId
     function _createRocHunting(
         uint _rocId,
         uint _huntingId
@@ -219,7 +219,7 @@ contract ItemsOwnership is ItemsBase, ERC721 {
     string public constant name = "CryptoFeatherItems";
     string public constant symbol = "CCHI";
 
-    bytes4 constant InterfaceSignature_ERC165 = 
+    bytes4 constant InterfaceSignature_ERC165 =
     bytes4(keccak256('supportsInterface(bytes4)'));
 
     bytes4 constant InterfaceSignature_ERC721 =
@@ -242,8 +242,8 @@ contract ItemsOwnership is ItemsBase, ERC721 {
     }
 
     /// @dev 特定のアドレスに指定されたitemの現在の所有者であるかどうかをチェックします。
-    /// @param _claimant 
-    /// @param _tokenId 
+    /// @param _claimant
+    /// @param _tokenId
     function _owns(address _claimant, uint256 _tokenId) internal view returns (bool) {
         return itemIndexToOwner[_tokenId] == _claimant;
     }
@@ -313,8 +313,8 @@ contract ItemsOwnership is ItemsBase, ERC721 {
     }
 
     /// @dev この契約に所有権を割り当て、NFTを強制終了します。
-    /// @param _owner 
-    /// @param _tokenId 
+    /// @param _owner
+    /// @param _tokenId
     function _escrow(address _owner, uint256 _tokenId) internal {
         // it will throw if transfer fails
         transferFrom(_owner, this, _tokenId);
@@ -325,12 +325,12 @@ contract ItemsOwnership is ItemsBase, ERC721 {
 /// @title Itemに関する管理を行うコントラクト
 contract ItemsBreeding is ItemsOwnership {
 
-    /// @notice Itemを作成して保存。 
-    /// @param _itemId 
-    /// @param _marketsFlg 
-    /// @param _rocId 
-    /// @param _equipmentFlg 
-    /// @param _owner 
+    /// @notice Itemを作成して保存。
+    /// @param _itemId
+    /// @param _marketsFlg
+    /// @param _rocId
+    /// @param _equipmentFlg
+    /// @param _owner
     function _createItem(
         uint _itemId,
         uint _marketsFlg,
@@ -361,10 +361,10 @@ contract ItemsBreeding is ItemsOwnership {
         return newItemId;
     }
 
-    /// @notice アイテムの装備状態を更新します。 
-    /// @param _reItems 
-    /// @param _inItems 
-    /// @param _rocId 
+    /// @notice アイテムの装備状態を更新します。
+    /// @param _reItems
+    /// @param _inItems
+    /// @param _rocId
     function equipmentItem(
         uint[] _reItems,
         uint[] _inItems,
@@ -418,7 +418,7 @@ contract ItemsBreeding is ItemsOwnership {
     }
 
     /// @notice 消費した事で削除の処理を行います。
-    /// @param _itemId 
+    /// @param _itemId
     function usedItem(
         uint _itemId
     )
@@ -441,9 +441,9 @@ contract ItemsBreeding is ItemsOwnership {
     }
 
     /// @notice Huntingの処理を行います。
-    /// @param _rocId 
-    /// @param _huntingId 
-    /// @param _items 
+    /// @param _rocId
+    /// @param _huntingId
+    /// @param _items
     function processHunting(
         uint _rocId,
         uint _huntingId,
@@ -489,8 +489,8 @@ contract ItemsBreeding is ItemsOwnership {
     }
 
     /// @notice Itemを作成します。イベント用
-    /// @param _items 
-    /// @param _owners 
+    /// @param _items
+    /// @param _owners
     function createItems(
         uint[] _items,
         address[] _owners
@@ -543,8 +543,8 @@ contract ItemsMarkets is ItemsBreeding {
     }
 
     /// @notice Itemマーケットへの出品を作成し、開始します。
-    /// @param _itemId 
-    /// @param _marketsPrice 
+    /// @param _itemId
+    /// @param _marketsPrice
     function createItemSaleMarkets(
         uint256 _itemId,
         uint256 _marketsPrice
@@ -580,7 +580,7 @@ contract ItemsMarkets is ItemsBreeding {
         _itemAddMarkets(itemTokenId, itemMarkets);
     }
 
-    /// @dev マーケットへの出品を公開マーケットへの出品のリストに追加します。 
+    /// @dev マーケットへの出品を公開マーケットへの出品のリストに追加します。
     ///  また、ItemMarketsCreatedイベントを発生させます。
     /// @param _tokenId The ID of the token to be put on markets.
     /// @param _markets Markets to add.
@@ -593,13 +593,13 @@ contract ItemsMarkets is ItemsBreeding {
     }
 
     /// @dev マーケットへの出品を公開マーケットへの出品のリストから削除します。
-    /// @param _tokenId 
+    /// @param _tokenId
     function _itemRemoveMarkets(uint256 _tokenId) internal {
         delete tokenIdToItemMarkets[_tokenId];
     }
 
     /// @dev 無条件にマーケットへの出品を取り消します。
-    /// @param _tokenId 
+    /// @param _tokenId
     function _itemCancelMarkets(uint256 _tokenId) internal {
         _itemRemoveMarkets(_tokenId);
         emit ItemMarketsCancelled(_tokenId);
@@ -608,7 +608,7 @@ contract ItemsMarkets is ItemsBreeding {
     /// @dev まだ獲得されていないマーケットへの出品をキャンセルします。
     ///  元の所有者にNFTを返します。
     /// @notice これは、契約が一時停止している間に呼び出すことができる状態変更関数です。
-    /// @param _itemId 
+    /// @param _itemId
     function itemCancelMarkets(uint _itemId) external {
         uint itemTokenId = getItemIdToTokenId(_itemId);
         ItemMarkets storage markets = tokenIdToItemMarkets[itemTokenId];
@@ -620,9 +620,9 @@ contract ItemsMarkets is ItemsBreeding {
     }
 
     /// @dev 契約が一時停止されたときにマーケットへの出品をキャンセルします。
-    ///  所有者だけがこれを行うことができ、NFTは売り手に返されます。 
+    ///  所有者だけがこれを行うことができ、NFTは売り手に返されます。
     ///  緊急時にのみ使用してください。
-    /// @param _itemId 
+    /// @param _itemId
     function itemCancelMarketsWhenPaused(uint _itemId) whenPaused onlyOwner external {
         uint itemTokenId = getItemIdToTokenId(_itemId);
         ItemMarkets storage markets = tokenIdToItemMarkets[itemTokenId];
@@ -634,7 +634,7 @@ contract ItemsMarkets is ItemsBreeding {
 
     /// @dev マーケットへの出品入札
     ///  十分な量のEtherが供給されればNFTの所有権を移転する。
-    /// @param _itemId 
+    /// @param _itemId
     function itemBid(uint _itemId) external payable whenNotPaused {
         uint itemTokenId = getItemIdToTokenId(_itemId);
         // マーケットへの出品構造体への参照を取得する
@@ -670,7 +670,7 @@ contract ItemsMarkets is ItemsBreeding {
     }
 
     /// @dev 手数料計算
-    /// @param _price 
+    /// @param _price
     function _computeCut(uint128 _price) internal view returns (uint) {
         return _price * ownerCut / 10000;
     }
@@ -699,7 +699,7 @@ contract ItemsCore is ItemsMarkets {
     }
 
     /// @notice tokenIdからItemに関するすべての関連情報を返します。
-    /// @param _tokenId 
+    /// @param _tokenId
     function getItem(uint _tokenId)
         external
         view
@@ -717,7 +717,7 @@ contract ItemsCore is ItemsMarkets {
     }
 
     /// @notice itemIdからItemに関するすべての関連情報を返します。
-    /// @param _itemId 
+    /// @param _itemId
     function getItemItemId(uint _itemId)
         external
         view
@@ -735,7 +735,7 @@ contract ItemsCore is ItemsMarkets {
     }
 
     /// @notice itemIdからMarkets情報を返します。
-    /// @param _itemId 
+    /// @param _itemId
     function getMarketsItemId(uint _itemId)
         external
         view
@@ -750,7 +750,7 @@ contract ItemsCore is ItemsMarkets {
     }
 
     /// @notice itemIdからオーナー情報を返します。
-    /// @param _itemId 
+    /// @param _itemId
     function getItemIndexToOwner(uint _itemId)
         external
         view
@@ -762,8 +762,8 @@ contract ItemsCore is ItemsMarkets {
     }
 
     /// @notice rocIdとhuntingIdからhuntingの存在チェック
-    /// @param _rocId 
-    /// @param _huntingId 
+    /// @param _rocId
+    /// @param _huntingId
     function getHunting(uint _rocId, uint _huntingId)
         public
         view
@@ -775,7 +775,7 @@ contract ItemsCore is ItemsMarkets {
     }
 
     /// @notice _rocIdからオーナー情報を返します。
-    /// @param _rocId 
+    /// @param _rocId
     function getRocOwnerItem(uint _rocId)
         external
         view
@@ -786,4 +786,33 @@ contract ItemsCore is ItemsMarkets {
         owner = rocCore.getRocIndexToOwner(checkTokenId);
     }
 
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

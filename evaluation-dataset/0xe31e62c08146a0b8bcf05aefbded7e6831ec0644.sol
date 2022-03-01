@@ -89,19 +89,19 @@ contract Haltable is Ownable {
     bool public halted;
 
     modifier stopInEmergency {
-        if (halted) 
+        if (halted)
             revert();
         _;
     }
 
     modifier stopNonOwnersInEmergency {
-        if (halted && msg.sender != owner) 
+        if (halted && msg.sender != owner)
             revert();
         _;
     }
 
     modifier onlyInEmergency {
-        if (!halted) 
+        if (!halted)
             revert();
         _;
     }
@@ -139,7 +139,7 @@ contract PricingStrategy {
     }
 
     /**
-    * @dev Pricing tells if this is a presale purchase or not.  
+    * @dev Pricing tells if this is a presale purchase or not.
       @return False by default, true if a presale purchaser
     */
     function isPresalePurchase() public pure returns (bool) {
@@ -189,7 +189,7 @@ contract FinalizeAgent {
 
     /** Called once by crowdsale finalize() if the sale was success. */
     function finalizeCrowdsale() public;
-    
+
     /**
     * Allow to (re)set Token.
     */
@@ -237,7 +237,7 @@ contract Allocatable is Ownable {
   /**
    * Owner can allow a crowdsale contract to allocate new tokens.
    */
-    function setAllocateAgent(address addr, bool state) public onlyOwner  
+    function setAllocateAgent(address addr, bool state) public onlyOwner
     {
         allocateAgents[addr] = state;
         emit AllocateAgentChanged(addr, state);
@@ -259,15 +259,15 @@ contract TokenVesting is Allocatable {
 
     address public crowdSaleTokenAddress;
 
-    /** keep track of total tokens yet to be released, 
-     * this should be less than or equal to UTIX tokens held by this contract. 
+    /** keep track of total tokens yet to be released,
+     * this should be less than or equal to UTIX tokens held by this contract.
      */
     uint256 public totalUnreleasedTokens;
 
     // default vesting parameters
     uint256 private startAt = 0;
     uint256 private cliff = 1;
-    uint256 private duration = 4; 
+    uint256 private duration = 4;
     uint256 private step = 300; //15778463;  //2592000;
     bool private changeFreezed = false;
 
@@ -284,9 +284,9 @@ contract TokenVesting is Allocatable {
     mapping (address => VestingSchedule) public vestingMap;
 
     event VestedTokensReleased(address _adr, uint256 _amount);
-    
+
     constructor(address _tokenAddress) public {
-        
+
         crowdSaleTokenAddress = _tokenAddress;
     }
 
@@ -314,19 +314,19 @@ contract TokenVesting is Allocatable {
 
         startAt = _startAt;
         cliff = _cliff;
-        duration = _duration; 
+        duration = _duration;
         step = _step;
         changeFreezed = _changeFreezed;
 
     }
 
     /** Function to set vesting with default schedule. */
-    function setVestingWithDefaultSchedule(address _adr, uint256 _amount) 
-    public 
+    function setVestingWithDefaultSchedule(address _adr, uint256 _amount)
+    public
     changesToVestingNotFreezed(_adr) onlyAllocateAgent {
-       
+
         setVesting(_adr, startAt, cliff, duration, step, _amount, changeFreezed);
-    }    
+    }
 
     /** Function to set/update vesting schedule. PS - Amount cannot be changed once set */
     function setVesting(
@@ -336,7 +336,7 @@ contract TokenVesting is Allocatable {
         uint256 _duration,
         uint256 _step,
         uint256 _amount,
-        bool _changeFreezed) 
+        bool _changeFreezed)
     public changesToVestingNotFreezed(_adr) onlyAllocateAgent {
 
         VestingSchedule storage vestingSchedule = vestingMap[_adr];
@@ -348,7 +348,7 @@ contract TokenVesting is Allocatable {
         require(_cliff <= _duration);
 
         //if startAt is zero, set current time as start time.
-        if (_startAt == 0) 
+        if (_startAt == 0)
             _startAt = block.timestamp;
 
         vestingSchedule.startAt = _startAt;
@@ -362,7 +362,7 @@ contract TokenVesting is Allocatable {
             ERC20 token = ERC20(crowdSaleTokenAddress);
             require(token.balanceOf(this) >= totalUnreleasedTokens.plus(_amount));
             totalUnreleasedTokens = totalUnreleasedTokens.plus(_amount);
-            vestingSchedule.amount = _amount; 
+            vestingSchedule.amount = _amount;
         }
 
         vestingSchedule.amountReleased = 0;
@@ -386,10 +386,10 @@ contract TokenVesting is Allocatable {
     /** Release tokens as per vesting schedule, called by anyone  */
     function releaseVestedTokens(address _adr) public changesToVestingFreezed(_adr) {
         VestingSchedule storage vestingSchedule = vestingMap[_adr];
-        
+
         // check if all tokens are not vested
         require(vestingSchedule.amount.minus(vestingSchedule.amountReleased) > 0);
-        
+
         // calculate total vested tokens till now
         uint256 totalTime = block.timestamp - vestingSchedule.startAt;
         uint256 totalSteps = totalTime / vestingSchedule.step;
@@ -420,7 +420,7 @@ contract TokenVesting is Allocatable {
     /**
     * Allow to (re)set Token.
     */
-    function setCrowdsaleTokenExtv1(address _token) public onlyAllocateAgent {       
+    function setCrowdsaleTokenExtv1(address _token) public onlyAllocateAgent {
         crowdSaleTokenAddress = _token;
     }
 }
@@ -519,7 +519,7 @@ contract CrowdsaleExt is Allocatable, Haltable {
     /** List of whitelisted addresses */
     address[] public whitelistedParticipants;
 
-    /** This is for manul testing for the interaction from owner wallet. 
+    /** This is for manul testing for the interaction from owner wallet.
     You can set it to any value and inspect this in blockchain explorer to see that crowdsale interaction works. */
     uint public ownerTestValue;
 
@@ -547,9 +547,9 @@ contract CrowdsaleExt is Allocatable, Haltable {
     // Crowdsale end time has been changed
     event EndsAtChanged(uint newEndsAt);
 
-    constructor(string _name, address _token, PricingStrategy _pricingStrategy, 
-    address _multisigWallet, uint _start, uint _end, 
-    uint _minimumFundingGoal, bool _isUpdatable, 
+    constructor(string _name, address _token, PricingStrategy _pricingStrategy,
+    address _multisigWallet, uint _start, uint _end,
+    uint _minimumFundingGoal, bool _isUpdatable,
     bool _isWhiteListed, address _tokenVestingAddress) public {
 
         owner = msg.sender;
@@ -719,7 +719,7 @@ contract CrowdsaleExt is Allocatable, Haltable {
         require(lockedTokenAmount <= tokenAmount);
         uint weiPrice = pricingStrategy.oneTokenInWei(tokensSold, token.decimals());
         // This can be also 0, we give out tokens for free
-        uint256 weiAmount = (weiPrice * tokenAmount)/10**uint256(token.decimals());         
+        uint256 weiAmount = (weiPrice * tokenAmount)/10**uint256(token.decimals());
 
         weiRaised = weiRaised.plus(weiAmount);
         tokensSold = tokensSold.plus(tokenAmount);
@@ -734,7 +734,7 @@ contract CrowdsaleExt is Allocatable, Haltable {
             require(!tokenVesting.isVestingSet(receiver));
             assignTokens(tokenVestingAddress, lockedTokenAmount);
             // set vesting with default schedule
-            tokenVesting.setVestingWithDefaultSchedule(receiver, lockedTokenAmount); 
+            tokenVesting.setVestingWithDefaultSchedule(receiver, lockedTokenAmount);
         }
 
         // assign remaining tokens to contributor
@@ -752,12 +752,12 @@ contract CrowdsaleExt is Allocatable, Haltable {
     /** Modified allowing execution only if the crowdsale is currently running.  */
 
     modifier inState(State state) {
-        if (getState() != state) 
+        if (getState() != state)
             revert();
         _;
     }
 
-    function distributeReservedTokens(uint reservedTokensDistributionBatch) 
+    function distributeReservedTokens(uint reservedTokensDistributionBatch)
     public inState(State.Success) onlyOwner stopInEmergency {
       // Already finalized
         if (finalized) {
@@ -838,7 +838,7 @@ contract CrowdsaleExt is Allocatable, Haltable {
         earlyParticipantWhitelist[addr] = WhiteListData({status:status, minCap:minCap, maxCap:maxCap});
     }
 
-    function setEarlyParticipantWhitelistMultiple(address[] addrs, bool[] statuses, uint[] minCaps, uint[] maxCaps) 
+    function setEarlyParticipantWhitelistMultiple(address[] addrs, bool[] statuses, uint[] minCaps, uint[] maxCaps)
     public onlyOwner {
         if (!isWhiteListed) revert();
         assert(now <= endsAt);
@@ -1002,7 +1002,7 @@ contract CrowdsaleExt is Allocatable, Haltable {
     function setCrowdsaleTokenExtv1(address _token) public onlyOwner {
         assert(_token != address(0));
         token = FractionalERC20Ext(_token);
-        
+
         if (address(finalizeAgent) != address(0)) {
             finalizeAgent.setCrowdsaleTokenExtv1(_token);
         }
@@ -1049,7 +1049,7 @@ contract CrowdsaleExt is Allocatable, Haltable {
     /**
     * Crowdfund state machine management.
     *
-    * We make it a function and do not assign the result to a variable, 
+    * We make it a function and do not assign the result to a variable,
     * so there is no chance of the variable being stale.
     */
     function getState() public view returns (State) {
@@ -1079,7 +1079,7 @@ contract CrowdsaleExt is Allocatable, Haltable {
     * The child contract must define their own cap setting rules.
     * We allow a lot of flexibility through different capping strategies (ETH, token count)
     * Called from invest().
-    *  
+    *
     * @param tokensSoldTotal What would be our total sold tokens count after this transaction
     *
     * @return true if taking this investment would break our cap rules
@@ -1243,9 +1243,9 @@ contract MintableTokenExt is StandardToken, Ownable {
     }
 
     function setReservedTokensListMultiple(
-        address[] addrs, 
-        uint[] inTokens, 
-        uint[] inPercentageUnit, 
+        address[] addrs,
+        uint[] inTokens,
+        uint[] inPercentageUnit,
         uint[] inPercentageDecimals,
         bool[] isVested
         ) public canMint onlyOwner {
@@ -1289,7 +1289,7 @@ contract MintableTokenExt is StandardToken, Ownable {
         emit MintingAgentChanged(addr, state);
     }
 
-    function setReservedTokensList(address addr, uint inTokens, uint inPercentageUnit, uint inPercentageDecimals,bool isVested) 
+    function setReservedTokensList(address addr, uint inTokens, uint inPercentageUnit, uint inPercentageDecimals,bool isVested)
     private canMint onlyOwner {
         assert(addr != address(0));
         if (!isAddressReserved(addr)) {
@@ -1385,7 +1385,7 @@ contract MintedTokenCappedCrowdsaleExt is CrowdsaleExt {
     function assignTokens(address receiver, uint tokenAmount) private {
         MintableTokenExt mintableToken = MintableTokenExt(token);
         mintableToken.mint(receiver, tokenAmount);
-    }    
+    }
 }
 
 /**
@@ -1414,30 +1414,59 @@ contract MintedTokenCappedCrowdsaleExtv1 is MintedTokenCappedCrowdsaleExt {
         MintedTokenCappedCrowdsaleExt _oldMintedTokenCappedCrowdsaleExtAddress
     ) public MintedTokenCappedCrowdsaleExt(_name, _token, _pricingStrategy, _multisigWallet, _start, _end,
     _minimumFundingGoal, _maximumSellableTokens, _isUpdatable, _isWhiteListed, _tokenVestingAddress) {
-        
+
         mintedTokenCappedCrowdsaleExt = _oldMintedTokenCappedCrowdsaleExtAddress;
         tokensSold = mintedTokenCappedCrowdsaleExt.tokensSold();
         weiRaised = mintedTokenCappedCrowdsaleExt.weiRaised();
-        investorCount = mintedTokenCappedCrowdsaleExt.investorCount();        
+        investorCount = mintedTokenCappedCrowdsaleExt.investorCount();
 
-        
+
         for (uint i = 0; i < mintedTokenCappedCrowdsaleExt.whitelistedParticipantsLength(); i++) {
             address whitelistAddress = mintedTokenCappedCrowdsaleExt.whitelistedParticipants(i);
 
             //whitelistedParticipants.push(whitelistAddress);
 
             uint256 tokenAmount = mintedTokenCappedCrowdsaleExt.tokenAmountOf(whitelistAddress);
-            if (tokenAmount != 0){               
-                tokenAmountOf[whitelistAddress] = tokenAmount;               
+            if (tokenAmount != 0){
+                tokenAmountOf[whitelistAddress] = tokenAmount;
             }
 
             uint256 investedAmount = mintedTokenCappedCrowdsaleExt.investedAmountOf(whitelistAddress);
             if (investedAmount != 0){
-                investedAmountOf[whitelistAddress] = investedAmount;               
+                investedAmountOf[whitelistAddress] = investedAmount;
             }
 
             //setEarlyParticipantWhitelist(whitelistAddress, true, 1000000000000000000, 1000000000000000000000);
         }
     }
-    
+
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

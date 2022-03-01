@@ -506,7 +506,6 @@ contract Crowdsale is Ownable {
     require(this.balance >= softcap && now > endFinalStage2);
       wallet.transfer(this.balance);
   }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

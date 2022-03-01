@@ -204,29 +204,39 @@ library SafeMath {
 
     /**
     *            CITY 2.0 token by www.SmartCityCoin.io
-    * 
-    *          .ossssss:                      `+sssss`      
-    *         ` +ssssss+` `.://++++++//:.`  .osssss+       
-    *            /sssssssssssssssssssssssss+ssssso`        
-    *             -sssssssssssssssssssssssssssss+`         
-    *            .+sssssssss+:--....--:/ossssssss+.        
-    *          `/ssssssssssso`         .sssssssssss/`      
-    *         .ossssss+sssssss-       :sssss+:ossssso.     
-    *        `ossssso. .ossssss:    `/sssss/  `/ssssss.    
-    *        ossssso`   `+ssssss+` .osssss:     /ssssss`   
-    *       :ssssss`      /sssssso:ssssso.       +o+/:-`   
-    *       osssss+        -sssssssssss+`                  
-    *       ssssss:         .ossssssss/                    
-    *       osssss/          `+ssssss-                     
-    *       /ssssso           :ssssss                      
-    *       .ssssss-          :ssssss                      
-    *        :ssssss-         :ssssss          `           
-    *         /ssssss/`       :ssssss        `/s+:`        
-    *          :sssssso:.     :ssssss      ./ssssss+`      
-    *           .+ssssssso/-.`:ssssss``.-/osssssss+.       
-    *             .+ssssssssssssssssssssssssssss+-         
-    *               `:+ssssssssssssssssssssss+:`           
-    *                  `.:+osssssssssssso+:.`              
-    *                        `/ssssss.`                    
-    *                         :ssssss                      
-    */
+    *
+    *          .ossssss:                      `+sssss`
+    *         ` +ssssss+` `.://++++++//:.`  .osssss+
+    *            /sssssssssssssssssssssssss+ssssso`
+    *             -sssssssssssssssssssssssssssss+`
+    *            .+sssssssss+:--....--:/ossssssss+.
+    *          `/ssssssssssso`         .sssssssssss/`
+    *         .ossssss+sssssss-       :sssss+:ossssso.
+    *        `ossssso. .ossssss:    `/sssss/  `/ssssss.
+    *        ossssso`   `+ssssss+` .osssss:     /ssssss`
+    *       :ssssss`      /sssssso:ssssso.       +o+/:-`
+    *       osssss+        -sssssssssss+`
+    *       ssssss:         .ossssssss/
+    *       osssss/          `+ssssss-
+    *       /ssssso           :ssssss
+    *       .ssssss-          :ssssss
+    *        :ssssss-         :ssssss          `
+    *         /ssssss/`       :ssssss        `/s+:`
+    *          :sssssso:.     :ssssss      ./ssssss+`
+    *           .+ssssssso/-.`:ssssss``.-/osssssss+.
+    *             .+ssssssssssssssssssssssssssss+-
+    *               `:+ssssssssssssssssssssss+:`
+    *                  `.:+osssssssssssso+:.`
+    *                        `/ssssss.`
+    *                         :ssssss
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
+}

@@ -4,12 +4,12 @@ pragma solidity ^0.4.25;
  * @title Ownable contract - base contract with an owner
  */
 contract Ownable {
-  
+
   address public owner;
   address public newOwner;
 
   event OwnershipTransferred(address indexed _from, address indexed _to);
-  
+
   /**
    * @dev The Ownable constructor sets the original `owner` of the contract to the sender
    * account.
@@ -31,7 +31,7 @@ contract Ownable {
    * @param _newOwner The address to transfer ownership to.
    */
   function transferOwnership(address _newOwner) public onlyOwner {
-    assert(_newOwner != address(0));      
+    assert(_newOwner != address(0));
     newOwner = _newOwner;
   }
 
@@ -50,14 +50,14 @@ contract Ownable {
 /**
  * @title SDADI - Interface
  */
-interface SDADI  {	
+interface SDADI  {
   function AddToken(address token) external;
   function DelToken(address token) external;
 }
 
 
 /**
- * @title DAppDEXI - Interface 
+ * @title DAppDEXI - Interface
  */
 interface DAppDEXI {
 
@@ -69,7 +69,7 @@ interface DAppDEXI {
     function getFeeMake(uint256 type_ ) external view returns(uint256);
     function getFeeTake(uint256 type_ ) external view returns(uint256);
     function changeFeeAccount(address feeAccount_) external;
-    
+
     function setWhitelistTokens(address token) external;
     function setWhitelistTokens(address token, bool active, uint256 timestamp, bytes32 typeERC) external;
     function depositToken(address token, uint amount) external;
@@ -81,7 +81,7 @@ interface DAppDEXI {
     function balanceOf(address token, address user) external view returns (uint);
 
     function order(address tokenBuy, uint amountBuy, address tokenSell, uint amountSell, uint expires, uint nonce) external;
-    function trade(address tokenBuy, uint amountBuy, address tokenSell, uint amountSell, uint expires, uint nonce, address user, uint8 v, bytes32 r, bytes32 s, uint amount) external;    
+    function trade(address tokenBuy, uint amountBuy, address tokenSell, uint amountSell, uint expires, uint nonce, address user, uint8 v, bytes32 r, bytes32 s, uint amount) external;
     function cancelOrder(address tokenBuy, uint amountBuy, address tokenSell, uint amountSell, uint expires, uint nonce, uint8 v, bytes32 r, bytes32 s) external;
     function testTrade(address tokenBuy, uint amountBuy, address tokenSell, uint amountSell, uint expires, uint nonce, address user, uint8 v, bytes32 r, bytes32 s, uint amount, address sender) external view returns(bool);
     function availableVolume(address tokenBuy, uint amountBuy, address tokenSell, uint amountSell, uint expires, uint nonce, address user, uint8 v, bytes32 r, bytes32 s) external view returns(uint);
@@ -99,11 +99,11 @@ interface ERC20I {
 
   function totalSupply() external view returns (uint256);
   function transfer(address _to, uint256 _value) external returns (bool success);
-  
+
   function allowance(address _owner, address _spender) external view returns (uint256);
   function transferFrom(address _from, address _to, uint256 _value) external returns (bool success);
   function approve(address _spender, uint256 _value) external returns (bool success);
-  
+
   event Transfer(address indexed from, address indexed to, uint256 value);
   event Approval(address indexed owner, address indexed spender, uint256 value);
 }
@@ -131,7 +131,7 @@ contract SafeMath {
         assert(z >= x);
         return z;
     }
-	
+
 	/**
     * @dev Integer division of two numbers, reverts on division by zero.
     */
@@ -139,15 +139,15 @@ contract SafeMath {
         uint256 z = x / y;
         return z;
     }
-    
+
     /**
     * @dev Multiplies two numbers, reverts on overflow.
-    */	
-    function safeMul(uint256 x, uint256 y) internal pure returns (uint256) {    
+    */
+    function safeMul(uint256 x, uint256 y) internal pure returns (uint256) {
         if (x == 0) {
             return 0;
         }
-    
+
         uint256 z = x * y;
         assert(z / x == y);
         return z;
@@ -160,16 +160,16 @@ contract SafeMath {
         if (x == 0) {
             return 0;
         }
-        
+
         uint256 z = x * y;
-        assert(z / x == y);    
+        assert(z / x == y);
         z = z / 10000; // percent to hundredths
         return z;
     }
 
     /**
     * @dev Returns the minimum value of two numbers.
-    */	
+    */
     function min(uint256 x, uint256 y) internal pure returns (uint256) {
         uint256 z = x <= y ? x : y;
         return z;
@@ -193,20 +193,20 @@ contract Agent is Ownable {
   address public defAgent;
 
   mapping(address => bool) public Agents;
-  
-  constructor() public {    
+
+  constructor() public {
     Agents[msg.sender] = true;
   }
-  
+
   modifier onlyAgent() {
     assert(Agents[msg.sender]);
     _;
   }
-  
+
   function updateAgent(address _agent, bool _status) public onlyOwner {
     assert(_agent != address(0));
     Agents[_agent] = _status;
-  }  
+  }
 }
 
 
@@ -214,7 +214,7 @@ contract Agent is Ownable {
  * @title DAppsDEX - Decentralized exchange for DApps
  */
 contract DAppDEX is DAppDEXI, SafeMath, Agent {
-    
+
     address public feeAccount;
     mapping (address => mapping (address => uint)) public tokens;
     mapping (address => mapping (bytes32 => bool)) public orders;
@@ -226,16 +226,16 @@ contract DAppDEX is DAppDEXI, SafeMath, Agent {
         bool active;
         uint256 timestamp;
     }
-    
+
     struct Fee {
         uint256 feeMake;
         uint256 feeTake;
     }
-    
+
     mapping (address => whitelistToken) public whitelistTokens;
     mapping (address => uint256) public accountTypes;
     mapping (uint256 => Fee) public feeTypes;
-  
+
     event Deposit(address token, address user, uint amount, uint balance);
     event PayFeeListing(address token, address user, uint amount, uint balance);
     event Withdraw(address token, address user, uint amount, uint balance);
@@ -243,7 +243,7 @@ contract DAppDEX is DAppDEXI, SafeMath, Agent {
     event Cancel(address tokenBuy, uint amountBuy, address tokenSell, uint amountSell, uint expires, uint nonce, address user, uint8 v, bytes32 r, bytes32 s, bytes32 hash);
     event Trade(address tokenBuy, uint amountBuy, address tokenSell, uint amountSell, address user, address recipient, bytes32 hash, uint256 timestamp);
     event WhitelistTokens(address token, bool active, uint256 timestamp, bytes32 typeERC);
-  
+
     constructor (address feeAccount_) public {
         feeAccount = feeAccount_;
         feeTypes[0] = Fee(1000000000000000, 2000000000000000);
@@ -254,7 +254,7 @@ contract DAppDEX is DAppDEXI, SafeMath, Agent {
     function setFeeListing(uint _feeListing) external onlyAgent {
         feeListing = _feeListing;
     }
-    
+
     function setAccountType(address user_, uint256 type_) external onlyAgent {
         accountTypes[user_] = type_;
     }
@@ -262,7 +262,7 @@ contract DAppDEX is DAppDEXI, SafeMath, Agent {
     function getAccountType(address user_) external view returns(uint256) {
         return accountTypes[user_];
     }
-  
+
     function setFeeType(uint256 type_ , uint256 feeMake_, uint256 feeTake_) external onlyAgent {
         feeTypes[type_] = Fee(feeMake_,feeTake_);
     }
@@ -270,11 +270,11 @@ contract DAppDEX is DAppDEXI, SafeMath, Agent {
     function getFeeMake(uint256 type_ ) external view returns(uint256) {
         return (feeTypes[type_].feeMake);
     }
-    
+
     function getFeeTake(uint256 type_ ) external view returns(uint256) {
         return (feeTypes[type_].feeTake);
     }
-    
+
     function changeFeeAccount(address feeAccount_) external onlyAgent {
         require(feeAccount_ != address(0));
         feeAccount = feeAccount_;
@@ -285,8 +285,8 @@ contract DAppDEX is DAppDEXI, SafeMath, Agent {
         whitelistTokens[token].timestamp = now;
         SDADI(feeAccount).AddToken(token);
         emit WhitelistTokens(token, true, now, "ERC20");
-    }    
-    
+    }
+
     function setWhitelistTokens(address token, bool active, uint256 timestamp, bytes32 typeERC) external onlyAgent {
         if (active) {
             uint fee = safePerc(ERC20I(token).totalSupply(), feeListing);
@@ -300,7 +300,7 @@ contract DAppDEX is DAppDEXI, SafeMath, Agent {
         whitelistTokens[token].timestamp = timestamp;
         emit WhitelistTokens(token, active, timestamp, typeERC);
     }
-    
+
     /**
     * deposit ETH
     */
@@ -308,7 +308,7 @@ contract DAppDEX is DAppDEXI, SafeMath, Agent {
         require(msg.value > 0);
         deposit(msg.sender);
     }
-  
+
     /**
     * Make deposit.
     *
@@ -319,7 +319,7 @@ contract DAppDEX is DAppDEXI, SafeMath, Agent {
         tokens[0][receiver] = safeAdd(tokens[0][receiver], msg.value);
         emit Deposit(0, receiver, msg.value, tokens[0][receiver]);
     }
-  
+
     /**
     * Deposit token.
     *
@@ -339,7 +339,7 @@ contract DAppDEX is DAppDEXI, SafeMath, Agent {
             tokens[token][feeAccount] = safeAdd(tokens[token][feeAccount], amount);
             emit PayFeeListing(token, msg.sender, amount, tokens[msg.sender][feeAccount]);
         }
-        
+
     }
 
     /**
@@ -347,13 +347,13 @@ contract DAppDEX is DAppDEXI, SafeMath, Agent {
     *
     * @param owner owner token
     * @param amount Deposit amount
-    * @param data payload  
+    * @param data payload
     *
     */
-    function tokenFallback(address owner, uint256 amount, bytes data) external returns (bool success) {      
+    function tokenFallback(address owner, uint256 amount, bytes data) external returns (bool success) {
 
         if (data.length == 0) {
-            assert(whitelistTokens[msg.sender].active && whitelistTokens[msg.sender].timestamp <= now);            
+            assert(whitelistTokens[msg.sender].active && whitelistTokens[msg.sender].timestamp <= now);
             tokens[msg.sender][owner] = safeAdd(tokens[msg.sender][owner], amount);
             emit Deposit(msg.sender, owner, amount, tokens[msg.sender][owner]);
             return true;
@@ -375,8 +375,8 @@ contract DAppDEX is DAppDEXI, SafeMath, Agent {
         tokens[0][msg.sender] = safeSub(tokens[0][msg.sender], amount);
         msg.sender.transfer(amount);
         emit Withdraw(0, msg.sender, amount, tokens[0][msg.sender]);
-    }  
-    
+    }
+
     /**
     * Withdraw token.
     *
@@ -391,17 +391,17 @@ contract DAppDEX is DAppDEXI, SafeMath, Agent {
         require(ERC20I(token).transfer(msg.sender, amount));
         emit Withdraw(token, msg.sender, amount, tokens[token][msg.sender]);
     }
-  
+
     function balanceOf(address token, address user) external view returns (uint) {
         return tokens[token][user];
     }
-  
+
     function order(address tokenBuy, uint amountBuy, address tokenSell, uint amountSell, uint expires, uint nonce) external {
         bytes32 hash = keccak256(abi.encodePacked(this, tokenBuy, amountBuy, tokenSell, amountSell, expires, nonce, msg.sender));
         orders[msg.sender][hash] = true;
         emit Order(tokenBuy, amountBuy, tokenSell, amountSell, expires, nonce, msg.sender);
     }
-  
+
     function trade(address tokenBuy, uint amountBuy, address tokenSell, uint amountSell, uint expires, uint nonce, address user, uint8 v, bytes32 r, bytes32 s, uint amount) external {
         bytes32 hash = keccak256(abi.encodePacked(this, tokenBuy, amountBuy, tokenSell, amountSell, expires, nonce, user));
         if (!(
@@ -423,14 +423,14 @@ contract DAppDEX is DAppDEXI, SafeMath, Agent {
         tokens[tokenSell][user] = safeSub(tokens[tokenSell][user], safeMul(amountSell, amount) / amountBuy);
         tokens[tokenSell][msg.sender] = safeAdd(tokens[tokenSell][msg.sender], safeMul(amountSell, amount) / amountBuy);
     }
-  
+
     function cancelOrder(address tokenBuy, uint amountBuy, address tokenSell, uint amountSell, uint expires, uint nonce, uint8 v, bytes32 r, bytes32 s) external {
         bytes32 hash = keccak256(abi.encodePacked(this, tokenBuy, amountBuy, tokenSell, amountSell, expires, nonce, msg.sender));
         if (!(orders[msg.sender][hash] || ecrecover(keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", hash)),v,r,s) == msg.sender)) revert();
         orderFills[msg.sender][hash] = amountBuy;
         emit Cancel(tokenBuy, amountBuy, tokenSell, amountSell, expires, nonce, msg.sender, v, r, s, hash);
     }
-  
+
     function testTrade(address tokenBuy, uint amountBuy, address tokenSell, uint amountSell, uint expires, uint nonce, address user, uint8 v, bytes32 r, bytes32 s, uint amount, address sender) external view returns(bool) {
         if (!(
             tokens[tokenBuy][sender] >= amount &&
@@ -455,4 +455,14 @@ contract DAppDEX is DAppDEXI, SafeMath, Agent {
         bytes32 hash = keccak256(abi.encodePacked(this, tokenBuy, amountBuy, tokenSell, amountSell, expires, nonce, user));
         return orderFills[user][hash];
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

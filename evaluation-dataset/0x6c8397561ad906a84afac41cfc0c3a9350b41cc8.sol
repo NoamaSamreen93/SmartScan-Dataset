@@ -1109,7 +1109,6 @@ contract ReitBZ is Ownable, ERC20MultiDividend, ERC20Burnable, ERC20Mintable, ER
         return super.decreaseAllowance(spender, subtractedValue);
     }
 
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

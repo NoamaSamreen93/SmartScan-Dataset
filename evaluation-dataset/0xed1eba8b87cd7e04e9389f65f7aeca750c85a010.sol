@@ -500,11 +500,11 @@ contract AGT is DSToken("AGT"), ERC223, Controlled {
      * Added support for the ERC 223 "tokenFallback" method in a "transfer" function with a payload.
      */
     function transfer(
-        address _to, 
-        uint _amount, 
-        bytes _data, 
+        address _to,
+        uint _amount,
+        bytes _data,
         string _custom_fallback)
-        public 
+        public
         returns (bool success)
     {
         return transferFrom(msg.sender, _to, _amount, _data, _custom_fallback);
@@ -522,7 +522,7 @@ contract AGT is DSToken("AGT"), ERC223, Controlled {
             if (!TokenController(controller).onApprove(msg.sender, _spender, _amount))
                 throw;
         }
-        
+
         return super.approve(_spender, _amount);
     }
 
@@ -607,4 +607,14 @@ contract AGT is DSToken("AGT"), ERC223, Controlled {
 ////////////////
 
     event ClaimedTokens(address indexed _token, address indexed _controller, uint _amount);
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

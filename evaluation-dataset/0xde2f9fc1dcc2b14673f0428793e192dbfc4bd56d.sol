@@ -31,7 +31,7 @@ contract Ownable {
    */
   function transferOwnership (address newOwner) public onlyOwner {
     require(newOwner != address(0));
-    emit OwnershipTransferred(owner, newOwner);  
+    emit OwnershipTransferred(owner, newOwner);
 
     owner = newOwner;
   }
@@ -259,7 +259,7 @@ contract FrozenableToken is BurnableToken, Ownable {
 
     return super.decreaseApproval(_spender, _subtractedValue);
   }
-  
+
 
 }
 
@@ -416,5 +416,20 @@ library SafeMath {
     c = a + b;
     assert(c >= a);
     return c;
+  }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
   }
 }

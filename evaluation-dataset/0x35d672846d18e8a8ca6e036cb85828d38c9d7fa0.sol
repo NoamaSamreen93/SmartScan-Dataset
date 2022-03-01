@@ -13,10 +13,10 @@ contract WETH {
     function deposit() public payable;
     function withdraw(uint wad) public;
 
-    function approve(address guy, uint wad) public returns (bool); 
+    function approve(address guy, uint wad) public returns (bool);
     function transfer(address dst, uint wad) public returns (bool);
     function transferFrom(address src, address dst, uint wad) public returns (bool);
-} 
+}
 
 contract UNISWAP {
     function ethToTokenSwapInput(uint256 min_tokens, uint256 deadline) public payable returns (uint256);
@@ -94,4 +94,10 @@ contract UniswapWrapper is Ownable{
       WETH(wethAddress).deposit.value(ethBought)();
       WETH(wethAddress).transfer(msg.sender, ethBought);
     }
+}
+pragma solidity ^0.4.24;
+contract SignalingTXN {
+	 function externalCallUsed() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

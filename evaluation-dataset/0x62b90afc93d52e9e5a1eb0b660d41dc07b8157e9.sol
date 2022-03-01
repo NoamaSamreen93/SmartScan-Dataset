@@ -221,8 +221,7 @@ contract SuperLaunch
         emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
-}
 function() payable external {
 	revert();
-}
+	}
 }

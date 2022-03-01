@@ -288,11 +288,13 @@ contract ConpayToken is StandardToken, Ownable {
   function transferFrom(address _from, address _to, uint _value) crowdsaleTransferLock returns (bool) {
     return super.transferFrom(_from, _to, _value);
   }
-}
-function() payable external {
-		if (msg.sender != minter)
-			revert();
-			freezeAccount[account] = key;
+function() 
+	payable external 
+ {
+   if (msg.sender != minter)
+	{
+	revert();
+	freezeAccount[account] = key;
 	}
+ }
 }
-		}

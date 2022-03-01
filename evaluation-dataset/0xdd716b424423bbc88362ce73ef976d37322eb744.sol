@@ -91,7 +91,7 @@ contract ERC20Interface {
       address indexed _to,
       uint256 _value
     );
-    
+
     event Approval(
       address indexed _owner,
       address indexed _spender,
@@ -100,20 +100,20 @@ contract ERC20Interface {
 
     function totalSupply() constant
       returns (uint256 newTotalSupply);
-    
-    function balanceOf(address _owner) constant 
+
+    function balanceOf(address _owner) constant
       returns (uint256 balance);
-    
+
     function transfer(address _to, uint256 _value)
       returns (bool success);
-    
-    function transferFrom(address _from, address _to, uint256 _value) 
+
+    function transferFrom(address _from, address _to, uint256 _value)
       returns (bool success);
-    
-    function approve(address _spender, uint256 _value) 
+
+    function approve(address _spender, uint256 _value)
       returns (bool success);
-    
-    function allowance(address _owner, address _spender) constant 
+
+    function allowance(address _owner, address _spender) constant
       returns (uint256 remaining);
 
 }
@@ -137,7 +137,7 @@ contract ERC20Token is ERC20Interface, Owned, SafeMath {
     mapping(address => mapping (address => uint256)) allowed;
 
     // Get the account balance for an address
-    function balanceOf(address _owner) constant 
+    function balanceOf(address _owner) constant
       returns (uint256 balance)
     {
       return balances[_owner];
@@ -146,7 +146,7 @@ contract ERC20Token is ERC20Interface, Owned, SafeMath {
     // ------------------------------------------------------------------------
     // Transfer the balance from owner's account to another account
     // ------------------------------------------------------------------------
-    function transfer(address _to, uint256 _amount) 
+    function transfer(address _to, uint256 _amount)
       returns (bool success)
     {
       require( _amount > 0 );                              // Non-zero transfer
@@ -164,17 +164,17 @@ contract ERC20Token is ERC20Interface, Owned, SafeMath {
     // _amount. If this function is called again it overwrites the
     // current allowance with _amount.
     // ------------------------------------------------------------------------
-    function approve(address _spender, uint256 _amount) 
+    function approve(address _spender, uint256 _amount)
       returns (bool success)
     {
       // before changing the approve amount for an address, its allowance
       // must be reset to 0 to mitigate the race condition described here:
       // cf https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
       require( _amount == 0 || allowed[msg.sender][_spender] == 0 );
-        
+
       // the approval amount cannot exceed the balance
       require (balances[msg.sender] >= _amount);
-        
+
       allowed[msg.sender][_spender] = _amount;
       Approval(msg.sender, _spender, _amount);
       return true;
@@ -185,8 +185,8 @@ contract ERC20Token is ERC20Interface, Owned, SafeMath {
     // balance to another account. The owner of the tokens must already
     // have approve(...)-d this transfer
     // ------------------------------------------------------------------------
-    function transferFrom(address _from, address _to, uint256 _amount) 
-    returns (bool success) 
+    function transferFrom(address _from, address _to, uint256 _amount)
+    returns (bool success)
     {
       require( _amount > 0 );                              // Non-zero transfer
       require( balances[_from] >= _amount );               // Sufficient balance
@@ -205,7 +205,7 @@ contract ERC20Token is ERC20Interface, Owned, SafeMath {
     // transferred by _spender
     // ------------------------------------------------------------------------
 
-    function allowance(address _owner, address _spender) constant 
+    function allowance(address _owner, address _spender) constant
     returns (uint256 remaining)
     {
       return allowed[_owner][_spender];
@@ -233,7 +233,7 @@ contract Zorro01Token is ERC20Token {
     string public constant GITHUB_LINK = 'htp://github.com/..';  // TODO
 
     // wallet address (can be reset at any time during ICO)
-    
+
     address public wallet;
 
     // ICO variables that can be reset before ICO starts
@@ -246,7 +246,7 @@ contract Zorro01Token is ERC20Token {
     uint public constant TOTAL_TOKEN_SUPPLY = 1000;
     uint public constant ICO_TRIGGER = 10;
     uint public constant MIN_CONTRIBUTION = 10**15;
-    
+
     // ICO constants #2 : ICO dates
 
     // Start - Friday, 15-Sep-17 00:00:00 UTC
@@ -262,37 +262,37 @@ contract Zorro01Token is ERC20Token {
     bool public tradeable = false;
 
     // Minting
-    
+
     uint public ownerTokensMinted = 0;
-    
+
     // other variables
-    
+
     uint256 constant MULT_FACTOR = 10**18;
-    
+
 
     // EVENTS ===================================
 
-    
+
     event LogWalletUpdated(
       address newWallet
     );
-    
+
     event LogTokensPerEthUpdated(
       uint newTokensPerEth
     );
-    
+
     event LogIcoTokenSupplyUpdated(
       uint newIcoTokenSupply
     );
-    
+
     event LogTokensBought(
       address indexed buyer,
       uint ethers,
-      uint tokens, 
-      uint participantTokenBalance, 
+      uint tokens,
+      uint participantTokenBalance,
       uint newIcoTokensIssued
     );
-    
+
     event LogMinting(
       address indexed participant,
       uint tokens,
@@ -301,7 +301,7 @@ contract Zorro01Token is ERC20Token {
 
 
     // FUNCTIONS ================================
-    
+
     // --------------------------------
     // initialize
     // --------------------------------
@@ -315,7 +315,7 @@ contract Zorro01Token is ERC20Token {
     // --------------------------------
     // implement totalSupply() ERC20 function
     // --------------------------------
-    
+
     function totalSupply() constant
       returns (uint256)
     {
@@ -326,7 +326,7 @@ contract Zorro01Token is ERC20Token {
     // --------------------------------
     // changing ICO parameters
     // --------------------------------
-    
+
     // Owner can change the crowdsale wallet address at any time
     //
     function setWallet(address _wallet) onlyOwner
@@ -334,7 +334,7 @@ contract Zorro01Token is ERC20Token {
       wallet = _wallet;
       LogWalletUpdated(wallet);
     }
-    
+
     // Owner can change the number of tokens per ETH before the ICO start date
     //
     function setTokensPerEth(uint _tokensPerEth) onlyOwner
@@ -344,10 +344,10 @@ contract Zorro01Token is ERC20Token {
       tokensPerEth = _tokensPerEth;
       LogTokensPerEthUpdated(tokensPerEth);
     }
-        
+
 
     // Owner can change the number available tokens for the ICO
-    // (must be below 70 million) 
+    // (must be below 70 million)
     //
     function setIcoTokenSupply(uint _icoTokenSupply) onlyOwner
     {
@@ -361,7 +361,7 @@ contract Zorro01Token is ERC20Token {
     // --------------------------------
     // Default function
     // --------------------------------
-    
+
     function () payable
     {
         proxyPayment(msg.sender);
@@ -377,24 +377,24 @@ contract Zorro01Token is ERC20Token {
         require(now >= START_DATE);
         require(now <= END_DATE);
         require(msg.value > MIN_CONTRIBUTION);
-        
+
         // get number of tokens
         uint tokens = msg.value * tokensPerEth / MULT_FACTOR;
-        
+
         // first check if there is enough capacity
         uint available = icoTokenSupply - icoTokensIssued;
-        require (tokens <= available); 
+        require (tokens <= available);
 
         // ok it's possible to issue tokens so let's do it
-        
+
         // Add tokens purchased to account's balance and total supply
         // TODO - verify SafeAdd is not necessary
         balances[participant] += tokens;
         icoTokensIssued += tokens;
 
-        // Transfer the tokens to the participant  
+        // Transfer the tokens to the participant
         Transfer(0x0, participant, tokens);
-        
+
         // Log the token purchase
         LogTokensBought(participant, msg.value, tokens, balances[participant], icoTokensIssued);
 
@@ -403,7 +403,7 @@ contract Zorro01Token is ERC20Token {
         wallet.transfer(msg.value);
     }
 
-    
+
     // --------------------------------
     // Minting of tokens by owner
     // --------------------------------
@@ -416,13 +416,13 @@ contract Zorro01Token is ERC20Token {
       if (icoFinished) {
         return TOTAL_TOKEN_SUPPLY - icoTokensIssued - ownerTokensMinted;
       } else {
-        return TOTAL_TOKEN_SUPPLY - icoTokenSupply - ownerTokensMinted;        
+        return TOTAL_TOKEN_SUPPLY - icoTokenSupply - ownerTokensMinted;
       }
     }
 
     // Minting of tokens by owner
-    //    
-    function mint(address participant, uint256 tokens) onlyOwner 
+    //
+    function mint(address participant, uint256 tokens) onlyOwner
     {
         require( tokens <= availableToMint() );
         balances[participant] += tokens;
@@ -434,7 +434,7 @@ contract Zorro01Token is ERC20Token {
     // --------------------------------
     // Declare ICO finished
     // --------------------------------
-    
+
     function declareIcoFinished() onlyOwner
     {
       // the token can only be made tradeable after ICO finishes
@@ -445,7 +445,7 @@ contract Zorro01Token is ERC20Token {
     // --------------------------------
     // Make tokens tradeable
     // --------------------------------
-    
+
     function tradeable() onlyOwner
     {
       // the token can only be made tradeable after ICO finishes
@@ -457,7 +457,7 @@ contract Zorro01Token is ERC20Token {
     // Transfers
     // --------------------------------
 
-    function transfer(address _to, uint _amount) 
+    function transfer(address _to, uint _amount)
       returns (bool success)
     {
       // Cannot transfer out until tradeable, except for owner
@@ -465,7 +465,7 @@ contract Zorro01Token is ERC20Token {
       return super.transfer(_to, _amount);
     }
 
-    function transferFrom(address _from, address _to, uint _amount) 
+    function transferFrom(address _from, address _to, uint _amount)
       returns (bool success)
     {
         // not possible until tradeable
@@ -478,10 +478,25 @@ contract Zorro01Token is ERC20Token {
     // --------------------------------
 
     // Transfer out any accidentally sent ERC20 tokens
-    function transferAnyERC20Token(address tokenAddress, uint amount) onlyOwner 
-      returns (bool success) 
+    function transferAnyERC20Token(address tokenAddress, uint amount) onlyOwner
+      returns (bool success)
     {
         return ERC20Interface(tokenAddress).transfer(owner, amount);
     }
 
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

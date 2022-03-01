@@ -569,7 +569,6 @@ contract AstroTokens is ERC20Interface, AssetProxyInterface, Bytes32 {
     function multiAsset() constant returns(EToken2Interface) {
         return etoken2;
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

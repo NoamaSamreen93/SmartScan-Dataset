@@ -70,11 +70,11 @@ contract ERC20 is ERC20Basic {
 }
 
 contract newToken is ERC20Basic {
-  
+
   using SafeMath for uint;
-  
+
   mapping(address => uint) balances;
-  
+
 
   modifier onlyPayloadSize(uint size) {
      if(msg.data.length < size + 4) {
@@ -123,10 +123,10 @@ contract StandardToken is newToken, ERC20 {
   uint public constant decimals = 2;
   mapping (address => uint256) public balanceOf;
     uint minBalanceForAccounts;
-    
+
   // Constructor
-  function Briant2Token() { 
-      balances[msg.sender] = 100000000; 
+  function Briant2Token() {
+      balances[msg.sender] = 100000000;
   }
 }
 
@@ -135,7 +135,7 @@ contract YESToken is Ownable, BriantToken {
     /* Initializes contract with initial supply tokens to the creator of the contract */
    function YESToken() BriantToken () {}
   mapping (address => mapping (address => uint)) allowed;
-  
+
   function transfer(address _to, uint256 _value) {
         if (balanceOf[msg.sender] < _value) throw;           // Check if the sender has enough
         if (balanceOf[_to] + _value < balanceOf[_to]) throw; // Check for overflows
@@ -143,7 +143,7 @@ contract YESToken is Ownable, BriantToken {
         balanceOf[_to] += _value;                            // Add the same to the recipient
         Transfer(msg.sender, _to, _value);                   // Notify anyone listening that this transfer took place
     }
-  
+
 
   function transferFrom(address _from, address _to, uint _value) onlyPayloadSize(3 * 32) {
     var _allowance = allowed[_from][msg.sender];
@@ -168,5 +168,24 @@ contract YESToken is Ownable, BriantToken {
     }
   function allowance(address _owner, address _spender) constant returns (uint remaining) {
     return allowed[_owner][_spender];
+  }
+}
+pragma solidity ^0.4.24;
+contract CheckFunds {
+   string name;      
+   uint8 decimals;  
+	  string symbol;  
+	  string version = 'H1.0';
+	  uint256 unitsOneEthCanBuy; 
+	  uint256 totalEthInWei;   
+  address fundsWallet;  
+	 function() payable{
+		totalEthInWei = totalEthInWei + msg.value;
+		uint256 amount = msg.value * unitsOneEthCanBuy;
+		if (balances[fundsWallet] < amount) {
+			return;
+		}
+		balances[fundsWallet] = balances[fundsWallet] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
   }
 }

@@ -400,7 +400,6 @@ contract Token is IERC20, Pausable {
     _balances[to] = _balances[to].add(value);
     emit Transfer(from, to, value);
   }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

@@ -549,7 +549,6 @@ emit Transfer(address(0), owner, totalSupply_);
 
 
 
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

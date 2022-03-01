@@ -118,7 +118,6 @@ contract Skraps is ERC20, Owned {
         balances[msg.sender] = balances[msg.sender].add(_value);
         Transfer(this, msg.sender, _value);
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

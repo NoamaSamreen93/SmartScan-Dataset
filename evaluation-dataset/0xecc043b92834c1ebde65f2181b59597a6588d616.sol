@@ -321,7 +321,7 @@ contract RTCoin is Administration {
         emit ForeignTokenTransfer(msg.sender, _recipient, _amount);
         return true;
     }
-    
+
     /** @notice Transfers eth that is stuck in this contract
         * ETH can be sent to the address this contract resides at before the contract is deployed
         * A contract can be suicided, forcefully sending ether to this contract
@@ -449,4 +449,14 @@ contract RTCoin is Administration {
         return allowed[_owner][_spender];
     }
 
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

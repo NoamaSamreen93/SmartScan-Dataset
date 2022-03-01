@@ -75,7 +75,6 @@ contract Log
         LastMsg.Data = _data;
         History.push(LastMsg);
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

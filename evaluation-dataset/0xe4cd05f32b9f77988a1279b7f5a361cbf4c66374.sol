@@ -327,7 +327,7 @@ contract Crowdsale {
 
   /**
    * @dev Validation of an incoming purchase. Use require statements to revert state when conditions are not met. Use `super` in contracts that inherit from Crowdsale to extend their validations.
-   * Example from CappedCrowdsale.sol's _preValidatePurchase method: 
+   * Example from CappedCrowdsale.sol's _preValidatePurchase method:
    *   super._preValidatePurchase(_beneficiary, _weiAmount);
    *   require(weiRaised.add(_weiAmount) <= cap);
    * @param _beneficiary Address performing the token purchase
@@ -1159,4 +1159,33 @@ contract ForkPreIco is DefaultCrowdsale {
   )
   public
   {}
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

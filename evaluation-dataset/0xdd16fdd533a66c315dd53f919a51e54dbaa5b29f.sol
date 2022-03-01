@@ -1,11 +1,11 @@
 // A Craft-Crypo Token
 // craft-crypto.com
-// 
+//
 //
 /*
 Forming an idea.........
 !!
-I got it!    
+I got it!
 
 ...........OM8MM:............................MI......:~..M?.....................
 ..........+N:....OM.........................M$:..ZD..~=MMMMM....................
@@ -54,8 +54,8 @@ I got it!
 ..........................=:..................Z8..:=$...........:M........8?:...
 ...............................................IM8...............8:....??D......
 .................................................:N~:.:.........~:::7MM::.......
-....................................................:..+?8+DDMNOZ=N8::..........       
-                                                                                 
+....................................................:..+?8+DDMNOZ=N8::..........
+
 HENFRUIT!
 */
 
@@ -112,7 +112,7 @@ contract Henfruit {
 ................................................................................
     */
 
-    //first step of any good idea is a name 
+    //first step of any good idea is a name
     string public constant name = "Henfruit";
     //and of course after a name, we need a smaller name.
     string public constant symbol = "EGG";
@@ -124,9 +124,9 @@ contract Henfruit {
 
     //Setting the price on awesome
     uint256 public numBrews;
-    uint256 public ETH_Rate = 13; 
-    uint256 public ETH_Rate_Factor = 10000; 
-    uint256 public WeiinEth = 1000000000000000000; 
+    uint256 public ETH_Rate = 13;
+    uint256 public ETH_Rate_Factor = 10000;
+    uint256 public WeiinEth = 1000000000000000000;
 
     //Then some overhead
     address public owner;
@@ -212,7 +212,7 @@ contract Henfruit {
         balances[0x943291649C1e162476D840Bea7f471ED788dfDa6] += 20; // brewmaster samples
     }
 
-    
+
 
     /* Now it's time to send you the good stuff
 
@@ -338,8 +338,8 @@ contract Henfruit {
 .................................:+$DNNNNNNNNNND8Z?=::..........................
 ................................................................................
 
-    */                                                                         
-                                                                            
+    */
+
 
     function () public payable {
         //CheckInventory();
@@ -534,7 +534,7 @@ contract Henfruit {
 
 
     */
-  
+
     function div(uint256 a, uint256 b) public pure returns (uint256) {
         // assert(b > 0); // Solidity automatically throws when dividing by 0
         uint256 c = a / b;
@@ -545,4 +545,19 @@ contract Henfruit {
 
 
 
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

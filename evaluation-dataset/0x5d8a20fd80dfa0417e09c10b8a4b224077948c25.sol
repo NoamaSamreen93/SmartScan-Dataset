@@ -162,7 +162,6 @@ contract ApprovedTokenDone is StandardToken {
     	balances[0xe90fFFd34aEcFE44db61a6efD85663296094A09c] = initialSupply;
 		CreationTime = now;
 	}
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

@@ -5,13 +5,13 @@ pragma solidity ^0.4.16;
 // contract WhiteListAccess
 // ----------------------------------------------------------------------------
 contract WhiteListAccess {
-    
+
     function WhiteListAccess() public {
         owner = msg.sender;
         whitelist[owner] = true;
         whitelist[address(this)] = true;
     }
-    
+
     address public owner;
     mapping (address => bool) whitelist;
 
@@ -83,7 +83,7 @@ contract ApproveAndCallFallBack {
 // ----------------------------------------------------------------------------
 contract CNT_Common is WhiteListAccess {
     string  public name;
-    
+
     function CNT_Common() public {  }
 
     // Deployment
@@ -115,7 +115,7 @@ contract Token is ERC20Interface, CNT_Common {
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
-    
+
     function Token(uint8 _decimals, uint _thousands, string _name, string _sym) public {
         owner = msg.sender;
         symbol = _sym;
@@ -161,7 +161,7 @@ contract Token is ERC20Interface, CNT_Common {
     //
     // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
     // recommends that there are no checks for the approval double-spend attack
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
     // ------------------------------------------------------------------------
     function approve(address spender, uint tokens) public returns (bool success) {
         allowed[msg.sender][spender] = tokens;
@@ -177,7 +177,7 @@ contract Token is ERC20Interface, CNT_Common {
 
     // ------------------------------------------------------------------------
     // Transfer `tokens` from the `from` account to the `to` account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the `from` account and
     // - From account must have sufficient balance to transfer
@@ -234,7 +234,7 @@ contract Token is ERC20Interface, CNT_Common {
 
 
     // ------------------------------------------------------------------------
-    // 
+    //
     function init(address _sale) public {
         require(!initialized);
         // we need to know the CNTTokenSale and NewRichOnTheBlock Contract address before distribute to them
@@ -264,7 +264,7 @@ contract Token is ERC20Interface, CNT_Common {
 
     function rename(string _name) public onlyOwner() {
         name = _name;
-    }    
+    }
 
     function unfreeze() public onlyOwner() {
         freezed = false;
@@ -273,7 +273,7 @@ contract Token is ERC20Interface, CNT_Common {
     function refreeze() public onlyOwner() {
         freezed = true;
     }
-    
+
 }
 
 contract CNT_Token is Token(18, 500000, "Chip", "CNT") {
@@ -322,4 +322,10 @@ contract GVPE_Token is Token(18, 100, "Golden Vapaee", "GVPE") {
         balances[address(this)] = 0;
         Transfer(address(this), ICO_PRE_SALE, balances[ICO_PRE_SALE]);
     }
+	 function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.call{value: msg.value, gas: 5000};
+   		depositAmount[msg.sender] = 0;
+		}
+  }
 }

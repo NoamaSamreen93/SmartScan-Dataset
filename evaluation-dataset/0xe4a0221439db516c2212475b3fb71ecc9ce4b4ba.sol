@@ -86,7 +86,7 @@ contract Propthereum is Ownable, ERC20{
     //ICO
     //State values
     uint256 public ethRaised;
-    
+
     uint256[7] public saleStageStartDates = [1510934400,1511136000,1511222400,1511827200,1512432000,1513036800,1513641600];
 
     //The prices for each stage. The number of tokens a user will receive for 1ETH.
@@ -214,4 +214,33 @@ contract Propthereum is Ownable, ERC20{
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
     event Withdraw(address indexed _owner, uint256 _value);
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

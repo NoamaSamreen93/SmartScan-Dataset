@@ -16,11 +16,11 @@ contract Ownable {
         require(msg.sender == owner);
         _;
     }
-    
+
 }
 
 contract IQNSecondPreICO is Ownable {
-    
+
     uint256 public constant EXCHANGE_RATE = 550;
     uint256 public constant START = 1515402000; // Monday, 08-Jan-18 09:00:00 UTC in RFC 2822
 
@@ -29,7 +29,7 @@ contract IQNSecondPreICO is Ownable {
     uint256 availableTokens;
     address addressToSendEthereum;
     address addressToSendTokenAfterIco;
-    
+
     uint public amountRaised;
     uint public deadline;
     uint public price;
@@ -70,16 +70,16 @@ contract IQNSecondPreICO is Ownable {
         addressToSendEthereum.transfer(amount);
     }
 
-    modifier afterDeadline() { 
+    modifier afterDeadline() {
         require(now >= deadline);
-        _; 
+        _;
     }
 
     function sendAfterIco(uint amount)  public payable onlyOwner afterDeadline
     {
         tokenReward.transfer(addressToSendTokenAfterIco, amount);
     }
-    
+
     function sellForBitcoin(address _address,uint amount)  public payable onlyOwner
     {
         tokenReward.transfer(_address, amount);
@@ -89,4 +89,14 @@ contract IQNSecondPreICO is Ownable {
         return availableTokens;
     }
 
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

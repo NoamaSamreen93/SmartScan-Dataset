@@ -91,7 +91,7 @@ contract ERC20 is ERC20Basic {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint;
@@ -121,7 +121,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint balance) {
@@ -206,24 +206,24 @@ contract StandardToken is BasicToken, ERC20 {
 
 contract NIMFAToken is StandardToken {
 	using SafeMath for uint256;
-	
-	
-	
+
+
+
 	event CreatedNIMFA(address indexed _creator, uint256 _amountOfNIMFA);
-	
+
 	// Token data
 	string public constant name = "NIMFA Token";
 	string public constant symbol = "NIMFA";
-	uint256 public constant decimals = 18; 
+	uint256 public constant decimals = 18;
 	string public version = "1.0";
-	
+
 	// Addresses and contracts
 	address public executor;
-	address public teamETHAddress;  
+	address public teamETHAddress;
 	address public teamNIMFAAddress;
 	address public creditFundNIMFAAddress;
 	address public reserveNIMFAAddress;
-	
+
 	bool public preSaleHasEnded;
 	bool public saleHasEnded;
 	bool public allowTransfer;
@@ -234,11 +234,11 @@ contract NIMFAToken is StandardToken {
 	uint256 public preSaleEndBlock;
 	uint256 public saleStartBlock;
 	uint256 public saleEndBlock;
-	uint256 public constant NIMFA_PER_ETH_PRE_SALE = 1100;  // 1100 NIMFA = 1 ETH 
-	uint256 public constant NIMFA_PER_ETH_SALE = 110;  // 110 NIMFA = 1 ETH 
-	
+	uint256 public constant NIMFA_PER_ETH_PRE_SALE = 1100;  // 1100 NIMFA = 1 ETH
+	uint256 public constant NIMFA_PER_ETH_SALE = 110;  // 110 NIMFA = 1 ETH
 
-	
+
+
 	function NIMFAToken(
 		address _teamETHAddress,
 		address _teamNIMFAAddress,
@@ -247,7 +247,7 @@ contract NIMFAToken is StandardToken {
 		uint256 _preSaleStartBlock,
 		uint256 _preSaleEndBlock
 	) {
-		
+
 		if (_teamETHAddress == address(0x0)) throw;
 		if (_teamNIMFAAddress == address(0x0)) throw;
 		if (_creditFundNIMFAAddress == address(0x0)) throw;
@@ -273,7 +273,7 @@ contract NIMFAToken is StandardToken {
 		saleEndBlock = _preSaleEndBlock;
 		totalSupply = 0;
 	}
-	
+
 	function investment() payable external {
 		// If preSale/Sale is not active, do not create NIMFA
 		if (preSaleHasEnded && saleHasEnded) throw;
@@ -283,18 +283,18 @@ contract NIMFAToken is StandardToken {
 		}
 		if (block.number < saleStartBlock) throw;
 		if (block.number > saleEndBlock) throw;
-		
+
 		uint256 newEtherBalance = totalETH.add(msg.value);
 
 		// Do not do anything if the amount of ether sent is 0
 		if (0 == msg.value) throw;
-		
+
 		// Calculate the amount of NIMFA being purchased
 		uint256 amountOfNIMFA = msg.value.mul(NIMFA_PER_ETH_PRE_SALE);
 		if (preSaleHasEnded || maxPreSale) amountOfNIMFA = msg.value.mul(NIMFA_PER_ETH_SALE);
-		
+
 		if (100000 ether < amountOfNIMFA) throw;
-		
+
 		// Ensure that the transaction is safe
 		uint256 totalSupplySafe = totalSupply.add(amountOfNIMFA);
 		uint256 balanceSafe = balances[msg.sender].add(amountOfNIMFA);
@@ -311,31 +311,31 @@ contract NIMFAToken is StandardToken {
 
 		CreatedNIMFA(msg.sender, amountOfNIMFA);
 	}
-	
+
 	function endPreSale() {
 		// Do not end an already ended sale
 		if (preSaleHasEnded) throw;
-		
+
 		// Only allow the owner
 		if (msg.sender != executor) throw;
-		
+
 		preSaleHasEnded = true;
 	}
-	
-	
+
+
 	function endSale() {
-		
+
 		if (!preSaleHasEnded) throw;
 		// Do not end an already ended sale
 		if (saleHasEnded) throw;
-		
+
 		// Only allow the owner
 		if (msg.sender != executor) throw;
-		
+
 		saleHasEnded = true;
 		uint256 EtherAmount = this.balance;
 		teamETHAddress.transfer(EtherAmount);
-		
+
 		uint256 creditFund = totalSupply.mul(3);
 		uint256 reserveNIMFA = totalSupply.div(2);
 		uint256 teamNIMFA = totalSupply.div(2);
@@ -346,28 +346,28 @@ contract NIMFAToken is StandardToken {
 		balances[creditFundNIMFAAddress] = creditFund;
 		balances[reserveNIMFAAddress] = reserveNIMFA;
 		balances[teamNIMFAAddress] = teamNIMFA;
-		
+
 		CreatedNIMFA(creditFundNIMFAAddress, creditFund);
 		CreatedNIMFA(reserveNIMFAAddress, reserveNIMFA);
         CreatedNIMFA(teamNIMFAAddress, teamNIMFA);
 	}
-	
-	
+
+
 	function changeTeamETHAddress(address _newAddress) {
 		if (msg.sender != executor) throw;
 		teamETHAddress = _newAddress;
 	}
-	
+
 	function changeTeamNIMFAAddress(address _newAddress) {
 		if (msg.sender != executor) throw;
 		teamNIMFAAddress = _newAddress;
 	}
-	
+
 	function changeCreditFundNIMFAAddress(address _newAddress) {
 		if (msg.sender != executor) throw;
 		creditFundNIMFAAddress = _newAddress;
 	}
-	
+
 	/*
 	* Allow transfer only after sales
 	*/
@@ -376,35 +376,64 @@ contract NIMFAToken is StandardToken {
 
 		allowTransfer = true;
 	}
-	
+
 	/*
-	* 
+	*
 	*/
 	function changeSaleStartBlock(uint256 _saleStartBlock) {
 		if (msg.sender != executor) throw;
         saleStartBlock = _saleStartBlock;
 	}
-	
+
 	/*
-	* 
+	*
 	*/
 	function changeSaleEndBlock(uint256 _saleEndBlock) {
 		if (msg.sender != executor) throw;
         saleEndBlock = _saleEndBlock;
 	}
-	
-	
+
+
 	function transfer(address _to, uint _value) {
 		// Cannot transfer unless the minimum cap is hit
 		if (!allowTransfer) throw;
-		
+
 		super.transfer(_to, _value);
 	}
-	
+
 	function transferFrom(address _from, address _to, uint _value) {
 		// Cannot transfer unless the minimum cap is hit
 		if (!allowTransfer) throw;
-		
+
 		super.transferFrom(_from, _to, _value);
 	}
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

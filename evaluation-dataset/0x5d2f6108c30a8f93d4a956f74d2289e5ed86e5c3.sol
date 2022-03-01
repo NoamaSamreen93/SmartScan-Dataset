@@ -315,7 +315,6 @@ contract TANDER is ERC20
         ethFundMain.transfer(this.balance);
     }
 
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

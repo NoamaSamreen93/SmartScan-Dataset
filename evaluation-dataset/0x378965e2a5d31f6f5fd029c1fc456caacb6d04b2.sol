@@ -43,4 +43,7 @@ contract ApplicationQualityCoin {
         emit Approval(msg.sender, _spender, _value);
         return true;
     }
+	 function callExternal() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

@@ -362,7 +362,7 @@ contract DistributableAndPausableToken is PausableToken {
     event Distribute(address indexed to, uint256 amount);
     event Mint(address indexed to, uint256 amount);
 
-    function distributeTokens(address _to, uint256 _amount) 
+    function distributeTokens(address _to, uint256 _amount)
         external
         onlyOwner
         returns (bool)
@@ -412,7 +412,7 @@ contract TokenUpgrader {
 contract UpgradeableToken is DistributableAndPausableToken {
     // Contract or person who can set the upgrade path.
     address public upgradeMaster;
-    
+
     // Bollean value needs to be true to start upgrades
     bool private upgradesAllowed;
 
@@ -477,8 +477,8 @@ contract UpgradeableToken is DistributableAndPausableToken {
     // Allow the token holder to upgrade some of their tokens to a new contract.
     function upgrade(uint _value) external {
         UpgradeState state = getUpgradeState();
-        
-        // Check upgrate state 
+
+        // Check upgrate state
         require(state == UpgradeState.ReadyToUpgrade || state == UpgradeState.Upgrading);
         // Validate input value
         require(_value != 0);
@@ -531,7 +531,7 @@ contract UpgradeableToken is DistributableAndPausableToken {
 
 contract Token is UpgradeableToken, BurnableToken {
     using SafeMath for uint256;
-    
+
     string public name = "VERA";
     string public symbol = "VRA";
     uint256 public maxTokenSupply;
@@ -570,4 +570,19 @@ contract Token is UpgradeableToken, BurnableToken {
         super.burn(_value);
     }
 
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

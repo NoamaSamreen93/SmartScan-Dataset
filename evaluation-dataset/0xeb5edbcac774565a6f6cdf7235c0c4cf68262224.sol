@@ -607,4 +607,14 @@ contract Cointribution is ERC20Interface, AssetProxyInterface, Bytes32, ReturnDa
     function multiAsset() public view returns(EToken2Interface) {
         return etoken2;
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -3319,7 +3319,6 @@ contract EuroTokenController is
         // we only get here if explicitFrom was true
         return explicitTo;
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

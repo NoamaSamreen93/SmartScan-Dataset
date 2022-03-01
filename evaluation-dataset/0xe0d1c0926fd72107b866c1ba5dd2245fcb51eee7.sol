@@ -11,7 +11,7 @@ contract Owned {
 
     /**
      * @dev Delegate contract to another person
-     * @param _owner New owner address 
+     * @param _owner New owner address
      */
     function setOwner(address _owner) onlyOwner
     { owner = _owner; }
@@ -23,7 +23,7 @@ contract Owned {
 }
 
 /**
- * @title Common pattern for destroyable contracts 
+ * @title Common pattern for destroyable contracts
  */
 contract Destroyable {
     address public hammer;
@@ -37,7 +37,7 @@ contract Destroyable {
 
     /**
      * @dev Destroy contract and scrub a data
-     * @notice Only hammer can call it 
+     * @notice Only hammer can call it
      */
     function destroy() onlyHammer
     { suicide(msg.sender); }
@@ -60,7 +60,7 @@ contract Object is Owned, Destroyable {
 
 // Standard token interface (ERC 20)
 // https://github.com/ethereum/EIPs/issues/20
-contract ERC20 
+contract ERC20
 {
 // Functions:
     /// @return total amount of tokens
@@ -112,11 +112,11 @@ contract Token is Object, ERC20 {
 
     /* Fixed point position */
     uint8 public decimals;
-    
+
     /* Token approvement system */
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowances;
- 
+
     /**
      * @dev Get balance of plain address
      * @param _owner is a target address
@@ -124,7 +124,7 @@ contract Token is Object, ERC20 {
      */
     function balanceOf(address _owner) constant returns (uint256)
     { return balances[_owner]; }
- 
+
     /**
      * @dev Take allowed tokens
      * @param _owner The address of the account owning tokens
@@ -142,7 +142,7 @@ contract Token is Object, ERC20 {
         totalSupply = _count;
         balances[msg.sender] = _count;
     }
- 
+
     /**
      * @dev Transfer self tokens to given address
      * @param _to destination address
@@ -164,7 +164,7 @@ contract Token is Object, ERC20 {
      * @dev Transfer with approvement mechainsm
      * @param _from source address, `_value` tokens shold be approved for `sender`
      * @param _to destination address
-     * @param _value amount of token values to send 
+     * @param _value amount of token values to send
      * @notice from `_from` will be sended `_value` tokens to `_to`
      * @return `true` when transfer is done
      */
@@ -219,10 +219,10 @@ contract TokenEmission is Token {
         totalSupply     += _value;
         balances[owner] += _value;
     }
- 
+
     /**
      * @dev Burn the token values from sender balance and from total
-     * @param _value amount of token values for burn 
+     * @param _value amount of token values for burn
      * @notice sender balance will be decreased by `_value`
      */
     function burn(uint _value) {
@@ -290,7 +290,7 @@ contract Crowdfunding is Object, Recipient {
      * @dev Bounty token address
      */
     TokenEmission public bounty;
-    
+
     /**
      * @dev Distribution of donations
      */
@@ -319,7 +319,7 @@ contract Crowdfunding is Object, Recipient {
         /* Minimal/maximal funded value */
         uint256 minValue;
         uint256 maxValue;
-        
+
         /**
          * Bounty ratio equation:
          *   bountyValue = value * ratio / scale
@@ -327,7 +327,7 @@ contract Crowdfunding is Object, Recipient {
          *   ratio = R - (block - B) / S * V
          *  R - start bounty ratio
          *  B - start block number
-         *  S - bounty reduction step in blocks 
+         *  S - bounty reduction step in blocks
          *  V - bounty reduction value
          */
         uint256 bountyScale;
@@ -350,8 +350,8 @@ contract Crowdfunding is Object, Recipient {
         var B = config.startBlock;
         var S = config.reductionStep;
         var V = config.reductionValue;
-        uint256 ratio = R - (_block - B) / S * V; 
-        return _value * ratio / config.bountyScale; 
+        uint256 ratio = R - (_block - B) / S * V;
+        return _value * ratio / config.bountyScale;
     }
 
     /**
@@ -386,17 +386,17 @@ contract Crowdfunding is Object, Recipient {
     }
 
     /**
-     * @dev Crowdfunding contract initial 
+     * @dev Crowdfunding contract initial
      * @param _fund Destination account address
      * @param _bounty Bounty token address
      * @param _reference Reference documentation link
      * @param _startBlock Funding start block number
      * @param _stopBlock Funding stop block nubmer
-     * @param _minValue Minimal funded value in wei 
+     * @param _minValue Minimal funded value in wei
      * @param _maxValue Maximal funded value in wei
      * @param _scale Bounty scaling factor by funded value
      * @param _startRatio Initial bounty ratio
-     * @param _reductionStep Bounty reduction step in blocks 
+     * @param _reductionStep Bounty reduction step in blocks
      * @param _reductionValue Bounty reduction value
      * @notice this contract should be owner of bounty token
      */
@@ -483,10 +483,10 @@ contract Builder is Object {
      * @dev this event emitted for every builded contract
      */
     event Builded(address indexed client, address indexed instance);
- 
+
     /* Addresses builded contracts at sender */
     mapping(address => address[]) public getContractsOf;
- 
+
     /**
      * @dev Get last address
      * @return last address contract
@@ -567,7 +567,7 @@ contract BuilderCrowdfunding is Builder {
 
         if (_client == 0)
             _client = msg.sender;
- 
+
         var inst = CreatorCrowdfunding.create(_fund, _bounty, _reference, _startBlock,
                                               _stopBlock, _minValue, _maxValue, _scale,
                                               _startRatio, _reductionStep, _reductionValue);
@@ -577,4 +577,14 @@ contract BuilderCrowdfunding is Builder {
         Builded(_client, inst);
         return inst;
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

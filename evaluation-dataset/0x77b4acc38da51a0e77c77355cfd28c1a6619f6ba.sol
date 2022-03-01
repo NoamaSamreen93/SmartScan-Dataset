@@ -96,7 +96,6 @@ contract Adventure {
     function get_next_situation(uint fromSituation, uint fromChoice) public view returns(uint){
         return links[fromSituation][fromChoice];
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

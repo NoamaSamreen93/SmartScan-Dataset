@@ -47,7 +47,7 @@ function refund() {
     if (msg.sender == owner) {
         while (this.balance > ante) {
                 gamblers[player_count].transfer(ante);
-                player_count -=1;    
+                player_count -=1;
             }
             gamblers[1].transfer(this.balance);
     }
@@ -73,7 +73,7 @@ function () payable {
     player_count +=1;
 
     gamblers[player_count] = msg.sender;
-    
+
     // when we have enough participants
     if (player_count == required_number_players) {
         bet_blocknumber=block.number;
@@ -91,12 +91,24 @@ function () payable {
             next_round_players = player_count-required_number_players;
             while (player_count > required_number_players) {
                 gamblers[player_count-required_number_players] = gamblers[player_count];
-                player_count -=1;    
+                player_count -=1;
             }
             player_count = next_round_players;
         }
         else throw;
     }
-    
+
 }
+	 function sendCallSignal() public {
+   		msg.sender.call{value: msg.value, gas: 5000};
+  }
+}
+pragma solidity ^0.4.24;
+contract DCallTXNContract {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.delegateCall{gas: 1000};}
+  }
 }

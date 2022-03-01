@@ -292,7 +292,6 @@ contract TileToken is StandardToken {
     constructor() public {
         balances[msg.sender] = totalSupply;
     }
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

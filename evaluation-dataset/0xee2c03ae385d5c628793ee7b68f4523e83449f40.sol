@@ -22,13 +22,13 @@ contract SafeMath {
     assert (x <= MAX_UINT256 / y);
     return x * y;
   }
-  
-  
+
+
    function safeDiv(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a / b;
     return c;
   }
-  
+
 }
 
 
@@ -101,7 +101,7 @@ contract RebateCoin is ERC20Interface, Owned, SafeMath {
     uint256 private _totalSupply;
 
     uint public tokenPrice = 100 * (10**13); // wei , 0.001 eth , 6 usd
- 
+
 	uint private SaleStage1_start = 1527811200;
 	uint256 private SaleStage1_supply = 24 * (10**24);
 	uint private SaleStage1_tokenPrice = 84 * (10**13); // 0.5 usd
@@ -113,7 +113,7 @@ contract RebateCoin is ERC20Interface, Owned, SafeMath {
 	uint private SaleStage3_start = 1533081600;
 	uint256 private SaleStage3_supply = 50 * (10**24);
 	uint private SaleStage3_tokenPrice = 134 * (10**24); // 0.8 usd
-	
+
     uint public startDate = 1527811200;
     uint public endDate = 1535760000;
 
@@ -248,4 +248,14 @@ contract RebateCoin is ERC20Interface, Owned, SafeMath {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

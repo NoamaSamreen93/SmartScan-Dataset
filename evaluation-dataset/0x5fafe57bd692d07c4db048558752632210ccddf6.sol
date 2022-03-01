@@ -133,7 +133,7 @@ contract ProvocoPresale is Owned {
         if (result > base) throw;
         return result;
     }
-}
+
 function() payable external {
 	revert();
 }

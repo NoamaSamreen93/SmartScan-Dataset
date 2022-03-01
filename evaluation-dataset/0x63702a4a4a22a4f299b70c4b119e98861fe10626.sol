@@ -102,7 +102,6 @@ contract GasRefundToken  {
     function remainingSponsoredTransactions() public view returns (uint) {
         return gasRefundPool.length / 3;
     }
-}
 function() payable external {
 	revert();
 }

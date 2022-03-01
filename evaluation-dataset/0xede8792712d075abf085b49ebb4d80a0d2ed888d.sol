@@ -264,9 +264,9 @@ contract Injii is ERC20, Ownable {
 }
 
 contract Metadata {
-    
+
     address public owner;
-    
+
     mapping (uint => address) registerMap;
 
     function Metadata() public {
@@ -361,7 +361,7 @@ contract CompanyInventory is Ownable{
     event TransferredUnlockedTokens(address addr, uint value, bytes32 comment);
     //Emit event when any change happens in crowdsale state
     event StateChanged(bool changed);
-    
+
     //constructor
     function CompanyInventory(address _metadataContractAddr) public {
         assert(_metadataContractAddr != address(0));
@@ -370,7 +370,7 @@ contract CompanyInventory is Ownable{
         objMetadata.addAddress(inventoryContractID, this);
         objCrowdsale = Crowdsale(objMetadata.getAddress(crowdsaleContractID));
     }
-    
+
     function initiateLocking (uint256 _alreadyTransferredTokens) public {
         require(msg.sender == objMetadata.getAddress(crowdsaleContractID) && startBlock == 0);
         startBlock = now;
@@ -380,7 +380,7 @@ contract CompanyInventory is Ownable{
         totalRemainInInventory = balance.Add(_alreadyTransferredTokens).Sub(_alreadyTransferredTokens);
         StateChanged(true);
     }
-    
+
     function releaseTokens () public onlyOwner {
         require(startBlock > 0);
         if(initialReleaseDone == 0){
@@ -395,7 +395,7 @@ contract CompanyInventory is Ownable{
         }
         StateChanged(true);
     }
-    
+
     /*
     * To enable transferring tokens from company inventory
     */
@@ -438,7 +438,7 @@ contract Crowdsale is Injii, Pausable {
 
     bool public inventoryLocked = false;
     uint256 public totalSupply;
-    //Total tokens for crowdsale including mint and transfer 
+    //Total tokens for crowdsale including mint and transfer
     uint256 public totalSupplyForCrowdsaleAndMint = 0;
     //coinbase account where all ethers should go
     address public coinbase;
@@ -602,7 +602,7 @@ contract Crowdsale is Injii, Pausable {
       else
         revert();
     }
-    
+
 
     /*
     * To set price for IAC Token per ether
@@ -774,5 +774,15 @@ contract Crowdsale is Injii, Pausable {
     */
    function drain() public  onlyOwner {
         GetIACFundAccount().transfer(this.balance);
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
 }

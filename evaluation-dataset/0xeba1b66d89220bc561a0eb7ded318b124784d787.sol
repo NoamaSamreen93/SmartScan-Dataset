@@ -65,7 +65,7 @@ contract Utils {
     function calcSrcQty(uint dstQty, uint srcDecimals, uint dstDecimals, uint rate) internal pure returns(uint) {
         require(dstQty <= MAX_QTY);
         require(rate <= MAX_RATE);
-        
+
         //source quantity is rounded up. to avoid dest quantity being too low.
         uint numerator;
         uint denominator;
@@ -484,7 +484,7 @@ contract WrapFeeBurner is WrapperBase {
     }
 
     TaxData internal taxData;
-    
+
     //data indexes
     uint internal constant KNC_RATE_RANGE_INDEX = 0;
     uint internal constant ADD_RESERVE_INDEX = 1;
@@ -667,4 +667,14 @@ contract WrapFeeBurner is WrapperBase {
             feeBurnerContract.setTaxWallet(taxData.wallet);
         }
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -1,52 +1,52 @@
 pragma solidity ^0.4.16;
 
 contract ERC20Interface {
-    function totalSupply() 
-        public 
-        constant 
+    function totalSupply()
+        public
+        constant
         returns (uint256);
 
     function balanceOf(
-        address _address) 
-        public 
-        constant 
+        address _address)
+        public
+        constant
         returns (uint256 balance);
 
     function allowance(
-        address _address, 
+        address _address,
         address _to)
-        public 
-        constant 
+        public
+        constant
         returns (uint256 remaining);
 
     function transfer(
-        address _to, 
-        uint256 _value) 
-        public 
+        address _to,
+        uint256 _value)
+        public
         returns (bool success);
 
     function approve(
-        address _to, 
-        uint256 _value) 
-        public 
+        address _to,
+        uint256 _value)
+        public
         returns (bool success);
 
     function transferFrom(
-        address _from, 
-        address _to, 
-        uint256 _value) 
-        public 
+        address _from,
+        address _to,
+        uint256 _value)
+        public
         returns (bool success);
 
     event Transfer(
-        address indexed _from, 
-        address indexed _to, 
+        address indexed _from,
+        address indexed _to,
         uint256 _value
     );
 
     event Approval(
-        address indexed _from, 
-        address indexed _to, 
+        address indexed _from,
+        address indexed _to,
         uint256 _value
     );
 }
@@ -55,10 +55,10 @@ contract ERC20Interface {
 contract Owned {
     address owner;
     address newOwner;
-    uint32 transferCount;    
+    uint32 transferCount;
 
     event TransferOwnership(
-        address indexed _from, 
+        address indexed _from,
         address indexed _to
     );
 
@@ -73,9 +73,9 @@ contract Owned {
     }
 
     function transferOwnership(
-        address _newOwner) 
-        public 
-        onlyOwner 
+        address _newOwner)
+        public
+        onlyOwner
     {
         newOwner = _newOwner;
     }
@@ -97,18 +97,18 @@ contract Owned {
         return transferCount;
     }
 
-    function isTransferPending() 
+    function isTransferPending()
         public
         view
         returns (bool) {
         require(
-            msg.sender == owner || 
+            msg.sender == owner ||
             msg.sender == newOwner);
         return newOwner != address(0);
     }
 
     function acceptOwnership()
-         public 
+         public
     {
         require(msg.sender == newOwner);
 
@@ -117,7 +117,7 @@ contract Owned {
         transferCount++;
 
         emit TransferOwnership(
-            owner, 
+            owner,
             newOwner
         );
     }
@@ -125,42 +125,42 @@ contract Owned {
 
 library SafeMath {
     function add(
-        uint256 a, 
+        uint256 a,
         uint256 b)
-        internal 
-        pure 
-        returns(uint256 c) 
+        internal
+        pure
+        returns(uint256 c)
     {
         c = a + b;
         require(c >= a);
     }
 
     function sub(
-        uint256 a, 
+        uint256 a,
         uint256 b)
-        internal 
-        pure 
-        returns(uint256 c) 
+        internal
+        pure
+        returns(uint256 c)
     {
         require(b <= a);
         c = a - b;
     }
 
     function mul(
-        uint256 a, 
-        uint256 b) 
-        internal 
-        pure 
+        uint256 a,
+        uint256 b)
+        internal
+        pure
         returns(uint256 c) {
         c = a * b;
         require(a == 0 || c / a == b);
     }
 
     function div(
-        uint256 a, 
-        uint256 b) 
-        internal 
-        pure 
+        uint256 a,
+        uint256 b)
+        internal
+        pure
         returns(uint256 c) {
         require(b > 0);
         c = a / b;
@@ -169,10 +169,10 @@ library SafeMath {
 
 contract ApproveAndCallFallBack {
     function receiveApproval(
-        address _from, 
-        uint256 _value, 
-        address token, 
-        bytes data) 
+        address _from,
+        uint256 _value,
+        address token,
+        bytes data)
         public
         returns (bool success);
 }
@@ -188,14 +188,14 @@ contract Token is ERC20Interface, Owned {
     mapping(address => uint256) balances;
     mapping(address => mapping(address => uint256)) allowed;
     mapping(address => uint256) incomes;
-    mapping(address => uint256) expenses; 
+    mapping(address => uint256) expenses;
 
     constructor(
         uint256 _totalSupply,
         string _name,
         string _symbol,
-        uint8 _decimals) 
-        public 
+        uint8 _decimals)
+        public
     {
         symbol = _symbol;
         name = _name;
@@ -215,17 +215,17 @@ contract Token is ERC20Interface, Owned {
     }
 
     function _transfer(
-        address _from, 
-        address _to, 
-        uint256 _value) 
-        internal 
+        address _from,
+        address _to,
+        uint256 _value)
+        internal
         returns (bool success)
     {
         require (_to != 0x0);
         require (balances[_from] >= _value);
 
-        balances[_from] = balances[_from].sub(_value);  
-        balances[_to] = balances[_to].add(_value);   
+        balances[_from] = balances[_from].sub(_value);
+        balances[_to] = balances[_to].add(_value);
 
         incomes[_to] = incomes[_to].add(_value);
         expenses[_from] = expenses[_from].add(_value);
@@ -236,19 +236,19 @@ contract Token is ERC20Interface, Owned {
     }
 
     function transfer(
-        address _to, 
-        uint256 _value) 
-        public 
-        returns (bool success) 
+        address _to,
+        uint256 _value)
+        public
+        returns (bool success)
     {
         return _transfer(msg.sender, _to, _value);
     }
 
     function approve(
-        address _spender, 
-        uint256 _value) 
-        public 
-        returns (bool success) 
+        address _spender,
+        uint256 _value)
+        public
+        returns (bool success)
     {
         require (_spender != 0x0);
 
@@ -260,21 +260,21 @@ contract Token is ERC20Interface, Owned {
     }
 
     function transferFrom(
-        address _from, 
-        address _to, 
-        uint256 _value) 
-        public 
-        returns (bool success) 
+        address _from,
+        address _to,
+        uint256 _value)
+        public
+        returns (bool success)
     {
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
         return _transfer(_from, _to, _value);
     }
 
     function balanceOf(
-        address _address) 
-        public 
-        constant 
-        returns (uint256 remaining) 
+        address _address)
+        public
+        constant
+        returns (uint256 remaining)
     {
         require(_address != 0x0);
 
@@ -282,10 +282,10 @@ contract Token is ERC20Interface, Owned {
     }
 
     function incomeOf(
-        address _address) 
-        public 
-        constant 
-        returns (uint256 income) 
+        address _address)
+        public
+        constant
+        returns (uint256 income)
     {
         require(_address != 0x0);
 
@@ -293,10 +293,10 @@ contract Token is ERC20Interface, Owned {
     }
 
     function expenseOf(
-        address _address) 
-        public 
-        constant 
-        returns (uint256 expense) 
+        address _address)
+        public
+        constant
+        returns (uint256 expense)
     {
         require(_address != 0x0);
 
@@ -304,11 +304,11 @@ contract Token is ERC20Interface, Owned {
     }
 
     function allowance(
-        address _from, 
-        address _to) 
-        public 
-        constant 
-        returns (uint256 remaining) 
+        address _from,
+        address _to)
+        public
+        constant
+        returns (uint256 remaining)
     {
         require(_from != 0x0);
         require(_to != 0x0);
@@ -319,11 +319,11 @@ contract Token is ERC20Interface, Owned {
 
 
     function approveAndCall(
-        address _spender, 
-        uint256 _value, 
-        bytes _data) 
-        public 
-        returns (bool success) 
+        address _spender,
+        uint256 _value,
+        bytes _data)
+        public
+        returns (bool success)
     {
         if (approve(_spender, _value)) {
             require(ApproveAndCallFallBack(_spender).receiveApproval(msg.sender, _value, this, _data) == true);
@@ -335,4 +335,14 @@ contract Token is ERC20Interface, Owned {
     function () public payable {
         revert();
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

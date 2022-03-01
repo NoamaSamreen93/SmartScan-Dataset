@@ -33,7 +33,7 @@ contract Ownable {
    */
   function Ownable() public {
       owner=msg.sender;
-  
+
   }
 
   /**
@@ -547,8 +547,8 @@ contract RefundableCrowdsale is FinalizableCrowdsale {
   function finalization() internal {
     if (goalReached()) {
       vault.close();
-    } 
-    
+    }
+
     else {
       vault.enableRefunds();
     }
@@ -602,7 +602,7 @@ contract Toplancer is MintableToken {
   string public constant name = "Toplancer";
   string public constant symbol = "TLC";
   uint8 public constant decimals = 18;
- 
+
 
 }
 
@@ -612,25 +612,25 @@ contract Allocation is Ownable {
   Toplancer tlc;
   mapping (address => uint) founderAllocations;
   uint256 tokensCreated = 0;
- 
- 
+
+
 //decimal value
  uint256 public constant decimalFactor = 10 ** uint256(18);
 
   uint256 constant public FounderAllocationTokens = 840000000*decimalFactor;
 
- 
+
   //address of the founder storage vault
   address public founderStorageVault = 0x97763051c517DD3aBc2F6030eac6Aa04576E05E1;
- 
+
   function TeamAllocation() {
     tlc = Toplancer(msg.sender);
-  
+
     unlockedAt = now;
-   
-    // 20% tokens from the FounderAllocation 
+
+    // 20% tokens from the FounderAllocation
     founderAllocations[founderStorageVault] = FounderAllocationTokens;
-   
+
   }
   function getTotalAllocation() returns (uint256){
     return (FounderAllocationTokens);
@@ -640,10 +640,10 @@ contract Allocation is Ownable {
     if (tokensCreated == 0) {
       tokensCreated = tlc.balanceOf(this);
     }
-    
+
     //transfer the  tokens to the founderStorageAddress
     tlc.transfer(founderStorageVault, tokensCreated);
-  
+
   }
 }
 
@@ -656,16 +656,16 @@ contract TLCMarketCrowdsale is RefundableCrowdsale,CappedCrowdsale {
 
 //decimal value
  uint256 public constant decimalFactor = 10 ** uint256(18);
- 
- 
- uint256 public constant _totalSupply = 2990000000 *decimalFactor; 
- 
+
+
+ uint256 public constant _totalSupply = 2990000000 *decimalFactor;
+
  uint256 public presaleCap = 200000000 *decimalFactor; // 7%
  uint256 public soldTokenInPresale;
  uint256 public publicSaleCap = 1950000000 *decimalFactor; // 65%
  uint256 public soldTokenInPublicsale;
  uint256 public distributionSupply = 840000000 *decimalFactor; // 28%
- 
+
 
 
 
@@ -699,14 +699,14 @@ contract TLCMarketCrowdsale is RefundableCrowdsale,CappedCrowdsale {
       require(publicSaleCap > 0);
       require(validPurchase());
       uint256  weiAmount = msg.value;
-       
+
        // calculate token amount to be created
     uint256 tokens = weiAmount.mul(rate);
 
     uint256 Bonus = tokens.mul(getTimebasedBonusRate()).div(100);
 
     tokens = tokens.add(Bonus);
-    
+
     if (state == State.PRESALE) {
         assert (soldTokenInPresale + tokens <= presaleCap);
         soldTokenInPresale = soldTokenInPresale.add(tokens);
@@ -716,7 +716,7 @@ contract TLCMarketCrowdsale is RefundableCrowdsale,CappedCrowdsale {
         soldTokenInPublicsale = soldTokenInPublicsale.add(tokens);
         publicSaleCap=publicSaleCap.sub(tokens);
     }
-       
+
        if(investedAmountOf[beneficiary] == 0) {
            // A new investor
            investorCount++;
@@ -727,7 +727,7 @@ contract TLCMarketCrowdsale is RefundableCrowdsale,CappedCrowdsale {
        weiRaised = weiRaised.add(weiAmount);
        token.mint(beneficiary, tokens);
        TokenPurchase(msg.sender, beneficiary, weiAmount, tokens);
-    
+
      }
 
 
@@ -766,11 +766,11 @@ contract TLCMarketCrowdsale is RefundableCrowdsale,CappedCrowdsale {
           }
       }
       return bonusRate;
-   }  
-     
+   }
+
         //start public sale
-      // @param startTime 
-      // @param _endTime 
+      // @param startTime
+      // @param _endTime
    function startPublicsale(uint256 _startTime, uint256 _endTime) public onlyOwner {
       require(state == State.PRESALE && _endTime >= _startTime);
       state = State.PUBLICSALE;
@@ -779,8 +779,8 @@ contract TLCMarketCrowdsale is RefundableCrowdsale,CappedCrowdsale {
       publicSaleCap=publicSaleCap.add(presaleCap);
       presaleCap=presaleCap.sub(presaleCap);
    }
-    
-     
+
+
    //it will call when   crowdsale unsuccessful  if crowdsale  completed
    function finalization() internal {
        if(goalReached()){
@@ -788,26 +788,26 @@ contract TLCMarketCrowdsale is RefundableCrowdsale,CappedCrowdsale {
         token.mint(address(allocation), distributionSupply);
         distributionSupply=distributionSupply.sub(distributionSupply);
        }
-        
+
         token.finishMinting();
         super.finalization();
-         
+
    }
 
     //change Starttime
-   // @param startTime 
+   // @param startTime
    function changeStarttime(uint256 _startTime) public onlyOwner {
-        require(_startTime != 0);  
+        require(_startTime != 0);
         startTime = _startTime;
     }
-        
-   
-  //change Edntime      
+
+
+  //change Edntime
  // @param _endTime
   function changeEndtime(uint256 _endTime) public onlyOwner {
-        require(_endTime != 0);    
+        require(_endTime != 0);
         endTime = _endTime;
-           
+
         }
     //change token price per 1 ETH
      // @param _rate
@@ -821,7 +821,17 @@ contract TLCMarketCrowdsale is RefundableCrowdsale,CappedCrowdsale {
     // @param wallet address
    function changeWallet (address _wallet) onlyOwner  {
         wallet = _wallet;
-       
+
     }
-        
-   }
+
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
+}

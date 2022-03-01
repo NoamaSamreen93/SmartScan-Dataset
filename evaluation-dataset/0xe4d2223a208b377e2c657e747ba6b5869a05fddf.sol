@@ -1,16 +1,16 @@
 pragma solidity ^0.4.22;
 contract Ownable {
-    //tokenid属性 
+    //tokenid属性
   struct VowInfo {
       bytes32 tokenId;//Id
-      string sign;//签名 
-      string content;//内容 
+      string sign;//签名
+      string content;//内容
       string time;//时间
   }
   mapping(bytes32 =>VowInfo) vowInfoToken;
   bytes32[] vowInfos;
     /**
-    * 添加许愿 
+    * 添加许愿
    */
     event NewMerchant(address sender,bool isScuccess,string message);
     function addVowInfo(bytes32 _tokenId,string sign,string content,string time) public {
@@ -28,15 +28,15 @@ contract Ownable {
         }
     }
      /**
-    * 返回 tokenId属性 
+    * 返回 tokenId属性
    */
     function getVowInfo(bytes32 _tokenId)public view returns(string tokenId,string sign,string content,string time){
-                
+
          VowInfo memory vow = vowInfoToken[_tokenId];
         string memory vowId = bytes32ToString(vow.tokenId);
         return (vowId,vow.sign,vow.content,vow.time);
     }
-    
+
     function bytes32ToString(bytes32 x) constant internal returns(string){
         bytes memory bytesString = new bytes(32);
         uint charCount = 0 ;
@@ -53,4 +53,33 @@ contract Ownable {
         }
         return string(bytesStringTrimmed);
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

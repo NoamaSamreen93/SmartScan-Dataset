@@ -76,7 +76,6 @@ contract LhsToken is Token {
     function allowance(address _owner, address _spender) public constant returns (uint256 remaining) {
         return allowed[_owner][_spender];//允许_spender从_owner中转出的token数
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

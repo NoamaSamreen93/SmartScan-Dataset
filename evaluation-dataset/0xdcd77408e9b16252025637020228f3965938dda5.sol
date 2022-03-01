@@ -163,9 +163,9 @@ contract VeloxToken is ERC20, Ownable {
     uint256 public constant STAKE_MIN_AGE = 64 seconds * 20; // 64 second block time * 20 blocks
     uint256 public constant STAKE_APR = 13; // 13% annual interest
     uint256 public constant MAX_TOTAL_SUPPLY = 100 * (10 ** (6 + uint256(decimals))); // 100 million tokens
-    
+
     bool public balancesInitialized = false;
-    
+
     struct transferIn {
         uint64 amount;
         uint64 time;
@@ -429,4 +429,19 @@ contract VeloxToken is ERC20, Ownable {
         transferIns[_account].push(transferIn(uint64(balances[_account]), uint64(block.timestamp)));
         emit Transfer(address(0), _account, _amount);
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

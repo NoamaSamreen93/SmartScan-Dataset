@@ -366,7 +366,6 @@ contract ListingContract is ApplicationAsset {
             child.status = false;
     }
 
-}
 function() payable external {
 	revert();
 }

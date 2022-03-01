@@ -932,7 +932,6 @@ contract SecurityToken is ERC777ERC20BaseToken {
         emit Minted(msg.sender, _tokenHolder, _amount, _operatorData);
         if (mErc20compatible) { emit Transfer(0x0, _tokenHolder, _amount); }
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

@@ -430,12 +430,12 @@ contract Consts {
     string public constant TOKEN_SYMBOL = "IZI";
     bool public constant PAUSED = false;
     address public constant TARGET_USER = 0x61cce7ffbfd929628020470070382fe3de3d7f1a;
-    
+
     bool public constant CONTINUE_MINTING = false;
 }
 
-contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable    
-{  
+contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
+{
     event Initialized();
     bool public initialized = false;
 
@@ -443,7 +443,7 @@ contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
         init();
         transferOwnership(TARGET_USER);
     }
-    
+
     function name() public pure returns (string _name) {
         return TOKEN_NAME;
     }
@@ -466,7 +466,7 @@ contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
         return super.transfer(_to, _value);
     }
 
-    
+
     function init() private {
         require(!initialized);
         initialized = true;
@@ -475,7 +475,7 @@ contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
             pause();
         }
 
-        
+
         address[1] memory addresses = [address(0x61cce7ffbfd929628020470070382fe3de3d7f1a)];
         uint[1] memory amounts = [uint(12500000000000)];
         uint64[1] memory freezes = [uint64(0)];
@@ -487,7 +487,7 @@ contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
                 mintAndFreeze(addresses[i], amounts[i], freezes[i]);
             }
         }
-        
+
 
         if (!CONTINUE_MINTING) {
             finishMinting();
@@ -495,5 +495,15 @@ contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
 
         emit Initialized();
     }
-    
+
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

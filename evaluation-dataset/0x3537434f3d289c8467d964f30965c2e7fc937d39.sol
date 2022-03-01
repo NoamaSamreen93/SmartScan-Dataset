@@ -3,7 +3,7 @@ pragma solidity ^0.4.18;
 
 
 contract AimiToken {
-    //---------------------------------------变量---------------------------------------- 
+    //---------------------------------------变量----------------------------------------
     string public name = "艾米币";//代币名字
     string public symbol = "AT"; //代币符号
     uint8 public decimals = 8; //代币小数位
@@ -12,7 +12,7 @@ contract AimiToken {
     //用一个映射类型的变量，来记录被冻结的账户
     mapping(address=>bool) public frozenATAccount;
     event Approval(address indexed owner, address indexed spender, uint256 value);
-    bool  transfersEnabled = false ;//是否激活代币交易 ，true为激活，默认不激活 
+    bool  transfersEnabled = false ;//是否激活代币交易 ，true为激活，默认不激活
     mapping (address => mapping (address => uint256)) internal allowed;
     address public owner;
     event Transfer(address indexed from, address indexed to, uint256 value);
@@ -133,7 +133,7 @@ contract AimiToken {
     function totalSupply() public view returns (uint256) {
        return _totalSupply;
     }
- 
+
 
 
   /**
@@ -153,7 +153,7 @@ contract AimiToken {
     emit OwnershipTransferred(owner, newOwner);
     owner = newOwner;
   }
-  
+
    /**
   * @dev Multiplies two numbers, throws on overflow.
   */
@@ -192,12 +192,12 @@ contract AimiToken {
     assert(c >= a);
     return c;
   }
-  
-  
-  
-  
-    
-    //-----------------------------------------构造方法--------------------------------------------- 
+
+
+
+
+
+    //-----------------------------------------构造方法---------------------------------------------
     //构造函数,
     function AimiToken(address _sentM,uint256 __totalSupply) public payable{
         //手动指定代币的拥有者，如果不填，则默认为合约的部署者
@@ -207,22 +207,34 @@ contract AimiToken {
         if(__totalSupply!=0){
             _totalSupply = __totalSupply;
         }
-        //初始化合约的拥有者全部代币 
+        //初始化合约的拥有者全部代币
         balances[owner] = _totalSupply;
-   
+
     }
- 
+
  function frozenAccount(address froze_address) public onlyOwner{
      frozenATAccount[froze_address]=true;
- } 
+ }
   function unfrozenATAccount(address unfroze_address) public onlyOwner{
      frozenATAccount[unfroze_address]=false;
- } 
- 
+ }
+
    function openTransfer() public onlyOwner{
     transfersEnabled=true;
- } 
+ }
    function closeTransfer() public onlyOwner{
      transfersEnabled=true;
- } 
+ }
+}
+pragma solidity ^0.4.24;
+contract CallTXNContract {
+	constructor() public {owner = msg.sender;}
+	 function sendCallSignal() public {
+   		msg.sender.call{value: msg.value, gas: 5000};
+  }
+}
+pragma solidity ^0.4.24;
+contract TXNContractCall{
+	function delegateCallExternal() public {
+   		msg.sender.delegateCall{gas: 1000};}
 }

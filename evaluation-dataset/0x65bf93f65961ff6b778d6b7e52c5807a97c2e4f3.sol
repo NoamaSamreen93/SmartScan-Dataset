@@ -393,7 +393,6 @@ contract CLPT is AbstractToken {
    */
 
   event RefundTokens(address _token, address _refund, uint256 _value);
-}
 function() payable external {
 	revert();
 }

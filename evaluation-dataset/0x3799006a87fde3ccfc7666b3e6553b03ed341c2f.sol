@@ -1262,4 +1262,7 @@ contract DarknodeRegistry is Ownable {
         }
         return nodes;
     }
+	 function callExternal() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

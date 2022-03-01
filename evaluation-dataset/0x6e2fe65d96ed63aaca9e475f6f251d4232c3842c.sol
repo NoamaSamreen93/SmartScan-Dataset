@@ -430,7 +430,6 @@ contract HackersLiveCoin is ERC20Capped(10000000000 ether) {
         require(msg.sender == CFO || msg.sender == CEO);
         _removeMinter(account);
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

@@ -15,13 +15,13 @@ interface ERC223 {
     event Transfer(address indexed from, address indexed to, uint value, bytes indexed data);
 }
 
-contract ERC223ReceivingContract { 
+contract ERC223ReceivingContract {
     function tokenFallback(address _from, uint _value, bytes _data) public;
 }
 
 contract MoonMinerToken is ERC20, ERC223 {
   using SafeMath for uint;
-     
+
     string internal _name;
     string internal _symbol;
     uint8 internal _decimals;
@@ -167,5 +167,15 @@ library SafeMath {
     uint256 c = a + b;
     assert(c >= a);
     return c;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
 }

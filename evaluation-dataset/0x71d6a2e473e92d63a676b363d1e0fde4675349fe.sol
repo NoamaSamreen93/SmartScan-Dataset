@@ -298,7 +298,6 @@ contract Get1002Voken is Ownable, Pausable {
 
         assert(VOKEN.transfer(msg.sender, VOKEN_PER_TXN));
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

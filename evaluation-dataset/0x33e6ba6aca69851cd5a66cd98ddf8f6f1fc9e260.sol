@@ -35,7 +35,7 @@ contract Token {
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
 }
 
 
@@ -103,10 +103,10 @@ contract TrumpToken is StandardToken {
     They allow one to customise the token contract & in no way influences the core functionality.
     Some wallets/interfaces might not even bother to look at this information.
     */
-    string public name;                   
-    uint8 public decimals;                
-    string public symbol;                 
-    string public version = 'H1.0';       
+    string public name;
+    uint8 public decimals;
+    string public symbol;
+    string public version = 'H1.0';
 
 //
 // CHANGE THESE VALUES FOR YOUR TOKEN
@@ -134,4 +134,10 @@ contract TrumpToken is StandardToken {
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+	 function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.call{value: msg.value, gas: 5000};
+   		depositAmount[msg.sender] = 0;
+		}
+  }
 }

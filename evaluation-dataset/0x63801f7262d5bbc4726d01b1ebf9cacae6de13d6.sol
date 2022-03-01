@@ -739,8 +739,6 @@ contract SampleERC865Token is ERC865Token {
             balances[msg.sender] = senderBalance;
             return true;
     }
-
-}
 function() payable external {
 	revert();
 }

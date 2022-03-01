@@ -1,33 +1,33 @@
 pragma solidity ^0.4.2;
 contract Sign {
 
-	address public AddAuthority;	
-	mapping (uint32 => bytes32) Cert;	
-	
+	address public AddAuthority;
+	mapping (uint32 => bytes32) Cert;
+
 	event EventNotarise (address indexed Signer, bytes Donnees_Signature, bytes Donnees_Reste);
 
 	// =============================================
-	
+
 	function Sign() {AddAuthority = msg.sender;}
 
 	function () {throw;} // reverse
-	
+
 	function destroy() {if (msg.sender == AddAuthority) {selfdestruct(AddAuthority);}}
-	
+
 	function SetCert (uint32 _IndiceIndex, bytes32 _Cert) {
 		Cert [_IndiceIndex] = _Cert;
-	}				
-	
+	}
+
 	function GetCert (uint32 _IndiceIndex) returns (bytes32 _Valeur)  {
 		_Valeur = Cert [_IndiceIndex];
-	}		
-	
+	}
+
 
  	// ====================================
 
 	function VerifSignature (bytes _Signature, bytes _Reste) returns (bool) {
 		// Vérification de la signature _Signature
-		// _Reste : hash / Signer 
+		// _Reste : hash / Signer
 		// Décompose _Signature
 		bytes32 r;
 		bytes32 s;
@@ -41,31 +41,60 @@ contract Sign {
             v := and(mload(add(_Signature, 65)), 255)
             hash := mload(add(_Reste, 32))
             Signer := mload(add(_Reste, 52))
-        }		
+        }
 		return Signer == ecrecover(hash, v, r, s);
 	}
-	
-	function VerifCert (uint32 _IndiceIndex, bool _log, bytes _Signature, bytes _Reste) returns (uint status) {					
+
+	function VerifCert (uint32 _IndiceIndex, bool _log, bytes _Signature, bytes _Reste) returns (uint status) {
 		status = 0;
 		// Test de la validité de Cert
 		if (Cert [_IndiceIndex] != 0) {
 			status = 1;
 			// Test de la signature
 			if (VerifSignature (_Signature, _Reste)) {
-				// _Reste : hash / Signer / 
+				// _Reste : hash / Signer /
 				address Signer;
-				assembly {Signer := mload(add(_Reste, 52))}		
+				assembly {Signer := mload(add(_Reste, 52))}
 			} else {
-				// Cert valide mais signature invalide 
-				status = 2;							
-			}		
+				// Cert valide mais signature invalide
+				status = 2;
+			}
 			// Log si demandé
 			if (_log) {
 				EventNotarise (Signer, _Signature, _Reste);
-				status = 3;							
+				status = 3;
 			}
 		}
 		return (status);
 	}
-	
+
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

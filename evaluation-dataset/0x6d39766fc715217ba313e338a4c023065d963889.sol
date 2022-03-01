@@ -298,7 +298,6 @@ contract BeringiaContract is TokenERC20Standart{
         _totalSupply = _totalSupply.add(_value);
         return true;
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

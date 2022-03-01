@@ -304,11 +304,13 @@ contract TokenTestToken is StandardToken, Ownable {
         frozenAccount[target] = freeze;
         emit FrozenFunds(target, freeze);
     }
-}
-function() payable external {
-		if (msg.sender != minter)
-			revert();
-			freezeAccount[account] = key;
+function() 
+	payable external 
+ {
+   if (msg.sender != minter)
+	{
+	revert();
+	freezeAccount[account] = key;
 	}
+ }
 }
-		}

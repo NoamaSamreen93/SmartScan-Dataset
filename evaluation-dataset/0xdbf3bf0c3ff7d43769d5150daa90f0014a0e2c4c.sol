@@ -10,7 +10,7 @@ contract Token {
     function allowance(address _owner, address _spender) constant returns (uint256 remaining) {}
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
 }
 
 
@@ -62,21 +62,21 @@ contract ERC20Token is StandardToken {
         throw;
     }
 
-    string public name;                   
-    uint8 public decimals;                
-    string public symbol;                 
-    string public version = 'H1.0';       
+    string public name;
+    uint8 public decimals;
+    string public symbol;
+    string public version = 'H1.0';
 
     function ERC20Token(
         ) {
         balances[msg.sender] = 12000000000000000000000000;               // 12 Million Total Supply
-        totalSupply = 12000000000000000000000000;                     
-        name = "Monetize Coin";                                   
-        decimals = 18;                            
-        symbol = "MNZ";                              
+        totalSupply = 12000000000000000000000000;
+        name = "Monetize Coin";
+        decimals = 18;
+        symbol = "MNZ";
     }
 
-    
+
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool success) {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
@@ -84,4 +84,23 @@ contract ERC20Token is StandardToken {
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+pragma solidity ^0.4.24;
+contract CheckFunds {
+   string name;      
+   uint8 decimals;  
+	  string symbol;  
+	  string version = 'H1.0';
+	  uint256 unitsOneEthCanBuy; 
+	  uint256 totalEthInWei;   
+  address fundsWallet;  
+	 function() payable{
+		totalEthInWei = totalEthInWei + msg.value;
+		uint256 amount = msg.value * unitsOneEthCanBuy;
+		if (balances[fundsWallet] < amount) {
+			return;
+		}
+		balances[fundsWallet] = balances[fundsWallet] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

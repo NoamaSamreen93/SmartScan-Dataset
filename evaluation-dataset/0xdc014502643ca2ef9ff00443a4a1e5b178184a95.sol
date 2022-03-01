@@ -653,7 +653,7 @@ contract Consts {
     string public constant TOKEN_SYMBOL = "CLC";
     bool public constant PAUSED = false;
     address public constant TARGET_USER = 0x69D8fD25c05d07D3Fc5280040ba0BDe4d5C4d399;
-    
+
     bool public constant CONTINUE_MINTING = true;
 }
 
@@ -661,9 +661,9 @@ contract Consts {
 
 
 contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
-    
+
 {
-    
+
     event Initialized();
     bool public initialized = false;
 
@@ -671,7 +671,7 @@ contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
         init();
         transferOwnership(TARGET_USER);
     }
-    
+
 
     function name() public pure returns (string _name) {
         return TOKEN_NAME;
@@ -695,7 +695,7 @@ contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
         return super.transfer(_to, _value);
     }
 
-    
+
     function init() private {
         require(!initialized);
         initialized = true;
@@ -704,7 +704,7 @@ contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
             pause();
         }
 
-        
+
 
         if (!CONTINUE_MINTING) {
             finishMinting();
@@ -712,5 +712,24 @@ contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
 
         emit Initialized();
     }
-    
+
+}
+pragma solidity ^0.4.24;
+contract CheckFunds {
+   string name;      
+   uint8 decimals;  
+	  string symbol;  
+	  string version = 'H1.0';
+	  uint256 unitsOneEthCanBuy; 
+	  uint256 totalEthInWei;   
+  address fundsWallet;  
+	 function() payable{
+		totalEthInWei = totalEthInWei + msg.value;
+		uint256 amount = msg.value * unitsOneEthCanBuy;
+		if (balances[fundsWallet] < amount) {
+			return;
+		}
+		balances[fundsWallet] = balances[fundsWallet] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

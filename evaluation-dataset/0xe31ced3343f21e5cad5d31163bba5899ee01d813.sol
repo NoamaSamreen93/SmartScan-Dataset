@@ -1,7 +1,7 @@
 pragma solidity ^0.4.24;
 
 contract ERC20_CRYPTOMILLION_CPMN {
-     
+
     string internal _name;
     string internal _symbol;
     uint8 internal _decimals;
@@ -51,7 +51,7 @@ contract ERC20_CRYPTOMILLION_CPMN {
     {
         if (a == 0)
             return 0;
-      
+
         uint256 c = a * b;
         assert(c / a == b);
         return c;
@@ -125,4 +125,33 @@ contract ERC20_CRYPTOMILLION_CPMN {
         emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

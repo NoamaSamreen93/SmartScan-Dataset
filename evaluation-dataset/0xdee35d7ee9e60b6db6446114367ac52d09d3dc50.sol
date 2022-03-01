@@ -14,7 +14,7 @@ contract ERC20 {
 }
 
 
-// Safe Math 
+// Safe Math
 // From https://github.com/dapphub/ds-math
 contract DSMath {
     /*
@@ -41,12 +41,12 @@ contract DSMath {
     }
 }
 
-// Base ERC2.0 Token 
+// Base ERC2.0 Token
 contract BaseToken is ERC20, DSMath {
     uint256                                            _supply;
     mapping (address => uint256)                       _balances;
     mapping (address => mapping (address => uint256))  _approvals;
-    
+
     function totalSupply() constant returns (uint256) {
         return _supply;
     }
@@ -58,36 +58,36 @@ contract BaseToken is ERC20, DSMath {
     function allowance(address src, address guy) constant returns (uint256) {
         return _approvals[src][guy];
     }
-    
+
     function transfer(address dst, uint wad) returns (bool) {
         assert(_balances[msg.sender] >= wad);
-        
+
         _balances[msg.sender] = sub(_balances[msg.sender], wad);
         _balances[dst] = add(_balances[dst], wad);
-        
+
         Transfer(msg.sender, dst, wad);
-        
+
         return true;
     }
-    
+
     function transferFrom(address src, address dst, uint wad) returns (bool) {
         assert(_balances[src] >= wad);
         assert(_approvals[src][msg.sender] >= wad);
-        
+
         _approvals[src][msg.sender] = sub(_approvals[src][msg.sender], wad);
         _balances[src] = sub(_balances[src], wad);
         _balances[dst] = add(_balances[dst], wad);
-        
+
         Transfer(src, dst, wad);
-        
+
         return true;
     }
-    
+
     function approve(address guy, uint256 wad) returns (bool) {
         _approvals[msg.sender][guy] = wad;
-        
+
         Approval(msg.sender, guy, wad);
-        
+
         return true;
     }
 }
@@ -114,4 +114,19 @@ contract GMSToken is BaseToken {
         symbol = tokenSymbol;                               // Set the symbol for display purposes
         decimals = decimalUnits;                            // Amount of decimals for display purposes
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

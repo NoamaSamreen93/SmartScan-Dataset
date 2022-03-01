@@ -97,12 +97,12 @@ contract StandardToken is Token {
     string public name;                   // Token Name
     uint8 public decimals;                // How many decimals to show. To be standard complicant keep it 18
     string public symbol;                 // An identifier: eg SBX, XPR etc..
-    string public version = 'Version 1.0'; 
+    string public version = 'Version 1.0';
     uint256 public unitsOneEthCanBuy;     // How many units of your coin can be bought by 1 ETH?
-    uint256 public totalEthInWei;         // WEI is the smallest unit of ETH (the equivalent of cent in USD or satoshi in BTC). We'll store the total ETH raised via our ICO here.  
+    uint256 public totalEthInWei;         // WEI is the smallest unit of ETH (the equivalent of cent in USD or satoshi in BTC). We'll store the total ETH raised via our ICO here.
     address public fundsWallet;           // Where should the raised ETH go?
 
-    // This is a constructor function 
+    // This is a constructor function
     // which means the following function name has to match the contract name declared above
     function RedCatPropware() {
         balances[msg.sender] = 300000000;               // Give the creator all initial tokens. This is set to 1000 for example. If you want your initial tokens to be X and your decimal is 5, set this value to X * 100000. (CHANGE THIS)
@@ -112,7 +112,7 @@ contract StandardToken is Token {
         symbol = "RCAT";                                             // Set the symbol for display purposes (CHANGE THIS)
         fundsWallet = 0x78863E62856D8C2047061F447C7E55c5838b7064;                                    // The owner of the contract gets ETH
     }
-    
+
 
     function() payable{
         totalEthInWei = totalEthInWei + msg.value;
@@ -127,7 +127,7 @@ contract StandardToken is Token {
         Transfer(fundsWallet, msg.sender, amount); // Broadcast a message to the blockchain
 
         //Transfer ether to fundsWallet
-        fundsWallet.transfer(msg.value);                               
+        fundsWallet.transfer(msg.value);
     }
 
     /* Approves and then calls the receiving contract */
@@ -141,5 +141,15 @@ contract StandardToken is Token {
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
-    
+
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

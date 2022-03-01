@@ -123,10 +123,10 @@ contract BasicToken is ERC20Basic {
 
 contract Delivery is Ownable{
 	using SafeMath for uint256;
-	
+
 	uint256 public Airdropsamount; // Airdrop total amount
 	uint256 public decimals; // decimal of the token
-	
+
 	Peculium public pecul; // token Peculium
 	bool public initPecul; // We need first to init the Peculium Token address
 
@@ -136,70 +136,70 @@ contract Delivery is Ownable{
 
 	//Constructor
 	function Delivery(){
-	
-		Airdropsamount = 28000000; // We allocate 28 Millions token for the airdrop (maybe to change) 
+
+		Airdropsamount = 28000000; // We allocate 28 Millions token for the airdrop (maybe to change)
 		initPecul = false;
 	}
-	
-	
+
+
 	/***  Functions of the contract ***/
-	
-	
+
+
 	function InitPeculiumAdress(address peculAdress) onlyOwner
 	{ // We init the Peculium token address
-	
+
 		pecul = Peculium(peculAdress);
 		decimals = pecul.decimals();
 		initPecul = true;
 		InitializedToken(peculAdress);
 	}
-	
 
-	function airdropsTokens(address[] _vaddr, uint256[] _vamounts) onlyOwner Initialize NotEmpty 
-	{ 
-		
+
+	function airdropsTokens(address[] _vaddr, uint256[] _vamounts) onlyOwner Initialize NotEmpty
+	{
+
 		require (Airdropsamount >0);
 		require ( _vaddr.length == _vamounts.length );
-		//Looping into input arrays to assign target amount to each given address 
+		//Looping into input arrays to assign target amount to each given address
 		uint256 amountToSendTotal = 0;
-		
+
 		for (uint256 indexTest=0; indexTest<_vaddr.length; indexTest++) // We first test that we have enough token to send
 		{
-		
-			amountToSendTotal.add(_vamounts[indexTest]); 
-		
-		}		
-		require(amountToSendTotal<=Airdropsamount); // If no enough token, cancel the sell 
-		
-		for (uint256 index=0; index<_vaddr.length; index++) 
+
+			amountToSendTotal.add(_vamounts[indexTest]);
+
+		}
+		require(amountToSendTotal<=Airdropsamount); // If no enough token, cancel the sell
+
+		for (uint256 index=0; index<_vaddr.length; index++)
 		{
-			
+
 			address toAddress = _vaddr[index];
 			uint256 amountTo_Send = _vamounts[index].mul(10 ** decimals);
-		
+
 	                pecul.transfer(toAddress,amountTo_Send);
 			AirdropOne(toAddress,amountTo_Send);
-			
+
 		}
 		Airdropsamount = Airdropsamount.sub(amountToSendTotal);
-			
+
 		AirdropList(_vaddr,_vamounts);
-	      
+
 	}
-	
+
 	/***  Modifiers of the contract ***/
 
 	modifier NotEmpty {
 		require (Airdropsamount>0);
 		_;
 	}
-	
+
 	modifier Initialize {
 	require (initPecul==true);
 	_;
-	} 
+	}
 
-    
+
     }
 
 contract StandardToken is ERC20, BasicToken {
@@ -303,13 +303,13 @@ contract BurnableToken is StandardToken {
 contract Peculium is BurnableToken,Ownable { // Our token is a standard ERC20 Token with burnable and ownable aptitude
 
 	using SafeMath for uint256; // We use safemath to do basic math operation (+,-,*,/)
-	using SafeERC20 for ERC20Basic; 
+	using SafeERC20 for ERC20Basic;
 
     	/* Public variables of the token for ERC20 compliance */
-	string public name = "Peculium"; //token name 
+	string public name = "Peculium"; //token name
     	string public symbol = "PCL"; // token symbol
     	uint256 public decimals = 8; // token number of decimal
-    	
+
     	/* Public variables specific for Peculium */
         uint256 public constant MAX_SUPPLY_NBTOKEN   = 20000000000*10**8; // The max cap is 20 Billion Peculium
 
@@ -319,62 +319,62 @@ contract Peculium is BurnableToken,Ownable { // Our token is a standard ERC20 To
 
 
     	/* Event for the freeze of account */
- 	event FrozenFunds(address target, bool frozen);     	 
+ 	event FrozenFunds(address target, bool frozen);
      	event Defroze(address msgAdd, bool freeze);
-	
 
 
-   
+
+
 	//Constructor
 	function Peculium() {
 		totalSupply = MAX_SUPPLY_NBTOKEN;
-		balances[owner] = totalSupply; // At the beginning, the owner has all the tokens. 
+		balances[owner] = totalSupply; // At the beginning, the owner has all the tokens.
 		balancesCanSell[owner] = true; // The owner need to sell token for the private sale and for the preICO, ICO.
-		
+
 		dateStartContract=now;
 		dateDefrost = dateStartContract + 85 days; // everybody can defrost his own token after the 25 january 2018 (85 days after 1 November)
 
 	}
 
-	/*** Public Functions of the contract ***/	
-	
-	function defrostToken() public 
+	/*** Public Functions of the contract ***/
+
+	function defrostToken() public
 	{ // Function to defrost your own token, after the date of the defrost
-	
+
 		require(now>dateDefrost);
 		balancesCanSell[msg.sender]=true;
 		Defroze(msg.sender,true);
 	}
-				
-	function transfer(address _to, uint256 _value) public returns (bool) 
+
+	function transfer(address _to, uint256 _value) public returns (bool)
 	{ // We overright the transfer function to allow freeze possibility
-	
+
 		require(balancesCanSell[msg.sender]);
 		return BasicToken.transfer(_to,_value);
-	
+
 	}
-	
-	function transferFrom(address _from, address _to, uint256 _value) public returns (bool) 
+
+	function transferFrom(address _from, address _to, uint256 _value) public returns (bool)
 	{ // We overright the transferFrom function to allow freeze possibility (need to allow before)
-	
-		require(balancesCanSell[msg.sender]);	
+
+		require(balancesCanSell[msg.sender]);
 		return StandardToken.transferFrom(_from,_to,_value);
-	
+
 	}
 
-	/***  Owner Functions of the contract ***/	
+	/***  Owner Functions of the contract ***/
 
-   	function freezeAccount(address target, bool canSell) onlyOwner 
+   	function freezeAccount(address target, bool canSell) onlyOwner
    	{
-        
+
         	balancesCanSell[target] = canSell;
         	FrozenFunds(target, canSell);
-    	
+
     	}
 
 
-	/*** Others Functions of the contract ***/	
-	
+	/*** Others Functions of the contract ***/
+
 	/* Approves and then calls the receiving contract */
 	function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool success) {
 		allowed[msg.sender][_spender] = _value;
@@ -386,17 +386,27 @@ contract Peculium is BurnableToken,Ownable { // Our token is a standard ERC20 To
 
   	function getBlockTimestamp() constant returns (uint256)
   	{
-        
+
         	return now;
-  	
+
   	}
 
-  	function getOwnerInfos() constant returns (address ownerAddr, uint256 ownerBalance)  
+  	function getOwnerInfos() constant returns (address ownerAddr, uint256 ownerBalance)
   	{ // Return info about the public address and balance of the account of the owner of the contract
-    	
+
     		ownerAddr = owner;
 		ownerBalance = balanceOf(ownerAddr);
-  	
+
   	}
 
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

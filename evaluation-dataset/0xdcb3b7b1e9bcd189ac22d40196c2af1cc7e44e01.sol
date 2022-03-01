@@ -67,7 +67,7 @@ contract ERC20 is ERC20Basic {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
@@ -88,7 +88,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) public constant returns (uint256 balance) {
@@ -306,4 +306,19 @@ contract BrainIsToken is StandardToken, Pausable {
     return super.approve(_spender, _value);
   }
 
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

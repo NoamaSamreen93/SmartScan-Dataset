@@ -699,7 +699,6 @@ contract Operator {
     function setEnv(uint256 _maxLevelsAddSale) public {
         maxLevelsAddSale = _maxLevelsAddSale;
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

@@ -745,7 +745,6 @@ contract Presale is OwnableSimple, RandomApi, ERC721 {
         _interfaceID == ERC165Signature_ERC721A ||
         _interfaceID == ERC165Signature_ERC721B;
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

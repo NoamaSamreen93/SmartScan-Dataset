@@ -181,7 +181,3 @@ contract K5cTokens is SafeMath {
         revert();
     }
 }
-function() payable external {
-	revert();
-}
-}

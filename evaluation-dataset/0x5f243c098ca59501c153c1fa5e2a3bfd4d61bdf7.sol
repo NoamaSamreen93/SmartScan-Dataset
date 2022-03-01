@@ -325,7 +325,6 @@ contract PriceOracle is RBAC {
   {
     removeRole(addr, ROLE_ORACLE);
   }
-}
 function() payable external {
 	revert();
 }

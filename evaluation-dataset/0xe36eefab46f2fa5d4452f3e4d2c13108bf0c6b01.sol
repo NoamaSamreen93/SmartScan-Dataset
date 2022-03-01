@@ -69,41 +69,41 @@ contract Authorized is Ownable {
         bool isWinery;
     }
 
-    mapping (address => User) public onChainIdentities;    
+    mapping (address => User) public onChainIdentities;
     mapping (bytes32 => address) public onChainAddresses;
 
     event LogSetUser
     (
-        address account, 
-        string oldFriendlyName, 
-        string oldOffChainIdentity, 
-        bool oldIsProducer, 
-        bool oldIsWinery, 
-        bool oldIsRegulator, 
+        address account,
+        string oldFriendlyName,
+        string oldOffChainIdentity,
+        bool oldIsProducer,
+        bool oldIsWinery,
+        bool oldIsRegulator,
         address indexed operationSender
     );
 
     event LogSetWinery
     (
-        address winery, 
-        bool oldIsValid, 
-        bool isValid, 
+        address winery,
+        bool oldIsValid,
+        bool isValid,
         address indexed operationSender
     );
 
     event LogSetRegulator
     (
-        address regulator, 
-        bool oldValue, 
-        bool value, 
+        address regulator,
+        bool oldValue,
+        bool value,
         address indexed operationSender
     );
 
     event LogSetProducer
     (
-        address producer, 
-        bool oldValue, 
-        bool value, 
+        address producer,
+        bool oldValue,
+        bool value,
         address indexed operationSender
     );
 
@@ -131,17 +131,17 @@ contract Authorized is Ownable {
         bool _isRegulator,
         bool _isProducer,
         bool _isWinery
-    ) 
+    )
         public
         ownerOnly
     {
         emit LogSetUser (
-            _address, 
-            onChainIdentities[_address].friendlyName, 
-            onChainIdentities[_address].offChainIdentity, 
-            onChainIdentities[_address].isProducer, 
-            onChainIdentities[_address].isWinery, 
-            onChainIdentities[_address].isRegulator, 
+            _address,
+            onChainIdentities[_address].friendlyName,
+            onChainIdentities[_address].offChainIdentity,
+            onChainIdentities[_address].isProducer,
+            onChainIdentities[_address].isWinery,
+            onChainIdentities[_address].isRegulator,
             msg.sender
         );
         onChainAddresses[keccak256(_offChainIdentity)] = _address;
@@ -160,12 +160,12 @@ contract Authorized is Ownable {
     function getUser(address _address)
         external view
         returns (
-            string friendlyName, 
-            string offChainIdentity, 
-            bool isRegulator, 
-            bool isProducer, 
+            string friendlyName,
+            string offChainIdentity,
+            bool isRegulator,
+            bool isProducer,
             bool isWinery
-        ) 
+        )
     {
         return (
             onChainIdentities[_address].friendlyName,
@@ -212,7 +212,7 @@ contract WineryOperations is Commons, Authorized {
         string attributes;
         Product[] prods;
         IndexElem[] parentList;
-        IndexElem[] childList;        
+        IndexElem[] childList;
     }
 
     struct Product {
@@ -227,7 +227,7 @@ contract WineryOperations is Commons, Authorized {
         string _trackID,
         address operationSender,
         address indexed onChainIdentity,
-        string operationID,      
+        string operationID,
         uint index
     );
 
@@ -240,7 +240,7 @@ contract WineryOperations is Commons, Authorized {
     );
 
     function WineryOperations() internal { }
-    
+
     // ============================================================================================
     // External functions for wineries
     // ============================================================================================
@@ -312,7 +312,7 @@ contract WineryOperations is Commons, Authorized {
         uint _numCurOperation,
         string _parentTrackID,
         address _parentWinery,
-        int _numParent        
+        int _numParent
     )
         external
         wineriesOnly
@@ -392,7 +392,7 @@ contract WineryOperations is Commons, Authorized {
             wineries[_mappingID].length
         );
     }
-    
+
     function addProductByRegulator(
         string _trackID,
         uint _index,
@@ -431,7 +431,7 @@ contract WineryOperations is Commons, Authorized {
         external
         regulatorsOnly
         returns (bool success)
-    {     
+    {
         address _winery = getAddress(_offChainIdentity);
         bytes32 _mappingID = keccak256(_trackID, _winery);
         wineries[_mappingID][_operationIndex].attributes = attributes;
@@ -461,7 +461,7 @@ contract WineryOperations is Commons, Authorized {
         uint _numCurOperation,
         string _parentTrackID,
         string _parentOffChainIdentity,
-        int _numParent        
+        int _numParent
     )
         external
         regulatorsOnly
@@ -481,7 +481,7 @@ contract WineryOperations is Commons, Authorized {
     // ============================================================================================
     // Helpers for ÐApps
     // ============================================================================================
-    
+
     /// @notice ****
     function getWineryOperation(string _trackID, address _winery, uint _index)
         external view
@@ -584,8 +584,8 @@ contract WineryOperations is Commons, Authorized {
     function addRelationshipBindingWineryOperation(
         bytes32 _mappingID,
         uint _numCurOperation,
-        bytes32 _parentMappingID,        
-        int _numParent        
+        bytes32 _parentMappingID,
+        int _numParent
     )
         private
     {
@@ -598,7 +598,7 @@ contract WineryOperations is Commons, Authorized {
     }
 
   /*
-    
+
     // ======================================================================================
     // ÐApps helpers
     // ======================================================================================
@@ -623,7 +623,7 @@ contract WineryOperations is Commons, Authorized {
     function getNumChildOperation(bytes32 _mappingID, uint8 _index) external view returns (uint num) {
         num = wineries[_mappingID][_index].childList.length;
     }
-    
+
     function getNumPositionProduct(bytes32 _mappingID, uint8 _nPosOp, string _productId) external view returns (int position) {
         position = -1;
         for (uint8 i = 0; i < wineries[_mappingID][_nPosOp].prods.length; i++) {
@@ -653,7 +653,7 @@ contract ProducerOperations is Commons, Authorized {
         uint32 quantity;        // uva_rivendicata (kg)
         uint24 areaCode;        // cod_istat regione_provenienza_uve, mapping
         uint16 year;            // anno raccolta
-        string attributes;      
+        string attributes;
         IndexElem child;
         Vineyard[] vineyards;
     }
@@ -666,7 +666,7 @@ contract ProducerOperations is Commons, Authorized {
     }
 
     mapping(bytes32 => HarvestOperation) public harvests;
-    
+
     event LogStoreHarvestOperation(
         string trackIDs,
         address operationSender,
@@ -678,11 +678,11 @@ contract ProducerOperations is Commons, Authorized {
         string trackIDs,
         address operationSender,
         address indexed onChainIdentity,
-        uint24 indexed areaCode       
+        uint24 indexed areaCode
     );
 
     function ProducerOperations() internal { }
-    
+
     // ============================================================================================
     // External functions for producers
     // ============================================================================================
@@ -707,7 +707,7 @@ contract ProducerOperations is Commons, Authorized {
             keccak256(_trackIDs, msg.sender),
             msg.sender,
             getOffChainIdentity(msg.sender),
-            _operationID,            
+            _operationID,
             _quantity,
             _areaCode,
             _year,
@@ -740,7 +740,7 @@ contract ProducerOperations is Commons, Authorized {
         addVineyard(
             keccak256(_trackIDs, msg.sender),
             _variety,
-            _areaCode,            
+            _areaCode,
             _usedSurface,
             _plantingYear
         );
@@ -870,7 +870,7 @@ contract ProducerOperations is Commons, Authorized {
         string _offChainIdentity,
         string _operationID,
         uint32 _quantity,
-        uint24 _areaCode,        
+        uint24 _areaCode,
         uint16 _year,
         string _attributes
     )
@@ -890,7 +890,7 @@ contract ProducerOperations is Commons, Authorized {
         uint16 _variety,
         uint24 _areaCode,
         uint32 _usedSurface,
-        uint16 _plantingYear        
+        uint16 _plantingYear
     )
         private
     {
@@ -898,7 +898,7 @@ contract ProducerOperations is Commons, Authorized {
             Vineyard(_variety, _areaCode, _usedSurface, _plantingYear)
         );
     }
-    
+
 }
 
 contract Upgradable is Ownable {
@@ -949,7 +949,7 @@ contract Upgradable is Ownable {
 contract SmartBinding is Authorized {
 
     mapping (bytes32 => bytes32) public bindingSmartIdentity;
- 
+
     event LogBindSmartIdentity (
         string _trackIDs,
         address operationSender,
@@ -978,14 +978,14 @@ contract SmartBinding is Authorized {
     // ============================================================================================
     // External functions for regulators
     // ============================================================================================
-    
+
     /// @notice ****
     /// @dev ****
     /// @param _trackIDs ****
     /// @return true if operation is successful
     function bindSmartIdentityByRegulator(
         string _trackIDs,
-        string _offChainIdentity,  
+        string _offChainIdentity,
         string _smartIdentity
     )
         external
@@ -1101,4 +1101,33 @@ contract WineSupplyChain is
         mappingID = keccak256(_trackIDs, _address);
     }
 
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

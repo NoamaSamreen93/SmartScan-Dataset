@@ -34,12 +34,12 @@ pragma solidity ^0.4.18;
  * about risks and limitations, please visit:
  *
  * https://www.iame.io
- * 
+ *
  **/
- 
+
 /**
  * Private Sale Contract Guide:
- * 
+ *
  * Start Date: 18 April 2018.
  * Contributions to this contract made before Start Date will be returned to sender.
  * Closing Date: 20 May 2018 at 2018.
@@ -151,4 +151,14 @@ contract IAMEPrivateSale is Owned {
     return result;
   }
 
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

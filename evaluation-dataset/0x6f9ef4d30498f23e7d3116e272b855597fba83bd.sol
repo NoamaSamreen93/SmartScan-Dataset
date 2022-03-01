@@ -234,7 +234,6 @@ function () external payable{
     jackpot = jackpot.add(base.mul(9)); // allocation to jackpot
     devfee = devfee.add(base);
 }// needed for P3D divs receiving
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

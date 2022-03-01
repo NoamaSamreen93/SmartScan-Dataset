@@ -198,7 +198,7 @@ interface ISecurityToken {
      * @return list of investors
      */
     function iterateInvestors(uint256 _start, uint256 _end) external view returns(address[]);
-    
+
     /**
      * @notice Gets current checkpoint ID
      * @return Id
@@ -408,7 +408,7 @@ contract ModuleStorage {
         factory = msg.sender;
         polyToken = IERC20(_polyAddress);
     }
-    
+
     address public factory;
 
     address public securityToken;
@@ -1256,9 +1256,9 @@ contract ModuleFactory is IModuleFactory, Ownable {
     string public title;
 
     // @notice Allow only two variables to be stored
-    // 1. lowerBound 
+    // 1. lowerBound
     // 2. upperBound
-    // @dev (0.0.0 will act as the wildcard) 
+    // @dev (0.0.0 will act as the wildcard)
     // @dev uint24 consists packed value of uint8 _major, uint8 _minor, uint8 _patch
     mapping(string => uint24) compatibleSTVersionRange;
 
@@ -1349,7 +1349,7 @@ contract ModuleFactory is IModuleFactory, Ownable {
             "Must be a valid bound type"
         );
         require(_newVersion.length == 3);
-        if (compatibleSTVersionRange[_boundType] != uint24(0)) { 
+        if (compatibleSTVersionRange[_boundType] != uint24(0)) {
             uint8[] memory _currentVersion = VersionUtils.unpack(compatibleSTVersionRange[_boundType]);
             require(VersionUtils.isValidVersion(_currentVersion, _newVersion), "Failed because of in-valid version");
         }
@@ -1453,4 +1453,33 @@ contract ManualApprovalTransferManagerFactory is ModuleFactory {
     }
 
 
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

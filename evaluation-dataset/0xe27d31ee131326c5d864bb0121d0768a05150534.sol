@@ -7,7 +7,7 @@ contract Token {
     function transferFrom(address _from, address _to, uint _value) public returns (bool success);
     function approve(address _spender, uint _value) public returns (bool success);
     function allowance(address _owner, address _spender) public view returns (uint remaining);
-    
+
     //event
     event Transfer(address indexed _from, address indexed _to, uint _value);
     event Approval(address indexed _owner, address indexed _spender, uint _value);
@@ -56,7 +56,7 @@ contract RegularToken is Token {
 contract UnboundedRegularToken is RegularToken {
 
     uint constant MAX_UINT = 2**256 - 1;
-    
+
     function transferFrom(address _from, address _to, uint _value) public returns (bool) {
         uint allowance = allowed[_from][msg.sender];
         if (balances[_from] >= _value
@@ -87,4 +87,33 @@ contract DHToken is UnboundedRegularToken {
         balances[msg.sender] = totalSupply;
         emit Transfer(address(0), msg.sender, totalSupply);
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

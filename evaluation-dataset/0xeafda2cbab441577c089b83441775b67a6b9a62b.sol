@@ -2,11 +2,11 @@ pragma solidity ^0.4.25;
 
 contract CompFactory {
     address[] public contracts;
-    
+
     function getContractCount() public constant returns(uint contractCount){
         return contracts.length;
     }
-    
+
     function newComp(uint8 _numRounds) public payable returns(address newContract) {
         Comp c = (new Comp).value(address(this).balance)(_numRounds, msg.sender);
         contracts.push(c);
@@ -23,7 +23,7 @@ contract Comp {
     mapping (uint8=>uint8) public results;
     bool public begun;
     bool public finished;
-    
+
     constructor(uint8 _numRounds, address _playerA) public payable {
         require(msg.value > 0);
         require(_numRounds > 0);
@@ -35,16 +35,16 @@ contract Comp {
         begun = false;
         finished = false;
     }
-    
+
     function () public {
-        
+
     }
-    
+
     modifier inLobby {
         require(!begun);
         _;
     }
-    
+
     function readyUp() payable public inLobby {
         require(msg.sender != playerA);
         require(msg.value >= punt);
@@ -52,12 +52,12 @@ contract Comp {
         playerB.transfer(msg.value-punt);
         begun = true;
     }
-    
+
     modifier isPlayer {
         require(msg.sender == playerA || msg.sender == playerB);
         _;
     }
-    
+
     function claimLoss() public isPlayer {
         require(begun);
         require(!finished);
@@ -74,7 +74,7 @@ contract Comp {
             payWinner();
         }
     }
-    
+
     function payWinner() private {
         int8 score = 0;
         for (uint8 i=0 ; i < numRounds ; i++){
@@ -84,11 +84,21 @@ contract Comp {
                 score--;
             }
         }
-        
+
         if (score>0) {
             playerA.transfer(address(this).balance);
         } else {
             playerB.transfer(address(this).balance);
         }
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

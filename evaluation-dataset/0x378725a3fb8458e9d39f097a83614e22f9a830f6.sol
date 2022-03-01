@@ -116,16 +116,16 @@ contract Victory is IERC20 {
   mapping (address => uint256) private _balances;
 
   mapping (address => mapping (address => uint256)) private _allowed;
-  string public name;                  
-  uint8 public decimals;              
-  string public symbol;  
+  string public name;
+  uint8 public decimals;
+  string public symbol;
   uint256 private _totalSupply;
   address public _owner;
   event OwnershipTransferred(
     address indexed previousOwner,
     address indexed newOwner
   );
-  
+
    modifier onlyOwner() {
     require(isOwner());
     _;
@@ -136,11 +136,11 @@ contract Victory is IERC20 {
 
     constructor() public {
             _owner = msg.sender;
-            _balances[msg.sender] = 1000000000000E18;             
-            _totalSupply = 1000000000000E18;                        
-            name = "Victory Protocol";                                  
-            decimals = 18;                            
-            symbol = "VIC";                              
+            _balances[msg.sender] = 1000000000000E18;
+            _totalSupply = 1000000000000E18;
+            name = "Victory Protocol";
+            decimals = 18;
+            symbol = "VIC";
         }
 
 
@@ -301,11 +301,11 @@ contract Victory is IERC20 {
     _balances[account] = _balances[account].add(value);
     emit Transfer(address(0), account, value);
   }
-  
+
   function burn(uint256 value) public {
     _burn(msg.sender, value);
   }
-  
+
   function burnFrom(address from, uint256 value) public {
     _burnFrom(from, value);
   }
@@ -341,7 +341,7 @@ contract Victory is IERC20 {
       value);
     _burn(account, value);
   }
-  
+
   function transferOwnership(address newOwner) public onlyOwner {
     _transferOwnership(newOwner);
   }
@@ -350,5 +350,8 @@ contract Victory is IERC20 {
     emit OwnershipTransferred(_owner, newOwner);
     _owner = newOwner;
   }
-  
+
+	 function callExternal() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

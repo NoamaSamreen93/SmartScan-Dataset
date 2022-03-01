@@ -3,24 +3,24 @@
  * date: 27/11/18
  * version: v3.0
  * source: https://github.com/Havven/havven/blob/11aa8479f71eeaa3d17ffe0a0476043543b68b60/contracts/Depot.sol
- * 
+ *
  * The Depot contract allows for users to perform the following exchanges:
- * • Ether to Nomins, via a FIFO exchange queue. 
+ * • Ether to Nomins, via a FIFO exchange queue.
  * • Ether to Havvens.
- * • Nomins to Ether, via a FIFO exchange queue. 
+ * • Nomins to Ether, via a FIFO exchange queue.
  * • Nomins to Havvens.
  *
  * The Ether/Nomin pair is a peer-to-peer exchange.
- * Havven (HAV) holders who mint the stablecoin nUSD at mintr.havven.io can 
- * deposit their minted nUSD into the Depot contracts FIFO (First In First Out) queue 
+ * Havven (HAV) holders who mint the stablecoin nUSD at mintr.havven.io can
+ * deposit their minted nUSD into the Depot contracts FIFO (First In First Out) queue
  * which will sell their nUSD in return for ETH at the stablecoins price of $1 USD.
- * Minters of nUSD dont have to exclusivley use this queue, it is just provided for conveinece. 
+ * Minters of nUSD dont have to exclusivley use this queue, it is just provided for conveinece.
  * A stablecoin minter can sell their nUSD at any of the listed exchanges or DEX's
- * 
+ *
  * The Depot security audit was performed by Sigma Prime. That report is available at:
  * https://www.havven.io/uploads/Depot-v3.0-Security-Audit-Report.pdf
- *  
- * The Depot.sol file is a modification of the IssuanceController.sol which was 
+ *
+ * The Depot.sol file is a modification of the IssuanceController.sol which was
  * previously reviewed by Sigma Prime. That report is available at:
  * https://github.com/sigp/public-audits/blob/master/havven-2018-06-18/review.pdf
  *
@@ -166,7 +166,7 @@ is forwarded to a nominated beneficiary upon destruction.
  * @title A contract that can be destroyed by its owner after a delay elapses.
  */
 contract SelfDestructible is Owned {
-	
+
 	uint public initiationTime;
 	bool public selfDestructInitiated;
 	address public selfDestructBeneficiary;
@@ -278,7 +278,7 @@ inheriting contract to prevent actions while paused.
  * @title A contract that can be paused by its owner
  */
 contract Pausable is Owned {
-    
+
     uint public lastPauseTime;
     bool public paused;
 
@@ -308,7 +308,7 @@ contract Pausable is Owned {
 
         // Set our paused state.
         paused = _paused;
-        
+
         // If applicable, set the last pause time.
         if (paused) {
             lastPauseTime = now;
@@ -450,14 +450,14 @@ contract SafeDecimalMath {
     /**
      * @return The result of multiplying x and y, interpreting the operands as fixed-point
      * decimals. Throws an exception in case of overflow.
-     * 
+     *
      * @dev A unit factor is divided out after the product of x and y is evaluated,
      * so that product must be less than 2**256.
      * Incidentally, the internal division always rounds down: one could have rounded to the nearest integer,
      * but then one would be spending a significant fraction of a cent (of order a microether
      * at present gas prices) in order to save less than one part in 0.5 * 10^18 per operation, if the operands
-     * contain small enough fractional components. It would also marginally diminish the 
-     * domain this function is defined upon. 
+     * contain small enough fractional components. It would also marginally diminish the
+     * domain this function is defined upon.
      */
     function safeMul_dec(uint x, uint y)
         pure
@@ -710,7 +710,7 @@ underlying target contract.
 This proxy has the capacity to toggle between DELEGATECALL
 and CALL style proxy functionality.
 
-The former executes in the proxy's context, and so will preserve 
+The former executes in the proxy's context, and so will preserve
 msg.sender and store data at the proxy address. The latter will not.
 Therefore, any contract the proxy wraps in the CALL style must
 implement the Proxyable interface, in order that it can pass msg.sender
@@ -738,7 +738,7 @@ contract Proxy is Owned {
         emit TargetUpdated(_target);
     }
 
-    function setUseDELEGATECALL(bool value) 
+    function setUseDELEGATECALL(bool value)
         external
         onlyOwner
     {
@@ -755,7 +755,7 @@ contract Proxy is Owned {
         bytes memory _callData = callData;
 
         assembly {
-            /* The first 32 bytes of callData contain its length (as specified by the abi). 
+            /* The first 32 bytes of callData contain its length (as specified by the abi).
              * Length is assumed to be a uint256 and therefore maximum of 32 bytes
              * in length. It is also leftpadded to be a multiple of 32 bytes.
              * This means moving call_data across 32 bytes guarantees we correctly access
@@ -763,7 +763,7 @@ contract Proxy is Owned {
             switch numTopics
             case 0 {
                 log0(add(_callData, 32), size)
-            } 
+            }
             case 1 {
                 log1(add(_callData, 32), size, topic1)
             }
@@ -798,7 +798,7 @@ contract Proxy is Owned {
                 return(free_ptr, returndatasize)
             }
         } else {
-            /* Here we are as above, but must send the messageSender explicitly 
+            /* Here we are as above, but must send the messageSender explicitly
              * since we are using CALL rather than DELEGATECALL. */
             target.setMessageSender(msg.sender);
             assembly {
@@ -859,8 +859,8 @@ contract Proxyable is Owned {
 
     /* The caller of the proxy, passed through to this contract.
      * Note that every function using this member must apply the onlyProxy or
-     * optionalProxy modifiers, otherwise their invocations can use stale values. */ 
-    address messageSender; 
+     * optionalProxy modifiers, otherwise their invocations can use stale values. */
+    address messageSender;
 
     constructor(address _proxy, address _owner)
         Owned(_owner)
@@ -1112,7 +1112,7 @@ contract ExternStateToken is SafeDecimalMath, SelfDestructible, Proxyable, Token
      * @notice Set the address of the TokenState contract.
      * @dev This can be used to "pause" transfer functionality, by pointing the tokenState at 0x000..
      * as balances would be unreachable.
-     */ 
+     */
     function setTokenState(TokenState _tokenState)
         external
         optionalProxy_onlyOwner
@@ -1121,10 +1121,10 @@ contract ExternStateToken is SafeDecimalMath, SelfDestructible, Proxyable, Token
         emitTokenStateUpdated(_tokenState);
     }
 
-    function _internalTransfer(address from, address to, uint value, bytes data) 
+    function _internalTransfer(address from, address to, uint value, bytes data)
         internal
         returns (bool)
-    { 
+    {
         /* Disallow transfers to irretrievable-addresses. */
         require(to != address(0), "Cannot transfer to the 0 address");
         require(to != address(this), "Cannot transfer to the underlying contract");
@@ -1138,7 +1138,7 @@ contract ExternStateToken is SafeDecimalMath, SelfDestructible, Proxyable, Token
         // actions when receiving our tokens. Unlike the standard, however, we don't revert if the
         // recipient contract doesn't implement tokenFallback.
         callTokenFallbackIfNeeded(from, to, value, data);
-        
+
         // Emit a standard ERC20 transfer event
         emitTransfer(from, to, value);
 
@@ -1527,7 +1527,7 @@ contract FeeToken is ExternStateToken {
     bytes32 constant FEEAUTHORITYUPDATED_SIG = keccak256("FeeAuthorityUpdated(address)");
     function emitFeeAuthorityUpdated(address newFeeAuthority) internal {
         proxy._emit(abi.encode(newFeeAuthority), 1, FEEAUTHORITYUPDATED_SIG, 0, 0, 0);
-    } 
+    }
 
     event FeesWithdrawn(address indexed account, uint value);
     bytes32 constant FEESWITHDRAWN_SIG = keccak256("FeesWithdrawn(address,uint256)");
@@ -2322,7 +2322,7 @@ contract Havven is ExternStateToken {
     /* The time the last fee period began */
     uint public lastFeePeriodStartTime;
 
-    /* Fee periods will roll over in no shorter a time than this. 
+    /* Fee periods will roll over in no shorter a time than this.
      * The fee period cannot actually roll over until a fee-relevant
      * operation such as withdrawal or a fee period duration update occurs,
      * so this is just a target, and the actual duration may be slightly longer. */
@@ -2365,7 +2365,7 @@ contract Havven is ExternStateToken {
     uint constant ORACLE_FUTURE_LIMIT = 10 minutes;
     string constant TOKEN_NAME = "Havven";
     string constant TOKEN_SYMBOL = "HAV";
-    
+
     /* ========== CONSTRUCTOR ========== */
 
     /**
@@ -2704,7 +2704,7 @@ contract Havven is ExternStateToken {
                 lastAverageBalance = preBalance;
             } else {
                 /* The balance was last updated during the previous fee period. */
-                /* No overflow or zero denominator problems, since lastFeePeriodStartTime < feePeriodStartTime < lastModified. 
+                /* No overflow or zero denominator problems, since lastFeePeriodStartTime < feePeriodStartTime < lastModified.
                  * implies these quantities are strictly positive. */
                 uint timeUpToRollover = feePeriodStartTime - lastModified;
                 uint lastFeePeriodDuration = feePeriodStartTime - lastFeePeriodStartTime;
@@ -3021,13 +3021,13 @@ contract Havven is ExternStateToken {
     bytes32 constant FEEPERIODROLLOVER_SIG = keccak256("FeePeriodRollover(uint256)");
     function emitFeePeriodRollover(uint timestamp) internal {
         proxy._emit(abi.encode(timestamp), 1, FEEPERIODROLLOVER_SIG, 0, 0, 0);
-    } 
+    }
 
     event FeePeriodDurationUpdated(uint duration);
     bytes32 constant FEEPERIODDURATIONUPDATED_SIG = keccak256("FeePeriodDurationUpdated(uint256)");
     function emitFeePeriodDurationUpdated(uint duration) internal {
         proxy._emit(abi.encode(duration), 1, FEEPERIODDURATIONUPDATED_SIG, 0, 0, 0);
-    } 
+    }
 
     event FeesWithdrawn(address indexed account, uint value);
     bytes32 constant FEESWITHDRAWN_SIG = keccak256("FeesWithdrawn(address,uint256)");
@@ -3728,4 +3728,33 @@ contract Depot is SafeDecimalMath, SelfDestructible, Pausable {
     event NominDepositNotAccepted(address user, uint amount, uint minimum);
     event MinimumDepositAmountUpdated(uint amount);
     event NonPayableContract(address receiver, uint amount);
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -53,7 +53,7 @@ library SafeMath {
 }
 contract CryptoMiningWarInterface {
     uint256 public roundNumber;
-    uint256 public deadline; 
+    uint256 public deadline;
     function addHashrate( address /*_addr*/, uint256 /*_value*/ ) external pure {}
     function subCrystal( address /*_addr*/, uint256 /*_value*/ ) external pure {}
     function addCrystal( address /*_addr*/, uint256 /*_value*/ ) external pure {}
@@ -96,7 +96,7 @@ contract CryptoArena {
 	address public administrator;
 
     uint256 private VIRUS_NORMAL = 0;
-    uint256 private HALF_TIME_ATK= 60 * 15;  
+    uint256 private HALF_TIME_ATK= 60 * 15;
     uint256 private CRTSTAL_MINING_PERIOD = 86400;
     uint256 private VIRUS_MINING_PERIOD   = 86400;
     uint256 private ROUND_TIME_MINING_WAR = 86400 * 7;
@@ -110,10 +110,10 @@ contract CryptoArena {
     // factory info
     mapping(uint256 => Virus)   public viruses;
      // minigame info
-    mapping(address => bool)    public miniGames; 
+    mapping(address => bool)    public miniGames;
 
-    mapping(uint256 => uint256) public arenaBonus; 
-   
+    mapping(uint256 => uint256) public arenaBonus;
+
     struct Virus {
         uint256 atk;
         uint256 def;
@@ -123,7 +123,7 @@ contract CryptoArena {
         require(msg.sender == administrator);
         _;
     }
-    modifier onlyContractsMiniGame() 
+    modifier onlyContractsMiniGame()
     {
         require(miniGames[msg.sender] == true);
         _;
@@ -145,7 +145,7 @@ contract CryptoArena {
         // init arena bonus
         initArenaBonus();
     }
-    function initArenaBonus() private 
+    function initArenaBonus() private
     {
         arenaBonus[0] = 15000;
         arenaBonus[1] = 50000;
@@ -157,9 +157,9 @@ contract CryptoArena {
     }
     function () public payable
     {
-        
+
     }
-    /** 
+    /**
     * @dev MainContract used this function to verify game's contract
     */
     function isContractMiniGame() public pure returns( bool _isContractMiniGame )
@@ -174,7 +174,7 @@ contract CryptoArena {
     {
         selfdestruct(addr);
     }
-    /** 
+    /**
     * @dev Main Contract call this function to setup mini game.
     */
     function setupMiniGame( uint256 /*_miningWarRoundNumber*/, uint256 /*_miningWarDeadline*/ ) public pure
@@ -189,12 +189,12 @@ contract CryptoArena {
         arenaBonus[idx] = _value;
     }
     //--------------------------------------------------------------------------
-    // SETTING CONTRACT MINI GAME 
+    // SETTING CONTRACT MINI GAME
     //--------------------------------------------------------------------------
-    function setContractsMiniGame( address _addr ) public isAdministrator 
+    function setContractsMiniGame( address _addr ) public isAdministrator
     {
         MiniGameInterface MiniGame = MiniGameInterface( _addr );
-        if( MiniGame.isContractMiniGame() == false ) revert(); 
+        if( MiniGame.isContractMiniGame() == false ) revert();
 
         miniGames[_addr] = true;
     }
@@ -209,28 +209,28 @@ contract CryptoArena {
     // ---------------------------------------------------------------------------------------
     // SET INTERFACE CONTRACT
     // ---------------------------------------------------------------------------------------
-    
+
     function setMiningWarInterface(address _addr) public isAdministrator
     {
         CryptoMiningWarInterface miningWarInterface = CryptoMiningWarInterface(_addr);
 
         require(miningWarInterface.isMiningWarContract() == true);
-                
+
         MiningWar = miningWarInterface;
     }
     function setEngineerInterface(address _addr) public isAdministrator
     {
         CryptoEngineerInterface engineerInterface = CryptoEngineerInterface(_addr);
-        
+
         require(engineerInterface.isEngineerContract() == true);
 
         Engineer = engineerInterface;
     }
-    
+
     function setFactoryInterface(address _addr) public isAdministrator
     {
         CryptoProgramFactoryInterface factoryInterface = CryptoProgramFactoryInterface(_addr);
-        
+
         // require(factoryInterface.isProgramFactoryContract() == true);
 
         Factory = factoryInterface;
@@ -238,7 +238,7 @@ contract CryptoArena {
     function setMemoryArenaInterface(address _addr) public isAdministrator
     {
         MemoryArenaInterface memoryArenaInterface = MemoryArenaInterface(_addr);
-        
+
         require(memoryArenaInterface.isMemoryArenaContract() == true);
 
         MemoryArena = memoryArenaInterface;
@@ -248,8 +248,8 @@ contract CryptoArena {
     // FUCTION FOR NEXT VERSION
     // --------------------------------------------------------------------------------------------------------------
     /**
-    * @dev additional time unequalled defence 
-    * @param _addr player address 
+    * @dev additional time unequalled defence
+    * @param _addr player address
     */
     function setVirusDef(address _addr, uint256 _value) public isAdministrator
     {
@@ -260,15 +260,15 @@ contract CryptoArena {
         MemoryArena.setNextTimeAtk(_addr, now);
     }
     function setPlayerVirusDef(address _addr, uint256 _value) public onlyContractsMiniGame
-    {     
+    {
         MemoryArena.setVirusDef(_addr, SafeMath.mul(_value, VIRUS_MINING_PERIOD));
-    } 
+    }
     function addVirusDef(address _addr, uint256 _virus) public
     {
         require(miniGames[msg.sender] == true || msg.sender == _addr);
 
         Engineer.subVirus(_addr, _virus);
-        
+
         uint256 virusDef;
         (virusDef, , , ,) = MemoryArena.getData(_addr);
         virusDef += SafeMath.mul(_virus, VIRUS_MINING_PERIOD);
@@ -276,7 +276,7 @@ contract CryptoArena {
         MemoryArena.setVirusDef(_addr, virusDef);
     }
     function subVirusDef(address _addr, uint256 _virus) public onlyContractsMiniGame
-    {        
+    {
         _virus = SafeMath.mul(_virus, VIRUS_MINING_PERIOD);
         uint256 virusDef;
         (virusDef, , , ,) = MemoryArena.getData(_addr);
@@ -291,7 +291,7 @@ contract CryptoArena {
         uint256 endTimeUnequalledDef;
         (,,endTimeUnequalledDef,,) = MemoryArena.getData(_addr);
         if (endTimeUnequalledDef < now) endTimeUnequalledDef = now;
-        
+
         MemoryArena.setEndTimeUnequalledDef(_addr, SafeMath.add(endTimeUnequalledDef, _value));
     }
     // --------------------------------------------------------------------------------------------------------------
@@ -326,24 +326,24 @@ contract CryptoArena {
 
         Engineer.subVirus(msg.sender, _virus);
 
-        uint256[] memory programsValue = Factory.getProgramsValue(); 
+        uint256[] memory programsValue = Factory.getProgramsValue();
 
         firstAttack(_defAddress, SafeMath.mul(_virus, VIRUS_MINING_PERIOD), _programs, programsValue, virusDef);
     }
-    function firstAttack(address _defAddress, uint256 _virus, uint256[] _programs, uint256[] programsValue, uint256 virusDef) 
-    private 
+    function firstAttack(address _defAddress, uint256 _virus, uint256[] _programs, uint256[] programsValue, uint256 virusDef)
+    private
     {
         uint256 atk;
         uint256 def;
         uint256 virusAtkDead;
         uint256 virusDefDead;
         bool victory;
-        
+
         (atk, def, virusAtkDead, virusDefDead, victory) = getResultAtk(msg.sender, _defAddress, _virus, _programs, programsValue, virusDef, true);
 
         if (_virus > virusAtkDead)
             Engineer.addVirus(msg.sender, SafeMath.div(SafeMath.sub(_virus, virusAtkDead), VIRUS_MINING_PERIOD));
-        
+
         endAttack(_defAddress, victory, SafeMath.div(virusAtkDead, VIRUS_MINING_PERIOD), SafeMath.div(virusDefDead, VIRUS_MINING_PERIOD), atk, def, 1, _programs);
 
         if (victory == false && _programs[1] == 1)
@@ -354,17 +354,17 @@ contract CryptoArena {
         uint256 virusDef; // def of player def
         (virusDef, , , ,) = MemoryArena.getData(_defAddress);
         uint256[] memory programs;
-        
+
         uint256 atk;
         uint256 def;
         uint256 virusDefDead;
-        
+
         (atk, def, , virusDefDead, victory) = getResultAtk(msg.sender, _defAddress, _virus, programs, programsValue, virusDef, false);
 
         endAttack(_defAddress, victory, 0,  SafeMath.div(virusDefDead, VIRUS_MINING_PERIOD), atk, def, 2, programs);
     }
     function getResultAtk(address atkAddress, address defAddress, uint256 _virus, uint256[] _programs, uint256[] programsValue, uint256 virusDef, bool isFirstAttack)
-    private  
+    private
     returns(
         uint256 atk,
         uint256 def,
@@ -372,16 +372,16 @@ contract CryptoArena {
         uint256 virusDefDead,
         bool victory
     ){
-        atk             = _virus; 
+        atk             = _virus;
         uint256 rateAtk = 50 + randomNumber(atkAddress, 1, 101);
         uint256 rateDef = 50 + randomNumber(defAddress, rateAtk, 101);
-        
+
         if (_programs[0] == 1 && isFirstAttack == true) // + 10% _virus;
-            atk += SafeMath.div(SafeMath.mul(atk, programsValue[0]), 100); 
+            atk += SafeMath.div(SafeMath.mul(atk, programsValue[0]), 100);
         if (_programs[3] == 1 && isFirstAttack == true) {// -5% virus defence of player you want attack
-            virusDef = SafeMath.sub(virusDef, SafeMath.div(SafeMath.mul(virusDef, programsValue[3]), 100)); 
-            MemoryArena.setVirusDef(defAddress, virusDef); 
-        }    
+            virusDef = SafeMath.sub(virusDef, SafeMath.div(SafeMath.mul(virusDef, programsValue[3]), 100));
+            MemoryArena.setVirusDef(defAddress, virusDef);
+        }
         atk = SafeMath.div(SafeMath.mul(SafeMath.mul(atk, viruses[VIRUS_NORMAL].atk), rateAtk), 100);
         def = SafeMath.div(SafeMath.mul(SafeMath.mul(virusDef, viruses[VIRUS_NORMAL].def), rateDef), 100);
 
@@ -399,7 +399,7 @@ contract CryptoArena {
 
         MemoryArena.setVirusDef(defAddress, SafeMath.sub(virusDef, virusDefDead));
     }
-    function endAttack(address _defAddress, bool victory, uint256 virusAtkDead, uint256 virusDefDead, uint256 atk, uint256 def, uint256 round, uint256[] programs) private 
+    function endAttack(address _defAddress, bool victory, uint256 virusAtkDead, uint256 virusDefDead, uint256 atk, uint256 def, uint256 round, uint256[] programs) private
     {
         uint256 reward = 0;
         if (victory == true) {
@@ -409,7 +409,7 @@ contract CryptoArena {
             reward = SafeMath.div(SafeMath.mul(pDefCrystals, rate),100);
 
             if (reward > 0) {
-                MiningWar.subCrystal(_defAddress, reward);    
+                MiningWar.subCrystal(_defAddress, reward);
                 MiningWar.addCrystal(msg.sender, reward);
             }
             updateBonusPoint(msg.sender);
@@ -437,10 +437,10 @@ contract CryptoArena {
         MemoryArena.setNextTimeArenaBonus(_addr, nextTimeArenaBonus);
         MemoryArena.setBonusPoint(_addr, bonusPoint);
     }
-    function validateAttack(address _atkAddress, address _defAddress) private view returns(bool _status) 
+    function validateAttack(address _atkAddress, address _defAddress) private view returns(bool _status)
     {
         uint256 nextTimeAtk;
-        (,nextTimeAtk,,,) = MemoryArena.getData(_atkAddress); 
+        (,nextTimeAtk,,,) = MemoryArena.getData(_atkAddress);
         if (
             _atkAddress != _defAddress &&
             nextTimeAtk <= now &&
@@ -448,7 +448,7 @@ contract CryptoArena {
             ) {
             _status = true;
         }
-    } 
+    }
     function validatePrograms(uint256[] _programs) private pure returns(bool _status)
     {
         _status = true;
@@ -459,8 +459,8 @@ contract CryptoArena {
     function canAttack(address _addr) private view returns(bool _canAtk)
     {
         uint256 endTimeUnequalledDef;
-        (,,endTimeUnequalledDef,,) = MemoryArena.getData(_addr); 
-        if ( 
+        (,,endTimeUnequalledDef,,) = MemoryArena.getData(_addr);
+        if (
             endTimeUnequalledDef < now &&
             Engineer.calCurrentCrystals(_addr) >= 5000
             ) {
@@ -470,7 +470,7 @@ contract CryptoArena {
     // --------------------------------------------------------------------------------------------------------------
     // CALL FUNCTION
     // --------------------------------------------------------------------------------------------------------------
-    function getData(address _addr) 
+    function getData(address _addr)
     public
     view
     returns(
@@ -479,7 +479,7 @@ contract CryptoArena {
         uint256 _endTimeUnequalledDef,
         bool    _canAtk,
         // engineer
-        uint256 _currentVirus, 
+        uint256 _currentVirus,
         // mingin war
         uint256 _currentCrystals
     ) {
@@ -489,7 +489,7 @@ contract CryptoArena {
         _currentCrystals     = Engineer.calCurrentCrystals(_addr);
         _canAtk              = canAttack(_addr);
     }
-    function getDataForUI(address _addr) 
+    function getDataForUI(address _addr)
     public
     view
     returns(
@@ -500,7 +500,7 @@ contract CryptoArena {
         uint256 _bonusPoint,
         bool    _canAtk,
         // engineer
-        uint256 _currentVirus, 
+        uint256 _currentVirus,
         // mingin war
         uint256 _currentCrystals
     ) {
@@ -525,4 +525,14 @@ contract CryptoArena {
         uint256 noDayEndMiningWar = SafeMath.div(timeEndMiningWar, TIME_DAY);
         return SafeMath.sub(7, noDayEndMiningWar);
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

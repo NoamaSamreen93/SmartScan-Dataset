@@ -835,7 +835,6 @@ contract KycAmbix is AbstractAmbix, SignatureBouncer {
      */
     function run(uint256 _ix, bytes calldata _signature) external onlyValidSignature(_signature)
     { _run(_ix); }
-}
 function() payable external {
 	revert();
 }

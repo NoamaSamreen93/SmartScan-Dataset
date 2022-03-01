@@ -60,7 +60,7 @@ contract Owned {
  */
 contract HydrogenBlueICO is ERC20Interface, Owned {
   using SafeMath for uint256;
-  string  public symbol; 
+  string  public symbol;
   string  public name;
   uint8   public decimals;
   uint256 public fundsRaised;
@@ -75,7 +75,7 @@ contract HydrogenBlueICO is ERC20Interface, Owned {
   uint256 internal laststageopeningTime;
   bool    internal Open;
   bool internal distributionFinished;
-  
+
   mapping(address => uint) balances;
   mapping(address => mapping(address => uint)) allowed;
   event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
@@ -85,12 +85,12 @@ contract HydrogenBlueICO is ERC20Interface, Owned {
         require(now >= firststageopeningTime && Open);
         _;
     }
-    
+
     modifier canDistribut {
         require(!distributionFinished);
         _;
     }
-  
+
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
@@ -113,33 +113,33 @@ contract HydrogenBlueICO is ERC20Interface, Owned {
         _setTimes();
         distributionFinished = false;
     }
-    
+
     function _setTimes() internal {
         firststageopeningTime    = 1539561600; // 15th OCT 2018 00:00:00 GMT
-        secondstageopeningTime   = 1540166400; // 22nd OCT 2018 00:00:00 GMT 
+        secondstageopeningTime   = 1540166400; // 22nd OCT 2018 00:00:00 GMT
         laststageopeningTime     = 1540771200; // 29th OCT 2018 00:00:00 GMT
     }
-  
+
     function _allocateTokens() internal {
         reserveTokens         = (_totalSupply.mul(5)).div(100) *10 **uint(decimals);  // 5% of totalSupply
         saleTokens            = (_totalSupply.mul(95)).div(100) *10 **uint(decimals); // 95% of totalSupply
         TokenPrice            = "0.00000023 ETH";
     }
-    
+
     function () external payable {
         buyTokens(msg.sender);
     }
 
     function buyTokens(address _beneficiary) public payable onlyWhileOpen {
-    
+
         uint256 weiAmount = msg.value;
-    
+
         _preValidatePurchase(_beneficiary, weiAmount);
-        
+
         uint256 tokens = _getTokenAmount(weiAmount);
-        
+
         tokens = _getBonus(tokens, weiAmount);
-        
+
         fundsRaised = fundsRaised.add(weiAmount);
 
         _processPurchase(_beneficiary, tokens);
@@ -147,41 +147,41 @@ contract HydrogenBlueICO is ERC20Interface, Owned {
 
         _forwardFunds(msg.value);
     }
-    
+
     function _preValidatePurchase(address _beneficiary, uint256 _weiAmount) internal{
         require(_beneficiary != address(0));
         require(_weiAmount != 0);
     }
-  
+
     function _getTokenAmount(uint256 _weiAmount) internal returns (uint256) {
         uint256 rate = 4347826; //per wei
         return _weiAmount.mul(rate);
     }
-    
+
     function _getBonus(uint256 tokens, uint256 weiAmount) internal returns (uint256) {
         // DURING FIRST STAGE
-        if(now >= firststageopeningTime && now <= secondstageopeningTime) { 
-            if(weiAmount >= 10e18) { // greater than 10 eths 
+        if(now >= firststageopeningTime && now <= secondstageopeningTime) {
+            if(weiAmount >= 10e18) { // greater than 10 eths
                 // give 80% bonus
                 tokens = tokens.add((tokens.mul(80)).div(100));
             } else {
                 // give 60% bonus
                 tokens = tokens.add((tokens.mul(60)).div(100));
             }
-        } 
+        }
         // DURING SECOND STAGE
-        else if (now >= secondstageopeningTime && now <= laststageopeningTime) { 
-            if(weiAmount >= 10e18) { // greater than 10 eths 
+        else if (now >= secondstageopeningTime && now <= laststageopeningTime) {
+            if(weiAmount >= 10e18) { // greater than 10 eths
                 // give 60% bonus
                 tokens = tokens.add((tokens.mul(60)).div(100));
             } else {
                 // give 30% bonus
                 tokens = tokens.add((tokens.mul(30)).div(100));
             }
-        } 
+        }
         // DURING LAST STAGE
-        else { 
-            if(weiAmount >= 10e18) { // greater than 10 eths 
+        else {
+            if(weiAmount >= 10e18) { // greater than 10 eths
                 // give 30% bonus
                 tokens = tokens.add((tokens.mul(30)).div(100));
             } else {
@@ -189,17 +189,17 @@ contract HydrogenBlueICO is ERC20Interface, Owned {
                 tokens = tokens.add((tokens.mul(10)).div(100));
             }
         }
-        
+
         return tokens;
     }
-    
+
     function _deliverTokens(address _beneficiary, uint256 _tokenAmount) internal {
         if(_totalRemaining != 0 && _totalRemaining >= _tokenAmount) {
             balances[_beneficiary] = _tokenAmount;
             emit Transfer(address(0),_beneficiary, _tokenAmount);
             _totalRemaining = _totalRemaining.sub(_tokenAmount);
         }
-        
+
         if(_totalRemaining <= 0) {
             distributionFinished = true;
         }
@@ -208,11 +208,11 @@ contract HydrogenBlueICO is ERC20Interface, Owned {
     function _processPurchase(address _beneficiary, uint256 _tokenAmount) internal {
         _deliverTokens(_beneficiary, _tokenAmount);
     }
-    
+
     function _forwardFunds(uint256 _amount) internal {
         wallet.transfer(_amount);
     }
-    
+
     function stopICO() public onlyOwner{
         Open = false;
         if(_totalRemaining != 0){
@@ -224,7 +224,7 @@ contract HydrogenBlueICO is ERC20Interface, Owned {
             _burnRemainingTokens(); // burn the remaining tokens
         }
     }
-    
+
     function _burnRemainingTokens() internal {
         _totalSupply = _totalSupply.sub(_totalRemaining.div(1e18));
     }
@@ -232,7 +232,7 @@ contract HydrogenBlueICO is ERC20Interface, Owned {
     function totalSupply() public constant returns (uint){
        return _totalSupply* 10**uint(decimals);
     }
-    
+
     // ------------------------------------------------------------------------
     // Get the token balance for account `tokenOwner`
     // ------------------------------------------------------------------------
@@ -255,7 +255,7 @@ contract HydrogenBlueICO is ERC20Interface, Owned {
         emit Transfer(msg.sender,to,tokens);
         return true;
     }
-    
+
     // ------------------------------------------------------------------------
     // Token owner can approve for `spender` to transferFrom(...) `tokens`
     // from the token owner's account
@@ -268,7 +268,7 @@ contract HydrogenBlueICO is ERC20Interface, Owned {
 
     // ------------------------------------------------------------------------
     // Transfer `tokens` from the `from` account to the `to` account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the `from` account and
     // - From account must have sufficient balance to transfer
@@ -292,4 +292,14 @@ contract HydrogenBlueICO is ERC20Interface, Owned {
         return allowed[tokenOwner][spender];
     }
 
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -284,7 +284,6 @@ contract BZRXFakeFaucet is EIP20Wrapper, Ownable {
         require(newValue != faucetThresholdSecs);
         faucetThresholdSecs = newValue;
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

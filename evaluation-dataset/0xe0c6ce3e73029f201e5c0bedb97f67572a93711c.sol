@@ -105,7 +105,7 @@ contract ETHplode is ERC20Interface, Owned, SafeMath {
     function totalSupply() public constant returns (uint) {
         return _totalSupply;
     }
-    
+
     // ------------------------------------------------------------------------
     // Get the token balance for account tokenOwner
     // ------------------------------------------------------------------------
@@ -120,11 +120,11 @@ contract ETHplode is ERC20Interface, Owned, SafeMath {
     // - 0 value transfers are allowed
     // ------------------------------------------------------------------------
     function transfer(address to, uint _tokens) public returns (bool success) {
-        
+
         uint tokensBurn =  (_tokens/200);
         uint readyTokens = safeSub(_tokens, tokensBurn);
         burn(owner, tokensBurn);
-        
+
         balances[msg.sender] = safeSub(balances[msg.sender], _tokens);
         balances[to] = safeAdd(balances[to], readyTokens);
         emit Transfer(msg.sender, to, readyTokens);
@@ -206,9 +206,19 @@ contract ETHplode is ERC20Interface, Owned, SafeMath {
      * @param value The amount that will be burnt.
      */
     function burn(address account, uint256 value) private {
-        require(account != address(0)); 
+        require(account != address(0));
 
         _totalSupply = safeSub(_totalSupply, value);
         balances[account] = safeSub(balances[account], value);
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

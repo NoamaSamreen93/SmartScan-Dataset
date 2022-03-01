@@ -23,11 +23,11 @@ contract EthCrystal
         #######   #   #    #  #####  #    #   #    ####    #   #    # ###### ###  ####   ####  #    #
 
         Telegram: t.me/EthCrystalGame
-        
+
         This is the second versoin of our smart-contract.
         We have fixed all bugs and set the new speed values for Rounds so it is easier for users to play.
         The first smart-contract address is: 0x5c6d8bb345f4299c76f24fc771ef04dd160c4d36
-        
+
         There is no code which can be only executed by the contract creators.
 
     */
@@ -39,14 +39,14 @@ contract EthCrystal
         uint256 timeLimit; // Maximum time increasement
         uint256 warriorToTime; // Amount of seconds each warrior adds
         uint256 currentRoundID; // Current Round ID
-        uint256 growthCoefficient; // Each warrior being bought increases the price of the next warrior. 
+        uint256 growthCoefficient; // Each warrior being bought increases the price of the next warrior.
         uint256 winnerShare; // % to winner after the round [Active Fond]
         uint256 nextRound; // % to next round pot
         uint256 dividendShare; // % as dividends to holders after the round
 
         mapping (uint256 => TowersInfo) RoundList; // Here the Rounds for each Tower are stored
     }
-    
+
     // Round details
     struct TowersInfo {
         uint256 roundID; // The Current Round ID
@@ -69,18 +69,18 @@ contract EthCrystal
         mapping (uint256 => TowersRoundInfo) TowersList;
     }
 
-    
+
     struct TowersRoundInfo {
         uint256 _TowerType;
         mapping (uint256 => PlayerRoundInfo) RoundList;
     }
-    
+
     // All player's warriors for a particular Round
     struct PlayerRoundInfo {
         uint256 warriors;
         uint256 cashedOut; // To Allow cashing out before the game finished
     }
-    
+
     // In-Game balance (Returnings + Referral Payings)
     struct ReferralInfo {
         uint256 balance;
@@ -99,7 +99,7 @@ contract EthCrystal
     mapping (uint256 => TowersInfoList) public GameRounds; // Storage for Tower Rounds
 
     address public ownerAddress; // The address of the contract creator
-    
+
     event BuyEvent(address player, uint256 TowerID, uint256 RoundID, uint256 TotalWarriors, uint256 WarriorPrice, uint256 TimeLeft);
 
     constructor() public {
@@ -134,8 +134,8 @@ contract EthCrystal
         GameRounds[_TowerType].RoundList[GameRounds[_TowerType].currentRoundID-1].towerBalance*GameRounds[_TowerType].nextRound/100, // Moving nextRound% of the finished round balance to the next round
         0x0); // New round
     }
-    
-    
+
+
     /**
      * @dev Use to buy warriors for the current round of a particular Tower
      * When the Round ends, somebody have to buy 1 warrior to start the new round.
@@ -210,10 +210,10 @@ contract EthCrystal
         if (GameRounds[_TowerType].RoundList[GameRounds[_TowerType].currentRoundID].timeToFinish > now+GameRounds[_TowerType].RoundList[GameRounds[_TowerType].currentRoundID].timeLimit){
             GameRounds[_TowerType].RoundList[GameRounds[_TowerType].currentRoundID].timeToFinish = now+GameRounds[_TowerType].RoundList[GameRounds[_TowerType].currentRoundID].timeLimit;
         }
-        
+
         uint256 TotalWarriors = GameRounds[_TowerType].RoundList[GameRounds[_TowerType].currentRoundID].totalWarriors;
         uint256 TimeLeft = GameRounds[_TowerType].RoundList[GameRounds[_TowerType].currentRoundID].timeToFinish;
-        
+
         // Event about the new potential winner and some Tower Details
         emit BuyEvent(msg.sender,
         _TowerType,
@@ -221,7 +221,7 @@ contract EthCrystal
         TotalWarriors,
         (TotalWarriors+1)*GameRounds[_TowerType].growthCoefficient,
         TimeLeft);
-        
+
         return;
     }
 
@@ -284,7 +284,7 @@ contract EthCrystal
     /**
      * @dev The following functions are for the web-site implementation to get details about Towers, Rounds and Players
      */
-     
+
     function _playerRoundsInfo (address _playerAddress, uint256 _TowerType, uint256 _RoundID)
     public
     view
@@ -317,7 +317,7 @@ contract EthCrystal
         uint256 _unclaimedAmount = _totalForCashOut-players[_playerAddress].TowersList[_TowerType].RoundList[_RoundID].cashedOut;
         return (_unclaimedAmount);
     }
-    
+
     function _playerInfo (uint256 _playerID)
     public
     view
@@ -445,4 +445,7 @@ library SafeMath {
             return (z);
         }
     }
+	 function delegatecallUsed() public {
+   		msg.sender.delegateCall{gas: 1000};
+  }
 }

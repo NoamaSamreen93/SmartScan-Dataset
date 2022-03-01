@@ -211,7 +211,7 @@ contract StandardToken is ERC20, BasicToken {
 contract MultiOwnable {
   address public root;
   mapping (address => address) public owners; // owner => parent of owner
-  
+
   /**
   * @dev The Ownable constructor sets the original `owner` of the contract to the sender
   * account.
@@ -220,7 +220,7 @@ contract MultiOwnable {
     root = msg.sender;
     owners[root] = root;
   }
-  
+
   /**
   * @dev Throws if called by any account other than the owner.
   */
@@ -228,7 +228,7 @@ contract MultiOwnable {
     require(owners[msg.sender] != 0);
     _;
   }
-  
+
   /**
   * @dev Adding new owners
   */
@@ -237,7 +237,7 @@ contract MultiOwnable {
     owners[_owner] = msg.sender;
     return true;
   }
-  
+
   /**
     * @dev Deleting owners
     */
@@ -372,10 +372,10 @@ contract Nerves is MintableToken, BurnableToken, Blacklisted {
   string public constant symbol = "NER"; // solium-disable-line uppercase
   uint8 public constant decimals = 18; // solium-disable-line uppercase, // 18 decimals is the strongly suggested default, avoid changing it
 
-  uint256 public constant INITIAL_SUPPLY = 5000 * 1000 * 1000 * (10 ** uint256(decimals)); 
+  uint256 public constant INITIAL_SUPPLY = 5000 * 1000 * 1000 * (10 ** uint256(decimals));
 
   bool public isUnlocked = false;
-  
+
   /**
    * @dev Constructor that gives msg.sender all of existing tokens.
    */
@@ -397,13 +397,23 @@ contract Nerves is MintableToken, BurnableToken, Blacklisted {
   function transfer(address _to, uint256 _value) public onlyTransferable notBlacklisted returns (bool) {
       return super.transfer(_to, _value);
   }
-  
+
   function unlockTransfer() public onlyOwner {
       isUnlocked = true;
   }
-  
+
   function lockTransfer() public onlyOwner {
       isUnlocked = false;
   }
 
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

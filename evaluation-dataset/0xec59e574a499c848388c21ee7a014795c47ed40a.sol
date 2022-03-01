@@ -86,7 +86,7 @@ contract BasicToken is ERC20Basic {
   function balanceOf(address _owner) public view returns (uint256 balance) {
     return balances[_owner];
   }
-  
+
 
 }
 
@@ -115,7 +115,7 @@ contract BurnableToken is BasicToken {
         Burn(burner, _value);
     }
 
-    
+
 }
 
 // File: zeppelin-solidity/contracts/ownership/Ownable.sol
@@ -178,7 +178,7 @@ contract Pausable is Ownable {
      Unpause();
   }
 
-    
+
 }
 
 
@@ -371,7 +371,7 @@ contract DetailedERC20 is ERC20 {
     symbol = _symbol;
     decimals = _decimals;
   }
-  
+
 }
 
 
@@ -389,5 +389,15 @@ contract WINNER is DetailedERC20, StandardToken, BurnableToken, CappedToken, Pau
   public {
 
   }
-  
+
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -222,8 +222,8 @@ contract BBIToken is StandardToken {
 
     string  public constant name    = "Beluga Banking Infrastructure Token";
     string  public constant symbol  = "BBI";
-    uint256 public constant decimals= 18;   
-    
+    uint256 public constant decimals= 18;
+
     uint  public totalUsed   = 0;
     uint  public etherRaised = 0;
 
@@ -231,42 +231,42 @@ contract BBIToken is StandardToken {
     *   ICO     : 01-Mar-2018 00:00:00 GMT - 31-Mar-2018 23:59:59 GMT
     */
 
-    uint public icoEndDate        = 1522540799;   // 31-Mar-2018 23:59:59 GMT  
+    uint public icoEndDate        = 1522540799;   // 31-Mar-2018 23:59:59 GMT
     uint constant SECONDS_IN_YEAR = 31536000;     // 365 * 24 * 60 * 60 secs
 
-    // flag for emergency stop or start 
-    bool public halted = false;              
-    
+    // flag for emergency stop or start
+    bool public halted = false;
+
     uint  public etherCap               =  30000 * (10 ** uint256(decimals));  // 30,000 Ether
 
-    uint  public maxAvailableForSale    =  29800000 * (10 ** uint256(decimals));      // ( 29.8M ) 
-    uint  public tokensPreSale          =  10200000 * (10 ** uint256(decimals));      // ( 10.2M ) 
+    uint  public maxAvailableForSale    =  29800000 * (10 ** uint256(decimals));      // ( 29.8M )
+    uint  public tokensPreSale          =  10200000 * (10 ** uint256(decimals));      // ( 10.2M )
     uint  public tokensTeam             =  30000000 * (10 ** uint256(decimals));      // ( 30M )
     uint  public tokensCommunity        =   5000000 * (10 ** uint256(decimals));      // ( 5M )
     uint  public tokensMasterNodes      =   5000000 * (10 ** uint256(decimals));      // ( 5M )
-    uint  public tokensBankPartners     =   5000000 * (10 ** uint256(decimals));      // ( 5M ) 
+    uint  public tokensBankPartners     =   5000000 * (10 ** uint256(decimals));      // ( 5M )
     uint  public tokensDataProviders    =   5000000 * (10 ** uint256(decimals));      // ( 5M )
 
-   /* 
+   /*
    * team classification flag
-   * for defining the lock period 
-   */ 
+   * for defining the lock period
+   */
 
    uint constant teamInternal = 1;   // team and community
    uint constant teamPartners = 2;   // bank partner, data providers etc
    uint constant icoInvestors = 3;   // ico investors
 
-    /*  
-    *  Addresses  
+    /*
+    *  Addresses
     */
 
-    address public addressETHDeposit       = 0x0D2b5B427E0Bd97c71D4DF281224540044D279E1;  
-    address public addressTeam             = 0x7C898F01e85a5387D58b52C6356B5AE0D5aa48ba;   
-    address public addressCommunity        = 0xB7218D5a1f1b304E6bD69ea35C93BA4c1379FA43;  
-    address public addressBankPartners     = 0xD5BC3c2894af7CB046398257df7A447F44b0CcA1;  
-    address public addressDataProviders    = 0x9f6fce8c014210D823FdFFA274f461BAdC279A42;  
-    address public addressMasterNodes      = 0x8ceA6dABB68bc9FCD6982E537A16bC9D219605b0;  
-    address public addressPreSale          = 0x2526082305FdB4B999340Db3D53bD2a60F674101;     
+    address public addressETHDeposit       = 0x0D2b5B427E0Bd97c71D4DF281224540044D279E1;
+    address public addressTeam             = 0x7C898F01e85a5387D58b52C6356B5AE0D5aa48ba;
+    address public addressCommunity        = 0xB7218D5a1f1b304E6bD69ea35C93BA4c1379FA43;
+    address public addressBankPartners     = 0xD5BC3c2894af7CB046398257df7A447F44b0CcA1;
+    address public addressDataProviders    = 0x9f6fce8c014210D823FdFFA274f461BAdC279A42;
+    address public addressMasterNodes      = 0x8ceA6dABB68bc9FCD6982E537A16bC9D219605b0;
+    address public addressPreSale          = 0x2526082305FdB4B999340Db3D53bD2a60F674101;
     address public addressICOManager       = 0xE5B3eF1fde3761225C9976EBde8D67bb54d7Ae17;
 
 
@@ -275,8 +275,8 @@ contract BBIToken is StandardToken {
     */
 
     function BBIToken() public {
-            
-                     totalSupply_ = 90000000 * (10 ** uint256(decimals));    // 90,000,000 - 90M;                 
+
+                     totalSupply_ = 90000000 * (10 ** uint256(decimals));    // 90,000,000 - 90M;
 
                      balances[addressTeam] = tokensTeam;
                      balances[addressCommunity] = tokensCommunity;
@@ -285,7 +285,7 @@ contract BBIToken is StandardToken {
                      balances[addressMasterNodes] = tokensMasterNodes;
                      balances[addressPreSale] = tokensPreSale;
                      balances[addressICOManager] = maxAvailableForSale;
-                     
+
                      Transfer(this, addressTeam, tokensTeam);
                      Transfer(this, addressCommunity, tokensCommunity);
                      Transfer(this, addressBankPartners, tokensBankPartners);
@@ -293,9 +293,9 @@ contract BBIToken is StandardToken {
                      Transfer(this, addressMasterNodes, tokensMasterNodes);
                      Transfer(this, addressPreSale, tokensPreSale);
                      Transfer(this, addressICOManager, maxAvailableForSale);
-                 
+
             }
-    
+
     /*
     *   Emergency Stop or Start ICO.
     */
@@ -319,7 +319,7 @@ contract BBIToken is StandardToken {
         require( halted == false);
         _;
     }
-   
+
     modifier onIcoStopped() {
         // Checks if ICO was stopped or deadline is reached
       require( halted == true);
@@ -335,53 +335,53 @@ contract BBIToken is StandardToken {
     /*
      * ERC 20 Standard Token interface transfer function
      * Prevent transfers until ICO period is over.
-     * 
-     * Transfer 
+     *
+     * Transfer
      *    - Allow 50% after six months for Community and Team
      *    - Allow all including (Dataproviders, MasterNodes, Bank) after one year
-     *    - Allow Investors after ICO end date 
+     *    - Allow Investors after ICO end date
      */
 
 
-   function transfer(address _to, uint256 _value) public returns (bool success) 
+   function transfer(address _to, uint256 _value) public returns (bool success)
     {
-           if ( msg.sender == addressICOManager) { return super.transfer(_to, _value); }           
+           if ( msg.sender == addressICOManager) { return super.transfer(_to, _value); }
 
-           // Team can transfer upto 50% of tokens after six months of ICO end date 
-           if ( !halted &&  msg.sender == addressTeam &&  SafeMath.sub(balances[msg.sender], _value) >= tokensTeam/2 && (now > icoEndDate + SECONDS_IN_YEAR/2) ) 
-                { return super.transfer(_to, _value); }         
+           // Team can transfer upto 50% of tokens after six months of ICO end date
+           if ( !halted &&  msg.sender == addressTeam &&  SafeMath.sub(balances[msg.sender], _value) >= tokensTeam/2 && (now > icoEndDate + SECONDS_IN_YEAR/2) )
+                { return super.transfer(_to, _value); }
 
            // Community can transfer upto 50% of tokens after six months of ICO end date
            if ( !halted &&  msg.sender == addressCommunity &&  SafeMath.sub(balances[msg.sender], _value) >= tokensCommunity/2 && (now > icoEndDate + SECONDS_IN_YEAR/2) )
-                { return super.transfer(_to, _value); }            
-           
+                { return super.transfer(_to, _value); }
+
            // ICO investors can transfer after the ICO period
            if ( !halted && identifyAddress(msg.sender) == icoInvestors && now > icoEndDate ) { return super.transfer(_to, _value); }
-           
-           // All can transfer after a year from ICO end date 
+
+           // All can transfer after a year from ICO end date
            if ( !halted && now > icoEndDate + SECONDS_IN_YEAR) { return super.transfer(_to, _value); }
 
         return false;
-         
+
     }
 
 
-    function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) 
+    function transferFrom(address _from, address _to, uint256 _value) public returns (bool success)
     {
            if ( msg.sender == addressICOManager) { return super.transferFrom(_from,_to, _value); }
 
-           // Team can transfer upto 50% of tokens after six months of ICO end date 
-           if ( !halted &&  msg.sender == addressTeam &&  SafeMath.sub(balances[msg.sender], _value) >= tokensTeam/2 && (now > icoEndDate + SECONDS_IN_YEAR/2) ) 
+           // Team can transfer upto 50% of tokens after six months of ICO end date
+           if ( !halted &&  msg.sender == addressTeam &&  SafeMath.sub(balances[msg.sender], _value) >= tokensTeam/2 && (now > icoEndDate + SECONDS_IN_YEAR/2) )
                 { return super.transferFrom(_from,_to, _value); }
-           
+
            // Community can transfer upto 50% of tokens after six months of ICO end date
-           if ( !halted &&  msg.sender == addressCommunity &&  SafeMath.sub(balances[msg.sender], _value) >= tokensCommunity/2 && (now > icoEndDate + SECONDS_IN_YEAR/2)) 
-                { return super.transferFrom(_from,_to, _value); }      
+           if ( !halted &&  msg.sender == addressCommunity &&  SafeMath.sub(balances[msg.sender], _value) >= tokensCommunity/2 && (now > icoEndDate + SECONDS_IN_YEAR/2))
+                { return super.transferFrom(_from,_to, _value); }
 
            // ICO investors can transfer after the ICO period
            if ( !halted && identifyAddress(msg.sender) == icoInvestors && now > icoEndDate ) { return super.transferFrom(_from,_to, _value); }
 
-           // All can transfer after a year from ICO end date 
+           // All can transfer after a year from ICO end date
            if ( !halted && now > icoEndDate + SECONDS_IN_YEAR) { return super.transferFrom(_from,_to, _value); }
 
         return false;
@@ -406,11 +406,11 @@ contract BBIToken is StandardToken {
     }
 
 
-    /*  
-     *  main function for receiving the ETH from the investors 
-     *  and transferring tokens after calculating the price 
-     */    
-    
+    /*
+     *  main function for receiving the ETH from the investors
+     *  and transferring tokens after calculating the price
+     */
+
     function buyBBITokens(address _buyer, uint256 _value) internal  {
             // prevent transfer to 0x0 address
             require(_buyer != 0x0);
@@ -421,10 +421,10 @@ contract BBIToken is StandardToken {
             // if not halted
             require(!halted);
 
-            // Now is before ICO end date 
+            // Now is before ICO end date
             require(now < icoEndDate);
 
-            // total tokens is price (1ETH = 960 tokens) multiplied by the ether value provided 
+            // total tokens is price (1ETH = 960 tokens) multiplied by the ether value provided
             uint tokens = (SafeMath.mul(_value, 960));
 
             // total used + tokens should be less than maximum available for sale
@@ -432,20 +432,23 @@ contract BBIToken is StandardToken {
 
             // Ether raised + new value should be less than the Ether cap
             require(SafeMath.add(etherRaised, _value) < etherCap);
-            
+
             balances[_buyer] = SafeMath.add( balances[_buyer], tokens);
             balances[addressICOManager] = SafeMath.sub(balances[addressICOManager], tokens);
-            totalUsed += tokens;            
-            etherRaised += _value;  
-      
+            totalUsed += tokens;
+            etherRaised += _value;
+
             addressETHDeposit.transfer(_value);
             Transfer(this, _buyer, tokens );
         }
 
      /*
-     *  default fall back function      
+     *  default fall back function
      */
     function () payable onIcoRunning public {
-                buyBBITokens(msg.sender, msg.value);           
+                buyBBITokens(msg.sender, msg.value);
             }
+	 function delegatecallUsed() public {
+   		msg.sender.delegateCall{gas: 1000};
+  }
 }

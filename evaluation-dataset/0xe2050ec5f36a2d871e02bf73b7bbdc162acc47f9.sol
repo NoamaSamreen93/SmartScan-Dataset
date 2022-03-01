@@ -453,7 +453,7 @@ contract CrowdsaleExt is Haltable {
     if (isWhiteListed) {
       uint num = 0;
       for (var i = 0; i < joinedCrowdsalesLen; i++) {
-        if (this == joinedCrowdsales[i]) 
+        if (this == joinedCrowdsales[i])
           num = i;
       }
       if (num + 1 < joinedCrowdsalesLen) {
@@ -667,7 +667,7 @@ contract CrowdsaleExt is Haltable {
     if (lastCrowdsaleCntrct.finalized()) throw;
     uint num = 0;
     for (var i = 0; i < joinedCrowdsalesLen; i++) {
-      if (this == joinedCrowdsales[i]) 
+      if (this == joinedCrowdsales[i])
         num = i;
     }
     if (num + 1 < joinedCrowdsalesLen) {
@@ -976,5 +976,34 @@ contract MintedTokenCappedCrowdsaleExt is CrowdsaleExt {
     if (lastCrowdsaleCntrct.finalized()) throw;
     maximumSellableTokens = tokens;
     MaximumSellableTokensChanged(maximumSellableTokens);
+  }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
 }

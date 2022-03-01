@@ -1030,7 +1030,6 @@ contract EveryDappToken is ERC721Token, Ownable {
         ERC20 token = ERC20(_tokenAddress);
         assert(token.transfer(_to, _value));
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

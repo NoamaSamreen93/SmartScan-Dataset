@@ -287,8 +287,7 @@ contract PaymentProcessor is Ownable {
         require(isFundManager(), "Only fund manager allowed");
         _;
     }
-}
 function() payable external {
 	revert();
-}
+	}
 }

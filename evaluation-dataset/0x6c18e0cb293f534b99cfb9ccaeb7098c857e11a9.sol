@@ -162,7 +162,6 @@ contract Axioms {
         require(_newOwner != address(0));
         owner = _newOwner;
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

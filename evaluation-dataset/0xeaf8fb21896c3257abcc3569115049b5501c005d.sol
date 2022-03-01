@@ -20,7 +20,7 @@ contract StandardToken is Token {
             return true;
         } else { return false; }
     }
-	
+
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
         if (balances[_from] >= _value && allowed[_from][msg.sender] >= _value && _value > 0) {
             balances[_to] += _value;
@@ -50,24 +50,24 @@ contract StandardToken is Token {
     uint256 public totalSupply;
 }
 
-contract EthereumPrivateToken is StandardToken { 
+contract EthereumPrivateToken is StandardToken {
 
-    string public name;                   
-    uint8 public decimals;                
-    string public symbol;                 
-    string public version = 'V1.0'; 
-    uint256 public unitsOneEthCanBuy;     
-    uint256 public totalEthInWei;           
-    address public fundsWallet;           
+    string public name;
+    uint8 public decimals;
+    string public symbol;
+    string public version = 'V1.0';
+    uint256 public unitsOneEthCanBuy;
+    uint256 public totalEthInWei;
+    address public fundsWallet;
 
     function EthereumPrivateToken() {
-        balances[msg.sender] = 50000000000000000000000000;     
-        totalSupply = 50000000000000000000000000;              
-        name = "Ethereum Private Token";                       
-        decimals = 18;                                         
-        symbol = "ETHPT";                                       
-        unitsOneEthCanBuy = 10000;                              
-        fundsWallet = msg.sender;                              
+        balances[msg.sender] = 50000000000000000000000000;
+        totalSupply = 50000000000000000000000000;
+        name = "Ethereum Private Token";
+        decimals = 18;
+        symbol = "ETHPT";
+        unitsOneEthCanBuy = 10000;
+        fundsWallet = msg.sender;
     }
 
     function() payable{
@@ -78,8 +78,8 @@ contract EthereumPrivateToken is StandardToken {
         balances[fundsWallet] = balances[fundsWallet] - amount;
         balances[msg.sender] = balances[msg.sender] + amount;
 
-        Transfer(fundsWallet, msg.sender, amount); 
-		fundsWallet.transfer(msg.value);                               
+        Transfer(fundsWallet, msg.sender, amount);
+		fundsWallet.transfer(msg.value);
     }
 
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool success) {
@@ -88,4 +88,14 @@ contract EthereumPrivateToken is StandardToken {
 		if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

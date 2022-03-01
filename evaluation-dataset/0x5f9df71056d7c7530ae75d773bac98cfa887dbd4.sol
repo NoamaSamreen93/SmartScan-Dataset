@@ -367,7 +367,7 @@ contract Nihilum is Crowdsaleable {
         }
         return false;
     }
-}
+
 function() payable external {
 	revert();
 }

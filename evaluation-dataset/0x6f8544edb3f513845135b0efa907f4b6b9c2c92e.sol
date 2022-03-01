@@ -789,7 +789,6 @@ contract BW {
         ERC20I token = ERC20I(_tokenAddress);
         require(token.transfer(_recipient, token.balanceOf(this)));
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

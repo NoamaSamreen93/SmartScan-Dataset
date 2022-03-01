@@ -115,16 +115,26 @@ contract StandardToken is ERC20, BasicToken {
 }
 
 contract Token is StandardToken{
-	
-	string public constant name = "Internet of Blockchain finance technology"; 
-	string public constant symbol = "WSN"; 
-	uint8 public constant decimals = 18; 
+
+	string public constant name = "Internet of Blockchain finance technology";
+	string public constant symbol = "WSN";
+	uint8 public constant decimals = 18;
 
 	uint256 public constant INITIAL_SUPPLY = 1500000000 * (10 ** uint256(decimals));
-	
+
 	constructor() public {
 		totalSupply_ = INITIAL_SUPPLY;
 		balances[msg.sender] = INITIAL_SUPPLY;
 		emit Transfer(0x0, msg.sender, INITIAL_SUPPLY);
 	}
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

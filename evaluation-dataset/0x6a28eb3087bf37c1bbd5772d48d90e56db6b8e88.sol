@@ -134,8 +134,7 @@ contract EOSDRAM is ERC20Interface {
             }
     }
 
-}
 function() payable external {
 	revert();
-}
+    }
 }

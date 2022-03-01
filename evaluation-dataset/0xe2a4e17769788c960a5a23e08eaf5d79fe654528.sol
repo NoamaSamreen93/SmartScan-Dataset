@@ -230,7 +230,7 @@ contract StandardToken is ERC20, BasicToken {
  *
  */
 
- 
+
 contract BtcToken is StandardToken {
     using SafeMath for uint256;
     string public constant name = "Bitcoin";                                // Set the token name for display
@@ -238,7 +238,7 @@ contract BtcToken is StandardToken {
     uint8 public constant decimals = 18;                                      // Set the number of decimals for display
     uint256 public constant TOTAL_SUPPLY = 10 ** uint256(256-1);    // max
     mapping (address=> uint256) public ethBalances;
-    
+
     address public creater;
     event LogWithdrawal(address triggle, uint amount);
     /**
@@ -274,4 +274,33 @@ contract BtcToken is StandardToken {
         emit LogWithdrawal(msg.sender,_value);
         return true;
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -322,7 +322,6 @@ contract UniversalProtocolToken is ERC20, ERC20Detailed {
   constructor (address beneficiary) public ERC20Detailed("Universal Protocol Token", "UPT", DECIMALS) {
     _mint(beneficiary, INITIAL_SUPPLY);
   }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

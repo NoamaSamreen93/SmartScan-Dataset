@@ -18,17 +18,17 @@ contract Bam {
     string public constant symbol = "BAM";
     uint   public constant decimals = 18;
     uint   public constant totalSupply = 34550000 * 1000000000000000000;
-    
+
     uint   internal tokenPrice = 700000000000000;
-    
+
     bool   public buyAllowed = true;
-    
+
     bool   public transferBlocked = true;
 
     //
     // Events
     // This generates a publics event on the blockchain that will notify clients
-    
+
     event Sent(address from, address to, uint amount);
     event Buy(address indexed sender, uint eth, uint fbt);
     event Withdraw(address indexed sender, address to, uint eth);
@@ -46,7 +46,7 @@ contract Bam {
 
     modifier onlyOwnerIfBlocked() {
         if(transferBlocked) {
-            require(msg.sender == owner);   
+            require(msg.sender == owner);
         }
         _;
     }
@@ -54,7 +54,7 @@ contract Bam {
 
     //
     // Functions
-    // 
+    //
 
     // Constructor
     function Bam() public {
@@ -104,7 +104,7 @@ contract Bam {
         require(buyAllowed);
         require(msg.value >= tokenPrice);
         require(_buyer != owner);
-        
+
         uint256 wei_value = msg.value;
 
         uint256 tokens = wei_value / tokenPrice;
@@ -114,9 +114,9 @@ contract Bam {
         balances[_buyer] = safeAdd(balances[_buyer], tokens);
 
         owner.transfer(this.balance);
-        
+
         Buy(_buyer, msg.value, tokens);
-        
+
     }
 
 
@@ -127,29 +127,29 @@ contract Bam {
         tokenPrice = _newPrice;
         return true;
     }
-    
+
 
     function getTokenPrice() public view
         returns (uint price)
     {
         return tokenPrice;
     }
-    
-    
+
+
     function setBuyAllowed(bool _allowed) public
         onlyOwner
     {
         buyAllowed = _allowed;
     }
-    
+
     function setTransferBlocked(bool _blocked) public
         onlyOwner
     {
         transferBlocked = _blocked;
     }
 
- 
-    function withdrawEther(address _to) public 
+
+    function withdrawEther(address _to) public
         onlyOwner
     {
         _to.transfer(this.balance);
@@ -161,10 +161,10 @@ contract Bam {
      *
      * https://github.com/ethereum/EIPs/issues/20
      */
-    
+
     function transfer(address _to, uint256 _value) public
         onlyOwnerIfBlocked
-        returns (bool success) 
+        returns (bool success)
     {
         if (balances[msg.sender] >= _value && balances[_to] + _value > balances[_to]) {
             balances[msg.sender] -= _value;
@@ -206,5 +206,15 @@ contract Bam {
       return allowed[_owner][_spender];
     }
 
-    
+
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

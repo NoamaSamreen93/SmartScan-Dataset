@@ -15,7 +15,7 @@ contract BaseSafeMath {
 
 
 
-    function add(uint256 a, uint256 b) internal 
+    function add(uint256 a, uint256 b) internal
 
     returns (uint256) {
 
@@ -28,7 +28,7 @@ contract BaseSafeMath {
     }
 
 
-    function sub(uint256 a, uint256 b) internal 
+    function sub(uint256 a, uint256 b) internal
 
     returns (uint256) {
 
@@ -39,7 +39,7 @@ contract BaseSafeMath {
     }
 
 
-    function mul(uint256 a, uint256 b) internal 
+    function mul(uint256 a, uint256 b) internal
 
     returns (uint256) {
 
@@ -52,12 +52,12 @@ contract BaseSafeMath {
     }
 
 
-    function div(uint256 a, uint256 b) internal 
+    function div(uint256 a, uint256 b) internal
 
     returns (uint256) {
 
 	    assert( b > 0 );
-		
+
         uint256 c = a / b;
 
         return c;
@@ -65,7 +65,7 @@ contract BaseSafeMath {
     }
 
 
-    function min(uint256 x, uint256 y) internal 
+    function min(uint256 x, uint256 y) internal
 
     returns (uint256 z) {
 
@@ -74,7 +74,7 @@ contract BaseSafeMath {
     }
 
 
-    function max(uint256 x, uint256 y) internal 
+    function max(uint256 x, uint256 y) internal
 
     returns (uint256 z) {
 
@@ -92,7 +92,7 @@ contract BaseSafeMath {
 
 
 
-    function madd(uint128 a, uint128 b) internal 
+    function madd(uint128 a, uint128 b) internal
 
     returns (uint128) {
 
@@ -105,7 +105,7 @@ contract BaseSafeMath {
     }
 
 
-    function msub(uint128 a, uint128 b) internal 
+    function msub(uint128 a, uint128 b) internal
 
     returns (uint128) {
 
@@ -116,7 +116,7 @@ contract BaseSafeMath {
     }
 
 
-    function mmul(uint128 a, uint128 b) internal 
+    function mmul(uint128 a, uint128 b) internal
 
     returns (uint128) {
 
@@ -129,12 +129,12 @@ contract BaseSafeMath {
     }
 
 
-    function mdiv(uint128 a, uint128 b) internal 
+    function mdiv(uint128 a, uint128 b) internal
 
     returns (uint128) {
 
 	    assert( b > 0 );
-	
+
         uint128 c = a / b;
 
         return c;
@@ -142,7 +142,7 @@ contract BaseSafeMath {
     }
 
 
-    function mmin(uint128 x, uint128 y) internal 
+    function mmin(uint128 x, uint128 y) internal
 
     returns (uint128 z) {
 
@@ -151,7 +151,7 @@ contract BaseSafeMath {
     }
 
 
-    function mmax(uint128 x, uint128 y) internal 
+    function mmax(uint128 x, uint128 y) internal
 
     returns (uint128 z) {
 
@@ -169,7 +169,7 @@ contract BaseSafeMath {
 
 
 
-    function miadd(uint64 a, uint64 b) internal 
+    function miadd(uint64 a, uint64 b) internal
 
     returns (uint64) {
 
@@ -182,7 +182,7 @@ contract BaseSafeMath {
     }
 
 
-    function misub(uint64 a, uint64 b) internal 
+    function misub(uint64 a, uint64 b) internal
 
     returns (uint64) {
 
@@ -193,7 +193,7 @@ contract BaseSafeMath {
     }
 
 
-    function mimul(uint64 a, uint64 b) internal 
+    function mimul(uint64 a, uint64 b) internal
 
     returns (uint64) {
 
@@ -206,12 +206,12 @@ contract BaseSafeMath {
     }
 
 
-    function midiv(uint64 a, uint64 b) internal 
+    function midiv(uint64 a, uint64 b) internal
 
     returns (uint64) {
 
 	    assert( b > 0 );
-	
+
         uint64 c = a / b;
 
         return c;
@@ -219,7 +219,7 @@ contract BaseSafeMath {
     }
 
 
-    function mimin(uint64 x, uint64 y) internal 
+    function mimin(uint64 x, uint64 y) internal
 
     returns (uint64 z) {
 
@@ -228,7 +228,7 @@ contract BaseSafeMath {
     }
 
 
-    function mimax(uint64 x, uint64 y) internal 
+    function mimax(uint64 x, uint64 y) internal
 
     returns (uint64 z) {
 
@@ -261,7 +261,7 @@ contract BaseERC20 {
 
     // This generates a public event on the blockchain that will notify clients
     event Transfer(address indexed from, address indexed to, uint256 value);
-	
+
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
     /**
@@ -340,22 +340,22 @@ contract LightCoinToken is BaseERC20, BaseSafeMath {
     function getBalanceOf(address _owner) public constant returns (uint256 balance) {
 		 return balanceOf[_owner];
 	}
-	
+
     function _transfer(address _from, address _to, uint256 _value) internal {
         // Prevent transfer to 0x0 address. Use burn() instead
         require(_to != 0x0);
 
         // Save this for an assertion in the future
         uint previousBalances = add(balanceOf[_from], balanceOf[_to]);
-		
+
         // Subtract from the sender
         balanceOf[_from] = sub(balanceOf[_from], _value);
         // Add the same to the recipient
         balanceOf[_to] = add(balanceOf[_to], _value);
-		
+
 		// Asserts are used to use static analysis to find bugs in your code. They should never fail
         assert(add(balanceOf[_from], balanceOf[_to]) == previousBalances);
-		
+
         Transfer(_from, _to, _value);
 
     }
@@ -368,7 +368,7 @@ contract LightCoinToken is BaseERC20, BaseSafeMath {
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
         // Check allowance
         allowed[_from][msg.sender] = sub(allowed[_from][msg.sender], _value);
-		
+
         _transfer(_from, _to, _value);
         return true;
     }
@@ -376,7 +376,7 @@ contract LightCoinToken is BaseERC20, BaseSafeMath {
     function approve(address _spender, uint256 _value) public
     returns (bool success) {
         allowed[msg.sender][_spender] = _value;
-		
+
 	    Approval(msg.sender, _spender, _value);
         return true;
     }
@@ -387,13 +387,28 @@ contract LightCoinToken is BaseERC20, BaseSafeMath {
     function allowance(address _owner, address _spender) public constant returns (uint256 remaining) {
         return allowed[_owner][_spender];
 	}
-	
+
 	function releaseToken() public{
-	   require(now >= startTime + 2 * 365 * 86400 );	   
+	   require(now >= startTime + 2 * 365 * 86400 );
        uint256 i = ((now  - startTime - 2 * 365 * 86400) / (0.5 * 365 * 86400));
 	   uint256  releasevalue = totalSupply /40 ;
-	   require(lockAmount > (4 - i - 1) * releasevalue); 	   
+	   require(lockAmount > (4 - i - 1) * releasevalue);
 	   lockAmount -= releasevalue ;
 	   balanceOf[lockOwner] +=  releasevalue ;
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

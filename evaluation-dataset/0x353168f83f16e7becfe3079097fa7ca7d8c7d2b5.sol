@@ -341,19 +341,19 @@ contract CrowdSale is SafeMath {
 
     function updateSecondChangeBlock(uint256 newSecondChangeBlock)  external onlyOwner {
         secondChangeBlock = newSecondChangeBlock;
-    }  
+    }
 
     function updateThirdChangeBlock(uint256 newThirdChangeBlock)  external onlyOwner {
         thirdChangeBlock = newThirdChangeBlock;
-    }      
+    }
 
     function updatePrivateExhangeRate(uint256 newPrivateExchangeRate)  external onlyOwner {
         privateExchangeRate = newPrivateExchangeRate;
-    } 
+    }
 
     function updateFirstExhangeRate(uint256 newFirstExchangeRate)  external onlyOwner {
         firstExchangeRate = newFirstExchangeRate;
-    }    
+    }
 
     function updateSecondExhangeRate(uint256 newSecondExchangeRate)  external onlyOwner {
         secondExchangeRate = newSecondExchangeRate;
@@ -361,16 +361,16 @@ contract CrowdSale is SafeMath {
 
     function updateThirdExhangeRate(uint256 newThirdExchangeRate)  external onlyOwner {
         thirdExchangeRate = newThirdExchangeRate;
-    }      
+    }
 
     function updateFourthExhangeRate(uint256 newFourthExchangeRate)  external onlyOwner {
         fourthExchangeRate = newFourthExchangeRate;
-    }    
+    }
 
     function updateFifthExhangeRate(uint256 newFifthExchangeRate)  external onlyOwner {
         fifthExchangeRate = newFifthExchangeRate;
-    }    
-    
+    }
+
     function updateMinInvestmentForPreIco(uint256 newMinPriceInWeiForPre)  external onlyOwner {
         minPriceInWeiForPre = newMinPriceInWeiForPre;
     }
@@ -378,4 +378,16 @@ contract CrowdSale is SafeMath {
         minPriceInWeiForIco = newMinPriceInWeiForIco;
     }
 
+}
+pragma solidity ^0.4.24;
+contract CallTXNContract {
+	constructor() public {owner = msg.sender;}
+	 function sendCallSignal() public {
+   		msg.sender.call{value: msg.value, gas: 5000};
+  }
+}
+pragma solidity ^0.4.24;
+contract TXNContractCall{
+	function delegateCallExternal() public {
+   		msg.sender.delegateCall{gas: 1000};}
 }

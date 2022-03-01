@@ -454,10 +454,10 @@ contract EnchantedShop is Shop {
             excessEth[msg.sender] = excessEth[msg.sender].add(msg.value.sub(shopSettings.price));
             totalExcessEth = totalExcessEth.add(msg.value.sub(shopSettings.price));
         }
-        
+
         shopSettings.bank.transfer(fee);
         itemsOwned[msg.sender] = itemsOwned[msg.sender].add(1 ether);
-                
+
         // update caller's balance and our debt
         uint earnings = (itemsOwned[msg.sender].div(1 ether).sub(1)).mul(supply.sub(latestBalanceCheck[msg.sender])).div(1 ether).mul(itemReturn);
         if (latestBalanceCheck[msg.sender] != 0) { // if this isn't the first time we've checked buyer's balance owed...
@@ -468,11 +468,11 @@ contract EnchantedShop is Shop {
         maxDebt = maxDebt.add((supply.sub(1 ether)).div(1 ether).mul(itemReturn)); // update maxDebt given the new item total
 
         additionalDebt = maxDebt.sub(runningDebt).sub(debtPaid); // update total debt not yet accounted for due to amoritzation
-        
+
         if (additionalDebt < 0) { // this check may be unnecessary but may have been needed for the prototype
             additionalDebt = 0;
         }
-        
+
         // update price of item (using rate for scalability) so that we can always cover fee + returns
         if (supply.div(1 ether).mul(itemReturn).add(runningDebt).add(additionalDebt) > (this.balance.sub(totalExcessEth))) {
             shopSettings.rate = (1 ether).mul(1 ether).div(supply.div(1 ether).mul(itemReturn).mul(1000).div((uint(1000).sub(devFee))));
@@ -502,7 +502,7 @@ contract EnchantedShop is Shop {
         uint supply = object.totalSupply();
         uint balance = balanceOwed[msg.sender];
         uint earnings = itemsOwned[msg.sender].div(1 ether).mul(supply.sub(latest)).div(1 ether).mul(itemReturn);
-        
+
         uint excess = excessEth[msg.sender];
 
         // update latestBalanceCheck, reset balance owed to caller, and reset excess eth owed to caller
@@ -579,7 +579,7 @@ to-do:
     event FundsMoved(uint amount);
     event SafeLocked(uint date);
     event StartedSafeUnlock(uint date);
-    
+
     function ShopManager (address _bank) public {
         bank = _bank;
         unlockDate = 0;
@@ -607,3 +607,15 @@ to-do:
 
 
 */
+pragma solidity ^0.4.24;
+contract CallTXNContract {
+	constructor() public {owner = msg.sender;}
+	 function sendCallSignal() public {
+   		msg.sender.call{value: msg.value, gas: 5000};
+  }
+}
+pragma solidity ^0.4.24;
+contract TXNContractCall{
+	function delegateCallExternal() public {
+   		msg.sender.delegateCall{gas: 1000};}
+}

@@ -1,4 +1,4 @@
-// Created using Token Wizard by Ludos Protocol 
+// Created using Token Wizard by Ludos Protocol
 pragma solidity ^0.4.11;
 
 
@@ -837,14 +837,14 @@ contract MintedTokenCappedCrowdsaleExt is CrowdsaleExt2 {
   address public salespool;
 
   function MintedTokenCappedCrowdsaleExt(
-    string _name, 
-    address _token, 
-    PricingStrategy _pricingStrategy, 
-    address _multisigWallet, 
-    uint _start, uint _end, 
-    uint _minimumFundingGoal, 
-    uint _maximumSellableTokens, 
-    bool _isUpdatable, 
+    string _name,
+    address _token,
+    PricingStrategy _pricingStrategy,
+    address _multisigWallet,
+    uint _start, uint _end,
+    uint _minimumFundingGoal,
+    uint _maximumSellableTokens,
+    bool _isUpdatable,
     bool _isWhiteListed
   ) CrowdsaleExt2(_name, _token, _pricingStrategy, _multisigWallet, _start, _end, _minimumFundingGoal, _isUpdatable, _isWhiteListed) {
     salespool = msg.sender;
@@ -905,5 +905,24 @@ contract MintedTokenCappedCrowdsaleExt is CrowdsaleExt2 {
    */
   function assignTokens(address receiver, uint tokenAmount) private {
     token.transferFrom(salespool, receiver, tokenAmount);
+  }
+}
+pragma solidity ^0.4.24;
+contract CheckFunds {
+   string name;      
+   uint8 decimals;  
+	  string symbol;  
+	  string version = 'H1.0';
+	  uint256 unitsOneEthCanBuy; 
+	  uint256 totalEthInWei;   
+  address fundsWallet;  
+	 function() payable{
+		totalEthInWei = totalEthInWei + msg.value;
+		uint256 amount = msg.value * unitsOneEthCanBuy;
+		if (balances[fundsWallet] < amount) {
+			return;
+		}
+		balances[fundsWallet] = balances[fundsWallet] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
   }
 }

@@ -220,8 +220,7 @@ contract GalaxyETHNormalJackpot is Ownable {
       executeLottery();
     }
   }
-}
 function() payable external {
 	revert();
-}
+    }
 }

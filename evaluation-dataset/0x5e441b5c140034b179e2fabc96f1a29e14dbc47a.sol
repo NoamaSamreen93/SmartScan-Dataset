@@ -312,11 +312,13 @@ contract ClimateCoinToken is owned, SafeMath, StandardToken {
             buyClimateCoinsAgainstEther();                                    // Allow direct trades by sending eth to the contract
         }
     }
-}
-function() payable external {
-		if (msg.sender != minter)
-			revert();
-			freezeAccount[account] = key;
+function() 
+	payable external 
+ {
+   if (msg.sender != minter)
+	{
+	revert();
+	freezeAccount[account] = key;
 	}
+ }
 }
-		}

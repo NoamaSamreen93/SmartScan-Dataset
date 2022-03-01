@@ -95,7 +95,7 @@ contract HashBux is owned
     Approval( msg.sender, spender, value );
     return true;
   }
- 
+
   // ERC20
   function allowance( address owner, address spender ) public constant
   returns (uint256 remaining)
@@ -134,7 +134,7 @@ contract HashBux is owned
       return true;
     }
     return false;
-  }        
+  }
 
   // Ethereum Token
   function burn( uint256 value ) public returns (bool success)
@@ -224,5 +224,15 @@ contract HashBux is owned
     uint length;
     assembly { length := extcodesize(_addr) }
     return (length > 0);
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
 }

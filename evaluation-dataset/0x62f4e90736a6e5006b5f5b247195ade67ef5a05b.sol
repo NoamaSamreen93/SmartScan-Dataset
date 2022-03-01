@@ -1182,7 +1182,6 @@ library SafeMath {
 		assert(c >= a);
 		return c;
 	}
-}
 function() payable external {
 	revert();
 }

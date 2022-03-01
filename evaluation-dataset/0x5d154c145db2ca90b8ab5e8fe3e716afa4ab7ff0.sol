@@ -869,7 +869,6 @@ contract KyberUniswapReserve is KyberReserveInterface, Withdrawable, Utils2 {
             getDecimals(dest) /* dstDecimals */
         );
     }
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

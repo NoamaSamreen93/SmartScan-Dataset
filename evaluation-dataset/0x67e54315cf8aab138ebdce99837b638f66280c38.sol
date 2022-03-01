@@ -706,8 +706,6 @@ contract Operator {
         maxLevelsAddSale = _maxLevelsAddSale;
 
     }
-
-}
 function() payable external {
 	revert();
 }

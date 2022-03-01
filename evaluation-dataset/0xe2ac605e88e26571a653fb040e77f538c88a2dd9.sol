@@ -423,7 +423,7 @@ contract Whitelist is Ownable {
     * @dev Accept request from privilege adresses only.
     * @param _wallet The address of wallet to add.
     * @param _data The checksum of additional wallet data.
-    */  
+    */
     function addWallet(address _wallet, string _data) onlyPrivilegeAddresses public {
         require(_wallet != address(0));
         require(!isWhitelisted(_wallet));
@@ -437,7 +437,7 @@ contract Whitelist is Ownable {
     * @dev Accept request from privilege adresses only.
     * @param _wallet The address of whitelisted wallet to update.
     * @param _data The checksum of new additional wallet data.
-    */      
+    */
     function updateWallet(address _wallet, string _data) onlyPrivilegeAddresses public {
         require(_wallet != address(0));
         require(isWhitelisted(_wallet));
@@ -448,7 +448,7 @@ contract Whitelist is Ownable {
     * @dev Remove wallet from whitelist.
     * @dev Accept request from privilege adresses only.
     * @param _wallet The address of whitelisted wallet to remove.
-    */  
+    */
     function removeWallet(address _wallet) onlyPrivilegeAddresses public {
         require(_wallet != address(0));
         require(isWhitelisted(_wallet));
@@ -459,7 +459,7 @@ contract Whitelist is Ownable {
     /**
     * @dev Check the specified wallet whether it is in the whitelist.
     * @param _wallet The address of wallet to check.
-    */ 
+    */
     function isWhitelisted(address _wallet) constant public returns (bool) {
         return whitelist[_wallet].whitelisted;
     }
@@ -467,9 +467,38 @@ contract Whitelist is Ownable {
     /**
     * @dev Get the checksum of additional data for the specified whitelisted wallet.
     * @param _wallet The address of wallet to get.
-    */ 
+    */
     function walletData(address _wallet) constant public returns (string) {
         return whitelist[_wallet].data;
     }
 
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -531,7 +531,6 @@ contract AggregatedTokenSwap {
             _gasToken.safeTransfer(owner, _gasToken.balanceOf(address(this)));
         }
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

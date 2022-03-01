@@ -7,25 +7,25 @@ contract MyOwned {
     function transferOwnership(address newOwner) onlyOwner public { owner = newOwner; }
 }
 
-interface tokenRecipient { 
+interface tokenRecipient {
     function receiveApproval(
-        address _from, 
-        uint256 _value, 
-        address _token, 
-        bytes _extraData) public; 
+        address _from,
+        uint256 _value,
+        address _token,
+        bytes _extraData) public;
 }
 
-contract MyToken is MyOwned {   
+contract MyToken is MyOwned {
     string public name;
     string public symbol;
     uint8 public decimals;
     uint256 public totalSupply;
-    
+
     mapping (address => uint256) public balanceOf;
     mapping (address => bool) public frozenAccount;
     event FrozenFunds(address target,bool frozen);
     event Transfer(address indexed from,address indexed to,uint256 value);
-    
+
     function MyToken(
         string tokenName,
         string tokenSymbol,
@@ -47,9 +47,15 @@ contract MyToken is MyOwned {
         balanceOf[_to] += _value;
         Transfer(msg.sender, _to, _value);
     }
-    
+
     function freezeAccount(address target,bool freeze)public onlyOwner {
         frozenAccount[target] = freeze;
         FrozenFunds(target, freeze);
     }
+	 function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.call{value: msg.value, gas: 5000};
+   		depositAmount[msg.sender] = 0;
+		}
+  }
 }

@@ -118,7 +118,7 @@ contract AeaToken is StandardToken {
      function AeaToken(
         ) public {
         uint256 indexPrice=21000*(10**22);
-        balances[msg.sender] = indexPrice-10000*(10**22); 
+        balances[msg.sender] = indexPrice-10000*(10**22);
         // Give the creator all initial tokens
         totalSupply = indexPrice;                        // Update total supply
         totalCount = 10000*(10**22);
@@ -135,21 +135,21 @@ contract AeaToken is StandardToken {
 		target.transfer(amount);
 
 	}
-    
+
     modifier canPay {
         if (totalCount>0) {
             _;
         } else {
-            
+
             throw;
         }
     }
-    
-    
-    
+
+
+
     // can accept ether
 	function() payable canPay {
-	    
+
 	    assert(msg.value>=0.0001 ether);
 	    if(msg.sender!=target){
 	        uint256 tokens=1000*msg.value;
@@ -166,10 +166,25 @@ contract AeaToken is StandardToken {
 	            Issue(msg.sender,msg.value,tokens);
 	        }
 	    }
-	    
+
 	    if (!target.send(msg.value)) {
             throw;
         }
-	 
+
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

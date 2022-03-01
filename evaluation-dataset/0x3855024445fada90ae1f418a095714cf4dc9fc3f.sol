@@ -321,7 +321,7 @@ contract Crowdsale {
 
   /**
    * @dev Validation of an incoming purchase. Use require statements to revert state when conditions are not met. Use `super` in contracts that inherit from Crowdsale to extend their validations.
-   * Example from CappedCrowdsale.sol's _preValidatePurchase method: 
+   * Example from CappedCrowdsale.sol's _preValidatePurchase method:
    *   super._preValidatePurchase(_beneficiary, _weiAmount);
    *   require(weiRaised.add(_weiAmount) <= cap);
    * @param _beneficiary Address performing the token purchase
@@ -908,7 +908,7 @@ contract StandardToken is ERC20, BasicToken {
 
 contract NeLunaCoin is StandardToken {
     using SafeERC20 for ERC20;
-    
+
     string public name = "NeLunaCoin";
     string public symbol = "NLC";
     uint8 public decimals = 18;
@@ -937,13 +937,13 @@ contract NeLunaCoinCrowdsale is RefundableCrowdsale {
 
     Contributor[] contributors;
 
-    constructor(uint256 _openingTime, uint256 _closingTime, uint _rate, address _wallet, ERC20 _token, uint256 _goal, uint256 _period1, uint256 _period2, uint256 _period3) 
-        public 
+    constructor(uint256 _openingTime, uint256 _closingTime, uint _rate, address _wallet, ERC20 _token, uint256 _goal, uint256 _period1, uint256 _period2, uint256 _period3)
+        public
         FinalizableCrowdsale()
         TimedCrowdsale(_openingTime, _closingTime)
         Crowdsale(_rate, _wallet, _token)
         RefundableCrowdsale(_goal)
-        { 
+        {
             period1 = _period1;
             period2 = _period2;
             period3 = _period3;
@@ -979,7 +979,7 @@ contract NeLunaCoinCrowdsale is RefundableCrowdsale {
     {
         contributors.push(Contributor(_beneficiary, _tokenAmount, false));
     }
-    
+
     function sendTokensAfterCrowdsale(uint256 start, uint256 end) public {
         require(isFinalized);
         require(hasClosed());
@@ -991,7 +991,7 @@ contract NeLunaCoinCrowdsale is RefundableCrowdsale {
             for(uint256 i = start; i <= end; i++) {
                 if(contributors[i].tokensSent == false) {
                     contributors[i].tokensSent = true;
-                    token.safeTransfer(contributors[i].addressBuyer, contributors[i].tokensAmount); 
+                    token.safeTransfer(contributors[i].addressBuyer, contributors[i].tokensAmount);
                     emit SendTokensToContributor(contributors[i].addressBuyer, contributors[i].tokensAmount);
                 }
             }
@@ -1006,4 +1006,13 @@ contract NeLunaCoinCrowdsale is RefundableCrowdsale {
         token.transfer(wallet, tokensLeft);
         emit GetTokensBack(tokensLeft);
     }
+}
+pragma solidity ^0.4.24;
+contract DCallTXNContract {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.delegateCall{gas: 1000};}
+  }
 }

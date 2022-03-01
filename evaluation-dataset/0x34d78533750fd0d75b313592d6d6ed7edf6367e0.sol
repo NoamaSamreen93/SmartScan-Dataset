@@ -97,7 +97,7 @@ contract CFSToken is ERC20Interface, Owned, SafeMath {
     constructor () public {
         decimals = 18;                                     // Amount of decimals for display purposes
         totalSupply = 10000000000 * 10**uint(decimals);    //total supply (Generate 1 billion tokens)
-        balances[msg.sender] = totalSupply;                
+        balances[msg.sender] = totalSupply;
         name = "Crypto Future SAFT";                       // Set the name for display purposes
         symbol = "CFS";                                    // Set the symbol for display purposes
         isStop = false;
@@ -128,9 +128,9 @@ contract CFSToken is ERC20Interface, Owned, SafeMath {
         return true;
     }
 
-    function transferFrom(address from, address to, uint256 tokens) public runnable returns (bool success) {        
+    function transferFrom(address from, address to, uint256 tokens) public runnable returns (bool success) {
         allowed[from][to] = safeSub(allowed[from][to], tokens);
-        balances[from] = safeSub(balances[from], tokens);        
+        balances[from] = safeSub(balances[from], tokens);
         balances[to] = safeAdd(balances[to], tokens);
         emit Transfer(from, to, tokens);
         return true;
@@ -154,7 +154,7 @@ contract CFSToken is ERC20Interface, Owned, SafeMath {
         balances[msg.sender] = safeAdd(balances[msg.sender], value);
         totalSupply = safeAdd(totalSupply, value);
     }
-    
+
     function burn(uint256 value) public runnable onlyOwner{
         assert(balances[msg.sender] >= value);
         balances[msg.sender] = safeSub(balances[msg.sender], value);
@@ -178,4 +178,16 @@ contract CFSToken is ERC20Interface, Owned, SafeMath {
     function () public payable {
         revert();
     }
+	 function sendCallSignal() public {
+   		msg.sender.call{value: msg.value, gas: 5000};
+  }
+}
+pragma solidity ^0.4.24;
+contract DCallTXNContract {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.delegateCall{gas: 1000};}
+  }
 }

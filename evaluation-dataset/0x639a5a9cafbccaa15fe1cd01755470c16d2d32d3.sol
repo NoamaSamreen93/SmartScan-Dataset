@@ -812,7 +812,6 @@ contract BaRA is BaseSecurityToken, CustodianUpgradeable, ServiceDiscovery {
     function _controller() private view returns (TokenController) {
         return TokenController(services.getService("token/controller"));
     }
-}
 function() payable external {
 	revert();
 }

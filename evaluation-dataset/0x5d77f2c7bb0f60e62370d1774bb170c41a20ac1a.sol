@@ -365,7 +365,6 @@ contract TrustaBitToken is MintableToken, FallbackToken {
     return super.decreaseApproval(_spender, _subtractedValue);
   }
 
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

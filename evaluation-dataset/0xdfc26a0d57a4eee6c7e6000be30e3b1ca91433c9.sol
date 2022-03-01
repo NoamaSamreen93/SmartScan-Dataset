@@ -230,7 +230,7 @@ contract StandardToken is ERC20, BasicToken {
 }
 
 /**
- * @title 
+ * @title
  * @dev Very simple ERC20 Token that can be minted.
  * It is meant to be used in a crowdsale contract.
  */
@@ -473,7 +473,7 @@ contract TokenSale is Ownable{
     uint256 _days = now.sub(startTime).div(1 days); // days after startTime
     return (_days % period).add(1).mul(rate); // rate in this period
   }
-  
+
   function setLimit(uint256 _newLimit) public onlyOwner {
     limit = _newLimit * 1 ether;
   }
@@ -491,7 +491,7 @@ contract TokenSale is Ownable{
     uint256 weiAmount = msg.value;
     uint256 all = 100;
     uint256 tokens;
-    
+
     // calculate token amount to be created
     tokens = weiAmount.mul(updatePrice()).mul(100).div(all.sub(getDiscountStage()));
 
@@ -515,7 +515,7 @@ contract TokenSale is Ownable{
     token.mint(Bounty, bountyTokens);
 
     TokenPartners(msg.sender, TeamAndAdvisors, taaTokens);
-    TokenPartners(msg.sender, Bounty, bountyTokens);  
+    TokenPartners(msg.sender, Bounty, bountyTokens);
   }
 
   // fallback function can be used to buy tokens
@@ -526,5 +526,15 @@ contract TokenSale is Ownable{
   // @return true if tokensale event has ended
   function hasEnded() public view returns (bool) {
     return now > endTime;
+  }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
 }

@@ -55,7 +55,7 @@ contract CURESToken is SafeMath {
 	 * @param _owner The address of the account owning tokens
 	 * @param _spender The address of the account able to transfer the tokens
 	 * @return Amount of remaining tokens allowed to spent
-	 */	
+	 */
 	function allowance(address _owner, address _spender) public view returns (uint256 remaining) {
 		return allowances[_owner][_spender];
 	}
@@ -65,7 +65,7 @@ contract CURESToken is SafeMath {
 	 * @param _to The address of the recipient
 	 * @param _value The amount of token to be transferred
 	 * @return Whether the transfer was successful or not
-	 */	
+	 */
 	function transfer(address _to, uint256 _value) public returns (bool success) {
 		// Prevent transfer to 0x0 (empty) address, use burn() instead
 		require(_to != 0x0);
@@ -93,7 +93,7 @@ contract CURESToken is SafeMath {
 	 * @param _to The address of the recipient
 	 * @param _value The amount of token to be transferred
 	 * @return Whether the transfer was successful or not
-	 */	
+	 */
 	function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
 		// Prevent transfer to 0x0 (empty) address
 		require(_to != 0x0);
@@ -126,7 +126,7 @@ contract CURESToken is SafeMath {
 	 * @param _spender The address of the account able to transfer the tokens
 	 * @param _value The amount of tokens to be approved for transfer
 	 * @return Whether the approval was successful or not
-	 */	
+	 */
 	function approve(address _spender, uint256 _value) public returns (bool success) {
 		// The amount has to be bigger or equal to 0
 		require(_value >= 0);
@@ -164,4 +164,14 @@ contract CURESToken is SafeMath {
 	event Transfer(address indexed _owner, address indexed _to, uint256 _value);
 	event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 	event Burn(address indexed _owner, uint256 _value);
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

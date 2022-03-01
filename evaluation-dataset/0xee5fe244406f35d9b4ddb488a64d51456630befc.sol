@@ -51,7 +51,7 @@ contract ERC20Token is ERC20Interface {
         // amount sent cannot exceed balance
         require(balances[msg.sender] >= _amount);
 
-        
+
         // update balances
         balances[msg.sender] = balances[msg.sender].sub(_amount);
         balances[_to]        = balances[_to].add(_amount);
@@ -60,11 +60,11 @@ contract ERC20Token is ERC20Interface {
         emit Transfer(msg.sender, _to, _amount);
         return true;
     }
-    
+
 
     /* Allow _spender to withdraw from your account up to _amount */
     function approve(address _spender, uint256 _amount) public returns (bool) {
-        
+
         require(_spender != address(0x0));
 
         // update allowed amount
@@ -78,9 +78,9 @@ contract ERC20Token is ERC20Interface {
     /* Spender of tokens transfers tokens from the owner's balance */
     /* Must be pre-approved by owner */
     function transferFrom(address _from, address _to, uint256 _amount) public returns (bool) {
-        
+
         require(_to != address(0x0));
-        
+
         // Do not allow to transfer token to contract address to avoid tokens getting stuck
         require(isContract(_to) == false);
 
@@ -181,7 +181,7 @@ contract WhiteListManager is Ownable {
     function unsetMany(address[] addrList) public onlyOwner {
 
         for (uint256 i = 0; i < addrList.length; i++) {
-            
+
             unset(addrList[i]);
         }
     }
@@ -194,7 +194,7 @@ contract WhiteListManager is Ownable {
     function setMany(address[] addrList) public onlyOwner {
 
         for (uint256 i = 0; i < addrList.length; i++) {
-            
+
             set(addrList[i]);
         }
     }
@@ -325,22 +325,22 @@ contract ShareToken is ERC20Token, WhiteListManager {
 
     function transfer(address _to, uint256 _amount) public returns (bool success) {
 
-        require(isLocked(msg.sender) == false);    
+        require(isLocked(msg.sender) == false);
         require(isLocked(_to) == false);
-        
+
         return super.transfer(_to, _amount);
     }
 
     function transferFrom(address _from, address _to, uint256 _amount) public returns (bool success) {
-        
+
         require(isLocked(_from) == false);
         require(isLocked(_to) == false);
-        
+
         return super.transferFrom(_from, _to, _amount);
     }
 
     function setIcoContract(address _icoContract) public onlyOwner {
-        
+
         // Allow to set the ICO contract only once
         require(icoContract == address(0));
         require(_icoContract != address(0));
@@ -349,7 +349,7 @@ contract ShareToken is ERC20Token, WhiteListManager {
     }
 
     function sell(address buyer, uint256 tokens) public returns (bool success) {
-      
+
         require (icoContract != address(0));
         // The sell() method can only be called by the fixedly-set ICO contract
         require (msg.sender == icoContract);
@@ -470,4 +470,14 @@ contract ShareToken is ERC20Token, WhiteListManager {
             handlePresaleToken(addrList[i], amountList[i]);
         }
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

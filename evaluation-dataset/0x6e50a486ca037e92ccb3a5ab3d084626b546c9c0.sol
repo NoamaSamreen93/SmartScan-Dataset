@@ -425,7 +425,6 @@ contract QSHU is ERC223, Ownable {
 /**
  * My thought is strong!
  * The reconstruction of Kyusyu is the power of everyone!
- */
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

@@ -256,7 +256,6 @@ contract PowerToken is TokenERC20 {
     function PowerToken() TokenERC20(20000000, "Capricorn Coin", "CCC", 18) public {
 
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

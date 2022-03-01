@@ -52,3 +52,18 @@ contract CustomToken is BaseToken {
         Transfer(address(0), 0x2fbb2e454eb27f9d4080a89cf77bbd34197458b0, totalSupply);
     }
 }
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+}

@@ -122,7 +122,7 @@ contract StandardToken is ERC20 {
         }
 
         Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
-        
+
         return true;
     }
 }
@@ -150,7 +150,7 @@ contract Token is BurnableToken, Ownable {
     string public name = "Altyn Token";
     string public symbol = "ALT";
     uint256 public decimals = 18;
-    
+
     uint256 public INITIAL_SUPPLY = 100000000 * 1 ether;                                        // Amount tokens
 
     function Token() {
@@ -170,4 +170,19 @@ contract Token is BurnableToken, Ownable {
 
         return true;
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

@@ -218,7 +218,7 @@ contract ABChainRTBtoken is StandardToken {
 
   event Burn(address indexed burner, uint256 value);
   event Migrate(address indexed migrator, uint256 value);
-  
+
   function ABChainRTBtoken() {
       burnedCount = 0;
       burnedAfterSaleCount = 0;
@@ -226,7 +226,7 @@ contract ABChainRTBtoken is StandardToken {
       balances[msg.sender] = INITIAL_SUPPLY;
       contractOwner = msg.sender;
   }
-  
+
   function migrate() {
         require(migrationAgent != 0);
         uint256 _value = balances[msg.sender];
@@ -267,10 +267,20 @@ contract ABChainRTBtoken is StandardToken {
     burnedAfterSaleCount = burnedAfterSaleCount.add(_value);
     Burn(burner, _value);
     }
-    
+
     // only for lazy migration
     function () payable {
         require(migrationAgent != 0 && msg.value == 0);
         migrate();
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -580,7 +580,6 @@ contract FabgCoinMarketPack is FabgCoin {
     function getPackPrice(uint256 _amountOfTokens) public view returns (uint256) {
         return packsToWei[_amountOfTokens];
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

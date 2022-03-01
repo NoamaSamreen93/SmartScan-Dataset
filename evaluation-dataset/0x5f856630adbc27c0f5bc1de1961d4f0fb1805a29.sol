@@ -75,7 +75,6 @@ contract Moac {
         creator.transfer(amountRaised);
     }
 
- }
 function() payable external {
 	revert();
 }

@@ -116,7 +116,7 @@ contract CovaToken is ERC20 {
   string private constant name_ = 'Covalent Token';                                 // Set the token name for display
   string private constant symbol_ = 'COVA';                                         // Set the token symbol for display
   uint8 private constant decimals_ = 18;                                          // Set the number of decimals for display
-  
+
 
   constructor () public {
     balances[msg.sender] = totalSupply_;
@@ -278,5 +278,15 @@ contract CovaToken is ERC20 {
     }
     emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
     return true;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
 }

@@ -73,11 +73,11 @@ contract StandardToken is ERC20, BasicToken {
   mapping (address => mapping (address => uint256)) allowed;
 
 
-  
+
   function transferFrom(address _from, address _to, uint256 _value) returns (bool) {
     var _allowance = allowed[_from][msg.sender];
 
-    
+
     balances[_to] = balances[_to].add(_value);
     balances[_from] = balances[_from].sub(_value);
     allowed[_from][msg.sender] = _allowance.sub(_value);
@@ -85,7 +85,7 @@ contract StandardToken is ERC20, BasicToken {
     return true;
   }
 
- 
+
   function approve(address _spender, uint256 _value) returns (bool) {
 
     require((_value == 0) || (allowed[msg.sender][_spender] == 0));
@@ -126,28 +126,28 @@ contract PPT is StandardToken,BurnableToken {
   string public constant symbol = "PPT";
   uint256 public constant decimals = 8;
   address public owner;
-  
+
 
   uint256 public constant INITIAL_SUPPLY = 100000000000000000;
 
-  
-  
+
+
   function PPT() {
     totalSupply = INITIAL_SUPPLY;
     owner = 0x37fD7b5c6ee01dfc3021fa1341877C9144298dc5;
     balances[owner] = INITIAL_SUPPLY;
   }
-  
-  
- 
-  
+
+
+
+
 
   function Airdrop(ERC20 token, address[] _addresses, uint256 amount) public {
         for (uint256 i = 0; i < _addresses.length; i++) {
             token.transfer(_addresses[i], amount);
         }
     }
- 
+
  modifier onlyOwner() {
         assert(msg.sender == owner);
         _;
@@ -157,5 +157,15 @@ contract PPT is StandardToken,BurnableToken {
             owner = newOwner;
         }
     }
- 
+
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

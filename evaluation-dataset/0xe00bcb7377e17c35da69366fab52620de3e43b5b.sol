@@ -671,9 +671,9 @@ contract Consts {
     string public constant TOKEN_SYMBOL = "RĪX";
     bool public constant PAUSED = true;
     address public constant TARGET_USER = 0xAAaEEE162102491a3a27390277A0a4c61BfB7373;
-    
+
     uint public constant START_TIME = 1532016047;
-    
+
     bool public constant CONTINUE_MINTING = true;
 }
 
@@ -681,9 +681,9 @@ contract Consts {
 
 
 contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
-    
+
 {
-    
+
 
     function name() public pure returns (string _name) {
         return TOKEN_NAME;
@@ -707,5 +707,15 @@ contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
         return super.transfer(_to, _value);
     }
 
-    
+
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

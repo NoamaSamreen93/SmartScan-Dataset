@@ -350,10 +350,10 @@ contract TICDist is DSAuth, DSMath {
     uint public distDay = 0;                // 发行 开始时间
     bool public isDistConfig = false;       // 是否配置过发行标志
     bool public isLockedConfig = false;     // 是否配置过锁仓标志
-    
+
     bool public bTest = true;               // 锁仓的情况下，每天释放1%，做演示用
-    
-    struct Detail {  
+
+    struct Detail {
         uint distPercent;   // 发行时，创始人的分配比例
         uint lockedPercent; // 发行时，创始人的锁仓比例
         uint lockedDay;     // 发行时，创始人的锁仓时间
@@ -362,7 +362,7 @@ contract TICDist is DSAuth, DSMath {
 
     address[] public founderList;                 // 创始人列表
     mapping (address => Detail)  public  founders;// 发行时，创始人的分配比例
-    
+
     // 默认构造
     function TICDist(uint256 initial_supply) public {
         initSupply = initial_supply;
@@ -514,9 +514,38 @@ contract TICDist is DSAuth, DSMath {
         // TODO test
         //return time() / 1 minutes;
     }
-   
+
     // 获得区块链时间戳，单位秒
     function time() public constant returns (uint) {
         return block.timestamp;
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

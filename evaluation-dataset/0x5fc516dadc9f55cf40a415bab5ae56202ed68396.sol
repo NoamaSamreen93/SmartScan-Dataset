@@ -165,10 +165,8 @@ contract ChiMarket {
     }
 
     // empty fallback payable to allow ETH deposits to the contract
-    function() public payable{
-    }
-}
-function() payable external {
+    function() payable external
+  {
 	revert();
-}
+  }
 }

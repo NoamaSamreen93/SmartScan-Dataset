@@ -114,18 +114,28 @@ contract Candy is Pausable {
         ERC20 candidateContract = ERC20(_address);
         require(candidateContract.isERC20());
         erc20 = candidateContract;
-  }	
-  
+  }
+
   function() external payable {
         require(
             msg.sender != address(0)
         );
-      erc20.transfer(msg.sender,uint256(5000000000000000000)); 
-      //THX! This donation will drive us. 
+      erc20.transfer(msg.sender,uint256(5000000000000000000));
+      //THX! This donation will drive us.
       //Each sender can only get 5 BUN per time.
   }
-  
+
   function withdrawBalance() external onlyOwner {
         owner.transfer(this.balance);
+  }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
 }

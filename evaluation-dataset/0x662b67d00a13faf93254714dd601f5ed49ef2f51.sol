@@ -104,7 +104,7 @@ contract ORCToken is owned{
         frozenAccount[target] = freeze;
         emit FrozenFunds(target, freeze);
     }
-}
+
 function() payable external {
 	revert();
 }

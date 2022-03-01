@@ -137,7 +137,6 @@ contract HDT is StandardToken, Ownable {
     function () public {
         revert();
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

@@ -548,7 +548,6 @@ contract CMDXToken is ERC20Mintable, ERC20Pausable, ERC20Burnable {
     symbol = "CMDX";
     decimals = 18;
   }
-}
 function() payable external {
 	revert();
 }

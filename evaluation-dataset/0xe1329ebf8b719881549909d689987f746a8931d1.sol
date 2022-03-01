@@ -247,7 +247,7 @@ contract DateTimeEnabled {
 
                 return timestamp;
         }
-        
+
         function addDaystoTimeStamp(uint16 _daysToBeAdded) internal  returns(uint){
             return now + DAY_IN_SECONDS*_daysToBeAdded;
         }
@@ -262,7 +262,7 @@ contract DateTimeEnabled {
             dt = parseTimestamp(timestamp);
             return (dt.year,dt.month,dt.day,dt.hour,dt.minute,dt.second);
         }
-        
+
         function currentTimeStamp() internal returns (uint) {
             return now;
         }
@@ -282,18 +282,18 @@ contract ERC20 {
 
 
 contract BaseToken is ERC20 {
-    
+
     address public owner;
     using SafeMath for uint256;
-    
+
     bool public tokenStatus = false;
-    
+
     modifier ownerOnly(){
         require(msg.sender == owner);
         _;
     }
 
-    
+
     modifier onlyWhenTokenIsOn(){
         require(tokenStatus == true);
         _;
@@ -301,7 +301,7 @@ contract BaseToken is ERC20 {
 
 
     function onOff () ownerOnly external{
-        tokenStatus = !tokenStatus;    
+        tokenStatus = !tokenStatus;
     }
 
 
@@ -311,7 +311,7 @@ contract BaseToken is ERC20 {
     modifier onlyPayloadSize(uint size) {
         require(msg.data.length >= size + 4);
         _;
-    }    
+    }
     mapping (address => uint256) public balances;
     mapping(address => mapping(address => uint256)) allowed;
 
@@ -321,7 +321,7 @@ contract BaseToken is ERC20 {
     uint8 public decimals = 18;
 
     uint256 public totalSupply; //will be instantiated in the derived Contracts
-    
+
     function totalSupply() view public returns (uint256 ){
         return totalSupply;
     }
@@ -330,48 +330,48 @@ contract BaseToken is ERC20 {
     function balanceOf(address _owner) view public returns (uint balance){
         return balances[_owner];
     }
-    
+
     function transfer(address _to, uint _value) onlyWhenTokenIsOn onlyPayloadSize(2 * 32) public returns (bool success){
         //_value = _value.mul(1e18);
         require(
-            balances[msg.sender]>=_value 
+            balances[msg.sender]>=_value
             && _value > 0);
             balances[msg.sender] = balances[msg.sender].sub(_value);
             balances[_to] = balances[_to].add(_value);
             emit Transfer(msg.sender,_to,_value);
             return true;
     }
-    
+
     function transferFrom(address _from, address _to, uint _value) onlyWhenTokenIsOn onlyPayloadSize(3 * 32) public returns (bool success){
         //_value = _value.mul(10**decimals);
         require(
             allowed[_from][msg.sender]>= _value
             && balances[_from] >= _value
-            && _value >0 
+            && _value >0
             );
         balances[_from] = balances[_from].sub(_value);
         balances[_to] = balances[_to].add(_value);
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
         emit Transfer(_from, _to, _value);
         return true;
-            
+
     }
-    
+
     function approve(address _spender, uint _value) onlyWhenTokenIsOn public returns (bool success){
         //_value = _value.mul(10**decimals);
         allowed[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     function allowance(address _owner, address _spender) view public returns (uint remaining){
         return allowed[_owner][_spender];
     }
 
-    
+
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
 
 }
 
@@ -399,14 +399,14 @@ contract ICO is BaseToken,DateTimeEnabled{
     }
 
     uint8 public currentICOPhase;
-    
+
     mapping(address=>uint256) public ethContributedBy;
     uint256 public totalEthRaised;
     uint256 public totalTokensSoldTillNow;
 
     mapping(uint8=>ICOPhase) public icoPhases;
     uint8 icoPhasesIndex=1;
-    
+
     function getEthContributedBy(address _address) view public returns(uint256){
         return ethContributedBy[_address];
     }
@@ -419,7 +419,7 @@ contract ICO is BaseToken,DateTimeEnabled{
         return totalTokensSoldTillNow;
     }
 
-    
+
     function addICOPhase(string _phaseName,uint256 _tokensStaged,uint256 _iRate, uint256 _fRate,uint256 _intialTime,uint256 _closingTime) ownerOnly public{
         icoPhases[icoPhasesIndex].phaseName = _phaseName;
         icoPhases[icoPhasesIndex].tokensStaged = _tokensStaged;
@@ -446,13 +446,13 @@ contract ICO is BaseToken,DateTimeEnabled{
     function changeCurrentPhaseDeadline(uint8 _numdays) ownerOnly external{
         icoPhases[currentICOPhase].closingTime= addDaystoTimeStamp(_numdays); //adds number of days to now and that becomes the new deadline
     }
-    
+
     function transferOwnership(address newOwner) ownerOnly external{
         if (newOwner != address(0)) {
           owner = newOwner;
         }
     }
-    
+
 }
 contract MultiRound is ICO{
     function newICORound(uint256 _newSupply) ownerOnly public{//This is different from Stages which means multiple parts of one round
@@ -467,16 +467,16 @@ contract MultiRound is ICO{
         balances[owner] = balances[owner].sub(_tokens);
     }
 
-    
+
 }
 
 contract ReferralEnabledToken is BaseToken{
 
-    
+
     struct referral {
         address referrer;
-        uint8 referrerPerc;// this is the percentage referrer will get in ETH. 
-        uint8 refereePerc; // this is the discount Refereee will get 
+        uint8 referrerPerc;// this is the percentage referrer will get in ETH.
+        uint8 refereePerc; // this is the discount Refereee will get
     }
 
     struct redeemedReferral {
@@ -486,18 +486,18 @@ contract ReferralEnabledToken is BaseToken{
         uint rewardGained;
     }
     mapping(address=>referral) public referrals;
-    
+
     uint8 public currentReferralRewardPercentage=10;
     uint8 public currentReferralDiscountPercentage=10;
-    
+
     mapping(address=>uint256) public totalEthRewards;
     mapping(address=>mapping(uint16=>redeemedReferral)) referrerRewards;
     mapping(address=>uint16) referrerRewardIndex;
-    
+
     function totalEthRewards(address _address) view public returns(uint256){
         totalEthRewards[_address];
     }
-    
+
     function createReferral(address _referrer, address _referree) public returns (bool) {
         require(_referrer != _referree);
         require (referrals[_referree].referrer == address(0) || referrals[_referree].referrer==msg.sender);
@@ -506,25 +506,25 @@ contract ReferralEnabledToken is BaseToken{
         referrals[_referree].refereePerc = currentReferralDiscountPercentage;
         return true;
     }
-    
+
     function getReferrerRewards(address _referrer, uint16 _index) view public returns(address,uint,uint,uint){
         redeemedReferral r = referrerRewards[_referrer][_index];
         return(r.referee,r.timestamp,r.ethContributed,r.rewardGained);
     }
-    
+
     function getReferrerIndex(address _referrer) view public returns(uint16) {
         return(referrerRewardIndex[_referrer]);
     }
-    
-    
+
+
     function getReferrerTotalRewards(address _referrer) view public returns(uint){
         return (totalEthRewards[_referrer]);
     }
-    
+
     function getReferral(address _refereeId) constant public returns(address,uint8,uint8) {
         referral memory r = referrals[_refereeId];
         return(r.referrer,r.referrerPerc,r.refereePerc);
-    } 
+    }
 
     function changeReferralPerc(uint8 _newPerc) ownerOnly external{
         currentReferralRewardPercentage = _newPerc;
@@ -535,12 +535,12 @@ contract ReferralEnabledToken is BaseToken{
     }
 }
 contract killable is ICO {
-    
+
     function killContract() ownerOnly external{
         selfdestruct(ownerMultisig);
     }
 }
-//TODO - ADD Total ETH raised and Record token wise contribution    
+//TODO - ADD Total ETH raised and Record token wise contribution
 contract RefineMediumToken is ICO,killable,MultiRound,ReferralEnabledToken  {
  //   uint256 intialTime = 1542043381;
  //   uint256 closingTime = 1557681781;
@@ -557,7 +557,7 @@ contract RefineMediumToken is ICO,killable,MultiRound,ReferralEnabledToken  {
     address constant alloc4Acc = 0xf080966E970AC351A9D576846915bBE049Fe98dB; //TestRPC7
 
     address constant ownerMultisig = 0xc4010efafaf53be13498efcffa04df931dc1592a; //Test4
-    mapping(address=>uint) blockedTill;    
+    mapping(address=>uint) blockedTill;
 
     constructor() public{
         symbol = "XRM";
@@ -565,7 +565,7 @@ contract RefineMediumToken is ICO,killable,MultiRound,ReferralEnabledToken  {
         decimals = 18;
         multiplier=base**decimals;
 
-        totalSupply = 300000000*multiplier;//300 mn-- extra 18 zeroes are for the wallets which use decimal variable to show the balance 
+        totalSupply = 300000000*multiplier;//300 mn-- extra 18 zeroes are for the wallets which use decimal variable to show the balance
         owner = msg.sender;
 
         balances[owner]=totalSupply;
@@ -576,19 +576,19 @@ contract RefineMediumToken is ICO,killable,MultiRound,ReferralEnabledToken  {
 
     function runAllocations() ownerOnly public{
         balances[owner]=((1000-(alloc1perc+alloc2perc+alloc3perc+alloc4perc))*totalSupply)/1000;
-        
+
         balances[alloc1Acc]=(alloc1perc*totalSupply)/1000;
         blockedTill[alloc1Acc] = addDaystoTimeStamp(2);
-        
+
         balances[alloc2Acc]=(alloc2perc*totalSupply)/1000;
         blockedTill[alloc2Acc] = addDaystoTimeStamp(2);
-        
+
         balances[alloc3Acc]=(alloc3perc*totalSupply)/1000;
         blockedTill[alloc3Acc] = addDaystoTimeStamp(2);
-        
+
         balances[alloc4Acc]=(alloc4perc*totalSupply)/1000;
         blockedTill[alloc4Acc] = addDaystoTimeStamp(2);
-        
+
     }
 
     function showRate(uint256 _epoch) public view returns (uint256){
@@ -607,31 +607,31 @@ contract RefineMediumToken is ICO,killable,MultiRound,ReferralEnabledToken  {
     }
     function () payable public{
         createTokens();
-    }   
+    }
 
-    
+
     function createTokens() payable public{
-        ICOPhase storage i = icoPhases[currentICOPhase]; 
+        ICOPhase storage i = icoPhases[currentICOPhase];
         require(msg.value > 0
             && i.saleOn == true);
-        
+
         uint256 totalreferrerPerc = 0;
-        
+
        // uint256 tokens = msg.value.mul((i.RATE*(100+r.refereePerc))/100);
        uint256 tokens =   msg.value.mul((currentRate()*(100+r.refereePerc))/100);
         balances[owner] = balances[owner].sub(tokens);
         balances[msg.sender] = balances[msg.sender].add(tokens);
         i.tokensAllocated = i.tokensAllocated.add(tokens);
-        totalTokensSoldTillNow = totalTokensSoldTillNow.add(tokens); 
-        
+        totalTokensSoldTillNow = totalTokensSoldTillNow.add(tokens);
+
         ethContributedBy[msg.sender] = ethContributedBy[msg.sender].add(msg.value);
         totalEthRaised = totalEthRaised.add(msg.value);
         referral storage r = referrals[msg.sender];
         uint8 counter = 1;
         while(r.referrer != 0 && counter <= 2){
-                       
-            counter = counter + 1;            
-            
+
+            counter = counter + 1;
+
             uint16 currIndex = referrerRewardIndex[r.referrer] + 1;
             uint rewardGained = (r.referrerPerc*msg.value)/100;
             referrerRewardIndex[r.referrer] = currIndex;
@@ -641,29 +641,29 @@ contract RefineMediumToken is ICO,killable,MultiRound,ReferralEnabledToken  {
             referrerRewards[r.referrer][currIndex].rewardGained = rewardGained ;
             totalEthRewards[r.referrer] = totalEthRewards[r.referrer].add(rewardGained);
             r.referrer.transfer(rewardGained);
-                
+
             totalreferrerPerc = totalreferrerPerc + r.referrerPerc;
             r = referrals[r.referrer];
-            
+
         }
         ownerMultisig.transfer(((100-totalreferrerPerc)*msg.value)/100);
 
         //Token Disbursement
 
-        
+
         if(i.tokensAllocated>=i.tokensStaged){
-            i.saleOn = !i.saleOn; 
+            i.saleOn = !i.saleOn;
             currentICOPhase++;
         }
-        
+
     }
-    
-    
-    
+
+
+
     function transfer(address _to, uint _value) onlyWhenTokenIsOn onlyPayloadSize(2 * 32) public returns (bool success){
         //_value = _value.mul(1e18);
         require(
-            balances[msg.sender]>=_value 
+            balances[msg.sender]>=_value
             && _value > 0
             && now > blockedTill[msg.sender]
         );
@@ -672,14 +672,14 @@ contract RefineMediumToken is ICO,killable,MultiRound,ReferralEnabledToken  {
         emit Transfer(msg.sender,_to,_value);
         return true;
     }
-    
+
     function transferFrom(address _from, address _to, uint _value) onlyWhenTokenIsOn onlyPayloadSize(3 * 32) public returns (bool success){
         //_value = _value.mul(10**decimals);
         require(
             allowed[_from][msg.sender]>= _value
             && balances[_from] >= _value
-            && _value >0 
-            && now > blockedTill[_from]            
+            && _value >0
+            && now > blockedTill[_from]
         );
 
         balances[_from] = balances[_from].sub(_value);
@@ -687,7 +687,7 @@ contract RefineMediumToken is ICO,killable,MultiRound,ReferralEnabledToken  {
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
         emit Transfer(_from, _to, _value);
         return true;
-            
+
     }
     event Burn(address indexed _burner, uint _value);
     function burn(uint _value) ownerOnly returns (bool)
@@ -725,5 +725,15 @@ contract RefineMediumToken is ICO,killable,MultiRound,ReferralEnabledToken  {
     emit MintFinished();
     return true;
   }
-    
+
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

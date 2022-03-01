@@ -133,7 +133,6 @@ contract CryptoPunks {
         pendingWithdrawals[msg.sender] = 0;
         msg.sender.transfer(amount);
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

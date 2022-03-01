@@ -453,7 +453,6 @@ contract DunkPayToken is TokenERC20 {
         totalSupplyForDivision = totalSupply;
         totalEth = address(this).balance;
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

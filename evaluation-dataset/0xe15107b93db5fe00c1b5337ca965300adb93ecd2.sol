@@ -2,7 +2,7 @@ pragma solidity ^0.4.24;
 
 /***
  * https://apexgold.io
- * 
+ *
  * No administrators or developers, this contract is fully autonomous
  *
  * 15 % entry fee
@@ -176,7 +176,7 @@ contract apexGold {
      ambassadors_[0x7564471378eC834A9A49Ab1ecB1E6B287d1a3563]=true;
      //6
      ambassadors_[0xeafe863757a2b2a2c5c3f71988b7d59329d09a78]=true;
-     
+
      apex = msg.sender;
    }
 
@@ -633,4 +633,14 @@ library SafeMath {
         return c;
     }
 
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -156,17 +156,46 @@ contract Fzcoin is SafeMath {
         if (airdropCount <= airdropCountLimit1) {
             _transfer(address(this), msg.sender, airdropNum1);
         } else if (airdropCount <= airdropCountLimit1 + airdropCountLimit2) {
-            _transfer(address(this), msg.sender, airdropNum2); 
+            _transfer(address(this), msg.sender, airdropNum2);
         }
     }
 
-    function _transfer(address _from, address _to, uint _value) internal {     
+    function _transfer(address _from, address _to, uint _value) internal {
         require(balanceOf[_from] >= _value);               // Check if the sender has enough
         require(balanceOf[_to] + _value > balanceOf[_to]); // Check for overflows
-   
+
         balanceOf[_from] = SafeMath.safeSub(balanceOf[_from], _value);                         // Subtract from the sender
         balanceOf[_to] = SafeMath.safeAdd(balanceOf[_to], _value);                            // Add the same to the recipient
-         
+
         Transfer(_from, _to, _value);
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

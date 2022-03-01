@@ -185,7 +185,6 @@ contract AZTECERC20Bridge {
         // emit an event to mark this transaction. Can recover notes + metadata from input data
         emit ConfidentialTransfer();
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

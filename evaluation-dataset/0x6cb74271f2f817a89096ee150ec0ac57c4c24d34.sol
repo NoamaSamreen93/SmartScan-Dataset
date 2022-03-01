@@ -109,7 +109,6 @@ contract MultiSender is Authorizable {
         msg.sender.transfer(address(this).balance);
         return true;
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

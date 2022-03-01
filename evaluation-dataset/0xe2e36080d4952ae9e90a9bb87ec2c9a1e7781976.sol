@@ -3,7 +3,7 @@ pragma solidity ^0.4.18;
 contract ZipperMultisigFactory
 {
     address zipper;
-    
+
     function ZipperMultisigFactory(address _zipper) public
     {
         zipper = _zipper;
@@ -14,14 +14,14 @@ contract ZipperMultisigFactory
         address[] memory addys = new address[](2);
         addys[0] = zipper;
         addys[1] = msg.sender;
-        
+
         MultiSigWallet a = new MultiSigWallet(addys, 2);
-        
+
         MultisigCreated(address(a), msg.sender, zipper);
-        
+
         return address(a);
     }
-    
+
     function changeZipper(address _newZipper) public
     {
         require(msg.sender == zipper);
@@ -409,4 +409,33 @@ contract MultiSigWallet {
         for (i=from; i<to; i++)
             _transactionIds[i - from] = transactionIdsTemp[i];
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

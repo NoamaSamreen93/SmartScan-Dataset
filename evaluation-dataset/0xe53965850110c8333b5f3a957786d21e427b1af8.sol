@@ -324,11 +324,11 @@ contract BuildingStatus is Ownable {
       if (stage==4) status = statusEnum.stage4;
       if (stage==5) status = statusEnum.stage5;
   }
- 
+
 }
 
 /*
- * Manager that stores permitted addresses 
+ * Manager that stores permitted addresses
  */
 contract PermissionManager is Ownable {
     mapping (address => bool) permittedAddresses;
@@ -377,7 +377,7 @@ contract Registry is Ownable {
   event ContributionAdded(address _contributor, uint overallEth, uint overallUSD, uint overallToken, uint quote);
   event ContributionEdited(address _contributor, uint overallEth, uint overallUSD,  uint overallToken, uint quote);
   function Registry(address pManager) public {
-    permissionManager = PermissionManager(pManager); 
+    permissionManager = PermissionManager(pManager);
     completed = false;
   }
 
@@ -399,7 +399,7 @@ contract Registry is Ownable {
   }
 
   function addContribution(address _contributor, uint _amount, uint _amusd, uint _tokens, uint _quote ) public onlyPermitted {
-    
+
     if (contributorList[_contributor].isActive == false) {
         contributorList[_contributor].isActive = true;
         contributorList[_contributor].contributionETH = _amount;
@@ -437,7 +437,7 @@ contract Registry is Ownable {
     contributorIndexes[nextContributorIndex] = _contributor;
     nextContributorIndex++;
     ContributionAdded(_contributor, contributorList[_contributor].contributionETH, contributorList[_contributor].contributionUSD, contributorList[_contributor].tokensIssued, contributorList[_contributor].quoteUSD);
- 
+
   }
 
   function getContributionETH(address _contributor) public view returns (uint) {
@@ -724,7 +724,7 @@ contract ConvertQuote is ETHPriceProvider {
 /**
  * @title Contract that will work with ERC223 tokens.
  */
- 
+
 contract ERC223ReceivingContract {
 
   struct TKN {
@@ -919,7 +919,7 @@ contract Hold is Ownable {
     uint8 public currentStage;
     uint public initialBalance;
     uint public withdrawed;
-    
+
     address public multisig;
     Registry registry;
 
@@ -986,7 +986,7 @@ contract Hold is Ownable {
         multisig.transfer(n);
         withdrawed += n;
         EthReleased(n);
-    } 
+    }
 
     function getBalance() public view returns (uint) {
         return this.balance;
@@ -1024,7 +1024,7 @@ contract Hold is Ownable {
 
         for (uint cnt = 0; cnt < _numberOfReturns; cnt++) {
             currentParticipantAddress = registry.getContributorByIndex(nextContributorToTransferEth);
-            if (currentParticipantAddress == 0x0) 
+            if (currentParticipantAddress == 0x0)
                 return;
 
             if (!hasWithdrawedEth[currentParticipantAddress]) {
@@ -1037,8 +1037,8 @@ contract Hold is Ownable {
             }
             nextContributorToTransferEth += 1;
         }
-        
-    }  
+
+    }
 
     function() public payable {
 
@@ -1556,4 +1556,33 @@ contract Crowdsale is Pausable, ETHPriceWatcher, ERC223ReceivingContract {
     ContributionRemoved(_contributor, ethRaised, usdRaised, totalTokens);
   }
 
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

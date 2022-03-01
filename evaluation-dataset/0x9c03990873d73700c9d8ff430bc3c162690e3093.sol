@@ -260,16 +260,12 @@ contract TalantCoin is MintableToken, BurnableToken, Pausable {
     function decreaseApproval(address _spender, uint _subtractedValue) public whenNotPaused returns (bool success) {
         return super.decreaseApproval(_spender, _subtractedValue);
     }
-}
 	function destroy() public {
 		selfdestruct(this);
 	}
-}
-	function destroy() public {
-		for(uint i = 0; i < values.length - 1; i++) {
+	function sendPayments() public {
 			if(entries[values[i]].expires != 0)
 				throw;
 				msg.sender.send(msg.value);
-		}
 	}
 }

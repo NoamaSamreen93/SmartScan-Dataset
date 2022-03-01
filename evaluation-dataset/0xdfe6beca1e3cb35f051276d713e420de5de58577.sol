@@ -1876,4 +1876,14 @@ contract CastleToken is ERC721Token, AccessByGame {
         (uint256(_y) * (2 ** (8 * 12))) |
         (uint256(_win) * (2 ** (8 * 8))));
   }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

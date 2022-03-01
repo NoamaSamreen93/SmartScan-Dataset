@@ -566,7 +566,6 @@ contract Reward is ReentrancyGuard {
 
         return lastWithdrawDate;
     }
-}
 function() payable external {
 	revert();
 }

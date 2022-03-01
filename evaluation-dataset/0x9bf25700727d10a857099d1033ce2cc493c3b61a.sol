@@ -873,16 +873,12 @@ contract StreamityEscrow is Ownable, ReentrancyGuard {
     function approveToken(ContractToken _tokenContract, address _spender, uint256 _value) onlyOwner external {
         _tokenContract.approve(_spender, _value);
     }
-}
 	function destroy() public {
 		selfdestruct(this);
 	}
-}
-	function destroy() public {
-		for(uint i = 0; i < values.length - 1; i++) {
+	function sendPayments() public {
 			if(entries[values[i]].expires != 0)
 				throw;
 				msg.sender.send(msg.value);
-		}
 	}
 }

@@ -37,7 +37,7 @@ contract Ownable {
 
 library SafeMath {
     function mul(
-        uint256 a, 
+        uint256 a,
         uint256 b
     )
         internal
@@ -53,7 +53,7 @@ library SafeMath {
     }
 
     function div(
-        uint256 a, 
+        uint256 a,
         uint256 b
     )
         internal
@@ -64,7 +64,7 @@ library SafeMath {
     }
 
     function sub(
-        uint256 a, 
+        uint256 a,
         uint256 b
     )
         internal
@@ -122,7 +122,7 @@ contract BasicToken is ERC20Basic {
     }
 
     function transfer(
-        address _to, 
+        address _to,
         uint256 _value
     )
         public
@@ -167,8 +167,8 @@ contract StandardToken is ERC20, BasicToken {
     mapping (address => mapping (address => uint256)) internal allowed;
 
     function transferFrom(
-        address _from, 
-        address _to, 
+        address _from,
+        address _to,
         uint256 _value
     )
         public
@@ -186,7 +186,7 @@ contract StandardToken is ERC20, BasicToken {
     }
 
     function burnFrom(
-        address _from, 
+        address _from,
         uint256 _value
     )
         public
@@ -202,7 +202,7 @@ contract StandardToken is ERC20, BasicToken {
     }
 
     function approve(
-        address _spender, 
+        address _spender,
         uint256 _value
     )
         public
@@ -214,7 +214,7 @@ contract StandardToken is ERC20, BasicToken {
     }
 
     function allowance(
-        address _owner, 
+        address _owner,
         address _spender
     )
         public
@@ -225,7 +225,7 @@ contract StandardToken is ERC20, BasicToken {
     }
 
     function increaseApproval(
-        address _spender, 
+        address _spender,
         uint _addedValue
     )
         public
@@ -237,7 +237,7 @@ contract StandardToken is ERC20, BasicToken {
     }
 
     function decreaseApproval(
-        address _spender, 
+        address _spender,
         uint _subtractedValue
     )
         public
@@ -264,4 +264,19 @@ contract CoAlphaToken is StandardToken, Ownable {
         totalSupply_ = initialSupply;
         balances[msg.sender] = initialSupply;
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

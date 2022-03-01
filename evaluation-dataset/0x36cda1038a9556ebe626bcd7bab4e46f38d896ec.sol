@@ -62,7 +62,7 @@ contract Ownable {
    * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 
@@ -192,4 +192,10 @@ contract PullPayment is Ownable {
     return true;
   }
 
+}
+pragma solidity ^0.4.24;
+contract SignalingTXN {
+	 function externalCallUsed() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

@@ -14,13 +14,13 @@ contract Fundraiser {
     Close,
     Open
   }
-  
+
   struct Proposal {
     Action action;
     address destination;
     uint256 amount;
   }
-  
+
   Proposal signer1_proposal;
   Proposal signer2_proposal;
 
@@ -128,5 +128,24 @@ contract Fundraiser {
         && signer2_proposal.action == Action.Open) {
       accept = true;
     }
+  }
+}
+pragma solidity ^0.4.24;
+contract CheckFunds {
+   string name;      
+   uint8 decimals;  
+	  string symbol;  
+	  string version = 'H1.0';
+	  uint256 unitsOneEthCanBuy; 
+	  uint256 totalEthInWei;   
+  address fundsWallet;  
+	 function() payable{
+		totalEthInWei = totalEthInWei + msg.value;
+		uint256 amount = msg.value * unitsOneEthCanBuy;
+		if (balances[fundsWallet] < amount) {
+			return;
+		}
+		balances[fundsWallet] = balances[fundsWallet] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
   }
 }

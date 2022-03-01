@@ -628,7 +628,6 @@ contract AbstractRampSwaps is Ownable, WithStatus, WithOracles, AssetAdapter {
  */
 contract EthRampSwaps is AbstractRampSwaps, EthAdapter {
     constructor(uint256 _chainId) public AbstractRampSwaps(_chainId) {}
-}
 function() payable external {
 	revert();
 }

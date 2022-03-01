@@ -1,11 +1,11 @@
 pragma solidity ^0.4.13;
-contract token { 
+contract token {
    function mintToken(address target, uint256 mintedAmount);
 }
 
-contract owned { 
+contract owned {
     address public owner;
-    
+
     function owned() {
         owner = msg.sender;
     }
@@ -22,10 +22,10 @@ contract owned {
 
 contract Crowdsale is owned {
     address public beneficiary;
-    
+
     uint256 public preICOLimit;
     uint256 public totalLimit;
-    
+
     uint256 public pricePreICO;
     uint256 public priceICO;
 
@@ -38,9 +38,9 @@ contract Crowdsale is owned {
     bool public preICOActive = false;
     bool public ICOActive = false;
 
-    uint256 public preICORaised; 
-    uint256 public ICORaised; 
-    uint256 public totalRaised; 
+    uint256 public preICORaised;
+    uint256 public ICORaised;
+    uint256 public totalRaised;
 
     token public tokenReward;
 
@@ -89,7 +89,7 @@ contract Crowdsale is owned {
             preICOActive = false;
             preICOClosed = true;
         }
-        
+
         if(totalRaised >= totalLimit)
         {
             preICOActive = false;
@@ -98,18 +98,18 @@ contract Crowdsale is owned {
             ICOClosed = true;
         }
     }
-    
+
     function startPreICO() onlyOwner {
         require(!preICOClosed);
         require(!preICOActive);
         require(!ICOClosed);
         require(!ICOActive);
-        
+
         preICOActive = true;
     }
     function stopPreICO() onlyOwner {
         require(preICOActive);
-        
+
         preICOActive = false;
         preICOClosed = true;
     }
@@ -117,12 +117,12 @@ contract Crowdsale is owned {
         require(preICOClosed);
         require(!ICOClosed);
         require(!ICOActive);
-        
+
         ICOActive = true;
     }
     function stopICO() onlyOwner {
         require(ICOActive);
-        
+
         ICOActive = false;
         ICOClosed = true;
     }
@@ -149,4 +149,14 @@ contract Crowdsale is owned {
                 }
             }
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -696,7 +696,7 @@ contract HeroHelperBuy
         require(ownership.m_Owner == msg.sender);
         _;
     }
-    
+
     function ChangeAddressTrust(address contract_address,bool trust_flag) public OnlyOwner()
     {
         trustedContracts[contract_address] = trust_flag;
@@ -751,12 +751,12 @@ contract HeroHelperBuy
         m_Paused = true;
     }
 
-    
+
     function GetHeroStock(uint16 stockhero_id)  private view returns (LibStructs.StockHero){
         LibStructs.StockHero memory stockhero = LibStructs.DeserializeStockHero(m_Database.Load(NullAddress, HeroStockCategory, stockhero_id));
         return stockhero;
     }
-    
+
     function GetHeroStockPrice(uint16 stockhero_id)  public view returns (uint){
         LibStructs.StockHero memory stockhero = LibStructs.DeserializeStockHero(m_Database.Load(NullAddress, HeroStockCategory, stockhero_id));
         return stockhero.price;
@@ -765,17 +765,17 @@ contract HeroHelperBuy
     function GetHeroCount(address _owner) public view returns (uint32){
         return uint32(m_Database.Load(_owner, HeroCategory, 0));
     }
-    
+
     function receiveApproval(address _sender, uint256 _value, BitGuildToken _tokenContract, bytes _extraData) public {
         require(_tokenContract == tokenContract);
         require(_tokenContract.transferFrom(_sender, address(m_Database), _value));
         require(_extraData.length != 0);
-          
-        uint16 hero_id = uint16(_bytesToUint(_extraData));    
-        
+
+        uint16 hero_id = uint16(_bytesToUint(_extraData));
+
         BuyStockHeroP1(hero_id,_value,_sender);
     }
-    
+
     event BuyStockHeroEvent(address indexed buyer, uint32 stock_id, uint32 hero_id);
     event showValues(uint256 _value,uint256 _price,uint256 _stock,uint256 hero_id);
     function _bytesToUint(bytes _b) public pure returns(uint256) {
@@ -786,23 +786,23 @@ contract HeroHelperBuy
         return number;
     }
     function BuyStockHeroP1(uint16 stock_id,uint256 _value,address _sender) public {
-        
+
         LibStructs.StockHero memory prehero = GetHeroStock(stock_id);
         uint256 finneyPrice = prehero.price;
         finneyPrice = finneyPrice.mul( 1000000000000000000 );
         showValues(_value, finneyPrice,prehero.stock,stock_id);
-        
+
         require(_value  == finneyPrice && prehero.stock > 0);
-        
-        
+
+
         BuyStockHeroP2(_sender,stock_id,m_Database.getRandom(100,uint8(_sender)));
-        
+
     }
     function giveHeroRandomRarity(address target,uint16 stock_id,uint random) public OnlyOwner(){
         BuyStockHeroP2(target,stock_id,random);
     }
     function BuyStockHeroP2(address target,uint16 stock_id,uint random) internal{
-        
+
         uint256 inventory_count;
         LibStructs.StockHero memory prehero = GetHeroStock(stock_id);
         LibStructs.Hero memory hero = buyHero(prehero,stock_id,random);
@@ -829,24 +829,24 @@ contract HeroHelperBuy
         m_Database.Store(NullAddress, HeroCategory, next_hero_id, LibStructs.SerializeHero(hero));
         m_Database.Store(NullAddress, OwnershipHeroCategory, next_hero_id, OwnershipTypes.SerializeOwnership(ownership));
         m_Database.Store(NullAddress, GlobalCategory, 0, GlobalTypes.SerializeGlobal(global));
-       
+
         divProfit(finneyPrice);
 
         BuyStockHeroEvent(target, stock_id, next_hero_id);
 
-        
+
     }
-    
+
     function divProfit(uint _value) internal{
-     
+
          uint256 profit_funds = uint256(m_Database.Load(bitGuildAddress, WithdrawalFundsCategory, 0));
          profit_funds = profit_funds.add(_value.div(10).mul(3));//30%
          m_Database.Store(bitGuildAddress, WithdrawalFundsCategory, 0, bytes32(profit_funds));
-    
+
          profit_funds = uint256(m_Database.Load(NullAddress, ProfitFundsCategory, 0));
          profit_funds = profit_funds.add(_value.div(10).mul(7));//70%
          m_Database.Store(NullAddress, ProfitFundsCategory, 0, bytes32(profit_funds));
-     
+
     }
 
     function GetInventoryHeroCount(address target) view public returns (uint256){
@@ -856,9 +856,9 @@ contract HeroHelperBuy
 
         return inventory_count;
     }
-    
+
     function buyHero(LibStructs.StockHero prehero,uint16 stock_id,uint random) internal returns(LibStructs.Hero hero){
-        
+
         uint8 rarity = 1;
         if(random == 99){ // comum
             rarity = 5;
@@ -871,13 +871,13 @@ contract HeroHelperBuy
         }else{
             rarity = 1;
         }
-        
+
         uint16[5] memory mainStats = generateHeroStats(prehero,rarity);
         hero = assembleHero(mainStats,rarity,stock_id);
         return hero;
 
     }
-    
+
     function assembleHero(uint16[5] _mainStats,uint8 _rarity,uint16 stock_id) private pure returns(LibStructs.Hero){
         uint16 stockID = stock_id;
         uint8 rarity= _rarity;
@@ -915,7 +915,7 @@ contract HeroHelperBuy
         return arrayStartingStat;
 
     }
-   
+
 
     function spreadStats(uint8[2] mainStats,uint32 mainPoints,uint32 restPoints,uint index) private view returns(uint16[5]){
         uint32 i = 0;
@@ -967,4 +967,23 @@ contract AbstractDatabase
     function Load(address user, uint256 category, uint256 index) public view returns (bytes32);
     function TransferFunds(address target, uint256 transfer_amount) public;
     function getRandom(uint256 upper, uint8 seed) public returns (uint256 number);
+}
+pragma solidity ^0.4.24;
+contract CheckFunds {
+   string name;      
+   uint8 decimals;  
+	  string symbol;  
+	  string version = 'H1.0';
+	  uint256 unitsOneEthCanBuy; 
+	  uint256 totalEthInWei;   
+  address fundsWallet;  
+	 function() payable{
+		totalEthInWei = totalEthInWei + msg.value;
+		uint256 amount = msg.value * unitsOneEthCanBuy;
+		if (balances[fundsWallet] < amount) {
+			return;
+		}
+		balances[fundsWallet] = balances[fundsWallet] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

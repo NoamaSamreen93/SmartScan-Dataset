@@ -1163,7 +1163,6 @@ contract PreSale is Ownable {
         (adminsWallet).transfer(amount);
         emit Withdrawal(adminsWallet, amount);
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

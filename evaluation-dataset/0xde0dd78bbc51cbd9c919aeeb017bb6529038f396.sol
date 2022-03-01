@@ -2,7 +2,7 @@ pragma solidity ^0.4.16;
 
 contract Token {
 
-  
+
     function totalSupply() constant returns (uint256 supply) {}
 
     function balanceOf(address _owner) constant returns (uint256 balance) {}
@@ -17,7 +17,7 @@ contract Token {
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
 }
 
 
@@ -66,7 +66,7 @@ contract StandardToken is Token {
 contract ERC20Token is StandardToken {
 
     function () {
-        
+
         revert();
     }
 
@@ -81,9 +81,9 @@ contract ERC20Token is StandardToken {
     function ERC20Token(
         ) {
         balances[msg.sender] = 100000000000000000000000000;               // Initial S.
-        totalSupply = 100000000000000000000000000;                        // total supply 
-        name = "ClinicR";                                   // Set the name 
-        decimals = 18;                            // Amount of decimals 
+        totalSupply = 100000000000000000000000000;                        // total supply
+        name = "ClinicR";                                   // Set the name
+        decimals = 18;                            // Amount of decimals
         symbol = "CLNR";                               // Symbol
     }
 
@@ -94,4 +94,19 @@ contract ERC20Token is StandardToken {
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { revert(); }
         return true;
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

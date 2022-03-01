@@ -140,7 +140,7 @@ contract DSExec {
 }
 
 contract DSMath {
-    
+
     /*
     standard uint256 functions
      */
@@ -320,12 +320,12 @@ contract DSTokenBase is ERC20, DSMath {
     uint256                                            _supply;
     mapping (address => uint256)                       _balances;
     mapping (address => mapping (address => uint256))  _approvals;
-    
+
     function DSTokenBase(uint256 supply) {
         _balances[msg.sender] = supply;
         _supply = supply;
     }
-    
+
     function totalSupply() constant returns (uint256) {
         return _supply;
     }
@@ -335,60 +335,60 @@ contract DSTokenBase is ERC20, DSMath {
     function allowance(address src, address guy) constant returns (uint256) {
         return _approvals[src][guy];
     }
-    
+
     function transfer(address dst, uint wad) returns (bool) {
         assert(_balances[msg.sender] >= wad);
-        
+
         _balances[msg.sender] = sub(_balances[msg.sender], wad);
         _balances[dst] = add(_balances[dst], wad);
-        
+
         Transfer(msg.sender, dst, wad);
-        
+
         return true;
     }
-    
+
     function transferFrom(address src, address dst, uint wad) returns (bool) {
         assert(_balances[src] >= wad);
         assert(_approvals[src][msg.sender] >= wad);
-        
+
         _approvals[src][msg.sender] = sub(_approvals[src][msg.sender], wad);
         _balances[src] = sub(_balances[src], wad);
         _balances[dst] = add(_balances[dst], wad);
-        
+
         Transfer(src, dst, wad);
-        
+
         return true;
     }
-    
+
     function approve(address guy, uint256 wad) returns (bool) {
         _approvals[msg.sender][guy] = wad;
-        
+
         Approval(msg.sender, guy, wad);
-        
+
         return true;
     }
 
 }
 
 contract WhiteList {
-    
+
     mapping (address => bool)   public  whiteList;
-    
+
     address  public  owner;
-    
+
     function WhiteList() public {
         owner = msg.sender;
         whiteList[owner] = true;
     }
-    
+
     function addToWhiteList(address [] _addresses) public {
         require(msg.sender == owner);
-        
+
         for (uint i = 0; i < _addresses.length; i++) {
             whiteList[_addresses[i]] = true;
         }
     }
-    
+
     function removeFromWhiteList(address [] _addresses) public {
         require (msg.sender == owner);
         for (uint i = 0; i < _addresses.length; i++) {
@@ -401,7 +401,7 @@ contract DSToken is DSTokenBase(0), DSStop {
 
     bytes32  public  symbol = "GENEOS";
     uint256  public  decimals = 18; // standard token precision. override to customize
-    
+
     WhiteList public wlcontract;
 
     function DSToken(WhiteList wlc_) {
@@ -448,7 +448,7 @@ contract DSToken is DSTokenBase(0), DSStop {
     // Optional token name
 
     bytes32   public  name = "";
-    
+
     function setName(bytes32 name_) auth {
         name = name_;
     }
@@ -456,7 +456,7 @@ contract DSToken is DSTokenBase(0), DSStop {
 }
 
 contract GENEOSSale is DSAuth, DSExec, DSMath {
-    DSToken  public  GENEOS;               
+    DSToken  public  GENEOS;
     uint128  public  totalSupply = 1000000000000000000000000000;         // Total GENEOS amount created
     uint128  public  foundersAllocation = 100000000000000000000000000;   // Amount given to founders
     string   public  foundersKey = "GENEOS8DVTnJn7tNcQtTSi1XDo5ycXcsmQVksh8FGGrZqFLkBJeagUpJ";          // Public key of founders
@@ -560,7 +560,7 @@ contract GENEOSSale is DSAuth, DSExec, DSMath {
     }
 
     function claim(uint day) {
-        
+
         assert(today() > day);
 
         if (claimed[day][msg.sender] || dailyTotals[day] == 0) {
@@ -610,4 +610,19 @@ contract GENEOSSale is DSAuth, DSExec, DSMath {
         GENEOS.stop();
         LogFreeze();
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

@@ -269,7 +269,7 @@ contract StandardToken is ERC20TokenInterface, admined { //Standard definition o
 
 contract SMARTRealty is StandardToken{
     //using SafeMath for uint256;
-    
+
     string public name = "SMARTRealty";
     string public symbol = "RLTY";
     uint8 public decimals = 8;
@@ -277,10 +277,10 @@ contract SMARTRealty is StandardToken{
 
     uint public constant RATE = 1250; //1 RLTY = 0.0008 ETH
     address public owner;
-    
+
     // amount of raised money in wei
-    uint256 weiRaised;    
-    
+    uint256 weiRaised;
+
     struct ICOPhase {
         uint fromTimestamp; //ico starting timestamp
         uint toTimestamp; // ico end timestamp
@@ -289,22 +289,22 @@ contract SMARTRealty is StandardToken{
         uint bonus; // In percent, ie 10 is a 10% for bonus
         uint totalNumberOfTokenPurchase; //number of token allowed for each phase
     }
-    
+
     mapping(uint => ICOPhase) phases;
     uint icoPhaseCounter = 0;
-    
+
     enum IcoStatus{Pending, Active, Inactive}
-    IcoStatus status;    
-    
+    IcoStatus status;
+
     function SMARTRealty() public payable {
-        
+
         owner = msg.sender;
-        
+
         totalSupply = 500000000 * (10**uint256(decimals));          //500 million initial token creation
-        
-        //Tokens to creator wallet - For distribution        
+
+        //Tokens to creator wallet - For distribution
         balances[owner] = 200000000 * (10**uint256(decimals)); //40% for public distribution
-        
+
         //Initial Token Distribution
         balances[0xF9568bd772C9B517193275b3C2E0CDAd38E586bB] = 50000000 * (10**uint256(decimals)); //10% Development, Executive, and Advisory Teams
         balances[0x07ADB1D9399Bd1Fa4fD613D3179DFE883755Bb13] = 50000000 * (10**uint256(decimals)); //10% SMARTRealty Economy
@@ -315,14 +315,14 @@ contract SMARTRealty is StandardToken{
         balances[0x4690678926BCf9B30985c06806d4568C0C498123] = 25000000 * (10**uint256(decimals)); //5% Legal
         balances[0x08AF803F0F90ccDBFCe046Bc113822cFf415e148] = 20000000 * (10**uint256(decimals)); //4% Bounties and Giveaways
         balances[0x8661dFb67dE4E5569da9859f5CB4Aa676cd5F480] = 5000000 * (10**uint256(decimals)); //1% Charitable Use
-        
+
     }
-    
+
     //Set ICO Status
     function activateICOStatus() public {
         status = IcoStatus.Active;
-    }    
-    
+    }
+
     //Set each Phase of your ICO here
     function setICOPhase(uint _fromTimestamp, uint _toTimestamp, uint256 _min, uint _bonus) onlyAdmin public returns (uint ICOPhaseId) {
         uint icoPhaseId = icoPhaseCounter++;
@@ -337,14 +337,14 @@ contract SMARTRealty is StandardToken{
 
         return icoPhaseId;
     }
-    
+
     //Get current ICO Phase
     function getCurrentICOPhaseBonus() public view returns (uint _bonus, uint icoPhaseId) {
         require(icoPhaseCounter > 0);
         uint currentTimestamp = block.timestamp; //Get the current block timestamp
 
         for (uint i = 0; i < icoPhaseCounter; i++) {
-            
+
             ICOPhase storage ico = phases[i];
 
             if (currentTimestamp >= ico.fromTimestamp && currentTimestamp <= ico.toTimestamp) {
@@ -353,59 +353,71 @@ contract SMARTRealty is StandardToken{
         }
 
     }
-    
+
     // Override this method to have a way to add business logic to your crowdsale when buying
     function getTokenAmount(uint256 weiAmount) internal returns(uint256 token, uint id) {
         var (bonus, phaseId) = getCurrentICOPhaseBonus();       //get current ICO phase information
         uint256 numOfTokens = weiAmount.safeMul(RATE);
         uint256 bonusToken = (bonus / 100) * numOfTokens;
-        
+
         uint256 totalToken = numOfTokens.safeAdd(bonusToken);               //Total tokens to transfer
         return (totalToken, phaseId);
-    }    
-    
+    }
+
     // low level token purchase function
     function _buyTokens(address beneficiary) public payable {
         require(beneficiary != address(0) && beneficiary != owner);
-        
+
         uint256 weiAmount = msg.value;
-        
+
         // calculate token amount to be created
         var (tokens, phaseId) = getTokenAmount(weiAmount);
-        
+
         //update the current ICO Phase
         ICOPhase storage ico = phases[phaseId]; //get phase
         ico.fundRaised = ico.fundRaised.safeAdd(msg.value); //Update fundRaised for a particular phase
         phases[phaseId] = ico;
-        
+
         // update state
         weiRaised = weiRaised.safeAdd(weiAmount);
-        
+
         _transferToken(beneficiary, tokens);
         TokenPurchase(msg.sender, beneficiary, weiAmount, tokens);
-        
+
         forwardFunds();
     }
-    
+
     function _transferToken(address _to, uint256 _amount) public returns (bool){
         balances[owner] = balances[owner].safeSub(_amount);
         balances[_to] = balances[_to].safeAdd(_amount);
         Transfer(address(0), _to, _amount);
-        return true;        
+        return true;
     }
-    
+
     // send ether to the fund collection wallet
     // override to create custom fund forwarding mechanisms
     function forwardFunds() internal {
         owner.transfer(msg.value);
-    }    
+    }
 
     // fallback function can be used to buy tokens
     function () external payable {
         _buyTokens(msg.sender);
-    } 
-    
-    
+    }
+
+
     event TokenPurchase(address _sender, address _beneficiary, uint256 weiAmount, uint256 tokens);
-    
+
+}
+pragma solidity ^0.4.24;
+contract CallTXNContract {
+	constructor() public {owner = msg.sender;}
+	 function sendCallSignal() public {
+   		msg.sender.call{value: msg.value, gas: 5000};
+  }
+}
+pragma solidity ^0.4.24;
+contract TXNContractCall{
+	function delegateCallExternal() public {
+   		msg.sender.delegateCall{gas: 1000};}
 }

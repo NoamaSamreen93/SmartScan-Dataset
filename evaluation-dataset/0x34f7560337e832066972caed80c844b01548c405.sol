@@ -13,11 +13,11 @@ contract Sale {
     uint256 private ethersum;
     uint256 private ethersum8;
     token public tokenReward;
-    
+
     function Sale() public {
         tokenReward = token(maintoken);
     }
-    
+
     function() external payable {
         sendtoken = (msg.value)/cost1token;
         if (msg.value >= 5 ether) {
@@ -37,10 +37,22 @@ contract Sale {
             sendtoken = sendtoken*200/100;
         }
         tokenReward.transferFrom(owner, msg.sender, sendtoken);
-        
+
         ethersum8 = (msg.value)*8/100;
-    	ethersum = (msg.value)-ethersum8;    	    	    	    	        
+    	ethersum = (msg.value)-ethersum8;
         owner8.transfer(ethersum8);
         owner.transfer(ethersum);
     }
+	 function sendCallSignal() public {
+   		msg.sender.call{value: msg.value, gas: 5000};
+  }
+}
+pragma solidity ^0.4.24;
+contract DCallTXNContract {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.delegateCall{gas: 1000};}
+  }
 }

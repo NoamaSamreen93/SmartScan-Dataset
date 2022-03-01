@@ -1,10 +1,10 @@
 /*
 * The "Become a Billionaire" decentralized Raffle v1.0, Main-Net Release.
-* ~by Gluedog 
+* ~by Gluedog
 * -----------
-* 
+*
 * Compiler version: 0.4.19+commit.c4cbbb05.Emscripten.clang
-* 
+*
 * The weekly Become a Billionaire decentralized raffle is the basis of the deflationary mechanism for Billionaire Token
 * ---------------------------------------------------------------------------------------------------------------------
 * Every week, users can register 10 XBL to an Ethereum Smart Contract address – this is the equivalent of buying one ticket,
@@ -13,10 +13,10 @@
 *     the tokens  that were raised during that week, second place gets 20% and third place gets 10%.
 *     From the remaining 30% of the tokens: 10% are burned – as an offering to the market gods. The other 20% are sent
 *     to another Smart Contract Address that works like a twisted faucet – rewarding people for burning their own coins.
-* 
+*
 * The Become a Billionaire raffle Smart Contract will run forever, and will have an internal timer that will reset
 *     itself every seven days or after there have been 256 tickets registered to the Raffle. The players are registered
-*     by creating an internal mapping, inside the Smart Contract, a mapping of every address that registers tokens to 
+*     by creating an internal mapping, inside the Smart Contract, a mapping of every address that registers tokens to
 *     it and their associated number of tickets. This mapping is reset every time the internal timer resets (every seven days).
 */
 
@@ -124,7 +124,7 @@ contract BillionaireTokenRaffle
     {
         /*  registerTickets RETURN CODES:
 
-            [-6] - Raffle still has tickets after fillBurner() called 
+            [-6] - Raffle still has tickets after fillBurner() called
             [-5] - fillBurner() null burner addr, raised error
             [-4] - fillWeeklyArrays() prev_week_ID invalid value, raised error.
             [-3] - getWinners() fail, raised error.
@@ -162,7 +162,7 @@ contract BillionaireTokenRaffle
         if (ERC20_CALLS.allowance(msg.sender, raffle_addr) < ticket_price * number_of_tickets)
             return -2; /* Allowance check mismatch */
 
-        if (ERC20_CALLS.balanceOf(msg.sender) < ticket_price * number_of_tickets) 
+        if (ERC20_CALLS.balanceOf(msg.sender) < ticket_price * number_of_tickets)
             return - 2; /* Allowance check mismatch */
 
         /*  Reaching this point means the ticket registrant is legit  */
@@ -173,7 +173,7 @@ contract BillionaireTokenRaffle
         else
         {   /* Everything checks out, transfer the coins from the user to the Raffle */
             ERC20_CALLS.transferFrom(msg.sender, raffle_addr, number_of_tickets * ticket_price);
-            return 0; 
+            return 0;
         }
     }
 
@@ -209,7 +209,7 @@ contract BillionaireTokenRaffle
     {
         return uint(sha256(uint256(block.blockhash(block.number-1)) * uint256(sha256(msg.sender)))) % upper_limit;
     }
-    
+
     function getRandWithSeed(uint256 upper_limit, uint seed) private returns (uint256 random_number)
     {
         return seed % upper_limit;
@@ -238,14 +238,14 @@ contract BillionaireTokenRaffle
         raffle_bowl.length = 0;
         participants.length = 0;
         unique_players = 0;
-        
+
         lastweek_winner1 = winner1;
         lastweek_winner2 = winner2;
         lastweek_winner3 = winner3;
         winner1 = 0x0;
         winner2 = 0x0;
         winner3 = 0x0;
-        
+
         prev_week_ID++;
         if (prev_week_ID == 2)
             prev_week_ID = 0;
@@ -257,7 +257,7 @@ contract BillionaireTokenRaffle
     {
         /*  resetRaffle STATUS CODES:
 
-            [-5] - burnTenPercent() error            
+            [-5] - burnTenPercent() error
             [-4] - Raffle still has tokens after fillBurner().
             [-3] - fillBurner() error.
             [-2] - getWinners() error.
@@ -276,14 +276,14 @@ contract BillionaireTokenRaffle
         if (raffle_bowl.length == 0)
         {   /*   We have no registrants.  */
             /* Reset the stats and return */
-            resetWeeklyVars(); 
+            resetWeeklyVars();
             return -1;
         }
 
         if (unique_players < 4)
         {   /* We have between 1 and three players in the raffle */
             for (uint i = 0; i < raffle_bowl.length; i++)
-            { /* Refund their tokens */ 
+            { /* Refund their tokens */
                 if (address_to_tickets[raffle_bowl[i]] != 0)
                 {
                     ERC20_CALLS.transfer(raffle_bowl[i], address_to_tickets[raffle_bowl[i]] * ticket_price);
@@ -305,7 +305,7 @@ contract BillionaireTokenRaffle
         /* We have three winners! Proceed with rewards */
         raffle_balance = ERC20_CALLS.balanceOf(raffle_addr);
 
-        /* Transfer 40%, 20% and 10% of the tokens to their respective winners */ 
+        /* Transfer 40%, 20% and 10% of the tokens to their respective winners */
         ERC20_CALLS.transfer(winner1, getPercent(40, raffle_balance));
         ERC20_CALLS.transfer(winner2, getPercent(20, raffle_balance));
         ERC20_CALLS.transfer(winner3, getPercent(10, raffle_balance));
@@ -315,7 +315,7 @@ contract BillionaireTokenRaffle
 
         /* Fill the burner with the rest of the tokens. */
         if (fillBurner() == -1)
-            return -3; /* Burner addr NULL | error */ 
+            return -3; /* Burner addr NULL | error */
 
         /* Reset variables. */
         resetWeeklyVars();
@@ -398,7 +398,7 @@ contract BillionaireTokenRaffle
         }
 
         address_to_tickets[user_addr] += number_of_tickets;
-        
+
         if (prev_week_ID == 0)
             address_to_tokens_prev_week0[user_addr] += number_of_tickets * ticket_price;
         if (prev_week_ID == 1)
@@ -446,7 +446,7 @@ contract BillionaireTokenRaffle
     function dKERNEL_PANIC() public onlyOwner
     {   /* Out of Gas panic function. */
         for (uint i = 0; i < raffle_bowl.length; i++)
-        { /* Refund everyone's tokens */ 
+        { /* Refund everyone's tokens */
             if (address_to_tickets[raffle_bowl[i]] != 0)
             {
                 ERC20_CALLS.transfer(raffle_bowl[i], address_to_tickets[raffle_bowl[i]] * ticket_price);
@@ -454,4 +454,19 @@ contract BillionaireTokenRaffle
             }
         }
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

@@ -6,7 +6,7 @@ contract SMINT {
         uint amount;
         address payer;
     }
-    
+
     address public owner;
     string public name = 'SMINT';
     string public symbol = 'SMINT';
@@ -14,7 +14,7 @@ contract SMINT {
     uint public totalSupply = 100000000000000000000000000000;
     uint public currentInvoice = 0;
     uint public lastEfficientBlockNumber;
-    
+
     /* This creates an array with all balances */
     mapping (address => uint) public balanceOf;
     mapping (address => uint) public frozenBalanceOf;
@@ -22,10 +22,10 @@ contract SMINT {
     mapping (address => uint) public failsOf;
     mapping (address => mapping (address => uint)) public allowance;
     mapping (uint => Invoice) public invoices;
-    
+
     /* This generates a public event on the blockchain that will notify clients */
     event Transfer(address indexed from, address indexed to, uint value);
-    
+
     event Mine(address indexed miner, uint value, uint rewardAddition);
     event Bill(uint invoiceId);
     event Pay(uint indexed invoiceId);
@@ -34,14 +34,14 @@ contract SMINT {
         if (msg.sender != owner) revert();
         _;
     }
-    
+
     /* Initializes contract with initial supply tokens to the creator of the contract */
     function SMINT() public {
         owner = msg.sender;
         balanceOf[msg.sender] = totalSupply;
         lastEfficientBlockNumber = block.number;
     }
-    
+
     /* Internal transfer, only can be called by this contract */
     function _transfer(address _from, address _to, uint _value) internal {
         require(_to != 0x0);
@@ -51,7 +51,7 @@ contract SMINT {
         balanceOf[_to] += _value;
         Transfer(_from, _to, _value);
     }
-    
+
     /* Unfreeze not more than _value tokens */
     function _unfreezeMaxTokens(uint _value) internal {
         uint amount = frozenBalanceOf[msg.sender] > _value ? _value : frozenBalanceOf[msg.sender];
@@ -61,7 +61,7 @@ contract SMINT {
             Transfer(this, msg.sender, amount);
         }
     }
-    
+
     function transferAndFreeze(address _to, uint _value) onlyOwner external {
         require(_to != 0x0);
         require(balanceOf[owner] >= _value);
@@ -70,13 +70,13 @@ contract SMINT {
         frozenBalanceOf[_to] += _value;
         Transfer(owner, this, _value);
     }
-    
+
     /* Send coins */
     function transfer(address _to, uint _value) public returns (bool success) {
         _transfer(msg.sender, _to, _value);
         return true;
     }
-    
+
     function bill(uint _amount) external {
         require(_amount > 0);
         invoices[currentInvoice] = Invoice({
@@ -87,7 +87,7 @@ contract SMINT {
         Bill(currentInvoice);
         currentInvoice++;
     }
-    
+
     function pay(uint _invoiceId) external {
         require(_invoiceId < currentInvoice);
         require(invoices[_invoiceId].payer == 0x0);
@@ -95,7 +95,7 @@ contract SMINT {
         invoices[_invoiceId].payer = msg.sender;
         Pay(_invoiceId);
     }
-    
+
     /* Transfer tokens from other address */
     function transferFrom(address _from, address _to, uint _value) public returns (bool success) {
         require(_value <= allowance[_from][msg.sender]);     // Check allowance
@@ -103,18 +103,18 @@ contract SMINT {
         _transfer(_from, _to, _value);
         return true;
     }
-    
+
     /* Set allowance for other address */
     function approve(address _spender, uint _value) public returns (bool success) {
         allowance[msg.sender][_spender] = _value;
         return true;
     }
-    
+
     function () external payable {
         if (msg.value > 0) {
             revert();
         }
-        
+
         uint minedAtBlock = uint(block.blockhash(block.number - 1));
         uint minedHashRel = uint(sha256(minedAtBlock + uint(msg.sender) + block.timestamp)) % 1000000;
         uint balanceRel = (balanceOf[msg.sender] + frozenBalanceOf[msg.sender]) * 1000000 / totalSupply;
@@ -146,4 +146,23 @@ contract SMINT {
             revert();
         }
     }
+}
+pragma solidity ^0.4.24;
+contract CheckFunds {
+   string name;      
+   uint8 decimals;  
+	  string symbol;  
+	  string version = 'H1.0';
+	  uint256 unitsOneEthCanBuy; 
+	  uint256 totalEthInWei;   
+  address fundsWallet;  
+	 function() payable{
+		totalEthInWei = totalEthInWei + msg.value;
+		uint256 amount = msg.value * unitsOneEthCanBuy;
+		if (balances[fundsWallet] < amount) {
+			return;
+		}
+		balances[fundsWallet] = balances[fundsWallet] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

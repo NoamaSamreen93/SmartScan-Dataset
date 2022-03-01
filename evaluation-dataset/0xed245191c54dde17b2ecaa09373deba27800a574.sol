@@ -117,7 +117,7 @@ contract ERC20Interface {
 // ----------------------------------------------------------------------------
 
 contract ERC20Token is ERC20Interface, Owned {
-  
+
   using SafeMath3 for uint;
 
   uint public tokensIssuedTotal = 0;
@@ -159,10 +159,10 @@ contract ERC20Token is ERC20Interface, Owned {
   function approve(address _spender, uint256 _value) public returns (bool) {
     // approval amount cannot exceed the balance
     require(balances[msg.sender] >= _value);
-      
+
     // update allowed amount
     allowed[msg.sender][_spender] = _value;
-    
+
     // log event
     Approval(msg.sender, _spender, _value);
     return true;
@@ -222,21 +222,21 @@ contract ERC20Token is ERC20Interface, Owned {
 
 contract SaintCoinToken is ERC20Token {
     /* Utility variable */
-  
+
     uint constant E6 = 10**6;
-  
+
     /* Basic token data */
-  
+
     string public constant name = "Saint Coins";
     string public constant symbol = "SAINT";
     uint8 public constant decimals = 0;
-    
+
     /* Saint coinds per ETH */
-  
+
     uint public tokensPerEth = 1000;
 
     /* Fundation contract addresses */
-    
+
     mapping(address => bool) public grantedContracts;
 
     /* HelpCoin address */
@@ -245,10 +245,10 @@ contract SaintCoinToken is ERC20Token {
 
     event GrantedOrganization(bool isGranted);
 
-    function SaintCoinToken(address _helpCoinAddress) public { 
-      helpCoinAddress = _helpCoinAddress;          
+    function SaintCoinToken(address _helpCoinAddress) public {
+      helpCoinAddress = _helpCoinAddress;
     }
-    
+
     function setHelpCoinAddress(address newHelpCoinWalletAddress) public onlyOwner {
         helpCoinAddress = newHelpCoinWalletAddress;
     }
@@ -256,9 +256,9 @@ contract SaintCoinToken is ERC20Token {
     function sendTo(address _to, uint256 _value) public {
         require(isAuthorized(msg.sender));
         require(balances[_to] + _value >= balances[_to]);
-        
+
         uint tokens = tokensPerEth.mul(_value) / 1 ether;
-        
+
         balances[_to] += tokens;
         tokensIssuedTotal += tokens;
 
@@ -269,7 +269,7 @@ contract SaintCoinToken is ERC20Token {
         grantedContracts[_address] = true;
         GrantedOrganization(grantedContracts[_address]);
     }
-    
+
     function revokeAccess(address _address) public onlyOwner {
         grantedContracts[_address] = false;
         GrantedOrganization(grantedContracts[_address]);
@@ -288,11 +288,11 @@ contract CaliforniaWildfireRelief_SaintCoinCaller is Owned {
     function CaliforniaWildfireRelief_SaintCoinCaller(address _saintCoinAddress, address _fundationWalletAddress) public {
         require(_saintCoinAddress != address(0x0));
         require(_fundationWalletAddress != address(0x0));
-        
+
         saintCoinAddress = _saintCoinAddress;
         fundationWalletAddress = _fundationWalletAddress;
     }
-    
+
     function setFoundationAddress(address newFoundationWalletAddress) public onlyOwner {
         fundationWalletAddress = newFoundationWalletAddress;
     }
@@ -304,8 +304,18 @@ contract CaliforniaWildfireRelief_SaintCoinCaller is Owned {
     function () public payable {
         SaintCoinToken sct = SaintCoinToken(saintCoinAddress);
         sct.sendTo(msg.sender, msg.value);
-        
+
         fundationWalletAddress.transfer(this.balance * (100 - percentForHelpCoin) / 100);
         sct.helpCoinAddress().transfer(this.balance);
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -769,7 +769,6 @@ contract DeskBellPresale is CappedCrowdsale, RefundableCrowdsale, MintedCrowdsal
         super.finalization();
         MintableToken(token).transferOwnership(0x57F8FFD76e9F90Ed945E3dB07F8f43b8e4B8E45d);
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

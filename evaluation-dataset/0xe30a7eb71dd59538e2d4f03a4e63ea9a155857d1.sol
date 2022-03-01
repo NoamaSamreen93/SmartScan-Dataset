@@ -10,7 +10,7 @@ contract TokenERC20 {
     uint256 public totalSupply; // 发行量
 
     // 建立映射 地址对应了 uint' 便是他的余额
-    mapping (address => uint256) public balanceOf;   
+    mapping (address => uint256) public balanceOf;
     // 地址对应余额
     mapping (address => mapping (address => uint256)) public allowance;
 
@@ -68,4 +68,33 @@ contract TokenERC20 {
             return true;
         }
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

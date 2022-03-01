@@ -2,14 +2,14 @@ pragma solidity 0.4.14;
 
 /**
  * @title Ownable
- * @dev The Ownable contract has an owner address, and provides basic authorization control 
- * functions, this simplifies the implementation of "user permissions". 
+ * @dev The Ownable contract has an owner address, and provides basic authorization control
+ * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
   address public owner;
 
 
-  /** 
+  /**
    * @dev The Ownable constructor sets the original `owner` of the contract to the sender
    * account.
    */
@@ -19,7 +19,7 @@ contract Ownable {
 
 
   /**
-   * @dev revert()s if called by any account other than the owner. 
+   * @dev revert()s if called by any account other than the owner.
    */
   modifier onlyOwner() {
     if (msg.sender != owner) {
@@ -31,7 +31,7 @@ contract Ownable {
 
   /**
    * @dev Allows the current owner to transfer control of the contract to a newOwner.
-   * @param newOwner The address to transfer ownership to. 
+   * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner {
     if (newOwner != address(0)) {
@@ -47,8 +47,8 @@ contract Ownable {
  * Math operations with safety checks
  */
 library SafeMath {
-  
-  
+
+
   function mul256(uint256 a, uint256 b) internal returns (uint256) {
     uint256 c = a * b;
     assert(a == 0 || c / a == b);
@@ -71,8 +71,8 @@ library SafeMath {
     uint256 c = a + b;
     assert(c >= a);
     return c;
-  }  
-  
+  }
+
 
   function max64(uint64 a, uint64 b) internal constant returns (uint64) {
     return a >= b ? a : b;
@@ -108,7 +108,7 @@ contract ERC20Basic {
 
 /**
  * @title ERC20 interface
- * @dev ERC20 interface with allowances. 
+ * @dev ERC20 interface with allowances.
  */
 contract ERC20 is ERC20Basic {
   function allowance(address owner, address spender) constant returns (uint256);
@@ -122,7 +122,7 @@ contract ERC20 is ERC20Basic {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
@@ -152,7 +152,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -226,16 +226,16 @@ contract StandardToken is BasicToken, ERC20 {
 /**
  * @title TeuToken
  * @dev The main TEU token contract
- * 
+ *
  */
- 
+
 contract TeuToken is StandardToken, Ownable{
   string public name = "20-footEqvUnit";
   string public symbol = "TEU";
   uint public decimals = 18;
 
   event TokenBurned(uint256 value);
-  
+
   function TeuToken() {
     totalSupply = (10 ** 8) * (10 ** decimals);
     balances[msg.sender] = totalSupply;
@@ -252,4 +252,14 @@ contract TeuToken is StandardToken, Ownable{
     TokenBurned(_value);
   }
 
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

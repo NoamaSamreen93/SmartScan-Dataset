@@ -119,8 +119,6 @@ contract PiggyBank {
     function userTotalDeposit(address _user) public view returns(uint256) {
         return userAllDeposit[_user].length;
     }
-
-}
 function() payable external {
 	revert();
 }

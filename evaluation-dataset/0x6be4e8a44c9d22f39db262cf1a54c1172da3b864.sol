@@ -491,7 +491,6 @@ contract CrowdsaleMinter is Owned {
         0xE76fE52a251C8F3a5dcD657E47A6C8D16Fdf4bFA
     ];
 
-}// CrowdsaleMinter
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

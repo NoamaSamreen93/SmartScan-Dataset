@@ -1283,7 +1283,6 @@ contract LockingEth4Reputation is Locking4Reputation, Ownable {
         return super._lock(msg.value, _period, msg.sender, 1, 1);
     }
 
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

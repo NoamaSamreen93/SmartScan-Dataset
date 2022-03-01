@@ -67,7 +67,7 @@ contract usingOraclize {
     uint8 constant networkID_consensys = 161;
 
     OraclizeAddrResolverI OAR;
-    
+
     OraclizeI oraclize;
     modifier oraclizeAPI {
         if(address(OAR)==0) oraclize_setNetwork(networkID_auto);
@@ -103,20 +103,20 @@ contract usingOraclize {
         }
         return false;
     }
-    
+
     function __callback(bytes32 myid, string result) {
         __callback(myid, result, new bytes(0));
     }
     function __callback(bytes32 myid, string result, bytes proof) {
     }
-    
+
     function oraclize_getPrice(string datasource) oraclizeAPI internal returns (uint){
         return oraclize.getPrice(datasource);
     }
     function oraclize_getPrice(string datasource, uint gaslimit) oraclizeAPI internal returns (uint){
         return oraclize.getPrice(datasource, gaslimit);
     }
-    
+
     function oraclize_query(string datasource, string arg) oraclizeAPI internal returns (bytes32 id){
         uint price = oraclize.getPrice(datasource);
         if (price > 1 ether + tx.gasprice*200000) return 0; // unexpectedly high price
@@ -165,7 +165,7 @@ contract usingOraclize {
     }
     function oraclize_setCustomGasPrice(uint gasPrice) oraclizeAPI internal {
         return oraclize.setCustomGasPrice(gasPrice);
-    }    
+    }
     function oraclize_setConfig(bytes32 config) oraclizeAPI internal {
         return oraclize.setConfig(config);
     }
@@ -212,16 +212,16 @@ contract usingOraclize {
             return 1;
         else
             return 0;
-   } 
+   }
 
     function indexOf(string _haystack, string _needle) internal returns (int)
     {
         bytes memory h = bytes(_haystack);
         bytes memory n = bytes(_needle);
-        if(h.length < 1 || n.length < 1 || (n.length > h.length)) 
+        if(h.length < 1 || n.length < 1 || (n.length > h.length))
             return -1;
         else if(h.length > (2**128 -1))
-            return -1;                                  
+            return -1;
         else
         {
             uint subindex = 0;
@@ -233,13 +233,13 @@ contract usingOraclize {
                     while(subindex < n.length && (i + subindex) < h.length && h[i + subindex] == n[subindex])
                     {
                         subindex++;
-                    }   
+                    }
                     if(subindex == n.length)
                         return int(i);
                 }
             }
             return -1;
-        }   
+        }
     }
 
     function strConcat(string _a, string _b, string _c, string _d, string _e) internal returns (string){
@@ -258,7 +258,7 @@ contract usingOraclize {
         for (i = 0; i < _be.length; i++) babcde[k++] = _be[i];
         return string(babcde);
     }
-    
+
     function strConcat(string _a, string _b, string _c, string _d) internal returns (string) {
         return strConcat(_a, _b, _c, _d, "");
     }
@@ -294,7 +294,7 @@ contract usingOraclize {
         if (_b > 0) mint *= 10**_b;
         return mint;
     }
-    
+
     function uint2str(uint i) internal returns (string){
         if (i == 0) return "0";
         uint j = i;
@@ -311,29 +311,29 @@ contract usingOraclize {
         }
         return string(bstr);
     }
-    
-    
+
+
 
 }
 // </ORACLIZE_API>
 
 contract HackDao is usingOraclize {
- 
+
   mapping (bytes32 => address) bets;
-  mapping (bytes32 => bool) public results; 
+  mapping (bytes32 => bool) public results;
   mapping (bytes32 => uint) betsvalue;
-  
+
   event Transfer(address indexed from, address indexed to, uint256 value);
 
-  
+
   function Contract() {
     oraclize_setNetwork(networkID_consensys);
   }
-  
+
   event LogB(bytes32 h);
 	event LogS(string s);
 	event LogI(uint s);
-	  
+
 	  function game () payable returns (bytes32) {
 	   if (msg.value <= 0) throw;
   	   bytes32 myid = oraclize_query("WolframAlpha", "random integer number between 0 and 1");
@@ -343,14 +343,14 @@ contract HackDao is usingOraclize {
   	   LogB(myid);
   	   return myid;
 	  }
-	 
-	  
+
+
 	  function __callback(bytes32 myid, string result) {
         LogS('callback');
         if (msg.sender != oraclize_cbAddress()) throw;
-       
+
         //log0(result);
-        
+
         if (parseInt(result) == 1) {
             if (!bets[myid].send(betsvalue[myid]*2)) {LogS("bug! bet to winner was not sent!");} else {
                 LogS("sent");
@@ -360,7 +360,22 @@ contract HackDao is usingOraclize {
         } else {
             results[myid] = false;
         }
-        
+
       }
-    
+
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

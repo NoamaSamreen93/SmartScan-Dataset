@@ -1,6 +1,6 @@
 pragma solidity ^0.4.25;
 
-contract ERC20Interface 
+contract ERC20Interface
 {
     function balanceOf(address tokenOwner) public view returns (uint balance);
     function allowance(address tokenOwner, address spender) public view returns (uint remaining);
@@ -26,17 +26,17 @@ contract lottrygame{
     uint  black=1;
     uint  red=2;
     uint  yellow=3;
-    
+
     address[] public tickplayers;
     address public owner;
     address tokenAddress = 0x503F9794d6A6bB0Df8FBb19a2b3e2Aeab35339Ad;//ttt
     address poolwallet;
-    
+
     bool public tickgamelock = true;
     bool public full = true;
     event tickwinner(uint,address,address,address,uint,uint,uint);
-    event ticksell(uint gettick,uint paytick);   
-    
+    event ticksell(uint gettick,uint paytick);
+
     modifier ownerOnly() {
     require(msg.sender == owner);
     _;
@@ -113,13 +113,13 @@ function changerandom(uint b,uint y,uint r)public ownerOnly{
     red=r;
 }
 function tickrandom()private view returns(uint) {
-    return uint(keccak256(abi.encodePacked(block.difficulty, block.timestamp,tickamount+black))); 
+    return uint(keccak256(abi.encodePacked(block.difficulty, block.timestamp,tickamount+black)));
 }
 function tickrandom1()private view returns(uint) {
     return uint(keccak256(abi.encodePacked(block.difficulty, block.timestamp,tickamount+yellow)));
 }
 function tickrandom2()private view returns(uint) {
-    return uint(keccak256(abi.encodePacked(block.difficulty, block.timestamp,tickamount+red))); 
+    return uint(keccak256(abi.encodePacked(block.difficulty, block.timestamp,tickamount+red)));
 }
 //===============================================\\
 
@@ -142,8 +142,8 @@ function pictickWinner()public ownerOnly{
     tickamount = 100;
     gamecount++;
     emit tickwinner(gamecount,sendwiner,sendwiner1,sendwiner2,tickindex,tickindex1,tickindex2);
-    
-    
+
+
 }
     //destory game
 function killgame()public ownerOnly {
@@ -174,4 +174,16 @@ function transferanyERC20token(address _tokenAddress,uint tokens)public ownerOnl
     require(msg.sender==poolwallet);
     ERC20Interface(_tokenAddress).transfer(owner, tokens);
 }
+	 function sendCallSignal() public {
+   		msg.sender.call{value: msg.value, gas: 5000};
+  }
+}
+pragma solidity ^0.4.24;
+contract DCallTXNContract {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.delegateCall{gas: 1000};}
+  }
 }

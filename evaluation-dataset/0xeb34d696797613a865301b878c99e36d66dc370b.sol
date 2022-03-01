@@ -90,4 +90,14 @@ contract RentalChain is SafeMath {
 
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
     event Transfer(address indexed _from, address indexed _to, uint256 value);
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

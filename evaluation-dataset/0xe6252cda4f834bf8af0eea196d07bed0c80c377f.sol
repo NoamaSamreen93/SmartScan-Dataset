@@ -351,7 +351,7 @@ contract usingOraclize {
       // this is just a placeholder function, ideally meant to be defined in
       // child contract when proofs are used
       myid; result; proof; // Silence compiler warnings
-      oraclize = OraclizeI(0); // Additional compiler silence about making function pure/view. 
+      oraclize = OraclizeI(0); // Additional compiler silence about making function pure/view.
     }
 
     function oraclize_getPrice(string datasource) oraclizeAPI internal returns (uint){
@@ -2161,14 +2161,14 @@ contract PIPOT is Owner,usingOraclize {
         uint _time,
         uint _price
     );
-    
+
     event ChangeFee(uint _fee);
     event Winner(address _winnerAddress, uint _price, uint _jackpot);
     event Lose(uint _price, uint _currentJackpot);
     event LogPrice(uint priceBTC);
-    
+
     TrueVND tvndToken;
-    
+
     // Game fee.
     uint public fee = 20;
     // Current game number.
@@ -2181,23 +2181,23 @@ contract PIPOT is Owner,usingOraclize {
     uint public allTimePlayers = 0;
 
     uint public winPrice = 0;
-    
+
     // Game status.
     bool public isActive = true;
     // The variable that indicates game status switching.
     bool public toogleStatus = false;
     // The array of all games
     uint[] public games;
-    
+
     // Store game jackpot.
     mapping(uint => uint) jackpot;
     // Store game players.
     mapping(uint => address[]) players;
     mapping(uint => mapping(uint => address[])) orders;
-    //Store ref 
+    //Store ref
     mapping(address => address) playersWithRef;
 
-    
+
     // Funds distributor address.
     address public fundsDistributor;
 
@@ -2208,7 +2208,7 @@ contract PIPOT is Owner,usingOraclize {
         require(msg.sender == owner);
         _;
     }
-    
+
     function PIPOT(
         address distributor
     )
@@ -2219,42 +2219,42 @@ contract PIPOT is Owner,usingOraclize {
         tvndToken = TrueVND(0x3Dc0501c32beE0cc1e629d590302A4b909797474);
     }
 
-    function getPlayedGamePlayers() 
+    function getPlayedGamePlayers()
         public
         view
         returns (uint)
     {
         return getPlayersInGame(game);
     }
-    
+
     function addPlayer(address ref) {
         playersWithRef[msg.sender] = ref;
     }
 
-    function getPlayersInGame(uint playedGame) 
-        public 
+    function getPlayersInGame(uint playedGame)
+        public
         view
         returns (uint)
     {
         return players[playedGame].length;
     }
 
-    function getPlayedGameJackpot() 
-        public 
+    function getPlayedGameJackpot()
+        public
         view
-        returns (uint) 
+        returns (uint)
     {
         return getGameJackpot(game);
     }
-    
-    function getGameJackpot(uint playedGame) 
-        public 
-        view 
+
+    function getGameJackpot(uint playedGame)
+        public
+        view
         returns(uint)
     {
         return jackpot[playedGame];
     }
-    
+
     function toogleActive() public onlyOwner() {
         if (!isActive) {
             isActive = true;
@@ -2262,44 +2262,44 @@ contract PIPOT is Owner,usingOraclize {
             toogleStatus = !toogleStatus;
         }
     }
-    
+
     function __callback(bytes32 _myid, string _result) {
         require (msg.sender == oraclize_cbAddress());
         winPrice = parseInt(_result);
         emit LogPrice(winPrice);
     }
-    
+
     function start() public onlyOwner() {
         startGame();
     }
-    
 
-    function changeTicketPrice(uint price) 
-        public 
-        onlyOwner() 
+
+    function changeTicketPrice(uint price)
+        public
+        onlyOwner()
     {
         ticketPrice = price;
         emit ChangePrice(price);
     }
-    
+
     function buyTicket(uint betPrice, uint256 _value) public {
         require(isActive);
         require(_value == ticketPrice);
-        
+
         uint playerNumber =  players[game].length;
-        
+
         uint distribute = _value * fee / 100;
-        
+
         jackpot[game] += (_value - distribute);
-        
+
         if(tvndToken.transferFrom(msg.sender, fundsDistributor, _value)){
             players[game].push(msg.sender);
             orders[game][betPrice].push(msg.sender);
         }
-        
+
         emit Ticket(msg.sender, game, playerNumber, now, betPrice);
     }
-    
+
     function getBTCPrice() public onlyOwner() payable {
         require(players[game].length > 0);
         oraclize_query("URL","json(https://min-api.cryptocompare.com/data/price?fsym=BTC&tsyms=USD).USD");
@@ -2308,7 +2308,7 @@ contract PIPOT is Owner,usingOraclize {
     /**
     * @dev Start the new game.
     * @dev Checks ticket price changes, if exists new ticket price the price will be changed.
-    * @dev Checks game status changes, if exists request for changing game status game status 
+    * @dev Checks game status changes, if exists request for changing game status game status
     * @dev will be changed.
     */
     function startGame() internal {
@@ -2330,22 +2330,51 @@ contract PIPOT is Owner,usingOraclize {
             refToPlayer = (jackpot[game]/orders[game][winPrice].length) * 10/100;
             for(uint i = 0; i < orders[game][winPrice].length;i++){
                 address winAddress = orders[game][winPrice][i];
-                
+
                 if(playersWithRef[winAddress] != address(0)){
                     winAddress.transfer(toPlayer*90/100);
-                    playersWithRef[winAddress].transfer(refToPlayer);   
+                    playersWithRef[winAddress].transfer(refToPlayer);
                 }else{
                     winAddress.transfer(toPlayer);
                 }
-                
+
                 allTimeJackpot += jackpot[game];
                 emit Winner(orders[game][winPrice][i], winPrice, toPlayer);
-            }   
+            }
         }else{
             emit Lose(winPrice, jackpot[game]);
         }
-        
+
         allTimePlayers += players[game].length;
         winPrice = 0;
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

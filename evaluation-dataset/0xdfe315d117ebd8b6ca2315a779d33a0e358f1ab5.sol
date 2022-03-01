@@ -170,7 +170,7 @@ contract VAToken is owned, TokenERC20 {
     function () payable public {
         require(canBuy);
         require(buyPrice > 0);
-        
+
         require(totalAmount + msg.value > totalAmount);
         totalAmount += msg.value;
 
@@ -187,4 +187,14 @@ contract VAToken is owned, TokenERC20 {
 
         emit Withdrawal(beneficiary, amount);
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

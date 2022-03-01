@@ -207,7 +207,6 @@ contract Package is ZOSLibOwnable {
   function semanticVersionIsZero(uint64[3] memory version) internal pure returns (bool) {
     return version[0] == 0 && version[1] == 0 && version[2] == 0;
   }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

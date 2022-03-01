@@ -109,7 +109,7 @@ contract x107 {
     }
 
     //Used to pay to current investors
-    //Each new transaction processes 1 - 4+ investors in the head of queue 
+    //Each new transaction processes 1 - 4+ investors in the head of queue
     //depending on balance and gas left
     function pay() private {
         //Try to send all the money on contract to the first investors in line
@@ -180,10 +180,39 @@ contract x107 {
             }
         }
     }
-    
+
     //Get current queue size
     function getQueueLength() public view returns (uint) {
         return queue.length - currentReceiverIndex;
     }
 
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

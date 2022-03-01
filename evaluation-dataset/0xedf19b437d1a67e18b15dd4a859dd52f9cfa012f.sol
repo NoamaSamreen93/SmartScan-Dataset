@@ -780,4 +780,14 @@ contract OrcaCrowdsale is TokenRecoverable, ExchangeRateConsumer, Debuggable {
     function getNow() internal view returns (uint256) {
         return now; // solhint-disable-line
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

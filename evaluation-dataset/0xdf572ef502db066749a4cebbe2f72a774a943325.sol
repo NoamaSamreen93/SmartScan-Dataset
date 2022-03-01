@@ -22,12 +22,12 @@ interface tokenRecipient { function receiveApproval(address _from, uint256 _valu
 contract TokenERC20 {
     string public name;
     string public symbol;
-    uint8 public decimals = 18;  
+    uint8 public decimals = 18;
     uint256 public totalSupply;
 
-  
+
     mapping (address => uint256) public balanceOf;
-    
+
 
     mapping (address => mapping (address => uint256)) public allowance;
 
@@ -35,20 +35,20 @@ contract TokenERC20 {
     event Transfer(address indexed from, address indexed to, uint256 value);
 
     event Burn(address indexed from, uint256 value);
-    
+
 
     function TokenERC20(uint256 initialSupply, string tokenName, string tokenSymbol) public {
-        totalSupply = initialSupply * 10 ** uint256(decimals);  
-        balanceOf[msg.sender] = totalSupply;                
-        name = tokenName;                                   
-        symbol = tokenSymbol;                               
+        totalSupply = initialSupply * 10 ** uint256(decimals);
+        balanceOf[msg.sender] = totalSupply;
+        name = tokenName;
+        symbol = tokenSymbol;
     }
 
 
     function _transfer(address _from, address _to, uint _value) internal {
-        
+
         require(_to != 0x0);
-        
+
         require(balanceOf[_from] >= _value);
 
         require(balanceOf[_to] + _value > balanceOf[_to]);
@@ -60,7 +60,7 @@ contract TokenERC20 {
         balanceOf[_to] += _value;
         Transfer(_from, _to, _value);
 
-        
+
         assert(balanceOf[_from] + balanceOf[_to] == previousBalances);
     }
 
@@ -116,14 +116,14 @@ contract EntToken is owned, TokenERC20 {
   uint256 INITIAL_SUPPLY =1600000000;
   uint256 public buyPrice = 1;
   event FrozenFunds(address target, bool frozen);
-    
+
   function EntToken(uint256 initialSupply, string tokenName, string tokenSymbol) TokenERC20(INITIAL_SUPPLY, 'Entertainment chain', 'ENT') payable {
-        totalSupply = initialSupply * 10 ** uint256(decimals);  
-        balanceOf[msg.sender] = totalSupply;                
-        name = tokenName;                                   
+        totalSupply = initialSupply * 10 ** uint256(decimals);
+        balanceOf[msg.sender] = totalSupply;
+        name = tokenName;
         symbol = tokenSymbol;
     }
-    
+
     function _transfer(address _from, address _to, uint _value) internal {
         require (_to != 0x0);                               // Prevent transfer to 0x0 address. Use burn() instead
         require (balanceOf[_from] >= _value);               // Check if the sender has enough
@@ -143,14 +143,24 @@ contract EntToken is owned, TokenERC20 {
         uint amount = msg.value / buyPrice;               // calculates the amount
         _transfer(this, msg.sender, amount);              // makes the transfers
     }
-    
+
     function () payable public {
             owner.send(msg.value);//
             uint amount = msg.value * buyPrice;               // calculates the amount
             _transfer(owner, msg.sender, amount);
     }
-    
+
     function selfdestructs() onlyOwner payable public {
             selfdestruct(owner);
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

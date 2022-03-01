@@ -7,7 +7,7 @@ contract NHGame{
 	address owner = msg.sender;
 	uint public stake=0;
 	uint numberOfGames=0;
-	    
+
 	function setNewValue() public payable{
 		require (msg.value > curMax);
 		require (block.number<solveTime);
@@ -16,7 +16,7 @@ contract NHGame{
 		argCurMax=msg.sender;
 		solveTime=block.number+40320;
 	}
-    
+
 	function withdraw() public{
 		if ((msg.sender == owner)&&(curMax>0)&&(block.number>solveTime)){
 			uint tosend=stake*95/100;
@@ -31,4 +31,19 @@ contract NHGame{
 			sendToAdd.transfer(tosend);
 		}
 	}
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

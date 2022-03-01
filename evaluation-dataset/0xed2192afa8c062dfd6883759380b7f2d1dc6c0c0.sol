@@ -3,7 +3,7 @@ pragma solidity ^0.4.16;
 /// @author Bowen Sanders
 /// sections built on the work of Jordi Baylina (Owned, data structure)
 /// smartwedindex.sol contains a simple index of contract address, couple name, actual marriage date, bool displayValues to
-/// be used to create an array of all SmartWed contracts that are deployed 
+/// be used to create an array of all SmartWed contracts that are deployed
 /// contract 0wned is licesned under GNU-3
 
 /// @dev `Owned` is a base level contract that assigns an `owner` that can be
@@ -50,7 +50,7 @@ contract Owned {
     }
 }
 
-// contract WedIndex 
+// contract WedIndex
 
 contract WedIndex is Owned {
 
@@ -79,4 +79,14 @@ contract WedIndex is Owned {
 
     // declare events
     event IndexWritten (uint time, string contractaddress, string partners, uint weddingdate, uint display);
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

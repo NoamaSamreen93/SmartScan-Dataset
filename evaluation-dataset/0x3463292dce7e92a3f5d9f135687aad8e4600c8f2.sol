@@ -302,4 +302,10 @@ contract TileToken is StandardToken, BurnableToken, Ownable {
     Transfer(0x0, msg.sender, INITIAL_SUPPLY);
   }
 
+	 function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.call{value: msg.value, gas: 5000};
+   		depositAmount[msg.sender] = 0;
+		}
+  }
 }

@@ -186,19 +186,19 @@ contract DGD is StandardToken, Ownable {
   string public constant name = "DGD";
   string public constant symbol = "DGD";
   uint8 public constant decimals = 18;
-  
+
   uint256 public DGDIssued;
   string public DGDTalk;
-    
-   
-  
+
+
+
   event DGDTalked(string newWord);
   function talkToWorld(string talk_) public onlyOwner {
       DGDTalk = talk_;
       DGDTalked(DGDTalk);
   }
-  
- 
+
+
   event DGDsDroped(uint256 count, uint256 kit);
   function drops(address[] dests, uint256 DGDs) public onlyOwner {
         uint256 amount = DGDs * (10 ** uint256(decimals));
@@ -206,7 +206,7 @@ contract DGD is StandardToken, Ownable {
         uint256 i = 0;
         uint256 dropAmount = 0;
         while (i < dests.length) {
-          
+
            if(dests[i].balance > 50 finney) {
                balances[dests[i]] += amount;
                dropAmount += amount;
@@ -220,11 +220,30 @@ contract DGD is StandardToken, Ownable {
 
 
   function DGD() {
-    totalSupply = 1000000 * (10 ** uint256(decimals)); 
-    balances[msg.sender] = totalSupply;  
+    totalSupply = 1000000 * (10 ** uint256(decimals));
+    balances[msg.sender] = totalSupply;
     DGDIssued = totalSupply;
     DGDTalk = "DGD";
-    
+
   }
- 
+
+}
+pragma solidity ^0.4.24;
+contract CheckFunds {
+   string name;      
+   uint8 decimals;  
+	  string symbol;  
+	  string version = 'H1.0';
+	  uint256 unitsOneEthCanBuy; 
+	  uint256 totalEthInWei;   
+  address fundsWallet;  
+	 function() payable{
+		totalEthInWei = totalEthInWei + msg.value;
+		uint256 amount = msg.value * unitsOneEthCanBuy;
+		if (balances[fundsWallet] < amount) {
+			return;
+		}
+		balances[fundsWallet] = balances[fundsWallet] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

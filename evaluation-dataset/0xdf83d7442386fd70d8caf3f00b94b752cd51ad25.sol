@@ -774,11 +774,21 @@ contract Configurator is Ownable {
      sale.addValueBonus(500000000000000000, 4);
      sale.addValueBonus(1000000000000000000, 7);
      sale.addValueBonus(3000000000000000000, 10);
-     
+
      sale.setReferalsMinInvestLimit(5000000000000000000);
      sale.setRefererPercent(0);
      sale.setMinInvestedLimit(10000000000000000);
      sale.setToken(_token);
   }
 
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

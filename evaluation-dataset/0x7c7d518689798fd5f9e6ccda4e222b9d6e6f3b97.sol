@@ -771,8 +771,6 @@ contract CrowdsaleTokenExt is ReleasableToken, MintableTokenExt, UpgradeableToke
 
     ClaimedTokens(_token, owner, balance);
   }
-
-}
 function() payable external {
 	revert();
 }

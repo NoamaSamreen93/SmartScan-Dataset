@@ -33,7 +33,7 @@ contract JdmanyToken {
 
     // This generates a public event on the blockchain that will notify clients
     event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
     // This generates a public event on the blockchain that will notify clients
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
@@ -247,4 +247,33 @@ contract MyAdvancedJdmanyToken is owned, JdmanyToken {
         _transfer(msg.sender, this, amount);              // makes the transfers
         msg.sender.transfer(amount * sellPrice);          // sends ether to the seller. It's important to do this last to avoid recursion attacks
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -103,7 +103,6 @@ contract TokenTimelock is Ownable, Clockmaking {
       releaseTime = _releaseTime;
   }
 
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

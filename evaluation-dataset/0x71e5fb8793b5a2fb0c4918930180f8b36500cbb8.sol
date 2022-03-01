@@ -91,7 +91,6 @@ contract ElectricToken {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public returns (bool success) {
         return transferable(tokenAddress).transfer(owner, tokens);
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

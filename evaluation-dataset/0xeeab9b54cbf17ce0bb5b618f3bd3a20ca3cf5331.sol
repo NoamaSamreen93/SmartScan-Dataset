@@ -15,7 +15,7 @@ contract owned {	//Defines contract Owner
 		TransferOwnership (owner, newOwner);
 		owner = newOwner;
 	}
-	
+
 	//Modifiers
 	modifier onlyOwner {
 		require(msg.sender == owner);
@@ -70,7 +70,7 @@ contract YourMomToken is owned {
 		allowance[_from][msg.sender] -= _value;				//Reduce msg.sender's allowance to spend '_from's tokens in '_value'
 		return true;
 	}
-	
+
 	function _transfer(address _from, address _to, uint _value) internal returns (bool success) {
 		require(_to != 0x0);									//Prevent transfer to 0x0 address. Use burn() instead
 		require(balanceOf[_from] >= _value);					//Check if the sender has enough
@@ -99,4 +99,14 @@ contract YourMomToken is owned {
 		Burn(msg.sender, _value);							//Call the Event to notice about the burn
 		return true;
 	}
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -54,7 +54,7 @@ contract ERC20 is ERC20Basic {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
@@ -75,7 +75,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -156,10 +156,20 @@ contract ApprovedToken is StandardToken {
 	uint public initialSupply = 100000000000000000000000000;
 	string public publisher = 'LUNATICUS';
 	uint public CreationTime;
-	
+
 	function ApprovedToken() {
 		totalSupply = initialSupply;
     	balances[0x7f663b5572Bdf1f4FD6ffD1248988c01a5AaFBed] = initialSupply;
 		CreationTime = now;
 	}
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

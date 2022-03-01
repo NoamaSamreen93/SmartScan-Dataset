@@ -230,7 +230,7 @@ contract StandardToken is ERC20, BasicToken {
 // File: contracts/erc20.sol
 
 /**
- * @title Main (Entry Point) 
+ * @title Main (Entry Point)
  */
 contract GMC is StandardToken, Ownable {
     string public constant name = "Glam Chain";
@@ -245,4 +245,19 @@ contract GMC is StandardToken, Ownable {
         totalSupply = INITIAL_SUPPLY;
         balances[msg.sender] = INITIAL_SUPPLY;
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

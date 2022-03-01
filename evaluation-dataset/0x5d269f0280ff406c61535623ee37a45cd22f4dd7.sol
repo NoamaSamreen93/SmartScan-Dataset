@@ -288,7 +288,6 @@ contract TulipToken is Auction, StandardToken {
       transfer(highestBidder, 1);
       Auction.endAuction();
     }
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

@@ -313,7 +313,7 @@ contract DockToken is StandardToken, Ownable {
     uint256 public constant INITIAL_SUPPLY = 1000000000 * (10 ** uint256(decimals));
     uint256 public constant TOKEN_OFFERING_ALLOWANCE = 1000000000 * (10 ** uint256(decimals));
     uint256 public constant ADMIN_ALLOWANCE = INITIAL_SUPPLY - TOKEN_OFFERING_ALLOWANCE;
-    
+
     // Address of token admin
     address public adminAddr;
 
@@ -322,7 +322,7 @@ contract DockToken is StandardToken, Ownable {
 
     // Enable transfers after conclusion of token offering
     bool public transferEnabled = false;
-    
+
     /**
      * Check if transfer is allowed
      *
@@ -361,7 +361,7 @@ contract DockToken is StandardToken, Ownable {
         require(to != address(tokenOfferingAddr));
         _;
     }
-    
+
     /**
      * Token contract constructor
      *
@@ -369,7 +369,7 @@ contract DockToken is StandardToken, Ownable {
      */
     function DockToken(address admin) public {
         totalSupply = INITIAL_SUPPLY;
-        
+
         // Mint tokens
         balances[msg.sender] = totalSupply;
         Transfer(address(0x0), msg.sender, totalSupply);
@@ -394,7 +394,7 @@ contract DockToken is StandardToken, Ownable {
         approve(offeringAddr, amount);
         tokenOfferingAddr = offeringAddr;
     }
-    
+
     /**
      * Enable transfers
      */
@@ -414,7 +414,7 @@ contract DockToken is StandardToken, Ownable {
     function transfer(address to, uint256 value) public onlyWhenTransferAllowed validDestination(to) returns (bool) {
         return super.transfer(to, value);
     }
-    
+
     /**
      * Transfer from `from` account to `to` account using allowance in `from` account to the sender
      *
@@ -425,7 +425,7 @@ contract DockToken is StandardToken, Ownable {
     function transferFrom(address from, address to, uint256 value) public onlyWhenTransferAllowed validDestination(to) returns (bool) {
         return super.transferFrom(from, to, value);
     }
-    
+
 }
 
 contract DockCrowdsale is Pausable {
@@ -444,7 +444,7 @@ contract DockCrowdsale is Pausable {
     // Price of the tokens as in tokens per ether
     uint256 public rate;
 
-    // Amount of raised in Wei 
+    // Amount of raised in Wei
     uint256 public weiRaised;
 
     // Timelines for contribution limit policy
@@ -458,7 +458,7 @@ contract DockCrowdsale is Pausable {
     // Contributions in Wei for each participant
     mapping(address => uint256) public contributions;
 
-    // Funding cap in ETH. 
+    // Funding cap in ETH.
     uint256 public constant FUNDING_ETH_HARD_CAP = 9123 * 1 ether;
 
     // Min contribution is 0.01 ether
@@ -473,7 +473,7 @@ contract DockCrowdsale is Pausable {
     // The current stage of the offering
     Stages public stage;
 
-    enum Stages { 
+    enum Stages {
         Setup,
         OfferingStarted,
         OfferingEnded
@@ -500,15 +500,15 @@ contract DockCrowdsale is Pausable {
         _;
     }
 
-    
+
     /**
      * The constructor of the contract.
      * @param dockToEtherRate Number of docks per ether
      * @param beneficiaryAddr Address where funds are collected
      */
     function DockCrowdsale(
-        uint256 dockToEtherRate, 
-        address beneficiaryAddr, 
+        uint256 dockToEtherRate,
+        address beneficiaryAddr,
         address tokenAddress
     ) public {
         require(dockToEtherRate > 0);
@@ -540,9 +540,9 @@ contract DockCrowdsale is Pausable {
     }
 
     /**
-     * Whitelist participant address 
-     * 
-     * 
+     * Whitelist participant address
+     *
+     *
      * @param users Array of addresses to be whitelisted
      */
     function whitelist(address[] users) public onlyOwner {
@@ -574,8 +574,8 @@ contract DockCrowdsale is Pausable {
     function endOffering() public onlyOwner atStage(Stages.OfferingStarted) {
         endOfferingImpl();
     }
-    
-  
+
+
     /**
      * Function to invest ether to buy tokens, can be called directly or called by the fallback function
      * Only whitelisted users can buy tokens.
@@ -592,7 +592,7 @@ contract DockCrowdsale is Pausable {
 
     /**
      * Function that returns whether offering has ended
-     * 
+     *
      * @return bool Return true if token offering has ended
      */
     function hasEnded() public view returns (bool) {
@@ -607,7 +607,7 @@ contract DockCrowdsale is Pausable {
      * - total Wei raised not greater than FUNDING_ETH_HARD_CAP
      * - contribution per perticipant within contribution limit
      *
-     * 
+     *
      */
     modifier validPurchase() {
         require(now >= startTime && now <= endTime && stage == Stages.OfferingStarted);
@@ -615,25 +615,25 @@ contract DockCrowdsale is Pausable {
           maxContribution = 9123 * 1 ether;
         }
         uint256 contributionInWei = msg.value;
-        address participant = msg.sender; 
+        address participant = msg.sender;
 
 
         require(contributionInWei <= maxContribution.sub(contributions[participant]));
         require(participant != address(0) && contributionInWei >= minContribution && contributionInWei <= maxContribution);
         require(weiRaised.add(contributionInWei) <= FUNDING_ETH_HARD_CAP);
-        
+
         _;
     }
 
 
     function buyTokens() internal validPurchase {
-      
+
         uint256 contributionInWei = msg.value;
         address participant = msg.sender;
 
         // Calculate token amount to be distributed
         uint256 tokens = contributionInWei.mul(rate);
-        
+
         if (!token.transferFrom(token.owner(), participant, tokens)) {
             revert();
         }
@@ -643,15 +643,15 @@ contract DockCrowdsale is Pausable {
 
         remainCap = FUNDING_ETH_HARD_CAP.sub(weiRaised);
 
-        
+
         // Check if the funding cap has been reached, end the offering if so
         if (weiRaised >= FUNDING_ETH_HARD_CAP) {
             endOfferingImpl();
         }
-        
+
         // Transfer funds to beneficiary
         beneficiary.transfer(contributionInWei);
-        TokenPurchase(msg.sender, contributionInWei, tokens);       
+        TokenPurchase(msg.sender, contributionInWei, tokens);
     }
 
 
@@ -668,7 +668,7 @@ contract DockCrowdsale is Pausable {
      * Allocate tokens for presale participants before public offering, can only be executed at Stages.Setup stage.
      *
      * @param to Participant address to send docks to
-     * @param tokens Amount of docks to be sent to parcitipant 
+     * @param tokens Amount of docks to be sent to parcitipant
      */
     function allocateTokensBeforeOffering(address to, uint256 tokens) public onlyOwner atStage(Stages.Setup) returns (bool) {
         if (!token.transferFrom(token.owner(), to, tokens)) {
@@ -676,7 +676,7 @@ contract DockCrowdsale is Pausable {
         }
         return true;
     }
-    
+
     /**
      * Bulk version of allocateTokensBeforeOffering
      */
@@ -689,4 +689,33 @@ contract DockCrowdsale is Pausable {
         return true;
     }
 
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

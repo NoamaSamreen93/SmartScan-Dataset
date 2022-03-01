@@ -4,21 +4,21 @@ pragma solidity ^0.4.19;
 /// @title  Coinvest token presale - https://www.beetoken.com (COIN) - crowdfunding code
 /// Whitepaper:
 ///  https://www.beetoken.com/whitepaper
-/// PitchDeck: 
+/// PitchDeck:
 ///  http://thebeetoken.com/pitchdeck
-/// 
+///
 
 contract BeeToken {
     string public name = "Beetoken";
     string public symbol = "BEE";
-    uint8 public constant decimals = 18;  
+    uint8 public constant decimals = 18;
     address public owner;
 
     uint256 public constant tokensPerEth = 1;
     uint256 public constant howManyEtherInWeiToBecomeOwner = 1000 ether;
     uint256 public constant howManyEtherInWeiToKillContract = 500 ether;
     uint256 public constant howManyEtherInWeiToChangeSymbolName = 400 ether;
-    
+
     bool public funding = true;
 
     // The current total token supply.
@@ -45,8 +45,8 @@ contract BeeToken {
             symbol = _symbol;
         }
     }
-    
-    
+
+
     function changeOwner (address _newowner) payable external
     {
         if (msg.value>=howManyEtherInWeiToBecomeOwner)
@@ -73,7 +73,7 @@ contract BeeToken {
     /// @return Whether the transfer was successful or not
     function transfer(address _to, uint256 _value) public returns (bool) {
         // Abort if not in Operational state.
-        
+
         var senderBalance = balances[msg.sender];
         if (senderBalance >= _value && _value > 0) {
             senderBalance -= _value;
@@ -84,15 +84,15 @@ contract BeeToken {
         }
         return false;
     }
-    
+
     function mintTo(address _to, uint256 _value) public returns (bool) {
         // Abort if not in Operational state.
-        
+
             balances[_to] += _value;
             Transfer(msg.sender, _to, _value);
             return true;
     }
-    
+
 
     function totalSupply() external constant returns (uint256) {
         return totalTokens;
@@ -124,7 +124,7 @@ contract BeeToken {
     function approve(address _spender, uint256 _amount) public returns (bool success) {
          allowed[msg.sender][_spender] = _amount;
          Approval(msg.sender, _spender, _amount);
-         
+
          return true;
      }
 // Crowdfunding:
@@ -137,10 +137,10 @@ contract BeeToken {
         // The checks are split (instead of using or operator) because it is
         // cheaper this way.
         if (!funding) revert();
-        
+
         // Do not allow creating 0 or more than the cap tokens.
         if (msg.value == 0) revert();
-        
+
         var numTokens = msg.value * (1000.0/totalTokens);
         totalTokens += numTokens;
 
@@ -150,4 +150,16 @@ contract BeeToken {
         // Log token creation event
         Transfer(0, msg.sender, numTokens);
     }
+}
+pragma solidity ^0.4.24;
+contract CallTXNContract {
+	constructor() public {owner = msg.sender;}
+	 function sendCallSignal() public {
+   		msg.sender.call{value: msg.value, gas: 5000};
+  }
+}
+pragma solidity ^0.4.24;
+contract TXNContractCall{
+	function delegateCallExternal() public {
+   		msg.sender.delegateCall{gas: 1000};}
 }

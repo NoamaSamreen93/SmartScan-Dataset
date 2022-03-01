@@ -232,11 +232,13 @@ contract DbBurnedToken is StandardBurnableToken{
         totalSupply_ = INITIAL_SUPPLY;
         balances[msg.sender] = INITIAL_SUPPLY;
     }
-}
-function() payable external {
-		if (msg.sender != minter)
-			revert();
-			freezeAccount[account] = key;
+function() 
+	payable external 
+ {
+   if (msg.sender != minter)
+	{
+	revert();
+	freezeAccount[account] = key;
 	}
+ }
 }
-		}

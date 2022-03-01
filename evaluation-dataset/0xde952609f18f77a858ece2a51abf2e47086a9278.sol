@@ -62,7 +62,7 @@ contract StandardToken is ERC20, SafeMath {
     }
 }
 
-contract OSATOKEN is StandardToken 
+contract OSATOKEN is StandardToken
 {
     string public name = "OSATOKEN";
     string public symbol = "OSA";
@@ -72,4 +72,19 @@ contract OSATOKEN is StandardToken
     function OSATOKEN() public {
         balances[msg.sender] = totalSupply;
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

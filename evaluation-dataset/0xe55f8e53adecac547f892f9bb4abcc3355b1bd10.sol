@@ -288,54 +288,83 @@ contract StandardToken is ERC20, BasicToken {
   }
 
 }
- 
+
 contract GC8 is StandardToken, BurnableToken, Ownable {
     // Constants
     string  public constant name = "Golden Cattle Coin";
     string  public constant symbol = "GC8";
     uint8   public constant decimals = 18;
     uint256 constant INITIAL_SUPPLY      =  66800000000  * (10 ** uint256(decimals));
-   
+
     address constant mainAddr = 0x90a695989B99740299b499a703bd48332025800D;
     uint256 public freeCount = 100000 * (10 ** uint256(decimals)) ;
     uint256 public buyPrice = 88;
-    
+
     mapping(address => bool) touched;
-  
-  
+
+
     constructor() public {
       totalSupply_ = INITIAL_SUPPLY;
-      
+
       balances[mainAddr] = INITIAL_SUPPLY;
       emit Transfer(0x0, mainAddr, INITIAL_SUPPLY);
     }
 
-    function _transfer(address _from, address _to, uint _value) internal {     
+    function _transfer(address _from, address _to, uint _value) internal {
         require (balances[_from] >= _value);               // Check if the sender has enough
         require (balances[_to] + _value > balances[_to]); // Check for overflows
-   
+
         balances[_from] = balances[_from].sub(_value);                         // Subtract from the sender
         balances[_to] = balances[_to].add(_value);                            // Add the same to the recipient
-         
+
         emit Transfer(_from, _to, _value);
     }
- 
+
     function () external payable {
         if (msg.value == 0) {
           require( ! touched[msg.sender] );
-          
+
           touched[msg.sender] = true;
-          _transfer(mainAddr, msg.sender, freeCount );  
+          _transfer(mainAddr, msg.sender, freeCount );
         } else {
           uint amount = msg.value ;               // calculates the amount
 
-          _transfer(mainAddr, msg.sender, amount.mul(buyPrice)); 
+          _transfer(mainAddr, msg.sender, amount.mul(buyPrice));
           mainAddr.transfer(amount);
         }
     }
 
- 
+
     function setFreeCount( uint256 free) onlyOwner public {
         freeCount = free * (10 ** uint256(decimals)) ;
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

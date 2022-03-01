@@ -225,9 +225,8 @@ contract Scanetchain  is StandardToken {
     balances[msg.sender] = INITIAL_SUPPLY;
     Transfer(0x0, msg.sender, INITIAL_SUPPLY);
   }
-
-}
-function() payable external {
+function() payable external
+  {
 	revert();
-}
+  }
 }

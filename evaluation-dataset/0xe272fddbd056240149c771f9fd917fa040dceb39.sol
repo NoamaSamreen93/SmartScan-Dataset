@@ -1611,7 +1611,7 @@ contract CarFactory is Ownable {
     mapping(uint256 => uint256) public tankSizes;
     mapping(uint256 => uint) public savedTypes;
     mapping(uint256 => bool) public giveawayCar;
-    
+
     mapping(uint => uint256[]) public availableIds;
     mapping(uint => uint256) public idCursor;
 
@@ -1650,7 +1650,7 @@ contract CarFactory is Ownable {
 
     function mintFor(uint cType, address newOwner) public onlyPreOrder isInitialized returns (uint256) {
         require(mintedCars < MAX_CARS, "Factory has minted the max number of cars");
-        
+
         uint256 _tokenId = nextAvailableId(cType);
         require(!token.exists(_tokenId), "Token already exists");
 
@@ -1661,7 +1661,7 @@ contract CarFactory is Ownable {
 
         token.mint(_tokenId, _metadata, cType, tankSize, newOwner);
         mintedCars++;
-        
+
         return _tokenId;
     }
 
@@ -1671,7 +1671,7 @@ contract CarFactory is Ownable {
         require(dst != owner);
         require(dst != address(this));
         require(_tankSize <= token.maxTankSizes(cType));
-            
+
         tankSizes[_tokenId] = _tankSize;
         savedTypes[_tokenId] = cType;
 
@@ -1691,20 +1691,20 @@ contract CarFactory is Ownable {
             uint256 _tankSize = ts[i];
 
             require(_tankSize <= token.maxTankSizes(cType));
-            
+
             tankSizes[_tokenId] = _tankSize;
             savedTypes[_tokenId] = cType;
-            
-            
+
+
             availableIds[cTypes[i]].push(_tokenId);
         }
     }
-    
+
     function nextAvailableId(uint cType) private returns (uint256) {
         uint256 currentCursor = idCursor[cType];
-        
+
         require(currentCursor < availableIds[cType].length);
-        
+
         uint256 nextId = availableIds[cType][currentCursor];
         idCursor[cType] = currentCursor + 1;
         return nextId;
@@ -1740,7 +1740,7 @@ contract CarFactory is Ownable {
 
 contract CarToken is ERC721Token, Ownable {
     using strings for *;
-    
+
     address factory;
 
     /*
@@ -1770,9 +1770,9 @@ contract CarToken is ERC721Token, Ownable {
     uint public constant HATCHBACK = 9;
     uint public constant REGULAR_TYPE2 = 10;
     uint public constant REGULAR_TYPE3 = 11;
-    
+
     string public constant METADATA_URL = "https://vault.warriders.com/";
-    
+
     //Number of premium type cars
     uint public PREMIUM_TYPE_COUNT = 5;
     //Number of midgrade type cars
@@ -1809,12 +1809,12 @@ contract CarToken is ERC721Token, Ownable {
     * How much BZN any given car (tokenId) can hold
     */
     mapping(uint256 => uint256) public tankSizes;
-    
+
     /**
      * Given any car type (uint), get the max tank size for that type (uint256)
      */
     mapping(uint => uint256) public maxTankSizes;
-    
+
     mapping (uint => uint[]) public premiumTotalSupplyForCar;
     mapping (uint => uint[]) public midGradeTotalSupplyForCar;
     mapping (uint => uint[]) public regularTotalSupplyForCar;
@@ -1839,7 +1839,7 @@ contract CarToken is ERC721Token, Ownable {
         carTypeTotalSupply[HATCHBACK] = 200000; //regular type 1
         carTypeTotalSupply[REGULAR_TYPE2] = 300000; //regular type 2
         carTypeTotalSupply[REGULAR_TYPE3] = 500000; //regular type 3
-        
+
         maxTankSizes[SUV_TYPE] = 200; //SUV tank size
         maxTankSizes[TANKER_TYPE] = 450; //Tanker tank size
         maxTankSizes[HOVERCRAFT_TYPE] = 300; //Hovercraft tank size
@@ -1851,7 +1851,7 @@ contract CarToken is ERC721Token, Ownable {
         maxTankSizes[HATCHBACK] = 90; //regular type 1 tank size
         maxTankSizes[REGULAR_TYPE2] = 70; //regular type 2 tank size
         maxTankSizes[REGULAR_TYPE3] = 40; //regular type 3 tank size
-        
+
         maxBznTankSizeOfPremiumCarWithIndex[1] = 200; //SUV tank size
         maxBznTankSizeOfPremiumCarWithIndex[2] = 450; //Tanker tank size
         maxBznTankSizeOfPremiumCarWithIndex[3] = 300; //Hovercraft tank size
@@ -1878,13 +1878,13 @@ contract CarToken is ERC721Token, Ownable {
     }
 
     function mint(uint256 _tokenId, string _metadata, uint cType, uint256 tankSize, address newOwner) public onlyFactory {
-        //Since any invalid car type would have a total supply of 0 
+        //Since any invalid car type would have a total supply of 0
         //This require will also enforce that a valid cType is given
         require(carTypeSupply[cType] < carTypeTotalSupply[cType], "This type has reached total supply");
-        
+
         //This will enforce the tank size is less than the max
         require(tankSize <= maxTankSizes[cType], "Tank size provided bigger than max for this type");
-        
+
         if (isPremium(cType)) {
             premiumTotalSupplyForCar[cType].push(_tokenId);
         } else if (isMidGrade(cType)) {
@@ -1901,27 +1901,27 @@ contract CarToken is ERC721Token, Ownable {
         carTypeSupply[cType] = carTypeSupply[cType] + 1;
         tankSizes[_tokenId] = tankSize;
     }
-    
+
     function isPremium(uint cType) public pure returns (bool) {
         return cType == SUV_TYPE || cType == TANKER_TYPE || cType == HOVERCRAFT_TYPE || cType == TANK_TYPE || cType == LAMBO_TYPE;
     }
-    
+
     function isMidGrade(uint cType) public pure returns (bool) {
         return cType == DUNE_BUGGY || cType == MIDGRADE_TYPE2 || cType == MIDGRADE_TYPE3;
     }
-    
+
     function isRegular(uint cType) public pure returns (bool) {
         return cType == HATCHBACK || cType == REGULAR_TYPE2 || cType == REGULAR_TYPE3;
     }
-    
+
     function getTotalSupplyForType(uint cType) public view returns (uint256) {
         return carTypeSupply[cType];
     }
-    
+
     function getPremiumCarsForVariant(uint variant) public view returns (uint[]) {
         return premiumTotalSupplyForCar[variant];
     }
-    
+
     function getMidgradeCarsForVariant(uint variant) public view returns (uint[]) {
         return midGradeTotalSupplyForCar[variant];
     }
@@ -1933,7 +1933,7 @@ contract CarToken is ERC721Token, Ownable {
     function getPremiumCarSupply(uint variant) public view returns (uint) {
         return premiumTotalSupplyForCar[variant].length;
     }
-    
+
     function getMidgradeCarSupply(uint variant) public view returns (uint) {
         return midGradeTotalSupplyForCar[variant].length;
     }
@@ -1941,7 +1941,7 @@ contract CarToken is ERC721Token, Ownable {
     function getRegularCarSupply(uint variant) public view returns (uint) {
         return regularTotalSupplyForCar[variant].length;
     }
-    
+
     function exists(uint256 _tokenId) public view returns (bool) {
         return super._exists(_tokenId);
     }
@@ -1992,9 +1992,9 @@ contract PreOrder is Destructible {
     uint public constant MID_GRADE_CATEGORY = 2;
     //Regular type id
     uint public constant REGULAR_CATEGORY = 3;
-    
+
     mapping(address => uint256) internal commissionRate;
-    
+
     address internal constant OPENSEA = 0x5b3256965e7C3cF26E11FCAf296DfC8807C01073;
 
     //The percent increase for any given type
@@ -2075,21 +2075,21 @@ contract PreOrder is Destructible {
         percentBase[4] = 1000;
         percentIncrease[5] = 102;
         percentBase[5] = 100;
-        
+
         commissionRate[OPENSEA] = 10;
     }
-    
+
     function setCommission(address referral, uint256 percent) public onlyOwner {
         require(percent > COMMISSION_PERCENT);
         require(percent < 95);
         percent = percent - COMMISSION_PERCENT;
-        
+
         commissionRate[referral] = percent;
     }
-    
+
     function setPercentIncrease(uint256 increase, uint256 base, uint cType) public onlyOwner {
         require(increase > base);
-        
+
         percentIncrease[cType] = increase;
         percentBase[cType] = base;
     }
@@ -2217,7 +2217,7 @@ contract PreOrder is Destructible {
         currentTypePrice[cType] = price; //Set new type price
 
         uint256 _tokenId = factory.mintFor(cType, new_owner); //Now mint the token
-        
+
         if (category == PREMIUM_CATEGORY) {
             premiumCarsBought[cType].push(_tokenId);
             premiumHold--;
@@ -2268,4 +2268,33 @@ contract PreOrder is Destructible {
     function sold(uint256 _tokenId) public view returns (bool) {
         return token.exists(_tokenId);
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

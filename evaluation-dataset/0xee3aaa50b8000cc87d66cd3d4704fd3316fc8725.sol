@@ -1,7 +1,7 @@
 pragma solidity ^0.4.18; // solhint-disable-line
 
 //http://0xbtcminer.surge.sh/
- 
+
 contract MineFarmer{
     //uint256 EGGS_PER_SHRIMP_PER_SECOND=1;
     uint256 public EGGS_TO_HATCH_1SHRIMP=86400;//for final version should be seconds in a day
@@ -31,10 +31,10 @@ contract MineFarmer{
         hatcheryShrimp[msg.sender]=SafeMath.add(hatcheryShrimp[msg.sender],newShrimp);
         claimedEggs[msg.sender]=0;
         lastHatch[msg.sender]=now;
-        
+
         //send referral eggs
         claimedEggs[referrals[msg.sender]]=SafeMath.add(claimedEggs[referrals[msg.sender]],SafeMath.div(eggsUsed,5));
-        
+
         //boost market to nerf shrimp hoarding
         marketEggs=SafeMath.add(marketEggs,SafeMath.div(eggsUsed,10));
     }
@@ -47,7 +47,7 @@ contract MineFarmer{
         lastHatch[msg.sender]=now;
         marketEggs=SafeMath.add(marketEggs,hasEggs);
         devFeeHandle(fee);
-        Token.transfer(msg.sender, SafeMath.sub(eggValue, fee)); 
+        Token.transfer(msg.sender, SafeMath.sub(eggValue, fee));
     }
     function buyEggs(uint256 _incoming, address who) internal{
         require(initialized);
@@ -57,13 +57,13 @@ contract MineFarmer{
         devFeeHandle(fee);
         claimedEggs[who]=SafeMath.add(claimedEggs[who],eggsBought);
     }
-    
+
     function receiveApproval(address receiveFrom, uint256 tkn, address tknaddr, bytes empty){
         require(tknaddr == address(Token) && msg.sender == tknaddr);
         Token.transferFrom(receiveFrom, address(this), tkn);
         buyEggs(tkn, receiveFrom);
     }
-    
+
     //magic trade balancing algorithm
     function calculateTrade(uint256 rt,uint256 rs, uint256 bs) public view returns(uint256){
         //(PSN*bs)/(PSNH+((PSN*rs+PSNH*rt)/rt));
@@ -81,7 +81,7 @@ contract MineFarmer{
     function devFee(uint256 amount) public view returns(uint256){
         return SafeMath.div(SafeMath.mul(amount,4),100);
     }
-    
+
     function devFeeHandle(uint256 fee) internal{
         Token.transfer(ceoAddress, fee/2);
         Token.transfer(partnerAddress, SafeMath.sub(fee,fee/2));
@@ -459,4 +459,14 @@ contract _0xBitcoinToken is ERC20Interface, Owned {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

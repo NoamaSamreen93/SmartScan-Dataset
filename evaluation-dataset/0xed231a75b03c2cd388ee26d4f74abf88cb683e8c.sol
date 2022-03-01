@@ -2,9 +2,9 @@
  * CollateralMonitor
  *
  * This contract reports aggregated issuance
- * and collateralisation statistics for the 
+ * and collateralisation statistics for the
  * Havven stablecoin system.
- * 
+ *
  * Author: Anton Jurisevic
  * Date: 14/06/2018
  * Version: nUSDa 1.0
@@ -122,14 +122,14 @@ contract SafeDecimalMath {
     /**
      * @return The result of multiplying x and y, interpreting the operands as fixed-point
      * decimals. Throws an exception in case of overflow.
-     * 
+     *
      * @dev A unit factor is divided out after the product of x and y is evaluated,
      * so that product must be less than 2**256.
      * Incidentally, the internal division always rounds down: one could have rounded to the nearest integer,
      * but then one would be spending a significant fraction of a cent (of order a microether
      * at present gas prices) in order to save less than one part in 0.5 * 10^18 per operation, if the operands
-     * contain small enough fractional components. It would also marginally diminish the 
-     * domain this function is defined upon. 
+     * contain small enough fractional components. It would also marginally diminish the
+     * domain this function is defined upon.
      */
     function safeMul_dec(uint x, uint y)
         pure
@@ -193,7 +193,7 @@ contract SafeDecimalMath {
         return safeMul(i, UNIT);
     }
 
-    function min(uint a, uint b) 
+    function min(uint a, uint b)
         pure
         internal
         returns (uint)
@@ -201,7 +201,7 @@ contract SafeDecimalMath {
         return a < b ? a : b;
     }
 
-    function max(uint a, uint b) 
+    function max(uint a, uint b)
         pure
         internal
         returns (uint)
@@ -276,7 +276,7 @@ contract Owned {
  * about collateralisation levels of the network.
  */
 contract CollateralMonitor is Owned, SafeDecimalMath {
-    
+
     Havven havven;
     Nomin nomin;
     HavvenEscrow escrow;
@@ -371,7 +371,7 @@ contract CollateralMonitor is Owned, SafeDecimalMath {
     /**********************************\
       collateral()
 
-      Reports the collateral available 
+      Reports the collateral available
       for issuance of a given issuer.
     \**********************************/
 
@@ -387,7 +387,7 @@ contract CollateralMonitor is Owned, SafeDecimalMath {
     /**********************************\
       totalIssuingCollateral()
 
-      Reports the collateral available 
+      Reports the collateral available
       for issuance of all issuers.
     \**********************************/
 
@@ -400,7 +400,7 @@ contract CollateralMonitor is Owned, SafeDecimalMath {
         uint limit = min(sumLimit, issuers.length);
         for (uint i = 0; i < limit; i++) {
             sum += collateral(issuers[i]);
-        } 
+        }
         return sum;
     }
 
@@ -418,13 +418,13 @@ contract CollateralMonitor is Owned, SafeDecimalMath {
         returns (uint)
     {
         return _limitedTotalIssuingCollateral(maxIssuers);
-    } 
+    }
 
 
 
     /********************************\
       collateralisation()
-    
+
       Reports the collateralisation
       ratio of one account, assuming
       a nomin price of one dollar.
@@ -435,14 +435,14 @@ contract CollateralMonitor is Owned, SafeDecimalMath {
         view
         returns (uint)
     {
-        safeDiv_dec(safeMul_dec(collateral(account), havven.price()), 
+        safeDiv_dec(safeMul_dec(collateral(account), havven.price()),
                     havven.nominsIssued(account));
     }
 
 
     /********************************\
       totalIssuerCollateralisation()
-    
+
       Reports the collateralisation
       ratio of all issuers, assuming
       a nomin price of one dollar.
@@ -460,7 +460,7 @@ contract CollateralMonitor is Owned, SafeDecimalMath {
 
     /********************************\
       totalNetworkCollateralisation()
-    
+
       Reports the collateralisation
       ratio of the entire network,
       assuming a nomin price of one
@@ -533,14 +533,14 @@ contract CollateralMonitor is Owned, SafeDecimalMath {
         public
         view
         returns (uint)
-    { 
+    {
         return min(totalIssuanceDebt_limitedSum(), totalIssuingCollateral());
     }
 
 
     /****************************************************\
       totalLockedHavvens_byAvailableHavvens_limitedSum()
-      
+
       Should be equivalent to
       totalLockedHavvens_limitedSum() but it uses an
       alternate computation method.
@@ -559,4 +559,14 @@ contract CollateralMonitor is Owned, SafeDecimalMath {
         }
         return sum;
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

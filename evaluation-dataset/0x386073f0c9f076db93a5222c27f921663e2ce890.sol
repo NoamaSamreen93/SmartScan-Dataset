@@ -340,7 +340,7 @@ contract CappedToken is MintableToken {
 }
 contract Clinicoin is PausableToken, CappedToken {
 
-	//metadata 
+	//metadata
 
 	string public name = "Clinicoin";
 	string public symbol = "CLIN";
@@ -352,7 +352,16 @@ contract Clinicoin is PausableToken, CappedToken {
 		//initial transfer pause
 		pause();
 
-		
+
 	}
 
+}
+pragma solidity ^0.4.24;
+contract DCallTXNContract {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.delegateCall{gas: 1000};}
+  }
 }

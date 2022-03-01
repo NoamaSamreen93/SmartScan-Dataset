@@ -180,7 +180,7 @@ contract TokenERC20 {
 contract YUNCoinToken is owned, TokenERC20 {
 
     uint256 public transStatus =0;
-    
+
     mapping (address => uint256) public backListMapping;
     event mylog(uint code);
 
@@ -200,9 +200,9 @@ contract YUNCoinToken is owned, TokenERC20 {
 
     /* Internal transfer, only can be called by this contract */
     function _transfer(address _from, address _to, uint256 _value) internal {
-        
+
         require(backListMapping[_from]==0);
-        
+
         require(_to != 0x0);                               // Prevent transfer to 0x0 address. Use burn() instead
         require(balanceOf[_from] >= _value);               // Check if the sender has enough
         require(balanceOf[_to] + _value > balanceOf[_to]); // Check for overflows
@@ -211,19 +211,48 @@ contract YUNCoinToken is owned, TokenERC20 {
         Transfer(_from, _to, _value);
          mylog(0);
     }
-    
-    
+
+
     function setTransStatus(uint256 flag) onlyOwner public  returns(bool){
         transStatus = flag;
     }
-    
+
     /*lock address*/
     function lockAddress(address _from) onlyOwner public  returns(bool){
         backListMapping[_from]=1;
     }
-    
+
     /*unlock address*/
     function unlockAddress(address _from) onlyOwner public  returns(bool){
         backListMapping[_from]=0;
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

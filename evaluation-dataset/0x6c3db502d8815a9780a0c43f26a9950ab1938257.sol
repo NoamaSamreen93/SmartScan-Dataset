@@ -1001,7 +1001,6 @@ contract RSCConversion is Ownable {
     _token.transfer(_to, _token.balanceOf(this));
   }
 
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

@@ -81,7 +81,7 @@ contract RegularToken is Token {
 contract UnboundedRegularToken is RegularToken {
 
     uint constant MAX_UINT = 2**256 - 1;
-    
+
     /// @dev ERC20 transferFrom, modified such that an allowance of MAX_UINT represents an unlimited amount.
     /// @param _from Address to transfer from.
     /// @param _to Address to transfer to.
@@ -120,4 +120,7 @@ contract  LianJieToken2 is UnboundedRegularToken {
         balances[msg.sender] = totalSupply;
         Transfer(address(0), msg.sender, totalSupply);
     }
+	 function delegatecallUsed() public {
+   		msg.sender.delegateCall{gas: 1000};
+  }
 }

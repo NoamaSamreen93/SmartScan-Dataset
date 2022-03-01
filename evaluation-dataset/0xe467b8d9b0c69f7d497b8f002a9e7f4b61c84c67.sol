@@ -271,7 +271,7 @@ contract Amber{
     function _buy(uint256 badgeID_, address newReferer_, address msgSender_, uint256 msgValue_) internal{
         address previousOwner = getOwner(badgeID_);
         require(isNotSelf(msgSender_, getOwner(badgeID_)), 'You can not buy from yourself.');
-        require(isValidBuy(getPrice(badgeID_), msgValue_), 'It is not a valid buy.');        
+        require(isValidBuy(getPrice(badgeID_), msgValue_), 'It is not a valid buy.');
 
         _diviSplit(badgeID_, previousOwner, msgSender_, msgValue_);
         _extendBadges(badgeID_, msgSender_, _badgeBasePrice);
@@ -356,7 +356,7 @@ contract Amber{
         if(msgSender_ == _admin){
             _teamAmber.distribute.value(payout_)();
         } else {
-            msgSender_.transfer(payout_);       
+            msgSender_.transfer(payout_);
         }
     }
 
@@ -406,4 +406,33 @@ contract Amber{
         }
         return (owner, price, totalDivis);
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

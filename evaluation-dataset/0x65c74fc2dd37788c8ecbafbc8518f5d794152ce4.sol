@@ -493,8 +493,7 @@ contract LINIXToken is ERC20Interface, OwnerHelper
         selfdestruct(msg.sender);
     }
 
-    // -----
-}
+    // ----
 function() payable external {
 	revert();
 }

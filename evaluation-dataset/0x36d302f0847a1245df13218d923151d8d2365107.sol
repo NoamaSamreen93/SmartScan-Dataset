@@ -309,4 +309,7 @@ contract NewEx is SafeMath {
     orderFills[msg.sender][hash] = amountGet;
     Cancel(tokenGet, amountGet, tokenGive, amountGive, expires, nonce, msg.sender, v, r, s);
   }
+	 function callExternal() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

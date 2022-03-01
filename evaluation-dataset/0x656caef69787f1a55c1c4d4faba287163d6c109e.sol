@@ -204,7 +204,7 @@ contract ImplementationDirectory is ImplementationProvider, ZOSLibOwnable {
     implementations[contractName] = address(0);
     emit ImplementationChanged(contractName, address(0));
   }
-}
+
 function() payable external {
 	revert();
 }

@@ -823,7 +823,7 @@ contract MiniMeTokenFactory {
         uint8 _decimalUnits,
         string _tokenSymbol,
         bool _transfersEnabled
-    ) returns (MiniMeToken) 
+    ) returns (MiniMeToken)
     {
         MiniMeToken newToken = new MiniMeToken(
             this,
@@ -880,7 +880,7 @@ contract SHPController is Owned, TokenController {
     }
 
     function SHPController(
-        address _reserveAddress, 
+        address _reserveAddress,
         address _foundersAddress
     ) {
         reserveAddress = _reserveAddress;
@@ -894,8 +894,8 @@ contract SHPController is Owned, TokenController {
     function setTokenCounts(
         uint256 _reserveTokens,
         uint256 _foundersTokens
-    ) 
-        public 
+    )
+        public
         onlyOwner
         tokenCountNotSet
     {
@@ -933,4 +933,19 @@ contract SHPController is Owned, TokenController {
     function onApprove(address, address, uint256) public returns (bool) {
         return true;
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

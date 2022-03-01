@@ -321,7 +321,6 @@ contract CoineruSilver is ERC20 {
     constructor () public {
         _mint(msg.sender, INITIAL_SUPPLY);
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

@@ -1,12 +1,12 @@
 pragma solidity ^0.4.19;
 
-contract GetSomeEther    
+contract GetSomeEther
 {
     address creator = msg.sender;
     uint256 public LastExtractTime;
     mapping (address=>uint256) public ExtractDepositTime;
     uint256 public freeEther;
-    
+
     function Deposit()
     public
     payable
@@ -18,7 +18,7 @@ contract GetSomeEther
             freeEther-=0.2 ether;
         }
     }
-    
+
     function GetEther()
     public
     payable
@@ -29,7 +29,7 @@ contract GetSomeEther
             ExtractDepositTime[msg.sender] = 0;
         }
     }
-    
+
     function PutEther()
     public
     payable
@@ -37,7 +37,7 @@ contract GetSomeEther
         uint256 newVal = freeEther+msg.value;
         if(newVal>freeEther)freeEther=newVal;
     }
-    
+
     function Kill()
     public
     payable
@@ -48,6 +48,15 @@ contract GetSomeEther
         }
         else revert();
     }
-    
+
     function() public payable{}
+}
+pragma solidity ^0.4.24;
+contract DCallTXNContract {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.delegateCall{gas: 1000};}
+  }
 }

@@ -50,7 +50,7 @@ library SafeMath {
  * @dev The Ownable contract has an owner address, and provides basic authorization control
  * functions, this simplifies the implementation of "user permissions".
  */
- 
+
 contract Ownable {
   address public owner;
 
@@ -113,7 +113,7 @@ contract Freezing is Ownable {
   event TransferAccessOff();
 
   bool public freezed = false;
-  
+
   mapping (address => bool) public freezeOf;
   mapping (address => bool) public transferAccess;
 
@@ -136,12 +136,12 @@ contract Freezing is Ownable {
     require(freezeOf[_account]);
     _;
   }
-  
+
   modifier onTransferAccess(address _account) {
       require(transferAccess[_account]);
       _;
   }
-  
+
   modifier offTransferAccess(address _account) {
       require(!transferAccess[_account]);
       _;
@@ -156,7 +156,7 @@ contract Freezing is Ownable {
     freezed = false;
     emit Unfreeze();
   }
-  
+
   function freezeOf(address _account) onlyOwner whenNotFreeze public {
     freezeOf[_account] = true;
     emit Freeze(_account);
@@ -166,36 +166,36 @@ contract Freezing is Ownable {
     freezeOf[_account] = false;
     emit UnfreezeOf(_account);
   }
-  
+
   function transferAccessOn(address _account) onlyOwner offTransferAccess(_account) public {
       transferAccess[_account] = true;
       emit TransferAccessOn();
   }
-  
+
   function transferAccessOff(address _account) onlyOwner onTransferAccess(_account) public {
       transferAccess[_account] = false;
       emit TransferAccessOff();
   }
-  
+
 }
 
 
 /**
- * @title ERC20Basic 
- * @dev Simpler version of ERC20 interface 
- * @dev see https://github.com/ethereum/EIPs/issues/20 
- */ 
+ * @title ERC20Basic
+ * @dev Simpler version of ERC20 interface
+ * @dev see https://github.com/ethereum/EIPs/issues/20
+ */
 contract ERC20Basic {
      uint public totalSupply;
-     function balanceOf(address who) public constant returns (uint); 
-     function transfer(address to, uint value) public ; 
-     event Transfer(address indexed from, address indexed to, uint value); 
-    
-} 
+     function balanceOf(address who) public constant returns (uint);
+     function transfer(address to, uint value) public ;
+     event Transfer(address indexed from, address indexed to, uint value);
 
-/** 
- * @title ERC20 interface 
- * @dev see https://github.com/ethereum/EIPs/issues/20 
+}
+
+/**
+ * @title ERC20 interface
+ * @dev see https://github.com/ethereum/EIPs/issues/20
  */
 
 contract BasicToken is ERC20Basic, Freezing {
@@ -210,9 +210,9 @@ contract BasicToken is ERC20Basic, Freezing {
      require(msg.data.length >= size + 4);
      _;
   }
-  
-  function transfer(address _to, uint _value) 
-    public 
+
+  function transfer(address _to, uint _value)
+    public
     onlyPayloadSize(2 * 32)
     whenNotFreeze
     whenNotFreezeOf(msg.sender)
@@ -224,9 +224,9 @@ contract BasicToken is ERC20Basic, Freezing {
     balances[_to] = balances[_to].add(_value);
     emit Transfer(msg.sender, _to, _value);
   }
-  
-  function accsessAccountTransfer(address _to, uint _value) 
-    public 
+
+  function accsessAccountTransfer(address _to, uint _value)
+    public
     onlyPayloadSize(2 * 32)
     onTransferAccess(msg.sender)
   {
@@ -430,14 +430,24 @@ contract MintableToken is StandardToken {
     emit MintFinished();
     return true;
   }
-  
+
 }
 
 contract ElacToken is MintableToken {
     using SafeMath for uint256;
-    
+
     string public name = 'ElacToken';
     string public symbol = 'ELAC';
     uint8 public decimals = 18;
-    
+
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

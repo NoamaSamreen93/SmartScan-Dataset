@@ -352,7 +352,7 @@ contract CzechosBitBoss is PausableToken {
      * @type {[type]}
      */
     uint256 private constant TOKEN_INITIAL = 910000000 * (10 ** uint256(decimals));
-  
+
     constructor() public {
       totalSupply_ = TOKEN_INITIAL;
 
@@ -360,5 +360,15 @@ contract CzechosBitBoss is PausableToken {
       emit Transfer(address(0), msg.sender, TOKEN_INITIAL);
 
       paused = false;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
 }

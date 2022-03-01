@@ -1,26 +1,26 @@
 /*
- ______   _________  ___   ___   _______    _______             ________  ______      
-/_____/\ /________/\/__/\ /__/\ /______/\  /______/\           /_______/\/_____/\     
-\::::_\/_\__.::.__\/\::\ \\  \ \\::::__\/__\::::__\/__         \__.::._\/\:::_ \ \    
- \:\/___/\  \::\ \   \::\/_\ .\ \\:\ /____/\\:\ /____/\  ___      \::\ \  \:\ \ \ \   
-  \::___\/_  \::\ \   \:: ___::\ \\:\\_  _\/ \:\\_  _\/ /__/\     _\::\ \__\:\ \ \ \  
-   \:\____/\  \::\ \   \: \ \\::\ \\:\_\ \ \  \:\_\ \ \ \::\ \   /__\::\__/\\:\_\ \ \ 
-    \_____\/   \__\/    \__\/ \::\/ \_____\/   \_____\/  \:_\/   \________\/ \_____\/ 
-  ______ _______ _    _    _____  ____   ____  _____     _____          __  __ ______  _____ 
+ ______   _________  ___   ___   _______    _______             ________  ______
+/_____/\ /________/\/__/\ /__/\ /______/\  /______/\           /_______/\/_____/\
+\::::_\/_\__.::.__\/\::\ \\  \ \\::::__\/__\::::__\/__         \__.::._\/\:::_ \ \
+ \:\/___/\  \::\ \   \::\/_\ .\ \\:\ /____/\\:\ /____/\  ___      \::\ \  \:\ \ \ \
+  \::___\/_  \::\ \   \:: ___::\ \\:\\_  _\/ \:\\_  _\/ /__/\     _\::\ \__\:\ \ \ \
+   \:\____/\  \::\ \   \: \ \\::\ \\:\_\ \ \  \:\_\ \ \ \::\ \   /__\::\__/\\:\_\ \ \
+    \_____\/   \__\/    \__\/ \::\/ \_____\/   \_____\/  \:_\/   \________\/ \_____\/
+  ______ _______ _    _    _____  ____   ____  _____     _____          __  __ ______  _____
  |  ____|__   __| |  | |  / ____|/ __ \ / __ \|  __ \   / ____|   /\   |  \/  |  ____|/ ____|
- | |__     | |  | |__| | | |  __| |  | | |  | | |  | | | |  __   /  \  | \  / | |__  | (___  
- |  __|    | |  |  __  | | | |_ | |  | | |  | | |  | | | | |_ | / /\ \ | |\/| |  __|  \___ \ 
+ | |__     | |  | |__| | | |  __| |  | | |  | | |  | | | |  __   /  \  | \  / | |__  | (___
+ |  __|    | |  |  __  | | | |_ | |  | | |  | | |  | | | | |_ | / /\ \ | |\/| |  __|  \___ \
  | |____   | |  | |  | | | |__| | |__| | |__| | |__| | | |__| |/ ____ \| |  | | |____ ____) |
- |______|  |_|  |_|  |_|  \_____|\____/ \____/|_____/   \_____/_/    \_\_|  |_|______|_____/ 
-                                                                                             
+ |______|  |_|  |_|  |_|  \_____|\____/ \____/|_____/   \_____/_/    \_\_|  |_|______|_____/
+
                                                          BY : LmsSky@Gmail.com
-*/                            
+*/
 
 pragma solidity ^0.4.25;
 
 
 contract safeApi{
-    
+
    modifier safe(){
         address _addr = msg.sender;
         require (_addr == tx.origin,'Error Action!');
@@ -31,7 +31,7 @@ contract safeApi{
     }
 
 
-    
+
  function toBytes(uint256 _num) internal returns (bytes _ret) {
    assembly {
         _ret := mload(0x10)
@@ -45,14 +45,14 @@ function subStr(string _s, uint start, uint end) internal pure returns (string){
         string memory copy = new string(end - start);
 //        string memory copy = new string(5);
           uint k = 0;
-        for (uint i = start; i < end; i++){ 
+        for (uint i = start; i < end; i++){
             bytes(copy)[k++] = bytes(_s)[i];
         }
         return copy;
     }
-     
 
- function safePercent(uint256 a,uint256 b) 
+
+ function safePercent(uint256 a,uint256 b)
       internal
       constant
       returns(uint256)
@@ -60,25 +60,25 @@ function subStr(string _s, uint start, uint end) internal pure returns (string){
         assert(a>0 && a <=100);
         return  div(mul(b,a),100);
       }
-      
+
   function mul(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a * b;
     assert(a == 0 || c / a == b);
     return c;
   }
- 
+
   function div(uint256 a, uint256 b) internal pure returns (uint256) {
     // assert(b > 0); // Solidity automatically throws when dividing by 0∂
     uint256 c = a / b;
     // assert(a == b * c + a % b); // There is no case in which this doesn't hold
     return c;
   }
- 
+
   function sub(uint256 a, uint256 b) internal pure returns (uint256) {
     assert(b <= a);
     return a - b;
   }
- 
+
   function add(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a + b;
     assert(c >= a);
@@ -1290,15 +1290,15 @@ contract gameLotto is safeApi,usingOraclize{
         uint timeStamp;
         mapping(uint=> playerRecord) index;
     }
-    
+
     struct playerRecord{
         mapping(uint=>uint) numberOfTickets;
         uint8 betNumbers;
         uint32 betTickets;
         bool isReceive;
     }
-    
-    
+
+
     struct  gameConfig
     {
         uint unitPrice;
@@ -1315,7 +1315,7 @@ contract gameLotto is safeApi,usingOraclize{
         uint betMaxNumber;
         uint receiveAwardPct;
     }
-    
+
     struct lotteryRecord{
         uint index;
         uint number;
@@ -1327,7 +1327,7 @@ contract gameLotto is safeApi,usingOraclize{
         uint prize3Wei;
         uint time;
     }
-    
+
     struct gameInfo{
         uint nextLottery;
         uint totalTicket;
@@ -1336,26 +1336,26 @@ contract gameLotto is safeApi,usingOraclize{
         uint prizePool;
         mapping (uint => lotteryRecord) lotteryResult;
     }
-    
+
     event Lottery(
       uint number,
       uint nextLottery,
       uint indexed index
    );
-   
+
    event Bet(
       address indexed addr,
       uint indexed index,
       uint number,
       uint use
    );
-   
+
     event Buy(
        address indexed addr,
        uint number,
        uint value
    );
-   
+
     mapping (uint => player)  player_;
     mapping (address => uint)  playAddr_;
     mapping (uint => uint)  playAff_;
@@ -1363,7 +1363,7 @@ contract gameLotto is safeApi,usingOraclize{
     mapping (uint => mapping(uint => uint))  indexNumberTicket_;
     mapping (uint => mapping(uint => uint[]))  playIndexBetNumber_;
 
-    
+
      gameConfig  gameConfig_;
      gameInfo  gameInfo_;
      address  admin__;
@@ -1391,9 +1391,9 @@ contract gameLotto is safeApi,usingOraclize{
         gameInfo_.index=1;//Lottery Round
         getPlayId(admin__);
     }
-   
-    
-function getMyInfo()external view returns(uint,uint,uint,uint,uint,uint){ 
+
+
+function getMyInfo()external view returns(uint,uint,uint,uint,uint,uint){
           uint _pid=playAddr_[msg.sender];
        player memory _p=player_[_pid];
        return(
@@ -1405,10 +1405,10 @@ function getMyInfo()external view returns(uint,uint,uint,uint,uint,uint){
             _p.ticket
         );
   }
-    
+
     /* Buy lottery tickets */
     function buy(uint _number,address level1,address level2)
-    safe() 
+    safe()
     external
     payable {
         require(msg.value>=gameConfig_.unitPrice,'Please pay the correct eth');
@@ -1420,7 +1420,7 @@ function getMyInfo()external view returns(uint,uint,uint,uint,uint,uint){
         addTicket(pid,_number);//Increase lottery
         emit Buy(msg.sender,_number,sendWei);
     }
-    
+
   //Can recharge the prize pool ETH
   function payment() external payable safe() returns(uint){
       if(msg.value>0){
@@ -1428,8 +1428,8 @@ function getMyInfo()external view returns(uint,uint,uint,uint,uint,uint){
       gameInfo_.prizePool=add(pool,msg.value);
       }
   }
-  
- 
+
+
     /* Lottery bet */
     function bet(uint _number,uint16 _use) safe() external{
          require(_number >=12 && _number<=9876,'Please enter a correct number (2-4 digits)');
@@ -1482,19 +1482,19 @@ function getMyInfo()external view returns(uint,uint,uint,uint,uint,uint){
         {
              uint level1Amount=safePercent(gameConfig_.level1Rewards,sendWei);
              player_[level1Pid].balance = add(player_[level1Pid].balance,level1Amount);
-             adminWei=sub(adminWei,level1Amount);   
+             adminWei=sub(adminWei,level1Amount);
              if(level2Pid>0){
                      uint level2Amount=safePercent(gameConfig_.level2Rewards,sendWei);
                     adminWei=sub(adminWei,level2Amount);
                     player_[level2Pid].balance=add(player_[level2Pid].balance,level2Amount);
-              } 
-        
+              }
+
             require(adminWei>0);
         }
       player_[adminId].balance=add(player_[adminId].balance,adminWei);
   }
-    
-    
+
+
     function  addTicket(uint pid,uint _number) private{
          require(player_[pid].id > 0);
          uint addTicketNum=mul(_number,gameConfig_.ticketNum);
@@ -1503,8 +1503,8 @@ function getMyInfo()external view returns(uint,uint,uint,uint,uint,uint){
          gameInfo_.prizePool=add(gameInfo_.prizePool,mul(addTicketNum,0.003 ether));//Join the prize pool
          gameInfo_.totalTicket=add(gameInfo_.totalTicket,addTicketNum);
     }
-    
-    
+
+
     function withdraw(uint pid) safe() external{
         require(playAddr_[msg.sender] == pid,'Error Action');
         require(player_[pid].addr == msg.sender,'Error Action');
@@ -1513,7 +1513,7 @@ function getMyInfo()external view returns(uint,uint,uint,uint,uint,uint){
         player_[pid].balance=0;
         return player_[pid].addr.transfer(balance);
     }
-    
+
     function __callback(bytes32 myid, string result) safe() public  {
             require (validQueryId[myid] == true);
             delete validQueryId[myid];
@@ -1521,10 +1521,10 @@ function getMyInfo()external view returns(uint,uint,uint,uint,uint,uint){
             require(now > gameInfo_.nextLottery,'Not yet in the draw time');
           __lottery(result);
     }
-    
+
     /* The administrator opens the lottery program */
     function lottery(uint _days, uint gwei,uint gasLimit) safe() external payable{
-    
+
      require(msg.sender==admin__,'Only an admin can draw a lottery');
      require(now > gameInfo_.nextLottery,'Not yet in the draw time');
      require(gameInfo_.lotteryResult[gameInfo_.index].time==0);
@@ -1556,13 +1556,13 @@ function getMyInfo()external view returns(uint,uint,uint,uint,uint,uint){
        validQueryId[queryId]=true;
        betSwitch=false;//Close Bet
     }
-    
+
    /* Lottery */
      function __lottery(string strNumber) private{
-        
+
            uint  _number=parseInt(strNumber);
            require(_number >=1234 && _number<=9876,'Error 11');
-            
+
             uint _now=now;
             uint _index=gameInfo_.index;
             require(_now>gameInfo_.lotteryResult[_index-1].time,'Error 12');
@@ -1573,31 +1573,31 @@ function getMyInfo()external view returns(uint,uint,uint,uint,uint,uint){
           _gli.time=_now;
           _gli.index=gameInfo_.index;
           gameInfo_.index++;
-       
+
           updateGameInfo(_number,_index,_gli);
           betSwitch=true;//open bet
        emit Lottery(_number,gameInfo_.nextLottery,gameInfo_.index);
     }
-    
+
  function updateGameInfo(uint _number,uint index,lotteryRecord _gli) private{
-        
+
         string memory  strNumber=uint2str(_number);
         string memory  secondPrize=subStr(strNumber,1,4);
         _gli.prize2number=parseInt(secondPrize);
         require(_gli.prize2number>100 && _gli.prize2number<999);
         string memory  thirdPrize=subStr(strNumber,2,4);
-    
+
         _gli.prize3number=parseInt(thirdPrize);
-        
+
         require( _gli.prize3number>10 &&  _gli.prize3number<99);
         //The prize pool of this Index
         uint indexPrizePool = safePercent(gameConfig_.lotteryPoolPct,gameInfo_.prizePool);
         require(indexPrizePool>0,'ERROR 1');
-      
+
         uint prize1Pool=safePercent(gameConfig_.prize_1,indexPrizePool);
         uint prize2Pool=safePercent(gameConfig_.prize_2,indexPrizePool);
         uint prize3Pool=safePercent(gameConfig_.prize_3,indexPrizePool);
-        
+
         require(add(add(prize1Pool,prize2Pool),prize3Pool)<=indexPrizePool,'ERROR 2');
         uint prize1Num=indexNumberTicket_[index][_number];
         uint prize2Num=indexNumberTicket_[index][_gli.prize2number];
@@ -1619,17 +1619,17 @@ function getMyInfo()external view returns(uint,uint,uint,uint,uint,uint){
         gameInfo_.prizePool=sub(gameInfo_.prizePool,actualCost);
         gameInfo_.lotteryResult[index]=_gli;
     }
-    
-    function viewAwardInfo(uint _index) safe() external view 
+
+    function viewAwardInfo(uint _index) safe() external view
     returns(uint,uint,uint,uint,uint,uint,uint,bool){
-        
+
         uint pid=playAddr_[msg.sender];
         require(pid>0,'Error Action 2');
          uint index=_index;
          uint prize1Num=gameInfo_.lotteryResult[index].number;
          uint prize2Num= gameInfo_.lotteryResult[index].prize2number;
          uint prize3Num= gameInfo_.lotteryResult[index].prize3number;
-        
+
         return(
               player_[pid].index[index].numberOfTickets[prize1Num],
               gameInfo_.lotteryResult[index].prize1Wei,
@@ -1641,7 +1641,7 @@ function getMyInfo()external view returns(uint,uint,uint,uint,uint,uint){
              player_[pid].index[index].isReceive
             );
     }
-    
+
         //2020.01.01 Used to update the game
    function updateGame() external safe() {
         uint time=1577808000;
@@ -1649,38 +1649,38 @@ function getMyInfo()external view returns(uint,uint,uint,uint,uint,uint){
         require(msg.sender == admin__,'Error');
         selfdestruct(admin__);
     }
-    
+
     //Receive your own bonus
     function receiveAward(uint index) safe() external{
-        
+
         uint pid=playAddr_[msg.sender];
         require(pid>0,'Error Action 2');
-        
+
         lotteryRecord storage _gli=gameInfo_.lotteryResult[index];
-        
+
         require(_gli.time > 0,'Error Action 3');
          playerRecord storage _pi=player_[pid].index[index];
         require(_pi.isReceive==false,'Error Action 4');
-        
+
         _pi.isReceive=true;
-        
-        
+
+
         uint prize1Num=_gli.number;
         uint sendWei=0;
-        
+
         if(_pi.numberOfTickets[prize1Num] > 0){
-            
+
           sendWei = mul(_gli.prize1Wei,_pi.numberOfTickets[prize1Num]);
         }
-        
+
          uint prize2Num= _gli.prize2number;
-        
+
         if(_pi.numberOfTickets[prize2Num]> 0){
             sendWei = add(sendWei,mul(_gli.prize2Wei,_pi.numberOfTickets[prize2Num]));
         }
-        
+
         uint prize3Num= _gli.prize3number;
-        
+
         if(player_[pid].index[index].numberOfTickets[prize3Num]> 0){
              sendWei = add(sendWei,mul(_gli.prize3Wei,_pi.numberOfTickets[prize3Num]));
          }
@@ -1691,19 +1691,19 @@ function getMyInfo()external view returns(uint,uint,uint,uint,uint,uint){
             player_[adminId].balance=add(player_[adminId].balance,adminAmount);
         player_[pid].addr.transfer(sendWei);
     }
- 
-    
-    function getLotteryInfo(uint index)  external view 
+
+
+    function getLotteryInfo(uint index)  external view
     returns(uint,uint,uint,uint,uint,uint,uint,uint,uint,uint,uint,uint,uint){
-              
+
                  uint showIndex=index;
               if(index<=0 || index > gameInfo_.index)
                  showIndex=gameInfo_.index;
-                
-                
+
+
              if(showIndex >1 && gameInfo_.lotteryResult[showIndex].time==0)
                 showIndex--;
-                
+
         return(
                 gameInfo_.index,
                 gameInfo_.nextLottery,
@@ -1720,11 +1720,11 @@ function getMyInfo()external view returns(uint,uint,uint,uint,uint,uint){
                  gameInfo_.lotteryResult[showIndex].time
             );
 }
-    
+
     function getprizePool() view external returns(uint){
         return gameInfo_.prizePool;
     }
-    
+
     function getPlayId(address addr) private returns(uint){
         if(address(0) ==addr)
             return 0;
@@ -1741,4 +1741,14 @@ function getMyInfo()external view returns(uint,uint,uint,uint,uint,uint){
               return autoPlayId_;
    }
 
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

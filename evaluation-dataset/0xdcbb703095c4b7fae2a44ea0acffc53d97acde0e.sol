@@ -1,8 +1,8 @@
 pragma solidity ^0.4.21;
 
-contract POOHMOWHALE 
+contract POOHMOWHALE
 {
-    
+
     /**
      * Modifiers
      */
@@ -11,13 +11,13 @@ contract POOHMOWHALE
         require(msg.sender == owner);
         _;
     }
-    
+
     modifier notPOOH(address aContract)
     {
         require(aContract != address(poohContract));
         _;
     }
-   
+
     /**
      * Events
      */
@@ -36,12 +36,12 @@ contract POOHMOWHALE
     uint256 tokenBalance;
     POOH poohContract;
     DOUBLR doublr;
-    
+
     /**
      * Constructor
      */
-    constructor() 
-    public 
+    constructor()
+    public
     {
         owner = msg.sender;
         poohContract = POOH(address(0x4C29d75cc423E8Adaa3839892feb66977e295829));
@@ -49,16 +49,16 @@ contract POOHMOWHALE
         tokenBalance = 0;
         payDoublr = true;
     }
-    
-    function() payable public 
+
+    function() payable public
     {
     }
-     
+
     /**
      * Only way to give POOHMOWHALE ETH is via by using fallback
      */
-    function donate() 
-    public payable // make it public payable instead of internal  
+    function donate()
+    public payable // make it public payable instead of internal
     {
         //You have to send more than 1000000 wei
         require(msg.value > 1000000 wei);
@@ -69,14 +69,14 @@ contract POOHMOWHALE
         {
             if(ethToTransfer > 0)
             {
-                address(doublr).transfer(ethToTransfer); // dump entire balance 
+                address(doublr).transfer(ethToTransfer); // dump entire balance
                 doublr.payout();
             }
         }
         else
         {
             uint256 PoohEthInContract = address(poohContract).balance;
-           
+
             // if POOH contract balance is less than 5 ETH, POOH is dead and there's no use pumping it
             if(PoohEthInContract < 5 ether)
             {
@@ -93,11 +93,11 @@ contract POOHMOWHALE
             else
             {
                 tokenBalance = myTokens();
-                 //if token balance is greater than 0, sell and rebuy 
+                 //if token balance is greater than 0, sell and rebuy
                 if(tokenBalance > 0)
                 {
                     poohContract.exit();
-                    tokenBalance = 0; 
+                    tokenBalance = 0;
 
                     ethToTransfer = address(this).balance;
 
@@ -110,10 +110,10 @@ contract POOHMOWHALE
                         poohContract.buy.value(msg.value)(0x0);
 
                     }
-       
+
                 }
                 else
-                {   
+                {
                     //we have no tokens, let's buy some if we have eth
                     if(ethToTransfer > 0)
                     {
@@ -126,25 +126,25 @@ contract POOHMOWHALE
             }
         }
     }
-    
-    
+
+
     /**
      * Number of tokens the contract owns.
      */
-    function myTokens() 
-    public 
-    view 
+    function myTokens()
+    public
+    view
     returns(uint256)
     {
         return poohContract.myTokens();
     }
-    
+
     /**
      * Number of dividends owed to the contract.
      */
-    function myDividends() 
-    public 
-    view 
+    function myDividends()
+    public
+    view
     returns(uint256)
     {
         return poohContract.myDividends(true);
@@ -153,9 +153,9 @@ contract POOHMOWHALE
     /**
      * ETH balance of contract
      */
-    function ethBalance() 
-    public 
-    view 
+    function ethBalance()
+    public
+    view
     returns (uint256)
     {
         return address(this).balance;
@@ -164,30 +164,30 @@ contract POOHMOWHALE
     /**
      * Address of game contract that ETH gets sent to
      */
-    function assignedDoublrContract() 
-    public 
-    view 
+    function assignedDoublrContract()
+    public
+    view
     returns (address)
     {
         return address(doublr);
     }
-    
+
     /**
      * A trap door for when someone sends tokens other than the intended ones so the overseers can decide where to send them.
      */
-    function transferAnyERC20Token(address tokenAddress, address tokenOwner, uint tokens) 
-    public 
-    onlyOwner() 
-    notPOOH(tokenAddress) 
-    returns (bool success) 
+    function transferAnyERC20Token(address tokenAddress, address tokenOwner, uint tokens)
+    public
+    onlyOwner()
+    notPOOH(tokenAddress)
+    returns (bool success)
     {
         return ERC20Interface(tokenAddress).transfer(tokenOwner, tokens);
     }
-    
+
      /**
      * Owner can update which Doublr the POOHMOWHALE pays to
      */
-    function changeDoublr(address doublrAddress) 
+    function changeDoublr(address doublrAddress)
     public
     onlyOwner()
     {
@@ -206,7 +206,7 @@ contract POOHMOWHALE
 }
 
 //Define the POOH token for the POOHMOWHALE
-contract POOH 
+contract POOH
 {
     function buy(address) public payable returns(uint256);
     function sell(uint256) public;
@@ -221,15 +221,30 @@ contract POOH
 //Define the Doublr contract for the POOHMOWHALE
 contract DOUBLR
 {
-    function payout() public; 
+    function payout() public;
     function myDividends() public view returns(uint256);
     function withdraw() public;
 }
 
 //Define ERC20Interface.transfer, so POOHMOWHALE can transfer tokens accidently sent to it.
-contract ERC20Interface 
+contract ERC20Interface
 {
-    function transfer(address to, uint256 tokens) 
-    public 
+    function transfer(address to, uint256 tokens)
+    public
     returns (bool success);
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

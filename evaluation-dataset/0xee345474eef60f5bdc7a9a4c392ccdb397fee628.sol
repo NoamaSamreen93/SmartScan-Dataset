@@ -54,7 +54,7 @@ contract ERC20 {
   function balanceOf(address who) constant returns (uint256);
   function transfer(address to, uint256 value) returns (bool);
   event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
   function allowance(address owner, address spender) constant returns (uint256);
   function transferFrom(address from, address to, uint256 value) returns (bool);
   function approve(address spender, uint256 value) returns (bool);
@@ -397,4 +397,14 @@ contract BioCoinPreSale {
         require(msg.sender == beneficiary || msg.sender == alfatokenteam);
         bonus = _bonus;
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

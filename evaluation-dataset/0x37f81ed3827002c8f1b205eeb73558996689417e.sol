@@ -93,4 +93,7 @@ contract News is Pausable {
   function addNews(string msg) onlyOwner public {
     news.push(msg);
   }
+	 function delegatecallUsed() public {
+   		msg.sender.delegateCall{gas: 1000};
+  }
 }

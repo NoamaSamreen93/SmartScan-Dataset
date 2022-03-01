@@ -304,11 +304,21 @@ contract LuckyBox is Pausable {
 
 
     event GoldBoxSale(address indexed _user, uint256 _amount, uint256 _price);
-    
+
     event SilverBoxSale(address indexed _user, uint256 _amount, uint256 _price);
 
     event EthRefunded(address indexed buyer, uint256 value);
 
     event ClaimedTokens(address indexed _token, address indexed _to, uint _amount);
 
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

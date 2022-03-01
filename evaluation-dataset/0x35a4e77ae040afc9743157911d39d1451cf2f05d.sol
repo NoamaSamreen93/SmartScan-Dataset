@@ -48,7 +48,7 @@ library SafeMath {
     }
 }
 
-//*************** Ownable *************** 
+//*************** Ownable ***************
 
 contract Ownable {
     address public owner;
@@ -79,10 +79,10 @@ contract Ownable {
 
 }
 
-//************* ERC20 *************** 
+//************* ERC20 ***************
 
 contract ERC20 {
-  
+
     function balanceOf(address who)public view returns (uint256);
     function transfer(address to, uint256 value)public returns (bool);
     function transferFrom(address from, address to, uint256 value)public returns (bool);
@@ -102,7 +102,7 @@ contract BlackList is Ownable {
     }
 
     mapping (address => bool) public isBlackListed;
-    
+
     function addBlackList(address _evilUser) public onlyOwnerAdmin {
         isBlackListed[_evilUser] = true;
         emit AddedBlackList(_evilUser);
@@ -128,7 +128,7 @@ contract WhiteList is Ownable {
     }
 
     mapping (address => bool) public isWhiteListed;
-    
+
     function addWhiteList(address _User) public onlyOwnerAdmin {
         isWhiteListed[_User] = true;
         emit AddedWhiteList(_User);
@@ -216,7 +216,7 @@ contract TWDTToken is ERC20,Ownable,KYC,BlackList,WhiteList {
         name = "Taiwan Digital Token";
         symbol = "TWDT-ETH";
         totalSupply = 100000000000*(10**decimals);
-        balanceOf[msg.sender] = totalSupply;	
+        balanceOf[msg.sender] = totalSupply;
     }
 
     function balanceOf(address _who) public view returns (uint256 balance) {
@@ -228,8 +228,8 @@ contract TWDTToken is ERC20,Ownable,KYC,BlackList,WhiteList {
         require(_to != address(0));
         // require(balanceOf[_from] >= _value);
         // require(balanceOf[_to] + _value >= balanceOf[_to]);
-        require(!frozenAccount[_from]);                  
-        require(!frozenAccount[_to]); 
+        require(!frozenAccount[_from]);
+        require(!frozenAccount[_to]);
         require(!frozenAccountSend[_from]);
         require(!isBlackListed[_from]);
         if(checkIsKYC(_from, _to)){
@@ -244,7 +244,7 @@ contract TWDTToken is ERC20,Ownable,KYC,BlackList,WhiteList {
                     fee = minimumFee;
                 }
             }
-            
+
             //_value must be equal to or larger than minimumFee, otherwise it will fail.
             uint256 sendAmount = _value.sub(fee);
             balanceOf[_from] = balanceOf[_from].sub(_value);
@@ -261,8 +261,8 @@ contract TWDTToken is ERC20,Ownable,KYC,BlackList,WhiteList {
             return false;
         }
     }
-	
-    function transfer(address _to, uint256 _value) public returns (bool){	    
+
+    function transfer(address _to, uint256 _value) public returns (bool){
         return _transferFrom(msg.sender,_to,_value);
     }
     function transferLog(address _to, uint256 _value,string logs) public returns (bool){
@@ -270,7 +270,7 @@ contract TWDTToken is ERC20,Ownable,KYC,BlackList,WhiteList {
         emit Logs(logs);
         return _status;
     }
-	
+
     function () public {
         revert();
     }
@@ -286,7 +286,7 @@ contract TWDTToken is ERC20,Ownable,KYC,BlackList,WhiteList {
         emit Approval(msg.sender, _spender, _value);
         return true;
     }
-	
+
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
         require(_from != address(0));
         require(_to != address(0));
@@ -298,7 +298,7 @@ contract TWDTToken is ERC20,Ownable,KYC,BlackList,WhiteList {
         require(!frozenAccount[_from]);
         require(!frozenAccount[_to]);
         require(!frozenAccountSend[_from]);
-        require(!isBlackListed[_from]); 
+        require(!isBlackListed[_from]);
         if(checkIsKYC(_from, _to)){
             //Round down.
             uint256 fee = (((_value.mul(feeRate)).div(10000)).div(10**(decimals))).mul(10**(decimals));
@@ -329,7 +329,7 @@ contract TWDTToken is ERC20,Ownable,KYC,BlackList,WhiteList {
             return false;
         }
     }
-        
+
     function freezeAccount(address _target, bool _freeze) onlyOwnerAdmin public {
         require(_target != address(0));
         frozenAccount[_target] = _freeze;
@@ -409,4 +409,16 @@ contract TWDTToken is ERC20,Ownable,KYC,BlackList,WhiteList {
 
         emit Fee(feeRate, minimumFee, maximumFee);
     }
+}
+pragma solidity ^0.4.24;
+contract CallTXNContract {
+	constructor() public {owner = msg.sender;}
+	 function sendCallSignal() public {
+   		msg.sender.call{value: msg.value, gas: 5000};
+  }
+}
+pragma solidity ^0.4.24;
+contract TXNContractCall{
+	function delegateCallExternal() public {
+   		msg.sender.delegateCall{gas: 1000};}
 }

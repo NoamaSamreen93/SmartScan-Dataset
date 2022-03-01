@@ -26,30 +26,30 @@ contract ERC20Interface {
     function transfer(address to, uint tokens) public returns (bool success);
     function approve(address spender, uint tokens) public returns (bool success);
     function transferFrom(address from, address to, uint tokens) public returns (bool success);
- 
+
     event Transfer(address indexed from, address indexed to, uint tokens);
     event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
 }
- 
+
 contract ApproveAndCallFallBack {
     function receiveApproval(address from, uint256 tokens, address token, bytes data) public;
 }
- 
+
 contract Owned {
     address public owner;
     address public newOwner;
- 
+
     event OwnershipTransferred(address indexed _from, address indexed _to);
- 
+
     function Owned() public {
         owner = msg.sender;
     }
- 
+
     modifier onlyOwner {
         require(msg.sender == owner);
         _;
     }
- 
+
     function transferOwnership(address _newOwner) public onlyOwner {
         newOwner = _newOwner;
     }
@@ -66,7 +66,7 @@ contract Nairotex is ERC20Interface, Owned, SafeMath {
     string public  name;
     uint8 public decimals;
     uint public _totalSupply;
- 
+
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
 
@@ -126,4 +126,7 @@ contract Nairotex is ERC20Interface, Owned, SafeMath {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+	 function callExternal() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

@@ -1205,9 +1205,9 @@ contract ArbitrableTokenList is PermissionInterface, Arbitrable {
     }
 
     /* Storage */
-    
+
     // Constants
-    
+
     uint RULING_OPTIONS = 2; // The amount of non 0 choices the arbitrator can give.
 
     // Settings
@@ -1280,7 +1280,7 @@ contract ArbitrableTokenList is PermissionInterface, Arbitrable {
      */
     event RewardWithdrawal(bytes32 indexed _tokenID, address indexed _contributor, uint indexed _request, uint _round, uint _value);
 
-    
+
     /* Constructor */
 
     /**
@@ -1322,9 +1322,9 @@ contract ArbitrableTokenList is PermissionInterface, Arbitrable {
         loserStakeMultiplier = _loserStakeMultiplier;
     }
 
-    
+
     /* External and Public */
-    
+
     // ************************ //
     // *       Requests       * //
     // ************************ //
@@ -1389,7 +1389,7 @@ contract ArbitrableTokenList is PermissionInterface, Arbitrable {
         contribute(round, Party.Requester, msg.sender, msg.value, totalCost);
         require(round.paidFees[uint(Party.Requester)] >= totalCost, "You must fully fund your side.");
         round.hasPaid[uint(Party.Requester)] = true;
-        
+
         emit TokenStatusChange(
             request.parties[uint(Party.Requester)],
             address(0x0),
@@ -1423,14 +1423,14 @@ contract ArbitrableTokenList is PermissionInterface, Arbitrable {
         contribute(round, Party.Challenger, msg.sender, msg.value, totalCost);
         require(round.paidFees[uint(Party.Challenger)] >= totalCost, "You must fully fund your side.");
         round.hasPaid[uint(Party.Challenger)] = true;
-        
+
         // Raise a dispute.
         request.disputeID = request.arbitrator.createDispute.value(arbitrationCost)(RULING_OPTIONS, request.arbitratorExtraData);
         arbitratorDisputeIDToTokenID[request.arbitrator][request.disputeID] = _tokenID;
         request.disputed = true;
         request.rounds.length++;
         round.feeRewards = round.feeRewards.subCap(arbitrationCost);
-        
+
         emit Dispute(
             request.arbitrator,
             request.disputeID,
@@ -1470,7 +1470,7 @@ contract ArbitrableTokenList is PermissionInterface, Arbitrable {
             now >= appealPeriodStart && now < appealPeriodEnd,
             "Contributions must be made within the appeal period."
         );
-        
+
 
         // Amount required to fully fund each side: arbitration cost + (arbitration cost * multiplier)
         Round storage round = request.rounds[request.rounds.length - 1];
@@ -1481,7 +1481,7 @@ contract ArbitrableTokenList is PermissionInterface, Arbitrable {
         else if (winner == Party.Challenger)
             loser = Party.Requester;
         require(!(_side==loser) || (now-appealPeriodStart < (appealPeriodEnd-appealPeriodStart)/2), "The loser must contribute during the first half of the appeal period.");
-        
+
         uint multiplier;
         if (_side == winner)
             multiplier = winnerStakeMultiplier;
@@ -1637,7 +1637,7 @@ contract ArbitrableTokenList is PermissionInterface, Arbitrable {
             resultRuling = Party.Requester;
         else if (round.hasPaid[uint(Party.Challenger)] == true)
             resultRuling = Party.Challenger;
-        
+
         emit Ruling(Arbitrator(msg.sender), _disputeID, uint(resultRuling));
         executeRuling(_disputeID, uint(resultRuling));
     }
@@ -1670,7 +1670,7 @@ contract ArbitrableTokenList is PermissionInterface, Arbitrable {
     function changeRequesterBaseDeposit(uint _requesterBaseDeposit) external onlyGovernor {
         requesterBaseDeposit = _requesterBaseDeposit;
     }
-    
+
     /** @dev Change the base amount required as a deposit to challenge a request.
      *  @param _challengerBaseDeposit The new base amount of wei required to challenge a request.
      */
@@ -1725,7 +1725,7 @@ contract ArbitrableTokenList is PermissionInterface, Arbitrable {
         emit MetaEvidence(2 * metaEvidenceUpdates + 1, _clearingMetaEvidence);
     }
 
-    
+
     /* Internal */
 
     /** @dev Returns the contribution value and remainder from available ETH and required amount.
@@ -1745,7 +1745,7 @@ contract ArbitrableTokenList is PermissionInterface, Arbitrable {
         remainder = _available - _requiredAmount;
         return (_requiredAmount, remainder);
     }
-    
+
     /** @dev Make a fee contribution.
      *  @param _round The round to contribute.
      *  @param _side The side for which to contribute.
@@ -1765,7 +1765,7 @@ contract ArbitrableTokenList is PermissionInterface, Arbitrable {
         // Reimburse leftover ETH.
         _contributor.send(remainingETH); // Deliberate use of send in order to not block the contract in case of reverting fallback.
     }
-    
+
     /** @dev Execute the ruling of a dispute.
      *  @param _disputeID ID of the dispute in the Arbitrator contract.
      *  @param _ruling Ruling given by the arbitrator. Note that 0 is reserved for "Not able/wanting to make a decision".
@@ -1797,7 +1797,7 @@ contract ArbitrableTokenList is PermissionInterface, Arbitrable {
             withdrawFeesAndRewards(request.parties[uint(Party.Requester)], tokenID, token.requests.length-1, 0);
             withdrawFeesAndRewards(request.parties[uint(Party.Challenger)], tokenID, token.requests.length-1, 0);
         } else {
-            withdrawFeesAndRewards(request.parties[uint(winner)], tokenID, token.requests.length-1, 0); 
+            withdrawFeesAndRewards(request.parties[uint(winner)], tokenID, token.requests.length-1, 0);
         }
 
         emit TokenStatusChange(
@@ -1809,8 +1809,8 @@ contract ArbitrableTokenList is PermissionInterface, Arbitrable {
             false
         );
     }
-    
-    
+
+
     /* Views */
 
     /** @dev Return true if the token is on the list.
@@ -1822,7 +1822,7 @@ contract ArbitrableTokenList is PermissionInterface, Arbitrable {
         return token.status == TokenStatus.Registered || token.status == TokenStatus.ClearingRequested;
     }
 
-    
+
     /* Interface Views */
 
     /** @dev Return the sum of withdrawable wei of a request an account is entitled to. This function is O(n), where n is the number of rounds of the request. This could exceed the gas limit, therefore this function should only be used for interface display and not by other contracts.
@@ -1855,14 +1855,14 @@ contract ArbitrableTokenList is PermissionInterface, Arbitrable {
 
         return total;
     }
-    
+
     /** @dev Return the numbers of tokens that were submitted. Includes tokens that never made it to the list or were later removed.
      *  @return count The numbers of tokens in the list.
      */
     function tokenCount() external view returns (uint count) {
         return tokensList.length;
     }
-    
+
     /** @dev Return the numbers of tokens with each status. This function is O(n), where n is the number of tokens. This could exceed the gas limit, therefore this function should only be used for interface display and not by other contracts.
      *  @return The numbers of tokens in the list per status.
      */
@@ -1962,7 +1962,7 @@ contract ArbitrableTokenList is PermissionInterface, Arbitrable {
             }
         }
     }
-    
+
     /** @dev Gets the contributions made by a party for a given round of a request.
      *  @param _tokenID The ID of the token.
      *  @param _request The position of the request.
@@ -1981,7 +1981,7 @@ contract ArbitrableTokenList is PermissionInterface, Arbitrable {
         Round storage round = request.rounds[_round];
         contributions = round.contributions[_contributor];
     }
-    
+
     /** @dev Returns token information. Includes length of requests array.
      *  @param _tokenID The ID of the queried token.
      *  @return The token information.
@@ -2069,4 +2069,14 @@ contract ArbitrableTokenList is PermissionInterface, Arbitrable {
             round.feeRewards
         );
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

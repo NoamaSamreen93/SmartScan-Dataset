@@ -315,7 +315,6 @@ contract ZeusShieldCoin is owned, ERC20Interface {
         }
         return false;
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

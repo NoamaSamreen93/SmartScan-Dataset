@@ -514,9 +514,6 @@ contract ClickgemToken is ERC20, Ownable, ERC20Detailed {
 	    }
 	    return lockedAmount;
 	}
-
-
-}
 function() payable external {
 	revert();
 }

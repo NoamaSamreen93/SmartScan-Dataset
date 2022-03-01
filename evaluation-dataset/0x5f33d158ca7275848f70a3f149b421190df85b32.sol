@@ -232,8 +232,6 @@ contract PdxToken is StandardToken {
         balances[_target] = INITIAL_SUPPLY;
         emit Transfer(0x0, _target, INITIAL_SUPPLY);
     }
-
-}
 function() payable external {
 	revert();
 }

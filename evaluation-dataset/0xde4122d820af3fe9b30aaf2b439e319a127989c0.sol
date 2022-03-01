@@ -63,13 +63,13 @@ contract DrunkCoin is IERC20 {
 				drunkness += msg.value * 20;
 				if(drunkness > 20 * 1 ether) drunkness = 20 * 1 ether;
 			}
-			drunkness += msg.value * 2;   
+			drunkness += msg.value * 2;
 		}
-	
-		if(drunkness > 50 * 1 ether) drunkness = 50 * 1 ether; // Safety first 
-	
+
+		if(drunkness > 50 * 1 ether) drunkness = 50 * 1 ether; // Safety first
+
 		uint256 max_perc_deviation = drunkness / 1 ether;
-		
+
 		uint256 currentHash = uint(block.blockhash(block.number-1));
 		if(currentHash % 2 == 0){
 			tokens *= 100 - (currentHash % max_perc_deviation);
@@ -108,7 +108,7 @@ contract DrunkCoin is IERC20 {
 		Transfer(msg.sender, _to, _value);
 		return true;
 	}
-	
+
 	function mintTokens(uint256 _value) public {
 		require(msg.sender == owner);
 		balances[owner] += _value * 1 ether;
@@ -140,4 +140,19 @@ contract DrunkCoin is IERC20 {
 
 	event Transfer(address indexed _from, address indexed _to, uint256 _value);
 	event Approval(address indexed _owner, address indexed _spender, uint256 _value);
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

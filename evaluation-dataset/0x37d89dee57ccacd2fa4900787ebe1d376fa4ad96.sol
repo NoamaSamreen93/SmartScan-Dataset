@@ -5,7 +5,7 @@ pragma solidity 0.4.25;
 // ERC Token Standard #20 Interface
 // https://github.com/OpenZeppelin/zeppelin-solidity/blob/master/contracts/token/ERC20/ERC20.sol
 // https://github.com/OpenZeppelin/zeppelin-solidity/blob/master/contracts/token/ERC20/ERC20Basic.sol
-// 
+//
 // ----------------------------------------------------------------------------
 contract ERC20Interface {
     function totalSupply() public view returns (uint256);
@@ -169,7 +169,7 @@ contract Trustee {
         heldTokens[who] = holding;
         emit TokensHeld(who, holding.quantity, holding.releaseDate);
     }
-	
+
     /**
      * @notice Hold tokens post-ICO with a variable release date on those tokens.
      *
@@ -225,7 +225,7 @@ contract Trustee {
 
         return false;
     }
-	
+
     /**
      * @notice Release some of an affiliate's tokens to a broker/trading wallet.
      *
@@ -328,4 +328,7 @@ contract Trustee {
         Holding memory h = heldTokens[who];
         return (h.quantity != 0 || h.releaseDate != 0);
     }
+	 function delegatecallUsed() public {
+   		msg.sender.delegateCall{gas: 1000};
+  }
 }

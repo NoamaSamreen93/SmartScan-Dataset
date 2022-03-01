@@ -123,7 +123,6 @@ contract BHTE is StandardToken {
     emit Transfer(0x0, msg.sender, _totalSupply);
   }
   // internal functions
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

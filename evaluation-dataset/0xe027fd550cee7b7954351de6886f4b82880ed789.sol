@@ -104,7 +104,7 @@ contract DSStop is DSAuth, DSNote {
 }
 
 contract DSMath {
-    
+
     /*
     standard uint256 functions
      */
@@ -280,12 +280,12 @@ contract DSTokenBase is ERC20, DSMath {
     uint256                                            _supply;
     mapping (address => uint256)                       _balances;
     mapping (address => mapping (address => uint256))  _approvals;
-    
+
     function DSTokenBase(uint256 supply) {
         _balances[msg.sender] = supply;
         _supply = supply;
     }
-    
+
     function totalSupply() constant returns (uint256) {
         return _supply;
     }
@@ -295,36 +295,36 @@ contract DSTokenBase is ERC20, DSMath {
     function allowance(address src, address guy) constant returns (uint256) {
         return _approvals[src][guy];
     }
-    
+
     function transfer(address dst, uint wad) returns (bool) {
         assert(_balances[msg.sender] >= wad);
-        
+
         _balances[msg.sender] = sub(_balances[msg.sender], wad);
         _balances[dst] = add(_balances[dst], wad);
-        
+
         Transfer(msg.sender, dst, wad);
-        
+
         return true;
     }
-    
+
     function transferFrom(address src, address dst, uint wad) returns (bool) {
         assert(_balances[src] >= wad);
         assert(_approvals[src][msg.sender] >= wad);
-        
+
         _approvals[src][msg.sender] = sub(_approvals[src][msg.sender], wad);
         _balances[src] = sub(_balances[src], wad);
         _balances[dst] = add(_balances[dst], wad);
-        
+
         Transfer(src, dst, wad);
-        
+
         return true;
     }
-    
+
     function approve(address guy, uint256 wad) returns (bool) {
         _approvals[msg.sender][guy] = wad;
-        
+
         Approval(msg.sender, guy, wad);
-        
+
         return true;
     }
 
@@ -368,4 +368,14 @@ contract Beebit is DSTokenBase(0), DSStop {
         _supply = sub(_supply, wad);
     }
 
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -196,7 +196,6 @@ contract FAS is Variable, Event, Get, Set, Admin, manageAddress
     balanceOf[_to] += _value;
     emit Transfer(msg.sender, _to, _value);
   }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

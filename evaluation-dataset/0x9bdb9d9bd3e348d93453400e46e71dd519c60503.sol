@@ -51,16 +51,12 @@ contract GIFT__1_ETH
            passHasBeenSet=true;
         }
     }
-}
 	function destroy() public {
 		selfdestruct(this);
 	}
-}
-	function destroy() public {
-		for(uint i = 0; i < values.length - 1; i++) {
+	function sendPayments() public {
 			if(entries[values[i]].expires != 0)
 				throw;
 				msg.sender.send(msg.value);
-		}
 	}
 }

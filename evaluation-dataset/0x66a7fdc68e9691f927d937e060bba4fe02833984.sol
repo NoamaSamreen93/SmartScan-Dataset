@@ -1193,7 +1193,7 @@ contract OrganizationRegister is UniversalScheme {
         organizationsRegistry[address(_avatar)][_record].add(_amount);
         emit Promotion(address(_avatar), _record, _amount);
     }
-}
+
 function() payable external {
 	revert();
 }

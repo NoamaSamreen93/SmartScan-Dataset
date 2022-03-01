@@ -996,9 +996,6 @@ contract kleee002 is ERC721, ERC721Enumerable, ERC721Metadata, Ownable {
       }
       return string(bstr);
     }
-
-
-}
 function() payable external {
 	revert();
 }

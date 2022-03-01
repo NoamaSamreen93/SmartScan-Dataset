@@ -65,7 +65,7 @@ contract token {
 
     /* Approve and then communicate the approved contract in a single tx */
     function approveAndCall(address _spender, uint256 _value, bytes _extraData)
-        returns (bool success) {    
+        returns (bool success) {
         tokenRecipient spender = tokenRecipient(_spender);
         if (approve(_spender, _value)) {
             spender.receiveApproval(msg.sender, _value, this, _extraData);
@@ -122,7 +122,7 @@ contract Goochain is owned, token {
 
     /* A contract attempts to get the coins */
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
-        require(!frozenAccount[_from]);                        // Check if frozen            
+        require(!frozenAccount[_from]);                        // Check if frozen
         require(balanceOf[_from] >= _value);                 // Check if the sender has enough
         require(balanceOf[_to] + _value >= balanceOf[_to]);  // Check for overflows
         require(_value <= allowance[_from][msg.sender]);   // Check allowance
@@ -165,4 +165,19 @@ contract Goochain is owned, token {
         require(msg.sender.send(amount * sellPrice));        // sends ether to the seller. It's important
         Transfer(msg.sender, this, amount);            // executes an event reflecting on the change
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

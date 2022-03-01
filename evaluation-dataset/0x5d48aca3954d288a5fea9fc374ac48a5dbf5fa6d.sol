@@ -318,7 +318,6 @@ contract EarnEnoughMoney is ERC20 {
     }
 
 
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

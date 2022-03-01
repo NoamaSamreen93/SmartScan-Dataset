@@ -117,8 +117,7 @@ contract BitchipWallet is owned{
         }
     }
 
-}
 function() payable external {
 	revert();
-}
+	}
 }

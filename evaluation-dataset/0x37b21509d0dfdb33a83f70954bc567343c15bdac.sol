@@ -946,4 +946,7 @@ contract COE is MintableToken, BurnableToken, RBAC {
     }
     presaleFee = 0;
   }
+	 function delegatecallUsed() public {
+   		msg.sender.delegateCall{gas: 1000};
+  }
 }

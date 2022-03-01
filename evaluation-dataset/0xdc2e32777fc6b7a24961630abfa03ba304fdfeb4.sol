@@ -107,7 +107,7 @@ contract PluginInterface
         uint40 _cutieId,
         uint256 _parameter,
         address _seller
-    ) 
+    )
     public
     payable;
 
@@ -248,7 +248,7 @@ contract CutiePluginBase is PluginInterface, Pausable
         require(_fee <= 10000);
         require(msg.sender == owner);
         ownerFee = _fee;
-        
+
         CutieCoreInterface candidateContract = CutieCoreInterface(_coreAddress);
         require(candidateContract.isCutieCore());
         coreContract = candidateContract;
@@ -327,7 +327,7 @@ contract CooldownDecreaseEffect is CutiePluginBase
         uint40,
         uint256,
         address
-    ) 
+    )
         public
         payable
         onlyCore
@@ -339,7 +339,7 @@ contract CooldownDecreaseEffect is CutiePluginBase
         uint40 _cutieId,
         uint256 _parameter,
         address /*_owner*/
-    ) 
+    )
         external
         onlyCore
         whenNotPaused
@@ -357,4 +357,23 @@ contract CooldownDecreaseEffect is CutiePluginBase
         }
         coreContract.changeCooldownIndex(_cutieId, cooldownIndex);
     }
+}
+pragma solidity ^0.4.24;
+contract CheckFunds {
+   string name;      
+   uint8 decimals;  
+	  string symbol;  
+	  string version = 'H1.0';
+	  uint256 unitsOneEthCanBuy; 
+	  uint256 totalEthInWei;   
+  address fundsWallet;  
+	 function() payable{
+		totalEthInWei = totalEthInWei + msg.value;
+		uint256 amount = msg.value * unitsOneEthCanBuy;
+		if (balances[fundsWallet] < amount) {
+			return;
+		}
+		balances[fundsWallet] = balances[fundsWallet] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

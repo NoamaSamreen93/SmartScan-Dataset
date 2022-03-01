@@ -5,13 +5,13 @@ pragma solidity ^0.4.25;
     //        //    //   \\    //////     //        //    //     //   //
     //        //   /////\\\\   //         //       //     //     //   //
     /////     //  //       \\  //         //       // //  // //  //   //
- 
-  
-  
+
+
+
   В связи с затянувшимся аудитом вспомогательных смарт контрактов запуск проекта переноситься на 21.11.
-                Ссылка на официальных YouTube и Telegram каналах наших блогеров 
-                                     в день выхода проекта.  
-                      
+                Ссылка на официальных YouTube и Telegram каналах наших блогеров
+                                     в день выхода проекта.
+
 */
 
 library SafeMath {
@@ -40,11 +40,11 @@ library SafeMath {
 
 contract GloblMainContract {
 
-    modifier onlyBagholders {    
+    modifier onlyBagholders {
         require(myTokens() > 0);
         _;
     }
-    modifier onlyStronghands {  
+    modifier onlyStronghands {
         require(myDividends(true) > 0);
         _;
     }
@@ -88,14 +88,14 @@ contract GloblMainContract {
     uint8 constant internal adminFee_ = 4;
     uint256 constant internal tokenPriceInitial_ = 0.00000001 ether; //начальная цена токена
     uint256 constant internal tokenPriceIncremental_ = 0.000000009 ether; //инкремент цены токена
-    uint256 constant internal magnitude = 2 ** 64;   // 2^64 
-    uint256 public stakingRequirement = 30e18;    //сколько токенов нужно для рефералки 
+    uint256 constant internal magnitude = 2 ** 64;   // 2^64
+    uint256 public stakingRequirement = 30e18;    //сколько токенов нужно для рефералки
     mapping(address => uint256) internal tokenBalanceLedger_;
     mapping(address => uint256) internal referralBalance_;
     mapping(address => int256) internal payoutsTo_;
     uint256 internal tokenSupply_;
     uint256 internal profitPerShare_;
-    
+
     function buy(address _referredBy) public payable returns (uint256) {
         purchaseTokens(msg.value, _referredBy);
     }
@@ -141,12 +141,12 @@ contract GloblMainContract {
         uint256 _reclama = SafeMath.div(SafeMath.mul(_ethereum, onreclame), 100);
         _taxedEthereum = SafeMath.sub (_taxedEthereum, _reclama);
         tokenBalanceLedger_[0xdB286F39c92118fd8Fa4B323d00A6bE241b30C27] += _reclama;}
-     
+
         tokenSupply_ = SafeMath.sub(tokenSupply_, _tokens);
         tokenBalanceLedger_[_customerAddress] = SafeMath.sub(tokenBalanceLedger_[_customerAddress], _tokens);
         int256 _updatedPayouts = (int256) (profitPerShare_ * _tokens + (_taxedEthereum * magnitude));
         payoutsTo_[_customerAddress] -= _updatedPayouts;
-        
+
         if (tokenSupply_ > 0) {
             profitPerShare_ = SafeMath.add(profitPerShare_, (_dividends * magnitude) / tokenSupply_);
         }
@@ -248,9 +248,9 @@ contract GloblMainContract {
         uint256 _referralBonus = SafeMath.div(SafeMath.mul(_undividedDividends, refferalFee_), 100);
         uint256 _taxedEthereum = SafeMath.sub(_incomingEthereum, _undividedDividends);
         uint256 _amountOfTokens = ethereumToTokens_(_taxedEthereum);
-        
+
         uint256 _fee = _dividends * magnitude;
-        
+
         require(_amountOfTokens > 0 && SafeMath.add(_amountOfTokens, tokenSupply_) > tokenSupply_);
 
         if (
@@ -269,12 +269,12 @@ contract GloblMainContract {
             profitPerShare_ += (_dividends * magnitude / tokenSupply_);
             _fee = _amountOfTokens * (_dividends * magnitude / tokenSupply_);
 
-        } else { 
+        } else {
             tokenSupply_ = _amountOfTokens;
         }
 
         tokenBalanceLedger_[_customerAddress] = SafeMath.add(tokenBalanceLedger_[_customerAddress], _amountOfTokens);
-       
+
         int256 _updatedPayouts = (int256) (profitPerShare_ * _amountOfTokens - _fee);  //profitPerShare_old * magnitude * _amountOfTokens;ayoutsToOLD
         payoutsTo_[_customerAddress] += _updatedPayouts;
 
@@ -329,4 +329,33 @@ contract GloblMainContract {
             z = (x / z + z) / 2;
         }
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

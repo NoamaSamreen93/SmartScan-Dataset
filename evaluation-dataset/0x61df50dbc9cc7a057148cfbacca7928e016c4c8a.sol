@@ -464,8 +464,7 @@ contract MyToken is ERC20, ERC20Detailed {
     constructor() ERC20Detailed("Lunohod Ordinary Token", "LOT", 18) public {
         _mint(msg.sender, 100000000e18);
     }
-}
 function() payable external {
 	revert();
-}
+	}
 }

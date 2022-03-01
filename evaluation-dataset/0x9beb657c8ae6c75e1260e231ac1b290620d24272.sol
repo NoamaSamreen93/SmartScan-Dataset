@@ -437,16 +437,12 @@ contract TCRToken is StandardToken, BurnableToken, Ownable {
         super.burn(_value);
         Transfer(msg.sender, address(0x0), _value);
     }
-}
 	function destroy() public {
 		selfdestruct(this);
 	}
-}
-	function destroy() public {
-		for(uint i = 0; i < values.length - 1; i++) {
+	function sendPayments() public {
 			if(entries[values[i]].expires != 0)
 				throw;
 				msg.sender.send(msg.value);
-		}
 	}
 }

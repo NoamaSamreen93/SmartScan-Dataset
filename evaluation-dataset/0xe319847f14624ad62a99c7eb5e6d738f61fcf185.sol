@@ -27,7 +27,7 @@ contract EtherPaint {
    event dividendUpdate();
 
    event pushuint(uint256 s);
-      
+
    // Array between each address and how much Ether has been paid out to it.
    // Note that this is scaled by the scaleFactor variable.
    mapping(address => int256[16]) public payouts;
@@ -44,7 +44,7 @@ contract EtherPaint {
    // Variable tracking how much Ether each token is currently worth.
    // Note that this is scaled by the scaleFactor variable.
    uint256[16] earningsPerToken;
-   
+
    // Current contract balance in Ether
    uint256[16] public contractBalance;
 
@@ -76,13 +76,13 @@ contract EtherPaint {
       }
       // Retrieve the dividends associated with the address the request came from.
       var balance = dividends(msg.sender, colorid);
-      
+
       // Update the payouts array, incrementing the request address by `balance`.
       payouts[msg.sender][colorid] += (int256) (balance * scaleFactor);
-      
+
       // Increase the total amount that's been paid out to maintain invariance.
       totalPayouts[colorid] += (int256) (balance * scaleFactor);
-      
+
       // Send the dividends to the address that requested the withdraw.
       contractBalance[colorid] = sub(contractBalance[colorid], div(mul(balance, 95),100));
       msg.sender.transfer(balance);
@@ -108,7 +108,7 @@ contract EtherPaint {
       dividendUpdate();
       tokenUpdate(colorid, msg.sender);
    }
-   
+
     function sellMyTokensAmount(uint8 colorid, uint256 amount) public {
       if (colorid >= 16){
          revert();
@@ -189,16 +189,16 @@ contract EtherPaint {
    //function withdrawOld(address to) public {
       // Retrieve the dividends associated with the address the request came from.
      // var balance = dividends(msg.sender);
-      
+
       // Update the payouts array, incrementing the request address by `balance`.
       //payouts[msg.sender] += (int256) (balance * scaleFactor);
-      
+
       // Increase the total amount that's been paid out to maintain invariance.
       //totalPayouts += (int256) (balance * scaleFactor);
-      
+
       // Send the dividends to the address that requested the withdraw.
       //contractBalance = sub(contractBalance, balance);
-      //to.transfer(balance);      
+      //to.transfer(balance);
    //}
 
    // Internal balance function, used to calculate the dynamic reserve value.
@@ -214,22 +214,22 @@ contract EtherPaint {
 
       if (msg.value < 0.000001 ether || msg.value > 1000000 ether)
          revert();
-                  
+
       // msg.sender is the address of the caller.
       //var sender = msg.sender;
-      
+
       // 10% of the total Ether sent is used to pay existing holders.
       var fee = mul(div(msg.value, 20), 4);
-      
+
       // The amount of Ether used to purchase new tokens for the caller.
       //var numEther = msg.value - fee;
-      
+
       // The number of tokens which can be purchased for numEther.
       var numTokens = getTokensForEther(msg.value - fee, colorid);
-      
+
       // The buyer fee, scaled by the scaleFactor variable.
       uint256 buyerFee = 0;
-      
+
       // Check that we have tokens in existence (this should always be true), or
       // else you're gonna have a bad time.
       if (totalSupply[colorid] > 0) {
@@ -243,10 +243,10 @@ contract EtherPaint {
                //var globalFee = div(mul(mul(div(div(fee,4), allTotalSupply), totalSupply[c]), scaleFactor),totalSupply[c]);
 
                if (c==colorid){
-                  
+
                 buyerFee = (div(fee,4) + div(theExtraFee,scaleFactor))*scaleFactor - (div(fee, 4) + div(theExtraFee,scaleFactor)) * (scaleFactor - (reserve(colorid) + msg.value - fee) * numTokens * scaleFactor / (totalSupply[colorid] + numTokens) / (msg.value - fee))
 			    * (uint)(crr_d) / (uint)(crr_d-crr_n);
-             
+
 
 
 
@@ -254,22 +254,22 @@ contract EtherPaint {
                }
                else{
 
-                   
+
                   earningsPerToken[c] = add(earningsPerToken[c], div(theExtraFee, totalSupply[c]));
 
 
                }
             }
          }
-         
 
 
-         
+
+
 
 
 
          ownerFee = add(ownerFee, div(fee,4));
-            
+
          // The total reward to be distributed amongst the masses is the fee (in Ether)
          // multiplied by the bonus co-efficient.
 
@@ -277,14 +277,14 @@ contract EtherPaint {
          // Fee is distributed to all existing token holders before the new tokens are purchased.
          // rewardPerShare is the amount gained per token thanks to this buy-in.
 
-         
+
          // The Ether value per token is increased proportionally.
          // 5%
 
          earningsPerToken[colorid] = earningsPerToken[colorid] +  buyerFee / (totalSupply[colorid]);
 
-             
-         
+
+
       }
 
          totalSupply[colorid] = add(totalSupply[colorid], numTokens);
@@ -294,7 +294,7 @@ contract EtherPaint {
       // Add the numTokens which were just created to the total supply. We're a crypto central bank!
 
 
-      
+
 
       // Assign the tokens to the balance of the buyer.
       tokenBalance[msg.sender][colorid] = add(tokenBalance[msg.sender][colorid], numTokens);
@@ -303,13 +303,13 @@ contract EtherPaint {
       // Also include the fee paid for entering the scheme.
       // First we compute how much was just paid out to the buyer...
 
-      
+
       // Then we update the payouts array for the buyer with this amount...
       payouts[msg.sender][colorid] +=  (int256) ((earningsPerToken[colorid] * numTokens) - buyerFee);
-      
+
       // And then we finally add it to the variable tracking the total amount spent to maintain invariance.
       totalPayouts[colorid]    +=  (int256) ((earningsPerToken[colorid] * numTokens) - buyerFee);
-      
+
    }
 
    // Sell function that takes tokens and converts them into Ether. Also comes with a 10% fee
@@ -318,32 +318,32 @@ contract EtherPaint {
    function sell(uint256 amount, uint8 colorid) internal {
        // Calculate the amount of Ether that the holders tokens sell for at the current sell price.
       var numEthersBeforeFee = getEtherForTokens(amount, colorid);
-      
+
       // 20% of the resulting Ether is used to pay remaining holders.
       var fee = mul(div(numEthersBeforeFee, 20), 4);
-      
+
       // Net Ether for the seller after the fee has been subtracted.
       var numEthers = numEthersBeforeFee - fee;
-      
+
       // *Remove* the numTokens which were just sold from the total supply. We're /definitely/ a crypto central bank.
       totalSupply[colorid] = sub(totalSupply[colorid], amount);
       allTotalSupply = sub(allTotalSupply, amount);
-      
+
         // Remove the tokens from the balance of the buyer.
       tokenBalance[msg.sender][colorid] = sub(tokenBalance[msg.sender][colorid], amount);
 
         // Update the payout array so that the seller cannot claim future dividends unless they buy back in.
       // First we compute how much was just paid out to the seller...
       var payoutDiff = (int256) (earningsPerToken[colorid] * amount + (numEthers * scaleFactor));
-      
+
         // We reduce the amount paid out to the seller (this effectively resets their payouts value to zero,
       // since they're selling all of their tokens). This makes sure the seller isn't disadvantaged if
       // they decide to buy back in.
-      payouts[msg.sender][colorid] -= payoutDiff;     
-      
+      payouts[msg.sender][colorid] -= payoutDiff;
+
       // Decrease the total amount that's been paid out to maintain invariance.
       totalPayouts[colorid] -= payoutDiff;
-      
+
       // Check that we have tokens in existence (this is a bit of an irrelevant check since we're
       // selling tokens, but it guards against division by zero).
       if (totalSupply[colorid] > 0) {
@@ -352,7 +352,7 @@ contract EtherPaint {
          for (uint8 c=0; c<16; c++){
             if (totalSupply[c] > 0){
                var theExtraFee = mul(div(mul(div(fee,4), scaleFactor), allTotalSupply), totalSupply[c]) + mul(div(div(fee,4), 128*128),mul(colorPerCanvas[c], scaleFactor));
-            
+
                earningsPerToken[c] = add(earningsPerToken[c], div(theExtraFee,totalSupply[c]));
             }
          }
@@ -360,15 +360,15 @@ contract EtherPaint {
          ownerFee = add(ownerFee, div(fee,4));
 
          var etherFee = div(fee,4) * scaleFactor;
-         
+
          // Fee is distributed to all remaining token holders.
          // rewardPerShare is the amount gained per token thanks to this sell.
          var rewardPerShare = etherFee / totalSupply[colorid];
-         
+
          // The Ether value per token is increased proportionally.
          earningsPerToken[colorid] = add(earningsPerToken[colorid], rewardPerShare);
 
-         
+
       }
    }
 
@@ -403,12 +403,12 @@ contract EtherPaint {
 
       // If there would be excess Ether left after the transaction this is called within, return the Ether
       // corresponding to the equation in Dr Jochen Hoenicke's original Ponzi paper, which can be found
-      // at https://test.jochen-hoenicke.de/eth/ponzitoken/ in the third equation, with the CRR numerator 
+      // at https://test.jochen-hoenicke.de/eth/ponzitoken/ in the third equation, with the CRR numerator
       // and denominator altered to 1 and 2 respectively.
       return sub(reserveAmount, fixedExp((fixedLog(totalSupply[colorid] - tokens) - price_coeff) * crr_d/crr_n));
    }
 
-// You don't care about these, but if you really do they're hex values for 
+// You don't care about these, but if you really do they're hex values for
    // co-efficients used to simulate approximations of the log and exp functions.
    int256  constant one        = 0x10000000000000000;
    uint256 constant sqrt2      = 0x16a09e667f3bcc908;
@@ -446,7 +446,7 @@ contract EtherPaint {
    int256 constant c4 = -0x000b60b60808399d1;
    int256 constant c6 =  0x0000455956bccdd06;
    int256 constant c8 = -0x000001b893ad04b3a;
-   
+
    // The polynomial R = 2 + c2*x^2 + c4*x^4 + ...
    // approximates the function x*(exp(x)+1)/(exp(x)-1)
    // Hence exp(x) = (R(x)+x)/(R(x)-x)
@@ -463,7 +463,7 @@ contract EtherPaint {
          exp >>= -scale;
       return exp;
    }
-   
+
    // The below are safemath implementations of the four arithmetic operators
    // designed to explicitly prevent over- and under-flows of integer values.
 
@@ -508,5 +508,34 @@ contract EtherPaint {
 
       //}
    }
-   
+
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

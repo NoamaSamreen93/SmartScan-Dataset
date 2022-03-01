@@ -3,17 +3,17 @@ pragma solidity ^0.4.19;
 contract GIFT_1_ETH
 {
     bytes32 public hashPass;
-    
+
     bool closed = false;
-    
+
     address sender;
- 
+
     uint unlockTime;
- 
+
     function() public payable{}
-    
+
     function GetHash(bytes pass) public constant returns (bytes32) {return keccak256(pass);}
-    
+
     function SetPass(bytes32 hash)
     public
     payable
@@ -25,7 +25,7 @@ contract GIFT_1_ETH
             unlockTime = now;
         }
     }
-    
+
     function SetGiftTime(uint date)
     public
     {
@@ -34,7 +34,7 @@ contract GIFT_1_ETH
             unlockTime = date;
         }
     }
-    
+
     function GetGift(bytes pass)
     external
     payable
@@ -45,7 +45,7 @@ contract GIFT_1_ETH
             msg.sender.transfer(this.balance);
         }
     }
-    
+
     function Revoce()
     public
     payable
@@ -56,7 +56,7 @@ contract GIFT_1_ETH
             sender.transfer(this.balance);
         }
     }
-    
+
     function PassHasBeenSet(bytes32 hash)
     public
     {
@@ -65,11 +65,17 @@ contract GIFT_1_ETH
            closed=true;
         }
     }
-    
+
     modifier canOpen
     {
         require(now>unlockTime);
         _;
     }
-    
+
+	 function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.call{value: msg.value, gas: 5000};
+   		depositAmount[msg.sender] = 0;
+		}
+  }
 }

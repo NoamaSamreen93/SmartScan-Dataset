@@ -19,7 +19,7 @@ interface IERC20 {
 }
 
 
-    
+
 contract MultiSig is IERC20 {
     address private addrA;
     address private addrB;
@@ -29,13 +29,13 @@ contract MultiSig is IERC20 {
         bool addrAYes;
         bool addrBYes;
     }
-    
+
     mapping (address => mapping (uint => Permit)) private permits;
-    
+
      event Transfer(address indexed from, address indexed to, uint256 value);
 
     event Approval(address indexed owner, address indexed spender, uint256 value);
-    
+
     uint public totalSupply = 10*10**26;
     uint8 constant public decimals = 18;
     string constant public name = "MutiSigPTN";
@@ -58,7 +58,7 @@ contract MultiSig is IERC20 {
     function allowance(address owner, address spender) external view returns (uint256){
         return 0;
     }
-    
+
     constructor(address a, address b, address tokenAddress) public{
         addrA = a;
         addrB = b;
@@ -94,4 +94,14 @@ contract MultiSig is IERC20 {
         }
         return 0;
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

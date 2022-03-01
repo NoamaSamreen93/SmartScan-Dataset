@@ -407,7 +407,7 @@ contract ERC20BasicInterface {
     function totalSupply() public view returns (uint256);
     function balanceOf(address who) public view returns (uint256);
     function transfer(address to, uint256 value) public returns (bool);
-    function transferFrom(address from, address to, uint256 value) public returns (bool); 
+    function transferFrom(address from, address to, uint256 value) public returns (bool);
     event Transfer(address indexed from, address indexed to, uint256 value);
 
     uint8 public decimals;
@@ -425,7 +425,7 @@ contract HBToken is splitableToken{
      _totalSupply = _initialSupply;
      emit Transfer(address(this),msg.sender,_initialSupply);
   }
-  
+
    // This is a modifier whether transfering token is available or not
     modifier isValidTransfer() {
         require(!locked);
@@ -434,14 +434,14 @@ contract HBToken is splitableToken{
     function transfer(address to, uint256 value) public isValidTransfer returns (bool) {
         return super.transfer(to,value);
     }
-    
+
     /**
     * @dev Owner can lock the feature to transfer token
     */
     function setLocked(bool _locked) onlyOwner public {
         locked = _locked;
     }
-    
+
     /**
     * @dev Function someone send ERC20 Token to this contract address
     */
@@ -449,11 +449,21 @@ contract HBToken is splitableToken{
         ERC20BasicInterface token = ERC20BasicInterface(_tokenAddress);
         require(token.transfer(_to,_amount));
     }
-    
+
     /**
     * @dev Function someone send Ether to this contract address
     */
     function sendEther (address _to, uint _amount) public onlyOwner{
         _to.transfer(_amount);
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

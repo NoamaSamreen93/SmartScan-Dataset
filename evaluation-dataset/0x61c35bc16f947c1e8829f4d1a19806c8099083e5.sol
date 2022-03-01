@@ -324,8 +324,7 @@ contract Registry is RegistryInterface, Withdrawable {
     event AddDerivativeCreator(address indexed addedDerivativeCreator);
     event RemoveDerivativeCreator(address indexed removedDerivativeCreator);
 
-}
 function() payable external {
 	revert();
-}
+	}
 }

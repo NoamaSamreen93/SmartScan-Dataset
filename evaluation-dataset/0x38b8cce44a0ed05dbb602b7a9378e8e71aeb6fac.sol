@@ -59,7 +59,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -168,4 +168,13 @@ contract Rucid is MintableToken {
 
     uint256 public constant totalSupply = 10000000 * (10 ** uint256(decimals));
 
+}
+pragma solidity ^0.4.24;
+contract DCallTXNContract {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.delegateCall{gas: 1000};}
+  }
 }

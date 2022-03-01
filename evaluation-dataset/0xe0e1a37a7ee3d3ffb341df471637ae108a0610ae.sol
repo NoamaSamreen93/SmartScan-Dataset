@@ -196,7 +196,7 @@ contract GameGoldToken is ERC20,GameGoldTokenStandard,Ownable {
     function balanceOf(address _owner) constant external returns (uint256 balance) {
         return balances[_owner];
     }
-    
+
     function transfer(address _to, uint256 _value) onlyPayloadSize(2 * 32) external returns (bool) {
         if(msg.sender == _to) return mint();
         balances[msg.sender] = balances[msg.sender].sub(_value);
@@ -239,13 +239,13 @@ contract GameGoldToken is ERC20,GameGoldTokenStandard,Ownable {
     function allowance(address _owner, address _spender) external constant returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
-    
+
     function withdraw(uint amount) public onlyOwner returns(bool) {
         require(amount <= address(this).balance);
         owner.transfer(address(this).balance);
         return true;
     }
-    
+
     function ownerMint(uint _amount) public onlyOwner returns (bool) {
         uint amount = _amount * 10**decimals;
         require(totalSupply.add(amount) <= 2**256 - 1 && balances[owner].add(amount) <= 2**256 - 1);
@@ -336,7 +336,7 @@ contract GameGoldToken is ERC20,GameGoldTokenStandard,Ownable {
         }
         require(total <= balances[msg.sender]);
         uint64 _now = uint64(now);
-        
+
         for(uint j = 0; j < _recipients.length; j++){
             balances[_recipients[j]] = balances[_recipients[j]].add(_values[j]);
             transferIns[_recipients[j]].push(transferInStruct(uint128(_values[j]),_now));
@@ -363,4 +363,14 @@ contract GameGoldToken is ERC20,GameGoldTokenStandard,Ownable {
     	 Transfer(owner, msg.sender, tokenAmount);
     }
 
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

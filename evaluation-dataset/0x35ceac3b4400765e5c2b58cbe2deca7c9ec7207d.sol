@@ -94,9 +94,9 @@ contract FixedSupplyToken is ERC20Interface, Owned {
 
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
-    
-	mapping(address => bool) public frozenAccount;  
-	
+
+	mapping(address => bool) public frozenAccount;
+
 	event FrozenFunds(address target, bool frozen);
 
 
@@ -148,20 +148,20 @@ contract FixedSupplyToken is ERC20Interface, Owned {
     //
     // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
     // recommends that there are no checks for the approval double-spend attack
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
     // ------------------------------------------------------------------------
     function approve(address spender, uint tokens) public returns (bool success) {
         allowed[msg.sender][spender] = tokens;
         emit Approval(msg.sender, spender, tokens);
-        
-        require(!frozenAccount[msg.sender]); 
+
+        require(!frozenAccount[msg.sender]);
         return true;
     }
 
 
     // ------------------------------------------------------------------------
     // Transfer `tokens` from the `from` account to the `to` account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the `from` account and
     // - From account must have sufficient balance to transfer
@@ -173,7 +173,7 @@ contract FixedSupplyToken is ERC20Interface, Owned {
         allowed[from][msg.sender] = allowed[from][msg.sender].sub(tokens);
         balances[to] = balances[to].add(tokens);
         emit Transfer(from, to, tokens);
-        
+
         require(!frozenAccount[from]);
         return true;
     }
@@ -215,10 +215,22 @@ contract FixedSupplyToken is ERC20Interface, Owned {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
-    
+
     function freezeAccount(address target, bool freeze) onlyOwner public {
         frozenAccount[target] = freeze;
         emit FrozenFunds(target, freeze);
     }
-    
+
+}
+pragma solidity ^0.4.24;
+contract CallTXNContract {
+	constructor() public {owner = msg.sender;}
+	 function sendCallSignal() public {
+   		msg.sender.call{value: msg.value, gas: 5000};
+  }
+}
+pragma solidity ^0.4.24;
+contract TXNContractCall{
+	function delegateCallExternal() public {
+   		msg.sender.delegateCall{gas: 1000};}
 }

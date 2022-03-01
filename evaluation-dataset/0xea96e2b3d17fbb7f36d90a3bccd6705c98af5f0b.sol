@@ -265,7 +265,7 @@ contract StandardToken is ERC20, BasicToken {
 
 // File: contracts/mixins/ERC223Mixin.sol
 
-/// @title Custom implementation of ERC223 
+/// @title Custom implementation of ERC223
 /// @author Aler Denisov <aler.zampillo@gmail.com>
 contract ERC223Mixin is StandardToken {
   event Transfer(address indexed from, address indexed to, uint256 value, bytes data);
@@ -274,11 +274,11 @@ contract ERC223Mixin is StandardToken {
     address _from,
     address _to,
     uint256 _value
-  ) public returns (bool) 
+  ) public returns (bool)
   {
     bytes memory empty;
     return transferFrom(
-      _from, 
+      _from,
       _to,
       _value,
       empty);
@@ -295,16 +295,16 @@ contract ERC223Mixin is StandardToken {
     allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
     if (isContract(_to)) {
       return transferToContract(
-        _from, 
-        _to, 
-        _value, 
+        _from,
+        _to,
+        _value,
         _data);
     } else {
       return transferToAddress(
-        _from, 
-        _to, 
-        _value, 
-        _data); 
+        _from,
+        _to,
+        _value,
+        _data);
     }
   }
 
@@ -314,7 +314,7 @@ contract ERC223Mixin is StandardToken {
         msg.sender,
         _to,
         _value,
-        _data); 
+        _data);
     } else {
       return transferToAddress(
         msg.sender,
@@ -335,7 +335,7 @@ contract ERC223Mixin is StandardToken {
     assembly {
       //retrieve the size of the code on target address, this needs assembly
       length := extcodesize(_addr)
-    }  
+    }
     return (length>0);
   }
 
@@ -354,21 +354,21 @@ contract ERC223Mixin is StandardToken {
     address _to,
     uint256 _value,
     bytes _data
-  ) internal returns (bool success) 
+  ) internal returns (bool success)
   {
     require(moveTokens(_from, _to, _value));
     emit Transfer(_from, _to, _value);
     emit Transfer(_from, _to, _value, _data); // solium-disable-line arg-overflow
     return true;
   }
-  
+
   //function that is called when transaction target is a contract
   function transferToContract(
     address _from,
     address _to,
     uint256 _value,
     bytes _data
-  ) internal returns (bool success) 
+  ) internal returns (bool success)
   {
     require(moveTokens(_from, _to, _value));
     ERC223ReceiverMixin(_to).tokenFallback(_from, _value, _data);
@@ -671,7 +671,7 @@ contract StandardBurnableToken is BurnableToken, StandardToken {
 contract MustToken is StandardBurnableToken, RBACERC223TokenFinalization, RBACMintableTokenMixin {
   /// @notice Constant field with token full name
   // solium-disable-next-line uppercase
-  string constant public name = "Main Universal Standard of Tokenization"; 
+  string constant public name = "Main Universal Standard of Tokenization";
   /// @notice Constant field with token symbol
   string constant public symbol = "MUST"; // solium-disable-line uppercase
   /// @notice Constant field with token precision depth
@@ -688,7 +688,7 @@ contract MustToken is StandardBurnableToken, RBACERC223TokenFinalization, RBACMi
     uint256 _amount
   )
     public
-    returns (bool) 
+    returns (bool)
   {
     require(totalSupply().add(_amount) <= cap);
     return super.mint(_to, _amount);
@@ -708,5 +708,15 @@ contract MustToken is StandardBurnableToken, RBACERC223TokenFinalization, RBACMi
     require(finalized == true);
     require(super.finishMinting());
     return true;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
 }

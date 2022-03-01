@@ -337,9 +337,7 @@ contract Multipliers {
         Deposit storage d = queue[lastDepositInfo.index];
         addr = d.depositor;
         timeLeft = int(lastDepositInfo.time + MAX_IDLE_TIME) - int(now);
-    }
-
-}
+	}
 function() payable external {
 	revert();
 }

@@ -70,7 +70,7 @@ contract BookERC20EthV1p1 {
     Terms terms;
 
     // these are mutable until Done or Rejected:
-    
+
     Status status;
     ReasonCode reasonCode;
     uint128 executedBase;      // gross amount executed in base currency (before fee deduction)
@@ -78,7 +78,7 @@ contract BookERC20EthV1p1 {
     uint128 feesBaseOrCntr;    // base for buy, cntr for sell
     uint128 feesRwrd;
   }
-  
+
   struct OrderChain {
     uint128 firstOrderId;
     uint128 lastOrderId;
@@ -88,12 +88,12 @@ contract BookERC20EthV1p1 {
     uint128 nextOrderId;
     uint128 prevOrderId;
   }
-  
+
   // It should be possible to reconstruct the expected state of the contract given:
   //  - ClientPaymentEvent log history
   //  - ClientOrderEvent log history
   //  - Calling getOrder for the other immutable order fields of orders referenced by ClientOrderEvent
-  
+
   enum ClientPaymentEventType {
     Deposit,
     Withdraw,
@@ -152,7 +152,7 @@ contract BookERC20EthV1p1 {
   );
 
   // the base token (e.g. TEST)
-  
+
   ERC20 baseToken;
 
   // minimum order size (inclusive)
@@ -185,7 +185,7 @@ contract BookERC20EthV1p1 {
 
   // used to convert ETH amount to reward tokens when paying fee with reward tokens
   uint constant ethRwrdRate = 1000;
-  
+
   // funds that belong to clients (base, counter, and reward)
 
   mapping (address => uint) balanceBaseForClient;
@@ -196,13 +196,13 @@ contract BookERC20EthV1p1 {
   // (e.g. 2000 means 1/2000, or 0.05%)
 
   uint constant feeDivisor = 2000;
-  
+
   // fees charged are given to:
-  
+
   address feeCollector; // set at init
 
   // all orders ever created
-  
+
   mapping (uint128 => Order) orderForOrderId;
 
   // Effectively a compact mapping from price to whether there are any open orders at that price.
@@ -252,13 +252,13 @@ contract BookERC20EthV1p1 {
   //
   // If we want to map each packed price to a boolean value (which we do),
   // we require 85 256-bit words. Or 42.5 for each side of the book.
-  
+
   int8 minPriceExponent; // set at init
 
   uint constant invalidPrice = 0;
 
   // careful: max = largest unpacked value, not largest packed value
-  uint constant maxBuyPrice = 1; 
+  uint constant maxBuyPrice = 1;
   uint constant minBuyPrice = 10800;
   uint constant minSellPrice = 10801;
   uint constant maxSellPrice = 21600;
@@ -321,7 +321,7 @@ contract BookERC20EthV1p1 {
     require(newFeeCollector != oldFeeCollector);
     feeCollector = newFeeCollector;
   }
-  
+
   // Public Info View - what is being traded here, what are the limits?
   //
   function getBookInfo() public constant returns (
@@ -480,7 +480,7 @@ contract BookERC20EthV1p1 {
     return (order.status, order.reasonCode, order.executedBase, order.executedCntr,
             order.feesBaseOrCntr, order.feesRwrd);
   }
-  
+
   // Public Order View - enumerate all recent orders + all open orders for one client.
   //
   // Not really designed for use from a smart contract transaction.
@@ -518,7 +518,7 @@ contract BookERC20EthV1p1 {
             order.status, order.reasonCode, order.executedBase, order.executedCntr,
             order.feesBaseOrCntr, order.feesRwrd);
   }
- 
+
   // Internal Price Calculation - turn packed price into a friendlier unpacked price.
   //
   function unpackPrice(uint16 price) internal constant returns (
@@ -544,7 +544,7 @@ contract BookERC20EthV1p1 {
     exponent = int8(zeroBasedExponent) + minPriceExponent;
     return;
   }
-  
+
   // Internal Price Calculation - is a packed price on the buy side?
   //
   // Throws an error if price is invalid.
@@ -553,7 +553,7 @@ contract BookERC20EthV1p1 {
     // yes, this looks odd, but max here is highest _unpacked_ price
     return price >= maxBuyPrice && price <= minBuyPrice;
   }
-  
+
   // Internal Price Calculation - turn a packed buy price into a packed sell price.
   //
   // Invalid price remains invalid.
@@ -567,7 +567,7 @@ contract BookERC20EthV1p1 {
       return uint16(maxBuyPrice + (maxSellPrice - price));
     }
   }
-  
+
   // Internal Price Calculation - compute amount in counter currency that would
   // be obtained by selling baseAmount at the given unpacked price (if no fees).
   //
@@ -776,7 +776,7 @@ contract BookERC20EthV1p1 {
     var (ourDirection,) = unpackPrice(order.price);
     uint theirPriceStart = (ourDirection == Direction.Buy) ? minSellPrice : maxBuyPrice;
     uint theirPriceEnd = computeOppositePrice(order.price);
-   
+
     MatchStopReason matchStopReason =
       matchAgainstBook(orderId, theirPriceStart, theirPriceEnd, maxMatches);
 
@@ -826,7 +826,7 @@ contract BookERC20EthV1p1 {
     }
     assert(false); // should not be possible to reach here
   }
- 
+
   // Used internally to indicate why we stopped matching an order against the book.
 
   enum MatchStopReason {
@@ -836,7 +836,7 @@ contract BookERC20EthV1p1 {
     PriceExhausted,
     BookExhausted
   }
- 
+
   // Internal Order Placement - Match the given order against the book.
   //
   // Resting orders matched will be updated, removed from book and funds credited to their owners.
@@ -854,7 +854,7 @@ contract BookERC20EthV1p1 {
       MatchStopReason matchStopReason
     ) {
     Order storage order = orderForOrderId[orderId];
-    
+
     uint bmi = theirPriceStart / 256;  // index into array of bitmaps
     uint bti = theirPriceStart % 256;  // bit position within bitmap
     uint bmiEnd = theirPriceEnd / 256; // last bitmap to search
@@ -863,7 +863,7 @@ contract BookERC20EthV1p1 {
     uint cbm = occupiedPriceBitmaps[bmi]; // original copy of current bitmap
     uint dbm = cbm; // dirty version of current bitmap where we may have cleared bits
     uint wbm = cbm >> bti; // working copy of current bitmap which we keep shifting
-    
+
     // these loops are pretty ugly, and somewhat unpredicatable in terms of gas,
     // ... but no-one else has come up with a better matching engine yet!
 
@@ -1000,7 +1000,7 @@ contract BookERC20EthV1p1 {
       removedLastAtPrice = false;
     }
   }
-  
+
   // Internal Order Placement.
   //
   // Match up to our remaining amount against a resting order in the book.
@@ -1022,7 +1022,7 @@ contract BookERC20EthV1p1 {
   //     If our order is completely matched, matchStopReason will be Satisfied.
   //     If our order is not completely matched, matchStopReason will be either
   //     PriceExhausted (if nothing left at this exact price) or None (if can continue).
-  // 
+  //
   function matchWithTheirs(
     uint ourRemainingBase, uint128 theirOrderId, uint16 theirPrice) internal returns (
     uint128 nextTheirOrderId, uint matchBase, uint matchCntr, MatchStopReason matchStopReason) {
@@ -1183,7 +1183,7 @@ contract BookERC20EthV1p1 {
   }
 
   // Public Book View
-  // 
+  //
   // Intended for public book depth enumeration from web3 (or similar).
   //
   // Not suitable for use from a smart contract transaction - gas usage
@@ -1212,16 +1212,16 @@ contract BookERC20EthV1p1 {
     ) {
     uint priceStart = fromPrice;
     uint priceEnd = (isBuyPrice(fromPrice)) ? minBuyPrice : maxSellPrice;
-    
+
     // See comments in matchAgainstBook re: how these crazy loops work.
-    
+
     uint bmi = priceStart / 256;
     uint bti = priceStart % 256;
     uint bmiEnd = priceEnd / 256;
     uint btiEnd = priceEnd % 256;
 
     uint wbm = occupiedPriceBitmaps[bmi] >> bti;
-    
+
     while (bmi < bmiEnd) {
       if (wbm == 0 || bti == 256) {
         bti = 0;
@@ -1284,4 +1284,33 @@ contract BookERC20EthV1p1Factory {
         book.changeFeeCollector(_feeCollector);
         BookCreated(address(book));
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

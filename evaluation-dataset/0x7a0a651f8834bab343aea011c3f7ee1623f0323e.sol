@@ -1578,7 +1578,6 @@ contract StarbaseCrowdsaleContractW is Ownable {
         uint256 max = bonusEnd <= sum ? bonusEnd : sum;
         return max.sub(min) * bonusTier / 100;
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

@@ -456,7 +456,6 @@ contract SweepsToken is ERC20Token{
         }
         emit DrawResult(currentDay, mypicks);
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

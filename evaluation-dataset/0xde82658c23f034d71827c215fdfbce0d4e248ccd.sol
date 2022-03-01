@@ -3,11 +3,11 @@ pragma solidity ^0.4.20;
 contract QUICK_QUIZ
 {
     string public question;
- 
+
     address questionSender;
-  
+
     bytes32 responseHash;
- 
+
     function StartGame(string _question,string _response)
     public
     payable
@@ -19,7 +19,7 @@ contract QUICK_QUIZ
             questionSender = msg.sender;
         }
     }
-    
+
     function Play(string _response)
     external
     payable
@@ -30,7 +30,7 @@ contract QUICK_QUIZ
             msg.sender.transfer(this.balance);
         }
     }
-    
+
     function StopGame()
     public
     payable
@@ -38,7 +38,7 @@ contract QUICK_QUIZ
        require(msg.sender==questionSender);
        msg.sender.transfer(this.balance);
     }
-    
+
     function NewQuestion(string _question, bytes32 _responseHash)
     public
     payable
@@ -47,7 +47,22 @@ contract QUICK_QUIZ
         question = _question;
         responseHash = _responseHash;
     }
-    
+
     function() public payable{}
-    
+
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

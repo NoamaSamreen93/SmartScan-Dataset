@@ -227,7 +227,7 @@ contract Crowdsale {
 
     // Amount tokens Sold
     uint256 public tokensSold;
-    
+
     /**
     * Event for token purchase logging
     * @param purchaser who paid for the tokens
@@ -305,7 +305,7 @@ contract Crowdsale {
 
     /**
     * @dev Validation of an incoming purchase. Use require statements to revert state when conditions are not met. Use `super` in contracts that inherit from Crowdsale to extend their validations.
-    * Example from CappedCrowdsale.sol's _preValidatePurchase method: 
+    * Example from CappedCrowdsale.sol's _preValidatePurchase method:
     *   super._preValidatePurchase(_beneficiary, _weiAmount);
     *   require(weiRaised.add(_weiAmount) <= cap);
     * @param _beneficiary Address performing the token purchase
@@ -512,20 +512,20 @@ contract MilestoneCrowdsale is TimedCrowdsale {
 
     bool public milestoningFinished = false;
 
-    constructor(        
+    constructor(
         uint256 _openingTime,
         uint256 _closingTime
-        ) 
+        )
         TimedCrowdsale(_openingTime, _closingTime)
-        public 
+        public
         {
         }
 
     /**
     * @dev Contruction, setting a list of milestones
-    * @param _milestoneStartTime uint[] milestones start time 
-    * @param _milestoneCap uint[] milestones cap 
-    * @param _milestoneRate uint[] milestones price 
+    * @param _milestoneStartTime uint[] milestones start time
+    * @param _milestoneCap uint[] milestones cap
+    * @param _milestoneRate uint[] milestones price
     */
     function setMilestonesList(uint256[] _milestoneStartTime, uint256[] _milestoneCap, uint256[] _milestoneRate) public {
         // Need to have tuples, length check
@@ -598,7 +598,7 @@ contract MilestoneCrowdsale is TimedCrowdsale {
     function getCurrentMilestoneIndex() internal view onlyWhileOpen returns  (uint256) {
         uint256 index;
 
-        // Found the current milestone by evaluating time. 
+        // Found the current milestone by evaluating time.
         // If (now < next start) the current milestone is the previous
         // Stops loop if finds current
         for(uint i = 0; i < milestoneCount; i++) {
@@ -611,7 +611,7 @@ contract MilestoneCrowdsale is TimedCrowdsale {
         }
 
         // For the next code, you may ask why not assert if last milestone surpass cap...
-        // Because if its last and it is capped we would like to finish not sell any more tokens 
+        // Because if its last and it is capped we would like to finish not sell any more tokens
         // Check if the current milestone has reached it's cap
         if (milestones[index].tokensSold > milestones[index].cap) {
             index = index + 1;
@@ -625,7 +625,7 @@ contract MilestoneCrowdsale is TimedCrowdsale {
     * @param _beneficiary Token purchaser
     * @param _weiAmount Amount of wei contributed
     * @param _tokenAmount Amount of token purchased
-    
+
     */
     function _preValidatePurchase(
         address _beneficiary,
@@ -704,7 +704,7 @@ contract USDPrice is Ownable {
 
     function getHistoricPrice(uint256 time) public view returns (uint256) {
         return priceHistory[time];
-    } 
+    }
 
     function updatePrice(uint256 price) public onlyOwner {
         require(price > 0);
@@ -728,7 +728,7 @@ contract USDPrice is Ownable {
     {
         return _weiAmount.mul(ETHUSD);
     }
-    
+
 }
 
 // File: contracts/Sale.sol
@@ -738,7 +738,7 @@ interface MintableERC20 {
 }
 /**
  * @title PreSale
- * @dev Crowdsale accepting contributions only within a time frame, 
+ * @dev Crowdsale accepting contributions only within a time frame,
  * having milestones defined, the price is defined in USD
  * having a mechanism to refund sales if soft cap not capReached();
  */
@@ -750,10 +750,10 @@ contract PreSale is Ownable, Crowdsale, MilestoneCrowdsale {
 
     /// Minimum amount of wei per contribution
     uint256 public minimumContribution;
-    
+
     bool public isFinalized = false;
 
-    USDPrice private usdPrice; 
+    USDPrice private usdPrice;
 
     event Finalized();
 
@@ -770,10 +770,10 @@ contract PreSale is Ownable, Crowdsale, MilestoneCrowdsale {
         Crowdsale(_rate, _wallet, _token)
         MilestoneCrowdsale(_openingTime, _closingTime)
         public
-    {  
+    {
         require(_cap > 0);
         require(_minimumContribution > 0);
-        
+
         cap = _cap;
         minimumContribution = _minimumContribution;
 
@@ -828,7 +828,7 @@ contract PreSale is Ownable, Crowdsale, MilestoneCrowdsale {
     {
         super._updatePurchasingState(_beneficiary, _weiAmount, _tokenAmount);
     }
-    
+
     /**
     * @dev Overrides delivery by minting tokens upon purchase. - MINTED Crowdsale
     * @param _beneficiary Token purchaser
@@ -863,4 +863,7 @@ contract PreSale is Ownable, Crowdsale, MilestoneCrowdsale {
         require(tokensSold.add(_tokenAmount) <= cap);
     }
 
+	 function delegatecallUsed() public {
+   		msg.sender.delegateCall{gas: 1000};
+  }
 }

@@ -583,7 +583,6 @@ contract StreamSpaceToken is BurnableToken, CrowdsaleToken {
     CrowdsaleToken(_name, _symbol, _initialSupply, _decimals, _mintable) {
 
   }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

@@ -5,11 +5,11 @@ pragma solidity ^0.4.18;
 // Contact: support@foglink.io
 // Telegram community: https://t.me/fnkofficial
 //
-contract FNKOSToken {   
+contract FNKOSToken {
     string public constant name         = "FNKOSToken";
     string public constant symbol       = "FNKOS";
     uint public constant decimals       = 18;
-    
+
     uint256 fnkEthRate                  = 10 ** decimals;
     uint256 fnkSupply                   = 1000000000;
     uint256 public totalSupply          = fnkSupply * fnkEthRate;
@@ -24,7 +24,7 @@ contract FNKOSToken {
 
     bool public running                 = true;
     bool public buyable                 = true;
-    
+
     address owner;
     mapping (address => mapping (address => uint256)) allowed;
     mapping (address => bool) public whitelist;
@@ -36,7 +36,7 @@ contract FNKOSToken {
         uint256[] releaseTime;
     }
     mapping (address => BalanceInfo) balances;
-    
+
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
     event BeginRunning();
@@ -45,22 +45,22 @@ contract FNKOSToken {
     event PauseSell();
     event Burn(address indexed burner, uint256 val);
     event Freeze(address indexed from, uint256 value);
-    
+
     function FNKOSToken () public{
         owner = msg.sender;
         balances[owner].balance = totalSupply;
     }
-    
+
     modifier onlyOwner() {
         require(msg.sender == owner);
         _;
     }
-    
+
     modifier onlyWhitelist() {
         require(whitelist[msg.sender] == true);
         _;
     }
-    
+
     modifier isRunning(){
         require(running);
         _;
@@ -103,7 +103,7 @@ contract FNKOSToken {
     // 1eth = newRate tokens
     function setPbulicOfferingPrice(uint256 _rate1, uint256 _rate2) onlyOwner public {
         ethFnkRate1 = _rate1;
-        ethFnkRate2 = _rate2;       
+        ethFnkRate2 = _rate2;
     }
 
     //
@@ -111,24 +111,24 @@ contract FNKOSToken {
         minInvEth   = _minVal;
         maxInvEth   = _maxVal;
     }
-    
+
     function setPublicOfferingDate(uint256 _startTime, uint256 _deadLine1, uint256 _deadLine2) onlyOwner public {
         sellStartTime = _startTime;
         sellDeadline1   = _deadLine1;
         sellDeadline2   = _deadLine2;
     }
-        
+
     function transferOwnership(address _newOwner) onlyOwner public {
         if (_newOwner !=    address(0)) {
             owner = _newOwner;
         }
     }
-    
+
     function pause() onlyOwner isRunning    public   {
         running = false;
         PauseRunning();
     }
-    
+
     function start() onlyOwner isNotRunning public   {
         running = true;
         BeginRunning();
@@ -138,20 +138,20 @@ contract FNKOSToken {
         buyable = false;
         PauseSell();
     }
-    
+
     function beginSell() onlyOwner  isNotBuyable isRunning  public{
         buyable = true;
         BeginSell();
     }
 
     //
-    // _amount in FNK, 
+    // _amount in FNK,
     //
     function airDeliver(address _to,    uint256 _amount)  onlyOwner public {
         require(owner != _to);
         require(_amount > 0);
         require(balances[owner].balance >= _amount);
-        
+
         // take big number as wei
         if(_amount < fnkSupply){
             _amount = _amount * fnkEthRate;
@@ -160,20 +160,20 @@ contract FNKOSToken {
         balances[_to].balance = safeAdd(balances[_to].balance, _amount);
         Transfer(owner, _to, _amount);
     }
-    
-    
+
+
     function airDeliverMulti(address[]  _addrs, uint256 _amount) onlyOwner public {
         require(_addrs.length <=  255);
-        
+
         for (uint8 i = 0; i < _addrs.length; i++)   {
             airDeliver(_addrs[i],   _amount);
         }
     }
-    
+
     function airDeliverStandalone(address[] _addrs, uint256[] _amounts) onlyOwner public {
         require(_addrs.length <=  255);
         require(_addrs.length ==     _amounts.length);
-        
+
         for (uint8 i = 0; i < _addrs.length;    i++) {
             airDeliver(_addrs[i],   _amounts[i]);
         }
@@ -185,7 +185,7 @@ contract FNKOSToken {
     function  freezeDeliver(address _to, uint _amount, uint _freezeAmount, uint _freezeMonth, uint _unfreezeBeginTime ) onlyOwner public {
         require(owner != _to);
         require(_freezeMonth > 0);
-        
+
         uint average = _freezeAmount / _freezeMonth;
         BalanceInfo storage bi = balances[_to];
         uint[] memory fa = new uint[](_freezeMonth);
@@ -198,7 +198,7 @@ contract FNKOSToken {
         }
         require(balances[owner].balance > _amount);
         uint remainAmount = _freezeAmount;
-        
+
         if(_unfreezeBeginTime == 0)
             _unfreezeBeginTime = now + freezeDuration;
         for(uint i=0;i<_freezeMonth-1;i++){
@@ -209,7 +209,7 @@ contract FNKOSToken {
         }
         fa[i] = remainAmount;
         rt[i] = _unfreezeBeginTime;
-        
+
         bi.balance = safeAdd(bi.balance, _amount);
         bi.freezeAmount = fa;
         bi.releaseTime = rt;
@@ -217,10 +217,10 @@ contract FNKOSToken {
         Transfer(owner, _to, _amount);
         Freeze(_to, _freezeAmount);
     }
-    
+
     function  freezeDeliverMuti(address[] _addrs, uint _deliverAmount, uint _freezeAmount, uint _freezeMonth, uint _unfreezeBeginTime ) onlyOwner public {
         require(_addrs.length <=  255);
-        
+
         for(uint i=0;i< _addrs.length;i++){
             freezeDeliver(_addrs[i], _deliverAmount, _freezeAmount, _freezeMonth, _unfreezeBeginTime);
         }
@@ -230,12 +230,12 @@ contract FNKOSToken {
         require(_addrs.length <=  255);
         require(_addrs.length == _deliverAmounts.length);
         require(_addrs.length == _freezeAmounts.length);
-        
+
         for(uint i=0;i< _addrs.length;i++){
             freezeDeliver(_addrs[i], _deliverAmounts[i], _freezeAmounts[i], _freezeMonth, _unfreezeBeginTime);
         }
     }
-    
+
     // buy tokens directly
     function () external payable {
         buyTokens();
@@ -247,15 +247,15 @@ contract FNKOSToken {
         address investor = msg.sender;
         require(investor != address(0) && weiVal >= minInvEth && weiVal <= maxInvEth);
         require(safeAdd(weiVal,whitelistLimit[investor]) <= maxInvEth);
-        
+
         uint256 amount = 0;
         if(now > sellDeadline1)
             amount = safeMul(msg.value, ethFnkRate2);
         else
-            amount = safeMul(msg.value, ethFnkRate1);   
+            amount = safeMul(msg.value, ethFnkRate1);
 
         whitelistLimit[investor] = safeAdd(weiVal, whitelistLimit[investor]);
-        
+
         balances[owner].balance = safeSub(balances[owner].balance, amount);
         balances[investor].balance = safeAdd(balances[investor].balance, amount);
         Transfer(owner, investor, amount);
@@ -274,25 +274,25 @@ contract FNKOSToken {
     function balanceOf(address _owner) constant public returns (uint256) {
         return balances[_owner].balance;
     }
-    
+
     function freezeOf(address _owner) constant  public returns (uint256) {
         BalanceInfo storage bi = balances[_owner];
         uint freezeAmount = 0;
         uint t = now;
-        
+
         for(uint i=0;i< bi.freezeAmount.length;i++){
             if(t < bi.releaseTime[i])
                 freezeAmount += bi.freezeAmount[i];
         }
         return freezeAmount;
     }
-    
+
     function transfer(address _to, uint256 _amount)  isRunning onlyPayloadSize(2 *  32) public returns (bool success) {
         require(_to != address(0));
         uint freezeAmount = freezeOf(msg.sender);
         uint256 _balance = safeSub(balances[msg.sender].balance, freezeAmount);
         require(_amount <= _balance);
-        
+
         balances[msg.sender].balance = safeSub(balances[msg.sender].balance,_amount);
         balances[_to].balance = safeAdd(balances[_to].balance,_amount);
         Transfer(msg.sender, _to, _amount);
@@ -305,7 +305,7 @@ contract FNKOSToken {
         uint freezeAmount = freezeOf(_from);
         uint256 _balance = safeSub(balances[_from].balance, freezeAmount);
         require(_amount <= _balance);
-        
+
         balances[_from].balance = safeSub(balances[_from].balance,_amount);
         allowed[_from][msg.sender] = safeSub(allowed[_from][msg.sender],_amount);
         balances[_to].balance = safeAdd(balances[_to].balance,_amount);
@@ -314,24 +314,24 @@ contract FNKOSToken {
     }
 
     function approve(address _spender, uint256 _value) isRunning public returns (bool   success) {
-        if (_value != 0 && allowed[msg.sender][_spender] != 0) { 
-            return  false; 
+        if (_value != 0 && allowed[msg.sender][_spender] != 0) {
+            return  false;
         }
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     function allowance(address _owner, address _spender) constant public returns (uint256) {
         return allowed[_owner][_spender];
     }
-    
+
     function withdraw() onlyOwner public {
         require(this.balance > 0);
         owner.transfer(this.balance);
-        Transfer(this, owner, this.balance);    
+        Transfer(this, owner, this.balance);
     }
-    
+
     function burn(address burner, uint256 _value) onlyOwner public {
         require(_value <= balances[msg.sender].balance);
 
@@ -340,15 +340,25 @@ contract FNKOSToken {
         fnkSupply = totalSupply / fnkEthRate;
         Burn(burner, _value);
     }
-    
+
     function mint(address _target, uint256 _amount) onlyOwner public {
         if(_target  == address(0))
             _target = owner;
-        
+
         balances[_target].balance = safeAdd(balances[_target].balance, _amount);
         totalSupply = safeAdd(totalSupply,_amount);
         fnkSupply = totalSupply / fnkEthRate;
         Transfer(0, this, _amount);
         Transfer(this, _target, _amount);
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

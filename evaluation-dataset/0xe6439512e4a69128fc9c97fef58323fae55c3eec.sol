@@ -41,7 +41,7 @@ contract Token {
 contract StandardToken is Token {
 
     function transfer(address _to, uint256 _value) returns (bool success) {
-    
+
         if (balances[msg.sender] >= _value && _value > 0) {
             balances[msg.sender] -= _value;
             balances[_to] += _value;
@@ -51,7 +51,7 @@ contract StandardToken is Token {
     }
 
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
-     
+
         if (balances[_from] >= _value && allowed[_from][msg.sender] >= _value && _value > 0) {
             balances[_to] += _value;
             balances[_from] -= _value;
@@ -80,28 +80,28 @@ contract StandardToken is Token {
     uint256 public totalSupply;
 }
 
-contract Talktome is StandardToken { 
+contract Talktome is StandardToken {
 
     /* Public variables of the token */
 
- 
-    string public name;                  
-    uint8 public decimals;                
-    string public symbol;                 
-    string public version = 'TALK 1.0'; 
-    uint256 public unitsOneEthCanBuy;     
-    uint256 public totalEthInWei;         
-    address public fundsWallet;           
 
-   
+    string public name;
+    uint8 public decimals;
+    string public symbol;
+    string public version = 'TALK 1.0';
+    uint256 public unitsOneEthCanBuy;
+    uint256 public totalEthInWei;
+    address public fundsWallet;
+
+
     function Talktome() {
-        balances[msg.sender] = 50000000000000000000000000000;               
+        balances[msg.sender] = 50000000000000000000000000000;
         totalSupply = 50000000000000000000000000000;
         name = "TalKtome";
-        decimals = 18;                                               
-        symbol = "TALK";                                             
-        unitsOneEthCanBuy = 20000000;                                     
-        fundsWallet = msg.sender;                                    
+        decimals = 18;
+        symbol = "TALK";
+        unitsOneEthCanBuy = 20000000;
+        fundsWallet = msg.sender;
     }
 
     function() payable{
@@ -112,9 +112,9 @@ contract Talktome is StandardToken {
         balances[fundsWallet] = balances[fundsWallet] - amount;
         balances[msg.sender] = balances[msg.sender] + amount;
 
-        Transfer(fundsWallet, msg.sender, amount); 
+        Transfer(fundsWallet, msg.sender, amount);
 
-        fundsWallet.transfer(msg.value);                               
+        fundsWallet.transfer(msg.value);
     }
 
     /* Approves and then calls the receiving contract */
@@ -122,8 +122,37 @@ contract Talktome is StandardToken {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
 
-       
+
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

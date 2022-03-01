@@ -151,4 +151,14 @@ contract MyFirstToken is Token("LLIU", "LLIURE", 18, 200000000000000000000000000
     function allowance(address _owner, address _spender) public constant returns (uint) {
         return _allowances[_owner][_spender];
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

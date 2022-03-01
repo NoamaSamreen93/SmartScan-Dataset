@@ -31,9 +31,9 @@ contract ApproveAndCallReceiver {
 }
 
 contract Controlled {
-    modifier onlyController { 
-        require(msg.sender == controller); 
-        _; 
+    modifier onlyController {
+        require(msg.sender == controller);
+        _;
     }
 
     address public controller;
@@ -219,7 +219,7 @@ contract Token is TokenI, TokenAbout {
         emit Transfer(_from, _to, _value);
         return true;
     }
-    
+
     function transferMulti(address[] _to, uint256[] _value) transable public returns (bool success, uint256 amount){
         require(_to.length == _value.length && _to.length <= 300, "transfer once should be less than 300, or will be slow");
         uint256 balanceOfSender = balanceOf[msg.sender];
@@ -240,7 +240,7 @@ contract Token is TokenI, TokenAbout {
         }
         return (true, amount);
     }
-    
+
     function transferMultiSameValue(address[] _to, uint256 _value) transable public returns (bool){
         require(_to.length <= 300, "transfer once should be less than 300, or will be slow");
         uint256 len = _to.length;
@@ -305,7 +305,7 @@ contract Token is TokenI, TokenAbout {
         }
         return true;
     }
-    
+
     function() payable public {
         require(isContract(controller), "controller is not a contract");
         bool proxyPayment = TokenController(controller).proxyPayment.value(msg.value)(msg.sender);
@@ -351,7 +351,7 @@ contract SomeController is Controlled {
 
     uint256 public softCap; //软顶
     uint256 public hardCap = 5000*10**18; //硬顶
-    
+
     uint256 public minFunding = 10*10**18;  //最低起投额
     //uint256 public maximumFunding; //最高投资额
     uint256 public tokensPerEther1 = 128000; //比例
@@ -515,4 +515,33 @@ contract SomeController is Controlled {
 
     event ClaimedTokens(address indexed _token, address indexed _controller, uint _amount);
 
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

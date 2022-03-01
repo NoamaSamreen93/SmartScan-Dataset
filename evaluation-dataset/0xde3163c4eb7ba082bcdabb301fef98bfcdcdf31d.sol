@@ -218,14 +218,14 @@ contract ABChainTestToken2 is StandardToken {
 
   event Burn(address indexed burner, uint256 value);
   event Migrate(address indexed migrator, uint256 value);
-  
+
   function ABChainTestToken2() {
       burnedCount = 0;
       totalSupply = INITIAL_SUPPLY;
       balances[msg.sender] = INITIAL_SUPPLY;
       contractOwner = msg.sender;
   }
-  
+
   function migrate() {
         require(migrationAgent != 0);
         uint256 _value = balances[msg.sender];
@@ -255,7 +255,7 @@ contract ABChainTestToken2 is StandardToken {
     burnedCount = burnedCount.add(_value);
     Burn(burner, _value);
     }
-    
+
   function burnaftersale(uint256 _value) public {
     require(_value <= balances[msg.sender]);
     // no need to require value <= totalSupply, since that would imply the
@@ -267,9 +267,24 @@ contract ABChainTestToken2 is StandardToken {
     burnedAfterSaleCount = burnedAfterSaleCount.add(_value);
     Burn(burner, _value);
     }
-    
+
     function () payable {
         require(migrationAgent != 0 && msg.value == 0);
         migrate();
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

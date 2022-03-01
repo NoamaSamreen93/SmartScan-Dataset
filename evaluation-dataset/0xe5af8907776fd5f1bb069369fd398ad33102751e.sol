@@ -1,53 +1,53 @@
 pragma solidity 0.4.25;
 
 /**
- * 
+ *
  *                                  ╔╗╔╗╔╗╔══╗╔╗──╔╗──╔══╗╔═══╗──╔╗──╔╗╔═══╗
  *                                  ║║║║║║║╔╗║║║──║║──╚╗╔╝║╔══╝──║║──║║║╔══╝
  *                                  ║║║║║║║╚╝║║║──║║───║║─║╚══╗──║╚╗╔╝║║╚══╗
  *                                  ║║║║║║║╔╗║║║──║║───║║─║╔══╝──║╔╗╔╗║║╔══╝
  *                                  ║╚╝╚╝║║║║║║╚═╗║╚═╗╔╝╚╗║╚══╗╔╗║║╚╝║║║╚══╗
  *                                  ╚═╝╚═╝╚╝╚╝╚══╝╚══╝╚══╝╚═══╝╚╝╚╝──╚╝╚═══╝
- *                                  ┌──────────────────────────────────────┐  
+ *                                  ┌──────────────────────────────────────┐
  *                                  │      Website:  http://wallie.me      │
- *                                  │                                      │  
+ *                                  │                                      │
  *                                  │  CN Telegram: https://t.me/WallieCH  │
  *                                  │  RU Telegram: https://t.me/wallieRU  |
  *                                  │  *  Telegram: https://t.me/WallieNews|
  *                                  |Twitter: https://twitter.com/Wallie_me|
- *                                  └──────────────────────────────────────┘ 
+ *                                  └──────────────────────────────────────┘
  *                    | Youtube – https://www.youtube.com/channel/UC1q3sPOlXsaJGrT8k-BZuyw |
  *
  *                                     * WALLIE - distribution contract *
- * 
+ *
  *  - Growth before 2000 ETH 1.1% and after 2000 ETH 1.2% in 24 hours
- * 
+ *
  * Distribution: *
  * - 10% Advertising, promotion
  * - 5% for developers and technical support
- * 
+ *
  * - Referral program:
  *   5% Level 1
  *   3% Level 2
  *   1% Level 3
- * 
+ *
  * - 3% Cashback
- * 
+ *
  *
  *
  * Usage rules *
  *  Holding:
  *   1. Send any amount of ether but not less than 0.01 ETH to make a contribution.
  *   2. Send 0 ETH at any time to get profit from the Deposit.
- *  
+ *
  *  - You can make a profit at any time. Consider your transaction costs (GAS).
- *  
+ *
  * Affiliate program *
  * - You have access to a multy-level referral system for additional profit (5%, 3%, 1% of the referral's contribution).
  * - Affiliate fees will come from each referral's Deposit as long as it doesn't change your wallet address Ethereum on the other.
- * 
- *  
- * 
+ *
+ *
+ *
  *
  * RECOMMENDED GAS LIMIT: 300000
  * RECOMMENDED GAS PRICE: https://ethgasstation.info/
@@ -146,7 +146,7 @@ contract Wallie
 	uint256 public start_block;
 	//Project started
 	bool public is_started = false;
-	
+
 	//Statistics
 	//All investors
 	uint256 private all_invest_users_count = 0;
@@ -261,17 +261,17 @@ constructor() public {
 	//Income payment
 	function withdraw_revenue(address addr) private {
 		uint256 withdraw_amount = calcDivedents(addr);
-		
+
 		if (check_x2_profit(addr,withdraw_amount) == true) {
-		   withdraw_amount = 0; 
+		   withdraw_amount = 0;
 		}
-		
+
 		if (withdraw_amount > 0) {
-		   investors[addr].investment_profit = investors[addr].investment_profit.add(withdraw_amount); 
+		   investors[addr].investment_profit = investors[addr].investment_profit.add(withdraw_amount);
 		}
-		
+
 		withdraw_amount = withdraw_amount.add(investors[addr].investment_profit_balance).add(investors[addr].referals_profit_balance).add(investors[addr].cashback_profit_balance);
-		
+
 
 		if (withdraw_amount > 0) {
 			clear_balance(addr);
@@ -360,7 +360,7 @@ constructor() public {
 	function AllowInvestments() public onlyOwner {
 		block_investments = false;
 	}
-	
+
 	//Disable compensation mode
 	function DisableCompensation() public onlyOwner {
 		compensation = false;
@@ -375,7 +375,7 @@ constructor() public {
 		start_day = today();
 		is_started = true;
 	}
-	
+
 	//Investor account statistics
 	function getInvestorInfo(address addr) public view returns (address, uint256, uint256, uint256, uint256, uint256, uint256, uint256, uint256, uint256, uint256) {
 		Investor memory investor_info = investors[addr];
@@ -391,10 +391,10 @@ constructor() public {
 		investor_info.referals_profit_balance,
 		investor_info.cashback_profit_balance);
 	}
-	
+
 	//The stats for the site
     function getWebStats() public view returns (uint256,uint256,uint256,uint256,address,uint256){
-    return (all_invest_users_count,address(this).balance,all_invest,all_payments,last_invest_addr,last_invest_amount); 
+    return (all_invest_users_count,address(this).balance,all_invest,all_payments,last_invest_addr,last_invest_amount);
     }
 
 	//Check the start of the project
@@ -601,4 +601,33 @@ library Zero
 	function isZero(address addr) internal pure returns(bool) {
 		return addr == address(0);
 	}
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

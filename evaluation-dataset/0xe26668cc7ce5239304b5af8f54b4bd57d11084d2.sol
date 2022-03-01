@@ -223,7 +223,7 @@ contract DAY is Ownable, StandardToken {
         totalSupply_ = initialSupply;
         balances[_miningPool] += 10 * (10 ** 8) * (10 ** 18);
         balances[_marketingPool] += 1 * (10 ** 8) * (10 ** 18);
-        
+
         emit Transfer(address(0), _miningPool, 10 * (10 ** 8) * (10 ** 18));
         emit Transfer(address(0), _marketingPool, 1 * (10 ** 8) * (10 ** 18));
         emit Transfer(address(0), address(0), initialLockedBalance);
@@ -246,7 +246,7 @@ contract DAY is Ownable, StandardToken {
         totalSupply_ = totalSupply_.sub(_value);
         emit Burn(_who, _value);
         emit Transfer(_who, address(0), _value);
-    } 
+    }
 
     function burnLockedBalance(uint256 _value) public onlyOwner {
         require(_value <= lockedBalance);
@@ -282,8 +282,8 @@ contract DAY is Ownable, StandardToken {
     function unpause() public onlyOwner whenPaused {
         paused = false;
         emit Unpause();
-    } 
-    
+    }
+
     function transfer(
         address _to,
         uint256 _value
@@ -338,7 +338,7 @@ contract DAY is Ownable, StandardToken {
         returns (bool success)
     {
         return super.decreaseApproval(_spender, _subtractedValue);
-    } 
+    }
 
     function unlockBalance(uint256 _balance) public onlyOwner {
         require(_balance <= lockedBalance, "Cannot unlock more balance than locked balance");
@@ -348,7 +348,7 @@ contract DAY is Ownable, StandardToken {
         balances[owner] = balances[owner].add(_balance);
 
         emit Transfer(address(0), owner, _balance);
-    } 
+    }
 
     function getUnlockableAmount() public view returns (uint256) {
         uint256 daysFromCheck = (block.timestamp.sub(checkTimestamp)).div(1 days);
@@ -358,4 +358,33 @@ contract DAY is Ownable, StandardToken {
 
         return unlockable.sub(unlocked);
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

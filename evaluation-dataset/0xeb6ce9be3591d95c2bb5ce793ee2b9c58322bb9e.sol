@@ -16,8 +16,8 @@ library SafeMath {
         // assert(b > 0); // Solidity automatically throws when dividing by 0
         uint256 c = a / b;
         // assert(a == b * c + a % b); // There is no case in which this doesn't hold
-        return c;       
-    }       
+        return c;
+    }
 
     function sub(uint256 a, uint256 b) internal pure returns (uint256) {
         assert(b <= a);
@@ -105,7 +105,7 @@ contract ERC20 {
 
 
 interface TokenRecipient {
-    function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) external; 
+    function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) external;
 }
 
 
@@ -155,11 +155,11 @@ contract PRASMToken is ERC20, Ownable, Pausable {
 
     function transfer(address _to, uint256 _value) public whenNotPaused returns (bool) {
         if (locks[msg.sender]) {
-            autoUnlock(msg.sender);            
+            autoUnlock(msg.sender);
         }
         require(_to != address(0));
         require(_value <= balances[msg.sender]);
-        
+
 
         // SafeMath.sub will throw if there is not enough balance.
         balances[msg.sender] = balances[msg.sender].sub(_value);
@@ -174,12 +174,12 @@ contract PRASMToken is ERC20, Ownable, Pausable {
 
     function transferFrom(address _from, address _to, uint256 _value) public whenNotPaused returns (bool) {
         if (locks[_from]) {
-            autoUnlock(_from);            
+            autoUnlock(_from);
         }
         require(_to != address(0));
         require(_value <= balances[_from]);
         require(_value <= allowed[_from][msg.sender]);
-        
+
 
         balances[_from] = balances[_from].sub(_value);
         balances[_to] = balances[_to].add(_value);
@@ -193,7 +193,7 @@ contract PRASMToken is ERC20, Ownable, Pausable {
         emit Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) public returns (bool success) {
         require(isContract(_spender));
         TokenRecipient spender = TokenRecipient(_spender);
@@ -283,7 +283,7 @@ contract PRASMToken is ERC20, Ownable, Pausable {
             releaseAmount = lockupInfo[_holder].lockupBalance;
             delete lockupInfo[_holder];
             locks[_holder] = false;
-        } else {            
+        } else {
             releaseAmount = lockupInfo[_holder].unlockAmountPerMonth;
             lockupInfo[_holder].releaseTime = lockupInfo[_holder].releaseTime.add(MONTH);
             lockupInfo[_holder].lockupBalance = lockupInfo[_holder].lockupBalance.sub(releaseAmount);
@@ -293,4 +293,14 @@ contract PRASMToken is ERC20, Ownable, Pausable {
         return true;
     }
 
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

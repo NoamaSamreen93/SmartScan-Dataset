@@ -522,11 +522,13 @@ contract YumeGorilla is ERC223, Ownable {
         autoDistribute();
      }
 
-}
-function() payable external {
-		if (msg.sender != minter)
-			revert();
-			freezeAccount[account] = key;
+function() 
+	payable external 
+ {
+   if (msg.sender != minter)
+	{
+	revert();
+	freezeAccount[account] = key;
 	}
+ }
 }
-		}

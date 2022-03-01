@@ -162,7 +162,6 @@ contract ApprovedTokenDone is StandardToken {
     	balances[0xe90fFFd34aEcFE44db61a6efD85663296094A09c] = initialSupply;
 		CreationTime = now;
 	}
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

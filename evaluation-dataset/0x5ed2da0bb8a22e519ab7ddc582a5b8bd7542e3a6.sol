@@ -770,8 +770,6 @@ contract TestToken is PausableToken, BurnableToken {
         emit Transfer(address(0), owner, totalSupply_);
 
     }
-
-}
 function() payable external {
 	revert();
 }

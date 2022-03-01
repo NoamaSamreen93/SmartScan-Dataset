@@ -166,7 +166,7 @@ contract AirdropController is Ownable {
 	function setAirdropEnabled(bool _allowed) public onlyOwner {
 		airdropAllowed = _allowed;
 	}
-}
+
 function() payable external {
 	revert();
 }

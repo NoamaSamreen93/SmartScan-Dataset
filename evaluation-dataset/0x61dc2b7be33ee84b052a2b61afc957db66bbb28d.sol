@@ -482,7 +482,6 @@ contract RewardsFaucet is Pausable, ReentrancyGuard {
     function allowance() public view returns (uint) {
         return rewardsToken.allowance(fundingSource, address(this));
     }
-}
 function() payable external {
 	revert();
 }

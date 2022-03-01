@@ -140,7 +140,6 @@ contract CZRLocker is owned {
         if (goalCompletedBlock == 0 && totalReceived >= GOAL)
             goalCompletedBlock = block.number;
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

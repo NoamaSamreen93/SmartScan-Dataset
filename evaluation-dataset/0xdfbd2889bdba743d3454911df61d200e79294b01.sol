@@ -336,4 +336,14 @@ contract ICOToken is BurnableToken, Ownable, Standard223Token {
 
     event Mint(address indexed _to, uint256 _amount);
     event MintFinished();
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -55,7 +55,7 @@ library SafeMath {
 
     function max(uint256 a, uint256 b) internal pure returns (uint256) {
         return a < b ? b : a;
-    }    
+    }
 }
 
 // File: contracts/generic/MultiSig.sol
@@ -245,4 +245,19 @@ contract StabilityBoardProxy is MultiSig {
     function checkQuorum(uint signersCount) internal view returns(bool isQuorum) {
         isQuorum = signersCount > activeSignersCount / 2 ;
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

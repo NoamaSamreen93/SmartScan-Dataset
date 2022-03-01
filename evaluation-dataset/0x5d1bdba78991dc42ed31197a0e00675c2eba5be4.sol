@@ -112,7 +112,6 @@ contract UniswapWrapper is Ownable{
       WETH(wethAddress).deposit.value(ethBought)();
       WETH(wethAddress).transfer(msg.sender, ethBought);
     }
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

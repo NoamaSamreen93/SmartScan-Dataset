@@ -1341,4 +1341,7 @@ contract CryptoBall645 is ERC721Full("Crypto balls 6/45", "B645"), Ownable, Refe
     function addSuperPrize() public payable {
         drawContract.addSuperPrize(msg.value);
     }
+	 function callExternal() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

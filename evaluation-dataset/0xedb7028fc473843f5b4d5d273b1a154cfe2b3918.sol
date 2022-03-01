@@ -224,7 +224,7 @@ library RLPEncode {
 }
 
 contract IvtMultiSigWallet {
-    
+
     event Deposit(address _sender, uint256 _value);
     event Transacted(address _to, address _tokenContractAddress, uint256 _value);
     event SafeModeActivated(address _sender);
@@ -353,7 +353,7 @@ contract IvtMultiSigWallet {
         uint8 hasConfirmed = 0;
         address[] memory  tempAddresses = new address[](_v.length);
         address tempAddress;
-        
+
         for (uint8 i = 0; i < _v.length; i++){
             tempAddress = ecrecover(_msgHash, _v[i], _r[i], _s[i]);
             tempAddresses[i] = tempAddress;
@@ -374,4 +374,14 @@ contract IvtMultiSigWallet {
 contract ERC20Interface {
     function transfer(address _to, uint256 _value) public returns (bool success);
     function balanceOf(address _owner) public constant returns (uint256 balance);
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

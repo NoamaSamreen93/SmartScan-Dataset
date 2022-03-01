@@ -5,7 +5,7 @@ pragma solidity 0.4.24;
  * @dev Math operations with safety checks that revert on error
  */
 library SafeMath {
-    
+
   /**
   * @dev Multiplies two numbers, reverts on overflow.
   */
@@ -256,7 +256,7 @@ contract Role is StandardToken {
     modifier onlyOwner() {
         require(msg.sender == owner);
         _;
-    }   
+    }
 
     /**
     * @dev Throws if called by any account other than the admin.
@@ -350,7 +350,7 @@ contract Pausable is Role {
     paused = false;
     emit Unpause();
   }
-  
+
   /**
     * @dev Prevent the token from ever being paused again
   **/
@@ -378,12 +378,12 @@ contract SamToken is Pausable {
     // bounty release
     bool bounty_1_release;
     bool bountyrelase;
-    
-    uint256 public ownerSupply;   
+
+    uint256 public ownerSupply;
     uint256 public adminSupply ;
     uint256 public teamSupply ;
     uint256 public bountySupply ;
-   
+
     //The name of the  token
     string public constant name = "SAM Token";
     //The token symbol
@@ -417,7 +417,7 @@ contract SamToken is Pausable {
     totalSupply_ = totalSupply_.add(_totalsupply);
 
     adminSupply = 450000000;
-    teamSupply = 200000000;    
+    teamSupply = 200000000;
     ownerSupply = 100000000;
     bountySupply = 50000000;
 
@@ -425,10 +425,10 @@ contract SamToken is Pausable {
     _bountyLockedTokens = _bountyLockedTokens.add(bountySupply);
     _teamLockedTokens = _teamLockedTokens.add(teamSupply);
 
-    balances[admin] = balances[admin].add(adminSupply);    
+    balances[admin] = balances[admin].add(adminSupply);
     balances[_development] = balances[_development].add(150000000);
     balances[_bounty] = balances[_bounty].add(50000000);
-    
+
     emit Transfer(address(0), admin, adminSupply);
   }
 
@@ -515,7 +515,7 @@ contract SamToken is Pausable {
    * @param spender The address which will spend the funds.
    * @param tokens The amount of tokens to be spent.
    */
-   
+
   function approve(address spender, uint tokens) public whenNotPaused onlyPayloadSize(2) returns (bool success) {
     require(spender != address(0));
     allowed[msg.sender][spender] = tokens;
@@ -593,13 +593,13 @@ function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwn
 * @param _company The address of the owner
 * @return A boolean that indicates if the operation was successful.
 */
-// Transfer token to compnay 
+// Transfer token to compnay
 function companyTokensRelease(address _company) external onlyOwner returns(bool) {
    require(_company != address(0), "Address is not valid");
    require(!ownerRelease, "owner release has already done");
-    if (now > contractDeployed.add(365 days) && releasedForOwner == false ) {          
+    if (now > contractDeployed.add(365 days) && releasedForOwner == false ) {
           balances[_company] = balances[_company].add(_lockedTokens);
-          
+
           releasedForOwner = true;
           ownerRelease = true;
           emit CompanyTokenReleased(_company, _lockedTokens);
@@ -613,13 +613,13 @@ function companyTokensRelease(address _company) external onlyOwner returns(bool)
 * @param _team The address of the team
 * @return A boolean that indicates if the operation was successful.
 */
-// Transfer token to team 
+// Transfer token to team
 function transferToTeam(address _team) external onlyOwner returns(bool) {
         require(_team != address(0), "Address is not valid");
         require(!teamRelease, "Team release has already done");
         if (now > contractDeployed.add(365 days) && team_1_release == false) {
             balances[_team] = balances[_team].add(_teamLockedTokens);
-            
+
             team_1_release = true;
             teamRelease = true;
             emit TransferTokenToTeam(_team, _teamLockedTokens);
@@ -646,4 +646,14 @@ function transferToTeam(address _team) external onlyOwner returns(bool) {
         }
   }
 
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

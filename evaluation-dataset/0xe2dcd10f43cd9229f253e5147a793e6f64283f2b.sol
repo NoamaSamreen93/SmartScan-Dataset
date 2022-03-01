@@ -78,11 +78,11 @@ contract Ownable {
 contract ERC20Basic {
     /// Total amount of tokens
   uint256 public totalSupply;
-  
+
   function balanceOf(address _owner) public view returns (uint256 balance);
-  
+
   function transfer(address _to, uint256 _amount) public returns (bool success);
-  
+
   event Transfer(address indexed from, address indexed to, uint256 value);
 }
 
@@ -92,11 +92,11 @@ contract ERC20Basic {
  */
 contract ERC20 is ERC20Basic {
   function allowance(address _owner, address _spender) public view returns (uint256 remaining);
-  
+
   function transferFrom(address _from, address _to, uint256 _amount) public returns (bool success);
-  
+
   function approve(address _spender, uint256 _amount) public returns (bool success);
-  
+
   event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
@@ -116,9 +116,9 @@ contract BasicToken is ERC20Basic {
       uint256 lockupAmount;
   }
   Lockup lockup;
-  mapping(address=>Lockup) lockupParticipants;  
-  
-  
+  mapping(address=>Lockup) lockupParticipants;
+
+
   uint256 startTime;
   /**
   * @dev transfer token for a specified address
@@ -163,8 +163,8 @@ contract BasicToken is ERC20Basic {
  * @dev https://github.com/ethereum/EIPs/issues/20
  */
 contract StandardToken is ERC20, BasicToken {
-  
-  
+
+
   mapping (address => mapping (address => uint256)) internal allowed;
 
 
@@ -179,7 +179,7 @@ contract StandardToken is ERC20, BasicToken {
     require(balances[_from] >= _amount);
     require(allowed[_from][msg.sender] >= _amount);
     require(_amount > 0 && balances[_to].add(_amount) > balances[_to]);
-    
+
     if (lockupParticipants[_from].lockupAmount>0)
     {
         uint timePassed = now - startTime;
@@ -253,19 +253,19 @@ contract BurnableToken is StandardToken, Ownable {
      string public name ;
      string public symbol ;
      uint8 public decimals =  2;
-     
-   
+
+
      /**
      *@dev users sending ether to this contract will be reverted. Any ether sent to the contract will be sent back to the caller
      */
      function ()public payable {
          revert();
      }
-     
+
      /**
      * @dev Constructor function to initialize the initial supply of token to the creator of the contract
      */
-     function DayDayToken(address wallet) public 
+     function DayDayToken(address wallet) public
      {
          owner = msg.sender;
          ownerWallet = wallet;
@@ -275,28 +275,28 @@ contract BurnableToken is StandardToken, Ownable {
          symbol = "DD";
          balances[wallet] = totalSupply;
          startTime = now;
-         
+
          //Emitting transfer event since assigning all tokens to the creator also corresponds to the transfer of tokens to the creator
          emit Transfer(address(0), msg.sender, totalSupply);
      }
-     
+
      /**
      *@dev helper method to get token details, name, symbol and totalSupply in one go
      */
     function getTokenDetail() public view returns (string, string, uint256) {
 	    return (name, symbol, totalSupply);
     }
-    
-     
+
+
     function lockTokensForFs (address F1, address F2) public onlyOwner
     {
         lockup = Lockup({lockupTime:720 days,lockupAmount:90000000 * 10 ** uint256(decimals)});
         lockupParticipants[F1] = lockup;
-        
+
         lockup = Lockup({lockupTime:720 days,lockupAmount:60000000 * 10 ** uint256(decimals)});
         lockupParticipants[F2] = lockup;
     }
-    function lockTokensForAs( address A1, address A2, 
+    function lockTokensForAs( address A1, address A2,
                          address A3, address A4,
                          address A5, address A6,
                          address A7, address A8,
@@ -304,50 +304,79 @@ contract BurnableToken is StandardToken, Ownable {
     {
         lockup = Lockup({lockupTime:180 days,lockupAmount:90000000 * 10 ** uint256(decimals)});
         lockupParticipants[A1] = lockup;
-        
+
         lockup = Lockup({lockupTime:180 days,lockupAmount:60000000 * 10 ** uint256(decimals)});
         lockupParticipants[A2] = lockup;
-        
+
         lockup = Lockup({lockupTime:180 days,lockupAmount:30000000 * 10 ** uint256(decimals)});
         lockupParticipants[A3] = lockup;
-        
+
         lockup = Lockup({lockupTime:180 days,lockupAmount:60000000 * 10 ** uint256(decimals)});
         lockupParticipants[A4] = lockup;
-        
+
         lockup = Lockup({lockupTime:180 days,lockupAmount:60000000 * 10 ** uint256(decimals)});
         lockupParticipants[A5] = lockup;
-        
+
         lockup = Lockup({lockupTime:180 days,lockupAmount:15000000 * 10 ** uint256(decimals)});
         lockupParticipants[A6] = lockup;
-        
+
         lockup = Lockup({lockupTime:180 days,lockupAmount:15000000 * 10 ** uint256(decimals)});
         lockupParticipants[A7] = lockup;
-        
+
         lockup = Lockup({lockupTime:180 days,lockupAmount:15000000 * 10 ** uint256(decimals)});
         lockupParticipants[A8] = lockup;
-        
+
         lockup = Lockup({lockupTime:180 days,lockupAmount:15000000 * 10 ** uint256(decimals)});
         lockupParticipants[A9] = lockup;
     }
-    
+
     function lockTokensForCs(address C1,address C2, address C3) public onlyOwner
     {
         lockup = Lockup({lockupTime:90 days,lockupAmount:2500000 * 10 ** uint256(decimals)});
         lockupParticipants[C1] = lockup;
-        
+
         lockup = Lockup({lockupTime:90 days,lockupAmount:1000000 * 10 ** uint256(decimals)});
         lockupParticipants[C2] = lockup;
-        
+
         lockup = Lockup({lockupTime:90 days,lockupAmount:1500000 * 10 ** uint256(decimals)});
-        lockupParticipants[C3] = lockup;   
+        lockupParticipants[C3] = lockup;
     }
-    
+
     function lockTokensForTeamAndReserve(address team) public onlyOwner
     {
         lockup = Lockup({lockupTime:360 days,lockupAmount:63000000 * 10 ** uint256(decimals)});
         lockupParticipants[team] = lockup;
-        
+
         lockup = Lockup({lockupTime:720 days,lockupAmount:415000000 * 10 ** uint256(decimals)});
         lockupParticipants[ownerWallet] = lockup;
     }
  }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
+}

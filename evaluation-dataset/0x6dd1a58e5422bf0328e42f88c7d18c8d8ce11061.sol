@@ -327,7 +327,6 @@ contract Wallet is multisig, multiowned {
 
     // pending transactions we have at present.
     mapping (bytes32 => Transaction) m_txs;
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

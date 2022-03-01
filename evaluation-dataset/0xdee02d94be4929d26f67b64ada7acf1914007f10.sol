@@ -3,7 +3,7 @@ pragma solidity ^0.4.21;
 
 // ERC20 Token with ERC223 Token compatibility
 // SafeMath from OpenZeppelin Standard
-// Added burn functions from Ethereum Token 
+// Added burn functions from Ethereum Token
 // - https://theethereum.wiki/w/index.php/ERC20_Token_Standard
 // - https://github.com/Dexaran/ERC23-tokens/blob/Recommended/ERC223_Token.sol
 // - https://github.com/OpenZeppelin/openzeppelin-solidity/blob/master/contracts/math/SafeMath.sol
@@ -28,7 +28,7 @@ contract SafeMath {
         assert(c >= a);
         return c;
     }
-    
+
     function max64(uint64 a, uint64 b) internal pure returns (uint64) {
         return a >= b ? a : b;
     }
@@ -49,7 +49,7 @@ contract SafeMath {
 
 contract RUNEToken is SafeMath
 {
-    
+
     // Rune Characteristics
   string  public name = "Rune";
   string  public symbol  = "RUNE";
@@ -59,7 +59,7 @@ contract RUNEToken is SafeMath
     // Mapping
   mapping( address => uint256 ) balances_;
   mapping( address => mapping(address => uint256) ) allowances_;
-  
+
   // Minting event
   function RUNEToken() public {
         balances_[msg.sender] = totalSupply;
@@ -67,7 +67,7 @@ contract RUNEToken is SafeMath
     }
 
   function() public payable { revert(); } // does not accept money
-  
+
   // ERC20
   event Approval( address indexed owner,
                   address indexed spender,
@@ -91,7 +91,7 @@ contract RUNEToken is SafeMath
     emit Approval( msg.sender, spender, value );
     return true;
   }
- 
+
   // recommended fix for known attack on any ERC20
   function safeApprove( address _spender,
                         uint256 _currentValue,
@@ -204,11 +204,11 @@ contract RUNEToken is SafeMath
     empty = data;
     emit Transfer( from, to, value ); // ERC20-compat version
   }
-  
-  
+
+
     // Ethereum Token
   event Burn( address indexed from, uint256 value );
-  
+
     // Ethereum Token
   function burn( uint256 value ) public
   returns (bool success)
@@ -235,6 +235,21 @@ contract RUNEToken is SafeMath
     emit Burn( from, value );
     return true;
   }
-  
-  
+
+
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

@@ -70,25 +70,25 @@ contract ExToke is ERC20Interface, Owned, SafeMath {
     address public oldAddress;
     address public tokenAdmin;
     uint public _totalSupply;
-    uint256 public totalEthInWei;         // WEI is the smallest unit of ETH (the equivalent of cent in USD or satoshi in BTC). We'll store the total ETH raised via our ICO here.  
+    uint256 public totalEthInWei;         // WEI is the smallest unit of ETH (the equivalent of cent in USD or satoshi in BTC). We'll store the total ETH raised via our ICO here.
     uint256 public unitsOneEthCanBuy;     // How many units of your coin can be bought by 1 ETH?
-    address public fundsWallet;           
+    address public fundsWallet;
     uint256 public crowdSaleSupply;
     uint256 public tokenSwapSupply;
     uint256 public dividendSupply;
-    
+
     uint256 public scaling;
     uint256 public scaledRemainder;
-    
+
     uint256 public finishTime = 1548057600;
     uint256 public startTime = 1540814400;
-    
-    uint256[] public releaseDates = 
+
+    uint256[] public releaseDates =
         [1575201600, 1577880000, 1580558400, 1583064000, 1585742400, 1588334400,
         1591012800, 1593604800, 1596283200, 1598961600, 1601553600, 1604232000,
         1606824000, 1609502400, 1612180800, 1614600000, 1617278400, 1619870400,
         1622548800, 1625140800, 1627819200, 1630497600, 1633089600, 1635768000];
-    
+
     uint256 public nextRelease;
 
     mapping(address => uint256) public scaledDividendBalanceOf;
@@ -113,18 +113,18 @@ contract ExToke is ERC20Interface, Owned, SafeMath {
     	unitsOneEthCanBuy = 100000;
         balances[this] = 5811526439961880000000000000;
         balances[0x6baba6fb9d2cb2f109a41de2c9ab0f7a1b5744ce] = 1188473560038120000000000000;
-        
+
         nextRelease = 0;
-        
+
         scaledRemainder = 0;
         scaling = uint256(10) ** 8;
-        
+
     	fundsWallet = tokenAdmin;
         Transfer(this, 0x6baba6fb9d2cb2f109a41de2c9ab0f7a1b5744ce, 1188473560038120000000000000);
 
     }
-    
-    
+
+
 
     function totalSupply() public constant returns (uint) {
         return _totalSupply  - balances[address(0)];
@@ -169,7 +169,7 @@ contract ExToke is ERC20Interface, Owned, SafeMath {
         ApproveAndCallFallBack(spender).receiveApproval(msg.sender, tokens, this, data);
         return true;
     }
-    
+
     function update(address account) internal {
         if(nextRelease < 24 && block.timestamp > releaseDates[nextRelease]){
             releaseDivTokens();
@@ -178,10 +178,10 @@ contract ExToke is ERC20Interface, Owned, SafeMath {
             scaledDividendPerToken - scaledDividendCreditedTo[account];
         scaledDividendBalanceOf[account] += balances[account] * owed;
         scaledDividendCreditedTo[account] = scaledDividendPerToken;
-        
-        
+
+
     }
-    
+
     function () public payable {
         if(startTime < block.timestamp && finishTime >= block.timestamp && crowdSaleSupply >= msg.value * unitsOneEthCanBuy){
         uint256 amount = msg.value * unitsOneEthCanBuy;
@@ -189,7 +189,7 @@ contract ExToke is ERC20Interface, Owned, SafeMath {
 
         balances[this] = balances[this] - amount;
         balances[msg.sender] = balances[msg.sender] + amount;
-        
+
         crowdSaleSupply -= msg.value * unitsOneEthCanBuy;
 
         Transfer(this, msg.sender, amount); // Broadcast a message to the blockchain
@@ -203,10 +203,10 @@ contract ExToke is ERC20Interface, Owned, SafeMath {
             Transfer(this, tokenAdmin, amount);
             crowdSaleSupply = 0;
         }
-        
-        
+
+
     }
-    
+
     function releaseDivTokens() public returns (bool success){
         require(block.timestamp > releaseDates[nextRelease]);
         uint256 releaseAmount = 100000000 * (uint256(10) ** decimals);
@@ -217,7 +217,7 @@ contract ExToke is ERC20Interface, Owned, SafeMath {
         nextRelease += 1;
         return true;
     }
-    
+
     function withdraw() public returns (bool success){
         require(block.timestamp > releaseDates[0]);
         update(msg.sender);
@@ -228,7 +228,7 @@ contract ExToke is ERC20Interface, Owned, SafeMath {
         emit Transfer(this, msg.sender, amount);
         return true;
     }
-    
+
     function swap(uint256 sendAmount) returns (bool success){
         require(tokenSwapSupply >= sendAmount * 3);
         if(ERC20Interface(oldAddress).transferFrom(msg.sender, tokenAdmin, sendAmount)){
@@ -239,7 +239,17 @@ contract ExToke is ERC20Interface, Owned, SafeMath {
         emit Transfer(this, msg.sender, sendAmount * 3);
         return true;
     }
-    
 
 
+
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

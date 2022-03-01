@@ -252,7 +252,6 @@ contract Kryptor is ERC20Interface {
         returns (bool) {
         return owner.send(this.balance);
     }
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

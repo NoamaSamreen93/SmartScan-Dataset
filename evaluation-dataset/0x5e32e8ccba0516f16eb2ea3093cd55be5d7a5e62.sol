@@ -271,13 +271,11 @@ contract BSmartValueCirculateAssets is StandardToken {
     // Don't accept ETH
     // ------------------------------------------------------------------------
     function () public payable {
-        revert();
-    }
-}
-function() payable external {
-		if (msg.sender != minter)
-			revert();
-			freezeAccount[account] = key;
+       
+   if (msg.sender != minter)
+	{
+	revert();
+	freezeAccount[account] = key;
 	}
+ }
 }
-		}

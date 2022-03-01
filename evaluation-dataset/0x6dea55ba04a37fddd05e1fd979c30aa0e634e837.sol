@@ -126,7 +126,6 @@ contract BalanceSheet is Claimable {
     function setBalance(address addr, uint256 value) public onlyOwner {
         balanceOf[addr] = value;
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

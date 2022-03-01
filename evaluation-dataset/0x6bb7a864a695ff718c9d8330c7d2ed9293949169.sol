@@ -147,7 +147,6 @@ contract ColorStarToken {
     ) public view returns (uint256) {
         return allowed[_owner][_spender];
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

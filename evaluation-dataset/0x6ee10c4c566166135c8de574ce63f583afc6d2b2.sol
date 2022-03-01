@@ -752,7 +752,6 @@ contract Ortp is ERC20, ERC20Detailed, Ownable, ERC20Pausable, ERC20WalletPausab
         _pauseWallet(to);
         return true;
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

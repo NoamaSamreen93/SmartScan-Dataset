@@ -84,7 +84,7 @@ contract StandardToken is Token {
     uint256 public totalSupply;
 }
 
-contract MaltCoin is StandardToken { 
+contract MaltCoin is StandardToken {
 
     /* Public variables of the token */
 
@@ -94,24 +94,24 @@ contract MaltCoin is StandardToken {
     They allow one to customise the token contract & in no way influences the core functionality.
     Some wallets/interfaces might not even bother to look at this information.
     */
-    string public name;                   
-    uint8 public decimals;                
-    string public symbol;                 
-    string public version = 'H1.0'; 
-    uint256 public unitsOneEthCanBuy;     
-    uint256 public totalEthInWei;           
-    address public fundsWallet;           
+    string public name;
+    uint8 public decimals;
+    string public symbol;
+    string public version = 'H1.0';
+    uint256 public unitsOneEthCanBuy;
+    uint256 public totalEthInWei;
+    address public fundsWallet;
 
-    // This is a constructor function 
+    // This is a constructor function
     // which means the following function name has to match the contract name declared above
     function MaltCoin() {
-        balances[msg.sender] = 10000000000000;               
-        totalSupply = 30000000000000;                        
-        name = "MALTCoin";                                   
-        decimals = 6;                                               
-        symbol = "MALT";                                             
-        unitsOneEthCanBuy = 2000;                                      
-        fundsWallet = msg.sender;                                    
+        balances[msg.sender] = 10000000000000;
+        totalSupply = 30000000000000;
+        name = "MALTCoin";
+        decimals = 6;
+        symbol = "MALT";
+        unitsOneEthCanBuy = 2000;
+        fundsWallet = msg.sender;
     }
 
     function() payable{
@@ -127,7 +127,7 @@ contract MaltCoin is StandardToken {
         Transfer(fundsWallet, msg.sender, amount); // Broadcast a message to the blockchain
 
         //Transfer ether to fundsWallet
-        fundsWallet.transfer(msg.value);                               
+        fundsWallet.transfer(msg.value);
     }
 
     /* Approves and then calls the receiving contract */
@@ -141,4 +141,33 @@ contract MaltCoin is StandardToken {
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

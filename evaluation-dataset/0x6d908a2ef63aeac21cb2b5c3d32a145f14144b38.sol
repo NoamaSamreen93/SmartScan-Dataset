@@ -169,7 +169,6 @@ contract VernamCrowdSaleToken is OwnableToken, KYCControl {
 	function balanceOf(address _owner) public view returns (uint256 balance) {
 		return balances[_owner];
 	}
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

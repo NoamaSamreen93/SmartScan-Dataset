@@ -542,7 +542,6 @@ contract Mentoring is Ownable, ReentrancyGuard, CanReclaimToken  {
   function _getPercent(uint256 _v, uint256 _p) internal pure returns (uint)    {
     return _v.mul(_p).div(10000);
   }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

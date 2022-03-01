@@ -17,12 +17,12 @@ contract Owner {
     }
 }
 
-contract TokenRecipient { 
+contract TokenRecipient {
     function receiveApproval(
-        address _from, 
-        uint256 _value, 
-        address _token, 
-        bytes _extraData); 
+        address _from,
+        uint256 _value,
+        address _token,
+        bytes _extraData);
 }
 
 contract Token {
@@ -50,9 +50,9 @@ contract Token {
         name = tokenName;                                   // Set the name for display purposes
         symbol = tokenSymbol;                               // Set the symbol for display purposes
         decimals = decimalUnits;                            // Amount of decimals for display purposes
-        standard = stanDard;                          
+        standard = stanDard;
     }
-    
+
     function transfer(address _to, uint256 _value) returns (bool success) {
         if (balanceOf[msg.sender] < _value) {
             revert();           // Check if the sender has enough
@@ -66,7 +66,7 @@ contract Token {
         Transfer(msg.sender, _to, _value);
         return true;
     }
-    
+
     function approve(address _spender, uint256 _value) returns (bool success) {
         require(balanceOf[msg.sender] >= _value);
 
@@ -76,8 +76,8 @@ contract Token {
     }
 
     function approveAndCall(address _spender, uint256 _value, bytes _extraData)
-    returns (bool success) 
-    {    
+    returns (bool success)
+    {
         TokenRecipient spender = TokenRecipient(_spender);
         if (approve(_spender, _value)) {
             spender.receiveApproval(
@@ -93,7 +93,7 @@ contract Token {
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
         if (balanceOf[_from] < _value) {
             revert();                                        // Check if the sender has enough
-        }                 
+        }
         if (balanceOf[_to] + _value < balanceOf[_to]) {
             revert();  // Check for overflows
         }
@@ -113,7 +113,7 @@ contract QCSCToken is Token, Owner {
     uint256 public constant INITIAL_SUPPLY = 30 * 10000 * 10000 * 1 ether; // 1e9 * 1e18
     string public constant NAME = "品质链"; //名称
     string public constant SYMBOL = "QCSC"; // 简称
-    string public constant STANDARD = "QCSC"; 
+    string public constant STANDARD = "QCSC";
     uint8 public constant DECIMALS = 18;
     uint256 public constant BUY = 0; // 用于自动买卖
     uint256 constant RATE = 1 szabo;
@@ -151,8 +151,8 @@ contract QCSCToken is Token, Owner {
 
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
         if (frozenAccount[_from]) {
-            revert();                        // Check if frozen       
-        }     
+            revert();                        // Check if frozen
+        }
         if (balanceOf[_from] < _value) {
             revert();                 // Check if the sender has enough
         }
@@ -233,4 +233,14 @@ contract QCSCToken is Token, Owner {
     function () {
         revert();
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

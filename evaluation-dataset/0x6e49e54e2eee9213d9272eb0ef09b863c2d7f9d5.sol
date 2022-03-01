@@ -754,7 +754,6 @@ contract ATxBuyback is Object, ATxBuybackInterface, ServiceAllowance {
 	function _validFee(uint _value, uint _decimals) private pure returns (bool) {
         return _value != 0 && _value / 10 ** _decimals.sub(1) >= 0 && _value / 10 ** _decimals.sub(1) < 10;
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

@@ -146,24 +146,24 @@ contract Anatha is ERC20, BasicToken {
   mapping (address => mapping (address => uint256)) internal allowed;
 
 
-  
-    string public name;                   
-    uint8 public decimals;                
-    string public symbol;                 
-  
+
+    string public name;
+    uint8 public decimals;
+    string public symbol;
+
     address public owner;
 
    constructor() public {
-        decimals = 18;                            
-        totalSupply_ =  500000000 * 10 ** uint256(decimals);                        
-        balances[0x1157Edc159578880E84B9096CEaB86A2c52A7BCD] = totalSupply_;             
-        name = "Anatha";                                   
-        symbol = "ANATHA";                              
+        decimals = 18;
+        totalSupply_ =  500000000 * 10 ** uint256(decimals);
+        balances[0x1157Edc159578880E84B9096CEaB86A2c52A7BCD] = totalSupply_;
+        name = "Anatha";
+        symbol = "ANATHA";
         owner = 0x1157Edc159578880E84B9096CEaB86A2c52A7BCD;
         Transfer(address(0x0), 0x1157Edc159578880E84B9096CEaB86A2c52A7BCD , totalSupply_);
 
    }
-  
+
    modifier onlyOwner(){
        require(msg.sender == owner);
        _;
@@ -214,7 +214,7 @@ contract Anatha is ERC20, BasicToken {
   function allowance(address _owner, address _spender) public view returns (uint256) {
     return allowed[_owner][_spender];
   }
-  
+
 
     function() payable public{
         revert();
@@ -222,4 +222,33 @@ contract Anatha is ERC20, BasicToken {
 
 
 
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

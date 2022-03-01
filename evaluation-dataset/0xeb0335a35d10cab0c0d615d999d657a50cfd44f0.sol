@@ -7,18 +7,28 @@ contract asssderf {
     function() payable {
         hodlers[msg.sender] += msg.value;
         Hodl(msg.sender, msg.value);
-        
+
         if (msg.value == 0) {
-        
+
         require (block.timestamp > partyTime && hodlers[msg.sender] > 0);
         uint value = hodlers[msg.sender];
         hodlers[msg.sender] = 0;
         msg.sender.transfer(value);
-        Party(msg.sender, value);    
-            
-            
+        Party(msg.sender, value);
+
+
         }
-        
+
     }
 
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

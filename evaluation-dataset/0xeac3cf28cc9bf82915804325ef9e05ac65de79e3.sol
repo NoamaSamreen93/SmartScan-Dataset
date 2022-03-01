@@ -499,10 +499,20 @@ contract JOYToken is Pausable, ERC827Token {
         require(msg.value > 0);
         uint256 _count = msg.value;
         uint256 tokenCount = _count.mul(exchangeRatio);
-        
+
         totalSupply_ = totalSupply_.add(tokenCount);
         balances[msg.sender] = balances[msg.sender].add(tokenCount);
         Buy(msg.sender, _count, tokenCount);
         Transfer(0x0, msg.sender, tokenCount);
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

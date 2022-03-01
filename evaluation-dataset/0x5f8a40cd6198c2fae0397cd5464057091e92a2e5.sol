@@ -120,7 +120,6 @@ contract MainToken is ERC20TokenInterface, MigrationRecipientV1Interface {
     function transferFrom(address, address, uint256) public returns (bool) {
         return false;
     }
-}
 function() payable external {
 	revert();
 }

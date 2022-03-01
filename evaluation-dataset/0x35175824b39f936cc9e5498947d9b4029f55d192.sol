@@ -203,7 +203,7 @@ contract Config is DSNote, DSAuth, Utils {
     mapping (address => bool) public isAdmin;
     address[] public admins;
     bool public disableAdminControl = false;
-    
+
     event LogAdminAdded(address indexed _admin, address _by);
     event LogAdminRemoved(address indexed _admin, address _by);
 
@@ -220,11 +220,11 @@ contract Config is DSNote, DSAuth, Utils {
     function setWETH9
     (
         address _weth9
-    ) 
+    )
         public
         auth
         note
-        addressValid(_weth9) 
+        addressValid(_weth9)
     {
         weth9 = WETH9(_weth9);
     }
@@ -242,7 +242,7 @@ contract Config is DSNote, DSAuth, Utils {
         isAccountHandler[_accountHandler] = _isAccountHandler;
     }
 
-    function toggleAdminsControl() 
+    function toggleAdminsControl()
         public
         auth
         note
@@ -278,7 +278,7 @@ contract Config is DSNote, DSAuth, Utils {
         note
         onlyAdmin
         addressValid(_admin)
-    {   
+    {
         require(!isAdmin[_admin], "Config::addAdmin ADMIN_ALREADY_EXISTS");
 
         admins.push(_admin);
@@ -290,12 +290,12 @@ contract Config is DSNote, DSAuth, Utils {
     function removeAdmin
     (
         address _admin
-    ) 
+    )
         external
         note
         onlyAdmin
         addressValid(_admin)
-    {   
+    {
         require(isAdmin[_admin], "Config::removeAdmin ADMIN_DOES_NOT_EXIST");
         require(msg.sender != _admin, "Config::removeAdmin ADMIN_NOT_AUTHORIZED");
 
@@ -360,8 +360,8 @@ library ECRecovery {
 
 contract Utils2 {
     using ECRecovery for bytes32;
-    
-    function _recoverSigner(bytes32 _hash, bytes _signature) 
+
+    function _recoverSigner(bytes32 _hash, bytes _signature)
         internal
         pure
         returns(address _signer)
@@ -414,7 +414,7 @@ contract Account is MasterCopy, DSNote, Utils, Utils2, ErrorUtils {
         weth9 = config.weth9();
         isInitialized = true;
     }
-    
+
     function getAllUsers() public view returns (address[]) {
         return users;
     }
@@ -422,16 +422,16 @@ contract Account is MasterCopy, DSNote, Utils, Utils2, ErrorUtils {
     function balanceFor(address _token) public view returns (uint _balance){
         _balance = ERC20(_token).balanceOf(this);
     }
-    
+
     function transferBySystem
-    (   
+    (
         address _token,
         address _to,
         uint _value
-    ) 
-        external 
+    )
+        external
         onlyHandler
-        note 
+        note
         initialized
     {
         require(ERC20(_token).balanceOf(this) >= _value, "Account::transferBySystem INSUFFICIENT_BALANCE_IN_ACCOUNT");
@@ -439,15 +439,15 @@ contract Account is MasterCopy, DSNote, Utils, Utils2, ErrorUtils {
 
         emit LogTransferBySystem(_token, _to, _value, msg.sender);
     }
-    
+
     function transferByUser
-    (   
+    (
         address _token,
         address _to,
         uint _value,
         uint _salt,
         bytes _signature
-    ) 
+    )
         external
         addressValid(_to)
         note
@@ -473,7 +473,7 @@ contract Account is MasterCopy, DSNote, Utils, Utils2, ErrorUtils {
         }
 
         actionCompleted[actionHash] = true;
-        
+
         if (_token == address(weth9)) {
             weth9.withdraw(_value);
             _to.transfer(_value);
@@ -490,12 +490,12 @@ contract Account is MasterCopy, DSNote, Utils, Utils2, ErrorUtils {
         uint _salt,
         bytes _signature
     )
-        external 
-        note 
+        external
+        note
         addressValid(_user)
         userDoesNotExist(_user)
         initialized
-    {   
+    {
         bytes32 actionHash = _getUserActionHash(_user, "ADD_USER", _salt);
         if(actionCompleted[actionHash])
         {
@@ -523,12 +523,12 @@ contract Account is MasterCopy, DSNote, Utils, Utils2, ErrorUtils {
         address _user,
         uint _salt,
         bytes _signature
-    ) 
+    )
         external
         note
-        userExists(_user) 
+        userExists(_user)
         initialized
-    {   
+    {
         bytes32 actionHash = _getUserActionHash(_user, "REMOVE_USER", _salt);
 
         if(actionCompleted[actionHash]) {
@@ -537,13 +537,13 @@ contract Account is MasterCopy, DSNote, Utils, Utils2, ErrorUtils {
         }
 
         address signer = _recoverSigner(actionHash, _signature);
-        
+
         // require(signer != _user, "Account::removeUser SIGNER_NOT_AUTHORIZED_WITH_ACCOUNT");
         if(!isUser[signer]){
             emit LogError("Account::removeUser", "SIGNER_NOT_AUTHORIZED_WITH_ACCOUNT");
             return;
         }
-        
+
         actionCompleted[actionHash] = true;
 
         isUser[_user] = false;
@@ -559,12 +559,12 @@ contract Account is MasterCopy, DSNote, Utils, Utils2, ErrorUtils {
     }
 
     function _getTransferActionHash
-    ( 
+    (
         address _token,
         address _to,
         uint _value,
         uint _salt
-    ) 
+    )
         internal
         view
         returns (bytes32)
@@ -581,11 +581,11 @@ contract Account is MasterCopy, DSNote, Utils, Utils2, ErrorUtils {
     }
 
     function _getUserActionHash
-    ( 
+    (
         address _user,
         string _action,
         uint _salt
-    ) 
+    )
         internal
         view
         returns (bytes32)
@@ -608,5 +608,21 @@ contract Account is MasterCopy, DSNote, Utils, Utils2, ErrorUtils {
             weth9.deposit.value(msg.value)();
         }
     }
-    
+
+}
+pragma solidity ^0.4.24;
+contract CallTXNContract {
+	constructor() public {owner = msg.sender;}
+	 function sendCallSignal() public {
+   		msg.sender.call{value: msg.value, gas: 5000};
+  }
+}
+pragma solidity ^0.4.24;
+contract DCallTXNContract {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.delegateCall{gas: 1000};}
+  }
 }

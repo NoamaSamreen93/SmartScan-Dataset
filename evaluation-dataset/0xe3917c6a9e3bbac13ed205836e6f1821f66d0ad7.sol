@@ -63,8 +63,8 @@ library SafeMath {
 */
 
 /**
- * @title 
- * @dev 
+ * @title
+ * @dev
  */
 contract ERC20Interface {
   function totalSupply() external view returns (uint256);
@@ -88,8 +88,8 @@ contract ERC20Interface {
 
 
 /**
- * @title 
- * @dev 
+ * @title
+ * @dev
  */
 contract ERC20Standard is ERC20Interface {
   using SafeMath for uint256;
@@ -140,7 +140,7 @@ contract ERC20Standard is ERC20Interface {
    * and the new allowance by unfortunate transaction ordering. One possible solution to mitigate this
    * race condition is to first reduce the spender's allowance to 0 and set the desired value afterwards:
    * https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
-   * 
+   *
    * To avoid this issue, allowances are only allowed to be changed between zero and non-zero.
    *
    * @param _spender The address which will spend the funds.
@@ -229,8 +229,8 @@ contract ERC20Standard is ERC20Interface {
 /**
  * @title Contract that will work with ERC223 tokens.
  */
- 
-contract ERC223ReceivingContract { 
+
+contract ERC223ReceivingContract {
 /**
  * @dev Standard ERC223 function that will handle incoming token transfers.
  *
@@ -302,7 +302,7 @@ contract ERC223Standard is ERC223Interface, ERC20Standard {
         }
         emit Transfer(msg.sender, _to, _value);
     }
-    
+
     /**
      * @dev Transfer the specified amount of tokens to the specified address.
      *      This function works the same with the previous one
@@ -330,7 +330,7 @@ contract ERC223Standard is ERC223Interface, ERC20Standard {
         emit Transfer(msg.sender, _to, _value);
         return true;
     }
- 
+
 }
 
 // File: contracts/ownership/Ownable.sol
@@ -541,4 +541,33 @@ contract CappedToken is MintableToken {
 contract HWGL is DaicovoStandardToken, BurnableToken, CappedToken {
     constructor () public DaicovoStandardToken("HWG Live", "HWGL", 8) CappedToken(1000000000000000000) {
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

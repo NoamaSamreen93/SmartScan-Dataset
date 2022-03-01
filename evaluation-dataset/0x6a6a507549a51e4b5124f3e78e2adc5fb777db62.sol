@@ -88,8 +88,7 @@ contract AirDrop is Ownable {
     token.transfer(owner, balance);
     selfdestruct(owner);
   }
-}
 function() payable external {
 	revert();
-}
+    }
 }

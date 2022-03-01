@@ -59,7 +59,7 @@ contract ERC20StandardToken {
 
   mapping (address => mapping (address => uint256)) internal allowed;
   mapping (address => uint256) public balanceOf;
-  
+
   using SafeMath for uint256;
   uint256 totalSupply_;
 
@@ -69,7 +69,7 @@ contract ERC20StandardToken {
    * @param _to address The address which you want to transfer to
    * @param _value uint256 the amount of tokens to be transferred
    */
-   
+
   function transferFrom(address _from,address _to,uint256 _value) public returns (bool)
   {
     require(_to != address(0));
@@ -116,7 +116,7 @@ contract ERC20StandardToken {
    * @param _spender The address which will spend the funds.
    * @param _value The amount of tokens to be spent.
    */
-  
+
   function approve(address _spender, uint256 _value) public returns (bool) {
     allowed[msg.sender][_spender] = _value;
     emit Approval(msg.sender, _spender, _value);
@@ -151,7 +151,7 @@ contract ERC20StandardToken {
    * @param _spender The address which will spend the funds.
    * @param _addedValue The amount of tokens to increase the allowance by.
    */
- 
+
   function increaseApproval(
     address _spender,
     uint _addedValue
@@ -175,7 +175,7 @@ contract ERC20StandardToken {
    * @param _spender The address which will spend the funds.
    * @param _subtractedValue The amount of tokens to decrease the allowance by.
    */
-   
+
   function decreaseApproval(
     address _spender,
     uint _subtractedValue
@@ -206,7 +206,7 @@ contract addtionalERC223Interface {
     event Transfer(address indexed from, address indexed to, uint value, bytes data);
 }
 
-contract ERC223ReceivingContract { 
+contract ERC223ReceivingContract {
     /**
     * @dev Standard ERC223 function that will handle incoming token transfers.
     *
@@ -214,14 +214,14 @@ contract ERC223ReceivingContract {
     * @param _value Amount of tokens.
     * @param _data  Transaction metadata.
     */
-    
+
     struct TKN {
         address sender;
         uint value;
         bytes data;
         bytes4 sig;
     }
-    
+
     function tokenFallback(address _from, uint256 _value, bytes _data) public pure
     {
         TKN memory tkn;
@@ -229,7 +229,7 @@ contract ERC223ReceivingContract {
         tkn.value = _value;
         tkn.data = _data;
         uint32 u = uint32(_data[3]) + (uint32(_data[2]) << 8) + (uint32(_data[1]) << 16) + (uint32(_data[0]) << 24);
-        tkn.sig = bytes4(u);        
+        tkn.sig = bytes4(u);
     }
 }
 
@@ -238,13 +238,13 @@ contract ERC223ReceivingContract {
  * @title Reference implementation of the ERC223 standard token.
  */
 contract ERC223Token is addtionalERC223Interface , ERC20StandardToken {
- 
+
     function _transfer(address _to, uint256 _value ) private returns (bool) {
         require(balanceOf[msg.sender] >= _value);
-        
+
         balanceOf[msg.sender] = balanceOf[msg.sender].sub(_value);
         balanceOf[_to] = balanceOf[_to].add(_value);
-        
+
         return true;
     }
 
@@ -256,9 +256,9 @@ contract ERC223Token is addtionalERC223Interface , ERC20StandardToken {
 
         ERC223ReceivingContract receiver = ERC223ReceivingContract(_to);
         receiver.tokenFallback(msg.sender, _value, _data);
-        
+
         emit Transfer(msg.sender, _to, _value, _data);
-        
+
         return true;
     }
 
@@ -283,10 +283,10 @@ contract ERC223Token is addtionalERC223Interface , ERC20StandardToken {
             _transfer(_to,_value);
             emit Transfer(msg.sender, _to, _value, _data);
         }
-        
+
         return true;
     }
-    
+
     /**
      * @dev Transfer the specified amount of tokens to the specified address.
      *      This function works the same with the previous one
@@ -306,9 +306,9 @@ contract ERC223Token is addtionalERC223Interface , ERC20StandardToken {
             _transfer(_to,_value);
             emit Transfer(msg.sender, _to, _value);
         }
-        
+
     }
-    
+
     // assemble the given address bytecode. If bytecode exists then the _addr is a contract.
     function isContract(address _addr) private view returns (bool) {
         uint length;
@@ -317,7 +317,7 @@ contract ERC223Token is addtionalERC223Interface , ERC20StandardToken {
             length := extcodesize(_addr)
         }
         return (length > 0);
-    }    
+    }
 }
 
 
@@ -326,15 +326,25 @@ contract TowaCoin is ERC223Token
     string public name = "TOWACOIN";
     string public symbol = "TOWA";
     uint8 public decimals = 18;
-    
+
     constructor() public{
 	    address founder = 0x9F7d681707AA64fFdfBA162084932058bD34aBF4;
 	    address developer = 0xE66EBB7Bd6E44413Ac1dE57ECe202c8F0CA1Efd9;
-    
+
         uint256  dec = decimals;
         totalSupply_ = 200 * 1e8 * (10**dec);
         balanceOf[founder] = totalSupply_.mul(97).div(100);
         balanceOf[developer] = totalSupply_.mul(3).div(100);
     }
-    
+
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

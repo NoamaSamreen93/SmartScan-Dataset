@@ -1,6 +1,6 @@
 pragma solidity ^0.4.20;
 
- 
+
 
 contract Lottery{
 
@@ -20,7 +20,7 @@ contract Lottery{
     {
         require(aContract != address(poohContract));
         _;
-    } 
+    }
 
     modifier isOpenToPublic()
     {
@@ -89,7 +89,7 @@ contract Lottery{
         if(msg.value > 10000000000000000)
         {
             uint extraTickets = SafeMath.div(msg.value, 10000000000000000); //each additional entry is 0.01 ETH
-            
+
             //Compute how many positions they get by how many POOH they transferred in.
             ticketNumber += extraTickets;
         }
@@ -227,9 +227,19 @@ library SafeMath {
     /**
     * @dev Integer division of two numbers, truncating the quotient.
     */
-    function div(uint256 a, uint256 b) internal pure returns (uint256) 
+    function div(uint256 a, uint256 b) internal pure returns (uint256)
     {
         uint256 c = a / b;
         return c;
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

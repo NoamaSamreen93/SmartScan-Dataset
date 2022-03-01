@@ -400,7 +400,6 @@ contract Crowdsale is ReentrancyGuard {
   function _forwardFunds() internal {
     _wallet.transfer(msg.value);
   }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

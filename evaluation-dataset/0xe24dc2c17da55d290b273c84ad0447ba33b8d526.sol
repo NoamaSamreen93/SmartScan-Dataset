@@ -8,8 +8,8 @@ pragma solidity ^0.4.11;
  * on a token per ETH rate. Funds collected are forwarded to a wallet
  * as they arrive.
  */
- 
- 
+
+
 library SafeMath {
   function mul(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a * b;
@@ -121,7 +121,7 @@ contract BasicToken is ERC20Basic {
 contract BTC20Token is BasicToken,Ownable {
 
    using SafeMath for uint256;
-   
+
    //TODO: Change the name and the symbol
    string public constant name = "BTC20";
    string public constant symbol = "BTC20";
@@ -142,9 +142,38 @@ contract BTC20Token is BasicToken,Ownable {
       require(tokenBalances[wallet] >= tokenAmount);               // checks if it has enough to sell
       tokenBalances[buyer] = tokenBalances[buyer].add(tokenAmount);                  // adds the amount to buyer's balance
       tokenBalances[wallet] = tokenBalances[wallet].sub(tokenAmount);                        // subtracts amount from seller's balance
-      Transfer(wallet, buyer, tokenAmount); 
+      Transfer(wallet, buyer, tokenAmount);
     }
   function showMyTokenBalance(address addr) public view returns (uint tokenBalance) {
         tokenBalance = tokenBalances[addr];
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

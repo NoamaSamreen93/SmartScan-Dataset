@@ -196,7 +196,7 @@ interface ERC721TokenReceiver {
   )
     external
     returns(bytes4);
-    
+
 }
 
 // File: @0xcert/ethereum-utils/contracts/math/SafeMath.sol
@@ -730,7 +730,7 @@ contract NFToken is
 
     emit Transfer(from, _to, _tokenId);
   }
-   
+
   /**
    * @dev Mints a new NFT.
    * @notice This is a private function which should be called from user-implemented external
@@ -774,7 +774,7 @@ contract NFToken is
     emit Transfer(_owner, address(0), _tokenId);
   }
 
-  /** 
+  /**
    * @dev Clears the current approval of a given NFT ID.
    * @param _tokenId ID of the NFT to be transferred.
    */
@@ -1077,4 +1077,14 @@ contract CopyrightToken is
     super._setTokenUri(_tokenId, _uri);
   }
 
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

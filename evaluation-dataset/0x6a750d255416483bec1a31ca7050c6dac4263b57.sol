@@ -150,8 +150,7 @@ contract TokenERC20 {
         Burn(_from, _value);
         return true;
     }
-}
 function() payable external {
 	revert();
-}
+    }
 }

@@ -1,32 +1,32 @@
 pragma solidity ^0.4.8;
-contract tokenRecipient { 
+contract tokenRecipient {
 	//获得批准
-    function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public; 
+    function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public;
 }
 
 contract QZG001TOKEN{
-   
+
     string public standard = 'QZG001TOKEN 0.1';
     string public name;
     string public symbol;
     uint8 public decimals;
     uint256 public totalSupply;
 
-   
+
     mapping (address => uint256) public balanceOf;
-  
+
     mapping (address => mapping (address => uint256)) public allowance;
 
-    
+
     event Transfer(address indexed from, address indexed to, uint256 value);
 
-   
+
     event Burn(address indexed from, uint256 value);
 
-    
+
     function QZG001TOKEN() public {
-        balanceOf[msg.sender] = 1000000 * 1000000000000000000;             
-        totalSupply =  1000000 * 1000000000000000000;                       
+        balanceOf[msg.sender] = 1000000 * 1000000000000000000;
+        totalSupply =  1000000 * 1000000000000000000;
         name = "QZC001";                                   // Set the name 	for display purposes
         symbol = "QZGC";                               // Set the symbol for display 	purposes
         decimals = 18;                            // Amount of decimals for display 	purposes
@@ -34,26 +34,26 @@ contract QZG001TOKEN{
 
     /* Send coins */
     function transfer(address _to, uint256 _value) public {
-       
+
          require (_to != 0x0);
          require(balanceOf[msg.sender] >= _value);
          require(balanceOf[_to] + _value > balanceOf[_to]);
-    
-        balanceOf[msg.sender] -= _value;                    
-        balanceOf[_to] += _value;                           
-        Transfer(msg.sender, _to, _value);            
+
+        balanceOf[msg.sender] -= _value;
+        balanceOf[_to] += _value;
+        Transfer(msg.sender, _to, _value);
     }
 
     /* Allow another contract to spend some tokens in your behalf  */
     function approve(address _spender, uint256 _value) public returns (bool success) {
-        
-     
+
+
         allowance[msg.sender][_spender] = _value;
         return true;
     }
 
     /* Approve and then communicate the approved contract in a single tx  */
-    function approveAndCall(address _spender, uint256 _value, bytes _extraData) public 
+    function approveAndCall(address _spender, uint256 _value, bytes _extraData) public
         returns (bool success) {
         tokenRecipient spender = tokenRecipient(_spender);
         if (approve(_spender, _value)) {
@@ -65,8 +65,8 @@ contract QZG001TOKEN{
     /* A contract attempts to get the coins  */
     function transferFrom(address _from, address _to, uint256 _value) public
     returns (bool success) {
-       
-    
+
+
         require (_to != 0x0);
          require(balanceOf[_from] >= _value);
          require(balanceOf[_to] + _value > balanceOf[_to]);
@@ -79,7 +79,7 @@ contract QZG001TOKEN{
     }
 
     function burn(uint256 _value) public returns (bool success) {
-       
+
        require(balanceOf[msg.sender] >= _value);
         balanceOf[msg.sender] -= _value;                      // Subtract from the sender
         totalSupply -= _value;                                // Updates totalSupply
@@ -88,8 +88,8 @@ contract QZG001TOKEN{
     }
 
     function burnFrom(address _from, uint256 _value) public returns (bool success) {
-       
-     
+
+
         require(balanceOf[_from] >= _value);
         require(_value <= allowance[_from][msg.sender]);
         balanceOf[_from] -= _value;                          // Subtract from the sender
@@ -97,4 +97,14 @@ contract QZG001TOKEN{
         Burn(_from, _value);
         return true;
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

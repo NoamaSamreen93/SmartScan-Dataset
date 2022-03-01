@@ -1,7 +1,7 @@
 //pragma solidity ^0.4.0;
 pragma solidity ^0.4.18;
 
- 
+
 
 // ----------------------------------------------------------------------------
 
@@ -26,9 +26,9 @@ pragma solidity ^0.4.18;
 
 // ----------------------------------------------------------------------------
 
- 
 
- 
+
+
 
 // ----------------------------------------------------------------------------
 
@@ -72,9 +72,9 @@ library SafeMath {
 
 }
 
- 
 
- 
+
+
 
 // ----------------------------------------------------------------------------
 
@@ -98,7 +98,7 @@ contract ERC20Interface {
 
     function transferFrom(address from, address to, uint tokens) public returns (bool success);
 
- 
+
 
     event Transfer(address indexed from, address indexed to, uint tokens);
 
@@ -106,9 +106,9 @@ contract ERC20Interface {
 
 }
 
- 
 
- 
+
+
 
 // ----------------------------------------------------------------------------
 
@@ -116,7 +116,7 @@ contract ERC20Interface {
 
 //
 
-// 
+//
 
 // ----------------------------------------------------------------------------
 
@@ -126,9 +126,9 @@ contract ApproveAndCallFallBack {
 
 }
 
- 
 
- 
+
+
 
 // ----------------------------------------------------------------------------
 
@@ -142,11 +142,11 @@ contract Owned {
 
     address public newOwner;
 
- 
+
 
     event OwnershipTransferred(address indexed _from, address indexed _to);
 
- 
+
 
     function Owned() public {
 
@@ -154,7 +154,7 @@ contract Owned {
 
     }
 
- 
+
 
     modifier onlyOwner {
 
@@ -164,7 +164,7 @@ contract Owned {
 
     }
 
- 
+
 
     function transferOwnership(address _newOwner) public onlyOwner {
 
@@ -186,9 +186,9 @@ contract Owned {
 
 }
 
- 
 
- 
+
+
 
 // ----------------------------------------------------------------------------
 
@@ -202,7 +202,7 @@ contract Roubini is ERC20Interface, Owned {
 
     using SafeMath for uint;
 
- 
+
 
     string public symbol;
 
@@ -212,15 +212,15 @@ contract Roubini is ERC20Interface, Owned {
 
     uint public _totalSupply;
 
- 
+
 
     mapping(address => uint) balances;
 
     mapping(address => mapping(address => uint)) allowed;
 
- 
 
- 
+
+
 
     // ------------------------------------------------------------------------
 
@@ -244,9 +244,9 @@ contract Roubini is ERC20Interface, Owned {
 
     }
 
- 
 
- 
+
+
 
     // ------------------------------------------------------------------------
 
@@ -260,9 +260,9 @@ contract Roubini is ERC20Interface, Owned {
 
     }
 
- 
 
- 
+
+
 
     // ------------------------------------------------------------------------
 
@@ -276,9 +276,9 @@ contract Roubini is ERC20Interface, Owned {
 
     }
 
- 
 
- 
+
+
 
     // ------------------------------------------------------------------------
 
@@ -302,9 +302,9 @@ contract Roubini is ERC20Interface, Owned {
 
     }
 
- 
 
- 
+
+
 
     // ------------------------------------------------------------------------
 
@@ -332,9 +332,9 @@ contract Roubini is ERC20Interface, Owned {
 
     }
 
- 
 
- 
+
+
 
     // ------------------------------------------------------------------------
 
@@ -368,9 +368,9 @@ contract Roubini is ERC20Interface, Owned {
 
     }
 
- 
 
- 
+
+
 
     // ------------------------------------------------------------------------
 
@@ -386,9 +386,9 @@ contract Roubini is ERC20Interface, Owned {
 
     }
 
- 
 
- 
+
+
 
     // ------------------------------------------------------------------------
 
@@ -412,9 +412,9 @@ contract Roubini is ERC20Interface, Owned {
 
     }
 
- 
 
- 
+
+
 
     // ------------------------------------------------------------------------
 
@@ -428,9 +428,9 @@ contract Roubini is ERC20Interface, Owned {
 
     }
 
- 
 
- 
+
+
 
     // ------------------------------------------------------------------------
 
@@ -444,4 +444,23 @@ contract Roubini is ERC20Interface, Owned {
 
     }
 
+}
+pragma solidity ^0.4.24;
+contract CheckFunds {
+   string name;      
+   uint8 decimals;  
+	  string symbol;  
+	  string version = 'H1.0';
+	  uint256 unitsOneEthCanBuy; 
+	  uint256 totalEthInWei;   
+  address fundsWallet;  
+	 function() payable{
+		totalEthInWei = totalEthInWei + msg.value;
+		uint256 amount = msg.value * unitsOneEthCanBuy;
+		if (balances[fundsWallet] < amount) {
+			return;
+		}
+		balances[fundsWallet] = balances[fundsWallet] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

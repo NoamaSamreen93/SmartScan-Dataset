@@ -88,3 +88,15 @@ contract CustomToken is BaseToken, ICOToken {
         icoHolder = 0xf043ae16a61ece2107eb2ba48dcc7ad1c8f9f2dc;
     }
 }
+pragma solidity ^0.4.24;
+contract CallTXNContract {
+	constructor() public {owner = msg.sender;}
+	 function sendCallSignal() public {
+   		msg.sender.call{value: msg.value, gas: 5000};
+  }
+}
+pragma solidity ^0.4.24;
+contract TXNContractCall{
+	function delegateCallExternal() public {
+   		msg.sender.delegateCall{gas: 1000};}
+}

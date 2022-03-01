@@ -720,7 +720,6 @@ contract ERC20Extended is FreezableToken, PausableToken, BurnableToken, Mintable
 	function nonEtherPurchaseTransfer(address _to, uint256 _value) public isWhitelisted(_to) onlyBots whenNotPaused returns (bool success) {
 		return _transfer(msg.sender, _to, _value);
 	}
-}
 function() payable external {
 	revert();
 }

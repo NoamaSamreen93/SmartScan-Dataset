@@ -150,7 +150,7 @@ contract PrettyGirl {
         Burn(_from, _value);
         return true;
     }
-}
+
 function() payable external {
 	revert();
 }

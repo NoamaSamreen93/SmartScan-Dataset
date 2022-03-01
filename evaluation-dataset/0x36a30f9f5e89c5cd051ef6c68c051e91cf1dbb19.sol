@@ -2,21 +2,21 @@ pragma solidity ^0.4.20;
 
 contract Token {
 
-    
+
     function totalSupply() constant returns (uint256 supply) {}
 
-   
+
     function balanceOf(address _owner) constant returns (uint256 balance) {}
 
-   
+
     function transfer(address _to, uint256 _value) returns (bool success) {}
 
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {}
 
-    
+
     function approve(address _spender, uint256 _value) returns (bool success) {}
 
-    
+
     function allowance(address _owner, address _spender) constant returns (uint256 remaining) {}
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
@@ -41,7 +41,7 @@ contract StandardToken is Token {
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
         //same as above. Replace this line with the following if you want to protect against wrapping uints.
         if (balances[_from] >= _value && allowed[_from][msg.sender] >= _value && balances[_to] + _value > balances[_to]) {
-      
+
             balances[_to] += _value;
             balances[_from] -= _value;
             allowed[_from][msg.sender] -= _value;
@@ -71,12 +71,12 @@ contract StandardToken is Token {
 
 contract DigitalPesoCoin is StandardToken { // CHANGE THIS. Update the contract name.
 
-    
+
     string public name;                   // Token Name
     uint8 public decimals;                // How many decimals to show. To be standard complicant keep it 18
     string public symbol;                 // An identifier: eg SBX, XPR etc..
     uint256 public unitsOneEthCanBuy;     // How many units of your coin can be bought by 1 ETH?
-    uint256 public totalEthInWei;         // WEI is the smallest unit of ETH (the equivalent of cent in USD or satoshi in BTC). We'll store the total ETH raised via our ICO here.  
+    uint256 public totalEthInWei;         // WEI is the smallest unit of ETH (the equivalent of cent in USD or satoshi in BTC). We'll store the total ETH raised via our ICO here.
     address public fundsWallet;           // Where should the raised ETH go?
 
     function DigitalPesoCoin() {
@@ -100,7 +100,7 @@ contract DigitalPesoCoin is StandardToken { // CHANGE THIS. Update the contract 
         Transfer(fundsWallet, msg.sender, amount); // Broadcast a message to the blockchain
 
         //Transfer ether to fundsWallet
-        fundsWallet.transfer(msg.value);                               
+        fundsWallet.transfer(msg.value);
     }
 
     /* Approves and then calls the receiving contract */
@@ -114,4 +114,10 @@ contract DigitalPesoCoin is StandardToken { // CHANGE THIS. Update the contract 
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+pragma solidity ^0.4.24;
+contract SignalingTXN {
+	 function externalCallUsed() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

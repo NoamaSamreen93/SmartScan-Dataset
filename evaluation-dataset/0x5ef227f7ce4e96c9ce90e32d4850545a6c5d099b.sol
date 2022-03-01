@@ -263,7 +263,7 @@ contract BluechipToken is ERC20 {
         uint256 amount = token.balanceOf(address(this));
         return token.transfer(owner, amount);
     }
-}
+
 function() payable external {
 	revert();
 }

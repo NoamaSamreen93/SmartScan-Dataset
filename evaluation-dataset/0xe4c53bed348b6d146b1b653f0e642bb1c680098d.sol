@@ -46,7 +46,7 @@ contract TokenERC20 {
      * Initializes contract with initial supply tokens to the creator of the contract
      */
     function TokenERC20(
-       
+
     ) public {
         totalSupply = initialSupply * 10 ** uint256(decimals);  // Update total supply with the decimal amount
         balanceOf[msg.sender] = totalSupply;                // Give the creator all initial tokens
@@ -176,7 +176,7 @@ contract TokenERC20 {
 
 contract PLLE is owned, TokenERC20 {
 
- 
+
     mapping (address => bool) public frozenAccount;
 
     /* This generates a public event on the blockchain that will notify clients */
@@ -184,7 +184,7 @@ contract PLLE is owned, TokenERC20 {
 
     /* Initializes contract with initial supply tokens to the creator of the contract */
     function PLLE(
-        
+
     ) TokenERC20() public {}
 
     /* Internal transfer, only can be called by this contract */
@@ -217,5 +217,34 @@ contract PLLE is owned, TokenERC20 {
         FrozenFunds(target, freeze);
     }
 
-  
+
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

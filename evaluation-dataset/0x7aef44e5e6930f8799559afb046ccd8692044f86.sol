@@ -384,7 +384,6 @@ contract Prover {
                 ledger[target].entries[dataHash].time,
                 ledger[target].entries[dataHash].value);
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

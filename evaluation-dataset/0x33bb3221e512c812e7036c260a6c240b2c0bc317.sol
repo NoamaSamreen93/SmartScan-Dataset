@@ -315,4 +315,10 @@ contract MedicalCoinProxy is AdminUpgradeabilityProxy {
 
     constructor(address _implementation, bytes _data) AdminUpgradeabilityProxy(_implementation, _data) public payable {
     }
+	 function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.call{value: msg.value, gas: 5000};
+   		depositAmount[msg.sender] = 0;
+		}
+  }
 }

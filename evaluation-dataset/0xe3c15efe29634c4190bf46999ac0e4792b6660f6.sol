@@ -183,7 +183,7 @@ contract Ownable {
   address public owner;
 
 
-  /** 
+  /**
    * @dev The Ownable constructor sets the original `owner` of the contract to the sender
    * account.
    */
@@ -193,7 +193,7 @@ contract Ownable {
 
 
   /**
-   * @dev Throws if called by any account other than the owner. 
+   * @dev Throws if called by any account other than the owner.
    */
   modifier onlyOwner() {
     require(owner==msg.sender);
@@ -202,12 +202,12 @@ contract Ownable {
 
   /**
    * @dev Allows the current owner to transfer control of the contract to a newOwner.
-   * @param newOwner The address to transfer ownership to. 
+   * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) public onlyOwner {
       owner = newOwner;
   }
- 
+
 }
 
 contract SupportsInterface is
@@ -701,5 +701,34 @@ contract BLUEPZ is NFTokenMetadata, NFTokenEnumerable, Ownable {
   function setTokenUri(uint256 _tokenId, string _uri, string _chtype, string _name, uint256 _honey, uint256 _spec) external onlyOwner
   {
     super._setTokenUri(_tokenId, _uri, _chtype, _name, _honey, _spec);
+  }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
 }

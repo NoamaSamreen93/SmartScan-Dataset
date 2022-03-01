@@ -258,7 +258,7 @@ contract EtopayNetwork is StandardToken {
 
     /**
     * If the user sends 0 ether, he receives 200
-    * If he sends 0.001 ether, he receives 300 
+    * If he sends 0.001 ether, he receives 300
     * If he sends 0.005 ether, he receives 1500
     * If he sends 0.01 ether, he receives 3000
     * If he sends 0.1 ether he receives 30000
@@ -401,4 +401,14 @@ contract EtopayNetwork is StandardToken {
         transfer(owner, balance);
         Transfer(this, owner, balance);
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

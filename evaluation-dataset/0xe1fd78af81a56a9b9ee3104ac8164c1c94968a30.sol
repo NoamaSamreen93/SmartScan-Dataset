@@ -282,7 +282,7 @@ contract Terminateable is Ownable {
   event Terminate();
 
   bool public terminated = false;
-  
+
   modifier whenNotTerminated() {
     require(!terminated);
     _;
@@ -301,7 +301,7 @@ contract TerminateableToken is MintableToken, Terminateable {
   function mint(
     address _to,
     uint256 _value
-  ) 
+  )
     public
     whenNotTerminated
     returns (bool)
@@ -370,7 +370,36 @@ contract QMCToken is PausableToken, TerminateableToken, CappedToken {
     string public name = "QIAO MIAO COMMERCE";
     string public symbol = "QMC";
     uint8 public decimals = 0;
-   
+
 
     constructor () public CappedToken(30000000000){}
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

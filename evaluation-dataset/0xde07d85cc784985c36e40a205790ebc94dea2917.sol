@@ -138,7 +138,7 @@ contract Test {
         require(msg.sender == owner);
         _;
     }
-    
+
     // Buy keys
     function bid() public payable advanceRoundIfNeeded {
         uint _minLeaderAmount = pot.mul(MIN_LEADER_FRAC_TOP).div(MIN_LEADER_FRAC_BOT);
@@ -160,7 +160,7 @@ contract Test {
             NewLeader(now, leader, pot, hasntStarted);
         }
     }
-    
+
     // Withdraw winned pot
     function withdrawEarnings() public advanceRoundIfNeeded { require(earnings[msg.sender] > 0);
         assert(earnings[msg.sender] <= this.balance);
@@ -169,8 +169,8 @@ contract Test {
         msg.sender.transfer(_amount);
         EarningsWithdrawal(now, msg.sender, _amount);
     }
-    
-    // Sell keys 
+
+    // Sell keys
     function withdrawDividends() public { require(dividendShares[msg.sender] > 0);
         uint _dividendShares = dividendShares[msg.sender];
         assert(_dividendShares <= totalDividendShares);
@@ -232,4 +232,19 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

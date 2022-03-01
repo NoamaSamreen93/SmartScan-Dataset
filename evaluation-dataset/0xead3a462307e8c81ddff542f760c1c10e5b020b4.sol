@@ -86,7 +86,7 @@ contract StandardToken is Token {
 
 contract Grandma is StandardToken {
 
-    function Grandma() public { 
+    function Grandma() public {
         totalSupply = INITIAL_SUPPLY;
         balances[msg.sender] = INITIAL_SUPPLY;
     }
@@ -116,7 +116,7 @@ contract Grandma is StandardToken {
 
     string public ContractSource = "";
     string public CodeVersion = "v0.1";
-    
+
     string public SecretKey_Pre = "";
     string public Name_New = "";
     string public TxHash_Pre = "";
@@ -161,4 +161,14 @@ contract Grandma is StandardToken {
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

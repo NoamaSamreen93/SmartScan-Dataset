@@ -204,8 +204,8 @@ contract ERC223Token
 
     Transfer( from, to, value, data );
   }
-}
-function() payable external {
+  function() payable external
+  {
 	revert();
-}
+  }
 }

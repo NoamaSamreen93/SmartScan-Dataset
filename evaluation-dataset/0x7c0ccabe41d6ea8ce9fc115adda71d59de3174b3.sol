@@ -89,7 +89,6 @@ contract AirdropperERC20 is Ownable {
     uint256 balance = token.balanceOf(this);
     token.transfer(owner, balance);
   }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

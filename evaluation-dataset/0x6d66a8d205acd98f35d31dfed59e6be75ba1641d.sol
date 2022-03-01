@@ -1159,7 +1159,6 @@ contract CompliantCrowdsale is Validator, FinalizableCrowdsale {
     function forwardFunds(uint256 amount) internal {
         wallet.transfer(amount);
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

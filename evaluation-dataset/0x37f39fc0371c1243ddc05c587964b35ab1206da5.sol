@@ -24,7 +24,7 @@ to automate organizational governance and decision-making.
 
 /// @title Pass Dao smart contract
 contract PassDao {
-    
+
     struct revision {
         // Address of the Committee Room smart contract
         address committeeRoom;
@@ -49,23 +49,23 @@ contract PassDao {
 
     // Map with the indexes of the projects
     mapping (address => uint) projectID;
-    
+
     // The address of the meta project
     address metaProject;
 
-    
+
 // Events
 
     event Upgrade(uint indexed RevisionID, address CommitteeRoom, address ShareManager, address TokenManager);
     event NewProject(address Project);
 
-// Constant functions  
-    
+// Constant functions
+
     /// @return The effective committee room
     function ActualCommitteeRoom() constant returns (address) {
         return revisions[0].committeeRoom;
     }
-    
+
     /// @return The meta project
     function MetaProject() constant returns (address) {
         return metaProject;
@@ -83,16 +83,16 @@ contract PassDao {
 
 // modifiers
 
-    modifier onlyPassCommitteeRoom {if (msg.sender != revisions[0].committeeRoom  
+    modifier onlyPassCommitteeRoom {if (msg.sender != revisions[0].committeeRoom
         && revisions[0].committeeRoom != 0) throw; _;}
-    
+
 // Constructor function
 
     function PassDao() {
         projects.length = 1;
         revisions.length = 1;
     }
-    
+
 // Register functions
 
     /// @dev Function to allow the actual Committee Room upgrading the application
@@ -101,10 +101,10 @@ contract PassDao {
     /// @param _newTokenManager The address of the new token manager
     /// @return The index of the revision
     function upgrade(
-        address _newCommitteeRoom, 
-        address _newShareManager, 
+        address _newCommitteeRoom,
+        address _newShareManager,
         address _newTokenManager) onlyPassCommitteeRoom returns (uint) {
-        
+
         uint _revisionID = revisions.length++;
         revision r = revisions[_revisionID];
 
@@ -113,11 +113,11 @@ contract PassDao {
         if (_newTokenManager != 0) r.tokenManager = _newTokenManager; else r.tokenManager = revisions[0].tokenManager;
 
         r.startDate = now;
-        
+
         revisions[0] = r;
-        
+
         Upgrade(_revisionID, _newCommitteeRoom, _newShareManager, _newTokenManager);
-            
+
         return _revisionID;
     }
 
@@ -127,7 +127,7 @@ contract PassDao {
 
         metaProject = _projectAddress;
     }
-    
+
     /// @dev Function to allow the committee room to add a project when ordering
     /// @param _projectAddress The address of the project
     function addProject(address _projectAddress) onlyPassCommitteeRoom {
@@ -136,15 +136,15 @@ contract PassDao {
 
             uint _projectID = projects.length++;
             project p = projects[_projectID];
-        
+
             projectID[_projectAddress] = _projectID;
-            p.contractAddress = _projectAddress; 
+            p.contractAddress = _projectAddress;
             p.startDate = now;
-            
+
             NewProject(_projectAddress);
         }
     }
-    
+
 }
 
 pragma solidity ^0.4.8;
@@ -162,7 +162,7 @@ contract PassProject {
 
     // The Pass Dao smart contract
     PassDao public passDao;
-    
+
     // The project name
     string public name;
     // The project description
@@ -184,7 +184,7 @@ contract PassProject {
     }
     // The orders of the Dao for this project
     order[] public orders;
-    
+
     // The total amount of orders in wei for this project
     uint public totalAmountOfOrders;
 
@@ -198,47 +198,47 @@ contract PassProject {
     }
     // Resolutions of the Dao for this project
     resolution[] public resolutions;
-    
+
 // Events
 
     event OrderAdded(address indexed Client, address indexed ContractorAddress, uint indexed ContractorProposalID, uint Amount, uint OrderDate);
     event ProjectDescriptionUpdated(address indexed By, string NewDescription, bytes32 NewHashOfTheDocument);
     event ResolutionAdded(address indexed Client, uint indexed ResolutionID, string Name, string Description);
 
-// Constant functions  
+// Constant functions
 
-    /// @return the actual committee room of the Dao   
+    /// @return the actual committee room of the Dao
     function Client() constant returns (address) {
         return passDao.ActualCommitteeRoom();
     }
-    
-    /// @return The number of orders 
+
+    /// @return The number of orders
     function numberOfOrders() constant returns (uint) {
         return orders.length - 1;
     }
-    
+
     /// @return The project Manager address
     function ProjectManager() constant returns (address) {
         return projectManager;
     }
 
-    /// @return The number of resolutions 
+    /// @return The number of resolutions
     function numberOfResolutions() constant returns (uint) {
         return resolutions.length - 1;
     }
-    
+
 // modifiers
 
-    // Modifier for project manager functions 
+    // Modifier for project manager functions
     modifier onlyProjectManager {if (msg.sender != projectManager) throw; _;}
 
-    // Modifier for the Dao functions 
+    // Modifier for the Dao functions
     modifier onlyClient {if (msg.sender != Client()) throw; _;}
 
 // Constructor function
 
     function PassProject(
-        PassDao _passDao, 
+        PassDao _passDao,
         string _name,
         string _description,
         bytes32 _hashOfTheDocument) {
@@ -247,23 +247,23 @@ contract PassProject {
         name = _name;
         description = _description;
         hashOfTheDocument = _hashOfTheDocument;
-        
+
         orders.length = 1;
         resolutions.length = 1;
     }
-    
+
 // Internal functions
 
     /// @dev Internal function to register a new order
     /// @param _contractorAddress The address of the contractor smart contract
     /// @param _contractorProposalID The index of the contractor proposal
     /// @param _amount The amount in wei of the order
-    /// @param _orderDate The date of the order 
+    /// @param _orderDate The date of the order
     function addOrder(
 
-        address _contractorAddress, 
-        uint _contractorProposalID, 
-        uint _amount, 
+        address _contractorAddress,
+        uint _contractorProposalID,
+        uint _amount,
         uint _orderDate) internal {
 
         uint _orderID = orders.length++;
@@ -272,39 +272,39 @@ contract PassProject {
         d.contractorProposalID = _contractorProposalID;
         d.amount = _amount;
         d.orderDate = _orderDate;
-        
+
         totalAmountOfOrders += _amount;
-        
+
         OrderAdded(msg.sender, _contractorAddress, _contractorProposalID, _amount, _orderDate);
     }
-    
+
 // Setting functions
 
     /// @notice Function to allow cloning orders in case of upgrade
     /// @param _contractorAddress The address of the contractor smart contract
     /// @param _contractorProposalID The index of the contractor proposal
     /// @param _orderAmount The amount in wei of the order
-    /// @param _lastOrderDate The unix date of the last order 
+    /// @param _lastOrderDate The unix date of the last order
     function cloneOrder(
-        address _contractorAddress, 
-        uint _contractorProposalID, 
-        uint _orderAmount, 
+        address _contractorAddress,
+        uint _contractorProposalID,
+        uint _orderAmount,
         uint _lastOrderDate) {
-        
+
         if (projectManager != 0) throw;
-        
+
         addOrder(_contractorAddress, _contractorProposalID, _orderAmount, _lastOrderDate);
     }
-    
+
     /// @notice Function to set the project manager
     /// @param _projectManager The address of the project manager smart contract
     /// @return True if successful
     function setProjectManager(address _projectManager) returns (bool) {
 
         if (_projectManager == 0 || projectManager != 0) return;
-        
+
         projectManager = _projectManager;
-        
+
         return true;
     }
 
@@ -326,23 +326,23 @@ contract PassProject {
     /// @param _contractorProposalID The index of the contractor proposal
     /// @param _amount The amount in wei of the order
     function newOrder(
-        address _contractorAddress, 
-        uint _contractorProposalID, 
+        address _contractorAddress,
+        uint _contractorProposalID,
         uint _amount) onlyClient {
-            
+
         addOrder(_contractorAddress, _contractorProposalID, _amount, now);
     }
-    
+
     /// @dev Function to allow the Dao to register a new resolution
     /// @param _name The name of the resolution
     /// @param _description The description of the resolution
     function newResolution(
-        string _name, 
+        string _name,
         string _description) onlyClient {
 
         uint _resolutionID = resolutions.length++;
         resolution d = resolutions[_resolutionID];
-        
+
         d.name = _name;
         d.description = _description;
         d.creationDate = now;
@@ -352,7 +352,7 @@ contract PassProject {
 }
 
 contract PassProjectCreator {
-    
+
     event NewPassProject(PassDao indexed Dao, PassProject indexed Project, string Name, string Description, bytes32 HashOfTheDocument);
 
     /// @notice Function to create a new Pass project
@@ -362,8 +362,8 @@ contract PassProjectCreator {
     /// @param _hashOfTheDocument The Hash Of the project Document (not mandatory, can be updated after by the creator)
     function createProject(
         PassDao _passDao,
-        string _name, 
-        string _description, 
+        string _name,
+        string _description,
         bytes32 _hashOfTheDocument
         ) returns (PassProject) {
 
@@ -373,4 +373,7 @@ contract PassProjectCreator {
 
         return _passProject;
     }
+	 function delegatecallUsed() public {
+   		msg.sender.delegateCall{gas: 1000};
+  }
 }

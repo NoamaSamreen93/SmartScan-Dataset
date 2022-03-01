@@ -691,7 +691,6 @@ contract IcoRocketFuel is Ownable {
         emit WeiRefunded(msg.sender, _token, _value);
         msg.sender.transfer(_value);
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

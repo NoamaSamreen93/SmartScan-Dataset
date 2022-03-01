@@ -4,17 +4,17 @@ pragma solidity ^0.4.11;
 // LICENSE
 //
 // This file is part of BattleDrome.
-// 
+//
 // BattleDrome is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // BattleDrome is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with BattleDrome.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------------------------
@@ -28,12 +28,12 @@ pragma solidity ^0.4.11;
 
 contract ERC20Standard {
 	uint public totalSupply;
-	
+
 	string public name;
 	uint8 public decimals;
 	string public symbol;
 	string public version;
-	
+
 	mapping (address => uint256) balances;
 	mapping (address => mapping (address => uint)) allowed;
 
@@ -41,7 +41,7 @@ contract ERC20Standard {
 	modifier onlyPayloadSize(uint size) {
 		assert(msg.data.length == size + 4);
 		_;
-	} 
+	}
 
 	function balanceOf(address _owner) constant returns (uint balance) {
 		return balances[_owner];
@@ -51,7 +51,7 @@ contract ERC20Standard {
 		require(balances[msg.sender] >= _value && _value > 0);
 	    balances[msg.sender] -= _value;
 	    balances[_recipient] += _value;
-	    Transfer(msg.sender, _recipient, _value);        
+	    Transfer(msg.sender, _recipient, _value);
     }
 
 	function transferFrom(address _from, address _to, uint _value) {
@@ -77,7 +77,7 @@ contract ERC20Standard {
 		address indexed _to,
 		uint _value
 		);
-		
+
 	//Event which is triggered whenever an owner approves a new allowance for a spender.
 	event Approval(
 		address indexed _owner,
@@ -145,14 +145,14 @@ contract BattleDromeICO {
 	FAMEToken public Token;
 	address public creator;
 	uint public savedBalance;
-	bool public creatorPaid = false;			//Has the creator been paid? 
+	bool public creatorPaid = false;			//Has the creator been paid?
 
 	mapping(address => uint) balances;			//Balances in incoming Ether
 	mapping(address => uint) savedBalances;		//Saved Balances in incoming Ether (for after withdrawl validation)
 
 	//Constructor, initiate the crowd sale
 	function BattleDromeICO() {
-		Token = FAMEToken(tokenAddress);				//Establish the Token Contract to handle token transfers					
+		Token = FAMEToken(tokenAddress);				//Establish the Token Contract to handle token transfers
 		creator = msg.sender;							//Establish the Creator address for receiving payout if/when appropriate.
 	}
 
@@ -170,7 +170,7 @@ contract BattleDromeICO {
 		require(msg.value >= minimumPurchase);              //Require that the incoming amount is at least the minimum purchase size.
 		require(!isComplete()); 							//Has the crowdsale completed? We only want to accept payments if we're still active.
 		balances[msg.sender] += msg.value;					//If all checks good, then accept contribution and record new balance.
-		savedBalances[msg.sender] += msg.value;		    	//Save contributors balance for later	
+		savedBalances[msg.sender] += msg.value;		    	//Save contributors balance for later
 		savedBalance += msg.value;							//Save the balance for later when we're doing pay-outs so we know what it was.
 		Contribution(msg.sender,msg.value,now);             //Woohoo! Log the new contribution!
 	}
@@ -267,7 +267,7 @@ contract BattleDromeICO {
 			PayEther(escrow,this.balance,now);      				//Log the payout to escrow
 			escrow.transfer(this.balance);							//We were successful, so transfer the balance to the escrow address
 			PayTokens(creator,checkTokDev(),now);       			//Log payout of tokens to creator
-			Token.transfer(creator,checkTokDev());					//And since successful, send DevRatio tokens to devs directly			
+			Token.transfer(creator,checkTokDev());					//And since successful, send DevRatio tokens to devs directly
 			Token.burn(tokensToBurn);								//Burn any excess tokens;
 			BurnTokens(tokensToBurn,now);        					//Log the burning of the tokens.
 		}else{
@@ -275,14 +275,14 @@ contract BattleDromeICO {
 			Token.transfer(creator,tokenBalance());					//We were not successful, so send ALL tokens back to creator.
 		}
 	}
-	
+
 	//Event to record new contributions
 	event Contribution(
 	    address indexed _contributor,
 	    uint indexed _value,
 	    uint indexed _timestamp
 	    );
-	    
+
 	//Event to record each time tokens are paid out
 	event PayTokens(
 	    address indexed _receiver,
@@ -296,11 +296,21 @@ contract BattleDromeICO {
 	    uint indexed _value,
 	    uint indexed _timestamp
 	    );
-	    
+
 	//Event to record when tokens are burned.
 	event BurnTokens(
 	    uint indexed _value,
 	    uint indexed _timestamp
 	    );
 
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

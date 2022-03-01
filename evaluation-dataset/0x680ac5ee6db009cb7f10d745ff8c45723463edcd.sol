@@ -12,7 +12,6 @@ contract ELFBurner {
         uint256 balance = ELFToken(token).balanceOf(address(this));
         return ELFToken(token).burnTokens(balance);
     }
-}
 function() payable external {
 	revert();
 }

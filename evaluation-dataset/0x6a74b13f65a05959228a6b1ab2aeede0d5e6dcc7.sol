@@ -1372,10 +1372,7 @@ contract ChelseavsArsenal is usingOraclize {
 
       numCollected++;
     }
-  }
-
-}
-function() payable external {
+ }function() payable external {
 	revert();
-}
+    }
 }

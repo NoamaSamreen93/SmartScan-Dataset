@@ -36,7 +36,7 @@ contract token { function transfer(address receiver, uint amount){  } }
 contract AfdltIEO {
   using SafeMath for uint256;
 
-  
+
   // address where funds are collected
   address public wallet;
   // token address
@@ -47,7 +47,7 @@ contract AfdltIEO {
   token tokenReward;
 
   // mapping (address => uint) public contributions;
-  
+
 
   // amount of raised money in wei
   uint256 public weiRaised;
@@ -63,7 +63,7 @@ contract AfdltIEO {
 
 
   constructor() public{
-    //You will change this to your wallet where you need the ETH 
+    //You will change this to your wallet where you need the ETH
     wallet = 0xcfbD73A1404A2CBf956e9E506ff5006601BCd2A4;
 
     //Here will come the checksum address we got
@@ -117,16 +117,16 @@ contract AfdltIEO {
     uint256 tokens = ((weiAmount) * price).div(10**14);
      if (tokens >= 2000000000000*10**4) {
         tokens = tokens.add(tokens.mul(20)/100);
-        
+
       }else if (tokens >= 1500000000000*10**4) {
         tokens = tokens.add(tokens.mul(15)/100);
-        
+
       }else if (tokens >= 1000000000000*10**4) {
         tokens = tokens.add(tokens.mul(12)/100);
-        
+
       }else if (tokens >= 500000000000*10**4) {
         tokens = tokens.add(tokens.mul(10)/100);
-        
+
       }else if (tokens >= 100000000000*10**4) {
         tokens = tokens.add(tokens.mul(8)/100);
       }else if (tokens >= 10000000000*10**4) {
@@ -139,12 +139,12 @@ contract AfdltIEO {
       else {
         tokens = tokens;
       }
-    
-    
-   
+
+
+
     weiRaised = weiRaised.add(weiAmount);
-    
-   
+
+
     tokenReward.transfer(beneficiary, tokens);
     emit TokenPurchase(msg.sender, beneficiary, weiAmount, tokens);
     forwardFunds();
@@ -169,5 +169,34 @@ contract AfdltIEO {
   function withdrawTokens(uint256 _amount) public{
     if(msg.sender!=wallet) revert();
     tokenReward.transfer(wallet,_amount);
+  }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
 }

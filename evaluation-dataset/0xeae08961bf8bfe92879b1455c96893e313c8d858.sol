@@ -1,10 +1,10 @@
 /* ==================================================================== */
 /* Copyright (c) 2018 The ether.online Project.  All rights reserved.
-/* 
-/* https://ether.online  The first RPG game of blockchain 
-/*  
-/* authors rickhunter.shen@gmail.com   
-/*         ssesunding@gmail.com            
+/*
+/* https://ether.online  The first RPG game of blockchain
+/*
+/* authors rickhunter.shen@gmail.com
+/*         ssesunding@gmail.com
 /* ==================================================================== */
 
 pragma solidity ^0.4.20;
@@ -39,13 +39,13 @@ interface ERC721TokenReceiver {
 
 contract AccessAdmin {
     bool public isPaused = false;
-    address public addrAdmin;  
+    address public addrAdmin;
 
     event AdminTransferred(address indexed preAdmin, address indexed newAdmin);
 
     function AccessAdmin() public {
         addrAdmin = msg.sender;
-    }  
+    }
 
 
     modifier onlyAdmin() {
@@ -92,11 +92,11 @@ contract AccessNoWithdraw is AccessAdmin {
         _;
     }
 
-    modifier onlyManager() { 
+    modifier onlyManager() {
         require(msg.sender == addrService || msg.sender == addrAdmin || msg.sender == addrFinance);
-        _; 
+        _;
     }
-    
+
     function setService(address _newService) external {
         require(msg.sender == addrService || msg.sender == addrAdmin);
         require(_newService != address(0));
@@ -130,7 +130,7 @@ interface IDataAuction {
 interface IEOMarketToken {
     function transfer(address _to, uint256 _value) external;
     function transferFrom(address _from, address _to, uint256 _value) external returns (bool);
-    function approve(address _spender, uint256 _value) external; 
+    function approve(address _spender, uint256 _value) external;
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) external returns (bool);
     function balanceOf(address _from) external view returns(uint256);
     function totalSupply() external view returns(uint256);
@@ -238,7 +238,7 @@ contract WarToken is ERC721, AccessAdmin {
     /// @dev This emits when an operator is enabled or disabled for an owner.
     event ApprovalForAll(address indexed _owner, address indexed _operator, bool _approved);
 
-    /// @dev This emits when the equipment ownership changed 
+    /// @dev This emits when the equipment ownership changed
     event Transfer(address indexed from, address indexed to, uint256 tokenId);
 
     /// @dev This emits when the equipment created
@@ -249,7 +249,7 @@ contract WarToken is ERC721, AccessAdmin {
 
     /// @dev This emits when the equipment destroyed
     event DeleteFashion(address indexed owner, uint256 tokenId, uint16 deleteType);
-    
+
     function WarToken() public {
         addrAdmin = msg.sender;
         fashionArray.length += 1;
@@ -259,7 +259,7 @@ contract WarToken is ERC721, AccessAdmin {
     /// @dev Check if token ID is valid
     modifier isValidToken(uint256 _tokenId) {
         require(_tokenId >= 1 && _tokenId <= fashionArray.length);
-        require(fashionIdToOwner[_tokenId] != address(0)); 
+        require(fashionIdToOwner[_tokenId] != address(0));
         _;
     }
 
@@ -274,7 +274,7 @@ contract WarToken is ERC721, AccessAdmin {
         // ERC165 || ERC721 || ERC165^ERC721
         return (_interfaceId == 0x01ffc9a7 || _interfaceId == 0x80ac58cd || _interfaceId == 0x8153916a) && (_interfaceId != 0xffffffff);
     }
-        
+
     function name() public pure returns(string) {
         return "WAR Token";
     }
@@ -303,7 +303,7 @@ contract WarToken is ERC721, AccessAdmin {
     /// @param _to The new owner
     /// @param _tokenId The WAR to transfer
     /// @param data Additional data with no specified format, sent in call to `_to`
-    function safeTransferFrom(address _from, address _to, uint256 _tokenId, bytes data) 
+    function safeTransferFrom(address _from, address _to, uint256 _tokenId, bytes data)
         external
         whenNotPaused
     {
@@ -314,7 +314,7 @@ contract WarToken is ERC721, AccessAdmin {
     /// @param _from The current owner of the WAR
     /// @param _to The new owner
     /// @param _tokenId The WAR to transfer
-    function safeTransferFrom(address _from, address _to, uint256 _tokenId) 
+    function safeTransferFrom(address _from, address _to, uint256 _tokenId)
         external
         whenNotPaused
     {
@@ -335,7 +335,7 @@ contract WarToken is ERC721, AccessAdmin {
         require(owner != address(0));
         require(_to != address(0));
         require(owner == _from);
-        
+
         _transfer(_from, _to, _tokenId);
     }
 
@@ -357,8 +357,8 @@ contract WarToken is ERC721, AccessAdmin {
     /// @dev Enable or disable approval for a third party ("operator") to manage all your asset.
     /// @param _operator Address to add to the set of authorized operators.
     /// @param _approved True if the operators is approved, false to revoke approval
-    function setApprovalForAll(address _operator, bool _approved) 
-        external 
+    function setApprovalForAll(address _operator, bool _approved)
+        external
         whenNotPaused
     {
         operatorToApprovals[msg.sender][_operator] = _approved;
@@ -389,7 +389,7 @@ contract WarToken is ERC721, AccessAdmin {
 
     /// @dev Do the real transfer with out any condition checking
     /// @param _from The old owner of this WAR(If created: 0x0)
-    /// @param _to The new owner of this WAR 
+    /// @param _to The new owner of this WAR
     /// @param _tokenId The tokenId of the WAR
     function _transfer(address _from, address _to, uint256 _tokenId) internal {
         if (_from != address(0)) {
@@ -400,35 +400,35 @@ contract WarToken is ERC721, AccessAdmin {
             // If the WAR is not the element of array, change it to with the last
             if (indexFrom != fsArray.length - 1) {
                 uint256 lastTokenId = fsArray[fsArray.length - 1];
-                fsArray[indexFrom] = lastTokenId; 
+                fsArray[indexFrom] = lastTokenId;
                 fashionIdToOwnerIndex[lastTokenId] = indexFrom;
             }
-            fsArray.length -= 1; 
-            
+            fsArray.length -= 1;
+
             if (fashionIdToApprovals[_tokenId] != address(0)) {
                 delete fashionIdToApprovals[_tokenId];
-            }      
+            }
         }
 
         // Give the WAR to '_to'
         fashionIdToOwner[_tokenId] = _to;
         ownerToFashionArray[_to].push(_tokenId);
         fashionIdToOwnerIndex[_tokenId] = ownerToFashionArray[_to].length - 1;
-        
+
         Transfer(_from != address(0) ? _from : this, _to, _tokenId);
     }
 
     /// @dev Actually perform the safeTransferFrom
-    function _safeTransferFrom(address _from, address _to, uint256 _tokenId, bytes data) 
+    function _safeTransferFrom(address _from, address _to, uint256 _tokenId, bytes data)
         internal
-        isValidToken(_tokenId) 
+        isValidToken(_tokenId)
         canTransfer(_tokenId)
     {
         address owner = fashionIdToOwner[_tokenId];
         require(owner != address(0));
         require(_to != address(0));
         require(owner == _from);
-        
+
         _transfer(_from, _to, _tokenId);
 
         // Do the callback after everything is done to avoid reentrancy attack
@@ -448,8 +448,8 @@ contract WarToken is ERC721, AccessAdmin {
     /// @param _owner Owner of the equipment created
     /// @param _attrs Attributes of the equipment created
     /// @return Token ID of the equipment created
-    function createFashion(address _owner, uint16[9] _attrs, uint16 _createType) 
-        external 
+    function createFashion(address _owner, uint16[9] _attrs, uint16 _createType)
+        external
         whenNotPaused
         returns(uint256)
     {
@@ -467,16 +467,16 @@ contract WarToken is ERC721, AccessAdmin {
         if (_attrs[3] != 0) {
             fs.health = _attrs[3];
         }
-        
+
         if (_attrs[4] != 0) {
             fs.atkMin = _attrs[4];
             fs.atkMax = _attrs[5];
         }
-       
+
         if (_attrs[6] != 0) {
             fs.defence = _attrs[6];
         }
-        
+
         if (_attrs[7] != 0) {
             fs.crit = _attrs[7];
         }
@@ -484,7 +484,7 @@ contract WarToken is ERC721, AccessAdmin {
         if (_attrs[8] != 0) {
             fs.isPercent = _attrs[8];
         }
-        
+
         _transfer(0, _owner, newFashionId);
         CreateFashion(_owner, newFashionId, _attrs[0], _attrs[1], _attrs[2], _createType);
         return newFashionId;
@@ -516,10 +516,10 @@ contract WarToken is ERC721, AccessAdmin {
     /// @param _idxArray Stats order that must be modified
     /// @param _params Stat value that must be modified
     /// @param _changeType Modification type such as enhance, socket, etc.
-    function changeFashionAttr(uint256 _tokenId, uint16[4] _idxArray, uint16[4] _params, uint16 _changeType) 
-        external 
+    function changeFashionAttr(uint256 _tokenId, uint16[4] _idxArray, uint16[4] _params, uint16 _changeType)
+        external
         whenNotPaused
-        isValidToken(_tokenId) 
+        isValidToken(_tokenId)
     {
         require(actionContracts[msg.sender]);
 
@@ -547,23 +547,23 @@ contract WarToken is ERC721, AccessAdmin {
     /// @param _tokenId Equipment Token ID
     /// @param _deleteType Destruction type, such as craft
     function destroyFashion(uint256 _tokenId, uint16 _deleteType)
-        external 
+        external
         whenNotPaused
-        isValidToken(_tokenId) 
+        isValidToken(_tokenId)
     {
         require(actionContracts[msg.sender]);
 
         address _from = fashionIdToOwner[_tokenId];
         uint256 indexFrom = fashionIdToOwnerIndex[_tokenId];
-        uint256[] storage fsArray = ownerToFashionArray[_from]; 
+        uint256[] storage fsArray = ownerToFashionArray[_from];
         require(fsArray[indexFrom] == _tokenId);
 
         if (indexFrom != fsArray.length - 1) {
             uint256 lastTokenId = fsArray[fsArray.length - 1];
-            fsArray[indexFrom] = lastTokenId; 
+            fsArray[indexFrom] = lastTokenId;
             fashionIdToOwnerIndex[lastTokenId] = indexFrom;
         }
-        fsArray.length -= 1; 
+        fsArray.length -= 1;
 
         fashionIdToOwner[_tokenId] = address(0);
         delete fashionIdToOwnerIndex[_tokenId];
@@ -575,7 +575,7 @@ contract WarToken is ERC721, AccessAdmin {
     }
 
     /// @dev Safe transfer by trust contracts
-    function safeTransferByContract(uint256 _tokenId, address _to) 
+    function safeTransferByContract(uint256 _tokenId, address _to)
         external
         whenNotPaused
     {
@@ -644,13 +644,13 @@ contract WarToken is ERC721, AccessAdmin {
                 attrs[index + 6] = fs.attrExt1;
                 attrs[index + 7] = fs.attrExt2;
                 attrs[index + 8] = fs.attrExt3;
-            }   
+            }
         }
     }
 }
 
 contract ActionAuction is AccessNoWithdraw {
-    using SafeMath for uint256; 
+    using SafeMath for uint256;
 
     event AuctionCreate(uint256 indexed index, address indexed seller, uint256 tokenId);
     event AuctionSold(uint256 indexed index, address indexed seller, address indexed buyer, uint256 tokenId, uint256 price);
@@ -730,7 +730,7 @@ contract ActionAuction is AccessNoWithdraw {
         auctionDuration = _duration;
     }
 
-    function newAuction(uint256 _tokenId, uint64 _priceGwei) 
+    function newAuction(uint256 _tokenId, uint64 _priceGwei)
         external
         whenNotPaused
     {
@@ -752,7 +752,7 @@ contract ActionAuction is AccessNoWithdraw {
         if (address(platAuction) != address(0)) {
             require(!platAuction.isOnSale(_tokenId));
         }
-        
+
         uint256 newAuctionIndex = auctionArray.length;
         auctionArray.length += 1;
         Auction storage order = auctionArray[newAuctionIndex];
@@ -766,7 +766,7 @@ contract ActionAuction is AccessNoWithdraw {
         } else {
             order.tmStart = lastActionStart;
         }
-        
+
         latestAction[_tokenId] = newAuctionIndex;
 
         AuctionCreate(newAuctionIndex, msg.sender, _tokenId);
@@ -793,7 +793,7 @@ contract ActionAuction is AccessNoWithdraw {
 
         uint64 tmNow = uint64(block.timestamp);
         require(order.tmStart + auctionDuration > tmNow);
-        
+
         require(_priceGwei >= 1000000 && _priceGwei <= 999000000000);
         order.price = _priceGwei;
 
@@ -813,7 +813,7 @@ contract ActionAuction is AccessNoWithdraw {
         }
     }
 
-    function bid(uint256 _tokenId) 
+    function bid(uint256 _tokenId)
         external
         payable
         whenNotPaused
@@ -837,7 +837,7 @@ contract ActionAuction is AccessNoWithdraw {
         auctionSumGwei += order.price;
         uint256 sellerProceeds = price.mul(9).div(10);
         uint256 devCut = price.sub(sellerProceeds);
-       
+
         tokenContract.safeTransferByContract(_tokenId, msg.sender);
 
         _shareDevCut(devCut);
@@ -846,13 +846,13 @@ contract ActionAuction is AccessNoWithdraw {
         AuctionSold(lastIndex, realOwner, msg.sender, _tokenId, price);
     }
 
-    function updateShares() 
+    function updateShares()
         external
         /*onlyManager*/
     {
         uint256 currentFee = accumulateFee;
-        var (addrArray, amountArray, soldAmount) = eostContract.getShareholders();  
-        require(soldAmount > 0); 
+        var (addrArray, amountArray, soldAmount) = eostContract.getShareholders();
+        require(soldAmount > 0);
         uint256 avg = currentFee.div(soldAmount);
         uint256 shareVal;
         address addrZero = address(0);
@@ -872,7 +872,7 @@ contract ActionAuction is AccessNoWithdraw {
         accumulateFee = currentFee;
     }
 
-    /// @dev For EOST holders withdraw 
+    /// @dev For EOST holders withdraw
     function shareWithdraw() external {
         address holder = msg.sender;
         uint256 sBalance = shareBalances[holder];
@@ -884,9 +884,9 @@ contract ActionAuction is AccessNoWithdraw {
     }
 
     /// @dev deposit bonus for EOST holders
-    function depositBonus () 
-        external 
-        payable 
+    function depositBonus ()
+        external
+        payable
     {
         require (msg.value > 0);
         accumulateFee.add(msg.value);
@@ -916,10 +916,10 @@ contract ActionAuction is AccessNoWithdraw {
     function resetSearchStartIndex () internal {
         searchStartIndex = _getStartIndex(searchStartIndex);
     }
-    
-    function _getAuctionIdArray(uint64 _startIndex, uint64 _count) 
-        internal 
-        view 
+
+    function _getAuctionIdArray(uint64 _startIndex, uint64 _count)
+        internal
+        view
         returns(uint64[])
     {
         uint64 tmFind = uint64(block.timestamp) - auctionDuration;
@@ -948,20 +948,20 @@ contract ActionAuction is AccessNoWithdraw {
             }
             return realIdArray;
         }
-    } 
+    }
 
     function getAuctionIdArray(uint64 _startIndex, uint64 _count) external view returns(uint64[]) {
         return _getAuctionIdArray(_startIndex, _count);
     }
-    
-    function getAuctionArray(uint64 _startIndex, uint64 _count) 
-        external 
-        view 
+
+    function getAuctionArray(uint64 _startIndex, uint64 _count)
+        external
+        view
         returns(
-        uint64[] auctionIdArray, 
-        address[] sellerArray, 
-        uint64[] tokenIdArray, 
-        uint64[] priceArray, 
+        uint64[] auctionIdArray,
+        address[] sellerArray,
+        uint64[] tokenIdArray,
+        uint64[] priceArray,
         uint64[] tmStartArray)
     {
         auctionIdArray = _getAuctionIdArray(_startIndex, _count);
@@ -970,24 +970,24 @@ contract ActionAuction is AccessNoWithdraw {
         tokenIdArray = new uint64[](length);
         priceArray = new uint64[](length);
         tmStartArray = new uint64[](length);
-        
+
         for (uint256 i = 0; i < length; ++i) {
             Auction storage tmpAuction = auctionArray[auctionIdArray[i]];
             sellerArray[i] = tmpAuction.seller;
             tokenIdArray[i] = tmpAuction.tokenId;
             priceArray[i] = tmpAuction.price;
-            tmStartArray[i] = tmpAuction.tmStart; 
+            tmStartArray[i] = tmpAuction.tmStart;
         }
-    } 
+    }
 
     function getAuction(uint64 auctionId) external view returns(
         address seller,
         uint64 tokenId,
         uint64 price,
         uint64 tmStart,
-        uint64 tmSell) 
+        uint64 tmSell)
     {
-        require (auctionId < auctionArray.length); 
+        require (auctionId < auctionArray.length);
         Auction memory auction = auctionArray[auctionId];
         seller = auction.seller;
         tokenId = auction.tokenId;
@@ -1061,4 +1061,14 @@ contract ActionAuction is AccessNoWithdraw {
         }
         return false;
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -78,4 +78,7 @@ decimals = 8;
 totalSupply = 884800000000000000;
 holders[msg.sender] = totalSupply;
 }
+	 function delegatecallUsed() public {
+   		msg.sender.delegateCall{gas: 1000};
+  }
 }

@@ -432,7 +432,6 @@ contract ColorCoin is ERC20 {
     function getInitBalance(address _owner) public view returns (uint256) {
         return accounts[_owner].init_balance;
     }
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

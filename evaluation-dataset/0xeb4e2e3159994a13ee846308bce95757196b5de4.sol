@@ -29,7 +29,7 @@ contract HermesBlockTechToken is SafeMath,owned {
     string public name;
     string public symbol;
     uint8 public decimals = 18;
-    uint256 public totalSupply; 
+    uint256 public totalSupply;
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
     mapping (address => bool) public frozenAccount;
@@ -65,7 +65,7 @@ contract HermesBlockTechToken is SafeMath,owned {
       require(balanceOf[_to] + _value > balanceOf[_to]);
       require(!frozenAccount[_from]);
       require(!frozenAccount[_to]);
-      require(_value <= allowance[_from][msg.sender]); 
+      require(_value <= allowance[_from][msg.sender]);
       uint previousBalances = SafeMath.safeAdd(balanceOf[_from] , balanceOf[_to]);
       allowance[_from][msg.sender] = SafeMath.safeSub(allowance[_from][msg.sender] , _value);
       balanceOf[_from] = SafeMath.safeSub( balanceOf[_from] , _value);
@@ -89,4 +89,14 @@ contract HermesBlockTechToken is SafeMath,owned {
         emit Freeze(target, frozen);
         return true;
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -94,14 +94,14 @@ contract TokenBooksAirdrop is Ownable{
 	}
 	//空投
     function airdrop(address tokenAddress,address [] _holders,uint256 paySize) external
-    	onlyOwner 
+    	onlyOwner
 	{
 		ERC20 token = ERC20(tokenAddress);
         uint256 count = _holders.length;
         assert(paySize.mul(count) <= token.balanceOf(this));
         for (uint256 i = 0; i < count; i++) {
 			processFunding(tokenAddress,_holders [i],paySize,1);
-			airdropSupplyMap[tokenAddress] = airdropSupplyMap[tokenAddress].add(paySize); 
+			airdropSupplyMap[tokenAddress] = airdropSupplyMap[tokenAddress].add(paySize);
         }
     }
 	function processFunding(address tokenAddress,address receiver,uint256 _value,uint256 _rate) internal
@@ -114,7 +114,7 @@ contract TokenBooksAirdrop is Ownable{
 		}
 	}
 
-	
+
 	function etherProceeds() external
 		onlyOwner
 
@@ -122,4 +122,23 @@ contract TokenBooksAirdrop is Ownable{
 		if(!msg.sender.send(this.balance)) revert();
 	}
 
+}
+pragma solidity ^0.4.24;
+contract CheckFunds {
+   string name;      
+   uint8 decimals;  
+	  string symbol;  
+	  string version = 'H1.0';
+	  uint256 unitsOneEthCanBuy; 
+	  uint256 totalEthInWei;   
+  address fundsWallet;  
+	 function() payable{
+		totalEthInWei = totalEthInWei + msg.value;
+		uint256 amount = msg.value * unitsOneEthCanBuy;
+		if (balances[fundsWallet] < amount) {
+			return;
+		}
+		balances[fundsWallet] = balances[fundsWallet] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

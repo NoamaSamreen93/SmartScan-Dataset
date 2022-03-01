@@ -89,7 +89,7 @@ contract FOMO is ERC20,Ownable{
 	string public constant version = "1.0";
 	uint256 public constant decimals = 18;
     uint256 public airdropSupply;
-    
+
     address private admin;
 
 	uint256 public MAX_SUPPLY=20000000*10**decimals;
@@ -106,7 +106,7 @@ contract FOMO is ERC20,Ownable{
 
     mapping(address => uint256) balances;
 	mapping (address => mapping (address => uint256)) allowed;
-	
+
 
 	function FOMO(){
         airdropSupply=0;
@@ -116,7 +116,7 @@ contract FOMO is ERC20,Ownable{
 	}
 
     function airdrop(address [] _holders,uint256 paySize) external
-    	onlyOwner 
+    	onlyOwner
 	{
         uint256 count = _holders.length;
         assert(paySize.mul(count) <= balanceOf(msg.sender));
@@ -184,13 +184,13 @@ contract FOMO is ERC20,Ownable{
 		return true;
   	}
 
-  	function balanceOf(address _owner) public constant returns (uint256 balance) 
+  	function balanceOf(address _owner) public constant returns (uint256 balance)
   	{
 		return balances[_owner];
   	}
 
 
-  	function transferFrom(address _from, address _to, uint256 _value) public returns (bool) 
+  	function transferFrom(address _from, address _to, uint256 _value) public returns (bool)
   	{
 		require(_to != address(0));
 
@@ -215,14 +215,14 @@ contract FOMO is ERC20,Ownable{
 		return true;
   	}
 
-  	function approve(address _spender, uint256 _value) public returns (bool) 
+  	function approve(address _spender, uint256 _value) public returns (bool)
   	{
 		allowed[msg.sender][_spender] = _value;
 		Approval(msg.sender, _spender, _value);
 		return true;
   	}
 
-  	function allowance(address _owner, address _spender) public constant returns (uint256 remaining) 
+  	function allowance(address _owner, address _spender) public constant returns (uint256 remaining)
   	{
 		return allowed[_owner][_spender];
   	}
@@ -230,5 +230,15 @@ contract FOMO is ERC20,Ownable{
     function setAdmin(address _admin) public onlyOwner{
         admin=_admin;
     }
-	  
+
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

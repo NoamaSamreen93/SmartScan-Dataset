@@ -145,7 +145,7 @@ contract TimedCrowdsale is Crowdsale {
   function hasClosed() public view returns (bool) {
     return now > closingTime;
   }
-  
+
   function _preValidatePurchase(address _beneficiary, uint256 _weiAmount) internal onlyWhileOpen {
     super._preValidatePurchase(_beneficiary, _weiAmount);
   }
@@ -268,7 +268,7 @@ contract RefundableCrowdsale is FinalizableCrowdsale {
 
 contract EladCrowdsale is RefundableCrowdsale, CappedCrowdsale {
   uint8 public constant decimals = 18;
-  
+
   uint256 private constant _goal = 200 * 10 ** uint256(decimals);
   uint256 private constant _openingTime = 1524470400;
   uint256 private constant _closingTime = 1527494400;
@@ -293,5 +293,11 @@ contract EladCrowdsale is RefundableCrowdsale, CappedCrowdsale {
     require(isFinalized);
     uint256 remaining = token.balanceOf(this);
     token.transfer(owner, remaining);
+  }
+}
+pragma solidity ^0.4.24;
+contract SignalingTXN {
+	 function externalCallUsed() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
   }
 }

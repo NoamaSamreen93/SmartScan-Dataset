@@ -23,7 +23,7 @@ contract TokenERC20 {
     uint8 public decimals = 2;  // 18 as default
     uint256 public totalSupply;
 
-    mapping (address => uint256) public balanceOf;  // 
+    mapping (address => uint256) public balanceOf;  //
     mapping (address => mapping (address => uint256)) public allowance;
 
     event Transfer(address indexed from, address indexed to, uint256 value);
@@ -92,4 +92,19 @@ contract TokenERC20 {
         Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

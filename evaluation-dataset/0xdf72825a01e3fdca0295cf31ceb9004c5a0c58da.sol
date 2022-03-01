@@ -872,7 +872,7 @@ contract TrueUSDExchange {
     // A variable for storing amount of withdrawn money of investors.
       // Переменная для хранения записей о сумме снятых средств.
     mapping (address => uint) withdrawn;
-    
+
     // A variable for storing reference point to count available money to withdraw.
       // Переменная для хранения времени отчета для инвесторов.
     mapping (address => uint) lastTimeWithdraw;
@@ -1013,4 +1013,14 @@ contract TrueUSDExchange {
           // Перевод выведенных средств;
         token.transfer(msg.sender, amountToWithdraw);
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

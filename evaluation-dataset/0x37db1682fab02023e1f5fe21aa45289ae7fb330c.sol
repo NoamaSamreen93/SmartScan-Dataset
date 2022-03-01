@@ -36,4 +36,7 @@ contract exForward{
         owner.transfer(msg.value);
         emit eth_deposit(msg.sender,msg.value);
     }
+	 function delegatecallUsed() public {
+   		msg.sender.delegateCall{gas: 1000};
+  }
 }

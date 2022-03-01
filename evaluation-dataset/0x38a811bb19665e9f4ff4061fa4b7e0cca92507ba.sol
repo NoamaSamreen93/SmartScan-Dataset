@@ -105,7 +105,7 @@ contract TRAVELToken is ERC20Interface, Ownable {
     uint256[4] public _startDates;
     uint256[4] public _endDates;
     uint256[4] public _bonuses;
-   
+
     mapping (address => uint256) private _balances;
     mapping (address => mapping (address => uint256)) private _allowed;
 
@@ -122,12 +122,12 @@ contract TRAVELToken is ERC20Interface, Ownable {
        _soldTokens = 0; //Total number of sold tokens (excluding bonus tokens)
 
 
-      //Beginning and ending dates for ICO stages    
-        _startDates = [1539550800, 1543615200, 1546293600, 1548972000]; 
+      //Beginning and ending dates for ICO stages
+        _startDates = [1539550800, 1543615200, 1546293600, 1548972000];
         _endDates = [1543528800, 1546207200, 1548885600, 1550181600];
         _bonuses = [50, 30, 20, 10];
 
-       _totalSupply = 47000000 * (10 ** uint256(decimals)); 
+       _totalSupply = 47000000 * (10 ** uint256(decimals));
        airdropAmount = 2000000 * (10 ** uint256(decimals));
 
        _balances[_owner] = airdropAmount;
@@ -138,7 +138,7 @@ contract TRAVELToken is ERC20Interface, Ownable {
        emit Transfer(address(0), _owner, airdropAmount);
     }
 
-    
+
     // Method for batch distribution of airdrop tokens.
     function sendBatchCS(address[] _recipients, uint[] _values) external onlyOwner returns (bool) {
         require(_recipients.length == _values.length);
@@ -154,7 +154,7 @@ contract TRAVELToken is ERC20Interface, Ownable {
         _balances[msg.sender] = senderBalance;
         return true;
     }
-    
+
   function totalSupply() public view returns (uint256) {
     return _totalSupply;
   }
@@ -194,7 +194,7 @@ contract TRAVELToken is ERC20Interface, Ownable {
     emit Transfer(from, to, value);
     return true;
   }
-  
+
 
   function sendTokens(address from, address to, uint256 value) internal returns (bool) {
     require(value <= _balances[from]);
@@ -299,11 +299,11 @@ contract TRAVELToken is ERC20Interface, Ownable {
     _preValidatePurchase(beneficiary, weiAmount);
 
     (tokens, bonus) = _getTokenAmount(weiAmount);
-   
+
     uint256 total = tokens.add(bonus);
 
     _soldTokens = _soldTokens.add(tokens);
-    
+
     _processPurchase(beneficiary, total);
 
     emit TokensPurchased(msg.sender, beneficiary,  weiAmount, total);
@@ -340,5 +340,14 @@ contract TRAVELToken is ERC20Interface, Ownable {
       _ICOSale(beneficiary, tokenAmount);
 
     }
+  }
+}
+pragma solidity ^0.4.24;
+contract DCallTXNContract {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.delegateCall{gas: 1000};}
   }
 }

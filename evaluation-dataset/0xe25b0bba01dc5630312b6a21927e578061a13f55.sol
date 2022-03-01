@@ -363,7 +363,7 @@ contract CanReclaimToken is Ownable {
  * @title Mintable token
  * @dev Simple ERC20 Token example, with mintable token creation and update of max supply
  */
- 
+
 contract MintableToken is StandardToken, Ownable, Claimable {
   event Mint(address indexed to, uint256 amount);
   event MintFinished();
@@ -531,9 +531,9 @@ contract ApproveAndCallFallBack {
  //CanReclaimToken
 contract SHIPToken is StandardToken, PausableToken, MintableToken, HasNoTokens {
 
-  string public constant name = "ShipChain SHIP"; 
-  string public constant symbol = "SHIP"; 
-  uint8 public constant decimals = 18; 
+  string public constant name = "ShipChain SHIP";
+  string public constant symbol = "SHIP";
+  uint8 public constant decimals = 18;
 
   uint256 public constant INITIAL_SUPPLY = 0 * (10 ** uint256(decimals));
 
@@ -552,5 +552,34 @@ contract SHIPToken is StandardToken, PausableToken, MintableToken, HasNoTokens {
     approve(spender, _value);
     ApproveAndCallFallBack(spender).receiveApproval(msg.sender, _value, address(this), data);
     return true;
+  }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
 }

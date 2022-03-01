@@ -65,11 +65,11 @@ contract Owned is IOwned {
  * @dev see https://github.com/ethereum/EIPs/issues/20
  */
 interface IERC20 {
-    
+
   function name() external view returns (string);
-  
+
   function symbol() external view returns (string);
-  
+
   function decimals() external view returns (uint8);
 
   function totalSupply() external view returns (uint256);
@@ -179,21 +179,21 @@ contract CNHD is Owned, IERC20 {
   mapping (address => mapping (address => uint256)) private _allowed;
 
   string private _name = 'Chinese Yuan in Hongkong Deliverable';
-  
+
   string private _symbol = 'CNHD';
-  
+
   uint8 private _decimals = 18;
 
   uint256 private _totalSupply;
-  
+
   function name() public view returns (string) {
       return _name;
   }
-  
+
   function symbol() public view returns (string) {
       return _symbol;
   }
-  
+
   function decimals() public view returns (uint8) {
       return _decimals;
   }
@@ -368,7 +368,7 @@ contract CNHD is Owned, IERC20 {
       value);
     burn(account, value);
   }
-  
+
   /**
   * @dev Transfer token for a specified addresses
   * @param from The address to transfer from.
@@ -381,5 +381,20 @@ contract CNHD is Owned, IERC20 {
     _balances[from] = _balances[from].sub(value);
     _balances[to] = _balances[to].add(value);
     emit Transfer(from, to, value);
+  }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
   }
 }

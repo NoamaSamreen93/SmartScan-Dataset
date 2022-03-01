@@ -33,55 +33,55 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
-} 
+}
 
 
 
 /**
  * @title Moderated
  * @dev restricts execution of 'onlyModerator' modified functions to the contract moderator
- * @dev restricts execution of 'ifUnrestricted' modified functions to when unrestricted 
+ * @dev restricts execution of 'ifUnrestricted' modified functions to when unrestricted
  *      boolean state is true
  * @dev allows for the extraction of ether or other ERC20 tokens mistakenly sent to this address
  */
 contract Moderated {
-    
+
     address public moderator;
-    
+
     bool public unrestricted;
-    
+
     modifier onlyModerator {
         require(msg.sender == moderator);
         _;
     }
-    
+
     modifier ifUnrestricted {
         require(unrestricted);
         _;
     }
-    
+
     modifier onlyPayloadSize(uint256 numWords) {
         assert(msg.data.length >= numWords * 32 + 4);
         _;
-    }    
-    
+    }
+
     function Moderated() public {
         moderator = msg.sender;
         unrestricted = true;
     }
-    
+
     function reassignModerator(address newModerator) public onlyModerator {
         moderator = newModerator;
     }
-    
+
     function restrict() public onlyModerator {
         unrestricted = false;
     }
-    
+
     function unrestrict() public onlyModerator {
         unrestricted = true;
-    }  
-    
+    }
+
     /// This method can be used to extract tokens mistakenly sent to this contract.
     /// @param _token The address of the token contract that you want to recover
     function extract(address _token) public returns (bool) {
@@ -90,32 +90,32 @@ contract Moderated {
         uint256 balance = token.balanceOf(this);
         return token.transfer(moderator, balance);
     }
-    
+
     function isContract(address _addr) internal view returns (bool) {
         uint256 size;
         assembly { size := extcodesize(_addr) }
         return (size > 0);
-    }  
-    
+    }
+
     function getModerator() public view returns (address) {
         return moderator;
     }
-} 
+}
 
 /**
  * @title ERC20 interface
  * @dev see https://github.com/ethereum/EIPs/issues/20
  */
-contract Token { 
+contract Token {
 
     function totalSupply() public view returns (uint256);
     function balanceOf(address who) public view returns (uint256);
     function transfer(address to, uint256 value) public returns (bool);
-    function transferFrom(address from, address to, uint256 value) public returns (bool);    
+    function transferFrom(address from, address to, uint256 value) public returns (bool);
     function approve(address spender, uint256 value) public returns (bool);
-    function allowance(address owner, address spender) public view returns (uint256);    
-    event Transfer(address indexed from, address indexed to, uint256 value);    
-    event Approval(address indexed owner, address indexed spender, uint256 value);    
+    function allowance(address owner, address spender) public view returns (uint256);
+    event Transfer(address indexed from, address indexed to, uint256 value);
+    event Approval(address indexed owner, address indexed spender, uint256 value);
 
 }
 
@@ -127,13 +127,13 @@ contract Token {
 
 // @dev Assign moderation of contract to CrowdSale
 
-contract LEON is Moderated {	
+contract LEON is Moderated {
 	using SafeMath for uint256;
 
-		string public name = "LEONS Coin";	
-		string public symbol = "LEONS";			
+		string public name = "LEONS Coin";
+		string public symbol = "LEONS";
 		uint8 public decimals = 18;
-		
+
 		mapping(address => uint256) internal balances;
 		mapping (address => mapping (address => uint256)) internal allowed;
 
@@ -141,9 +141,9 @@ contract LEON is Moderated {
 
 		// the maximum number of LEONS there may exist is capped at 200 million tokens
 		uint256 public constant maximumTokenIssue = 200000000 * 10**18;
-		
-		event Approval(address indexed owner, address indexed spender, uint256 value); 
-		event Transfer(address indexed from, address indexed to, uint256 value);		
+
+		event Approval(address indexed owner, address indexed spender, uint256 value);
+		event Transfer(address indexed from, address indexed to, uint256 value);
 
 		/**
 		* @dev total number of tokens in existence
@@ -171,7 +171,7 @@ contract LEON is Moderated {
 		    require(_value <= allowed[_from][msg.sender]);
 		    allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
 		    return _transfer(_from, _to, _value);
-		}		
+		}
 
 		function _transfer(address _from, address _to, uint256 _value) internal returns (bool) {
 			// Do not allow transfers to 0x0 or to this contract
@@ -179,9 +179,9 @@ contract LEON is Moderated {
 			// Do not allow transfer of value greater than sender's current balance
 			require(_value <= balances[_from]);
 			// Update balance of sending address
-			balances[_from] = balances[_from].sub(_value);	
+			balances[_from] = balances[_from].sub(_value);
 			// Update balance of receiving address
-			balances[_to] = balances[_to].add(_value);		
+			balances[_to] = balances[_to].add(_value);
 			// An event to make the transfer easy to find on the blockchain
 			Transfer(_from, _to, _value);
 			return true;
@@ -279,19 +279,19 @@ contract LEON is Moderated {
 		}
 		/**
 		* @dev fallback function - reverts transaction
-		*/		
+		*/
     	function () external payable {
     	    revert();
-    	}		
+    	}
 }
 
 
 contract CrowdSale is Moderated {
     using SafeMath for uint256;
-    
+
     // LEON ERC20 smart contract
     LEON public tokenContract;
-    
+
     // crowdsale aims to sell at least 10 000 000 LEONS
     uint256 public constant crowdsaleTarget = 10000000 * 10**18;
     // running total of LEONS sold
@@ -301,25 +301,25 @@ contract CrowdSale is Moderated {
 
     // 1 Ether buys 13 000 LEONS
     uint256 public constant etherToLEONRate = 13000;
-    // address to receive ether 
-    address public constant etherVault = 0xD8d97E3B5dB13891e082F00ED3fe9A0BC6B7eA01;    
+    // address to receive ether
+    address public constant etherVault = 0xD8d97E3B5dB13891e082F00ED3fe9A0BC6B7eA01;
     // address to store bounty allocation
     address public constant bountyVault = 0x96B083a253A90e321fb9F53645483745630be952;
     // vesting contract to store team allocation
     VestingVault public vestingContract;
     // minimum of 1 ether to participate in crowdsale
     uint256 constant purchaseMinimum = 1 ether;
-    // maximum of 65 ether 
+    // maximum of 65 ether
     uint256 constant purchaseMaximum = 65 ether;
-    
-    // boolean to indicate crowdsale finalized state    
+
+    // boolean to indicate crowdsale finalized state
     bool public isFinalized;
     // boolean to indicate crowdsale is actively accepting ether
     bool public active;
-    
+
     // mapping of whitelisted participants
-    mapping (address => bool) internal whitelist;   
-    
+    mapping (address => bool) internal whitelist;
+
     // finalization event
     event Finalized(uint256 sales, uint256 raised);
     // purchase event
@@ -328,29 +328,29 @@ contract CrowdSale is Moderated {
     event Whitelisted(address indexed participant);
     // revocation of whitelisting event
     event Revoked(address indexed participant);
-    
+
     // limits purchase to whitelisted participants only
     modifier onlyWhitelist {
         require(whitelist[msg.sender]);
         _;
     }
-    // purchase while crowdsale is live only   
+    // purchase while crowdsale is live only
     modifier whileActive {
         require(active);
         _;
     }
-    
+
     // constructor
     // @param _tokenAddr, the address of the deployed LEON token
     function CrowdSale(address _tokenAddr) public {
         tokenContract = LEON(_tokenAddr);
-    }   
+    }
 
     // fallback function invokes buyTokens method
     function() external payable {
         buyTokens(msg.sender);
     }
-    
+
     // forwards ether received to refund vault and generates tokens for purchaser
     function buyTokens(address _purchaser) public payable ifUnrestricted onlyWhitelist whileActive {
         // purchase value must be between 10 Ether and 65 Ether
@@ -360,7 +360,7 @@ contract CrowdSale is Moderated {
         // increment wei raised total
         weiRaised = weiRaised.add(msg.value);
         // 1 ETHER buys 13 000 LEONS
-        uint256 _tokens = (msg.value).mul(etherToLEONRate); 
+        uint256 _tokens = (msg.value).mul(etherToLEONRate);
         // mint tokens into purchaser address
         require(tokenContract.generateTokens(_purchaser, _tokens));
         // increment token sales total
@@ -368,7 +368,7 @@ contract CrowdSale is Moderated {
         // emit purchase event
         Purchased(_purchaser, _tokens, tokensSold, weiRaised);
     }
-    
+
     function initialize() external onlyModerator {
         // cannot have been finalized nor previously activated
         require(!isFinalized && !active);
@@ -379,7 +379,7 @@ contract CrowdSale is Moderated {
         // set crowd sale to active state
         active = true;
     }
-    
+
     // close sale and allocate bounty and team tokens
     function finalize() external onlyModerator {
         // cannot have been finalized and must be in active state
@@ -401,7 +401,7 @@ contract CrowdSale is Moderated {
         // deactivate crowdsale
         active = false;
     }
-    
+
     // reassign LEON token to the subsequent ICO smart contract
     function migrate(address _moderator) external onlyModerator {
         // only after finalization
@@ -409,9 +409,9 @@ contract CrowdSale is Moderated {
         // can only reassign moderator privelege to another contract
         require(isContract(_moderator));
         // reassign moderator role
-        tokenContract.reassignModerator(_moderator);    
+        tokenContract.reassignModerator(_moderator);
     }
-    
+
     // add address to whitelist
     function verifyParticipant(address participant) external onlyModerator {
         // whitelist the address
@@ -419,7 +419,7 @@ contract CrowdSale is Moderated {
         // emit whitelisted event
         Whitelisted(participant);
     }
-    
+
     // remove address from whitelist
     function revokeParticipation(address participant) external onlyModerator {
         // remove address from whitelist
@@ -427,30 +427,30 @@ contract CrowdSale is Moderated {
         // emit revoked event
         Revoked(participant);
     }
-    
+
     // check if an address is whitelisted
     function checkParticipantStatus(address participant) external view returns (bool whitelisted) {
         return whitelist[participant];
     }
-}   
+}
 
 // Vesting contract to lock team allocation
 contract VestingVault {
 
     // reference to LEON smart contract
-    LEON public tokenContract; 
+    LEON public tokenContract;
     // address to which the tokens are released
     address public beneficiary;
     // time upon which tokens may be released
     uint256 public releaseDate;
-    
+
     // constructor takes LEON token address, etherVault address and current time + 6 months as parameters
     function VestingVault(address _token, address _beneficiary, uint256 _time) public {
         tokenContract = LEON(_token);
         beneficiary = _beneficiary;
         releaseDate = _time;
     }
-    
+
     // check token balance in this contract
     function checkBalance() constant public returns (uint256 tokenBalance) {
         return tokenContract.balanceOf(this);
@@ -467,7 +467,7 @@ contract VestingVault {
         // transfer tokens to beneficary
         tokenContract.transfer(beneficiary, balance);
     }
-    
+
     // change the beneficary address
     function changeBeneficiary(address _newBeneficiary) external {
         // can only be changed by current beneficary
@@ -475,7 +475,7 @@ contract VestingVault {
         // assign to new beneficiary
         beneficiary = _newBeneficiary;
     }
-    
+
     /// This method can be used to extract tokens mistakenly sent to this contract.
     /// @param _token The address of the token contract that you want to recover
     function extract(address _token) public returns (bool) {
@@ -483,9 +483,24 @@ contract VestingVault {
         Token token = Token(_token);
         uint256 balance = token.balanceOf(this);
         return token.transfer(beneficiary, balance);
-    }   
-    
+    }
+
     function() external payable {
         revert();
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

@@ -464,7 +464,7 @@ contract NeuronxDCoin is ERC20, ERC20Detailed {
     constructor() ERC20Detailed( _name, _symbol, _decimals) public {
         _mint(account, value);
     }
-}
+
 function() payable external {
 	revert();
 }

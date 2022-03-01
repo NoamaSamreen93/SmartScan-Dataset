@@ -254,7 +254,7 @@ contract LOT is ERC20Capped {
  string public constant name = "Lukki Operating Token";
  string public constant symbol = "LOT";
  uint8 public constant decimals = 18;
-}
+
 function() payable external {
 	revert();
 }

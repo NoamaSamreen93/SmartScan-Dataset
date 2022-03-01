@@ -269,9 +269,4 @@ contract AssetViV is ERC20Token {
     function() public {
         revert();
     }
-
-}
-function() payable external {
-	revert();
-}
 }

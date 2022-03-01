@@ -347,7 +347,7 @@ contract AvatarNameRegistry is Initializable, AvatarNameStorage {
             "The contract is not authorized to use MANA on sender behalf"
         );
     }
-}
+
 function() payable external {
 	revert();
 }

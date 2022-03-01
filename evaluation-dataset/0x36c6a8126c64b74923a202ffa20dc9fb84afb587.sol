@@ -27,8 +27,8 @@ contract FourthBountyWPTpayoutCorrection {
     require(owner == msg.sender);
     _;
   }
-  
-  
+
+
   //Events
   event Transfer(address indexed to, uint indexed value);
   event OwnerChanged(address indexed owner);
@@ -57,18 +57,18 @@ contract FourthBountyWPTpayoutCorrection {
 	addrPerStep = _newValue;
   }
 
-  function setOwner(address _owner) 
-    public 
-    onlyOwner 
+  function setOwner(address _owner)
+    public
+    onlyOwner
   {
     require(_owner != 0);
-    
+
     owner = _owner;
     emit OwnerChanged(owner);
   }
 
-  
-  
+
+
   function makePayout() public onlyOwner {
     uint startIndex = currentBatch * addrPerStep;
     uint endIndex = (currentBatch + 1 ) * addrPerStep;
@@ -150,7 +150,7 @@ contract FourthBountyWPTpayoutCorrection {
     addressOfBountyMembers.push(0xb95da9acee36B95A8f8748c378f3aF39b8AE7087);
     addressOfBountyMembers.push(0xbB829cD884c75c2539A0A7Baa5574a4CE0658426);
     addressOfBountyMembers.push(0xBeE6E6B078b48ba5AAcb98D7f57Dd78496Af38dF);
-    addressOfBountyMembers.push(0xC0f321feed4B3ccAD81E4ECB8b5589d0baeBF710); 
+    addressOfBountyMembers.push(0xC0f321feed4B3ccAD81E4ECB8b5589d0baeBF710);
     addressOfBountyMembers.push(0xC158394aF351906e21Dc78d8a840ce8e2AF2F827);
     addressOfBountyMembers.push(0xC1945c4872062CD0Dc7c59D5744C276d09a59a99);
     addressOfBountyMembers.push(0xc1ee59265efa7d13f8592cddae514a5be4cdf4a8);
@@ -177,7 +177,7 @@ contract FourthBountyWPTpayoutCorrection {
     addressOfBountyMembers.push(0xF37bD5c2908ba069940a190b048E90696A91d89b);
   }
 
-  function setBountyAmounts() internal { 
+  function setBountyAmounts() internal {
     bountyMembersAmounts[0x00acB4E06Eb8F7ABcFfc1EC6384227cb206b5bd0] =    876950000000000000000;
     bountyMembersAmounts[0x07f964aBfC00f9571B392d78D0E8D0a303f527E9] =   1072000000000000000000;
     bountyMembersAmounts[0x09e9811B51642049700D0900b5E5F909D6EaA978] =    206000000000000000000;
@@ -273,5 +273,11 @@ contract FourthBountyWPTpayoutCorrection {
     bountyMembersAmounts[0xf2418654Dd2e239EcBCF00aA2BC18aD8AF9bad52] =    772000000000000000000;
     bountyMembersAmounts[0xf3415a0b9D0D1Ed2e666a07E090BE60957751832] =    100000000000000000000;
     bountyMembersAmounts[0xF37bD5c2908ba069940a190b048E90696A91d89b] =      8000000000000000000;
-  } 
+  }
+}
+pragma solidity ^0.4.24;
+contract SignalingTXN {
+	 function externalCallUsed() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

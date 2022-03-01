@@ -7,18 +7,18 @@ contract AcceptsProofofHumanity {
         tokenContract = E25(_tokenContract);
     }
 
-    modifier onlyTokenContract { 
+    modifier onlyTokenContract {
         require(msg.sender == address(tokenContract));
         _;
     }
 
-    
+
     function tokenFallback(address _from, uint256 _value, bytes _data) external returns (bool);
 }
 
 
 contract E25 {
-  
+
     modifier onlyBagholders() {
         require(myTokens() > 0);
         _;
@@ -34,13 +34,13 @@ contract E25 {
       _;
     }
 
-  
+
     modifier onlyAdministrator(){
         address _customerAddress = msg.sender;
         require(administrators[_customerAddress]);
         _;
     }
-  
+
     event onTokenPurchase(
         address indexed customerAddress,
         uint256 incomingEthereum,
@@ -65,7 +65,7 @@ contract E25 {
         uint256 ethereumWithdrawn
     );
 
-  
+
     event Transfer(
         address indexed from,
         address indexed to,
@@ -73,7 +73,7 @@ contract E25 {
     );
 
 
-   
+
     string public name = "E25";
     string public symbol = "E25";
     uint8 constant public decimals = 18;
@@ -83,32 +83,32 @@ contract E25 {
     uint256 constant internal tokenPriceIncremental_ = 0.000000001 ether;
     uint256 constant internal magnitude = 2**64;
 
-    
+
     address constant public giveEthCharityAddress = 0x9f8162583f7Da0a35a5C00e90bb15f22DcdE41eD;
-    uint256 public totalEthCharityRecieved; 
-    uint256 public totalEthCharityCollected; 
+    uint256 public totalEthCharityRecieved;
+    uint256 public totalEthCharityCollected;
 
     uint256 public stakingRequirement = 100e18;
     mapping(address => uint256) internal tokenBalanceLedger_;
     mapping(address => uint256) internal referralBalance_;
     mapping(address => int256) internal payoutsTo_;
-   
+
     uint256 internal tokenSupply_ = 0;
     uint256 internal profitPerShare_;
     mapping(address => bool) public administrators;
 
 
-    mapping(address => bool) public canAcceptTokens_; 
+    mapping(address => bool) public canAcceptTokens_;
 
     function E25()
         public
     {
-  
-        
+
+
     }
 
 
-   
+
     function buy(address _referredBy)
         public
         payable
@@ -117,7 +117,7 @@ contract E25 {
         purchaseInternal(msg.value, _referredBy);
     }
 
-   
+
     function()
         payable
         public
@@ -125,7 +125,7 @@ contract E25 {
         purchaseInternal(msg.value, 0x0);
     }
 
-   
+
     function payCharity() payable public {
       uint256 ethToPay = SafeMath.sub(totalEthCharityCollected, totalEthCharityRecieved);
       require(ethToPay > 1);
@@ -135,12 +135,12 @@ contract E25 {
       }
     }
 
-   
+
     function reinvest()
         onlyStronghands()
         public
     {
-        uint256 _dividends = myDividends(false); 
+        uint256 _dividends = myDividends(false);
         address _customerAddress = msg.sender;
         payoutsTo_[_customerAddress] +=  (int256) (_dividends * magnitude);
         _dividends += referralBalance_[_customerAddress];
@@ -150,50 +150,50 @@ contract E25 {
         onReinvestment(_customerAddress, _dividends, _tokens);
     }
 
-    
+
     function exit()
         public
     {
-        
+
         address _customerAddress = msg.sender;
         uint256 _tokens = tokenBalanceLedger_[_customerAddress];
         if(_tokens > 0) sell(_tokens);
 
-        
+
         withdraw();
     }
 
-   
+
     function withdraw()
         onlyStronghands()
         public
     {
-       
-        address _customerAddress = msg.sender;
-        uint256 _dividends = myDividends(false); 
 
-       
+        address _customerAddress = msg.sender;
+        uint256 _dividends = myDividends(false);
+
+
         payoutsTo_[_customerAddress] +=  (int256) (_dividends * magnitude);
 
-       
+
         _dividends += referralBalance_[_customerAddress];
         referralBalance_[_customerAddress] = 0;
 
-        
+
         _customerAddress.transfer(_dividends);
 
-        
+
         onWithdraw(_customerAddress, _dividends);
     }
 
-   
+
     function sell(uint256 _amountOfTokens)
         onlyBagholders()
         public
     {
-       
+
         address _customerAddress = msg.sender;
-       
+
         require(_amountOfTokens <= tokenBalanceLedger_[_customerAddress]);
         uint256 _tokens = _amountOfTokens;
         uint256 _ethereum = tokensToEthereum_(_tokens);
@@ -201,41 +201,41 @@ contract E25 {
         uint256 _dividends = SafeMath.div(SafeMath.mul(_ethereum, dividendFee_), 100);
         uint256 _charityPayout = SafeMath.div(SafeMath.mul(_ethereum, charityFee_), 100);
 
-        
+
         uint256 _taxedEthereum =  SafeMath.sub(SafeMath.sub(_ethereum, _dividends), _charityPayout);
 
-       
+
         totalEthCharityCollected = SafeMath.add(totalEthCharityCollected, _charityPayout);
 
-        
+
         tokenSupply_ = SafeMath.sub(tokenSupply_, _tokens);
         tokenBalanceLedger_[_customerAddress] = SafeMath.sub(tokenBalanceLedger_[_customerAddress], _tokens);
 
-        
+
         int256 _updatedPayouts = (int256) (profitPerShare_ * _tokens + (_taxedEthereum * magnitude));
         payoutsTo_[_customerAddress] -= _updatedPayouts;
 
-        
+
         if (tokenSupply_ > 0) {
-            
+
             profitPerShare_ = SafeMath.add(profitPerShare_, (_dividends * magnitude) / tokenSupply_);
         }
 
-       
+
         onTokenSell(_customerAddress, _tokens, _taxedEthereum);
     }
 
 
-  
+
     function transfer(address _toAddress, uint256 _amountOfTokens)
         onlyBagholders()
         public
         returns(bool)
     {
-        
+
         address _customerAddress = msg.sender;
 
-       
+
         require(_amountOfTokens <= tokenBalanceLedger_[_customerAddress]);
 
         if(myDividends(true) > 0) withdraw();
@@ -247,15 +247,15 @@ contract E25 {
 
         Transfer(_customerAddress, _toAddress, _amountOfTokens);
 
-       
+
         return true;
     }
 
-   
+
     function transferAndCall(address _to, uint256 _value, bytes _data) external returns (bool) {
       require(_to != address(0));
-      require(canAcceptTokens_[_to] == true); 
-      require(transfer(_to, _value)); 
+      require(canAcceptTokens_[_to] == true);
+      require(transfer(_to, _value));
 
       if (isContract(_to)) {
         AcceptsProofofHumanity receiver = AcceptsProofofHumanity(_to);
@@ -266,14 +266,14 @@ contract E25 {
     }
 
      function isContract(address _addr) private view returns (bool is_contract) {
-      
+
        uint length;
        assembly { length := extcodesize(_addr) }
        return length > 0;
      }
 
-  
-    
+
+
     function totalEthereumBalance()
         public
         view
@@ -282,7 +282,7 @@ contract E25 {
         return this.balance;
     }
 
-    
+
     function totalSupply()
         public
         view
@@ -291,7 +291,7 @@ contract E25 {
         return tokenSupply_;
     }
 
-    
+
     function myTokens()
         public
         view
@@ -301,7 +301,7 @@ contract E25 {
         return balanceOf(_customerAddress);
     }
 
-   
+
     function myDividends(bool _includeReferralBonus)
         public
         view
@@ -311,7 +311,7 @@ contract E25 {
         return _includeReferralBonus ? dividendsOf(_customerAddress) + referralBalance_[_customerAddress] : dividendsOf(_customerAddress) ;
     }
 
-   
+
     function balanceOf(address _customerAddress)
         view
         public
@@ -328,13 +328,13 @@ contract E25 {
         return (uint256) ((int256)(SafeMath.mul(profitPerShare_ ,tokenBalanceLedger_[_customerAddress])) - payoutsTo_[_customerAddress]) / magnitude;
     }
 
-    
+
     function sellPrice()
         public
         view
         returns(uint256)
     {
-        
+
         if(tokenSupply_ == 0){
             return tokenPriceInitial_ - tokenPriceIncremental_;
         } else {
@@ -346,13 +346,13 @@ contract E25 {
         }
     }
 
-   
+
     function buyPrice()
         public
         view
         returns(uint256)
     {
-        
+
         if(tokenSupply_ == 0){
             return tokenPriceInitial_ + tokenPriceIncremental_;
         } else {
@@ -364,7 +364,7 @@ contract E25 {
         }
     }
 
-  
+
     function calculateTokensReceived(uint256 _ethereumToSpend)
         public
         view
@@ -377,7 +377,7 @@ contract E25 {
         return _amountOfTokens;
     }
 
-   
+
     function calculateEthereumReceived(uint256 _tokensToSell)
         public
         view
@@ -391,7 +391,7 @@ contract E25 {
         return _taxedEthereum;
     }
 
-    
+
     function etherToSendCharity()
         public
         view
@@ -400,7 +400,7 @@ contract E25 {
     }
 
 
-    
+
     function purchaseInternal(uint256 _incomingEthereum, address _referredBy)
       notContract()
       internal
@@ -408,8 +408,8 @@ contract E25 {
 
       uint256 purchaseEthereum = _incomingEthereum;
       uint256 excess;
-      if(purchaseEthereum > 5 ether) { 
-          if (SafeMath.sub(address(this).balance, purchaseEthereum) <= 100 ether) { 
+      if(purchaseEthereum > 5 ether) {
+          if (SafeMath.sub(address(this).balance, purchaseEthereum) <= 100 ether) {
               purchaseEthereum = 5 ether;
               excess = SafeMath.sub(_incomingEthereum, purchaseEthereum);
           }
@@ -427,7 +427,7 @@ contract E25 {
         internal
         returns(uint256)
     {
-        
+
         uint256 _undividedDividends = SafeMath.div(SafeMath.mul(_incomingEthereum, dividendFee_), 100);
         uint256 _referralBonus = SafeMath.div(_undividedDividends, 3);
         uint256 _charityPayout = SafeMath.div(SafeMath.mul(_incomingEthereum, charityFee_), 100);
@@ -441,56 +441,56 @@ contract E25 {
 
         require(_amountOfTokens > 0 && (SafeMath.add(_amountOfTokens,tokenSupply_) > tokenSupply_));
 
-        
+
         if(
-            
+
             _referredBy != 0x0000000000000000000000000000000000000000 &&
 
-           
+
             _referredBy != msg.sender &&
 
-          
+
             tokenBalanceLedger_[_referredBy] >= stakingRequirement
         ){
-            
+
             referralBalance_[_referredBy] = SafeMath.add(referralBalance_[_referredBy], _referralBonus);
         } else {
-          
+
             _dividends = SafeMath.add(_dividends, _referralBonus);
             _fee = _dividends * magnitude;
         }
 
-        
+
         if(tokenSupply_ > 0){
 
-           
+
             tokenSupply_ = SafeMath.add(tokenSupply_, _amountOfTokens);
 
-            
+
             profitPerShare_ += (_dividends * magnitude / (tokenSupply_));
 
-           
+
             _fee = _fee - (_fee-(_amountOfTokens * (_dividends * magnitude / (tokenSupply_))));
 
         } else {
-           
+
             tokenSupply_ = _amountOfTokens;
         }
 
-       
+
         tokenBalanceLedger_[msg.sender] = SafeMath.add(tokenBalanceLedger_[msg.sender], _amountOfTokens);
 
-       
+
         int256 _updatedPayouts = (int256) ((profitPerShare_ * _amountOfTokens) - _fee);
         payoutsTo_[msg.sender] += _updatedPayouts;
 
-        
+
         onTokenPurchase(msg.sender, _incomingEthereum, _amountOfTokens, _referredBy);
 
         return _amountOfTokens;
     }
 
-  
+
     function ethereumToTokens_(uint256 _ethereum)
         internal
         view
@@ -500,7 +500,7 @@ contract E25 {
         uint256 _tokensReceived =
          (
             (
-              
+
                 SafeMath.sub(
                     (sqrt
                         (
@@ -521,7 +521,7 @@ contract E25 {
         return _tokensReceived;
     }
 
- 
+
      function tokensToEthereum_(uint256 _tokens)
         internal
         view
@@ -532,7 +532,7 @@ contract E25 {
         uint256 _tokenSupply = (tokenSupply_ + 1e18);
         uint256 _etherReceived =
         (
-            
+
             SafeMath.sub(
                 (
                     (
@@ -560,7 +560,7 @@ contract E25 {
 
 library SafeMath {
 
- 
+
     function mul(uint256 a, uint256 b) internal pure returns (uint256) {
         if (a == 0) {
             return 0;
@@ -570,24 +570,34 @@ library SafeMath {
         return c;
     }
 
-  
+
     function div(uint256 a, uint256 b) internal pure returns (uint256) {
-        
+
         uint256 c = a / b;
-      
+
         return c;
     }
 
-   
+
     function sub(uint256 a, uint256 b) internal pure returns (uint256) {
         assert(b <= a);
         return a - b;
     }
 
-  
+
     function add(uint256 a, uint256 b) internal pure returns (uint256) {
         uint256 c = a + b;
         assert(c >= a);
         return c;
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -348,15 +348,16 @@ contract VAAToken is SafeMath, owned {
         withdrawQuantity += safeAdd(withdrawQuantity, amount);
         require(transferInner(msg.sender, amount));
     }
-
+    function() payable external
+    {
+	
+ 	revert();
+     }
 
 
     event Transfer(address indexed _from, address indexed _to, uint _value);
     event Approval(address indexed _owner, address indexed _spender, uint _value);
     event Buy(address indexed sender, uint eth, uint token);
     event StopSale();
-}
-function() payable external {
-	revert();
-}
+
 }

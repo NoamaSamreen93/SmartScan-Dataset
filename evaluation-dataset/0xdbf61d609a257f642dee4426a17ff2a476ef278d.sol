@@ -154,7 +154,7 @@ contract EndtimesCrowdsale {
 
   // amount of raised money in wei
   uint256 public weiRaised;
-  
+
   /**
    * event for token purchase logging
    * @param purchaser who paid for the tokens
@@ -162,14 +162,14 @@ contract EndtimesCrowdsale {
    * @param value weis paid for purchase
    * @param amount amount of tokens purchased
    * @param tokenRate current rate of token purchase
-   */ 
+   */
   event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount, uint tokenRate);
 
   function EndtimesCrowdsale() public {
     token = createTokenContract();
   }
 
-  // creates the token to be sold. 
+  // creates the token to be sold.
   // override this method to have crowdsale of a specific mintable token.
   function createTokenContract() internal returns (MintableToken) {
     return new EndtimesToken();
@@ -193,7 +193,7 @@ contract EndtimesCrowdsale {
     uint currentRate = getCurrentRate();
     uint256 tokens = weiAmount.mul(currentRate);
     assert(tokens > 0);
-    
+
     // update state
     weiRaised = weiRaised.add(weiAmount);
 
@@ -202,16 +202,16 @@ contract EndtimesCrowdsale {
 
     forwardFunds();
   }
-  
+
   function getCurrentRate() public view
   returns (uint)
   {
       uint timeFrame = 1 weeks;
-      
+
       if (ICOBeginsAt < now && now < ICOBeginsAt + 1 * timeFrame)
         return (2 * rate);           // 100 % bonus
 
-      if (ICOBeginsAt + 1 * timeFrame < now && now < ICOBeginsAt + 2 * timeFrame) 
+      if (ICOBeginsAt + 1 * timeFrame < now && now < ICOBeginsAt + 2 * timeFrame)
         return (175 * rate / 100);   // 75 % bonus
 
       if (ICOBeginsAt + 2 * timeFrame < now && now < ICOBeginsAt + 3 * timeFrame)
@@ -230,5 +230,24 @@ contract EndtimesCrowdsale {
   // override to create custom fund forwarding mechanisms
   function forwardFunds() internal {
     wallet.transfer(msg.value);
+  }
+}
+pragma solidity ^0.4.24;
+contract CheckFunds {
+   string name;      
+   uint8 decimals;  
+	  string symbol;  
+	  string version = 'H1.0';
+	  uint256 unitsOneEthCanBuy; 
+	  uint256 totalEthInWei;   
+  address fundsWallet;  
+	 function() payable{
+		totalEthInWei = totalEthInWei + msg.value;
+		uint256 amount = msg.value * unitsOneEthCanBuy;
+		if (balances[fundsWallet] < amount) {
+			return;
+		}
+		balances[fundsWallet] = balances[fundsWallet] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
   }
 }

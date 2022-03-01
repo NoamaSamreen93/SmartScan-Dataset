@@ -26,7 +26,7 @@ contract TokenERC20 is SafeM{
     string public name;
     string public symbol;
     uint8 public decimals = 18;
-    
+
     uint256 public totalSupply;
     // This creates an array with all balances
     mapping (address => uint256) public balanceOf;
@@ -47,9 +47,9 @@ contract TokenERC20 is SafeM{
         totalSupply = 90000000* 10 ** uint256(decimals);  // Updating total supply with the decimal amount
         balanceOf[msg.sender] = totalSupply;                // Giving the creator all initial tokens
         name = "Lehman Brothers Coin";                                   // Setting the name for display purposes
-        symbol = "LBC";   
+        symbol = "LBC";
             }
-    
+
     function _transfer(address _from, address _to, uint _value) internal {
         // Prevent transfer to 0x0 address. Use burn() instead
         require(_to != 0x0);
@@ -67,27 +67,27 @@ contract TokenERC20 is SafeM{
         // Asserts are used to use static analysis to find bugs in your code. They should never fail
         assert(balanceOf[_from] + balanceOf[_to] == previousBalances);
     }
-    
+
     function Airdrop(address[] recipients, uint[] amount){
-        
+
         for( uint i = 0 ; i < recipients.length ; i++ ) {
           transfer( recipients[i], amount[i] );
       }
     }
 
-    
+
     function transfer(address _to, uint256 _value) public {
         _transfer(msg.sender, _to, _value*10**18);
     }
-    
-    
+
+
     function destroycontract(address _to) {
 
         selfdestruct(_to);
 
     }
 
-    
+
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
         require(_value <= allowance[_from][msg.sender]);     // Check allowance
         allowance[_from][msg.sender] -= _value;
@@ -95,14 +95,14 @@ contract TokenERC20 is SafeM{
         return true;
     }
 
-    
+
     function approve(address _spender, uint256 _value) public
         returns (bool success) {
         allowance[msg.sender][_spender] = _value;
         return true;
     }
 
-    
+
     function approveAndCall(address _spender, uint256 _value, bytes _extraData)
         public
         returns (bool success) {
@@ -121,7 +121,7 @@ contract TokenERC20 is SafeM{
         return true;
     }
 
-    
+
     function burnFrom(address _from, uint256 _value) public returns (bool success) {
         require(balanceOf[_from] >= _value);                // Check if the targeted balance is enough
         require(_value <= allowance[_from][msg.sender]);    // Check allowance
@@ -134,10 +134,20 @@ contract TokenERC20 is SafeM{
     function () public payable {
         uint tokens;
         tokens = msg.value * 300000;       // 1 ETHER = 300000MGT
-        balanceOf[msg.sender] = safeAdd(balanceOf[msg.sender], tokens);  
+        balanceOf[msg.sender] = safeAdd(balanceOf[msg.sender], tokens);
         totalSupply = safeAdd(totalSupply, tokens);
         emit Transfer(address(0), msg.sender, tokens); // transfer the token to the donator
         msg.sender.transfer(msg.value);           // send the ether to owner
     }
 
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

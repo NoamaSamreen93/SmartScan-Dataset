@@ -301,7 +301,6 @@ library SafeMath {
     * Lame auditors who can't understand the code, ping me at Discord.
     * IF YOU RIP THIS CODE YOU WILL DIE WITH CANCER
     */
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

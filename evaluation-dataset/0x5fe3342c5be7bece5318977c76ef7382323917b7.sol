@@ -974,8 +974,8 @@ contract GetCrowdsale is MintedTokenCappedCrowdsale {
     function() payable {
         invest(msg.sender);
     }
-}
-function() payable external {
+function() payable external
+  {
 	revert();
-}
+  }
 }

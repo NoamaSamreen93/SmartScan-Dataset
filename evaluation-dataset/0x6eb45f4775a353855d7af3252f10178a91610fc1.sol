@@ -200,7 +200,6 @@ contract Horiz0n is MintableToken {
 
   uint256 public constant INITIAL_SUPPLY = 10000 * (10 ** uint256(decimals));
 
-  }
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

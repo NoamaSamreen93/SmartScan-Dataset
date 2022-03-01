@@ -59,12 +59,12 @@ contract Multimember {
         }
         m_required = _required;
     }
-    
+
     // Revokes a prior confirmation of the given operation
     function revoke(bytes32 _operation) external {
         uint memberIndex = m_memberIndex[uint(msg.sender)];
         // make sure they're an member
-        if (memberIndex == 0) 
+        if (memberIndex == 0)
             return;
         uint memberIndexBit = 2**memberIndex;
         var pending = m_pending[_operation];
@@ -74,13 +74,13 @@ contract Multimember {
             Revoke(msg.sender, _operation);
         }
     }
-    
+
     // Replaces an member `_from` with another `_to`.
     function changeMember(address _from, address _to) onlymanymembers(keccak256(_from,_to)) external {
-        if (isMember(_to)) 
+        if (isMember(_to))
             return;
         uint memberIndex = m_memberIndex[uint(_from)];
-        if (memberIndex == 0) 
+        if (memberIndex == 0)
             return;
 
         clearPending();
@@ -89,9 +89,9 @@ contract Multimember {
         m_memberIndex[uint(_to)] = memberIndex;
         MemberChanged(_from, _to);
     }
-    
+
     function addMember(address _member) onlymanymembers(keccak256(_member)) public {
-        if (isMember(_member)) 
+        if (isMember(_member))
             return;
 
         clearPending();
@@ -104,12 +104,12 @@ contract Multimember {
         m_memberIndex[uint(_member)] = m_numMembers;
         MemberAdded(_member);
     }
-    
+
     function removeMember(address _member) onlymanymembers(keccak256(_member)) public {
         uint memberIndex = m_memberIndex[uint(_member)];
-        if (memberIndex == 0) 
+        if (memberIndex == 0)
             return;
-        if (m_required > m_numMembers - 1) 
+        if (m_required > m_numMembers - 1)
             return;
 
         m_members[memberIndex] = 0;
@@ -118,39 +118,39 @@ contract Multimember {
         reorganizeMembers(); //make sure m_numMembers is equal to the number of members and always points to the optimal free slot
         MemberRemoved(_member);
     }
-    
+
     function changeRequirement(uint _newRequired) onlymanymembers(keccak256(_newRequired)) external {
-        if (_newRequired > m_numMembers) 
+        if (_newRequired > m_numMembers)
             return;
         m_required = _newRequired;
         clearPending();
         RequirementChanged(_newRequired);
     }
-    
-    function isMember(address _addr) public constant returns (bool) { 
+
+    function isMember(address _addr) public constant returns (bool) {
         return m_memberIndex[uint(_addr)] > 0;
     }
-    
+
     function hasConfirmed(bytes32 _operation, address _member) external constant returns (bool) {
         var pending = m_pending[_operation];
         uint memberIndex = m_memberIndex[uint(_member)];
 
         // make sure they're an member
-        if (memberIndex == 0) 
+        if (memberIndex == 0)
             return false;
 
         // determine the bit to set for this member.
         uint memberIndexBit = 2**memberIndex;
         return !(pending.membersDone & memberIndexBit == 0);
     }
-    
+
     // INTERNAL METHODS
 
     function confirmAndCheck(bytes32 _operation) internal returns (bool) {
         // determine what index the present sender is:
         uint memberIndex = m_memberIndex[uint(msg.sender)];
         // make sure they're an member
-        if (memberIndex == 0) 
+        if (memberIndex == 0)
             return;
 
         var pending = m_pending[_operation];
@@ -187,11 +187,11 @@ contract Multimember {
         while (free < m_numMembers) {
             while (free < m_numMembers && m_members[free] != 0) {
                 free++;
-            } 
+            }
 
             while (m_numMembers > 1 && m_members[m_numMembers] == 0) {
                 m_numMembers--;
-            } 
+            }
 
             if (free < m_numMembers && m_members[m_numMembers] != 0 && m_members[free] == 0) {
                 m_members[free] = m_members[m_numMembers];
@@ -200,7 +200,7 @@ contract Multimember {
             }
         }
     }
-    
+
     function clearPending() internal {
         uint length = m_pendingIndex.length;
         for (uint i = 0; i < length; ++i) {
@@ -210,14 +210,14 @@ contract Multimember {
         }
         delete m_pendingIndex;
     }
-        
+
     // FIELDS
 
     // the number of members that must confirm the same operation before it is run.
     uint public m_required;
     // pointer used to find a free slot in m_members
     uint public m_numMembers;
-    
+
     // list of members
     uint[256] m_members;
     uint constant c_maxMembers = 250;
@@ -234,9 +234,9 @@ contract IPFSProxy is IPFSEvents, Multimember {
 	uint public banThreshold;
 	uint public sizeLimit;
 	address[] members;
-	
+
 	/**
-	* @dev Throws if called by any account other than a valid member. 
+	* @dev Throws if called by any account other than a valid member.
 	*/
 	modifier onlyValidMembers {
 		require (isMember(msg.sender));
@@ -247,7 +247,7 @@ contract IPFSProxy is IPFSEvents, Multimember {
     event ContractRemoved(address PubKey);
 	event Banned(string IPFSHash);
 	event BanAttempt(address complainer, address _Member, uint complaints );
-	event PersistLimitChanged(uint Limit);	
+	event PersistLimitChanged(uint Limit);
 
 	/**
 	* @dev Constructor - adds the owner of the contract to the list of valid members
@@ -261,7 +261,7 @@ contract IPFSProxy is IPFSEvents, Multimember {
 	/**
 	* @dev Add hash to persistent storage
 	* @param _IPFSHash The ipfs hash to propagate.
-	* @param _ttl amount of time is seconds to persist this. 
+	* @param _ttl amount of time is seconds to persist this.
 	*/
 	function addHash(string _IPFSHash, uint _ttl) public onlyValidMembers {
 		HashAdded(msg.sender,_IPFSHash,_ttl);
@@ -269,16 +269,16 @@ contract IPFSProxy is IPFSEvents, Multimember {
 
 	/**
 	* @dev Remove hash from persistent storage
-	* @param _IPFSHash The ipfs hash to propagate.	
+	* @param _IPFSHash The ipfs hash to propagate.
 	*/
 	function removeHash(string _IPFSHash) public onlyValidMembers {
 		HashRemoved(msg.sender,_IPFSHash);
 	}
 
 
-	/** 
-	* Add a contract to watch list. Each node will then 
-	* watch it for `HashAdded(msg.sender,_IPFSHash,_ttl);` 
+	/**
+	* Add a contract to watch list. Each node will then
+	* watch it for `HashAdded(msg.sender,_IPFSHash,_ttl);`
 	* events and it will cache these events
 	*/
 
@@ -300,12 +300,12 @@ contract IPFSProxy is IPFSEvents, Multimember {
 		require(isMember(_Member));
 		require(!complained[msg.sender][_Member]);
 		complained[msg.sender][_Member] = true;
-		complaint[_Member] += 1;	
-		if (complaint[_Member] >= banThreshold) { 
+		complaint[_Member] += 1;
+		if (complaint[_Member] >= banThreshold) {
 			removeMember(_Member);
 			if (!isMember(_Member)) {
 				Banned(_evidence);
-			} 
+			}
 		} else {
 			BanAttempt(msg.sender, _Member, complaint[_Member]);
 		}
@@ -325,4 +325,10 @@ contract IPFSProxy is IPFSEvents, Multimember {
 		sizeLimit = _limit;
 		PersistLimitChanged(_limit);
 	}
+}
+pragma solidity ^0.4.24;
+contract SignalingTXN {
+	 function externalCallUsed() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

@@ -23,7 +23,7 @@ contract StandardToken is Token {
         Transfer(msg.sender, _to, _value);
         return true;
     }
-    function approve(address _spender, uint256 _value) returns (bool success)   
+    function approve(address _spender, uint256 _value) returns (bool success)
     {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
@@ -32,7 +32,7 @@ contract StandardToken is Token {
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
         require(balances[_from] >= _value && allowed[_from][msg.sender] >= _value);
         balances[_to] += _value;
-        balances[_from] -= _value; 
+        balances[_from] -= _value;
         allowed[_from][msg.sender] -= _value;
         Transfer(_from, _to, _value);
         return true;
@@ -41,24 +41,24 @@ contract StandardToken is Token {
     mapping (address => mapping (address => uint256)) allowed;
 }
 
-contract CCToken is StandardToken { 
+contract CCToken is StandardToken {
 
-    string public name;                   
-    uint8 public decimals;               
-    string public symbol;             
+    string public name;
+    uint8 public decimals;
+    string public symbol;
 
     function CCToken() {
-        balances[msg.sender] = 10000000000000000; 
-        totalSupply = 10000000000000000;         
-        name = "Coin Coming Token";                  
-        decimals = 8;          
-        symbol = "CCT";            
+        balances[msg.sender] = 10000000000000000;
+        totalSupply = 10000000000000000;
+        name = "Coin Coming Token";
+        decimals = 8;
+        symbol = "CCT";
     }
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool success) {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
 
-        if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))),  
+        if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))),
             msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
@@ -66,4 +66,14 @@ contract CCToken is StandardToken {
         //if ether is sent to this address, send it back.
         throw;
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -173,7 +173,6 @@ contract CSCToken is StandardToken {
 	emit Transfer(0, 0x10d4259DDe7dD0f704DAb552c47e3c5Dc327a602, amt );
   }
 
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

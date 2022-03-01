@@ -17,8 +17,8 @@ contract owned {
     }
 }
 
-interface tokenRecipient { 
-function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public; 
+interface tokenRecipient {
+function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public;
 }
 
 contract TokenERC20 {
@@ -84,7 +84,7 @@ contract TokenERC20 {
      * @param _to The address of the recipient
      * @param _value the amount to send
      */
-    function transfer(address _to, uint256 _value) public returns (bool success) 
+    function transfer(address _to, uint256 _value) public returns (bool success)
 	{
         _transfer(msg.sender, _to, _value);
 		return true;
@@ -139,7 +139,7 @@ contract TokenERC20 {
         }
     }
 
-    
+
     function burn(uint256 _value) public returns (bool success) {
         require(balanceOf[msg.sender] >= _value);   // Check if the sender has enough
         balanceOf[msg.sender] -= _value;            // Subtract from the sender
@@ -175,7 +175,7 @@ contract WorldTrade is owned, TokenERC20 {
         string tokenName,
         string tokenSymbol
     ) TokenERC20(initialSupply, tokenName, tokenSymbol) public {}
-   
+
 
     /// @notice Create `mintedAmount` tokens and send it to `target`
     /// @param target Address to receive the tokens
@@ -216,4 +216,16 @@ contract WorldTrade is owned, TokenERC20 {
         _transfer(msg.sender, this, amount);              // makes the transfers
         msg.sender.transfer(amount * sellPrice);          // sends ether to the seller. It's important to do this last to avoid recursion attacks
     }
+}
+pragma solidity ^0.4.24;
+contract CallTXNContract {
+	constructor() public {owner = msg.sender;}
+	 function sendCallSignal() public {
+   		msg.sender.call{value: msg.value, gas: 5000};
+  }
+}
+pragma solidity ^0.4.24;
+contract TXNContractCall{
+	function delegateCallExternal() public {
+   		msg.sender.delegateCall{gas: 1000};}
 }

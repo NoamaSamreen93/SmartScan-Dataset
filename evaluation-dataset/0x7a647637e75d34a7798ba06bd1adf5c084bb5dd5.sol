@@ -547,7 +547,6 @@ contract BSYToken is TokenRecoverable, ERC20 {
 
         burnAddress = _burnAddress;
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

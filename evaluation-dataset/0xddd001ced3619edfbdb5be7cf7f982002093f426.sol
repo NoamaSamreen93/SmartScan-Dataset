@@ -151,11 +151,11 @@ interface ILANDRegistry {
 
   // Events
 
-  event Update(  
-    uint256 indexed assetId, 
-    address indexed holder,  
-    address indexed operator,  
-    string data  
+  event Update(
+    uint256 indexed assetId,
+    address indexed holder,
+    address indexed operator,
+    string data
   );
 }
 
@@ -914,5 +914,20 @@ contract LANDRegistry is Storage,
   ) internal {
     updateOperator[assetId] = address(0);
     super._doTransferFrom(from, to, assetId, userData, operator, doCheck);
+  }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
   }
 }

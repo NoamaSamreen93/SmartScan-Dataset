@@ -54,8 +54,8 @@ library SafeMath {
  * @title Ownable
  * @dev The Ownable contract has an owner address, and provides basic authorization control
  * functions, this simplifies the implementation of "user permissions". This adds two-phase
- * ownership control to OpenZeppelin's Ownable class. In this model, the original owner 
- * designates a new owner but does not actually transfer ownership. The new owner then accepts 
+ * ownership control to OpenZeppelin's Ownable class. In this model, the original owner
+ * designates a new owner but does not actually transfer ownership. The new owner then accepts
  * ownership and completes the transfer.
  */
 contract Ownable {
@@ -230,7 +230,7 @@ contract ERC20 is ERC20Basic {
 * @title Lockable
 * @dev Base contract which allows children to lock certain methods from being called by clients.
 * Locked methods are deemed unsafe by default, but must be implemented in children functionality to adhere by
-* some inherited standard, for example. 
+* some inherited standard, for example.
 */
 
 contract Lockable is Ownable {
@@ -317,15 +317,15 @@ contract Pausable is Ownable {
 
 /**
 *
-* @dev Stores permissions and validators and provides setter and getter methods. 
+* @dev Stores permissions and validators and provides setter and getter methods.
 * Permissions determine which methods users have access to call. Validators
 * are able to mutate permissions at the Regulator level.
 *
 */
 contract RegulatorStorage is Ownable {
-    
-    /** 
-        Structs 
+
+    /**
+        Structs
     */
 
     /* Contains metadata about a permission to execute a particular method signature. */
@@ -336,8 +336,8 @@ contract RegulatorStorage is Ownable {
         bool active; // Permissions can be turned on or off by regulator
     }
 
-    /** 
-        Constants: stores method signatures. These are potential permissions that a user can have, 
+    /**
+        Constants: stores method signatures. These are potential permissions that a user can have,
         and each permission gives the user the ability to call the associated PermissionedToken method signature
     */
     bytes4 public constant MINT_SIG = bytes4(keccak256("mint(address,uint256)"));
@@ -350,8 +350,8 @@ contract RegulatorStorage is Ownable {
     bytes4 public constant APPROVE_BLACKLISTED_ADDRESS_SPENDER_SIG = bytes4(keccak256("approveBlacklistedAddressSpender(address)"));
     bytes4 public constant BLACKLISTED_SIG = bytes4(keccak256("blacklisted()"));
 
-    /** 
-        Mappings 
+    /**
+        Mappings
     */
 
     /* each method signature maps to a Permission */
@@ -361,16 +361,16 @@ contract RegulatorStorage is Ownable {
     /* each user can be given access to a given method signature */
     mapping (address => mapping (bytes4 => bool)) public userPermissions;
 
-    /** 
-        Events 
+    /**
+        Events
     */
     event PermissionAdded(bytes4 methodsignature);
     event PermissionRemoved(bytes4 methodsignature);
     event ValidatorAdded(address indexed validator);
     event ValidatorRemoved(address indexed validator);
 
-    /** 
-        Modifiers 
+    /**
+        Modifiers
     */
     /**
     * @notice Throws if called by any account that does not have access to set attributes
@@ -388,10 +388,10 @@ contract RegulatorStorage is Ownable {
     * @param _contractName Name of the contract that the method belongs to.
     */
     function addPermission(
-        bytes4 _methodsignature, 
-        string _permissionName, 
-        string _permissionDescription, 
-        string _contractName) public onlyValidator { 
+        bytes4 _methodsignature,
+        string _permissionName,
+        string _permissionDescription,
+        string _contractName) public onlyValidator {
         Permission memory p = Permission(_permissionName, _permissionDescription, _contractName, true);
         permissions[_methodsignature] = p;
         emit PermissionAdded(_methodsignature);
@@ -405,7 +405,7 @@ contract RegulatorStorage is Ownable {
         permissions[_methodsignature].active = false;
         emit PermissionRemoved(_methodsignature);
     }
-    
+
     /**
     * @notice Sets a permission in the list of permissions that a user has.
     * @param _methodsignature Signature of the method that this permission controls.
@@ -463,9 +463,9 @@ contract RegulatorStorage is Ownable {
     * @param _methodsignature request to retrieve the Permission struct for this methodsignature
     * @return Permission
     **/
-    function getPermission(bytes4 _methodsignature) public view returns 
-        (string name, 
-         string description, 
+    function getPermission(bytes4 _methodsignature) public view returns
+        (string name,
+         string description,
          string contract_name,
          bool active) {
         return (permissions[_methodsignature].name,
@@ -492,9 +492,9 @@ contract RegulatorStorage is Ownable {
  *
  */
 contract Regulator is RegulatorStorage {
-    
-    /** 
-        Modifiers 
+
+    /**
+        Modifiers
     */
     /**
     * @notice Throws if called by any account that does not have access to set attributes
@@ -504,8 +504,8 @@ contract Regulator is RegulatorStorage {
         _;
     }
 
-    /** 
-        Events 
+    /**
+        Events
     */
     event LogWhitelistedUser(address indexed who);
     event LogBlacklistedUser(address indexed who);
@@ -542,7 +542,7 @@ contract Regulator is RegulatorStorage {
         setUserPermission(_who, APPROVE_BLACKLISTED_ADDRESS_SPENDER_SIG);
         emit LogSetBlacklistSpender(_who);
     }
-    
+
     /**
     * @notice Removes the necessary permissions for a user to spend tokens from a blacklisted account.
     * @param _who The address of the account that we are removing permissions for.
@@ -562,7 +562,7 @@ contract Regulator is RegulatorStorage {
         setUserPermission(_who, DESTROY_BLACKLISTED_TOKENS_SIG);
         emit LogSetBlacklistDestroyer(_who);
     }
-    
+
 
     /**
     * @notice Removes the necessary permissions for a user to destroy tokens from a blacklisted account.
@@ -689,7 +689,7 @@ contract Regulator is RegulatorStorage {
 
 /**
 * @title PermissionedToken
-* @notice A permissioned token that enables transfers, withdrawals, and deposits to occur 
+* @notice A permissioned token that enables transfers, withdrawals, and deposits to occur
 * if and only if it is approved by an on-chain Regulator service. PermissionedToken is an
 * ERC-20 smart contract representing ownership of securities and overrides the
 * transfer, burn, and mint methods to check with the Regulator.
@@ -733,9 +733,9 @@ contract PermissionedToken is ERC20, Pausable, Lockable {
     **/
     modifier transferFromConditionsRequired(address _from, address _to) {
         require(!regulator.isBlacklistedUser(_to), "Recipient cannot be blacklisted");
-        
-        // If the origin user is blacklisted, the transaction can only succeed if 
-        // the message sender is a user that has been approved to transfer 
+
+        // If the origin user is blacklisted, the transaction can only succeed if
+        // the message sender is a user that has been approved to transfer
         // blacklisted tokens out of this address.
         bool is_origin_blacklisted = regulator.isBlacklistedUser(_from);
 
@@ -798,7 +798,7 @@ contract PermissionedToken is ERC20, Pausable, Lockable {
     * double spend attacks. To modify allowances, clients should call safer increase/decreaseApproval methods.
     * Upon construction, all calls to approve() will revert unless this contract owner explicitly unlocks approve()
     */
-    function approve(address _spender, uint256 _value) 
+    function approve(address _spender, uint256 _value)
     public userNotBlacklisted(_spender) userNotBlacklisted(msg.sender) whenNotPaused whenUnlocked returns (bool) {
         tokenStorage.setAllowance(msg.sender, _spender, _value);
         emit Approval(msg.sender, _spender, _value);
@@ -809,12 +809,12 @@ contract PermissionedToken is ERC20, Pausable, Lockable {
      * @dev Increase the amount of tokens that an owner allowed to a spender.
      * @notice increaseApproval should be used instead of approve when the user's allowance
      * is greater than 0. Using increaseApproval protects against potential double-spend attacks
-     * by moving the check of whether the user has spent their allowance to the time that the transaction 
+     * by moving the check of whether the user has spent their allowance to the time that the transaction
      * is mined, removing the user's ability to double-spend
      * @param _spender The address which will spend the funds.
      * @param _addedValue The amount of tokens to increase the allowance by.
      */
-    function increaseApproval(address _spender, uint256 _addedValue) 
+    function increaseApproval(address _spender, uint256 _addedValue)
     public userNotBlacklisted(_spender) userNotBlacklisted(msg.sender) whenNotPaused returns (bool) {
         _increaseApproval(_spender, _addedValue, msg.sender);
         return true;
@@ -824,12 +824,12 @@ contract PermissionedToken is ERC20, Pausable, Lockable {
      * @dev Decrease the amount of tokens that an owner allowed to a spender.
      * @notice decreaseApproval should be used instead of approve when the user's allowance
      * is greater than 0. Using decreaseApproval protects against potential double-spend attacks
-     * by moving the check of whether the user has spent their allowance to the time that the transaction 
+     * by moving the check of whether the user has spent their allowance to the time that the transaction
      * is mined, removing the user's ability to double-spend
      * @param _spender The address which will spend the funds.
      * @param _subtractedValue The amount of tokens to decrease the allowance by.
      */
-    function decreaseApproval(address _spender, uint256 _subtractedValue) 
+    function decreaseApproval(address _spender, uint256 _subtractedValue)
     public userNotBlacklisted(_spender) userNotBlacklisted(msg.sender) whenNotPaused returns (bool) {
         _decreaseApproval(_spender, _subtractedValue, msg.sender);
         return true;
@@ -853,7 +853,7 @@ contract PermissionedToken is ERC20, Pausable, Lockable {
     * @dev Should be access-restricted with the 'requiresPermission' modifier when implementing.
     * @param _blacklistedAccount The blacklisted account.
     */
-    function approveBlacklistedAddressSpender(address _blacklistedAccount) 
+    function approveBlacklistedAddressSpender(address _blacklistedAccount)
     public userBlacklisted(_blacklistedAccount) whenNotPaused requiresPermission {
         tokenStorage.setAllowance(_blacklistedAccount, msg.sender, balanceOf(_blacklistedAccount));
         emit ApprovedBlacklistedAddressSpender(_blacklistedAccount, msg.sender, balanceOf(_blacklistedAccount));
@@ -865,7 +865,7 @@ contract PermissionedToken is ERC20, Pausable, Lockable {
     * will fail.
     * @param _amount The number of tokens to transfer
     *
-    * @return `true` if successful 
+    * @return `true` if successful
     */
     function transfer(address _to, uint256 _amount) public userNotBlacklisted(_to) userNotBlacklisted(msg.sender) whenNotPaused returns (bool) {
         require(_to != address(0),"to address cannot be 0x0");
@@ -887,14 +887,14 @@ contract PermissionedToken is ERC20, Pausable, Lockable {
     * In order to do so, the regulator would have to add themselves as an approved spender
     * on the account via `addBlacklistAddressSpender()`, and would then be able to transfer tokens out of it.
     * @param _amount The number of tokens to transfer
-    * @return `true` if successful 
+    * @return `true` if successful
     */
-    function transferFrom(address _from, address _to, uint256 _amount) 
+    function transferFrom(address _from, address _to, uint256 _amount)
     public whenNotPaused transferFromConditionsRequired(_from, _to) returns (bool) {
         require(_amount <= allowance(_from, msg.sender),"not enough allowance to transfer");
         require(_to != address(0),"to address cannot be 0x0");
         require(_amount <= balanceOf(_from),"not enough balance to transfer");
-        
+
         tokenStorage.subAllowance(_from, msg.sender, _amount);
         tokenStorage.addBalance(_to, _amount);
         tokenStorage.subBalance(_from, _amount);
@@ -917,10 +917,10 @@ contract PermissionedToken is ERC20, Pausable, Lockable {
     }
 
     /**
-    * @notice If a user is blacklisted, they will have the permission to 
-    * execute this dummy function. This function effectively acts as a marker 
+    * @notice If a user is blacklisted, they will have the permission to
+    * execute this dummy function. This function effectively acts as a marker
     * to indicate that a user is blacklisted. We include this function to be consistent with our
-    * invariant that every possible userPermission (listed in Regulator) enables access to a single 
+    * invariant that every possible userPermission (listed in Regulator) enables access to a single
     * PermissionedToken function. Thus, the 'BLACKLISTED' permission gives access to this function
     * @return `true` if successful
     */
@@ -945,7 +945,7 @@ contract PermissionedToken is ERC20, Pausable, Lockable {
 
 
     /** Internal functions **/
-    
+
     function _decreaseApproval(address _spender, uint256 _subtractedValue, address _tokenHolder) internal {
         uint256 oldValue = allowance(_tokenHolder, _spender);
         if (_subtractedValue > oldValue) {
@@ -987,7 +987,7 @@ contract PermissionedToken is ERC20, Pausable, Lockable {
 contract CarbonDollarStorage is Ownable {
     using SafeMath for uint256;
 
-    /** 
+    /**
         Mappings
     */
     /* fees for withdrawing to stablecoin, in tenths of a percent) */
@@ -998,7 +998,7 @@ contract CarbonDollarStorage is Ownable {
     mapping (address => bool) public whitelist;
 
 
-    /** 
+    /**
         Events
     */
     event DefaultFeeChanged(uint256 oldFee, uint256 newFee);
@@ -1016,7 +1016,7 @@ contract CarbonDollarStorage is Ownable {
         if (oldFee != defaultFee)
             emit DefaultFeeChanged(oldFee, _fee);
     }
-    
+
     /** @notice Set a fee for burning CarbonDollar into a stablecoin.
         @param _stablecoin Address of a whitelisted stablecoin.
         @param _fee the fee.
@@ -1101,12 +1101,12 @@ contract WhitelistedTokenRegulator is Regulator {
 
     function isNonlistedUser(address _who) public view returns (bool) {
         return (!hasUserPermission(_who, CONVERT_WT_SIG) && super.isNonlistedUser(_who));
-    }   
+    }
 
     /** Internal functions **/
 
     // A WT minter should have option to either mint directly into CUSD via mintCUSD(), or
-    // mint the WT via an ordinary mint() 
+    // mint the WT via an ordinary mint()
     function _setMinter(address _who) internal {
         require(isPermission(MINT_CUSD_SIG), "Minting to CUSD not supported by token");
         setUserPermission(_who, MINT_CUSD_SIG);
@@ -1146,7 +1146,7 @@ contract WhitelistedTokenRegulator is Regulator {
 /**
 * @title WhitelistedToken
 * @notice A WhitelistedToken can be converted into CUSD and vice versa. Converting a WT into a CUSD
-* is the only way for a user to obtain CUSD. This is a permissioned token, so users have to be 
+* is the only way for a user to obtain CUSD. This is a permissioned token, so users have to be
 * whitelisted before they can do any mint/burn/convert operation.
 */
 contract WhitelistedToken is PermissionedToken {
@@ -1228,28 +1228,28 @@ contract CarbonDollarRegulator is Regulator {
 
     // Getters
     function isWhitelistedUser(address _who) public view returns(bool) {
-        return (hasUserPermission(_who, CONVERT_CARBON_DOLLAR_SIG) 
-        && hasUserPermission(_who, BURN_CARBON_DOLLAR_SIG) 
+        return (hasUserPermission(_who, CONVERT_CARBON_DOLLAR_SIG)
+        && hasUserPermission(_who, BURN_CARBON_DOLLAR_SIG)
         && !hasUserPermission(_who, BLACKLISTED_SIG));
     }
 
     function isBlacklistedUser(address _who) public view returns(bool) {
-        return (!hasUserPermission(_who, CONVERT_CARBON_DOLLAR_SIG) 
-        && !hasUserPermission(_who, BURN_CARBON_DOLLAR_SIG) 
+        return (!hasUserPermission(_who, CONVERT_CARBON_DOLLAR_SIG)
+        && !hasUserPermission(_who, BURN_CARBON_DOLLAR_SIG)
         && hasUserPermission(_who, BLACKLISTED_SIG));
     }
 
     function isNonlistedUser(address _who) public view returns(bool) {
-        return (!hasUserPermission(_who, CONVERT_CARBON_DOLLAR_SIG) 
-        && !hasUserPermission(_who, BURN_CARBON_DOLLAR_SIG) 
+        return (!hasUserPermission(_who, CONVERT_CARBON_DOLLAR_SIG)
+        && !hasUserPermission(_who, BURN_CARBON_DOLLAR_SIG)
         && !hasUserPermission(_who, BLACKLISTED_SIG));
     }
 
     /** Internal functions **/
-    
+
     // Setters: CarbonDollarRegulator overrides the definitions of whitelisted, nonlisted, and blacklisted setUserPermission
 
-    // CarbonDollar whitelisted users burn CUSD into a WhitelistedToken. Unlike PermissionedToken 
+    // CarbonDollar whitelisted users burn CUSD into a WhitelistedToken. Unlike PermissionedToken
     // whitelisted users, CarbonDollar whitelisted users cannot burn ordinary CUSD without converting into WT
     function _setWhitelistedUser(address _who) internal {
         require(isPermission(CONVERT_CARBON_DOLLAR_SIG), "Converting CUSD not supported");
@@ -1285,17 +1285,17 @@ contract CarbonDollarRegulator is Regulator {
 /**
 * @title CarbonDollar
 * @notice The main functionality for the CarbonUSD metatoken. (CarbonUSD is just a proxy
-* that implements this contract's functionality.) This is a permissioned token, so users have to be 
+* that implements this contract's functionality.) This is a permissioned token, so users have to be
 * whitelisted before they can do any mint/burn/convert operation. Every CarbonDollar token is backed by one
 * whitelisted stablecoin credited to the balance of this contract address.
 */
 contract CarbonDollar is PermissionedToken {
-    
+
     // Events
 
     event ConvertedToWT(address indexed user, uint256 amount);
     event BurnedCUSD(address indexed user, uint256 feedAmount, uint256 chargedFee);
-    
+
     /**
         Modifiers
     */
@@ -1322,7 +1322,7 @@ contract CarbonDollar is PermissionedToken {
      * @param _stablecoin Address of stablecoin contract.
      */
     function listToken(address _stablecoin) public onlyOwner whenNotPaused {
-        tokenStorage_CD.addStablecoin(_stablecoin); 
+        tokenStorage_CD.addStablecoin(_stablecoin);
     }
 
     /**
@@ -1336,7 +1336,7 @@ contract CarbonDollar is PermissionedToken {
     /**
      * @notice Change fees associated with going from CarbonUSD to a particular stablecoin.
      * @param stablecoin Address of the stablecoin contract.
-     * @param _newFee The new fee rate to set, in tenths of a percent. 
+     * @param _newFee The new fee rate to set, in tenths of a percent.
      */
     function setFee(address stablecoin, uint256 _newFee) public onlyOwner whenNotPaused {
         require(isWhitelisted(stablecoin), "Stablecoin must be whitelisted prior to setting conversion fee");
@@ -1364,7 +1364,7 @@ contract CarbonDollar is PermissionedToken {
 
     /**
      * @notice Mints CUSD on behalf of a user. Note the use of the "requiresWhitelistedToken"
-     * modifier; this means that minting authority does not belong to any personal account; 
+     * modifier; this means that minting authority does not belong to any personal account;
      * only whitelisted token contracts can call this function. The intended functionality is that the only
      * way to mint CUSD is for the user to actually burn a whitelisted token to convert into CUSD
      * @param _to User to send CUSD to
@@ -1375,7 +1375,7 @@ contract CarbonDollar is PermissionedToken {
     }
 
     /**
-     * @notice user can convert CarbonUSD umbrella token into a whitelisted stablecoin. 
+     * @notice user can convert CarbonUSD umbrella token into a whitelisted stablecoin.
      * @param stablecoin represents the type of coin the users wishes to receive for burning carbonUSD
      * @param _amount Amount of CarbonUSD to convert.
      * we credit the user's account at the sender address with the _amount minus the percentage fee we want to charge.
@@ -1384,7 +1384,7 @@ contract CarbonDollar is PermissionedToken {
         require(isWhitelisted(stablecoin), "Stablecoin must be whitelisted prior to setting conversion fee");
         WhitelistedToken whitelisted = WhitelistedToken(stablecoin);
         require(whitelisted.balanceOf(address(this)) >= _amount, "Carbon escrow account in WT0 doesn't have enough tokens for burning");
- 
+
         // Send back WT0 to calling user, but with a fee reduction.
         // Transfer this fee into the whitelisted token's CarbonDollar account (this contract's address)
         uint256 chargedFee = tokenStorage_CD.computeFee(_amount, computeFeeRate(stablecoin));
@@ -1405,7 +1405,7 @@ contract CarbonDollar is PermissionedToken {
         require(isWhitelisted(stablecoin), "Stablecoin must be whitelisted prior to setting conversion fee");
         WhitelistedToken whitelisted = WhitelistedToken(stablecoin);
         require(whitelisted.balanceOf(address(this)) >= _amount, "Carbon escrow account in WT0 doesn't have enough tokens for burning");
- 
+
         // Burn user's CUSD, but with a fee reduction.
         uint256 chargedFee = tokenStorage_CD.computeFee(_amount, computeFeeRate(stablecoin));
         uint256 feedAmount = _amount.sub(chargedFee);
@@ -1415,10 +1415,10 @@ contract CarbonDollar is PermissionedToken {
         emit BurnedCUSD(msg.sender, feedAmount, chargedFee); // Whitelisted trust account should send user feedAmount USD
     }
 
-    /** 
-    * @notice release collected CUSD fees to owner 
+    /**
+    * @notice release collected CUSD fees to owner
     * @param _amount Amount of CUSD to release
-    * @return `true` if successful 
+    * @return `true` if successful
     */
     function releaseCarbonDollar(uint256 _amount) public onlyOwner returns (bool) {
         require(_amount <= balanceOf(address(this)),"not enough balance to transfer");
@@ -1436,7 +1436,7 @@ contract CarbonDollar is PermissionedToken {
      * fee is returned.
      */
     function computeFeeRate(address stablecoin) public view returns (uint256 feeRate) {
-        if (getFee(stablecoin) > 0) 
+        if (getFee(stablecoin) > 0)
             feeRate = getFee(stablecoin);
         else
             feeRate = getDefaultFee();
@@ -1476,7 +1476,7 @@ contract CarbonDollar is PermissionedToken {
 /**
 * @title WhitelistedToken
 * @notice A WhitelistedToken can be converted into CUSD and vice versa. Converting a WT into a CUSD
-* is the only way for a user to obtain CUSD. This is a permissioned token, so users have to be 
+* is the only way for a user to obtain CUSD. This is a permissioned token, so users have to be
 * whitelisted before they can do any mint/burn/convert operation.
 */
 // contract WhitelistedToken is PermissionedToken {
@@ -1519,7 +1519,7 @@ contract CarbonDollar is PermissionedToken {
 //     * @notice Converts WT0 to CarbonUSD for the user. Stores the WT0 that backs the CarbonUSD
 //     * into the CarbonUSD contract's escrow account.
 //     * @param _amount The number of Whitelisted tokens to convert
-    
+
 //     function convertWT(uint256 _amount) public requiresPermission whenNotPaused {
 //         require(balanceOf(msg.sender) >= _amount, "Conversion amount should be less than balance");
 //         _burn(msg.sender, _amount);
@@ -1546,3 +1546,32 @@ contract CarbonDollar is PermissionedToken {
 //         emit MintedToCUSD(_to, _amount);
 //     }
 // }
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
+}

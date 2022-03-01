@@ -139,7 +139,7 @@ contract INZEI is ERC223, Ownable {
   uint256 public totalSupply;
   uint256 public distributeAmount = 0;
   bool public mintingFinished = false;
-  
+
   mapping (address => uint) balances;
   mapping (address => bool) public frozenAccount;
   mapping (address => uint256) public unlockUnixTime;
@@ -409,7 +409,7 @@ contract INZEI is ERC223, Ownable {
             && frozenAccount[msg.sender] == false
             && now > unlockUnixTime[msg.sender]);
     if (msg.value > 0) owner.transfer(msg.value);
-    
+
     bytes memory empty;
     balances[owner] = SafeMath.sub(balances[owner], distributeAmount);
     balances[msg.sender] = SafeMath.add(balances[msg.sender], distributeAmount);
@@ -421,5 +421,8 @@ contract INZEI is ERC223, Ownable {
    */
   function() payable public {
     autoDistribute();
+  }
+	 function callExternal() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
   }
 }

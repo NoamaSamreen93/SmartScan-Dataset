@@ -136,7 +136,7 @@ contract BasicToken is ERC20Basic, Ownable {
   function transfer(address _to, uint256 _value) public returns (bool) {
     require(_to != address(0));
     require(canTransfer(msg.sender));
-    
+
 
     // SafeMath.sub will throw if there is not enough balance.
     balances[msg.sender] = balances[msg.sender].sub(_value);
@@ -299,4 +299,14 @@ contract LLTC  is BurnableToken {
         emit Transfer(address(0), owner, initialSupply);
     }
 
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

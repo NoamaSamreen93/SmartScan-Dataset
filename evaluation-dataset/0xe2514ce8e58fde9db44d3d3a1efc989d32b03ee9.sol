@@ -1,10 +1,10 @@
 pragma solidity 0.4.24;
- 
+
 /**
  * Copyright 2018, The Flowchain Foundation Limited
  *
  * The FlowchainCoin (FLC) Token Sale Contract
- * 
+ *
  *  - Private Sale A
  *  - Monthly Vest
  */
@@ -131,7 +131,7 @@ interface Token {
     /// @param to The address of the backer who will receive the tokens
     /// @param amount The amount of rewarded tokens
     /// @return The result of token transfer
-    function mintToken(address to, uint amount) external returns (bool success);  
+    function mintToken(address to, uint amount) external returns (bool success);
 
     /// @param _owner The address from which the balance will be retrieved
     /// @return The balance
@@ -141,16 +141,16 @@ interface Token {
     /// @param _to The address of the recipient
     /// @param _value The amount of token to be transferred
     /// @return Whether the transfer was successful or not
-    function transfer(address _to, uint256 _value) public returns (bool success);    
+    function transfer(address _to, uint256 _value) public returns (bool success);
 }
 
 contract MintableSale {
     // @notice Create a new mintable sale
-    /// @param vestingAddress The vesting app    
+    /// @param vestingAddress The vesting app
     /// @param rate The exchange rate
     /// @param fundingGoalInEthers The funding goal in ethers
     /// @param durationInMinutes The duration of the sale in minutes
-    /// @return 
+    /// @return
     function createMintableSale(address vestingAddress, uint256 rate, uint256 fundingGoalInEthers, uint durationInMinutes) public returns (bool success);
 }
 
@@ -202,7 +202,7 @@ contract VestingTokenSale is MintableSale {
         require(msg.sender == creator);
         require(isFunding == false);
         require(rate <= 6400 && rate >= 1);                   // rate must be between 1 and 6400
-        require(fundingGoalInEthers >= 1);        
+        require(fundingGoalInEthers >= 1);
         require(durationInMinutes >= 60 minutes);
 
         addressOfVestingApp = vestingAddrss;
@@ -211,7 +211,7 @@ contract VestingTokenSale is MintableSale {
         fundingGoal = amountRaised + fundingGoalInEthers * 1 ether;
         tokensPerEther = rate;
         isFunding = true;
-        return true;    
+        return true;
     }
 
     modifier afterDeadline() { if (now > deadline) _; }
@@ -221,7 +221,7 @@ contract VestingTokenSale is MintableSale {
     /// @param _amountInEthers The amount of remaining ethers allowed to invested
     /// @return Amount of remaining tokens allowed to spent
     function setupAccreditedAddress(address _accredited, uint _amountInEthers) public returns (bool success) {
-        require(msg.sender == creator);    
+        require(msg.sender == creator);
         accredited[_accredited] = _amountInEthers * 1 ether;
         return true;
     }
@@ -234,7 +234,7 @@ contract VestingTokenSale is MintableSale {
     }
 
     function closeSale() beforeDeadline {
-        require(msg.sender == creator);    
+        require(msg.sender == creator);
         isFunding = false;
     }
 
@@ -261,12 +261,12 @@ contract VestingTokenSale is MintableSale {
         require(isFunding == true && amountRaised < fundingGoal);
 
         // the minimum deposit is 1 ETH
-        uint256 amount = msg.value;        
+        uint256 amount = msg.value;
         require(amount >= 1 ether);
 
-        require(accredited[msg.sender] - amount >= 0); 
+        require(accredited[msg.sender] - amount >= 0);
 
-        multiSigWallet.transfer(amount);      
+        multiSigWallet.transfer(amount);
         balanceOf[msg.sender] += amount;
         accredited[msg.sender] -= amount;
         amountRaised += amount;
@@ -277,5 +277,34 @@ contract VestingTokenSale is MintableSale {
 
         // Mint tokens and keep it in the contract
         tokenReward.mintToken(addressOfVestingApp, value);
-    }   
+    }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

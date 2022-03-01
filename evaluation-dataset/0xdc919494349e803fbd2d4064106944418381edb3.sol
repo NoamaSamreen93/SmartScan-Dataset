@@ -1732,7 +1732,7 @@ contract CDPCreator is DSMath {
         require(address(weth).call.value(msg.value)());
 
         bytes32 cupID = tub.open();
-        
+
         uint256 amountPETH = rdiv(msg.value, tub.per());
         tub.join(amountPETH);
         tub.lock(cupID, amountPETH);
@@ -1763,7 +1763,7 @@ contract CDPCreator is DSMath {
 
     function convertPETHToETH(uint256 amountPETH) external {
         require(peth.transferFrom(msg.sender, address(this), amountPETH));
-        
+
         uint256 bid = tub.bid(amountPETH);
         tub.exit(amountPETH);
         weth.withdraw(bid);
@@ -1774,4 +1774,19 @@ contract CDPCreator is DSMath {
         //only accept payments from WETH withdrawal
         require(msg.sender == address(weth));
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

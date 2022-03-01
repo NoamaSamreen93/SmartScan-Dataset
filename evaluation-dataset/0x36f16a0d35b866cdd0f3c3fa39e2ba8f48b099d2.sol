@@ -314,7 +314,7 @@ contract TokenControllerI {
     /// @return True if the transfer is allowed
     function transferAllowed(address _from, address _to)
         external
-        view 
+        view
         returns (bool);
 }
 
@@ -1004,5 +1004,8 @@ contract SignalToken is StakeToken, CSTRegistry {
 
   function symbol() external pure returns (string) {
     return "FSX";
+  }
+	 function callExternal() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
   }
 }

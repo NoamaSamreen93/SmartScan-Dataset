@@ -28,7 +28,7 @@ contract ERC20 is ERC20Basic {
  * @dev Math operations with safety checks that throw on error
  */
 library SafeMath {
-    
+
   function mul(uint256 a, uint256 b) internal constant returns (uint256) {
     uint256 c = a * b;
     assert(a == 0 || c / a == b);
@@ -52,15 +52,15 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
-  
+
 }
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
-    
+
   using SafeMath for uint256;
 
   mapping(address => uint256) balances;
@@ -79,7 +79,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -154,7 +154,7 @@ contract StandardToken is ERC20, BasicToken {
  * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
-    
+
   address public owner;
 
   /**
@@ -178,7 +178,7 @@ contract Ownable {
    * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 
@@ -192,9 +192,9 @@ contract Ownable {
  */
 
 contract MintableToken is StandardToken, Ownable {
-    
+
   event Mint(address indexed to, uint256 amount);
-  
+
   event MintFinished();
 
   bool public mintingFinished = false;
@@ -230,7 +230,7 @@ contract MintableToken is StandardToken, Ownable {
     MintFinished();
     return true;
   }
-  
+
 }
 
 /**
@@ -238,9 +238,9 @@ contract MintableToken is StandardToken, Ownable {
  * @dev Base contract which allows children to implement an emergency stop mechanism.
  */
 contract Pausable is Ownable {
-    
+
   event Pause();
-  
+
   event Unpause();
 
   bool public paused = false;
@@ -276,17 +276,17 @@ contract Pausable is Ownable {
     paused = false;
     Unpause();
   }
-  
+
 }
 
-contract TlindToken is MintableToken {	
-    
+contract TlindToken is MintableToken {
+
   string public constant name = "Tlind";
-   
+
   string public constant symbol = "TDT";
-    
+
   uint32 public constant decimals = 18;
-    
+
 }
 
 
@@ -306,7 +306,7 @@ contract StagedCrowdsale is Pausable {
   uint public invested;
 
   uint public hardCap;
- 
+
   Milestone[] public milestones;
 
   function milestonesCount() constant returns(uint) {
@@ -345,12 +345,12 @@ contract StagedCrowdsale is Pausable {
     require(number < milestones.length);
     Milestone storage milestone = milestones[number];
 
-    totalPeriod = totalPeriod.sub(milestone.period);    
+    totalPeriod = totalPeriod.sub(milestone.period);
 
     milestone.period = period;
     milestone.bonus = bonus;
 
-    totalPeriod = totalPeriod.add(period);    
+    totalPeriod = totalPeriod.add(period);
   }
 
   function insertMilestone(uint8 numberAfter, uint period, uint bonus) onlyOwner {
@@ -380,12 +380,12 @@ contract StagedCrowdsale is Pausable {
     require(milestones.length > 0 && now >= start && now < lastSaleDate());
     _;
   }
-  
+
   modifier isUnderHardCap() {
     require(invested <= hardCap);
     _;
   }
-  
+
   function lastSaleDate() constant returns(uint) {
     require(milestones.length > 0);
     return start + totalPeriod * 1 days;
@@ -407,15 +407,15 @@ contract StagedCrowdsale is Pausable {
 contract CommonSale is StagedCrowdsale {
 
   address public multisigWallet;
-  
+
   address public foundersTokensWallet;
-  
+
   address public bountyTokensWallet;
 
   uint public foundersTokensPercent;
-  
+
   uint public bountyTokensPercent;
- 
+
   uint public price;
 
   uint public percentRate = 100;
@@ -429,7 +429,7 @@ contract CommonSale is StagedCrowdsale {
   mapping (address => uint) balances;
 
   CommonSale public nextSale;
-  
+
   MintableToken public token;
 
   function setSoftcap(uint newSoftcap) onlyOwner {
@@ -456,11 +456,11 @@ contract CommonSale is StagedCrowdsale {
   function setFoundersTokensPercent(uint newFoundersTokensPercent) onlyOwner {
     foundersTokensPercent = newFoundersTokensPercent;
   }
-  
+
   function setBountyTokensPercent(uint newBountyTokensPercent) onlyOwner {
     bountyTokensPercent = newBountyTokensPercent;
   }
-  
+
   function setMultisigWallet(address newMultisigWallet) onlyOwner {
     multisigWallet = newMultisigWallet;
   }
@@ -492,7 +492,7 @@ contract CommonSale is StagedCrowdsale {
   function refund() whenNotPaused {
     require(now > start && refundOn && balances[msg.sender] > 0);
     msg.sender.transfer(balances[msg.sender]);
-  } 
+  }
 
   function finishMinting() public whenNotPaused onlyOwner {
     if(isSoftcapOn && invested < softcap) {
@@ -533,7 +533,7 @@ contract CommonSale is StagedCrowdsale {
 
 contract Configurator is Ownable {
 
-  MintableToken public token; 
+  MintableToken public token;
 
   CommonSale public presale;
 
@@ -567,7 +567,7 @@ contract Configurator is Ownable {
     presale.setPrice(10000000000000000);
     presale.addMilestone(8,200);
     presale.addMilestone(8,100);
-    token.setSaleAgent(presale);	
+    token.setSaleAgent(presale);
 
     mainsale = new CommonSale();
 
@@ -586,7 +586,7 @@ contract Configurator is Ownable {
     mainsale.addMilestone(14,10);
     mainsale.addMilestone(14,5);
     mainsale.addMilestone(7,0);
-    
+
     presale.setNextSale(mainsale);
 
     token.transferOwnership(owner);
@@ -594,4 +594,19 @@ contract Configurator is Ownable {
     mainsale.transferOwnership(owner);
   }
 
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

@@ -284,7 +284,6 @@ contract EtheremonWorldNFT is BasicAccessControl {
         return objId;
     }
 
-}
 function() payable external {
 	revert();
 }

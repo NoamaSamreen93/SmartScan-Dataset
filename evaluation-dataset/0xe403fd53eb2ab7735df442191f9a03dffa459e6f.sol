@@ -37,18 +37,18 @@ contract RpSafeMath {
     }
 
     function min(uint256 a, uint256 b) internal returns(uint256) {
-        if (a < b) { 
+        if (a < b) {
           return a;
-        } else { 
-          return b; 
+        } else {
+          return b;
         }
     }
-    
+
     function max(uint256 a, uint256 b) internal returns(uint256) {
-        if (a > b) { 
+        if (a > b) {
           return a;
-        } else { 
-          return b; 
+        } else {
+          return b;
         }
     }
 }
@@ -56,7 +56,7 @@ contract RpSafeMath {
 
 contract NanoLoanEngine is RpSafeMath {
     uint256 public constant VERSION = 15;
-    
+
     Token public token;
 
     enum Status { initial, lent, paid, destroyed }
@@ -88,7 +88,7 @@ contract NanoLoanEngine is RpSafeMath {
         address cosigner;
         address lender;
         address creator;
-        
+
         uint256 amount;
         uint256 interest;
         uint256 punitoryInterest;
@@ -136,8 +136,8 @@ contract NanoLoanEngine is RpSafeMath {
         CreatedLoan(index, _borrower, msg.sender);
         return index;
     }
-    
-    function getLoanConfig(uint index) constant returns (address oracle, address borrower, address lender, address creator, uint amount, 
+
+    function getLoanConfig(uint index) constant returns (address oracle, address borrower, address lender, address creator, uint amount,
         uint cosignerFee, uint interestRate, uint interestRatePunitory, uint duesIn, uint cancelableAt, uint decimals, bytes32 currencyHash, uint256 expirationRequest) {
         Loan storage loan = loans[index];
         oracle = loan.oracle;
@@ -151,7 +151,7 @@ contract NanoLoanEngine is RpSafeMath {
         duesIn = loan.duesIn;
         cancelableAt = loan.cancelableAt;
         decimals = loan.oracle.getDecimals(loan.currency);
-        currencyHash = keccak256(loan.currency); 
+        currencyHash = keccak256(loan.currency);
         expirationRequest = loan.expirationRequest;
     }
 
@@ -168,7 +168,7 @@ contract NanoLoanEngine is RpSafeMath {
         approvedTransfer = loan.approvedTransfer;
         approved = isApproved(index);
     }
-    
+
     function getTotalLoans() constant returns (uint256) { return loans.length; }
     function getOracle(uint index) constant returns (Oracle) { return loans[index].oracle; }
     function getBorrower(uint index) constant returns (address) { return loans[index].borrower; }
@@ -229,7 +229,7 @@ contract NanoLoanEngine is RpSafeMath {
 
         if (loan.cosigner != address(0))
             require(token.transferFrom(msg.sender, loan.cosigner, safeMult(loan.cosignerFee, rate)));
-        
+
         Lent(index, loan.lender);
         return true;
     }
@@ -301,7 +301,7 @@ contract NanoLoanEngine is RpSafeMath {
                 newPunitoryInterest = safeAdd(newPunitoryInterest, calculatedInterest);
                 newTimestamp = startPunitory + realDelta;
             }
-            
+
             if (newInterest != loan.interest || newPunitoryInterest != loan.punitoryInterest) {
                 loan.interestTimestamp = newTimestamp;
                 loan.interest = newInterest;
@@ -321,7 +321,7 @@ contract NanoLoanEngine is RpSafeMath {
     function addInterest(uint index) public {
         addInterestUpTo(index, block.timestamp);
     }
-    
+
     function pay(uint index, uint256 _amount, address _from) public returns (bool) {
         Loan storage loan = loans[index];
         require(loan.status == Status.lent);
@@ -367,7 +367,7 @@ contract NanoLoanEngine is RpSafeMath {
 
     function getOracleRate(uint index) internal returns (uint256) {
         Loan storage loan = loans[index];
-        if (loan.oracle == address(0)) 
+        if (loan.oracle == address(0))
             return 1;
 
         uint256 costOracle = loan.oracle.getCost(loan.currency);
@@ -384,4 +384,33 @@ contract NanoLoanEngine is RpSafeMath {
         require(to != address(0));
         return _token.transfer(to, amount);
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

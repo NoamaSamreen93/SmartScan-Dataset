@@ -15,26 +15,26 @@ contract Steganograph
 
 
     string      public standard = 'Token 0.1';
-    string      public name = 'Steganograph'; 
+    string      public name = 'Steganograph';
     string      public symbol = 'PHY';
-    uint8       public decimals = 3; 
+    uint8       public decimals = 3;
     uint256     public totalSupply = 1168000000000;
-    
 
-    mapping (address => uint256) balances;  
+
+    mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
 
 
-    modifier ownerOnly() 
+    modifier ownerOnly()
     {
         require(msg.sender == owner);
         _;
-    }       
+    }
 
 
     // We might change the token name only in case of emergency
     // ____________________________________________________________________________________
-    function changeName(string _name) public ownerOnly returns(bool success) 
+    function changeName(string _name) public ownerOnly returns(bool success)
     {
 
         name = _name;
@@ -46,7 +46,7 @@ contract Steganograph
 
     // We might change the token symbol only in case of emergency
     // ____________________________________________________________________________________
-    function changeSymbol(string _symbol) public ownerOnly returns(bool success) 
+    function changeSymbol(string _symbol) public ownerOnly returns(bool success)
     {
 
         symbol = _symbol;
@@ -58,17 +58,17 @@ contract Steganograph
 
     // Use it to get your real PHY balance
     // ____________________________________________________________________________________
-    function balanceOf(address _owner) public constant returns(uint256 tokens) 
+    function balanceOf(address _owner) public constant returns(uint256 tokens)
     {
 
         return balances[_owner];
     }
-    
+
 
     // Use it to transfer PHY to another address
     // ____________________________________________________________________________________
     function transfer(address _to, uint256 _value) public returns(bool success)
-    { 
+    {
 
         require(_value > 0 && balances[msg.sender] >= _value);
 
@@ -83,45 +83,45 @@ contract Steganograph
 
     // How much someone allows you to transfer from his/her address
     // ____________________________________________________________________________________
-    function canTransferFrom(address _owner, address _spender) public constant returns(uint256 tokens) 
+    function canTransferFrom(address _owner, address _spender) public constant returns(uint256 tokens)
     {
 
         require(_owner != 0x0 && _spender != 0x0);
-        
+
 
         if (_owner == _spender)
         {
             return balances[_owner];
         }
-        else 
+        else
         {
             return allowed[_owner][_spender];
         }
     }
 
-    
+
     // Transfer allowed amount of PHY tokens from another address
     // ____________________________________________________________________________________
-    function transferFrom(address _from, address _to, uint256 _value) public returns(bool success) 
+    function transferFrom(address _from, address _to, uint256 _value) public returns(bool success)
     {
 
         require(_value > 0 && _from != 0x0 &&
-                allowed[_from][msg.sender] >= _value && 
+                allowed[_from][msg.sender] >= _value &&
                 balances[_from] >= _value);
-                
+
 
         balances[_from] -= _value;
         allowed[_from][msg.sender] -= _value;
-        balances[_to] += _value;    
+        balances[_to] += _value;
         emit Transfer(_from, _to, _value);
 
         return true;
     }
 
-    
+
     // Allow someone transfer PHY tokens from your address
     // ____________________________________________________________________________________
-    function approve(address _spender, uint256 _value) public returns(bool success)  
+    function approve(address _spender, uint256 _value) public returns(bool success)
     {
 
         require(_spender != 0x0 && _spender != msg.sender);
@@ -154,4 +154,33 @@ contract Steganograph
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
     event TokenDeployed(uint256 _totalSupply);
 
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

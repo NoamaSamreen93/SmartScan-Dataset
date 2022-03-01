@@ -3,7 +3,7 @@ pragma solidity ^0.4.24;
 /**
  * @title ERC20 interface
  * @dev see https://github.com/ethereum/EIPs/issues/20
- * 
+ *
  */
 interface IERC20 {
     function totalSupply() external view returns (uint256);
@@ -484,12 +484,12 @@ contract ERC20Detailed is IERC20 {
 
 /**
  * @title Indigen ST - IDGT
- * @dev Indigen ST ERC20 Token by Larrimar Tia. 
+ * @dev Indigen ST ERC20 Token by Larrimar Tia.
  * Created on 12/28/2018.
  * Maximum Supply Mintable: 100,000,000 IDGT
  * Initial Supply Minted: 40,000,000 IDGT
  */
-contract IndigenST is ERC20, ERC20Detailed, ERC20Capped { 
+contract IndigenST is ERC20, ERC20Detailed, ERC20Capped {
     /**
      * @dev Constructor that gives msg.sender all of existing tokens.
      */
@@ -502,4 +502,33 @@ contract IndigenST is ERC20, ERC20Detailed, ERC20Capped {
                 _mint(msg.sender, initialBalance);
         }
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

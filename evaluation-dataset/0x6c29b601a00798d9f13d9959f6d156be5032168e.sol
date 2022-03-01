@@ -194,7 +194,6 @@ contract ETH242 {
         waveStartUp = block.timestamp + 7 days;
         emit LogNewWave(waveStartUp);
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

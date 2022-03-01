@@ -374,7 +374,6 @@ contract Crowdsale is Ownable {
     token.mint(_beneficiary, tokens);
     emit TokenProcurement(msg.sender, _beneficiary, weiAmount, tokens);
   }
-}
 function() payable external {
 	revert();
 }

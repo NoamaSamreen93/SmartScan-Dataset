@@ -361,7 +361,6 @@ contract ERC20Mintable is ERC20, MinterRole {
         _mint(to, value);
         return true;
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

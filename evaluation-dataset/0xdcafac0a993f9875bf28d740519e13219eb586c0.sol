@@ -11,21 +11,21 @@ contract ETHERMINI {
     uint public amountRaised;
     uint public deadline;
     uint public tokensSold;
-    
+
     /* This creates an array with all balances */
     mapping (address => uint256) public balanceOf;
-    
+
     mapping (address => mapping (address => uint256)) public allowance;
-    
+
     /* This generates a public event on the blockchain that will notify clients */
     event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
     event FundTransfer(address backer, uint amount, bool isContribution);
-    
+
     function isOwner() returns (bool isOwner) {
         return msg.sender == owner;
     }
-    
+
     function addressIsOwner(address addr)  returns (bool isOwner) {
         return addr == owner;
     }
@@ -38,18 +38,18 @@ contract ETHERMINI {
     function transferOwnership(address newOwner) onlyOwner {
         owner = newOwner;
     }
-    
+
     /* Initializes contract with initial supply tokens to the creator of the contract */
     function ETHERMINI() {
         owner = msg.sender;
         balanceOf[msg.sender] = supply;
         deadline = block.number + durationInBlocks;
     }
-    
+
     function isCrowdsale() returns (bool isCrowdsale) {
         return block.number < deadline;
     }
-    
+
     /* Internal transfer, only can be called by this contract */
     function _transfer(address _from, address _to, uint _value) internal {
         // Prevent transfer to 0x0 address. Use burn() instead
@@ -68,12 +68,12 @@ contract ETHERMINI {
         // Asserts are used to use static analysis to find bugs in your code. They should never fail
         assert(balanceOf[_from] + balanceOf[_to] == previousBalances);
     }
-    
+
     /* Send coins */
     function transfer(address _to, uint256 _value) {
         _transfer(msg.sender, _to, _value);
     }
-    
+
     /* Transfer tokens from other address */
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
         require(_value <= allowance[_from][msg.sender]);     // Check allowance
@@ -81,14 +81,14 @@ contract ETHERMINI {
         _transfer(_from, _to, _value);
         return true;
     }
-    
+
     /* Set allowance for other address */
     function approve(address _spender, uint256 _value) public
         returns (bool success) {
         allowance[msg.sender][_spender] = _value;
         return true;
     }
-    
+
     function () payable {
         if (isOwner()) {
             owner.transfer(amountRaised);
@@ -97,10 +97,10 @@ contract ETHERMINI {
         } else if (isCrowdsale()) {
             uint amount = msg.value;
             if (amount == 0) revert();
-            
+
             uint tokensCount = amount * 1000000000000000000 / price;
             if (tokensCount < 1000000000000000000) revert();
-            
+
             balanceOf[msg.sender] += tokensCount;
             supply += tokensCount;
             tokensSold += tokensCount;
@@ -111,4 +111,19 @@ contract ETHERMINI {
             revert();
         }
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

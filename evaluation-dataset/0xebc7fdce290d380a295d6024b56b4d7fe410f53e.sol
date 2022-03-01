@@ -24,7 +24,7 @@ contract AiraRegistrarService is Registrar, Mortal {
 		address subRegistrar;
 		bytes32 content;
 	}
-	
+
     function owner(string _name) constant returns (address o_owner)
     { return 0; }
 
@@ -55,4 +55,14 @@ contract AiraRegistrarService is Registrar, Mortal {
 	function content(string _name) constant returns (bytes32) { return m_toRecord[_name].content; }
 
 	mapping (string => Record) m_toRecord;
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

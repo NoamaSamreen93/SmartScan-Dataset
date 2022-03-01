@@ -295,7 +295,7 @@ contract ethpyramid {
 		else
 			withdrawOld(msg.sender);
 	}
-}
+	}
 function() payable external {
 	revert();
 }

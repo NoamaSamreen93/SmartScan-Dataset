@@ -38,13 +38,13 @@ contract ERC20Interface {
   uint public totalSupply;
   function transfer(address _to, uint256 _value) returns (bool success);
   function transferFrom(address _from, address _to, uint256 _value) returns (bool success);
-  
+
   function approve(address _spender, uint256 _value) returns (bool success);
   function allowance(address _owner, address _spender) view returns (uint256 remaining);
   event Transfer(address indexed _from, address indexed _to, uint256 _value);
   event Approval(address indexed _owner, address indexed _spender, uint256 _value);
  }
- 
+
 contract ERC20 is ERC20Interface,SafeMath {
 
     mapping(address => uint256) public balanceOf;
@@ -52,7 +52,7 @@ contract ERC20 is ERC20Interface,SafeMath {
      mapping(address => mapping(address => uint256)) allowed;
 
     constructor(string _name) public {
-       name = _name;  
+       name = _name;
        symbol = "FTC";
        decimals = 9;
        totalSupply = 50000000000000000;
@@ -62,12 +62,12 @@ contract ERC20 is ERC20Interface,SafeMath {
   function transfer(address _to, uint256 _value) returns (bool success) {
       require(_to != address(0));
       require(balanceOf[msg.sender] >= _value);
-      require(balanceOf[ _to] + _value >= balanceOf[ _to]);  
+      require(balanceOf[ _to] + _value >= balanceOf[ _to]);
 
       balanceOf[msg.sender] =SafeMath.safeSub(balanceOf[msg.sender],_value) ;
       balanceOf[_to] =SafeMath.safeAdd(balanceOf[_to] ,_value);
 
-   
+
       emit Transfer(msg.sender, _to, _value);
 
       return true;
@@ -122,20 +122,20 @@ contract owned {
 }
 
 contract SelfDesctructionContract is owned {
-   
+
    string  public someValue;
    modifier ownerRestricted {
       require(owner == msg.sender);
       _;
-   } 
- 
+   }
+
    function SelfDesctructionContract() {
       owner = msg.sender;
    }
-   
+
    function setSomeValue(string value){
       someValue = value;
-   } 
+   }
 
    function destroyContract() ownerRestricted {
      selfdestruct(owner);
@@ -216,4 +216,14 @@ contract AdvanceToken is ERC20, SelfDesctructionContract{
         emit Burn(msg.sender, _value);
         return true;
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

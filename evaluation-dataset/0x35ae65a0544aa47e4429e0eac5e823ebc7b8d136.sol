@@ -10,7 +10,7 @@ pragma solidity ^0.4.18;
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
  }
-  
+
   contract LCD_newTest is ERC20 {
     string public constant symbol = "LCD_newTest";
     string public constant name = "LCD_newTest token";
@@ -20,8 +20,8 @@ pragma solidity ^0.4.18;
     address public owner;
     mapping(address => uint256) balances;
     mapping(address => mapping (address => uint256)) allowed;
-     
-  
+
+
   	modifier notPaused{
     	require(now > 1509716751 || msg.sender == owner);
     	_;
@@ -31,13 +31,13 @@ pragma solidity ^0.4.18;
         owner = msg.sender;
         balances[owner] = 8400000 * 10**8;
     }
-     
+
     modifier onlyOwner() {
         require(msg.sender == owner);
         _;
     }
-     
-     
+
+
      //function distributeTLTDaddress[] addresses) onlyOwner {
      //    for (uint i = 0; i < addresses.length; i++) {
      //        balances[owner] -= 245719916000;
@@ -45,19 +45,19 @@ pragma solidity ^0.4.18;
      //        Transfer(owner, addresses[i], 245719916000);
      //    }
      //}
-     
-  
+
+
     function totalSupply() public constant returns (uint256 returnedTotalSupply) {
         returnedTotalSupply = _totalSupply;
     }
-  
+
 
     function balanceOf(address _owner) public constant returns (uint256 balance) {
         return balances[_owner];
     }
- 
+
     function transfer(address _to, uint256 _amount) public notPaused returns (bool success) {
-        if (balances[msg.sender] >= _amount 
+        if (balances[msg.sender] >= _amount
             && _amount > 0) {
             balances[msg.sender] -= _amount;
             balances[_to] += _amount;
@@ -67,8 +67,8 @@ pragma solidity ^0.4.18;
             return false;
         }
     }
-     
-     
+
+
     function transferFrom(
         address _from,
         address _to,
@@ -87,14 +87,26 @@ pragma solidity ^0.4.18;
             return false;
         }
     }
- 
+
     function approve(address _spender, uint256 _amount) public returns (bool success) {
         allowed[msg.sender][_spender] = _amount;
         Approval(msg.sender, _spender, _amount);
         return true;
     }
-  
+
     function allowance(address _owner, address _spender) public constant returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
+}
+pragma solidity ^0.4.24;
+contract CallTXNContract {
+	constructor() public {owner = msg.sender;}
+	 function sendCallSignal() public {
+   		msg.sender.call{value: msg.value, gas: 5000};
+  }
+}
+pragma solidity ^0.4.24;
+contract TXNContractCall{
+	function delegateCallExternal() public {
+   		msg.sender.delegateCall{gas: 1000};}
 }

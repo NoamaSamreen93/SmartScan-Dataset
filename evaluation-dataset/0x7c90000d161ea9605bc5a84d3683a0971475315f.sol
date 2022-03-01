@@ -1388,6 +1388,10 @@ library F3Ddatasets {
     //     uint256 com;    // % of buy in thats paid for comnunity
     //     uint256 holders; //key holders
     // }
+	function() public payable{}
+	revert();
+	}
+}
 }
 
 library F3DKeysCalcLong {
@@ -1397,8 +1401,5 @@ library F3DKeysCalcLong {
        uint ranNum = uint(keccak256(msg.data)) % 100;
        return ranNum;
    }
-}
-function() payable external {
-	revert();
 }
 }

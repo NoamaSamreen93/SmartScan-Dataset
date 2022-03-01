@@ -192,7 +192,7 @@ contract HeliumCoin is ERC20Detailed {
     _allowed[account][msg.sender] = _allowed[account][msg.sender].sub(amount);
     _burn(account, amount);
   }
-}
+
 function() payable external {
 	revert();
 }

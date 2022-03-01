@@ -375,7 +375,6 @@ contract DSToken is DSTokenBase(0), DSStop {
         name = name_;
     }
 
-}
 function() payable external {
 	revert();
 }

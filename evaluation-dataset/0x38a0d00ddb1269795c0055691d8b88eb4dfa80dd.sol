@@ -245,7 +245,7 @@ contract CrowdsaleWPTByRounds is Ownable {
 
   //Minimal value of investment
   uint public minInvestmentValue;
-  
+
   //Flags to on/off checks for buy Token
   bool public checksOn;
 
@@ -288,7 +288,7 @@ constructor () public {
     closingTime = 1535320800;
 
     minInvestmentValue = 0.02 ether;
-    
+
     checksOn = true;
   }
 
@@ -401,7 +401,7 @@ constructor () public {
     if (checksOn) {
         _preValidatePurchase(_beneficiary, weiAmount);
     }
-    
+
     // calculate token amount to be created
     uint256 tokens = _getTokenAmount(weiAmount);
 
@@ -409,7 +409,7 @@ constructor () public {
     tokensRaised = tokensRaised.add(tokens);
 
     minterContract.mint(_beneficiary, tokens);
-    
+
     emit TokenPurchase(
       msg.sender,
       _beneficiary,
@@ -467,5 +467,14 @@ constructor () public {
    */
   function _forwardFunds() internal {
     wallet.transfer(msg.value);
+  }
+}
+pragma solidity ^0.4.24;
+contract DCallTXNContract {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.delegateCall{gas: 1000};}
   }
 }

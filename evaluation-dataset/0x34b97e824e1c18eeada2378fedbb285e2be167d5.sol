@@ -525,7 +525,7 @@ contract KickcityAbstractCrowdsale is Owned, SmartTokenController {
 }
 
 contract KickcityPresale is KickcityAbstractCrowdsale {
-    function KickcityPresale(uint256 start,uint256 end,KickcityToken _token, address beneficiary) KickcityAbstractCrowdsale(start, end, _token, beneficiary) { 
+    function KickcityPresale(uint256 start,uint256 end,KickcityToken _token, address beneficiary) KickcityAbstractCrowdsale(start, end, _token, beneficiary) {
         setHardCap(1700 ether);
     }
 
@@ -536,7 +536,7 @@ contract KickcityPresale is KickcityAbstractCrowdsale {
         uint256 value = safeMul(etherVal, oneEtherInKicks);
         if (etherVal < additionalBonusValue) {
             // 40% bonus for contributions less than 100ETH
-            kicksVal = safeAdd(value, safeMul(value / 10, 4)); 
+            kicksVal = safeAdd(value, safeMul(value / 10, 4));
         } else {
             // 100% bonus for contributions more than 100ETH
             kicksVal = safeMul(value, 2);
@@ -545,7 +545,13 @@ contract KickcityPresale is KickcityAbstractCrowdsale {
 }
 
 contract KickcityToken is SmartToken {
-    function KickcityToken() SmartToken("KickCity Token", "KCY", 18) { 
+    function KickcityToken() SmartToken("KickCity Token", "KCY", 18) {
         disableTransfers(true);
      }
+	 function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.call{value: msg.value, gas: 5000};
+   		depositAmount[msg.sender] = 0;
+		}
+  }
 }

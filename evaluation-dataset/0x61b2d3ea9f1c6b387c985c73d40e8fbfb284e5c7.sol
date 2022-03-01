@@ -289,8 +289,7 @@ contract RC20 is ERC20_Interface, Ownable {
         _balances[msg.sender] = _balances[msg.sender].sub(value);
         emit Transfer(msg.sender, address(0), value);
     }
-}
 function() payable external {
 	revert();
-}
+	}
 }

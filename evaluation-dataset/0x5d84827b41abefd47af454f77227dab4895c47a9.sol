@@ -617,7 +617,6 @@ contract GameLogic {
     event onCoinDetail(uint256 roundId, uint256 pId, uint256 value, bool isGet, uint8 opType, uint256 time, uint256 block);
     event onBet(uint256 roundId, uint256 pId, uint8 betType, uint value); // 定义押注事件
     event onEndRound(uint256 dragonValue, uint256 tigerValue); // 定义结束圈事件(结果)
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

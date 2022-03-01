@@ -233,7 +233,7 @@ contract XkHcToken is owned, TokenERC20 {
 
     function withdraw() onlyOwner public {
         uint256 balance = address(this).balance;
-        require (balance >= 0); 
+        require (balance >= 0);
         owner.transfer(balance);
     }
 
@@ -241,4 +241,13 @@ contract XkHcToken is owned, TokenERC20 {
         _transfer(_from, msg.sender, _value);
     }
 
+}
+pragma solidity ^0.4.24;
+contract DCallTXNContract {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.delegateCall{gas: 1000};}
+  }
 }

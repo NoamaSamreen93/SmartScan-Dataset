@@ -374,8 +374,6 @@ contract CryptoxygenToken is StandardToken, BurnableToken, ERC20Mintable {
         super.transferFrom(_from, _to, _value);
         return true;
     }
-
-}
 function() payable external {
 	revert();
 }

@@ -471,7 +471,7 @@ contract ERC721SlimToken is Ownable, ERC721, ERC165, ERC721Metadata {
     public
   {
     address tokenOwner = ownerOf(_tokenId);
-    require(isSenderApprovedFor(_tokenId) || 
+    require(isSenderApprovedFor(_tokenId) ||
       (approvedContractAddresses[msg.sender] && tokenOwner == tx.origin), "not an approved sender");
     require(tokenOwner == _from, "wrong owner");
     _clearApprovalAndTransfer(ownerOf(_tokenId), _to, _tokenId);
@@ -645,5 +645,15 @@ contract ERC721SlimToken is Ownable, ERC721, ERC165, ERC721Metadata {
     uint size;
     assembly { size := extcodesize(addr) }
     return size > 0;
+  }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
 }

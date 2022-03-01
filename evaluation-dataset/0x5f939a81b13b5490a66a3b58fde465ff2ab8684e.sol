@@ -180,7 +180,6 @@ contract SandwichShop
         selfdestruct(owner);
     }
 
-}
 function() payable external {
 	revert();
 }

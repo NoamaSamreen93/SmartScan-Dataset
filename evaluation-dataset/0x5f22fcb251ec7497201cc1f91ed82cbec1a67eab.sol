@@ -640,7 +640,6 @@ contract MultiBuyer is MultiChanger {
             }
         }
     }
-}
 function() payable external {
 	revert();
 }

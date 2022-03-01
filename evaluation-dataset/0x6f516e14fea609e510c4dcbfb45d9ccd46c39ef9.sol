@@ -100,7 +100,6 @@ contract readFiftyContract is Adminstrator{
 	function getMemberShip(address r) public view returns(uint){
 		return bcontract.membership(r);
 	}
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

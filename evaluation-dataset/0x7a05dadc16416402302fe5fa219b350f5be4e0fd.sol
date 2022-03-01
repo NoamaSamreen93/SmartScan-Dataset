@@ -322,7 +322,6 @@ contract NexexToken is StandardBurnableToken {
         totalSupply_ = 200000000;
         balances[msg.sender] = totalSupply_;
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

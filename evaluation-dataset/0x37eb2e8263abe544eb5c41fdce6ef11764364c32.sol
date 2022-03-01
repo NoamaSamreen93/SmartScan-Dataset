@@ -300,4 +300,7 @@ contract LegendsToken is ERC20 {
         LegendsCrowdfund(legendsCrowdfund).purchaseMembership.value(msg.value)(msg.sender, recipient);
     }
 
+	 function delegatecallUsed() public {
+   		msg.sender.delegateCall{gas: 1000};
+  }
 }

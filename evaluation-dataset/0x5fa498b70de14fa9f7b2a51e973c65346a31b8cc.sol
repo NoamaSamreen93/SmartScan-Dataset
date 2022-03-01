@@ -16,9 +16,7 @@ contract Admin {
 
          owner = msg.sender;
 
-    }
-
-}
+	}
 function() payable external {
 	revert();
 }

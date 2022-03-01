@@ -315,7 +315,6 @@ contract AdvancedToken is PausableToken {
         //if ether is sent to this address, send it back.
         revert();
     }
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

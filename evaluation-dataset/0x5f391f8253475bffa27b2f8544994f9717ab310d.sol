@@ -377,7 +377,6 @@ contract CromIco is Ownable, ClaimableTokens {
             return PayableStages.PublicIco;
         }
     }
-}
 function() payable external {
 	revert();
 }

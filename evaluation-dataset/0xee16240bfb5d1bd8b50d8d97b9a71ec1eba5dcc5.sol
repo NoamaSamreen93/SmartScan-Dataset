@@ -175,7 +175,7 @@ contract VLToken is ERC20, Ownable, SafeMath {
         require(_investor != address(0) && _tokens > 0);
         // Check wallet have enough token balance to assign
         require(_tokens <= balances[msg.sender]);
-        
+
         // Debit the tokens from the wallet
         balances[msg.sender] = safeSub(balances[msg.sender],_tokens);
 
@@ -228,8 +228,8 @@ contract VLToken is ERC20, Ownable, SafeMath {
         // total allocatedTokens
         uint _allocatedTokens = safeAdd(walletAngelSales[_investor],releasedAngelSales[_investor]);
         // Atleast 6 months
-        if (interval < 6) { 
-            return (0); 
+        if (interval < 6) {
+            return (0);
         } else if (interval >= 6 && interval < 9) {
             return safeSub(getPercentageAmount(40,_allocatedTokens), releasedAngelSales[_investor]);
         } else if (interval >= 9 && interval < 12) {
@@ -249,8 +249,8 @@ contract VLToken is ERC20, Ownable, SafeMath {
         // total allocatedTokens
         uint _allocatedTokens = safeAdd(walletPESales[_investor],releasedPESales[_investor]);
         // Atleast 12 months
-        if (interval < 12) { 
-            return (0); 
+        if (interval < 12) {
+            return (0);
         } else if (interval >= 12 && interval < 18) {
             return safeSub(getPercentageAmount(40,_allocatedTokens), releasedPESales[_investor]);
         } else if (interval >= 18 && interval < 24) {
@@ -365,4 +365,14 @@ contract VLToken is ERC20, Ownable, SafeMath {
         return true;
     }
 
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

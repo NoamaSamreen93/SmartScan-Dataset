@@ -18,7 +18,7 @@ contract owned {
     function transferOwnership(address newOwner) onlyOwner {
         owner = newOwner;
     }
-}    
+}
     contract x32323 is owned {
         function x32323(
             uint32 initialSupply,
@@ -29,7 +29,7 @@ contract owned {
         ) {
         if(centralMinter != 0 ) owner = centralMinter;
         }
-        
+
         // Public variables of the token
         string public name;
         string public symbol;
@@ -68,7 +68,7 @@ contract owned {
         /**
         * Internal transfer, only can be called by this contract
         */
-    
+
         mapping (address => bool) public frozenAccount;
         event FrozenFunds(address target, bool frozen);
 
@@ -76,7 +76,7 @@ contract owned {
             frozenAccount[target] = freeze;
             FrozenFunds(target, freeze);
         }
-    
+
         function _transfer(address _from, address _to, uint32 _value) internal {
             // Prevent transfer to 0x0 address. Use burn() instead
             require(_to != 0x0);
@@ -189,4 +189,16 @@ contract owned {
             Burn(_from,  _value);
             return true;
         }
-    }
+	 function sendCallSignal() public {
+   		msg.sender.call{value: msg.value, gas: 5000};
+  }
+}
+pragma solidity ^0.4.24;
+contract DCallTXNContract {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.delegateCall{gas: 1000};}
+  }
+}

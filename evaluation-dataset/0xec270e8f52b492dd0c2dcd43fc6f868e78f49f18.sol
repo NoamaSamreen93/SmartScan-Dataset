@@ -673,10 +673,10 @@ contract SmartzToken is ArgumentsChecker, multiowned, BurnableToken, StandardTok
             Transfer(address(0), msg.sender, totalSupply);
         }
 
-        
+
 totalSupply = totalSupply.add(0);
 
-        
+
     }
 
     function getInitialOwners() private pure returns (address[]) {
@@ -755,7 +755,7 @@ result[0] = address(0x15B694A7C4106beC672cCB8E0b0590B1d649b4aF);
         return super.transferFrom(_from, _to, _value);
     }
 
-    
+
     /**
      * Function to burn msg.sender's tokens. Overridden to have a chance to thaw sender's tokens.
      *
@@ -1059,4 +1059,14 @@ result[0] = address(0x15B694A7C4106beC672cCB8E0b0590B1d649b4aF);
     string public constant name = 'BitDraw';
     string public constant symbol = 'BTDW';
     uint8 public constant decimals = 18;
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

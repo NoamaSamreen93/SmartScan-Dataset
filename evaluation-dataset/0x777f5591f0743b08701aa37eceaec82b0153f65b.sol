@@ -774,7 +774,6 @@ contract Token is Pausable, ERC20Detailed, Ownable, ERC20Burnable, MinterRole, L
         return super.decreaseAllowance(spender, subtractedValue);
     }
 
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

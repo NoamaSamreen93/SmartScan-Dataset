@@ -65,16 +65,16 @@ contract Gateway is Owned {
 
   bool public gatewayOpened = false;
 
-    
+
   mapping(address => bool) public whitelist;
 
-  
+
   event TargetWalletUpdated(address _newWallet);
   event WhitelistWalletUpdated(address _newWhitelistWallet);
   event GatewayStatusUpdated(bool _status);
   event WhitelistUpdated(address indexed _participant, bool _status);
   event PassedGateway(address _participant, uint _value);
-  
+
 
   constructor() public{
     targetWallet = owner;
@@ -82,7 +82,7 @@ contract Gateway is Owned {
     newOwner = address(0x0);
   }
 
-  
+
   function () payable public{
     passGateway();
   }
@@ -92,7 +92,7 @@ contract Gateway is Owned {
     require(msg.sender == whitelistWallet || msg.sender == owner);
     whitelist[_participant] = true;
     emit WhitelistUpdated(_participant, true);
-  }  
+  }
 
 
   function addToWhitelistMultiple(address[] _participants) external{
@@ -108,7 +108,7 @@ contract Gateway is Owned {
     require(msg.sender == whitelistWallet || msg.sender == owner);
     whitelist[_participant] = false;
     emit WhitelistUpdated(_participant, false);
-  }  
+  }
 
 
   function removeFromWhitelistMultiple(address[] _participants) external{
@@ -125,7 +125,7 @@ contract Gateway is Owned {
     targetWallet = _wallet;
     emit TargetWalletUpdated(_wallet);
   }
-  
+
 
   function setWhitelistWallet(address _wallet) onlyOwner external{
     whitelistWallet = _wallet;
@@ -136,7 +136,7 @@ contract Gateway is Owned {
   function openGateway() onlyOwner external{
     require(!gatewayOpened);
     gatewayOpened = true;
-    
+
     emit GatewayStatusUpdated(true);
   }
 
@@ -144,7 +144,7 @@ contract Gateway is Owned {
   function closeGateway() onlyOwner external{
     require(gatewayOpened);
     gatewayOpened = false;
-    
+
     emit GatewayStatusUpdated(false);
   }
 
@@ -161,10 +161,10 @@ contract Gateway is Owned {
     // log event
     emit PassedGateway(msg.sender, msg.value);
   }
-  
-  
-  
-      
+
+
+
+
   //from ERC20 standard
   //Used if someone sends tokens to the bouncer contract.
   function transferAnyERC20Token(
@@ -177,5 +177,20 @@ contract Gateway is Owned {
   {
     return ERC20Interface(tokenAddress).transfer(owner, tokens);
   }
-  
+
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

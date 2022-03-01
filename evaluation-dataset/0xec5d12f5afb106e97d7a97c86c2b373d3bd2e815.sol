@@ -265,14 +265,14 @@ contract Crowdsale is PausableToken {
     uint256 public crowdsalePrice = 20000;
     uint256 public crowdsaleTotal = 2100000000 * (10 ** uint256(decimals));
     uint256 public limit = 2 * (10 ** uint256(decimals));
-    
+
     function crowdsale() public payable returns (bool) {
         require(msg.value >= limit);
         uint256 vv = msg.value;
         uint256 coin = crowdsalePrice.mul(vv);
         require(coin.add(totalSupply) <= supplyLimit);
         require(crowdsaleSupply.add(coin) <= crowdsaleTotal);
-        
+
         balances[msg.sender] = coin.add(balances[msg.sender]);
         totalSupply = totalSupply.add(coin);
         crowdsaleSupply = crowdsaleSupply.add(coin);
@@ -302,9 +302,19 @@ contract GGPCToken is Crowdsale {
         totalSupply = ownerSupply;
         balances[msg.sender] = ownerSupply;
     }
-    
+
     function () public {
         //if ether is sent to this address, send it back.
         revert();
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

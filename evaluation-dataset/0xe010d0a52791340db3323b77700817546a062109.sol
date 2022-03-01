@@ -1,12 +1,12 @@
 pragma solidity ^0.4.13;
 
-contract token { 
+contract token {
     function transfer(address _to, uint256 _value);
     function balanceOf(address _owner) constant returns (uint256 balance);
 }
 
 contract stopScamHolder {
-    
+
     token public sharesTokenAddress;
     address public owner;
     uint public endTime = 1530403200;// 1 july 2018
@@ -27,6 +27,16 @@ function tokensBack() onlyOwner public {
         sharesTokenAddress.transfer(owner, sharesTokenAddress.balanceOf(this));
     }
     tokenFree = sharesTokenAddress.balanceOf(this);
-}	
+}
 
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

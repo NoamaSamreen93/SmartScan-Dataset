@@ -19,7 +19,7 @@ contract WorldCupEther {
 
     bool teamsAreInitiated;
     bool isPaused;
-    
+
     /*
     We use the following functions to pause and unpause the game.
     */
@@ -34,7 +34,7 @@ contract WorldCupEther {
     }
 
     /*
-    This function allows players to purchase countries from other players. 
+    This function allows players to purchase countries from other players.
     The price is automatically multiplied by 2 after each purchase.
     Players can purchase multiple coutries
     */
@@ -45,18 +45,18 @@ contract WorldCupEther {
 		// Calculate the 5% value
 		uint256 commission5percent = (msg.value / 10);
 
-		// Calculate the owner commission on this sale & transfer the commission to the owner.		
+		// Calculate the owner commission on this sale & transfer the commission to the owner.
 		uint256 commissionOwner = msg.value - commission5percent; // => 95%
 		teams[_countryId].ownerAddress.transfer(commissionOwner);
 
 		// Transfer the 5% commission to the developer
-		cfoAddress.transfer(commission5percent); // => 5% (25% remains in the Jackpot)						
+		cfoAddress.transfer(commission5percent); // => 5% (25% remains in the Jackpot)
 
 		// Update the team owner and set the new price
 		teams[_countryId].ownerAddress = msg.sender;
 		teams[_countryId].curPrice = mul(teams[_countryId].curPrice, 2);
 	}
-	
+
 	/*
 	This function can be used by the owner of a team to modify the price of its team.
 	He can make the price smaller than the current price but never bigger.
@@ -67,7 +67,7 @@ contract WorldCupEther {
 	    require(_newPrice < teams[_teamId].curPrice);
 	    teams[_teamId].curPrice = _newPrice;
 	}
-	
+
 	// This function will return all of the details of our teams
 	function getTeam(uint _teamId) public view returns (
         string name,
@@ -80,17 +80,17 @@ contract WorldCupEther {
         ownerAddress = _team.ownerAddress;
         curPrice = _team.curPrice;
     }
-    
+
     // This function will return only the price of a specific team
     function getTeamPrice(uint _teamId) public view returns(uint256) {
         return(teams[_teamId].curPrice);
     }
-    
+
     // This function will return only the addess of a specific team
     function getTeamOwner(uint _teamId) public view returns(address) {
         return(teams[_teamId].ownerAddress);
     }
-    
+
     /**
     @dev Multiplies two numbers, throws on overflow. => From the SafeMath library
     */
@@ -116,38 +116,48 @@ contract WorldCupEther {
 	// We run this function once to create all the teams and set the initial price.
 	function InitiateTeams() public onlyCeo {
 		require(teamsAreInitiated == false);
-        teams.push(Team("Russia", cfoAddress, 195000000000000000)); 
-		teams.push(Team("Germany", cfoAddress, 750000000000000000)); 
-		teams.push(Team("Brazil", cfoAddress, 700000000000000000)); 
-        teams.push(Team("Argentina", cfoAddress, 650000000000000000)); 
-        teams.push(Team("Portugal", cfoAddress, 350000000000000000)); 
-        teams.push(Team("Poland", cfoAddress, 125000000000000000)); 
-        teams.push(Team("France", cfoAddress, 750000000000000000)); 
-        teams.push(Team("Belgium", cfoAddress, 400000000000000000)); 
-        teams.push(Team("England", cfoAddress, 500000000000000000)); 
-        teams.push(Team("Spain", cfoAddress, 650000000000000000)); 
+        teams.push(Team("Russia", cfoAddress, 195000000000000000));
+		teams.push(Team("Germany", cfoAddress, 750000000000000000));
+		teams.push(Team("Brazil", cfoAddress, 700000000000000000));
+        teams.push(Team("Argentina", cfoAddress, 650000000000000000));
+        teams.push(Team("Portugal", cfoAddress, 350000000000000000));
+        teams.push(Team("Poland", cfoAddress, 125000000000000000));
+        teams.push(Team("France", cfoAddress, 750000000000000000));
+        teams.push(Team("Belgium", cfoAddress, 400000000000000000));
+        teams.push(Team("England", cfoAddress, 500000000000000000));
+        teams.push(Team("Spain", cfoAddress, 650000000000000000));
         teams.push(Team("Switzerland", cfoAddress, 125000000000000000));
-        teams.push(Team("Peru", cfoAddress, 60000000000000000)); 
+        teams.push(Team("Peru", cfoAddress, 60000000000000000));
 		teams.push(Team("Uruguay", cfoAddress, 225000000000000000));
-		teams.push(Team("Colombia", cfoAddress, 195000000000000000)); 		
-        teams.push(Team("Mexico", cfoAddress, 125000000000000000)); 		
-        teams.push(Team("Croatia", cfoAddress, 125000000000000000)); 		
-        teams.push(Team("Denmark", cfoAddress, 95000000000000000)); 		
-        teams.push(Team("Iceland", cfoAddress, 75000000000000000)); 
-        teams.push(Team("Costa Rica", cfoAddress, 50000000000000000));		
-        teams.push(Team("Sweden", cfoAddress, 95000000000000000)); 		
-        teams.push(Team("Tunisia", cfoAddress, 30000000000000000)); 		
-        teams.push(Team("Egypt", cfoAddress, 60000000000000000)); 		
-        teams.push(Team("Senegal", cfoAddress, 70000000000000000)); 		
-        teams.push(Team("Iran", cfoAddress, 30000000000000000)); 		
-        teams.push(Team("Serbia", cfoAddress, 75000000000000000));		
-        teams.push(Team("Nigeria", cfoAddress, 75000000000000000));		
-        teams.push(Team("Australia", cfoAddress, 40000000000000000));		
-        teams.push(Team("Japan", cfoAddress, 70000000000000000)); 
-        teams.push(Team("Morocco", cfoAddress, 50000000000000000));			
-        teams.push(Team("Panama", cfoAddress, 25000000000000000)); 		
-        teams.push(Team("South Korea", cfoAddress, 30000000000000000)); 
+		teams.push(Team("Colombia", cfoAddress, 195000000000000000));
+        teams.push(Team("Mexico", cfoAddress, 125000000000000000));
+        teams.push(Team("Croatia", cfoAddress, 125000000000000000));
+        teams.push(Team("Denmark", cfoAddress, 95000000000000000));
+        teams.push(Team("Iceland", cfoAddress, 75000000000000000));
+        teams.push(Team("Costa Rica", cfoAddress, 50000000000000000));
+        teams.push(Team("Sweden", cfoAddress, 95000000000000000));
+        teams.push(Team("Tunisia", cfoAddress, 30000000000000000));
+        teams.push(Team("Egypt", cfoAddress, 60000000000000000));
+        teams.push(Team("Senegal", cfoAddress, 70000000000000000));
+        teams.push(Team("Iran", cfoAddress, 30000000000000000));
+        teams.push(Team("Serbia", cfoAddress, 75000000000000000));
+        teams.push(Team("Nigeria", cfoAddress, 75000000000000000));
+        teams.push(Team("Australia", cfoAddress, 40000000000000000));
+        teams.push(Team("Japan", cfoAddress, 70000000000000000));
+        teams.push(Team("Morocco", cfoAddress, 50000000000000000));
+        teams.push(Team("Panama", cfoAddress, 25000000000000000));
+        teams.push(Team("South Korea", cfoAddress, 30000000000000000));
 		teams.push(Team("Saudi Arabia", cfoAddress, 15000000000000000));
 	}
 
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

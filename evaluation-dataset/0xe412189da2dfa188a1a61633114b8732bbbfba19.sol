@@ -3,7 +3,7 @@ pragma solidity ^0.4.11;
  /* Receiver must implement this function to receive tokens
  *  otherwise token transaction will fail
  */
- 
+
  contract ContractReceiver {
     function tokenFallback(address _from, uint256 _value, bytes _data){
       _from = _from;
@@ -12,7 +12,7 @@ pragma solidity ^0.4.11;
       // Incoming transaction code here
     }
 }
- 
+
  /* New ERC23 contract interface */
 
 contract ERC23 {
@@ -40,7 +40,7 @@ contract ERC23 {
  *
  * https://github.com/Dexaran/ERC23-tokens
  */
- 
+
 contract ERC23Token is ERC23 {
 
   mapping(address => uint256) balances;
@@ -70,7 +70,7 @@ contract ERC23Token is ERC23 {
 
   //function that is called when a user or another contract wants to transfer funds
   function transfer(address _to, uint256 _value, bytes _data) returns (bool success) {
-  
+
     //filtering if the target is a contract with bytecode inside it
     if(isContract(_to)) {
         transferToContract(_to, _value, _data);
@@ -80,9 +80,9 @@ contract ERC23Token is ERC23 {
     }
     return true;
   }
-  
+
   function transfer(address _to, uint256 _value) returns (bool success) {
-      
+
     //standard function transfer similar to ERC20 transfer with no _data
     //added due to backwards compatibility reasons
     bytes memory empty;
@@ -103,7 +103,7 @@ contract ERC23Token is ERC23 {
     Transfer(msg.sender, _to, _value, _data);
     return true;
   }
-  
+
   //function that is called when transaction target is a contract
   function transferToContract(address _to, uint256 _value, bytes _data) private returns (bool success) {
     balances[msg.sender] -= _value;
@@ -114,7 +114,7 @@ contract ERC23Token is ERC23 {
     Transfer(msg.sender, _to, _value, _data);
     return true;
   }
-  
+
   //assemble the given address bytecode. If bytecode exists then the _addr is a contract.
   function isContract(address _addr) private returns (bool is_contract) {
       _addr = _addr;
@@ -133,7 +133,7 @@ contract ERC23Token is ERC23 {
 
   function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
     var _allowance = allowed[_from][msg.sender];
-    
+
     if(_value > _allowance) {
         throw;
     }
@@ -226,4 +226,33 @@ contract DASToken is ERC23Token {
         }
         return ERC23Token.transferFrom(_from, _to, _value);
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

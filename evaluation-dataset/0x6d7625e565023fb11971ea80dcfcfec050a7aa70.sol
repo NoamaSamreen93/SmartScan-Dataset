@@ -119,7 +119,6 @@ contract CANtoSOLVEmigration is Graceful, Owned {
     function withdrawAllTokensFromContract(Asset _contract) public onlyContractOwner() returns(bool) {
         return _contract.transfer(msg.sender, _contract.balanceOf(address(this)));
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

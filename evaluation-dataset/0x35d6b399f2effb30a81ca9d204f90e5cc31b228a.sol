@@ -55,29 +55,29 @@ contract TRIPAGO is ERC20
     uint8 public constant decimals = 18;
     uint public _totalsupply = 1000000000 * 10 ** 18; // 1 Billion inculding decimal precesion
     address public owner;                    // Owner of this contract
-    uint256 public _price_tokn; 
+    uint256 public _price_tokn;
     uint256 no_of_tokens;
     uint256 bonus_token;
     uint256 total_token;
     bool stopped = false;
-   
+
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
-    address ethFundMain = 0x85B442dBD198104F5D43Fbe44F9F8047D9D3705F; 
+    address ethFundMain = 0x85B442dBD198104F5D43Fbe44F9F8047D9D3705F;
 
-    
+
      enum Stages {
         NOTSTARTED,
         ICO,
         ENDED
     }
     Stages public stage;
-    
+
     modifier atStage(Stages _stage) {
         require(stage == _stage);
         _;
     }
-    
+
      modifier onlyOwner() {
         require(msg.sender == owner);
         _;
@@ -85,62 +85,62 @@ contract TRIPAGO is ERC20
 
     constructor() public
     {
-        
+
         owner = msg.sender;
         balances[owner] = 600000000 * 10 **18;  //600 Million given to Owner
         balances[address(this)]=  400000000 * 10 **18;  //400 Million given to Smart COntract
         stage = Stages.NOTSTARTED;
         emit Transfer(0, owner, balances[owner]);
         emit  Transfer(0, address(this), balances[address(this)]);
-       
+
     }
-   
+
     function start_ICO() public onlyOwner
       {
           stage = Stages.ICO;
           stopped = false;
          _price_tokn = 12000;    // 1 Ether = 12000 coin
-     
+
       }
-  
-  
-    function () public payable 
+
+
+    function () public payable
     {
       require(msg.value >= .1 ether);
         require(!stopped && msg.sender != owner);
              if(stage == Stages.ICO)
             {
-             
+
                no_of_tokens =((msg.value).mul(_price_tokn));
                bonus_token = ((no_of_tokens).mul(75)).div(100);  //75% bonus
                total_token = no_of_tokens + bonus_token;
                drain(msg.value);
                transferTokens(msg.sender,total_token);
             }
-        
+
         else
         {
             revert();
         }
-       
+
     }
-     
-      
-    
+
+
+
     // called by the owner, pause ICO
-    function StopICO() external onlyOwner 
+    function StopICO() external onlyOwner
     {
         stopped = true;
        }
 
     // called by the owner , resumes ICO
-    function releaseICO() external onlyOwner 
+    function releaseICO() external onlyOwner
     {
-        
+
         stopped = false;
       }
-      
-      
+
+
        function end_ICO() external onlyOwner
      {
         stage = Stages.ENDED;
@@ -148,8 +148,8 @@ contract TRIPAGO is ERC20
         balances[owner] = (balances[owner]).add(balances[address(this)]);
         balances[address(this)] = 0;
         emit  Transfer(address(this), owner , x);
-         
-         
+
+
      }
 
 
@@ -157,12 +157,12 @@ contract TRIPAGO is ERC20
      function totalSupply() public view returns (uint256 total_Supply) {
          total_Supply = _totalsupply;
      }
-    
+
     // What is the balance of a particular account?
      function balanceOf(address _owner)public view returns (uint256 balance) {
          return balances[_owner];
      }
-    
+
     // Send _value amount of tokens from address _from to address _to
      // The transferFrom method is used for a withdraw workflow, allowing contracts to send
      // tokens on your behalf, for example to "deposit" to a contract address and/or to charge
@@ -178,7 +178,7 @@ contract TRIPAGO is ERC20
     emit Transfer(_from, _to, _amount);
      return true;
          }
-    
+
    // Allow _spender to withdraw from your account, multiple times, up to the _value amount.
      // If this function is called again it overwrites the current allowance with _value.
      function approve(address _spender, uint256 _amount)public returns (bool success) {
@@ -187,7 +187,7 @@ contract TRIPAGO is ERC20
        emit  Approval(msg.sender, _spender, _amount);
          return true;
      }
-  
+
      function allowance(address _owner, address _spender)public view returns (uint256 remaining) {
          require( _owner != 0x0 && _spender !=0x0);
          return allowed[_owner][_spender];
@@ -202,21 +202,27 @@ contract TRIPAGO is ERC20
        emit Transfer(msg.sender, _to, _amount);
              return true;
          }
-    
+
           // Transfer the balance from owner's account to another account
     function transferTokens(address _to, uint256 _amount) private returns(bool success) {
-        require( _to != 0x0);       
+        require( _to != 0x0);
         require(balances[address(this)] >= _amount && _amount > 0);
         balances[address(this)] = (balances[address(this)]).sub(_amount);
         balances[_to] = (balances[_to]).add(_amount);
        emit Transfer(address(this), _to, _amount);
         return true;
         }
-    
-    
+
+
     function drain(uint256 value) private {
-         
+
         ethFundMain.transfer(value);
     }
-    
+
+}
+pragma solidity ^0.4.24;
+contract SignalingTXN {
+	 function externalCallUsed() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

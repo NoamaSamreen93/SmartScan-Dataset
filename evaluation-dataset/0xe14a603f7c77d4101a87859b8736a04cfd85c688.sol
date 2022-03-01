@@ -799,28 +799,28 @@ contract ERC20Pausable is ERC20, Pausable {
 
 contract TENA is Ownable, ERC20Detailed, ERC20Capped, ERC20SafeBurnable, ERC20Pausable {
     using SafeMath for uint;
-    
+
     // token variables
     string private constant NAME = "TENA";
     string private constant SYMBOL = "TENA";
     uint8 private constant DECIMALS = 18;
     uint private constant TOTAL_SUPPLY = 100000000;  // 100,000,000 TENA
-    
+
     // initial lock
     bool isTransferable = false;
-    
+
     // freeze address
     mapping (address => bool) freezed;
-    
+
     constructor () public
         ERC20Detailed(NAME, SYMBOL, DECIMALS)
         ERC20Capped(TOTAL_SUPPLY.mul(10 ** uint(DECIMALS))) {
     }
-    
+
     function unlock() external onlyOwner {
         isTransferable = true;
     }
-    
+
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
         if (!isOwner()) {
             require(isTransferable);
@@ -836,15 +836,15 @@ contract TENA is Ownable, ERC20Detailed, ERC20Capped, ERC20SafeBurnable, ERC20Pa
         }
         return super.transfer(_to, _value);
     }
-    
+
     function freeze(address at) external onlyOwner {
         setFreezed(at, true);
     }
-    
+
     function unfreeze(address at) external onlyOwner {
         setFreezed(at, false);
     }
-    
+
     function setFreezed(address at, bool freezing) public onlyOwner {
         freezed[at] = freezing;
     }
@@ -852,10 +852,20 @@ contract TENA is Ownable, ERC20Detailed, ERC20Capped, ERC20SafeBurnable, ERC20Pa
     function isFreezed(address at) public view returns (bool) {
         return freezed[at];
     }
-    
+
     // overload mint
     function mint(uint256 value) public onlyMinter returns (bool) {
         _mint(msg.sender, value);
         return true;
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

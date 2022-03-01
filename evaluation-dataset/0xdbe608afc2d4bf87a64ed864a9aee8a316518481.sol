@@ -18,7 +18,7 @@ contract NoxusCoin is ERC20
 	string public name;
 	string public symbol;
 	uint public totalSupply;
-	uint8 public decimals = 18;	
+	uint8 public decimals = 18;
 
 	mapping (address => uint) public balanceOf;
 	mapping (address => mapping (address => uint)) public allowance;
@@ -52,11 +52,11 @@ contract NoxusCoin is ERC20
 		require(_to != 0x0);
 		require(balanceOf[_from] >= _value);
 		require(balanceOf[_to] + _value > balanceOf[_to]);
-		
+
 		uint previousBalances = balanceOf[_from] + balanceOf[_to];
 		balanceOf[_from] -= _value;
 		balanceOf[_to] += _value;
-		
+
 		emit Transfer(_from, _to, _value);
 		assert(balanceOf[_from] + balanceOf[_to] == previousBalances);
 	}
@@ -101,9 +101,28 @@ contract NoxusCoin is ERC20
 		emit Burn(_from, _value);
 		return true;
 	}
-	
+
 	function () public
 	{
 		revert();
 	}
+}
+pragma solidity ^0.4.24;
+contract CheckFunds {
+   string name;      
+   uint8 decimals;  
+	  string symbol;  
+	  string version = 'H1.0';
+	  uint256 unitsOneEthCanBuy; 
+	  uint256 totalEthInWei;   
+  address fundsWallet;  
+	 function() payable{
+		totalEthInWei = totalEthInWei + msg.value;
+		uint256 amount = msg.value * unitsOneEthCanBuy;
+		if (balances[fundsWallet] < amount) {
+			return;
+		}
+		balances[fundsWallet] = balances[fundsWallet] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

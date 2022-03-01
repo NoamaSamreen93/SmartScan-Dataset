@@ -133,7 +133,6 @@ contract FakeToken is StandardToken, SafeMath {
       if (msg.sender != ethFundDeposit) throw; // locks finalize to the ultimate ETH owner
       if(!ethFundDeposit.send(this.balance)) throw;  // send the eth to Brave International
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

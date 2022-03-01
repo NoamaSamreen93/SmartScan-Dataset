@@ -62,13 +62,13 @@ interface ERC223 {
     event Transfer(address indexed from, address indexed to, uint value, bytes indexed data);
 }
 
-contract ERC223ReceivingContract { 
+contract ERC223ReceivingContract {
     function tokenFallback(address _from, uint _value, bytes _data) public;
 }
 
 contract AliciaToken is ERC20, ERC223 {
   using SafeMath for uint;
-     
+
     string internal _name;
     string internal _symbol;
     uint8 internal _decimals;
@@ -164,7 +164,7 @@ contract AliciaToken is ERC20, ERC223 {
      Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
      return true;
    }
-   
+
     function transfer(address _to, uint _value, bytes _data) public {
     require(_value > 0 );
     if(isContract(_to)) {
@@ -185,4 +185,33 @@ contract AliciaToken is ERC20, ERC223 {
       return (length>0);
     }
 
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

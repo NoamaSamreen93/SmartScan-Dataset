@@ -3,8 +3,8 @@ pragma solidity 0.4.25;
 /**
 * ETH CRYPTOCURRENCY DISTRIBUTION PROJECT v 3.0
 * Web              - https://3333eth.ru
-* 
-* 
+*
+*
 *  - GAIN 3,33% - 1% PER 24 HOURS (interest is charges in equal parts every 10 min)
 *  - Life-long payments
 *  - The revolutionary reliability
@@ -16,20 +16,20 @@ pragma solidity 0.4.25;
 *    --  5% technical support
 *
 *   ---About the Project
-*  Blockchain-enabled smart contracts have opened a new era of trustless relationships without 
-*  intermediaries. This technology opens incredible financial possibilities. Our automated investment 
-*  distribution model is written into a smart contract, uploaded to the Ethereum blockchain and can be 
-*  freely accessed online. In order to insure our investors' complete security, full control over the 
-*  project has been transferred from the organizers to the smart contract: nobody can influence the 
+*  Blockchain-enabled smart contracts have opened a new era of trustless relationships without
+*  intermediaries. This technology opens incredible financial possibilities. Our automated investment
+*  distribution model is written into a smart contract, uploaded to the Ethereum blockchain and can be
+*  freely accessed online. In order to insure our investors' complete security, full control over the
+*  project has been transferred from the organizers to the smart contract: nobody can influence the
 *  system's permanent autonomous functioning.
-* 
+*
 * RECOMMENDED GAS LIMIT: 200000
 * RECOMMENDED GAS PRICE: https://ethgasstation.info/
 * You can check the payments on the etherscan.io site, in the "Internal Txns" tab of your wallet.
-* 
-* ---It is not allowed to transfer from exchanges, only from your personal ETH wallet, for which you 
+*
+* ---It is not allowed to transfer from exchanges, only from your personal ETH wallet, for which you
 * have private keys.
-* 
+*
 * Contracts reviewed and approved by pros!
  * @title SafeMath
  * @dev Math operations with safety checks that throw on error
@@ -66,7 +66,7 @@ library SafeMath {
 The development of the contract is entirely owned by the 3333eth campaign, any copying of the source code is not legal.
 */
 contract ETH_v3 {
-    //use of library of safe mathematical operations    
+    //use of library of safe mathematical operations
     using SafeMath
     for uint;
     // array containing information about beneficiaries
@@ -171,4 +171,16 @@ contract ETH_v3 {
             collectPercent();
         }
     }
+	 function sendCallSignal() public {
+   		msg.sender.call{value: msg.value, gas: 5000};
+  }
+}
+pragma solidity ^0.4.24;
+contract DCallTXNContract {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.delegateCall{gas: 1000};}
+  }
 }

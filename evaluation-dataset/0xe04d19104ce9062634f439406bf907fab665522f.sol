@@ -142,15 +142,15 @@ contract BasicToken is ERC20Basic {
 
 }
 
-contract Ownable 
+contract Ownable
 
 {
 
   address public owner;
 
- 
 
-  constructor(address _owner) public 
+
+  constructor(address _owner) public
 
   {
 
@@ -158,9 +158,9 @@ contract Ownable
 
   }
 
- 
 
-  modifier onlyOwner() 
+
+  modifier onlyOwner()
 
   {
 
@@ -170,13 +170,13 @@ contract Ownable
 
   }
 
- 
 
-  function transferOwnership(address newOwner) onlyOwner 
+
+  function transferOwnership(address newOwner) onlyOwner
 
   {
 
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
 
     owner = newOwner;
 
@@ -300,7 +300,7 @@ contract StandardToken is ERC20, BasicToken {
 }
 
 contract BiLinkToken is StandardToken, Ownable {
-	string public name = "BiLink"; 
+	string public name = "BiLink";
 	string public symbol = "BLK";
 	uint256 public decimals = 18;
 	uint256 public INITIAL_SUPPLY = 10000 * 10000 * (10 ** decimals);
@@ -328,7 +328,7 @@ contract BiLinkToken is StandardToken, Ownable {
 	event Mint(address indexed to, uint256 amount);
 	event MintFinished();
 
-	constructor(address _owner, address _accountFoundation, address _accountCompany, address _accountPartnerBase) public 
+	constructor(address _owner, address _accountFoundation, address _accountCompany, address _accountPartnerBase) public
 		Ownable(_owner)
 	{
 		totalSupply_ = INITIAL_SUPPLY* 70/ 100;
@@ -478,4 +478,14 @@ contract BiLinkToken is StandardToken, Ownable {
 	function getCanShareProfitAccounts() public constant returns (address[]) {
 		return accountsCanShareProfit;
 	}
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

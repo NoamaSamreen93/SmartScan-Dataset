@@ -11,29 +11,29 @@ pragma solidity ^0.4.11;
 // LICENSE
 //
 // This file is part of BattleDrome.
-// 
+//
 // BattleDrome is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // BattleDrome is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with BattleDrome.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------------------------------
 
 contract ERC20Standard {
 	uint public totalSupply;
-	
+
 	string public name;
 	uint8 public decimals;
 	string public symbol;
 	string public version;
-	
+
 	mapping (address => uint256) balances;
 	mapping (address => mapping (address => uint)) allowed;
 
@@ -41,7 +41,7 @@ contract ERC20Standard {
 	modifier onlyPayloadSize(uint size) {
 		assert(msg.data.length == size + 4);
 		_;
-	} 
+	}
 
 	function balanceOf(address _owner) constant returns (uint balance) {
 		return balances[_owner];
@@ -51,7 +51,7 @@ contract ERC20Standard {
 		require(balances[msg.sender] >= _value && _value > 0);
 	    balances[msg.sender] -= _value;
 	    balances[_recipient] += _value;
-	    Transfer(msg.sender, _recipient, _value);        
+	    Transfer(msg.sender, _recipient, _value);
     }
 
 	function transferFrom(address _from, address _to, uint _value) {
@@ -77,7 +77,7 @@ contract ERC20Standard {
 		address indexed _to,
 		uint _value
 		);
-		
+
 	//Event which is triggered whenever an owner approves a new allowance for a spender.
 	event Approval(
 		address indexed _owner,
@@ -98,4 +98,19 @@ contract NewToken is ERC20Standard {
 		version = "1.0";
 		balances[msg.sender] = totalSupply;
 	}
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

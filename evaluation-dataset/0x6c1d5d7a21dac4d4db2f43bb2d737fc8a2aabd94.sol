@@ -170,7 +170,6 @@ contract NTToken is StandardToken {
 	emit Transfer(address(0),0xBd21453fC62b730DDeBa9Fe22FbE7CfFcEDebeBd, totalSupply );
   }
 
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

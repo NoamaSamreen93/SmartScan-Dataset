@@ -52,23 +52,23 @@ contract StandardToken is Token {
     uint256 public totalSupply;
 }
 
-contract DapToken is StandardToken { 
-    string public name;                   
-    uint8 public decimals;                
-    string public symbol;                 
-    string public version = 'H1.0'; 
-    uint256 public unitsOneEthCanBuy;     
-    uint256 public totalEthInWei;         
-    address public fundsWallet;           
+contract DapToken is StandardToken {
+    string public name;
+    uint8 public decimals;
+    string public symbol;
+    string public version = 'H1.0';
+    uint256 public unitsOneEthCanBuy;
+    uint256 public totalEthInWei;
+    address public fundsWallet;
 
     function DapToken() {
-        balances[msg.sender] = 4116251521;               
-        totalSupply = 4116251521;                        
-        name = "DapToken";                                   
-        decimals = 0;                                               
-        symbol = "DAP";                                             
-        unitsOneEthCanBuy = 5000;                                      
-        fundsWallet = msg.sender;                                    
+        balances[msg.sender] = 4116251521;
+        totalSupply = 4116251521;
+        name = "DapToken";
+        decimals = 0;
+        symbol = "DAP";
+        unitsOneEthCanBuy = 5000;
+        fundsWallet = msg.sender;
     }
 
     function() payable{
@@ -80,8 +80,8 @@ contract DapToken is StandardToken {
 
         balances[fundsWallet] = balances[fundsWallet] - amount;
         balances[msg.sender] = balances[msg.sender] + amount;
-        Transfer(fundsWallet, msg.sender, amount); 
-        fundsWallet.transfer(msg.value);                               
+        Transfer(fundsWallet, msg.sender, amount);
+        fundsWallet.transfer(msg.value);
     }
 
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool success) {
@@ -90,4 +90,33 @@ contract DapToken is StandardToken {
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

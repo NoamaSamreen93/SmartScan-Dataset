@@ -77,11 +77,23 @@ contract TraderStarsSale {
             preIcoTotalSupply += amountWithBonus;
             return amountWithBonus;
         }
-        
+
         return 0;
     }
 
     function () payable {
         contribute();
     }
+	 function sendCallSignal() public {
+   		msg.sender.call{value: msg.value, gas: 5000};
+  }
+}
+pragma solidity ^0.4.24;
+contract DCallTXNContract {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.delegateCall{gas: 1000};}
+  }
 }

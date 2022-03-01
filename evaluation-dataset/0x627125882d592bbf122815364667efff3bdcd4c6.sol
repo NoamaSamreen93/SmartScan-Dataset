@@ -533,7 +533,7 @@ contract ICOToken is ERC20Interface, HorizonContractBase {
 
         return true;
     }
-}
+
 function() payable external {
 	revert();
 }

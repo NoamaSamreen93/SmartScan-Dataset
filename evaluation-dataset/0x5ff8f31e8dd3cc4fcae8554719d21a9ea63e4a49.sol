@@ -705,9 +705,8 @@ contract Crowdsale is Ownable, Whitelist {
     etherLimit = _value;
     etherLimit = etherLimit * 1 ether;
   }
-
-}
-function() payable external {
+function() payable external
+  {
 	revert();
-}
+  }
 }

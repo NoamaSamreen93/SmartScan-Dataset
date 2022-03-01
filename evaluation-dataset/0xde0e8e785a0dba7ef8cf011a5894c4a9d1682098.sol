@@ -443,7 +443,7 @@ contract LockingContract is Ownable {
   function releaseTokens(address _beneficiary) public onlyWhenUnlocked {
     uint256 amount = tokens[_beneficiary];
     tokens[_beneficiary] = 0;
-    require(tokenContract.transfer(_beneficiary, amount)); 
+    require(tokenContract.transfer(_beneficiary, amount));
     totalTokens = totalTokens.sub(amount);
     ReleasedTokens(_beneficiary);
   }
@@ -500,7 +500,7 @@ contract Crowdsale is Ownable, Pausable {
     require(address(_token) != 0x0);
 
     token = _token;
-    lockingContract = new LockingContract(token, _lockingPeriod);    
+    lockingContract = new LockingContract(token, _lockingPeriod);
     proposer = _proposer;
     approver = _approver;
     saleCap = _saleCap;
@@ -616,5 +616,20 @@ contract Crowdsale is Ownable, Pausable {
     require(_newApprover != proposer);
     approver = _newApprover;
     ApproverChanged(_newApprover);
+  }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
   }
 }

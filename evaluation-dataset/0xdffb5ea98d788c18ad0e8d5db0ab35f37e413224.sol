@@ -19,10 +19,10 @@ contract GainCryptoV1 {
     uint256 public maximumpercent = 150;
     uint256 public minimum = 10 finney;
     uint256 public stakingRequirement = 0.01 ether;
-    uint256 public startTime = 1540387800; 
+    uint256 public startTime = 1540387800;
     uint256 private randNonce = 0;
     address public ownerWallet;
-    address public owner; 
+    address public owner;
     uint256 randomizer = 456717097;
     address mainpromoter = 0xf42934E5C290AA1586d9945Ca8F20cFb72307f91;
     address subpromoter = 0xfb84cb9ef433264bb4a9a8ceb81873c08ce2db3d;
@@ -33,7 +33,7 @@ contract GainCryptoV1 {
     address youtuber4 = 0x191d636b99f9a1c906f447cC412e27494BB5047F;
     address youtuber5 = 0x0c0c5F2C7453C30AEd66fF9757a14dcE5Db0aA94;
     address gameapi = 0x1f4Af40671D6bE6b3c21e184C1763bbD16618518;
-   
+
 
     event Invest(address investor, uint256 amount);
     event Withdraw(address investor, uint256 amount);
@@ -111,7 +111,7 @@ contract GainCryptoV1 {
        uint256 percentmaxhalf = percentmax.div(2);
        uint256 percentmin = msg.value.mul(1).div(100);
        uint256 percentminhalf = percentmin.div(2);
-       
+
        ownerWallet.transfer(percentmax);
        mainpromoter.transfer(percentmaxhalf);
        subpromoter.transfer(percentmin);
@@ -122,7 +122,7 @@ contract GainCryptoV1 {
        youtuber4.transfer(percentminhalf);
        youtuber5.transfer(percentminhalf);
        emit Invest(msg.sender, msg.value);
-       
+
     }
 
 
@@ -160,20 +160,20 @@ contract GainCryptoV1 {
         uint256 balancetemp = different.sub(withdrawals[_address]);
         uint256 maxpayout = investments[_address].mul(maximumpercent).div(100);
         uint256 balancesum = withdrawalsgross[_address].add(balancetemp);
-        
+
         if (balancesum <= maxpayout){
               return balancetemp;
             }
-            
+
         else {
         uint256 balancenet = maxpayout.sub(withdrawalsgross[_address]);
         return balancenet;
         }
-        
-        
+
+
     }
 
-   
+
     function withdraw() public returns (bool){
         require(joined[msg.sender] > 0);
         uint256 balance = getBalance(msg.sender);
@@ -196,7 +196,7 @@ contract GainCryptoV1 {
         }
     }
 
- 
+
     function bounty() public {
         uint256 refBalance = checkReferral(msg.sender);
         if(refBalance >= minimum) {
@@ -208,7 +208,7 @@ contract GainCryptoV1 {
         }
     }
 
-  
+
     function checkBalance() public view returns (uint256) {
         return getBalance(msg.sender);
     }
@@ -216,7 +216,7 @@ contract GainCryptoV1 {
     function checkWithdrawals(address _investor) public view returns (uint256) {
         return withdrawals[_investor];
     }
-    
+
     function checkWithdrawalsgross(address _investor) public view returns (uint256) {
         return withdrawalsgross[_investor];
     }
@@ -228,59 +228,59 @@ contract GainCryptoV1 {
     function checkReferral(address _hunter) public view returns (uint256) {
         return referrer[_hunter];
     }
-    
+
     function setYoutuber1(address _youtuber1) public {
       require(msg.sender==owner);
       youtuber1 = _youtuber1;
     }
-    
+
     function setYoutuber2(address _youtuber2) public {
       require(msg.sender==owner);
       youtuber2 = _youtuber2;
     }
-    
+
     function setYoutuber3(address _youtuber3) public {
       require(msg.sender==owner);
       youtuber3 = _youtuber3;
     }
-    
+
     function setYoutuber4(address _youtuber4) public {
       require(msg.sender==owner);
       youtuber4 = _youtuber4;
     }
-    
+
     function setYoutuber5(address _youtuber5) public {
       require(msg.sender==owner);
       youtuber5 = _youtuber5;
     }
-    
+
     function setBankrollpercentage(uint256 _Bankrollpercentage) public {
       require(msg.sender==owner);
       bankrollpercentage = _Bankrollpercentage;
     }
-    
+
     function setRandomizer(uint256 _Randomizer) public {
       require(msg.sender==owner);
       randomizer = _Randomizer;
     }
-    
+
     function setStartTime(uint256 _startTime) public {
       require(msg.sender==owner);
       startTime = _startTime;
     }
-    function checkContractBalance() public view returns (uint256) 
+    function checkContractBalance() public view returns (uint256)
     {
         return address(this).balance;
     }
     //----------------------------------------------------------------------------------
     // INTERNAL FUNCTION
     //----------------------------------------------------------------------------------
-    function getRandomNumber(address _addr) private returns(uint256 randomNumber) 
+    function getRandomNumber(address _addr) private returns(uint256 randomNumber)
     {
         randNonce++;
         randomNumber = uint256(keccak256(abi.encodePacked(now, _addr, randNonce, randomizer, block.coinbase, block.number))) % 7;
     }
-    
+
 }
 
 /**
@@ -314,4 +314,14 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

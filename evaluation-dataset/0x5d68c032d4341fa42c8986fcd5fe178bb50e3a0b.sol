@@ -104,7 +104,6 @@ contract DistributedEnergyCoin is DistributedEnergyCoinBase {
 
        emit Transfer(freezeOwner, owner, unfreezeTimeMap[i].unfreezeValue);
     }
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

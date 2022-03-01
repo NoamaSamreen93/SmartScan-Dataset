@@ -375,7 +375,6 @@ contract Crowdsale is Pausable, PullPayment {
             asyncSend(msg.sender, ETHToSend); // pull payment to get refund in ETH
         }
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

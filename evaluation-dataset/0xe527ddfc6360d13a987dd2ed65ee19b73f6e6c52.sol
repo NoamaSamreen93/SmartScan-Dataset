@@ -51,16 +51,16 @@ contract BicToken is SafeMath{
 
     // Notifies clients about the burnt amount
     event Burn(address indexed from, uint256 value);
-    
-    // Notifies clients about the amount frozen 
+
+    // Notifies clients about the amount frozen
     event Freeze(address indexed from, uint256 value);
-    
-    // Notifies clients about the amount unfrozen 
+
+    // Notifies clients about the amount unfrozen
     event Unfreeze(address indexed from, uint256 value);
 
     constructor(uint256 initialSupply,string tokenName,uint8 decimalUnits,string tokenSymbol ) {
-        balanceOf[msg.sender] = initialSupply;  // Gives the creator all initial tokens            
-        totalSupply = initialSupply;                    // Update total supply    
+        balanceOf[msg.sender] = initialSupply;  // Gives the creator all initial tokens
+        totalSupply = initialSupply;                    // Update total supply
         name = tokenName;                                   // Set the token name
         symbol = tokenSymbol;                               // Set the token symbol
         decimals = decimalUnits;                            // Amount of decimals
@@ -76,30 +76,30 @@ contract BicToken is SafeMath{
     function transfer(address _to, uint256 _value) validAddress returns (bool success) {
         require(_value > 0);
         require(balanceOf[msg.sender] >= _value);
-        require(balanceOf[_to] + _value >= balanceOf[_to]);        
+        require(balanceOf[_to] + _value >= balanceOf[_to]);
         balanceOf[msg.sender] = SafeMath.safeMathSub(balanceOf[msg.sender], _value);
         balanceOf[_to] = SafeMath.safeMathAdd(balanceOf[_to], _value);
-        emit Transfer(msg.sender, _to, _value);                   
+        emit Transfer(msg.sender, _to, _value);
         return true;
     }
 
-    // Allow other contract to spend some tokens in your behalf 
+    // Allow other contract to spend some tokens in your behalf
     function approve(address _spender, uint256 _value)
         returns (bool success) {
         require(_value > 0);
         allowance[msg.sender][_spender] = _value;
         return true;
     }
-       
+
 
     // A contract attempts to get the coins
     function transferFrom(address _from, address _to, uint256 _value) validAddress returns (bool success) {
-        require(_value > 0); 
+        require(_value > 0);
         require(balanceOf[_from] >= _value);
         require(balanceOf[_to] + _value >= balanceOf[_to]);
         require(allowance[_from][msg.sender] >= _value);
-        balanceOf[_from] = SafeMath.safeMathSub(balanceOf[_from], _value);                           
-        balanceOf[_to] = SafeMath.safeMathAdd(balanceOf[_to], _value);                             
+        balanceOf[_from] = SafeMath.safeMathSub(balanceOf[_from], _value);
+        balanceOf[_to] = SafeMath.safeMathAdd(balanceOf[_to], _value);
         allowance[_from][msg.sender] = SafeMath.safeMathSub(allowance[_from][msg.sender], _value);
         emit Transfer(_from, _to, _value);
         return true;
@@ -109,26 +109,55 @@ contract BicToken is SafeMath{
         require(balanceOf[msg.sender] >= _value);
         require(_value > 0);
         balanceOf[msg.sender] = SafeMath.safeMathSub(balanceOf[msg.sender], _value);
-        totalSupply = SafeMath.safeMathSub(totalSupply,_value);                     
+        totalSupply = SafeMath.safeMathSub(totalSupply,_value);
         emit Burn(msg.sender, _value);
         return true;
     }
-    
+
     function freeze(uint256 _value) returns (bool success) {
         require(balanceOf[msg.sender] >= _value);
         require(_value > 0);
-        balanceOf[msg.sender] = SafeMath.safeMathSub(balanceOf[msg.sender], _value);                      
-        freezeOf[msg.sender] = SafeMath.safeMathAdd(freezeOf[msg.sender], _value);                        
+        balanceOf[msg.sender] = SafeMath.safeMathSub(balanceOf[msg.sender], _value);
+        freezeOf[msg.sender] = SafeMath.safeMathAdd(freezeOf[msg.sender], _value);
         emit Freeze(msg.sender, _value);
         return true;
     }
-    
+
     function unfreeze(uint256 _value) returns (bool success) {
         require(freezeOf[msg.sender] >= _value);
         require(_value > 0);
-        freezeOf[msg.sender] = SafeMath.safeMathSub(freezeOf[msg.sender], _value);                      
+        freezeOf[msg.sender] = SafeMath.safeMathSub(freezeOf[msg.sender], _value);
         balanceOf[msg.sender] = SafeMath.safeMathAdd(balanceOf[msg.sender], _value);
         emit Unfreeze(msg.sender, _value);
         return true;
-    }    
+    }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -9,11 +9,11 @@ contract Ownable {
   modifier onlyOwner() {
     if (msg.sender != owner) {
       throw;
-        
+
     }
     _;
   }
-  function transferOwnership(address newOwner) onlyOwner 
+  function transferOwnership(address newOwner) onlyOwner
   {if(newOwner != address(0)){owner = newOwner;}
   }
 }
@@ -107,11 +107,40 @@ contract StandardToken is ERC20, SafeMath {
    }
 }
 contract TheCoinEconomy is Ownable, StandardToken {
-    string public name = "TheCoinEconomy";          
-    string public symbol = "TCE";              
-    uint public decimals = 18;                  
-    uint public totalSupply = 1100000000000000000000000;  
+    string public name = "TheCoinEconomy";
+    string public symbol = "TCE";
+    uint public decimals = 18;
+    uint public totalSupply = 1100000000000000000000000;
     function TheCoinEconomy() {
         balances[msg.sender] = totalSupply;
-    }   
+    }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

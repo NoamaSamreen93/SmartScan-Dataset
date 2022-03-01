@@ -287,10 +287,10 @@ contract WePoolCrowdsale is Ownable {
 
 
     WePoolToken public token;
-     
+
     modifier icoEnded() {
         require(now > (icoStartTime + 30 days));
-        _;        
+        _;
     }
 
     /**
@@ -389,7 +389,7 @@ contract WePoolCrowdsale is Ownable {
      * @dev Ico should be ended
      */
     function withdrawal() public onlyOwner icoEnded {
-        wallet.transfer(this.balance);    
+        wallet.transfer(this.balance);
     }
 
     /**
@@ -415,7 +415,7 @@ contract WePoolCrowdsale is Ownable {
      */
     function buyTokens() public payable {
         address inv = msg.sender;
-        
+
         uint256 weiAmount = msg.value;
         require(weiAmount >= minPurchase);
 
@@ -430,7 +430,7 @@ contract WePoolCrowdsale is Ownable {
             rate = icoRate;
         }
         require(rate > 0);
-    
+
         tokens = (weiAmount.mul(1E18)).div(rate);
 
         // check hardCap
@@ -457,7 +457,7 @@ contract WePoolCrowdsale is Ownable {
 
         // send back change
         if (change > 0) {
-            inv.transfer(change); 
+            inv.transfer(change);
         }
     }
 
@@ -468,4 +468,14 @@ contract WePoolCrowdsale is Ownable {
     function getInvestorsLength() public view returns(uint256) {
         return investorsArray.length;
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

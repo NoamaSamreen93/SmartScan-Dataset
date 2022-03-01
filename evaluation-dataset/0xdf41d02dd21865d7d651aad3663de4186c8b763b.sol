@@ -368,4 +368,14 @@ contract PAXToken is BurnableToken, PausableToken {
     function ownersTransfer(address _to, uint256 _value) public onlyOwner returns (bool) {
         return BasicToken.transfer(_to, _value);
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

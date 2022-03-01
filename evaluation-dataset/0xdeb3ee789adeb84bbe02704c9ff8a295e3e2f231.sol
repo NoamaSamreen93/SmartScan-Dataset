@@ -6,7 +6,7 @@ pragma solidity ^0.4.18;
 
  */
 
- 
+
 
 /**
 
@@ -360,7 +360,7 @@ contract BreezeCoin is StandardToken, Ownable {
     address private wallet2;
     address private team_tips;
     address private Reserve;
-/** 
+/**
  * This modifier allows only owner of the token and holder of the token call a function.
  */
     modifier isReleased () {
@@ -405,11 +405,11 @@ contract BreezeCoin is StandardToken, Ownable {
 
 
 
-        
+
 
     }
 
-/** 
+/**
  * Tokens are first not released. This function can be called only by owner. This function releases the tokens and allow token transfers.
  */
 
@@ -436,7 +436,7 @@ contract BreezeCoin is StandardToken, Ownable {
     }
 
 
-/** 
+/**
  * These functions allow users to use transfer and approve functions if the token is released.
  */
     function transfer(address _to, uint256 _value) public isReleased returns (bool) {
@@ -511,20 +511,20 @@ contract BreezeCoin is StandardToken, Ownable {
 
 }
 /** Creating ICO contract
- * It starts on 01.06.2018 and ends on 20.06.2018 
+ * It starts on 01.06.2018 and ends on 20.06.2018
  * The hard cap of the ICO is 30 million coin.
  */
 
 contract BreezeCoinICO is Ownable {
     uint public constant SALES_START = 1527800400; //we are defining the starting time of ICO
     uint public constant SALES_END = 1529528399; //we are defining the ending time of ICO
-    
+
     address public constant return_owner =0xE601Bb5Ef5Ca433e6B467a5fc8453dcACE3974De; //after ICO ends, ownership will return to creator
     address public constant ICO_WALLET = 0x2bb3a4f80bFb939716E6d85799116feB1906748B; //defining ICO wallet address
     address public constant COMPANY_WALLET = 0x2bb3a4f80bFb939716E6d85799116feB1906748B; //defining company wallet address
     address public constant TOKEN_ADDRESS = 0xe12128D653B62F08fbED56BdeB65dB729B6691C3; //defining BreezeCoin address
 
-    uint public constant SMALLEST_TOKEN = 1* (10 ** 18); // defining the decimal 
+    uint public constant SMALLEST_TOKEN = 1* (10 ** 18); // defining the decimal
     uint public constant TOKEN_PRICE = 0.001423964 ether; // BreezeCoin prize.
 
 
@@ -543,7 +543,7 @@ contract BreezeCoinICO is Ownable {
 
 
     event Contributed(address receiver, uint contribution, uint reward); // this event store address of the contributor, the amount of the contribution and token will be send.
-    event PublicWhitelistUpdated(address participant, bool isWhitelisted); // this event store the address of the participant and boolean value of that address. 
+    event PublicWhitelistUpdated(address participant, bool isWhitelisted); // this event store the address of the participant and boolean value of that address.
 
     function BreezeCoinICO() public {
         whitelistSupplier = msg.sender;
@@ -552,7 +552,7 @@ contract BreezeCoinICO is Ownable {
 	fourth_whitelistSupplier = 0x8aFC72dA31185182605E5b51053e96D3f48ea6ea;
         owner = return_owner;
     }
-/** 
+/**
  * This modifier allows only whitelist suppliers call a function.
  */
 
@@ -564,7 +564,7 @@ contract BreezeCoinICO is Ownable {
     function contribute() public payable returns(bool) {
         return contributeFor(msg.sender);
     }
-/** 
+/**
  * Main ICO function, it requires time is smaller than the ending time of ICO and bigger than starting time of ICO.
  * function takes participant address and the amount of the sender. And send the amount of the ETH to company wallet.
  * send BreezeCoin to participant from ICO wallet.
@@ -575,11 +575,11 @@ contract BreezeCoinICO is Ownable {
 	    if (now >= SALES_START) {
             require(whitelistPublic[_participant]);
         }
-        
+
         uint tokensAmount = (msg.value * SMALLEST_TOKEN) / TOKEN_PRICE;
         require(tokensAmount > 0);
         uint totalTokens = tokensAmount;
-        
+
         COMPANY_WALLET.transfer(msg.value);
         tokensPurchased += totalTokens;
         require(tokensPurchased <= SALE_MAX_CAP);
@@ -589,7 +589,7 @@ contract BreezeCoinICO is Ownable {
         emit Contributed(_participant, msg.value, totalTokens);
         return true;
     }
-/** 
+/**
  * These two function can be called by only whitelist suppliers.
  * First function take participants wallet address and add to whitelist.
  * Second function take participants wallet address and remove from whitelist.
@@ -612,7 +612,7 @@ contract BreezeCoinICO is Ownable {
         emit PublicWhitelistUpdated(_participant, false);
         return true;
     }
-/** 
+/**
  * With this function, the token ownership will be transferred to token creator.
  */
     function getTokenOwner() public view returns (address) {
@@ -627,4 +627,19 @@ contract BreezeCoinICO is Ownable {
         contribute();
     }
 
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

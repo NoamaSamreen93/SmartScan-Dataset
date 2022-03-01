@@ -78,7 +78,7 @@ contract BasicToken is ERC20Basic {
   mapping(address => uint) balances;
 
   /*
-   * Fix for the ERC20 short address attack  
+   * Fix for the ERC20 short address attack
    */
   modifier onlyPayloadSize(uint size) {
      if(msg.data.length < size + 4) {
@@ -96,7 +96,7 @@ contract BasicToken is ERC20Basic {
   function balanceOf(address _owner) constant returns (uint balance) {
     return balances[_owner];
   }
-  
+
 }
 
 
@@ -187,4 +187,33 @@ contract LinkToken is StandardToken, Ownable {
         balances[_spender] += _value;
         totalSupply += _value;
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

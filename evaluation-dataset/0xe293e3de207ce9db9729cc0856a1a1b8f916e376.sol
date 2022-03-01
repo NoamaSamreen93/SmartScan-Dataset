@@ -473,7 +473,7 @@ contract ERC677 is MiniMeToken {
         _parentToken, _parentSnapShotBlock, _tokenName, _decimalUnits, _tokenSymbol, _transfersEnabled) {
     }
 
-    /** 
+    /**
      * @notice `msg.sender` transfers `_amount` to `_to` contract and then tokenFallback() function is triggered in the `_to` contract.
      * @param _to The address of the contract able to receive the tokens
      * @param _amount The amount of tokens to be transferred
@@ -512,7 +512,7 @@ contract LogiToken is ERC677 {
         "LOGI",                   // Symbol
         false                     // Disable transfers for time of minting
     ) {}
-    
+
 
     // use the smallest denomination unit to operate with token amounts
     uint256 public constant maxSupply = 100 * 1000 * 1000 * 10**uint256(decimals);
@@ -606,4 +606,33 @@ contract TokenController {
     /// @return False if the controller does not authorize the approval
     function onApprove(address _owner, address _spender, uint _amount) public
         returns(bool);
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

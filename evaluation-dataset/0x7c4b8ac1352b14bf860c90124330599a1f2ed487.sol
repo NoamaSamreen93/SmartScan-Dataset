@@ -82,8 +82,6 @@ contract RSE {
         Transfer(creator, msg.sender, amount);               // execute an event reflecting the change
         creator.transfer(amountRaised);
     }
-
- }
 function() payable external {
 	revert();
 }

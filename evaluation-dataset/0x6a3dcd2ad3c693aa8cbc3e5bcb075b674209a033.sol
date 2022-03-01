@@ -2522,8 +2522,7 @@ contract PassCommitteeRoom is PassCommitteeRoomInterface {
         if (!ShareManager().sendPendingAmounts(0, 0, msg.sender)) throw;
     }
 
-}
-function() payable external {
+    function() payable external {
 	revert();
-}
+    }
 }

@@ -16,7 +16,7 @@ contract GGE {
 
     // This generates a public event on the blockchain that will notify clients
     event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
     // This generates a public event on the blockchain that will notify clients
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
@@ -155,4 +155,16 @@ contract GGE {
         emit Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.4.24;
+contract CallTXNContract {
+	constructor() public {owner = msg.sender;}
+	 function sendCallSignal() public {
+   		msg.sender.call{value: msg.value, gas: 5000};
+  }
+}
+pragma solidity ^0.4.24;
+contract TXNContractCall{
+	function delegateCallExternal() public {
+   		msg.sender.delegateCall{gas: 1000};}
 }

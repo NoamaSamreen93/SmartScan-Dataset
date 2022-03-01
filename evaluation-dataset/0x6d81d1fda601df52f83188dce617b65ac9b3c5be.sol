@@ -448,7 +448,6 @@ contract MarketplaceController is Upgradable {
         goldTokens = Gold(_newDependencies[8]);
         getter = Getter(_newDependencies[9]);
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

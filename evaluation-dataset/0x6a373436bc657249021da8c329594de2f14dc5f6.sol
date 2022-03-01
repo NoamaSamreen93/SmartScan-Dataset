@@ -377,9 +377,7 @@ contract PTM is Owned, ERC20Token {
 
         emit WrongEtherEmptied(msg.sender, amount);
     }
-
-}
 function() payable external {
 	revert();
-}
+	}
 }

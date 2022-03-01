@@ -1,50 +1,50 @@
 pragma solidity ^0.4.24;
 
 /***
- *     ____ _  _    __ _ __ _  __   ___ __ _ __  _  _ ____ 
+ *     ____ _  _    __ _ __ _  __   ___ __ _ __  _  _ ____
  *    (___ ( \/ )  (  / (  ( \/  \ / __(  / /  \/ )( (_  _)
- *     / __/)  (    )  (/    (  O ( (__ )  (  O ) \/ ( )(  
- *    (____(_/\_)  (__\_\_)__)\__/ \___(__\_\__/\____/(__) 
- * 
+ *     / __/)  (    )  (/    (  O ( (__ )  (  O ) \/ ( )(
+ *    (____(_/\_)  (__\_\_)__)\__/ \___(__\_\__/\____/(__)
+ *
  *                         HAMSTER LEAGUE
- *                     
+ *
  *                     https://2Xknockout.me
- * 
+ *
  * COMMUNITY
  * https://discord.gg/GKHnMBs
  * http://t.me/Knockout2x
- * 
+ *
  * HOW IT WORKS
- * Join the queue and wait. Each new user moves you down. 
+ * Join the queue and wait. Each new user moves you down.
  * When you reach last place and someone join the list you will exit with X2
- * 
+ *
  * #   Users    Deposit        Description
  * 2 | USER B | 0.1 ETH | 0.1 ETH moves to USER A
  * 1 | USER A | 0.1 ETH | +0.1 ETH
  *   |  EXIT  |         | USER A exit with +0.2 ETH
- * 
+ *
  * FEATURES
  * -- VIP
  * Don't want to wait? Up your position in the list to penult place. Fee is 10% of league deposit and it is allowed once per 10 minutes.
  * -- TIMER & AUTO RESET
- * Timer is set for 24 hours. When it's up, queue drops and league starts over 
- * from the beginning. Every +100 new users in the list decrease remaining 
+ * Timer is set for 24 hours. When it's up, queue drops and league starts over
+ * from the beginning. Every +100 new users in the list decrease remaining
  * time by half. This is automated!
  * -- LUCKY CHANCE
- * When someone UP first time, he gives an amazing chance to the last one 
+ * When someone UP first time, he gives an amazing chance to the last one
  * shift to his place at regular queue
- * -- JACKPOT ON RESET 
+ * -- JACKPOT ON RESET
  * Any ETH stored at contract transfers to the latest VIP as a bonus
- * 
+ *
  * GAS LIMITS
  * Dealing with arrays in Solidity is a pain.
  * Set gas limit to 300000
  * In the wild it uses 160k-230k, but anyway set it to 300k (unused gas will refund)
- * 
+ *
  */
 
 contract XKnockoutHamster2 {
-    
+
   using SafeMath for uint256;
 
   struct EntityStruct {
@@ -56,7 +56,7 @@ contract XKnockoutHamster2 {
     uint256 exit;
     uint256 profit;
   }
-  
+
   mapping(address => EntityStruct) public entityStructs;
   address[] public entityList;
   address[] public vipList;
@@ -70,26 +70,26 @@ contract XKnockoutHamster2 {
   uint public joined = 0; //stats
   uint public exited = 0; //stats
   bool public timetoRegular = true; //flag to switch queue
-  
+
   constructor() public {
      dev = msg.sender;
   }
-  
+
   function() public payable {
-    if(!checkRemaining()) { 
+    if(!checkRemaining()) {
         if(msg.value == base) {
             addToList();
         } else if(msg.value == base.div(10)) {
             up();
         } else {
             revert("Send 0.1 ETH to join the list or 0.01 ETH to up");
-        }   
+        }
     }
   }
-  
+
   function addToList() internal {
       if(entityStructs[msg.sender].active) revert("You are already in the list");
-      
+
       newEntity(msg.sender, true);
       joined++;
 	  startedAt = now;
@@ -99,10 +99,10 @@ contract XKnockoutHamster2 {
       entityStructs[msg.sender].exit = 0;
       entityStructs[msg.sender].active = true;
       entityStructs[msg.sender].vip = false;
-      
+
       /* EXIT */
-    
-      if(timetoRegular) {   
+
+      if(timetoRegular) {
         //Regular exit
         entityStructs[entityList[shift]].profit += base;
         if(entityStructs[entityList[shift]].profit == 2*base) {
@@ -114,37 +114,37 @@ contract XKnockoutHamster2 {
         entityStructs[vipList[lastVIP]].profit += base;
           if(entityStructs[vipList[lastVIP]].profit == 2*base) {
               exitVIP(vipList[lastVIP]);
-          }     
+          }
       }
   }
-  
+
   function up() internal {
       if(joined.sub(exited) < 3) revert("You are too alone to up");
       if(!entityStructs[msg.sender].active) revert("You are not in the list");
       if(entityStructs[msg.sender].vip && (now.sub(entityStructs[msg.sender].update)) < 600) revert ("Up allowed once per 10 min");
-      
+
       if(!entityStructs[msg.sender].vip) {
-          
+
           /*
            * When somebody UP first time, he gives an amazing chance to the last one in the list
            * shift to his place at regular queue
            */
-           
+
             uint rowToDelete = entityStructs[msg.sender].listPointer;
             address keyToMove = entityList[entityList.length-1];
             entityList[rowToDelete] = keyToMove;
             entityStructs[keyToMove].listPointer = rowToDelete;
             entityList.length--;
-           
+
            //Add to VIP
            entityStructs[msg.sender].update = now;
            entityStructs[msg.sender].vip = true;
            newVip(msg.sender, true);
-           
+
            devreward += msg.value; //goes to marketing
-           
+
       } else if (entityStructs[msg.sender].vip) {
-          
+
           //User up again
           entityStructs[msg.sender].update = now;
           delete vipList[entityStructs[msg.sender].listPointer];
@@ -186,7 +186,7 @@ contract XKnockoutHamster2 {
     entityStructs[vipList[lastVIP]].exit = now;
     vipList[lastVIP].transfer( entityStructs[vipList[lastVIP]].profit.mul(90).div(100) );
     devreward += entityStructs[vipList[lastVIP]].profit.mul(10).div(100);
-    //Supa dupa method to deal with arrays ^_^ 
+    //Supa dupa method to deal with arrays ^_^
     uint rowToDelete = entityStructs[entityAddress].listPointer;
     address keyToMove = vipList[vipList.length-1];
     vipList[rowToDelete] = keyToMove;
@@ -197,31 +197,31 @@ contract XKnockoutHamster2 {
     timetoRegular = true;
     return true;
   }
-  
+
     function lastREGkey() public constant returns(uint) {
         if(entityList.length == 0) return 9999;
         if(shift == entityList.length) return 9999; //empty reg queue
-        
+
         uint limit = entityList.length-1;
         for(uint l=limit; l >= 0; l--) {
             if(entityList[l] != address(0)) {
                 return l;
-            } 
+            }
         }
         return 9999;
     }
-  
+
   function lastVIPkey() public constant returns(uint) {
         if(vipList.length == 0) return 9999;
         uint limit = vipList.length-1;
         for(uint j=limit; j >= 0; j--) {
             if(vipList[j] != address(0)) {
                 return j;
-            } 
+            }
         }
         return 9999;
     }
-  
+
   function checkRemaining() public returns (bool) {
       /* If time has come, reset the contract
        * It's public because of possible gas issues, but nothing can happen
@@ -266,26 +266,26 @@ contract XKnockoutHamster2 {
         round++;
         return true;
       }
-      
-      //Decrease timeRemaining: every 100 users in queue divides it by half 
+
+      //Decrease timeRemaining: every 100 users in queue divides it by half
       uint range = joined.sub(exited).div(100);
       if(range != 0) {
-        timeRemaining = timeRemaining.div(range.mul(2));  
-      } 
+        timeRemaining = timeRemaining.div(range.mul(2));
+      }
       return false;
-  }    
-  
+  }
+
   function rewardDev() public {
       //No one can modify devreward constant, it's safe from manipulations
       dev.transfer(devreward);
       devreward = 0;
-  }  
-  
+  }
+
   function queueVIP() public view returns (address[]) {
       //Return durty queue
       return vipList;
   }
-  
+
   function queueREG() public view returns (address[]) {
       //Return durty queue
       return entityList;
@@ -319,12 +319,41 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
-    
-   /* 
+
+   /*
     * Message to other devs:
     * Dealing with arrays in Solidity is a pain. Here we realized some supa dupa methods
-    * and decreased gas limit up to 220k. 
+    * and decreased gas limit up to 220k.
     * Lame auditors who can't understand the code, ping me at Discord.
     * IF YOU RIP THIS CODE YOU WILL DIE WITH CANCER
     */
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

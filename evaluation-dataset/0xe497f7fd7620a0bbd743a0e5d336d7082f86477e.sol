@@ -209,7 +209,7 @@ contract TeamVesting is Object {
         // passed and can only be retrieved by the same account which was
         // depositing them - highlighting the intrinsic security model
         // offered by a blockchain system like Ethereum
-        uint amount = ERC20Interface(asset).balanceOf(this); 
+        uint amount = ERC20Interface(asset).balanceOf(this);
         if(lock.balance != 0) {
             if(lock.balance != amount) {
 				lock.balance == amount;
@@ -223,7 +223,7 @@ contract TeamVesting is Object {
         lock = accountData(amount,now,0);
         return OK;
     }
-    
+
     function payOut(address reciever) onlyContractOwner returns (uint errorCode) {
         // check if user has funds due for pay out because lock time is over
         uint amount = getVesting();
@@ -236,7 +236,7 @@ contract TeamVesting is Object {
         return OK;
     }
 
-    // used to calculate amount we are able to spend according to current timestamp 
+    // used to calculate amount we are able to spend according to current timestamp
     function getVesting() returns (uint) {
         uint amount;
         for(uint i = 24; i >= 6;) {
@@ -259,15 +259,44 @@ contract TeamVesting is Object {
           }
             i-=3;
         }
-        return amount;   
+        return amount;
     }
 
     function getLockedFunds() constant returns (uint) {
         return ERC20Interface(asset).balanceOf(this);
     }
-    
+
     function getLockedFundsLastSpending() constant returns (uint) {
 	    return lock.lastSpending;
     }
 
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

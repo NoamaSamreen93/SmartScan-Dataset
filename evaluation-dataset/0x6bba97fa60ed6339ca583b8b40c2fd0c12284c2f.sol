@@ -542,7 +542,6 @@ contract WinnerWinner is Core, Internal, ExternalView {
     addressOfCaptain.transfer(payout);
     emit Won(msg.sender, payout);
   }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

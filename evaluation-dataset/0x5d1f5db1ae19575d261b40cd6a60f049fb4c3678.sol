@@ -99,7 +99,6 @@ contract Sponsify {
         return true;
     }
 
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

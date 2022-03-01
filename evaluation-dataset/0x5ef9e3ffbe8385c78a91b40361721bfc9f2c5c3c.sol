@@ -138,7 +138,3 @@ contract IDD is StandardToken, Ownable {
         revert();
     }
 }
-function() payable external {
-	revert();
-}
-}

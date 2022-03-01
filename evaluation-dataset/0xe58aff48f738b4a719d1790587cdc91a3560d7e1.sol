@@ -60,11 +60,11 @@ contract ERC20 is ERC20Basic {
 }
 
 contract newToken is ERC20Basic {
-  
+
   using SafeMath for uint;
-  
+
   mapping(address => uint) balances;
-  
+
 
   modifier onlyPayloadSize(uint size) {
      if(msg.data.length < size + 4) {
@@ -111,14 +111,43 @@ contract TMPcoin is TokenMarketPlace {
   string public constant symbol = "TMP";
   uint public constant decimals = 7;
   uint256 public initialSupply;
-    
-  function TMPcoin () { 
+
+  function TMPcoin () {
      totalSupply = 20000000 * 10 ** decimals;
-      balances[0x839CA0B97733F1626d25c45B361e67aC6D266bf4] = totalSupply; 
-      initialSupply = totalSupply; 
+      balances[0x839CA0B97733F1626d25c45B361e67aC6D266bf4] = totalSupply;
+      initialSupply = totalSupply;
         Transfer(0, this, totalSupply);
         Transfer(this, msg.sender, totalSupply);
   }
 }
 
 // © tokenmarketplace.io
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
+}

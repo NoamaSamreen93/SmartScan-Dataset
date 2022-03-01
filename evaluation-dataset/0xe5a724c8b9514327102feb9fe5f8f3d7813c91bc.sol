@@ -846,7 +846,7 @@ contract NokuCustomService is Pausable {
     function setPricingPlan(address _pricingPlan) public onlyOwner {
         require(_pricingPlan.isContract(), "_pricingPlan is not contract");
         require(NokuPricingPlan(_pricingPlan) != pricingPlan, "_pricingPlan equal to current");
-        
+
         pricingPlan = NokuPricingPlan(_pricingPlan);
 
         emit LogPricingPlanChanged(msg.sender, _pricingPlan);
@@ -895,4 +895,33 @@ contract NokuCustomReservationService is NokuCustomService {
 
         require(pricingPlan.payFee(SERVICE_NAME, CREATE_AMOUNT, msg.sender), "fee payment failed");
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

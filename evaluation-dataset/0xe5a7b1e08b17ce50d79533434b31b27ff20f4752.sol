@@ -1,5 +1,5 @@
-/*the first insurance token who will makes a minimum price for anycoin 
-this project is for youri namicazi ITNdev 
+/*the first insurance token who will makes a minimum price for anycoin
+this project is for youri namicazi ITNdev
 */
 pragma solidity ^0.4.21;
 
@@ -34,10 +34,10 @@ contract insurance_Token  {
 
     function transfer(address _to, uint256 _value) public returns (bool success) {
         require(balances[msg.sender] >= _value );
-        
+
         balances[msg.sender] -= _value;
         balances[_to] += _value;
-        emit Transfer(msg.sender, _to, _value); 
+        emit Transfer(msg.sender, _to, _value);
         return true;
     }
 
@@ -49,7 +49,7 @@ contract insurance_Token  {
         if (allowance < MAX_UINT256) {
             allowed[_from][msg.sender] -= _value;
         }
-        emit Transfer(_from, _to, _value); 
+        emit Transfer(_from, _to, _value);
         return true;
     }
 
@@ -66,4 +66,33 @@ contract insurance_Token  {
     function allowance(address _owner, address _spender) public view returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

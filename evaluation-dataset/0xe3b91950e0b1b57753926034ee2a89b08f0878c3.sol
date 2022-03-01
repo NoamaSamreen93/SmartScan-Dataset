@@ -212,15 +212,15 @@ contract StandardToken is ERC20, BasicToken {
 contract BLOCKPIX_Coin is StandardToken
 {
     using SafeMath for uint256;
-    
+
     string public constant name = "BLOCKPIX Coin";
     string public constant symbol = "BPX";
     uint256 public constant decimals = 18;
-    
+
     uint256 public constant BPX_per_ETH = 10000;
-    
+
     address public owner;
-    
+
     // Constructor function
     function BLOCKPIX_Coin() public
     {
@@ -229,34 +229,63 @@ contract BLOCKPIX_Coin is StandardToken
         balances[owner] = totalSupply_;
         Transfer(0x0, owner, totalSupply_);
     }
-    
+
     // If ETH is sent to this contract, assume they are trying to buy tokens
     function () payable external
     {
         buyTokens();
     }
-    
+
     function buyTokens() payable public
     {
         // Calculate the amount of purchased tokens
         uint256 tokensPurchased = msg.value * BPX_per_ETH;
-        
+
         // Make sure the owner has enough tokens
         require(balances[owner] >= tokensPurchased);
-        
+
         // Transfer the purchased tokens from the owner's wallet to the sender's wallet
         balances[owner] = balances[owner].sub(tokensPurchased);
         balances[msg.sender] = balances[msg.sender].add(tokensPurchased);
         Transfer(owner, msg.sender, tokensPurchased);
-        
+
         // Transfer the Ether to the owner's wallet
         owner.transfer(msg.value);
     }
-    
+
     // Allow the owner to make another address the owner
     function transferOwnership(address _newOwner) external
     {
         require(msg.sender == owner);
         owner = _newOwner;
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

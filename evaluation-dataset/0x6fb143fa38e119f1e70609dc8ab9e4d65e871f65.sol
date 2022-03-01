@@ -254,7 +254,6 @@ contract UKPound is BurnableToken, Ownable {
         totalSupply = initialSupply;
         balances[msg.sender] = initialSupply; // Send all tokens to owner
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

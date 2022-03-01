@@ -1042,7 +1042,6 @@ contract ERC721Classic is
         ERC721Full(name, symbol)
         Ownable()
     {} // solium-disable-line
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

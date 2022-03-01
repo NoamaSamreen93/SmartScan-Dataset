@@ -479,7 +479,6 @@ contract IrisTokenPrivatSale is Ownable, Pausable{
   function emergencyERC20Drain( ERC20 oddToken, uint amount ) public onlyOwner{
     oddToken.transfer(owner, amount);
   }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

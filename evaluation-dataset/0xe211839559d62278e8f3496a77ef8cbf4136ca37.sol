@@ -2,17 +2,17 @@ pragma solidity ^0.4.24;
 
 /**
  * luck100.win - Fair Ethereum game platform
- * 
+ *
  * OutLuck100
  * More exciting game than Fomo3D
- * 
+ *
  * 1. One out of every three new coupons will be awarded 180% of the proceeds;
- * 
+ *
  * 2. Inviting others to buy lottery tickets can permanently earn 10% of the proceeds;
- * 
+ *
  * 3. 1% income per day sign-in
  */
- 
+
 contract Ownable {
   address public owner;
   address public admin;
@@ -307,7 +307,7 @@ contract OutLuck100 is Ownable{
           emit recEvent(addr, ba, 5, now);
       }
   }
-  
+
   function getUserInfo(address addr, bytes6 mcode) public view returns(
     address parentAddr,
     address codeAddr,
@@ -352,5 +352,34 @@ contract OutLuck100 is Ownable{
           ts[i] = c.typeId;
           os[i] = c.isOut;
       }
+  }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
 }

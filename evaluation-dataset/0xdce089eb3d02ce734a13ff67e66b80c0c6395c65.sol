@@ -86,7 +86,7 @@ contract StandardToken is Token {
 
 contract PCSetup0521 is StandardToken {
 
-    function PCSetup0521() public { 
+    function PCSetup0521() public {
         totalSupply = INITIAL_SUPPLY;
         balances[msg.sender] = INITIAL_SUPPLY;
     }
@@ -116,7 +116,7 @@ contract PCSetup0521 is StandardToken {
 
     string public ContractSource = "";
     string public CodeVersion = "v0.1";
-    
+
     string public SecretKey_Pre = "";
     string public Name_New = "";
     string public TxHash_Pre = "";
@@ -161,4 +161,19 @@ contract PCSetup0521 is StandardToken {
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

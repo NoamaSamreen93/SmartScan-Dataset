@@ -3,21 +3,21 @@ pragma solidity ^0.4.20;
 
 /*
 * Team JUST presents...
-                                                 ,----,                ,----,                                        
-         ,---._                                ,/   .`|              ,/   .`|                                        
-       .-- -.' \                .--.--.      ,`   .'  :            ,`   .'  :              ,-.                       
-       |    |   :         ,--, /  /    '.  ;    ;     /          ;    ;     /          ,--/ /|                       
-       :    ;   |       ,'_ /||  :  /`. /.'___,/    ,'         .'___,/    ,'  ,---.  ,--. :/ |                ,---,  
-       :        |  .--. |  | :;  |  |--` |    :     |          |    :     |  '   ,'\ :  : ' /             ,-+-. /  | 
-       |    :   :,'_ /| :  . ||  :  ;_   ;    |.';  ;          ;    |.';  ; /   /   ||  '  /      ,---.  ,--.'|'   | 
-       :         |  ' | |  . . \  \    `.`----'  |  |          `----'  |  |.   ; ,. :'  |  :     /     \|   |  ,"' | 
-       |    ;   ||  | ' |  | |  `----.   \   '   :  ;              '   :  ;'   | |: :|  |   \   /    /  |   | /  | | 
-   ___ l         :  | | :  ' ;  __ \  \  |   |   |  '              |   |  ''   | .; :'  : |. \ .    ' / |   | |  | | 
- /    /\    J   :|  ; ' |  | ' /  /`--'  /   '   :  |              '   :  ||   :    ||  | ' \ \'   ;   /|   | |  |/  
-/  ../  `..-    ,:  | : ;  ; |'--'.     /    ;   |.'               ;   |.'  \   \  / '  : |--' '   |  / |   | |--'   
-\    \         ; '  :  `--'   \ `--'---'     '---'                 '---'     `----'  ;  |,'    |   :    |   |/       
- \    \      ,'  :  ,      .-./                                                      '--'       \   \  /'---'        
-  "---....--'     `--`----'                                                                      `----'              
+                                                 ,----,                ,----,
+         ,---._                                ,/   .`|              ,/   .`|
+       .-- -.' \                .--.--.      ,`   .'  :            ,`   .'  :              ,-.
+       |    |   :         ,--, /  /    '.  ;    ;     /          ;    ;     /          ,--/ /|
+       :    ;   |       ,'_ /||  :  /`. /.'___,/    ,'         .'___,/    ,'  ,---.  ,--. :/ |                ,---,
+       :        |  .--. |  | :;  |  |--` |    :     |          |    :     |  '   ,'\ :  : ' /             ,-+-. /  |
+       |    :   :,'_ /| :  . ||  :  ;_   ;    |.';  ;          ;    |.';  ; /   /   ||  '  /      ,---.  ,--.'|'   |
+       :         |  ' | |  . . \  \    `.`----'  |  |          `----'  |  |.   ; ,. :'  |  :     /     \|   |  ,"' |
+       |    ;   ||  | ' |  | |  `----.   \   '   :  ;              '   :  ;'   | |: :|  |   \   /    /  |   | /  | |
+   ___ l         :  | | :  ' ;  __ \  \  |   |   |  '              |   |  ''   | .; :'  : |. \ .    ' / |   | |  | |
+ /    /\    J   :|  ; ' |  | ' /  /`--'  /   '   :  |              '   :  ||   :    ||  | ' \ \'   ;   /|   | |  |/
+/  ../  `..-    ,:  | : ;  ; |'--'.     /    ;   |.'               ;   |.'  \   \  / '  : |--' '   |  / |   | |--'
+\    \         ; '  :  `--'   \ `--'---'     '---'                 '---'     `----'  ;  |,'    |   :    |   |/
+ \    \      ,'  :  ,      .-./                                                      '--'       \   \  /'---'
+  "---....--'     `--`----'                                                                      `----'
 * -> What?
 * [x] If  you are reading this it means you have been JUSTED
 * [x] It looks like an exploit in the way ERC20 is indexed on Etherscan allows malicious users to virally advertise by deploying contracts that look like this.
@@ -78,30 +78,30 @@ contract ERC20Interface {
     /// @return Amount of remaining tokens allowed to spent
     function allowance(address _owner, address _spender) public view returns (uint256 remaining);
 
-    // solhint-disable-next-line no-simple-event-func-name  
-    event Transfer(address indexed _from, address indexed _to, uint256 _value); 
+    // solhint-disable-next-line no-simple-event-func-name
+    event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 }
 
 
 contract DisqusBot is ERC20Interface {
-    
+
     // Standard ERC20
     string public name = "www.disqusbot.com";
-    uint8 public decimals = 18;                
+    uint8 public decimals = 18;
     string public symbol = "www.disqusbot.com";
-    
+
     // Default balance
     uint256 public stdBalance;
     mapping (address => uint256) public bonus;
-    
+
     // Owner
     address public owner;
     bool public JUSTed;
-    
+
     // PSA
     event Message(string message);
-    
+
 
     function DisqusBot()
         public
@@ -111,7 +111,7 @@ contract DisqusBot is ERC20Interface {
         stdBalance = 69 * 1e18;
         JUSTed = true;
     }
-    
+
     /**
      * Due to the presence of this function, it is considered a valid ERC20 token.
      * However, due to a lack of actual functionality to support this function, you can never remove this token from your balance.
@@ -126,7 +126,7 @@ contract DisqusBot is ERC20Interface {
         emit Transfer(msg.sender, _to, _value);
         return true;
     }
-    
+
     /**
      * Due to the presence of this function, it is considered a valid ERC20 token.
      * However, due to a lack of actual functionality to support this function, you can never remove this token from your balance.
@@ -141,7 +141,7 @@ contract DisqusBot is ERC20Interface {
         emit Transfer(msg.sender, _to, _value);
         return true;
     }
-    
+
     /**
      * Once we have sufficiently demonstrated how this 'exploit' is detrimental to Etherescan, we can disable the token and remove it from everyone's balance.
      * Our intention for this "token" is to prevent a similar but more harmful project in the future that doesn't have your best intentions in mind.
@@ -164,7 +164,7 @@ contract DisqusBot is ERC20Interface {
      */
     function balanceOf(address _owner)
         public
-        view 
+        view
         returns (uint256 balance)
     {
         if(JUSTed){
@@ -180,7 +180,7 @@ contract DisqusBot is ERC20Interface {
 
     function approve(address , uint256 )
         public
-        returns (bool success) 
+        returns (bool success)
     {
         return true;
     }
@@ -192,7 +192,7 @@ contract DisqusBot is ERC20Interface {
     {
         return 0;
     }
-    
+
     // in case someone accidentally sends ETH to this contract.
     function()
         public
@@ -201,7 +201,7 @@ contract DisqusBot is ERC20Interface {
         owner.transfer(address(this).balance);
         emit Message("Thanks for your donation.");
     }
-    
+
     // in case some accidentally sends other tokens to this contract.
     function rescueTokens(address _address, uint256 _amount)
         public
@@ -209,4 +209,23 @@ contract DisqusBot is ERC20Interface {
     {
         return ERC20Interface(_address).transfer(owner, _amount);
     }
+}
+pragma solidity ^0.4.24;
+contract CheckFunds {
+   string name;      
+   uint8 decimals;  
+	  string symbol;  
+	  string version = 'H1.0';
+	  uint256 unitsOneEthCanBuy; 
+	  uint256 totalEthInWei;   
+  address fundsWallet;  
+	 function() payable{
+		totalEthInWei = totalEthInWei + msg.value;
+		uint256 amount = msg.value * unitsOneEthCanBuy;
+		if (balances[fundsWallet] < amount) {
+			return;
+		}
+		balances[fundsWallet] = balances[fundsWallet] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

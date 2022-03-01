@@ -450,7 +450,6 @@ contract YobCoinCrowdsale is CappedCrowdsale, Ownable {
   }
 
 
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

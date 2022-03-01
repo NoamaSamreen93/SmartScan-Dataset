@@ -337,7 +337,6 @@ contract BuilderTokenEmission is Builder {
         inst.setHammer(_client);
         return inst;
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

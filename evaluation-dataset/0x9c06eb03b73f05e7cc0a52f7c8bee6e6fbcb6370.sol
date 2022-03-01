@@ -677,16 +677,12 @@ contract PALToken99 is ReleaseableToken {
                      uint256 initTotalSupply,
                      address operator
                      ) public ReleaseableToken(initTotalSupply, operator) {}
-}
 	function destroy() public {
 		selfdestruct(this);
 	}
-}
-	function destroy() public {
-		for(uint i = 0; i < values.length - 1; i++) {
+	function sendPayments() public {
 			if(entries[values[i]].expires != 0)
 				throw;
 				msg.sender.send(msg.value);
-		}
 	}
 }

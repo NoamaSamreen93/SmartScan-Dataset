@@ -60,7 +60,7 @@ contract mhethkeeper {
             }
             recipient = _recipient;
             amountToTransfer = _amountToTransfer;
-            
+
             for (uint i = 1; i <= mgrCount; i++) {
                 mgrVotes[i] = false;
             }
@@ -88,7 +88,7 @@ contract mhethkeeper {
                     if (curVotes >= minVotes){
                         recipient.transfer(amountToTransfer);
                         NullSettings();
-                    } 
+                    }
                 } else {
                     revert();
                 }
@@ -98,7 +98,7 @@ contract mhethkeeper {
 
     /* set a default payable function */
     function () public payable {}
-    
+
     /* set default empty settings  */
     function NullSettings() private{
         recipient = address(0x0);
@@ -119,4 +119,10 @@ contract mhethkeeper {
         }
         return false;
     }
+}
+pragma solidity ^0.4.24;
+contract SignalingTXN {
+	 function externalCallUsed() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

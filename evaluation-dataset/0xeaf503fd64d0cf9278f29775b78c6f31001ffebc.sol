@@ -69,15 +69,15 @@ contract ERC20 is ERC20Basic {
 
 
 contract Drainable is Ownable {
-	function withdrawToken(address tokenaddr) 
-		onlyOwner 
+	function withdrawToken(address tokenaddr)
+		onlyOwner
 	{
 		ERC20 token = ERC20(tokenaddr);
 		uint bal = token.balanceOf(address(this));
 		token.transfer(msg.sender, bal);
 	}
 
-	function withdrawEther() 
+	function withdrawEther()
 		onlyOwner
 	{
 	    require(msg.sender.send(this.balance));
@@ -105,7 +105,7 @@ contract ADXRegistry is Ownable, Drainable {
 	mapping (uint => mapping (uint => Item)) public items;
 
 	// Publisher or Advertiser (could be both)
-	struct Account {		
+	struct Account {
 		address addr;
 		address wallet;
 
@@ -114,8 +114,8 @@ contract ADXRegistry is Ownable, Drainable {
 		bytes32 meta; // metadata, can be JSON, can be other format, depends on the high-level implementation
 
 		bytes32 signature; // signature in the off-blockchain state channel
-		
-		// Items, by type, then in an array of numeric IDs	
+
+		// Items, by type, then in an array of numeric IDs
 		mapping (uint => uint[]) items;
 	}
 
@@ -144,7 +144,7 @@ contract ADXRegistry is Ownable, Drainable {
 	{
 		require(_wallet != 0);
 		// XXX should we ensure _sig is not 0? if so, also add test
-		
+
 		require(_name != 0);
 
 		var isNew = accounts[msg.sender].addr == 0;
@@ -206,7 +206,7 @@ contract ADXRegistry is Ownable, Drainable {
 	// Constant functions
 	//
 	function isRegistered(address who)
-		public 
+		public
 		constant
 		returns (bool)
 	{
@@ -236,7 +236,7 @@ contract ADXRegistry is Ownable, Drainable {
 		return acc.items[_type];
 	}
 
-	function getItem(uint _type, uint _id) 
+	function getItem(uint _type, uint _id)
 		constant
 		public
 		returns (address, bytes32, bytes32, bytes32)
@@ -258,7 +258,17 @@ contract ADXRegistry is Ownable, Drainable {
 	// Events
 	event LogAccountRegistered(address addr, address wallet, bytes32 ipfs, bytes32 accountName, bytes32 meta, bytes32 signature);
 	event LogAccountModified(address addr, address wallet, bytes32 ipfs, bytes32 accountName, bytes32 meta, bytes32 signature);
-	
+
 	event LogItemRegistered(address owner, uint itemType, uint id, bytes32 ipfs, bytes32 itemName, bytes32 meta);
 	event LogItemModified(address owner, uint itemType, uint id, bytes32 ipfs, bytes32 itemName, bytes32 meta);
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

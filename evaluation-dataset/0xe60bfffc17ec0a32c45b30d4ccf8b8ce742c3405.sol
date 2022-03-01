@@ -49,7 +49,7 @@ contract BasicToken is ERC20 {
 
     mapping(address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
-    
+
 /**
   * @dev transfer token for a specified address
   * @param _to The address to transfer to.
@@ -64,7 +64,7 @@ contract BasicToken is ERC20 {
         }
         return false;
     }
-    
+
 
   /**
    * @dev Transfer tokens from one address to another
@@ -87,7 +87,7 @@ contract BasicToken is ERC20 {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
     function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -298,4 +298,33 @@ contract BiQToken is BasicToken {
     revert();
   }
 
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

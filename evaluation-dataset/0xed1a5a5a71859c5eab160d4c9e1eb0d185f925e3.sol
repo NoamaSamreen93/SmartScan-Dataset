@@ -28,7 +28,7 @@ contract ERC20 is ERC20Basic {
  * @dev Math operations with safety checks that throw on error
  */
 library SafeMath {
-    
+
   function mul(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a * b;
     assert(a == 0 || c / a == b);
@@ -52,15 +52,15 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
-  
+
 }
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
-    
+
   using SafeMath for uint256;
 
   mapping(address => uint256) balances;
@@ -79,7 +79,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) public constant returns (uint256 balance) {
@@ -154,7 +154,7 @@ contract StandardToken is ERC20, BasicToken {
  * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
-    
+
   address public owner;
 
   /**
@@ -178,7 +178,7 @@ contract Ownable {
    * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) public onlyOwner {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 
@@ -207,10 +207,10 @@ contract BurnableToken is StandardToken {
 }
 
 contract MRDSCoinToken is BurnableToken {
-    
+
   string public constant name = "MRDS Coin Token";
   string public constant symbol = "MRDS";
- 
+
   uint32 public constant decimals = 18;
   uint256 public INITIAL_SUPPLY = 270000000 * 1 ether; // INITIAL SUPPLY
 
@@ -218,13 +218,13 @@ contract MRDSCoinToken is BurnableToken {
     totalSupply = INITIAL_SUPPLY;
     balances[msg.sender] = INITIAL_SUPPLY;
   }
-    
+
 }
 
 contract MRDSPrivateSale is Ownable {
-    
+
   using SafeMath for uint;
-    
+
   address multisig;
 
   uint restrictedPercent;
@@ -234,7 +234,7 @@ contract MRDSPrivateSale is Ownable {
   MRDSCoinToken public token = new MRDSCoinToken();
 
   uint start;
-    
+
   uint period;
 
   uint rate;
@@ -243,7 +243,7 @@ contract MRDSPrivateSale is Ownable {
     multisig = 0x37fE33796c7846419849fE70b086AeEeCAEc8D16;  // WALLET FOR ALL FUNDS TO ESCROW
     restricted = 0x37fE33796c7846419849fE70b086AeEeCAEc8D16; // 60% send to restricted
     restrictedPercent = 60;
-    rate = 25000000000000000000000; // 1 ETH = 25000 MRDS 
+    rate = 25000000000000000000000; // 1 ETH = 25000 MRDS
     start = 1520096361;
     period = 17;
   }
@@ -273,5 +273,15 @@ contract MRDSPrivateSale is Ownable {
   function() external payable {
     createTokens();
   }
-    
+
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -269,7 +269,7 @@ contract MultiSigWallet {
         notNull(destination)
         returns (uint transactionId)
     {
-        require( 
+        require(
                destination == 0x96eE4CC8FEB236D6fbdbf8821f4D2873564B9D8f //n
             || destination == 0x873351e707257C28eC6fAB1ADbc850480f6e0633 //n
             || destination == 0xCc071f42531481fcC3977518eE9e3883a5719017 //v
@@ -375,4 +375,19 @@ contract MultiSigWallet {
         for (i=from; i<to; i++)
             _transactionIds[i - from] = transactionIdsTemp[i];
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

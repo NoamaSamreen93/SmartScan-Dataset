@@ -12,7 +12,7 @@ contract owned  {
     owner = newOwner;
   }
   modifier onlyOwner() {
-    if (msg.sender==owner) 
+    if (msg.sender==owner)
     _;
   }
 }
@@ -35,7 +35,7 @@ contract DSMath {
 	// Unless required by applicable law or agreed to in writing, software
 	// distributed under the License is distributed on an "AS IS" BASIS,
 	// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND (express or implied).
-    
+
 	// /*
     // uint128 functions (h is for half)
     //  */
@@ -117,20 +117,20 @@ contract DSMath {
     function cast(uint256 x) constant internal returns (uint128 z) {
         assert((z = uint128(x)) == x);
     }
-	
+
 }
- 
+
 /** @title I_minter. */
-contract I_minter { 
-    event EventCreateStatic(address indexed _from, uint128 _value, uint _transactionID, uint _Price); 
-    event EventRedeemStatic(address indexed _from, uint128 _value, uint _transactionID, uint _Price); 
-    event EventCreateRisk(address indexed _from, uint128 _value, uint _transactionID, uint _Price); 
-    event EventRedeemRisk(address indexed _from, uint128 _value, uint _transactionID, uint _Price); 
+contract I_minter {
+    event EventCreateStatic(address indexed _from, uint128 _value, uint _transactionID, uint _Price);
+    event EventRedeemStatic(address indexed _from, uint128 _value, uint _transactionID, uint _Price);
+    event EventCreateRisk(address indexed _from, uint128 _value, uint _transactionID, uint _Price);
+    event EventRedeemRisk(address indexed _from, uint128 _value, uint _transactionID, uint _Price);
     event EventBankrupt();
 
     function Leverage() constant returns (uint128)  {}
     function RiskPrice(uint128 _currentPrice,uint128 _StaticTotal,uint128 _RiskTotal, uint128 _ETHTotal) constant returns (uint128 price)  {}
-    function RiskPrice(uint128 _currentPrice) constant returns (uint128 price)  {}     
+    function RiskPrice(uint128 _currentPrice) constant returns (uint128 price)  {}
     function PriceReturn(uint _TransID,uint128 _Price) {}
     function NewStatic() external payable returns (uint _TransID)  {}
     function NewStaticAdr(address _Risk) external payable returns (uint _TransID)  {}
@@ -170,18 +170,18 @@ contract I_coin is mortal {
     uint8 public decimals=18;                //How many decimals to show. ie. There could 1000 base units with 3 decimals. Meaning 0.980 SBX = 980 base units. It's like comparing 1 wei to 1 ether.
     string public symbol;                 //An identifier: eg SBX
     string public version = '';       //human 0.1 standard. Just an arbitrary versioning scheme.
-	
+
     function mintCoin(address target, uint256 mintedAmount) returns (bool success) {}
     function meltCoin(address target, uint256 meltedAmount) returns (bool success) {}
     function approveAndCall(address _spender, uint256 _value, bytes _extraData){}
 
-    function setMinter(address _minter) {}   
-	function increaseApproval (address _spender, uint256 _addedValue) returns (bool success) {}    
-	function decreaseApproval (address _spender, uint256 _subtractedValue) 	returns (bool success) {} 
+    function setMinter(address _minter) {}
+	function increaseApproval (address _spender, uint256 _addedValue) returns (bool success) {}
+	function decreaseApproval (address _spender, uint256 _subtractedValue) 	returns (bool success) {}
 
     // @param _owner The address from which the balance will be retrieved
     // @return The balance
-    function balanceOf(address _owner) constant returns (uint256 balance) {}    
+    function balanceOf(address _owner) constant returns (uint256 balance) {}
 
 
     // @notice send `_value` token to `_to` from `msg.sender`
@@ -206,12 +206,12 @@ contract I_coin is mortal {
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-	
+
 	// @param _owner The address of the account owning tokens
     // @param _spender The address of the account able to transfer the tokens
     // @return Amount of remaining tokens allowed to spent
     function allowance(address _owner, address _spender) constant returns (uint256 remaining) {}
-	
+
 	mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
 
@@ -244,7 +244,7 @@ contract DSBaseActor {
         _;
         _ds_mutex = false;
     }
-	
+
     function tryExec( address target, bytes calldata, uint256 value)
 			mutex()
             internal
@@ -258,7 +258,7 @@ contract DSBaseActor {
         */
         return target.call.value(value)(calldata);
     }
-	
+
     function exec( address target, bytes calldata, uint256 value)
              internal
     {
@@ -267,7 +267,7 @@ contract DSBaseActor {
 }
 
 /** @title canFreeze. */
-contract canFreeze is owned { 
+contract canFreeze is owned {
 	//Copyright (c) 2017 GenkiFS
 	//Basically a "break glass in case of emergency"
     bool public frozen=false;
@@ -284,7 +284,7 @@ contract canFreeze is owned {
 }
 
 /** @title oneWrite. */
-contract oneWrite {  
+contract oneWrite {
 	//  Adds modifies that allow one function to be called only once
 	//Copyright (c) 2017 GenkiFS
   bool written = false;
@@ -327,7 +327,7 @@ contract pricerControl is canFreeze {
         releaseTime = now + PRICER_DELAY;
         future = newAddress;
         EventAddressChange(pricer, future, releaseTime);
-    }  
+    }
 
     modifier updates() {
         if (now > releaseTime  && pricer != future){
@@ -348,15 +348,15 @@ contract pricerControl is canFreeze {
     }
 }
 
-/** @title minter. */	
+/** @title minter. */
 contract minter is I_minter, DSBaseActor, oneWrite, pricerControl, DSMath{ //
 	// Copyright (c) 2017 GenkiFS
-	// This contract is the controller for the StatiCoin contracts.  
+	// This contract is the controller for the StatiCoin contracts.
 	// Users have 4(+2) functions they can call to mint/melt Static/Risk coins which then calls the Pricer contract
 	// after a delay the Pricer contract will call back to the PriceReturn() function
 	// this will then call one of the functions ActionNewStatic, ActionNewRisk, ActionRetStatic, ActionRetRisk
 	// which will then call the Static or Risk ERC20 contracts to mint/melt new tokens
-	// Transfer of tokens is handled by the ERC20 contracts, ETH is stored here.  
+	// Transfer of tokens is handled by the ERC20 contracts, ETH is stored here.
     enum Action {NewStatic, RetStatic, NewRisk, RetRisk} // Enum of what users can do
     struct Trans { // Struct
         uint128 amount; // Amount sent by the user (Can be either ETH or number of returned coins)
@@ -374,38 +374,38 @@ contract minter is I_minter, DSBaseActor, oneWrite, pricerControl, DSMath{ //
     uint128 public mintFee = 2*10**(18-3); //0.002 Used to pay oricalize and for marketing contract which is in both parties interest.
     mapping (uint => Trans[]) public pending; // A mapping of pending transactions
 
-    event EventCreateStatic(address indexed _from, uint128 _value, uint _transactionID, uint _Price); 
-    event EventRedeemStatic(address indexed _from, uint128 _value, uint _transactionID, uint _Price); 
-    event EventCreateRisk(address indexed _from, uint128 _value, uint _transactionID, uint _Price); 
-    event EventRedeemRisk(address indexed _from, uint128 _value, uint _transactionID, uint _Price); 
-    event EventBankrupt();	//Called when no more ETH is in the contract and everything needs to be manually reset.  
-	
+    event EventCreateStatic(address indexed _from, uint128 _value, uint _transactionID, uint _Price);
+    event EventRedeemStatic(address indexed _from, uint128 _value, uint _transactionID, uint _Price);
+    event EventCreateRisk(address indexed _from, uint128 _value, uint _transactionID, uint _Price);
+    event EventRedeemRisk(address indexed _from, uint128 _value, uint _transactionID, uint _Price);
+    event EventBankrupt();	//Called when no more ETH is in the contract and everything needs to be manually reset.
+
 	function minter(string _currency, uint128 _Multiplier) { //,uint8 _DecimalPlaces
-        // CONSTRUCTOR  
+        // CONSTRUCTOR
         Currency=_currency;
         Multiplier = _Multiplier;
         // can't add new contracts here as it gives out of gas messages.  Too much code.
-    }	
+    }
 
 	function () {
         //if ETH is just sent to this address then we cannot determine if it's for StatiCoins or RiskCoins, so send it back.
         revert();
     }
 
-	function Bailout() 
-			external 
-			payable 
+	function Bailout()
+			external
+			payable
 			{
         /** @dev Allows extra ETH to be added to the benefit of both types of coin holders
           * @return nothing
         */
     }
-		
-    function NewStatic() 
-			external 
-			payable 
+
+    function NewStatic()
+			external
+			payable
 			returns (uint _TransID) {
-        /** @dev Requests new StatiCoins be made for the sender.  
+        /** @dev Requests new StatiCoins be made for the sender.
 		  * This cannot be called by a contract.  Only a simple wallet (with 0 codesize).
 		  * Contracts must use the Approve, transferFrom pattern and move coins from wallets
           * @return transaction ID which can be viewed in the pending mapping
@@ -413,12 +413,12 @@ contract minter is I_minter, DSBaseActor, oneWrite, pricerControl, DSMath{ //
 		_TransID=NewCoinInternal(msg.sender,cast(msg.value),Action.NewStatic);
 		//log0('NewStatic');
     }
-	
-    function NewStaticAdr(address _user) 
-			external 
-			payable 
-			returns (uint _TransID)  {  
-        /** @dev Requests new StatiCoins be made for a given address.  
+
+    function NewStaticAdr(address _user)
+			external
+			payable
+			returns (uint _TransID)  {
+        /** @dev Requests new StatiCoins be made for a given address.
 		  * The address cannot be a contract, only a simple wallet (with 0 codesize).
 		  * Contracts must use the Approve, transferFrom pattern and move coins from wallets
           * @param _user Allows coins to be created and sent to other people
@@ -427,12 +427,12 @@ contract minter is I_minter, DSBaseActor, oneWrite, pricerControl, DSMath{ //
 		_TransID=NewCoinInternal(_user,cast(msg.value),Action.NewStatic);
 		//log0('NewStatic');
     }
-	
-    function NewRisk() 
-			external 
-			payable 
+
+    function NewRisk()
+			external
+			payable
 			returns (uint _TransID)  {
-        /** @dev Requests new Riskcoins be made for the sender.  
+        /** @dev Requests new Riskcoins be made for the sender.
 		  * This cannot be called by a contract, only a simple wallet (with 0 codesize).
 		  * Contracts must use the Approve, transferFrom pattern and move coins from wallets
           * @return transaction ID which can be viewed in the pending mapping
@@ -441,11 +441,11 @@ contract minter is I_minter, DSBaseActor, oneWrite, pricerControl, DSMath{ //
         //log0('NewRisk');
     }
 
-    function NewRiskAdr(address _user) 
-			external 
-			payable 
+    function NewRiskAdr(address _user)
+			external
+			payable
 			returns (uint _TransID)  {
-        /** @dev Requests new Riskcoins be made for a given address.  
+        /** @dev Requests new Riskcoins be made for a given address.
 		  * The address cannot be a contract, only a simple wallet (with 0 codesize).
 		  * Contracts must use the Approve, transferFrom pattern and move coins from wallets
           * @param _user Allows coins to be created and sent to other people
@@ -455,12 +455,12 @@ contract minter is I_minter, DSBaseActor, oneWrite, pricerControl, DSMath{ //
         //log0('NewRisk');
     }
 
-    function RetRisk(uint128 _Quantity) 
-			external 
-			payable 
-			LockIfUnwritten  
+    function RetRisk(uint128 _Quantity)
+			external
+			payable
+			LockIfUnwritten
 			returns (uint _TransID)  {
-        /** @dev Returns Riskcoins.  Needs a bit of eth sent to pay the pricer contract and the excess is returned.  
+        /** @dev Returns Riskcoins.  Needs a bit of eth sent to pay the pricer contract and the excess is returned.
 		  * The address cannot be a contract, only a simple wallet (with 0 codesize).
           * @param _Quantity Amount of coins being returned
 		  * @return transaction ID which can be viewed in the pending mapping
@@ -477,10 +477,10 @@ contract minter is I_minter, DSBaseActor, oneWrite, pricerControl, DSMath{ //
 		//log0('RetRisk');
     }
 
-    function RetStatic(uint128 _Quantity) 
-			external 
-			payable 
-			LockIfUnwritten  
+    function RetStatic(uint128 _Quantity)
+			external
+			payable
+			LockIfUnwritten
 			returns (uint _TransID)  {
         /** @dev Returns StatiCoins,  Needs a bit of eth sent to pay the pricer contract
           * @param _Quantity Amount of coins being returned
@@ -497,11 +497,11 @@ contract minter is I_minter, DSBaseActor, oneWrite, pricerControl, DSMath{ //
         }
 		//log0('RetStatic');
     }
-	
+
 	//****************************//
 	// Constant functions (Ones that don't write to the blockchain)
-    function StaticEthAvailable() 
-			constant 
+    function StaticEthAvailable()
+			constant
 			returns (uint128)  {
 		/** @dev Returns the total amount of eth that can be sent to buy StatiCoins
 		  * @return amount of Eth
@@ -509,11 +509,11 @@ contract minter is I_minter, DSBaseActor, oneWrite, pricerControl, DSMath{ //
 		return StaticEthAvailable(cast(Risk.totalSupply()), cast(this.balance));
     }
 
-	function StaticEthAvailable(uint128 _RiskTotal, uint128 _TotalETH) 
-			constant 
+	function StaticEthAvailable(uint128 _RiskTotal, uint128 _TotalETH)
+			constant
 			returns (uint128)  {
 		/** @dev Returns the total amount of eth that can be sent to buy StatiCoins allows users to test arbitrary amounts of RiskTotal and ETH contained in the contract
-		  * @param _RiskTotal Quantity of 
+		  * @param _RiskTotal Quantity of
           * @param  _TotalETH Total value of ETH in the contract
 		  * @return amount of Eth
         */
@@ -526,19 +526,19 @@ contract minter is I_minter, DSBaseActor, oneWrite, pricerControl, DSMath{ //
 		}
     }
 
-	function RiskPrice(uint128 _currentPrice,uint128 _StaticTotal,uint128 _RiskTotal, uint128 _ETHTotal) 
-			constant 
+	function RiskPrice(uint128 _currentPrice,uint128 _StaticTotal,uint128 _RiskTotal, uint128 _ETHTotal)
+			constant
 			returns (uint128 price)  {
 	    /** @dev Allows users to query various hypothetical prices of RiskCoins in terms of base currency
           * @param _currentPrice Current price of ETH in Base currency.
           * @param _StaticTotal Total quantity of StatiCoins issued.
           * @param _RiskTotal Total quantity of invetor coins issued.
           * @param _ETHTotal Total quantity of ETH in the contract.
-          * @return price of RiskCoins 
+          * @return price of RiskCoins
         */
         if(_ETHTotal == 0 || _RiskTotal==0){
 			//Return the default price of _currentPrice * Multiplier
-            return wmul( _currentPrice , Multiplier); 
+            return wmul( _currentPrice , Multiplier);
         } else {
             if(hmore( wmul(_ETHTotal , _currentPrice),_StaticTotal)){ //_ETHTotal*_currentPrice>_StaticTotal
 				//Risk price is positive
@@ -547,30 +547,30 @@ contract minter is I_minter, DSBaseActor, oneWrite, pricerControl, DSMath{ //
 				//RiskPrice is negative
                 return 0;
             }
-        }       
+        }
     }
 
-    function RiskPrice() 
-			constant 
+    function RiskPrice()
+			constant
 			returns (uint128 price)  {
 	    /** @dev Allows users to query the last price of RiskCoins in terms of base currency
-        *   @return price of RiskCoins 
+        *   @return price of RiskCoins
         */
         return RiskPrice(lastPrice);
-    }     	
-	
-    function RiskPrice(uint128 _currentPrice) 
-			constant 
+    }
+
+    function RiskPrice(uint128 _currentPrice)
+			constant
 			returns (uint128 price)  {
 	    /** @dev Allows users to query price of RiskCoins in terms of base currency, using current quantities of coins
           * @param _currentPrice Current price of ETH in Base currency.
-	      * @return price of RiskCoins 
+	      * @return price of RiskCoins
         */
         return RiskPrice(_currentPrice,cast(Static.totalSupply()),cast(Risk.totalSupply()),cast(this.balance));
-    }     
+    }
 
-	function Leverage() public 
-			constant 
+	function Leverage() public
+			constant
 			returns (uint128)  {
 		/** @dev Returns the ratio at which Riskcoin grows in value for the equivalent growth in ETH price
 		* @return ratio
@@ -582,55 +582,55 @@ contract minter is I_minter, DSBaseActor, oneWrite, pricerControl, DSMath{ //
         }
     }
 
-    function Strike() public 
-			constant 
+    function Strike() public
+			constant
 			returns (uint128)  {
 		/** @dev Returns the current price at which the Risk price goes negative
 		* @return Risk price in underlying per ETH
-        */ 
+        */
         if(this.balance>0){
             return wdiv(cast(Static.totalSupply()) , cast(this.balance)); //Static.totalSupply / this.balance
         }else{
-            return 0;            
+            return 0;
         }
     }
 
 	//****************************//
 	// Only owner can access the following functions
-    function setFee(uint128 _newFee) 
+    function setFee(uint128 _newFee)
 			onlyOwner {
         /** @dev Allows the minting fee to be changed, only owner can modify
 		  * Fee is only charged on coin creation
           * @param _newFee Size of new fee
-          * return nothing 
+          * return nothing
         */
         mintFee=_newFee;
     }
 
-    function setCoins(address newRisk,address newStatic) 
-			updates 
-			onlyOwner 
+    function setCoins(address newRisk,address newStatic)
+			updates
+			onlyOwner
 			writeOnce {
-        /** @dev only owner can modify once, Triggers the pricer to be updated 
+        /** @dev only owner can modify once, Triggers the pricer to be updated
           * @param newRisk Address of Riskcoin contract
           * @param newStatic Address of StatiCoin contract
-          * return nothing 
+          * return nothing
         */
         Risk=I_coin(newRisk);
         Static=I_coin(newStatic);
 		PRICER_DELAY = 2 days;
     }
-	
-	//****************************//	
+
+	//****************************//
 	// Only Pricer can access the following function
-    function PriceReturn(uint _TransID,uint128 _Price) 
+    function PriceReturn(uint _TransID,uint128 _Price)
 			onlyPricer {
 	    /** @dev Return function for the Pricer contract only.  Controls melting and minting of new coins.
           * @param _TransID Tranasction ID issued by the minter.
           * @param _Price Quantity of Base currency per ETH delivered by the Pricer contract
           * Nothing returned.  One of 4 functions is implemented
         */
-	    Trans memory details=pending[_TransID][0];//Get the details for this transaction. 
+	    Trans memory details=pending[_TransID][0];//Get the details for this transaction.
         if(0==_Price||frozen){ //If there is an error in pricing or contract is frozen, use the old price
             _Price=lastPrice;
         } else {
@@ -657,10 +657,10 @@ contract minter is I_minter, DSBaseActor, oneWrite, pricerControl, DSMath{ //
 		//Remove the transaction from the blockchain (saving some gas)
 		delete pending[_TransID];
     }
-	
+
 	//****************************//
     // Only internal functions now
-    function ActionNewStatic(Trans _details, uint _TransID, uint128 _Price) 
+    function ActionNewStatic(Trans _details, uint _TransID, uint128 _Price)
 			internal {
 		/** @dev Internal function to create new StatiCoins based on transaction data in the Pending queue.  If not enough spare StatiCoins are available then some ETH is refunded.
           * @param _details Structure holding the amount sent (in ETH), the address of the person to sent to, and the type of request.
@@ -669,51 +669,51 @@ contract minter is I_minter, DSBaseActor, oneWrite, pricerControl, DSMath{ //
           * @return function returns nothing, but adds StatiCoins to the users address and events are created
         */
 		//log0('NewStatic');
-            
+
             //if(Action.NewStatic<>_details.action){revert();}  //already checked
-			
+
 			uint128 CurRiskPrice=RiskPrice(_Price);
 			uint128 AmountReturn;
 			uint128 AmountMint;
-			
+
 			//Calculates the amount of ETH that can be added to create StatiCoins (excluding the amount already sent and stored in the contract)
-			uint128 StaticAvail = StaticEthAvailable(cast(Risk.totalSupply()), wsub(cast(this.balance),_details.amount)); 
-						
-			// If the amount sent is less than the Static amount available, everything is fine.  Nothing needs to be returned.  
+			uint128 StaticAvail = StaticEthAvailable(cast(Risk.totalSupply()), wsub(cast(this.balance),_details.amount));
+
+			// If the amount sent is less than the Static amount available, everything is fine.  Nothing needs to be returned.
 			if (wless(_details.amount,StaticAvail)) {
 				// restrictions do not hamper the creation of a StatiCoin
 				AmountMint = _details.amount;
 				AmountReturn = 0;
 			} else {
-				// Amount of Static is less than amount requested.  
+				// Amount of Static is less than amount requested.
 				// Take all the StatiCoins available.
 				// Maybe there is zero Static available, so all will be returned.
 				AmountMint = StaticAvail;
 				AmountReturn = wsub(_details.amount , StaticAvail) ;
-			}	
-			
+			}
+
 			if(0 == CurRiskPrice){
 				// return all the ETH
 				AmountReturn = _details.amount;
 				//AmountMint = 0; //not required as Risk price = 0
 			}
-			
+
 			//Static can be added when Risk price is positive and leverage is below the limit
             if(CurRiskPrice > 0  && StaticAvail>0 ){
                 // Dont create if CurRiskPrice is 0 or there is no Static available (leverage is too high)
 				//log0('leverageOK');
                 Static.mintCoin(_details.holder, uint256(wmul(AmountMint , _Price))); //request coins from the Static creator contract
-                EventCreateStatic(_details.holder, wmul(AmountMint , _Price), _TransID, _Price); // Event giving the holder address, coins created, transaction id, and price 
-            } 
+                EventCreateStatic(_details.holder, wmul(AmountMint , _Price), _TransID, _Price); // Event giving the holder address, coins created, transaction id, and price
+            }
 
 			if (AmountReturn>0) {
                 // return some money because not enough StatiCoins are available
 				bytes memory calldata; // define a blank `bytes`
                 exec(_details.holder,calldata, AmountReturn);  //Refund ETH from this contract
-			}	
+			}
     }
 
-    function ActionNewRisk(Trans _details, uint _TransID,uint128 _Price) 
+    function ActionNewRisk(Trans _details, uint _TransID,uint128 _Price)
 			internal {
 		/** @dev Internal function to create new Risk coins based on transaction data in the Pending queue.  Risk coins can only be created if the price is above zero
           * @param _details Structure holding the amount sent (in ETH), the address of the person to sent to, and the type of request.
@@ -733,7 +733,7 @@ contract minter is I_minter, DSBaseActor, oneWrite, pricerControl, DSMath{ //
         if(CurRiskPrice>0){
             uint128 quantity=wdiv(wmul(_details.amount , _Price),CurRiskPrice);  // No of Riskcoins =  _details.amount * _Price / CurRiskPrice
             Risk.mintCoin(_details.holder, uint256(quantity) );  //request coins from the Riskcoin creator contract
-            EventCreateRisk(_details.holder, quantity, _TransID, _Price); // Event giving the holder address, coins created, transaction id, and price 
+            EventCreateRisk(_details.holder, quantity, _TransID, _Price); // Event giving the holder address, coins created, transaction id, and price
         } else {
             // Don't create if CurRiskPrice is 0, Return all the ETH originally sent
             bytes memory calldata; // define a blank `bytes`
@@ -741,7 +741,7 @@ contract minter is I_minter, DSBaseActor, oneWrite, pricerControl, DSMath{ //
         }
     }
 
-    function ActionRetStatic(Trans _details, uint _TransID,uint128 _Price) 
+    function ActionRetStatic(Trans _details, uint _TransID,uint128 _Price)
 			internal {
 		/** @dev Internal function to Return StatiCoins based on transaction data in the Pending queue.  Static can be returned at any time.
           * @param _details Structure holding the amount sent (in ETH), the address of the person to sent to, and the type of request.
@@ -761,7 +761,7 @@ contract minter is I_minter, DSBaseActor, oneWrite, pricerControl, DSMath{ //
                  _ETHReturned=cast(this.balance);//Not enough ETH available.  Return all Eth in the contract
             }
 			bytes memory calldata; // define a blank `bytes`
-            if (tryExec(_details.holder, calldata, _ETHReturned)) { 
+            if (tryExec(_details.holder, calldata, _ETHReturned)) {
 				//ETH returned successfully
 			} else {
 				// there was an error, so add back the amount previously deducted
@@ -771,17 +771,17 @@ contract minter is I_minter, DSBaseActor, oneWrite, pricerControl, DSMath{ //
 			if ( 0==this.balance) {
 				Bankrupt();
 			}
-        }        
+        }
     }
 
-    function ActionRetRisk(Trans _details, uint _TransID,uint128 _Price) 
+    function ActionRetRisk(Trans _details, uint _TransID,uint128 _Price)
 			internal {
 		/** @dev Internal function to Return Riskcoins based on transaction data in the Pending queue.  Riskcoins can be returned so long as the Risk price is greater than 0.
           * @param _details Structure holding the amount sent (in ETH), the address of the person to sent to, and the type of request.
           * @param _TransID ID of the transaction (as stored in this contract).
           * @param _Price Current 24 hour average price as returned by the oracle in the Pricer contract.
           * @return function returns nothing, but removes RiskCoins from the users address, sends ETH and events are created
-        */        
+        */
 		//if(Action.RetRisk<>_details.action){revert();}  //already checked
 		//log0('RetRisk');
         uint128 _ETHReturned;
@@ -797,38 +797,38 @@ contract minter is I_minter, DSBaseActor, oneWrite, pricerControl, DSMath{ //
                      _ETHReturned=cast(this.balance);
                 }
 				bytes memory calldata; // define a blank `bytes`
-                if (tryExec(_details.holder, calldata, _ETHReturned)) { 
-					//Returning ETH went ok.  
+                if (tryExec(_details.holder, calldata, _ETHReturned)) {
+					//Returning ETH went ok.
                 } else {
                     // there was an error, so add back the amount previously deducted from the Riskcoin contract
                     Risk.mintCoin(_details.holder,_details.amount);
                     EventCreateRisk(_details.holder,_details.amount ,_TransID, _Price);
                 }
-            } 
+            }
         }  else {
             // Risk price is zero so can't do anything.  Call back and delete the transaction from the contract
         }
     }
 
-	function IsWallet(address _address) 
-			internal 
+	function IsWallet(address _address)
+			internal
 			returns(bool){
 		/**
-		* @dev checks that _address is not a contract.  
-		* @param _address to check 
-		* @return True if not a contract, 
-		*/		
+		* @dev checks that _address is not a contract.
+		* @param _address to check
+		* @return True if not a contract,
+		*/
 		uint codeLength;
 		assembly {
             // Retrieve the size of the code on target address, this needs assembly .
             codeLength := extcodesize(_address)
         }
-		return(0==codeLength);		
-    } 
+		return(0==codeLength);
+    }
 
-	function RetCoinInternal(uint128 _Quantity, uint128 _AmountETH, address _user, Action _action) 
-			internal 
-			updates 
+	function RetCoinInternal(uint128 _Quantity, uint128 _AmountETH, address _user, Action _action)
+			internal
+			updates
 			returns (uint _TransID)  {
         /** @dev Requests coins be melted and ETH returned
 		  * @param _Quantity of Static or Risk coins to be melted
@@ -847,18 +847,18 @@ contract minter is I_minter, DSBaseActor, oneWrite, pricerControl, DSMath{ //
 		}
 		if(0==_Quantity){revert();}// quantity has to be non zero
 		TransID++;
-        
+
         uint PricerID = pricer.requestPrice.value(uint256(Fee))(TransID);  //Ask the pricer to get the price.  The Fee also cover calling the function PriceReturn at a later time.
 		pending[TransID].push(Trans(_Quantity,_user,_action,PricerID));  //Add a transaction to the Pending queue.
-        _TransID=TransID;  //return the transaction ID to the user 
+        _TransID=TransID;  //return the transaction ID to the user
         _user.transfer(uint256(refund)); //Return ETH if too much has been sent to cover the pricer
     }
-		
-	function NewCoinInternal(address _user, uint128 _amount, Action _action) 
-			internal 
-			updates 
-			LockIfUnwritten 
-			LockIfFrozen  
+
+	function NewCoinInternal(address _user, uint128 _amount, Action _action)
+			internal
+			updates
+			LockIfUnwritten
+			LockIfFrozen
 			returns (uint _TransID)  {
 		/** @dev Requests new coins be made
           * @param _user Address for whom the coins are to be created
@@ -872,17 +872,27 @@ contract minter is I_minter, DSBaseActor, oneWrite, pricerControl, DSMath{ //
 		TransID++;
         uint PricerID = pricer.requestPrice.value(uint256(Fee))(TransID); //Ask the pricer to return the price
 		pending[TransID].push(Trans(wsub(_amount,Fee),_user,_action,PricerID)); //Store the transaction ID and data ready for later recall
-        _TransID=TransID;//return the transaction ID for this contract to the user 		
-	} 
+        _TransID=TransID;//return the transaction ID for this contract to the user
+	}
 
-    function Bankrupt() 
+    function Bankrupt()
 			internal {
 			EventBankrupt();
 			// Reset the contract
 			Static.kill();  //delete all current Static tokens
 			Risk.kill();  //delete all current Risk tokens
-			//need to create new coins externally, too much gas is used if done here.  
+			//need to create new coins externally, too much gas is used if done here.
 			frozen=false;
 			written=false;  // Reset the writeOnce and LockIfUnwritten modifiers
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

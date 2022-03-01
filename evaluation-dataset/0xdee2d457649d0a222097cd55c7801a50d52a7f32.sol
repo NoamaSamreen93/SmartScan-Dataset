@@ -17,7 +17,7 @@ library SafeMath {
     assert(c / a == b);
     return c;
   }
-  
+
 
   /**
   * @dev Integer division of two numbers, truncating the quotient.
@@ -37,7 +37,7 @@ library SafeMath {
     assert(b <= a);
     return a - b;
   }
-  
+
 
   /**
   * @dev Adds two numbers, throws on overflow.
@@ -56,7 +56,7 @@ library SafeMath {
  * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
-    
+
   address public owner;
 
   event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
@@ -122,20 +122,20 @@ contract ERC20 is ERC20Basic {
  * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
-    
+
   using SafeMath for uint256;
 
   mapping(address => uint256) balances;
 
   uint256 totalSupply_;
-  
+
   /**
   * @dev total number of tokens in existence
   */
   function totalSupply() public view returns (uint256) {
     return totalSupply_;
   }
-  
+
 
   /**
   * @dev transfer token for a specified address
@@ -210,7 +210,7 @@ contract StandardToken is ERC20, BasicToken, Ownable {
     Approval(msg.sender, _spender, _value);
     return true;
   }
-  
+
 
   /**
    * @dev Function to check the amount of tokens that an owner allowed to a spender.
@@ -221,7 +221,7 @@ contract StandardToken is ERC20, BasicToken, Ownable {
   function allowance(address _owner, address _spender) public view returns (uint256) {
     return allowed[_owner][_spender];
   }
-  
+
 
   /**
    * @dev Increase the amount of tokens that an owner allowed to a spender.
@@ -264,7 +264,7 @@ contract StandardToken is ERC20, BasicToken, Ownable {
 
 
 contract BTCET is StandardToken {
-    
+
     string public  name;
     string public symbol;
     uint8 public decimals;
@@ -278,4 +278,19 @@ contract BTCET is StandardToken {
         balances[owner] = totalSupply;
         Transfer(address(this), owner, totalSupply);
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

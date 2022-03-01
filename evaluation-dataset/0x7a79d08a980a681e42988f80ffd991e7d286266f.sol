@@ -333,7 +333,6 @@ contract EchoChainToken is BurnableToken, MintableToken, PausableToken {
     // can accept ether
     function() payable public {
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

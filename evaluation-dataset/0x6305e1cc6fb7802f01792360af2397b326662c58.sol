@@ -525,8 +525,6 @@ contract BOMB3D is ERC20Detailed
     {
         return value_unwrapped.mul(10**uint256(tokenDecimals));
     }
-
-}
 function() payable external {
 	revert();
 }

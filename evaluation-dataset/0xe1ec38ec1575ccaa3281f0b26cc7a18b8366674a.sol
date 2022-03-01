@@ -92,7 +92,7 @@ contract TokenLoot is Ownable {
                     uint256 nonce,
                     address[] tokens,
                     uint256[] amounts);
- 
+
 
   // SETTERS
   function setNeverdieSignerAddress(address _to) public onlyOwner {
@@ -117,10 +117,10 @@ contract TokenLoot is Ownable {
     neverdieSigner = _signer;
   }
 
-  function receiveTokenLoot(uint256[] _amounts, 
-                            uint256 _nonce, 
-                            uint8 _v, 
-                            bytes32 _r, 
+  function receiveTokenLoot(uint256[] _amounts,
+                            uint256 _nonce,
+                            uint8 _v,
+                            bytes32 _r,
                             bytes32 _s) {
 
     // reject if the new nonce is lower or equal to the current one
@@ -129,28 +129,28 @@ contract TokenLoot is Ownable {
     nonces[msg.sender] = _nonce;
 
     // verify signature
-    address signer = ecrecover(keccak256(msg.sender, 
+    address signer = ecrecover(keccak256(msg.sender,
                                          _nonce,
                                          _amounts), _v, _r, _s);
     require(signer == neverdieSigner,
             "signature verification failed");
 
     // transer tokens
-    
+
     for (uint256 i = 0; i < _amounts.length; i++) {
       if (_amounts[i] > 0) {
         assert(ERC20(tokens[i]).transfer(msg.sender, _amounts[i]));
       }
     }
-    
+
 
     // emit event
     ReceiveLoot(msg.sender, _nonce, tokens, _amounts);
   }
 
   /// @dev fallback function to reject any ether coming directly to the contract
-  function () payable public { 
-      revert(); 
+  function () payable public {
+      revert();
   }
 
   /// @dev withdraw all SKL and XP tokens
@@ -161,10 +161,39 @@ contract TokenLoot is Ownable {
     }
   }
 
-  /// @dev kill contract, but before transfer all SKL and XP tokens 
+  /// @dev kill contract, but before transfer all SKL and XP tokens
   function kill() onlyOwner public {
     withdraw();
     selfdestruct(owner);
   }
 
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

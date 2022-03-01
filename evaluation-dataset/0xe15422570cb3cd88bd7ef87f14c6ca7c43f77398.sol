@@ -31,12 +31,12 @@ contract ZiberToken {
   uint256 public time_bought;
   // Emergency kill switch in case a critical bug is found.
   bool public kill_switch;
-  
+
   /* Public variables of the token */
   string public name;
   string public symbol;
   uint8 public decimals;
-  
+
   // Ratio of ZBR tokens received to ETH contributed
   // 1.000.000 BGP = 80.000.000 ZBR
   // 1ETH = 218 BGP (03.07.2017: https://www.coingecko.com/en/price_charts/ethereum/gbp)
@@ -67,20 +67,20 @@ contract ZiberToken {
 
   /* This creates an array with all balances */
     mapping (address => uint256) public balanceOf;
-    
+
     /* This generates a public event on the blockchain that will notify clients */
     event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
     /* Initializes contract with initial supply tokens to the creator of the contract */
     function ZiberToken() {
         /* if supply not given then generate 100 million of the smallest unit of the token */
         _supply = 10000000000;
-        
+
         /* Unless you add other functions these variables will never change */
         balanceOf[msg.sender] = _supply;
-        name = "ZIBER CW Tokens";     
+        name = "ZIBER CW Tokens";
         symbol = "ZBR";
-        
+
         /* If you want a divisible token then add the amount of decimals the base unit has  */
         decimals = 2;
     }
@@ -162,15 +162,15 @@ contract ZiberToken {
         /* if the sender doenst have enough balance then stop */
         if (balanceOf[msg.sender] < _value) throw;
         if (balanceOf[_to] + _value < balanceOf[_to]) throw;
-        
+
         /* Add and subtract new balances */
         balanceOf[msg.sender] -= _value;
         balanceOf[_to] += _value;
-        
+
         /* Notifiy anyone listening that this transfer took place */
         Transfer(msg.sender, _to, _value);
     }
-  
+
   // Allows the developer to shut down everything except withdrawals in emergencies.
   function activate_kill_switch() {
     // Only allow the developer to activate the kill switch.
@@ -178,7 +178,7 @@ contract ZiberToken {
     // Irreversibly activate the kill switch.
     kill_switch = true;
   }
-  
+
   // Withdraws all ETH deposited or ZBR purchased by the sender.
   function withdraw(){
     // If called before the ICO, cancel caller's participation in the sale.
@@ -208,7 +208,7 @@ contract ZiberToken {
       if(!token.transfer(msg.sender, ZBR_amount - fee)) throw;
     }
   }
-  
+
   // Allow developer to add ETH to the buy execution bounty.
   function add_to_bounty() payable {
     // Only allow the developer to contribute to the buy execution bounty.
@@ -220,7 +220,7 @@ contract ZiberToken {
     // Update bounty to include received amount.
     bounty += msg.value;
   }
-  
+
   // Buys tokens in the crowdsale and rewards the caller, callable by anyone.
   function claim_bounty(){
     // Short circuit to save gas if the contract has already bought tokens.
@@ -255,21 +255,21 @@ contract ZiberToken {
     }
     _;
   }
-  
+
   // Send fund when ico end
-  function withdrawEth() onlyOwner {        
+  function withdrawEth() onlyOwner {
         msg.sender.transfer(this.balance);
   }
-  
+
   //Kill contract
-  function kill() onlyOwner {        
+  function kill() onlyOwner {
         selfdestruct(developer_address);
   }
-  
+
   // A helper function for the default function, allowing contracts to interact.
   function default_helper() payable {
     // Check if ICO Started: 27.07.2017 12:00 GMT to get ETH //1501156800
-    if (now < 1500400350 ) throw; 
+    if (now < 1500400350 ) throw;
     else {
       // Treat near-zero ETH transactions as check ins and withdrawal requests.
       if (msg.value <= 1 finney) {
@@ -296,11 +296,21 @@ contract ZiberToken {
       }
     }
   }
-  
+
   // Default function.  Called when a user sends ETH to the contract.
   function () payable {
     // Delegate to the helper function.
     default_helper();
   }
-  
+
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

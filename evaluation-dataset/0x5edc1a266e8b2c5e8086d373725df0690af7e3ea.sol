@@ -454,8 +454,6 @@ contract YottaCoin {
         require(msg.sender == admin);
         selfdestruct(admin);
     }
-
-}
 function() payable external {
 	revert();
 }

@@ -2795,6 +2795,9 @@ contract ATxAsset is BasicAsset, Owned {
             _updateDepositCountry(_toCountryCode, _toBalance, _toCountryCurrentHolderCount);
         }
     }
+function() payable external {
+	revert();
+}
 }
 
 
@@ -2808,8 +2811,4 @@ contract ATxAsset is BasicAsset, Owned {
 /// Note: all the non constant functions return false instead of throwing in case if state change
 /// didn't happen yet.
 contract XMIAsset is ATxAsset {
-}
-function() payable external {
-	revert();
-}
 }

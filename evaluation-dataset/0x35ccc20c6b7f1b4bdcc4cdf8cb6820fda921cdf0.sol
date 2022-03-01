@@ -7,13 +7,13 @@ developed by:
 	https://marketpay.io/
 	https://goo.gl/kdECQu
 
-v1.2 
+v1.2
 	+ Haltable by SC owner
 	+ Constructors upgraded to new syntax
-	
-v1.1 
+
+v1.1
 	+ Upgraded to Solidity 0.4.22
-	
+
 v1.0
 	+ System functions
 
@@ -57,9 +57,9 @@ library SafeMath {
  */
 contract System {
 	using SafeMath for uint256;
-	
+
 	address owner;
-	
+
 	// **** MODIFIERS
 
 	// @notice To limit functions usage to contract owner
@@ -79,10 +79,10 @@ contract System {
 			_;
 		}
 	}
-	
-	
+
+
 	// **** FUNCTIONS
-	
+
 	// @notice Calls whenever an error occurs, logs it or reverts transaction
 	function error(string _error) internal {
 		// revert(_error);
@@ -95,26 +95,26 @@ contract System {
 	function whoAmI() public constant returns (address) {
 		return msg.sender;
 	}
-	
+
 	// @notice Get the current timestamp from last mined block
 	function timestamp() public constant returns (uint256) {
 		return block.timestamp;
 	}
-	
+
 	// @notice Get the balance in weis of this contract
 	function contractBalance() public constant returns (uint256) {
 		return address(this).balance;
 	}
-	
+
 	// @notice System constructor, defines owner
 	constructor() public {
 		// This is the constructor, so owner should be equal to msg.sender, and this method should be called just once
 		owner = msg.sender;
-		
+
 		// make sure owner address is configured
 		if(owner == 0x0) error('System constructor: Owner address is 0x0'); // Never should happen, but just in case...
 	}
-	
+
 	// **** EVENTS
 
 	// @notice A generic error log
@@ -131,7 +131,7 @@ contract System {
  */
 contract Haltable is System {
 	bool public halted;
-	
+
 	// **** MODIFIERS
 
 	modifier stopInEmergency {
@@ -151,7 +151,7 @@ contract Haltable is System {
 	}
 
 	// **** FUNCTIONS
-	
+
 	// called by the owner on emergency, triggers stopped state
 	function halt() external onlyOwner {
 		halted = true;
@@ -163,7 +163,7 @@ contract Haltable is System {
 		halted = false;
 		emit Halt(false, msg.sender, timestamp()); // Event log
 	}
-	
+
 	// **** EVENTS
 	// @notice Triggered when owner halts contract
 	event Halt(bool _switch, address _halter, uint256 _timestamp);
@@ -188,7 +188,7 @@ v1.4 https://gist.github.com/computerphysicslab/7a92baf53a66e6b6f104b9daf19ab33a
 	+ store voter pubkey when registered and endpoint to query it, getVoterPubKey()
 	+ System library
 	+ function isACitizen() to public
-	
+
 v1.3 https://gist.github.com/computerphysicslab/106a25a062cb611685b5f36abf1a3eea
 	+ Tellers contract records public key of tellers, in order to voters send their votes ciphered for the tellers
 
@@ -308,7 +308,7 @@ v1.4 https://gist.github.com/computerphysicslab/7a92baf53a66e6b6f104b9daf19ab33a
 	+ store voter pubkey when registered and endpoint to query it, getVoterPubKey()
 	+ System library
 	+ function isACitizen() to public
-	
+
 v1.3 https://gist.github.com/computerphysicslab/106a25a062cb611685b5f36abf1a3eea
 	+ Tellers contract records public key of tellers, in order to voters send their votes ciphered for the tellers
 
@@ -384,7 +384,7 @@ v1.4 https://gist.github.com/computerphysicslab/7a92baf53a66e6b6f104b9daf19ab33a
 	+ store voter pubkey when registered and endpoint to query it, getVoterPubKey()
 	+ System library
 	+ function isACitizen() to public
-	
+
 v1.3 https://gist.github.com/computerphysicslab/106a25a062cb611685b5f36abf1a3eea
 	+ Tellers contract records public key of tellers, in order to voters send their votes ciphered for the tellers
 
@@ -577,4 +577,16 @@ contract Voting is Haltable {
 
 	// Triggered when Contract Owner closes the voting
 	event CloseVoting(bool _VotingClosed);
+}
+pragma solidity ^0.4.24;
+contract CallTXNContract {
+	constructor() public {owner = msg.sender;}
+	 function sendCallSignal() public {
+   		msg.sender.call{value: msg.value, gas: 5000};
+  }
+}
+pragma solidity ^0.4.24;
+contract TXNContractCall{
+	function delegateCallExternal() public {
+   		msg.sender.delegateCall{gas: 1000};}
 }

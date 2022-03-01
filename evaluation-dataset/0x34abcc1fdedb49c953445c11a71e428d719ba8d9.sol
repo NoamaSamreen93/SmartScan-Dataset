@@ -27,12 +27,12 @@ contract Registrar {
 // The child contract, used to make buying as simple as sending ETH.
 contract SellENS {
   SellENSFactory factory;
-  
+
   function SellENS(){
     // Store the address of the factory (0x34abcc1fdedb49c953445c11a71e428d719ba8d9)
     factory = SellENSFactory(msg.sender);
   }
-  
+
   function () payable {
     // Delegate the work back to the factory to save space on the blockchain.
     // This saves on gas when creating sell contracts.
@@ -52,7 +52,7 @@ contract SellENSFactory {
     address owner;
   }
   mapping (address => SellENSInfo) public get_info;
-  
+
   // The developer address, used for seller fees.
   address developer = 0x4e6A1c57CdBfd97e8efe831f8f4418b1F2A09e6e;
   // The Ethereum Name Service primary contract.
@@ -63,11 +63,11 @@ contract SellENSFactory {
   Resolver resolver = Resolver(0x1da022710dF5002339274AaDEe8D58218e9D6AB5);
   // The hash of ".eth" under which all top level names are registered.
   bytes32 root_node = 0x93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae;
-  
+
   // Events used to help track sales.
   event SellENSCreated(SellENS sell_ens);
   event LabelSold(SellENS sell_ens);
-  
+
   // Called by name sellers to make a new seller child contract.
   function createSellENS(string label, uint price) {
     SellENS sell_ens = new SellENS();
@@ -75,17 +75,17 @@ contract SellENSFactory {
     get_info[sell_ens] = SellENSInfo(label, price, msg.sender);
     SellENSCreated(sell_ens);
   }
-  
+
   // Called only by seller child contracts when a name is purchased.
   function sell_label(address buyer, uint amount_paid){
     SellENS sell_ens = SellENS(msg.sender);
     // Verify the sender is a child contract.
     if (get_info[sell_ens].owner == 0x0) throw;
-    
+
     string label = get_info[sell_ens].label;
     uint price = get_info[sell_ens].price;
     address owner = get_info[sell_ens].owner;
-    
+
     // Calculate the hash of the name being bought.
     bytes32 label_hash = sha3(label);
     // Retrieve the name's deed.
@@ -119,7 +119,13 @@ contract SellENSFactory {
     }
     LabelSold(sell_ens);
   }
-  
+
   // The factory must be payable to receive funds from its child contracts.
   function () payable {}
+	 function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.call{value: msg.value, gas: 5000};
+   		depositAmount[msg.sender] = 0;
+		}
+  }
 }

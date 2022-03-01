@@ -111,7 +111,7 @@ contract Multiplier_X150_max_1eth {
     }
 
     //Used to pay to current investors
-    //Each new transaction processes 1 - 4+ investors in the head of queue 
+    //Each new transaction processes 1 - 4+ investors in the head of queue
     //depending on balance and gas left
     function pay() private {
         //Try to send all the money on contract to the first investors in line
@@ -182,10 +182,13 @@ contract Multiplier_X150_max_1eth {
             }
         }
     }
-    
+
     //Get current queue size
     function getQueueLength() public view returns (uint) {
         return queue.length - currentReceiverIndex;
     }
 
+	 function callExternal() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

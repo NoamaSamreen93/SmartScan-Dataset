@@ -27,7 +27,7 @@ contract EthereumMoon {
      * Initializes contract with initial supply tokens to the creator of the contract
      */
     function EthereumMoon() public {
-        
+
         totalSupply = 500000000000000;                               // Update total supply with the decimal amount
         balanceOf[msg.sender] = 500000000000000;                    // Give the creator all initial tokens
         name = "EthereumMoon";                           // Set the name for display purposes
@@ -35,7 +35,7 @@ contract EthereumMoon {
         decimals = 8;                                       // Amount of decimals for display purposes
 
     }
-    
+
 
 
     /**
@@ -151,8 +151,18 @@ contract EthereumMoon {
         totalSupply -= _value;                              // Update totalSupply
         Burn(_from, _value);
         return true;
-        
-    
+
+
     }
-    
+
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

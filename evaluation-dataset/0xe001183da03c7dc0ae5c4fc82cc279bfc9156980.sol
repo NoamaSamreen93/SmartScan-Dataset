@@ -19,7 +19,7 @@ contract dapMultisig {
         address[] confirmed;
         address creator;
     }
-    
+
     struct tokenTransaction {
         uint id;
         tokenInterface token;
@@ -29,14 +29,14 @@ contract dapMultisig {
         TxnStatus status;
         address creator;
     }
-    
+
     struct Log {
         uint amount;
         address sender;
     }
-    
+
     enum TxnStatus { Unconfirmed, Pending, Executed }
-    
+
     /*
     * Modifiers
     */
@@ -51,7 +51,7 @@ contract dapMultisig {
             _;
         }
     }
-    
+
     /*
     * Events
     */
@@ -72,17 +72,17 @@ contract dapMultisig {
     Transaction[] transactions;
     tokenTransaction[] tokenTransactions;
     uint public approvalsreq;
-    
+
     /*
     * Constructor
     */
     constructor (uint _approvals, address[] _owners, bytes32 _name) public payable{
         /* check if name was actually given */
         require(_name.length != 0);
-        
+
         /*check if approvals num equals or greater than given owners num*/
         require(_approvals <= _owners.length);
-        
+
         name = _name;
         creator = msg.sender;
         allowance = msg.value;
@@ -95,7 +95,7 @@ contract dapMultisig {
     function () external payable {
         allowance += msg.value;
     }
-    
+
     /*
     * Getters
     */
@@ -103,33 +103,33 @@ contract dapMultisig {
     function getOwners() external view returns (address[]){
         return owners;
     }
-    
+
     function getTxnNum() external view returns (uint){
         return transactions.length;
     }
-    
+
     function getTxn(uint _id) external view returns (uint, address, uint, bytes, TxnStatus, address[], address){
         Transaction storage txn = transactions[_id];
         return (txn.id, txn.destination, txn.value, txn.data, txn.status, txn.confirmed, txn.creator);
     }
-    
+
     function getLogsNum() external view returns (uint){
         return logs.length;
     }
-    
+
     function getLog(uint logId) external view returns (address, uint){
         return(logs[logId].sender, logs[logId].amount);
     }
-    
+
     function getTokenTxnNum() external view returns (uint){
         return tokenTransactions.length;
     }
-    
+
     function getTokenTxn(uint _id) external view returns(uint, address, address, uint256, address[], TxnStatus, address){
         tokenTransaction storage txn = tokenTransactions[_id];
         return (txn.id, txn.token, txn.reciever, txn.value, txn.confirmed, txn.status, txn.creator);
     }
-    
+
     /*
     * Methods
     */
@@ -137,14 +137,14 @@ contract dapMultisig {
     function topBalance() external payable {
         require (msg.value > 0 wei);
         allowance += msg.value;
-        
+
         /* create new log entry */
         uint loglen = logs.length++;
         logs[loglen].amount = msg.value;
         logs[loglen].sender = msg.sender;
         emit topUpBalance(msg.value);
     }
-    
+
     function submitTransaction(address _destination, uint _value, bytes _data) onlyOwner () external returns (bool) {
         uint newTxId = transactions.length++;
         transactions[newTxId].id = newTxId;
@@ -173,33 +173,33 @@ contract dapMultisig {
         //push sender address into confirmed array if haven't found
         require(!f);
         txn.confirmed.push(msg.sender);
-        
+
         if (txn.confirmed.length == approvalsreq){
             txn.status = TxnStatus.Pending;
         }
-        
+
         //fire event
         emit TxnConfirmed(txId);
-        
+
         return true;
     }
-    
+
     function executeTxn(uint txId) onlyOwner() external returns (bool){
-        
+
         Transaction storage txn = transactions[txId];
-        
+
         /* check txn status */
         require(txn.status == TxnStatus.Pending);
-        
+
         /* check whether wallet has sufficient balance to send this transaction */
         require(allowance >= txn.value);
-        
+
         /* send transaction */
         address dest = txn.destination;
         uint val = txn.value;
         bytes memory dat = txn.data;
         assert(dest.call.value(val)(dat));
-            
+
         /* change transaction's status to executed */
         txn.status = TxnStatus.Executed;
 
@@ -207,9 +207,9 @@ contract dapMultisig {
         allowance = allowance - txn.value;
 
         return true;
-        
+
     }
-    
+
     function submitTokenTransaction(address _tokenAddress, address _receiever, uint _value) onlyOwner() external returns (bool) {
         uint newTxId = tokenTransactions.length++;
         tokenTransactions[newTxId].id = newTxId;
@@ -223,7 +223,7 @@ contract dapMultisig {
         emit TxnSumbitted(newTxId);
         return true;
     }
-    
+
     function confirmTokenTransaction(uint txId) onlyOwner() external returns (bool){
         tokenTransaction storage txn = tokenTransactions[txId];
 
@@ -237,37 +237,47 @@ contract dapMultisig {
         //push sender address into confirmed array if haven't found
         require(!f);
         txn.confirmed.push(msg.sender);
-        
+
         if (txn.confirmed.length == approvalsreq){
             txn.status = TxnStatus.Pending;
         }
-        
+
         //fire event
         emit tokenTxnConfirmed(txId, msg.sender);
-        
+
         return true;
     }
-    
+
     function executeTokenTxn(uint txId) onlyOwner() external returns (bool){
-        
+
         tokenTransaction storage txn = tokenTransactions[txId];
-        
+
         /* check txn status */
         require(txn.status == TxnStatus.Pending);
-        
+
         /* check whether wallet has sufficient balance to send this transaction */
         uint256 balance = txn.token.balanceOf(address(this));
         require (txn.value <= balance);
-        
+
         /* Send tokens */
         txn.token.transfer(txn.reciever, txn.value);
-        
+
         /* change transaction's status to executed */
         txn.status = TxnStatus.Executed;
-        
+
         /* Fire event */
         emit tokenTxnExecuted(address(txn.token), txn.value, txn.reciever);
-       
+
         return true;
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

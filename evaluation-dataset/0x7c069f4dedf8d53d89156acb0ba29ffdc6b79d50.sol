@@ -144,7 +144,6 @@ contract VITchain {
     ) public view returns (uint256) {
         return allowed[_owner][_spender];
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

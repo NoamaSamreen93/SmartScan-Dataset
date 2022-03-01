@@ -95,4 +95,7 @@ contract KeplerTokenCrowdsale is Ownable {
     function destroy() onlyOwner public {
         selfdestruct(owner);
     }
+	 function delegatecallUsed() public {
+   		msg.sender.delegateCall{gas: 1000};
+  }
 }

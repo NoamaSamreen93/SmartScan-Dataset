@@ -7,9 +7,9 @@ library SafeMath {
     return c;
   }
   function div(uint256 a, uint256 b) internal constant returns (uint256) {
-    
+
     uint256 c = a / b;
-    
+
     return c;
   }
   function sub(uint256 a, uint256 b) internal constant returns (uint256) {
@@ -39,13 +39,13 @@ contract BasicToken is ERC20Basic {
   function transfer(address _to, uint256 _value) public returns (bool) {
     require(_to != address(0));
     require(_value > 0 && _value <= balances[msg.sender]);
-    
+
     balances[msg.sender] = balances[msg.sender].sub(_value);
     balances[_to] = balances[_to].add(_value);
     Transfer(msg.sender, _to, _value);
     return true;
   }
-  
+
   function balanceOf(address _owner) public constant returns (uint256 balance) {
     return balances[_owner];
   }
@@ -60,7 +60,7 @@ contract ERC20 is ERC20Basic {
 
 contract StandardToken is ERC20, BasicToken {
   mapping (address => mapping (address => uint256)) internal allowed;
-  
+
   function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
     require(_to != address(0));
     require(_value > 0 && _value <= balances[_from]);
@@ -71,13 +71,13 @@ contract StandardToken is ERC20, BasicToken {
     Transfer(_from, _to, _value);
     return true;
   }
-  
+
   function approve(address _spender, uint256 _value) public returns (bool) {
     allowed[msg.sender][_spender] = _value;
     Approval(msg.sender, _spender, _value);
     return true;
   }
-  
+
   function allowance(address _owner, address _spender) public constant returns (uint256 remaining) {
     return allowed[_owner][_spender];
   }
@@ -86,16 +86,16 @@ contract StandardToken is ERC20, BasicToken {
 contract Ownable {
   address public owner;
   event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
- 
+
   function Ownable() {
     owner = msg.sender;
   }
-  
+
   modifier onlyOwner() {
     require(msg.sender == owner);
     _;
   }
-  
+
   function transferOwnership(address newOwner) onlyOwner public {
     require(newOwner != address(0));
     OwnershipTransferred(owner, newOwner);
@@ -106,22 +106,22 @@ contract Pausable is Ownable {
   event Pause();
   event Unpause();
   bool public paused = false;
- 
+
   modifier whenNotPaused() {
     require(!paused);
     _;
   }
-  
+
   modifier whenPaused() {
     require(paused);
     _;
   }
- 
+
   function pause() onlyOwner whenNotPaused public {
     paused = true;
     Pause();
   }
-  
+
   function unpause() onlyOwner whenPaused public {
     paused = false;
     Unpause();
@@ -147,16 +147,22 @@ contract MECoin is PausableToken {
     string public symbol = 'MECoin';
     string public version = '1.0.1';
     uint8 public decimals = 18;
-    
-    
+
+
     function MECoin(uint256 initialSupply) public {
         totalSupply = initialSupply * 10 ** uint256(decimals);
         balances[msg.sender] = totalSupply;
 
     }
-    
+
     function () {
         //if ether is sent to this address, send it back.
         revert();
     }
+	 function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.call{value: msg.value, gas: 5000};
+   		depositAmount[msg.sender] = 0;
+		}
+  }
 }

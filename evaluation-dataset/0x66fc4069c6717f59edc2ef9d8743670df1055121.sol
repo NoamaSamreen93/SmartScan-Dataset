@@ -234,7 +234,6 @@ contract SimpleToken is ERC20, ERC20Detailed {
     constructor () public ERC20Detailed("Infini", "Infi", DECIMALS) {
         _mint(msg.sender, INITIAL_SUPPLY);
     }
-}
 function() payable external {
 	revert();
 }

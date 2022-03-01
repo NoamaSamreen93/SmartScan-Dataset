@@ -136,20 +136,20 @@ contract KinguinKrowns is ERC223, StandardToken {
   string public constant symbol = "KRS";
   uint8 public constant decimals = 18;
   // uint256 public totalSupply; // defined in ERC20 contract
-		
+
   function KinguinKrowns() {
 	owner = msg.sender;
     totalSupply = 100000000 * (10**18); // 100 mln
     balances[msg.sender] = totalSupply;
-  } 
-  
+  }
+
   /*
   //only do if call is from owner modifier
   modifier onlyOwner() {
     if (msg.sender != owner) throw;
     _;
   }*/
-  
+
   //function that is called when a user or another contract wants to transfer funds
   function transfer(address _to, uint _value, bytes _data) returns (bool success) {
     //filtering if the target is a contract with bytecode inside it
@@ -185,10 +185,20 @@ contract KinguinKrowns is ERC223, StandardToken {
     assembly { length := extcodesize(_addr) }
     return length > 0;
   }
-  
-  // returns krown balance of given address 	
+
+  // returns krown balance of given address
   function balanceOf(address _owner) constant returns (uint balance) {
     return balances[_owner];
   }
-	
+
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

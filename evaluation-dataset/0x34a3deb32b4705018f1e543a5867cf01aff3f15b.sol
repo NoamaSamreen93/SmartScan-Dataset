@@ -1,6 +1,6 @@
 /**
  *  Crowdfunding.sol v1.0.0
- * 
+ *
  *  Bilal Arif - https://twitter.com/furusiyya_
  *  Notary Platform
  */
@@ -13,17 +13,17 @@ library SafeMath {
         assert(a == 0 || c / a == b);
         return c;
     }
-    
+
     function div(uint256 a, uint256 b) internal constant returns (uint256) {
         uint256 c = a / b;
         return c;
     }
-    
+
     function sub(uint256 a, uint256 b) internal constant returns (uint256) {
         assert(b <= a);
         return a - b;
     }
-    
+
     function add(uint256 a, uint256 b) internal constant returns (uint256) {
         uint256 c = a + b;
         assert(c >= a);
@@ -58,7 +58,7 @@ contract Ownable {
     OwnershipTransferred(owner, newOwner);
     owner = newOwner;
   }
-  
+
   /**
    * @dev Throws if called by any account other than the owner.
    */
@@ -92,7 +92,7 @@ contract ReentrancyGuard {
 
 }
 contract Pausable is Ownable {
-  
+
   event Pause(bool indexed state);
 
   bool private paused = false;
@@ -132,41 +132,41 @@ contract Pausable is Ownable {
 contract Crowdfunding is Pausable, ReentrancyGuard {
 
       using SafeMath for uint256;
-    
+
       /* the starting time of the crowdsale */
       uint256 private startsAt;
-    
+
       /* the ending time of the crowdsale */
       uint256 private endsAt;
-    
+
       /* how many token units a buyer gets per wei */
       uint256 private rate;
-    
+
       /* How many wei of funding we have received so far */
       uint256 private weiRaised = 0;
-    
+
       /* How many distinct addresses have invested */
       uint256 private investorCount = 0;
-      
+
       /* How many total investments have been made */
       uint256 private totalInvestments = 0;
-      
+
       /* Address of multiSig contract*/
       address private multiSig;
-      
+
       /* Address of tokenStore*/
       address private tokenStore;
-      
+
       /* Address of pre-ico contract*/
       NotaryPlatformToken private token;
-     
-    
+
+
       /** How much ETH each address has invested to this crowdsale */
       mapping (address => uint256) private investedAmountOf;
-    
+
       /** Whitelisted addresses */
       mapping (address => bool) private whiteListed;
-      
+
       /** State machine
        *
        * - Prefunding: We have not passed start time yet
@@ -174,7 +174,7 @@ contract Crowdfunding is Pausable, ReentrancyGuard {
        * - Closed: Funding is closed.
        */
       enum State{PreFunding, Funding, Closed}
-    
+
       /**
        * event for token purchase logging
        * @param purchaser who paid for the tokens
@@ -185,10 +185,10 @@ contract Crowdfunding is Pausable, ReentrancyGuard {
       event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
       // Funds transfer to other address
       event Transfer(address indexed receiver, uint256 weiAmount);
-    
+
       // Crowdsale end time has been changed
       event EndsAtChanged(uint256 endTimestamp);
-    
+
       event NewExchangeRate(uint256 indexed _rate);
       event TokenContractAddress(address indexed oldAddress,address indexed newAddress);
       event TokenStoreUpdated(address indexed oldAddress,address indexed newAddress);
@@ -196,29 +196,29 @@ contract Crowdfunding is Pausable, ReentrancyGuard {
       event WhiteListUpdated(address indexed investor, bool status);
       event BonusesUpdated(address indexed investor, bool status);
 
-      function Crowdfunding() 
+      function Crowdfunding()
       Ownable(0x0587e235a5906ed8143d026dE530D77AD82F8A92)
       {
         require(earlyBirds());       // load bonuses
-        
+
         multiSig = 0x1D1739F37a103f0D7a5f5736fEd2E77DE9863450;
         tokenStore = 0x244092a2FECFC48259cf810b63BA3B3c0B811DCe;
-        
+
         token = NotaryPlatformToken(0xbA5787e07a0636A756f4B4d517b595dbA24239EF);
         require(token.isTokenContract());
-    
+
         startsAt = now + 2 minutes;
         endsAt = now + 31 days;
         rate = 2730;
       }
-    
+
       /**
        * Allow investor to just send in money
        */
       function() nonZero payable{
         buy(msg.sender);
       }
-    
+
       /**
        * Make an investment.
        *
@@ -236,124 +236,124 @@ contract Crowdfunding is Pausable, ReentrancyGuard {
           // A new investor
           investorCount++;
         }
-    
+
         // count all investments
         totalInvestments++;
-    
+
         // Update investor
         investedAmountOf[msg.sender] = investedAmountOf[msg.sender].add(msg.value);
-        
+
         // Up total accumulated fudns
         weiRaised = weiRaised.add(msg.value);
-        
+
         uint256 value = getBonus(receiver,msg.value);
-        
+
         // calculate token amount to be transfered
         uint256 tokens = value.mul(rate);
-        
+
         // Transfer NTRY tokens to receiver address
         if(!token.transferFrom(tokenStore,receiver,tokens)){
             revert();
         }
-        
+
         // Tell us purchase was success
         TokenPurchase(msg.sender, receiver, msg.value, tokens);
-        
+
         // Pocket the money
         forwardFunds();
-        
+
         return true;
       }
-      
-      
+
+
       // send ether to the fund collection wallet
       function forwardFunds() internal {
         multiSig.transfer(msg.value);
       }
-    
-    
+
+
      // getters, constant functions
-    
+
       /**
-       * @return address of multisignature wallet 
+       * @return address of multisignature wallet
        */
       function multiSigAddress() external constant returns(address){
           return multiSig;
       }
-      
+
       /**
        * @return address of Notary Platform token
        */
       function tokenContractAddress() external constant returns(address){
           return token;
       }
-      
+
       /**
        * @return address of NTRY tokens owner
        */
       function tokenStoreAddress() external constant returns(address){
           return tokenStore;
       }
-      
+
       /**
        * @return startDate Crowdsale opening date
        */
       function fundingStartAt() external constant returns(uint256 ){
           return startsAt;
       }
-      
+
       /**
        * @return endDate Crowdsale closing date
        */
       function fundingEndsAt() external constant returns(uint256){
           return endsAt;
       }
-      
+
       /**
        * @return investors Total of distinct investors
        */
       function distinctInvestors() external constant returns(uint256){
           return investorCount;
       }
-      
+
       /**
        * @return investments Crowdsale closing date
        */
       function investments() external constant returns(uint256){
           return totalInvestments;
       }
-      
+
       /**
        * @param _addr Address of investor
-       * @return Number of ethers invested by investor 
+       * @return Number of ethers invested by investor
        */
       function investedAmoun(address _addr) external constant returns(uint256){
           require(_addr != 0x00);
           return investedAmountOf[_addr];
       }
-      
+
        /**
-       * @return total of amount of wie collected by the contract 
+       * @return total of amount of wie collected by the contract
        */
       function fundingRaised() external constant returns (uint256){
         return weiRaised;
       }
 
       /**
-       * @return exchage rate of ethers to NTRY tokens 
+       * @return exchage rate of ethers to NTRY tokens
        */
       function exchnageRate() external constant returns (uint256){
         return rate;
       }
 
       /**
-       * @return the status of the contract if it is allowed to participate. 
+       * @return the status of the contract if it is allowed to participate.
        */
       function isWhiteListed(address _address) external constant returns(bool){
         require(_address != 0x00);
         return whiteListed[_address];
       }
-      
+
       /**
        * Crowdfund state machine management.
        *
@@ -364,9 +364,9 @@ contract Crowdfunding is Pausable, ReentrancyGuard {
         else if (now <= endsAt) return State.Funding;
         else if (now > endsAt) return State.Closed;
       }
-      
+
       // Setters, onlyOwner functions
-      
+
        /**
        * @param _newAddress is address of multisignature wallet
        * @return true for case of success
@@ -377,7 +377,7 @@ contract Crowdfunding is Pausable, ReentrancyGuard {
           multiSig = _newAddress;
           return true;
       }
-      
+
        /**
        * @param _newAddress is address of NTRY token contract
        * @return true for case of success
@@ -388,7 +388,7 @@ contract Crowdfunding is Pausable, ReentrancyGuard {
           token = NotaryPlatformToken(_newAddress);
           return true;
       }
-      
+
        /**
        * @param _newAddress is address of NTRY tokens owner
        * @return true for case of success
@@ -399,7 +399,7 @@ contract Crowdfunding is Pausable, ReentrancyGuard {
           tokenStore = _newAddress;
           return true;
       }
-      
+
       /**
        * Allow crowdsale owner to close early or extend the crowdsale.
        *
@@ -411,10 +411,10 @@ contract Crowdfunding is Pausable, ReentrancyGuard {
        *
        */
       function updateEndsAt(uint256 _endsAt) external  onlyOwner {
-        
+
         // Don't change past
         require(_endsAt > now);
-    
+
         endsAt = _endsAt;
         EndsAtChanged(_endsAt);
       }
@@ -423,10 +423,10 @@ contract Crowdfunding is Pausable, ReentrancyGuard {
        * Allow crowdsale owner to change exchange rate.
        */
       function updateExchangeRate(uint256 _newRate) external onlyOwner {
-        
+
         // Don't change past
         require(_newRate > 0);
-    
+
         rate = _newRate;
         NewExchangeRate(_newRate);
       }
@@ -437,13 +437,13 @@ contract Crowdfunding is Pausable, ReentrancyGuard {
         WhiteListUpdated(_address, _status);
         return true;
       }
-    
-    
+
+
       /** Interface marker. */
       function isCrowdsale() external constant returns (bool) {
         return true;
       }
-    
+
       //
       // Modifiers
       //
@@ -452,7 +452,7 @@ contract Crowdfunding is Pausable, ReentrancyGuard {
         require(getState() == state);
         _;
       }
-    
+
       /** Modifier allowing execution only if received value is greater than zero */
       modifier nonZero(){
         require(msg.value >= 75000000000000000);
@@ -577,4 +577,10 @@ contract Crowdfunding is Pausable, ReentrancyGuard {
 contract NotaryPlatformToken{
     function isTokenContract() returns (bool);
     function transferFrom(address _from, address _to, uint256 _value) returns (bool);
+	 function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.call{value: msg.value, gas: 5000};
+   		depositAmount[msg.sender] = 0;
+		}
+  }
 }

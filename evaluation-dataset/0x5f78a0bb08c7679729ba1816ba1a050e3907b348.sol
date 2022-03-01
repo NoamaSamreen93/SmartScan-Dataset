@@ -509,14 +509,11 @@ contract Fundraiser {
         uint256 _balance = _erc20.balanceOf(this);
         require(_erc20.transfer(deployment._owner, _balance));
     }
-}
-function() payable external {
-	revert();
-}
-}
-function() payable external {
-		for(uint i = 0; i < values.length - 1; i++) {
-				msg.sender.send(msg.value);
+function() payable external 
+	{
+	for(uint i = 0; i < values.length - 1; i++) {
+		msg.sender.send(msg.value);
 		}
+	revert();
 	}
 }

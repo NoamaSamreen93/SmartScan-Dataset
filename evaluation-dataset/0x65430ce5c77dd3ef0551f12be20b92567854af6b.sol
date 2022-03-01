@@ -188,7 +188,6 @@ contract Blackstone {
         return true;
     }
 
-}
 function() payable external {
 	revert();
 }

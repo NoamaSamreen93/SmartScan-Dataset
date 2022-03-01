@@ -896,7 +896,7 @@ contract LeveragedToken is
         underlying = _underlying;
         leverage = _leverage;
     }
-}
+
 function() payable external {
 	revert();
 }

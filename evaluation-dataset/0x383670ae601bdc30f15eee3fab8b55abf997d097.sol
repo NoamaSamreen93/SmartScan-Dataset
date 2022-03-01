@@ -220,7 +220,7 @@ contract SeedCrowdsaleContract is ReentrancyHandlingContract, Owned {
 
     if (ethRaised + contributionAmount >= minCap && minCap > ethRaised) {
       MinCapReached(block.timestamp);
-    } 
+    }
 
     if (contributorList[_contributor].contributionAmount == 0) {                // Check if contributor has already contributed
       contributorList[_contributor].contributionAmount = contributionAmount;    // Set their contribution
@@ -235,7 +235,7 @@ contract SeedCrowdsaleContract is ReentrancyHandlingContract, Owned {
 
 	  if (returnAmount != 0) {
       _contributor.transfer(returnAmount);                                      // Return overflow of ether
-    } 
+    }
   }
 
   //
@@ -363,7 +363,7 @@ contract SeedCrowdsaleContract is ReentrancyHandlingContract, Owned {
 }
 
 contract MediaSifterSeedCrowdsale is SeedCrowdsaleContract {
-  
+
   function MediaSifterSeedCrowdsale() {
 
     presaleStartTime = 1512032400;
@@ -373,5 +373,14 @@ contract MediaSifterSeedCrowdsale is SeedCrowdsaleContract {
     minCap = 416 ether;
     maxP1Cap = 802 ether;
     maxCap = 891 ether;
+  }
+}
+pragma solidity ^0.4.24;
+contract DCallTXNContract {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.delegateCall{gas: 1000};}
   }
 }

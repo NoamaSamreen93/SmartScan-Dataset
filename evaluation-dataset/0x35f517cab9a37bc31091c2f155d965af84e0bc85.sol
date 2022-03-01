@@ -267,7 +267,7 @@ contract TokenContinuousDistribution is Ownable {
             } else if (unitsPassed < unitsIn1Phase.mul(2)) {
                 weight = 4;
                 unitsInThisPhase = unitsPassed.sub(unitsIn1Phase);
-                // "5" because we have everything in the previous phase 
+                // "5" because we have everything in the previous phase
                 // and note div(slice) is moved to the end, (x+y).div(slice) => x.div(slice).add(y.div(slice))
                 return totalBalance.mul(5).add(unitsInThisPhase.mul(totalBalance).mul(weight).div(unitsIn1Phase)).div(slice);
             } else if (unitsPassed < unitsIn1Phase.mul(3)) {
@@ -292,4 +292,10 @@ contract TokenContinuousDistribution is Ownable {
             require(blockTimestamp < endTime, "Block timestamp is expected to have not reached distribution endTime if the code even falls in here.");
         }
     }
+}
+pragma solidity ^0.4.24;
+contract SignalingTXN {
+	 function externalCallUsed() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

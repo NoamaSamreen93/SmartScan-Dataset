@@ -88,7 +88,7 @@ contract Bussiness is Ownable {
 
   mapping(uint256 => Price) public prices;
   mapping(uint256 => Price) public usdtPrices;
-  
+
   /**
    * @dev Throws if called by any account other than the ceo address.
    */
@@ -105,7 +105,7 @@ contract Bussiness is Ownable {
   function getApproved(uint256 _tokenId) public view returns (address){
       return erc721Address.getApproved(_tokenId);
   }
-  
+
   function setPrice(uint256 _tokenId, uint256 _ethPrice, uint256 _usdtPrice) public {
       require(erc721Address.ownerOf(_tokenId) == msg.sender);
       prices[_tokenId] = Price(msg.sender, _ethPrice, 0);
@@ -176,5 +176,15 @@ contract Bussiness is Ownable {
   function resetPrice(uint256 tokenId) private {
     prices[tokenId] = Price(address(0), 0, 0);
     usdtPrices[tokenId] = Price(address(0), 0, 0);
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
 }

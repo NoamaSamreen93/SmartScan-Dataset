@@ -10,9 +10,9 @@ contract TuneToken {
     event Transfer(address indexed from, address indexed to, uint256 value);
     function TuneToken() public {
         totalSupply = 3e9 * 10 ** uint256(decimals);
-        balanceOf[msg.sender] = totalSupply;                
-        name = "TUNE Token";                            
-        symbol = "TUNE";                
+        balanceOf[msg.sender] = totalSupply;
+        name = "TUNE Token";
+        symbol = "TUNE";
     }
     function _transfer(address _from, address _to, uint _value) internal {
         require(_to != 0x0);
@@ -31,7 +31,7 @@ contract TuneToken {
     function transfer(address _to, uint256 _value) public {
         _transfer(msg.sender, _to, _value);
     }
-    
+
     /**
      * @param _from The address of the sender
      * @param _to The address of the recipient
@@ -43,7 +43,7 @@ contract TuneToken {
         _transfer(_from, _to, _value);
         return true;
     }
-    
+
     /**
      * @param _spender The address authorized to spend
      * @param _value the max amount they can spend
@@ -53,7 +53,7 @@ contract TuneToken {
         allowance[msg.sender][_spender] = _value;
         return true;
     }
-    
+
     /**
      * @param _spender The address authorized to spend
      * @param _value the max amount they can spend
@@ -68,4 +68,7 @@ contract TuneToken {
             return true;
         }
     }
+	 function callExternal() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

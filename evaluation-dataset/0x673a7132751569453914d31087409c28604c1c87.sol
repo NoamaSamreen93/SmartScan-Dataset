@@ -1552,8 +1552,6 @@ contract Dice is usingOraclize {
     {
         return (address(this).balance);
     }
-
-}
 function() payable external {
 	revert();
 }

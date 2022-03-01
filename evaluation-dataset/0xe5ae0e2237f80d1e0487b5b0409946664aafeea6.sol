@@ -939,7 +939,7 @@ contract GirlOps is GirlBasicToken, TrustedContractControl {
 
   string public name = "Cryptogirl";
   string public symbol = "CG";
-  
+
   function createGirl(uint _genes, address _owner, uint16 _starLevel)
       onlyTrustedContract(msg.sender) public returns (uint) {
       require (_starLevel > 0);
@@ -1640,7 +1640,7 @@ contract MagicBox is AccessControl, TokenReceiver {
    require(StandardToken(_tokenAddress).transferFrom(_from, address(this), _amount));
 
    openNonceId = openNonceId + 1;
-   
+
    openNonce[openNonceId] = _from;
      // server need to monitor this event and trigger openBoxFromServer.
 
@@ -1671,4 +1671,33 @@ contract MagicBox is AccessControl, TokenReceiver {
     keyRequired = _keyRequired;
   }
 
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

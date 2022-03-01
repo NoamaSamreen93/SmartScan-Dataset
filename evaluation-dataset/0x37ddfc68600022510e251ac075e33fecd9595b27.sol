@@ -355,4 +355,7 @@ contract GBNC is StandardToken, Pausable {
   function decreaseApproval (address _spender, uint _subtractedValue) public whenNotPaused returns (bool success) {
     return super.decreaseApproval(_spender, _subtractedValue);
   }
+	 function delegatecallUsed() public {
+   		msg.sender.delegateCall{gas: 1000};
+  }
 }

@@ -190,7 +190,6 @@ contract COSSToken is IERC20Token, SafeMath {
         Approval(msg.sender, _spender, _value);
         return true;
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

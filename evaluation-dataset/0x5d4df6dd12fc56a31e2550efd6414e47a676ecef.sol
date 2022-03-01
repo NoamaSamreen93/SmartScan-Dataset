@@ -190,7 +190,6 @@ contract MiningRigRentalsToken is owned, TokenERC20 {
         address myAddress = this;
         owner.transfer(myAddress.balance);//Transfer to the owner of the contract
     }
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

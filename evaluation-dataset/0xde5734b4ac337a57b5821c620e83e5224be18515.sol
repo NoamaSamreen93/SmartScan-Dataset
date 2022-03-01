@@ -1,56 +1,56 @@
 /*
- ____   _______  _______  _______  __   __    __   __  _______  __    _  ___   _  _______  __   __ 
+ ____   _______  _______  _______  __   __    __   __  _______  __    _  ___   _  _______  __   __
 |    | |  _    ||  _    ||       ||  | |  |  |  |_|  ||       ||  |  | ||   | | ||       ||  | |  |
  |   | | | |   || | |   ||_     _||  |_|  |  |       ||   _   ||   |_| ||   |_| ||    ___||  |_|  |
  |   | | | |   || | |   |  |   |  |       |  |       ||  | |  ||       ||      _||   |___ |       |
  |   | | |_|   || |_|   |  |   |  |       |  |       ||  |_|  ||  _    ||     |_ |    ___||_     _|
- |   | |       ||       |  |   |  |   _   |  | ||_|| ||       || | |   ||    _  ||   |___   |   |  
- |___| |_______||_______|  |___|  |__| |__|  |_|   |_||_______||_|  |__||___| |_||_______|  |___|  
+ |   | |       ||       |  |   |  |   _   |  | ||_|| ||       || | |   ||    _  ||   |___   |   |
+ |___| |_______||_______|  |___|  |__| |__|  |_|   |_||_______||_|  |__||___| |_||_______|  |___|
 
-                                          
-                                           `oyyydssydy-                                             
-                                    `/so/`:hyyhhhyyhhhddyooo+/:-`                                   
-                                     `:dhhdhyhhyyhhyhhhhhhhhhhyyyso+-`                              
-                               `-+oyhhhhhhhhhhhhhhhhhhhhyysssyyyyysoos+/.                           
-                           `:oydhhhhhhhhhhhhhhhhhhhhhhyyyyyyysssssssso+/oo/`                        
-                        `/ydhhhhhhhhhhhhhhhhhhhhhhhyysssssssssssssssossso++s+`                      
-                      -sysyhhhhhhhhhhhhhhhhhhhhhyyssssssysssssssoooosooosso+oy+`                    
-                    .sy+ohhhhhhhhhhhhhhhhhhhhyyyyyyyyyyysssssssssssooosoossso+sy:                   
-                  `oy++syhhhhhhhhhhhhhhddhhhhhhhhhhhhhhhhhhhyysssssssssssssssoosys`                 
-                 :hs+oyhhhhhhhhhhhddddddhysyhhhhhhhhhhhhhhhhhhhhyysssssysssssyssssy`                
-                ohosyhhhhhhhhhhhhhddddhhsyhyhhhhhhhhddddddddddddhhhyysssyysssyhyhyhh`  `----.       
-              `yhsyhhhhhhdddddddddddhhhyhyshhhhhddhyo+//:::://oshddhhhssshhysyhhhhdds:/-.```-/:`    
-             `yhhhhhhhhhhddmdddddhhhhhhhhhhhhddyo/:-------------:+yddhhyshhhhhhhddhy:`.-//+/-..+`   
-             yhhhhhhhhddddddddddmdddhhhhhhhhdy+:--:::::-----------:ohddhhhhhhhhddhs:-/oyysssyo-.o   
-            +hhhhhhdddhys+/////ydhddddhhdhdds/-:++/::---------------+dmdhhhhhddhho///ss++++++ss.::  
-           `dhhhhdddy+/:------/ddyshdhdddddy/-+s+/-::/+++++:--------:sdddhhhhddho/+ooo+++///++y:.o  
-    `-::::-+dhhhddh+:---::://:oh+/+dhdhsddd+--s////++:`./++oo/-------+hmdhhhddhdhdho+++oo+////+:`o  
-  .:-.`..-/dhhhddy/:-::::::/+os+//odddo+hdd/--:///o/` omo..:hy+------/hmddhdddmddmhddddyssyo///-`o  
- ::`.-:////mhhhdh//------://++++:-/yddo//sd/:--//++  oNmy-.-sNh/-----/hmddddhdddddmmddyy+++s///--/  
-::`./ssooysmhhddo/-----/o/.`.:/o+:-:/os+:-:/:--:/s-  dNNNmmmNNNo-----/hmdddddddddddddyo++//////.o`  
-+..:s+++++omdhdd+/----:s. :y:-/yyo:----::::-----/o:  sNNNNNNNNNo-----+dmdddddddddmmmmmmy///////:/   
-o`-/s/////+dhhdd+/----++  mdo/+dNm+-------------:+s. `dNNNNNNNh/-----sddddddddddddmdyoos///////o    
-o`-/o//:://yhhhdo/:---/o` dNNNNNNNy:-------------:/o-``+dNNNmdosoo+-/hmddddddddddmNddo++/////++     
-+.-://+syssydhhhh//---:o: .dNNNNNNy:----::::::::::::+++/:+shho/----:ymdddddddddddNsso+++++//o/      
-`+.-///+oyyhdhhhds/:---:o+.`/ydmdh+:/++//:::-:---::::////+yo:-----:ymmdddddddddddm////////+/`       
- -/.:+/+oohdhhhhhds//----/++///+oo+/:-------------------://+::--:/hmmdddddddddddmmhs++++/:`         
-  :/./s/:ydhdhhhhhds//:--+soosss+:--------------------------//++sdmmmdddddddmmmmmmmh                
-   -+.-osy+odddhhhhdho//::---/+:-----------://:::--------------/odmmmdddddddmmmmmmd.                
-    `//--:++hyyhdhhhdmhs+///o/--:-:/:-----::-/++/----------------/sdmmddddddmmmmmd.                 
-      .//----:+oyddddddmmdhs/--+-/+oo+/:--:+++/+/-------------...-/ohmmddddmmmmmy`                  
-        `-:/++++/smmdddddmh/---:::++oo+/--//////:---------:++:--:///+hmmddmmmmd/                    
-              ``/hmmdddddd+:------::///:--:///::----------:/ooo+/////sdmmmmmdo`                     
-              -dmdmmmdhyhs//:-------------------------::/oss/////////odmmmh/`                       
-              d/`dmmmdo/:----::::::::::::::-------::/ooo+++//////////odh+.                          
-              . `d-+dmds+/:::---......-----::://+oo+:.``+o///////////s`                             
-                 `  /dy-+o++++++o+++++++ooo+++/:.`   -+s+///////////o-                              
-                     `.   +/////+oshddddy+-.`  `.-/oyhs/://////////o-                               
-                           :+///////+oyddddhhhhhhhhhs+:-/////////++.                                
-                            `//////////+oshhdhhhyso/:--:///////++-                                  
-                              ./+/////////:::::-....-://////+o/.                                    
-                                `:/+/////////:::::///////++/-                                       
-                                    .::/++/////////+++/:-`                                          
-                                         `.-------.`        
+
+                                           `oyyydssydy-
+                                    `/so/`:hyyhhhyyhhhddyooo+/:-`
+                                     `:dhhdhyhhyyhhyhhhhhhhhhhyyyso+-`
+                               `-+oyhhhhhhhhhhhhhhhhhhhhyysssyyyyysoos+/.
+                           `:oydhhhhhhhhhhhhhhhhhhhhhhyyyyyyysssssssso+/oo/`
+                        `/ydhhhhhhhhhhhhhhhhhhhhhhhyysssssssssssssssossso++s+`
+                      -sysyhhhhhhhhhhhhhhhhhhhhhyyssssssysssssssoooosooosso+oy+`
+                    .sy+ohhhhhhhhhhhhhhhhhhhhyyyyyyyyyyysssssssssssooosoossso+sy:
+                  `oy++syhhhhhhhhhhhhhhddhhhhhhhhhhhhhhhhhhhyysssssssssssssssoosys`
+                 :hs+oyhhhhhhhhhhhddddddhysyhhhhhhhhhhhhhhhhhhhhyysssssysssssyssssy`
+                ohosyhhhhhhhhhhhhhddddhhsyhyhhhhhhhhddddddddddddhhhyysssyysssyhyhyhh`  `----.
+              `yhsyhhhhhhdddddddddddhhhyhyshhhhhddhyo+//:::://oshddhhhssshhysyhhhhdds:/-.```-/:`
+             `yhhhhhhhhhhddmdddddhhhhhhhhhhhhddyo/:-------------:+yddhhyshhhhhhhddhy:`.-//+/-..+`
+             yhhhhhhhhddddddddddmdddhhhhhhhhdy+:--:::::-----------:ohddhhhhhhhhddhs:-/oyysssyo-.o
+            +hhhhhhdddhys+/////ydhddddhhdhdds/-:++/::---------------+dmdhhhhhddhho///ss++++++ss.::
+           `dhhhhdddy+/:------/ddyshdhdddddy/-+s+/-::/+++++:--------:sdddhhhhddho/+ooo+++///++y:.o
+    `-::::-+dhhhddh+:---::://:oh+/+dhdhsddd+--s////++:`./++oo/-------+hmdhhhddhdhdho+++oo+////+:`o
+  .:-.`..-/dhhhddy/:-::::::/+os+//odddo+hdd/--:///o/` omo..:hy+------/hmddhdddmddmhddddyssyo///-`o
+ ::`.-:////mhhhdh//------://++++:-/yddo//sd/:--//++  oNmy-.-sNh/-----/hmddddhdddddmmddyy+++s///--/
+::`./ssooysmhhddo/-----/o/.`.:/o+:-:/os+:-:/:--:/s-  dNNNmmmNNNo-----/hmdddddddddddddyo++//////.o`
++..:s+++++omdhdd+/----:s. :y:-/yyo:----::::-----/o:  sNNNNNNNNNo-----+dmdddddddddmmmmmmy///////:/
+o`-/s/////+dhhdd+/----++  mdo/+dNm+-------------:+s. `dNNNNNNNh/-----sddddddddddddmdyoos///////o
+o`-/o//:://yhhhdo/:---/o` dNNNNNNNy:-------------:/o-``+dNNNmdosoo+-/hmddddddddddmNddo++/////++
++.-://+syssydhhhh//---:o: .dNNNNNNy:----::::::::::::+++/:+shho/----:ymdddddddddddNsso+++++//o/
+`+.-///+oyyhdhhhds/:---:o+.`/ydmdh+:/++//:::-:---::::////+yo:-----:ymmdddddddddddm////////+/`
+ -/.:+/+oohdhhhhhds//----/++///+oo+/:-------------------://+::--:/hmmdddddddddddmmhs++++/:`
+  :/./s/:ydhdhhhhhds//:--+soosss+:--------------------------//++sdmmmdddddddmmmmmmmh
+   -+.-osy+odddhhhhdho//::---/+:-----------://:::--------------/odmmmdddddddmmmmmmd.
+    `//--:++hyyhdhhhdmhs+///o/--:-:/:-----::-/++/----------------/sdmmddddddmmmmmd.
+      .//----:+oyddddddmmdhs/--+-/+oo+/:--:+++/+/-------------...-/ohmmddddmmmmmy`
+        `-:/++++/smmdddddmh/---:::++oo+/--//////:---------:++:--:///+hmmddmmmmd/
+              ``/hmmdddddd+:------::///:--:///::----------:/ooo+/////sdmmmmmdo`
+              -dmdmmmdhyhs//:-------------------------::/oss/////////odmmmh/`
+              d/`dmmmdo/:----::::::::::::::-------::/ooo+++//////////odh+.
+              . `d-+dmds+/:::---......-----::://+oo+:.``+o///////////s`
+                 `  /dy-+o++++++o+++++++ooo+++/:.`   -+s+///////////o-
+                     `.   +/////+oshddddy+-.`  `.-/oyhs/://////////o-
+                           :+///////+oyddddhhhhhhhhhs+:-/////////++.
+                            `//////////+oshhdhhhyso/:--:///////++-
+                              ./+/////////:::::-....-://////+o/.
+                                `:/+/////////:::::///////++/-
+                                    .::/++/////////+++/:-`
+                                         `.-------.`
 
 The game starts on Saturday, November 10, 2018 at 5:00:00 PM (GMT)
 
@@ -59,10 +59,10 @@ https://discord.gg/3UQ4dNj
 
 DISCLAIMER:
 
-Please note, during your use of this contract, that online gambling is an entertainment vehicle, and that it carries with it a certain degree of financial risk. 
-Players should be aware of this risk, and govern themselves accordingly. All users of this contract should exercise responsibility when playing in online casinos, lotteries, and dAPPS. 
-CIRCUS FREAKS PRODUCTIONS have undertaken the appropriate steps to inform all those interested in online gaming about the dangers of excess play; that could potentially result from such an activity. 
-There is nothing contained herein that constitutes a guarantee of winning, nor is there an intention to induce anyone into violating any local, state or national laws. 
+Please note, during your use of this contract, that online gambling is an entertainment vehicle, and that it carries with it a certain degree of financial risk.
+Players should be aware of this risk, and govern themselves accordingly. All users of this contract should exercise responsibility when playing in online casinos, lotteries, and dAPPS.
+CIRCUS FREAKS PRODUCTIONS have undertaken the appropriate steps to inform all those interested in online gaming about the dangers of excess play; that could potentially result from such an activity.
+There is nothing contained herein that constitutes a guarantee of winning, nor is there an intention to induce anyone into violating any local, state or national laws.
 Recognizing that the laws and regulations involving online gaming are different everywhere, readers are advised to check with the laws that exist within their own jurisdiction to ascertain the legality of the activities which are covered.
 
 */
@@ -124,8 +124,8 @@ contract OneHundredthMonkey {
 	bool public earlyResolveACalled = false;
 	bool public earlyResolveBCalled = false;
 	uint256 public activationTime = 1541869200; // (GMT): Saturday, November 10, 2018 5:00:00 PM
-	uint256 public miniGamesPerRound = 100; 
-	uint256 public miniGamesPerCycle = 1000; 
+	uint256 public miniGamesPerRound = 100;
+	uint256 public miniGamesPerCycle = 1000;
 	uint256 public miniGamePotRate = 25; //25%
 	uint256 public progressivePotRate = 25; //25%
 	uint256 public roundDivRate = 20; //20%
@@ -133,18 +133,18 @@ contract OneHundredthMonkey {
 	uint256 public referralRate = 10; //10%
 	uint256 public miniGameAirdropRate = 5; //5%
 	uint256 public adminFeeRate = 5; //5%
-	uint256 public roundPotRate = 48; //48% of progressive pot 
-	uint256 internal precisionFactor = 18; 
-	uint256 public seedAreward = 25000000000000000; 
-	uint256 public seedBreward = 25000000000000000; 
+	uint256 public roundPotRate = 48; //48% of progressive pot
+	uint256 internal precisionFactor = 18;
+	uint256 public seedAreward = 25000000000000000;
+	uint256 public seedBreward = 25000000000000000;
 	mapping (uint256 => bool) public miniGameSeedAawarded;
 	mapping (uint256 => bool) public miniGameSeedBawarded;
-	
+
 	//RNG
 	uint256 internal RNGblockDelay = 1;
-	uint256 internal salt = 0; 
-	bytes32 internal hashA; 
-	bytes32 internal hashB; 
+	uint256 internal salt = 0;
+	bytes32 internal hashA;
+	bytes32 internal hashB;
 
 	//MINIGAME TRACKING
 	bool public miniGameProcessing;
@@ -203,9 +203,9 @@ contract OneHundredthMonkey {
 	address public cyclePrizeWinner;
 
 	//TOKEN TRACKING
-	uint256 public tokenPrice = 0.001 ether; 
-	uint256 public tokenPriceIncrement = 0.0005 ether; 
-	uint256 public minTokensPerMiniGame = 10000; //between 1x and 2x this amount of tokens generated each minigame 
+	uint256 public tokenPrice = 0.001 ether;
+	uint256 public tokenPriceIncrement = 0.0005 ether;
+	uint256 public minTokensPerMiniGame = 10000; //between 1x and 2x this amount of tokens generated each minigame
 
 	//USER TRACKING PUBLIC
 	address[] public uniqueAddress;
@@ -232,7 +232,7 @@ contract OneHundredthMonkey {
 	mapping (address => mapping (uint256 => uint256)) internal userDivsRoundClaimed;
 	mapping (address => mapping (uint256 => uint256)) internal userDivsRoundUnclaimed;
 
-	
+
 	///////////////
 	//CONSTRUCTOR//
 	///////////////
@@ -244,14 +244,14 @@ contract OneHundredthMonkey {
 		admins.push(msg.sender);
 		isAdmin[msg.sender] = true;
 		admins.push(_adminTwo);
-		isAdmin[_adminTwo] = true; 
+		isAdmin[_adminTwo] = true;
 		admins.push(_adminThree);
-		isAdmin[_adminThree] = true; 
+		isAdmin[_adminThree] = true;
 		admins.push(_adminFour);
-		isAdmin[_adminFour] = true; 
+		isAdmin[_adminFour] = true;
 	}
 
-	
+
 	/////////////
 	//MODIFIERS//
 	/////////////
@@ -261,9 +261,9 @@ contract OneHundredthMonkey {
 		_;
 	}
 
-	modifier onlyHumans() { 
-	    require (msg.sender == tx.origin, "only approved contracts allowed"); 
-	    _; 
+	modifier onlyHumans() {
+	    require (msg.sender == tx.origin, "only approved contracts allowed");
+	    _;
 	  }
 
 	modifier gameOpen() {
@@ -273,8 +273,8 @@ contract OneHundredthMonkey {
 	  	}
 	  	_;
 	}
-    
-    
+
+
     //////////
 	//EVENTS//
 	//////////
@@ -282,7 +282,7 @@ contract OneHundredthMonkey {
 	event adminWithdrew(
 		uint256 _amount,
 		address indexed _caller,
-		string _message 
+		string _message
 	);
 
 	event cycleStarted(
@@ -405,43 +405,43 @@ contract OneHundredthMonkey {
 	}
 
 	//this function begins resolving the round in the event that the game has stalled
-	//it can be called no sooner than 1 week after the start of a minigame 
+	//it can be called no sooner than 1 week after the start of a minigame
 	//can only be called once. can be restarted with restartMiniGame if 256 blocks pass
 	function earlyResolveA() external onlyAdmins() onlyHumans() gameOpen() {
 		require (now > miniGameStartTime[miniGameCount] + 604800 && miniGameProcessing == false, "earlyResolveA cannot be called yet"); //1 week
 		require (miniGamePrizePot[miniGameCount].sub(seedAreward).sub(seedBreward) >= 0);
-		
+
 		gameActive = false;
 		earlyResolveACalled = true;
 		generateSeedA();
 	}
 
-	//this function comlpetes the resolution and ends the game 
+	//this function comlpetes the resolution and ends the game
 	function earlyResolveB() external onlyAdmins() onlyHumans() {
-		require (earlyResolveACalled == true && earlyResolveBCalled == false && miniGameProcessing == true && block.number > miniGameProcessingBegun + RNGblockDelay, "earlyResolveB cannot be called yet"); 
-		
+		require (earlyResolveACalled == true && earlyResolveBCalled == false && miniGameProcessing == true && block.number > miniGameProcessingBegun + RNGblockDelay, "earlyResolveB cannot be called yet");
+
 		earlyResolveBCalled = true;
 		resolveCycle();
 
-		emit resolvedEarly(msg.sender, cycleProgressivePot, "the cycle was resolved early"); 
+		emit resolvedEarly(msg.sender, cycleProgressivePot, "the cycle was resolved early");
 	}
 
-	//resets the first seed in case the processing is not completed within 256 blocks 
+	//resets the first seed in case the processing is not completed within 256 blocks
 	function restartMiniGame() external onlyAdmins() onlyHumans() {
 		require (miniGameProcessing == true && block.number > miniGameProcessingBegun + 256, "restartMiniGame cannot be called yet");
-		
+
 		generateSeedA();
 
 		emit processingRestarted(msg.sender, "mini-game processing was restarted");
 	}
 
-	//admins can close the contract no sooner than 30 days after a full cycle completes 
+	//admins can close the contract no sooner than 30 days after a full cycle completes
 	//users need to withdraw funds before this date or risk losing them
 	function zeroOut() external onlyAdmins() onlyHumans() {
-	    require (now >= cycleEnded + 30 days && cycleOver == true, "too early to close the contract"); 
-	    
+	    require (now >= cycleEnded + 30 days && cycleOver == true, "too early to close the contract");
+
 	  	//event emited before selfdestruct
-	    emit contractDestroyed(msg.sender, address(this).balance, "contract destroyed"); 
+	    emit contractDestroyed(msg.sender, address(this).balance, "contract destroyed");
 
 	    selfdestruct(foundationFund);
 	}
@@ -453,14 +453,14 @@ contract OneHundredthMonkey {
 
 	function () external payable onlyHumans() gameOpen() {
 		//funds sent directly to contract will trigger buy
-		//no refferal on fallback 
+		//no refferal on fallback
 		buyInternal(msg.value, 0x0);
 	}
 
 	function buy(address _referral) public payable onlyHumans() gameOpen() {
 		buyInternal(msg.value, _referral);
 	}
-	
+
 	function reinvest(uint256 _amount, address _referral) external onlyHumans() gameOpen() {
 		//update userBalance at beginning of function in case user has new funds to reinvest
 		updateUserBalance(msg.sender);
@@ -470,7 +470,7 @@ contract OneHundredthMonkey {
 
 		//take funds from user persistent storage and buy
 		userBalance[msg.sender] = userBalance[msg.sender].sub(_amount);
-		
+
 		buyInternal(_amount, _referral);
 
 		emit userReinvested(msg.sender, _amount, "a user reinvested");
@@ -511,7 +511,7 @@ contract OneHundredthMonkey {
 	    return roundPrizePot[roundCount];
 	}
 
-	//helper function to return contract balance 
+	//helper function to return contract balance
 	function contractBalance() external view returns(uint256 _contractBalance) {
 	    return address(this).balance;
 	}
@@ -593,7 +593,7 @@ contract OneHundredthMonkey {
 		);
 	}
 
-	//cycle data	
+	//cycle data
 	function cycleInfo() external view returns(
 		bool _cycleComplete,
 		uint256 _currentRound,
@@ -609,7 +609,7 @@ contract OneHundredthMonkey {
 			} else {
 				isActive = false;
 			}
-		
+
 		return (
 			isActive,
 			roundCount,
@@ -628,18 +628,18 @@ contract OneHundredthMonkey {
 
 	function startCycle() internal {
 		require (gameActive == false && cycleCount == 0, "the cycle has already been started");
-		
+
 		gameActive = true;
 		cycleStart();
 		roundStart();
 		miniGameStart();
 
-		emit cycleStarted(msg.sender, "a new cycle just started"); 
+		emit cycleStarted(msg.sender, "a new cycle just started");
 	}
 
 	function buyInternal(uint256 _amount, address _referral) internal {
 		require (_amount >= tokenPrice, "you must buy at least one token");
-		require (userMiniGameTokensMin[msg.sender][miniGameCount].length < 10, "you are buying too often in this round"); //sets up bounded loop 
+		require (userMiniGameTokensMin[msg.sender][miniGameCount].length < 10, "you are buying too often in this round"); //sets up bounded loop
 
 		//start cycle on first buy
 		if (gameActive == false && now >= activationTime) {
@@ -687,9 +687,9 @@ contract OneHundredthMonkey {
 		//add min ranges and save in user accounting
 		userMiniGameTokensMin[msg.sender][miniGameCount].push(cycleActiveTokens + 1);
 		userMiniGameTokensMax[msg.sender][miniGameCount].push(cycleActiveTokens + tokensPurchased);
-		//log last eligible rounds for withdraw checking 
+		//log last eligible rounds for withdraw checking
 		userLastMiniGameInteractedWith[msg.sender] = miniGameCount;
-		userLastRoundInteractedWith[msg.sender] = roundCount;	
+		userLastRoundInteractedWith[msg.sender] = roundCount;
 
 		uint256 referralShare = (ethSpent.mul(referralRate)).div(100);
 		//check referral
@@ -697,7 +697,7 @@ contract OneHundredthMonkey {
 	      // assign refferal
 	      userBalance[_referral] += referralShare;
 	   	} else if (_referral == 0x0000000000000000000000000000000000000000 || _referral == msg.sender){
-	   		//if no referral used, add to progessive pot 
+	   		//if no referral used, add to progessive pot
 	   		cycleProgressivePot += referralShare;
 	   	}
 
@@ -720,7 +720,7 @@ contract OneHundredthMonkey {
 		uint256 cyclePot = ethSpent.mul(progressivePotRate).div(100);
 		cycleProgressivePot += cyclePot;
 
-     	//update global token accounting 
+     	//update global token accounting
      	if (miniGameTokensLeft[miniGameCount] > 0) {
 			miniGameTokensLeft[miniGameCount] = miniGameTokensLeft[miniGameCount].sub(tokensPurchased);
 		}
@@ -730,7 +730,7 @@ contract OneHundredthMonkey {
 		totalVolume += ethSpent;
 		totalBuys++;
 
-        //update user balance, if necessary. done here to keep ensure updateUserBalance never has to search through multiple minigames 
+        //update user balance, if necessary. done here to keep ensure updateUserBalance never has to search through multiple minigames
 		updateUserBalance(msg.sender);
 
 		emit userBought(msg.sender, tokensPurchased, miniGameCount, "a user just bought tokens");
@@ -741,7 +741,7 @@ contract OneHundredthMonkey {
 		uint256 _mg = userLastMiniGameInteractedWith[_user];
 		uint256 _rnd = userLastRoundInteractedWith[_user];
 
-		//calculate minigame divs 
+		//calculate minigame divs
 		userShareMiniGame[_user][_mg] = userMiniGameTokens[_user][_mg].mul(10 ** (precisionFactor + 1)).div(miniGameTokens[_mg] + 5).div(10);
 	    userDivsMiniGameTotal[_user][_mg] = miniGameDivs[_mg].mul(userShareMiniGame[_user][_mg]).div(10 ** precisionFactor);
 	    userDivsMiniGameUnclaimed[_user][_mg] = userDivsMiniGameTotal[_user][_mg].sub(userDivsMiniGameClaimed[_user][_mg]);
@@ -757,7 +757,7 @@ contract OneHundredthMonkey {
 			userBalance[_user] += shareTempMg;
 			miniGameDivsClaimed[_mg] += shareTempMg;
 		    }
-	    //calculate round divs 
+	    //calculate round divs
 		userShareRound[_user][_rnd] = userRoundTokens[_user][_rnd].mul(10 ** (precisionFactor + 1)).div(roundTokensActive[_rnd] + 5).div(10);
 	    userDivsRoundTotal[_user][_rnd] = roundDivs[_rnd].mul(userShareRound[_user][_rnd]).div(10 ** precisionFactor);
 	    userDivsRoundUnclaimed[_user][_rnd] = userDivsRoundTotal[_user][_rnd].sub(userDivsRoundClaimed[_user][_rnd]);
@@ -772,23 +772,23 @@ contract OneHundredthMonkey {
 			userDivsRoundUnclaimed[_user][_rnd] = 0;
 			userBalance[_user] += shareTempRnd;
 			roundDivsClaimed[_rnd] += shareTempRnd;
-	    }	
+	    }
 	}
 
 	function checkPrizes(address _user) internal {
 		//push cycle prizes to persistent storage
 		if (cycleOver == true && userCycleChecked[_user] == false) {
-			//get minigame cycle prize was in 
+			//get minigame cycle prize was in
 			uint256 mg = cyclePrizeInMinigame;
-			//check if user won cycle prize 
+			//check if user won cycle prize
 			if (cylcePrizeClaimed == false && userMiniGameTokensMax[_user][mg].length > 0) {
-				//check if user won minigame 
+				//check if user won minigame
 				//loop iterations bounded to a max of 10 on buy()
 	  			for (uint256 i = 0; i < userMiniGameTokensMin[_user][mg].length; i++) {
 	  				if (cyclePrizeWinningNumber >= userMiniGameTokensMin[_user][mg][i] && cyclePrizeWinningNumber <= userMiniGameTokensMax[_user][mg][i]) {
 	  					userBalance[_user] += cycleProgressivePot;
 	  					cylcePrizeClaimed = true;
-						cyclePrizeWinner = msg.sender;				
+						cyclePrizeWinner = msg.sender;
 	  					break;
 	  				}
 	  			}
@@ -797,7 +797,7 @@ contract OneHundredthMonkey {
 		}
 		//push round prizes to persistent storage
 		if (roundPrizeClaimed[userLastRoundInteractedWith[_user]] == false && roundPrizeTokenRangeIdentified[userLastRoundInteractedWith[_user]]) {
-			//get minigame round prize was in 
+			//get minigame round prize was in
 			uint256 rnd = userLastRoundInteractedWith[_user];
 			uint256 mgp = roundPrizeInMinigame[rnd];
 			//check if user won round prize
@@ -805,7 +805,7 @@ contract OneHundredthMonkey {
 				if (roundPrizeNumber[rnd] >= userMiniGameTokensMin[_user][mgp][i] && roundPrizeNumber[rnd] <= userMiniGameTokensMax[_user][mgp][i]) {
 					userBalance[_user] += roundPrizePot[mgp];
 					roundPrizeClaimed[rnd] = true;
-					roundPrizeWinner[rnd] = msg.sender;		
+					roundPrizeWinner[rnd] = msg.sender;
 					break;
 				}
 			}
@@ -813,13 +813,13 @@ contract OneHundredthMonkey {
 		}
 		//push minigame prizes to persistent storage
 		if (userLastMiniGameChecked[_user] < userLastMiniGameInteractedWith[_user] && miniGameCount > userLastMiniGameInteractedWith[_user]) {
-			//check if user won minigame 
+			//check if user won minigame
 			mg = userLastMiniGameInteractedWith[_user];
 			for (i = 0; i < userMiniGameTokensMin[_user][mg].length; i++) {
 				if (miniGamePrizeNumber[mg] >= userMiniGameTokensMin[_user][mg][i] && miniGamePrizeNumber[mg] <= userMiniGameTokensMax[_user][mg][i]) {
 					userBalance[_user] += miniGamePrizePot[mg];
 					miniGamePrizeClaimed[mg] = true;
-					miniGamePrizeWinner[mg] = msg.sender;			
+					miniGamePrizeWinner[mg] = msg.sender;
 					break;
 				}
 			}
@@ -832,7 +832,7 @@ contract OneHundredthMonkey {
 					break;
 				}
 			}
-			//update last mini game checked 
+			//update last mini game checked
 			userLastMiniGameChecked[_user] = userLastMiniGameInteractedWith[_user];
 		}
 	}
@@ -844,30 +844,30 @@ contract OneHundredthMonkey {
 
 	function miniGameStart() internal {
 		require (cycleOver == false, "the cycle cannot be over");
-		
+
 		miniGameCount++;
 		miniGameStartTime[miniGameCount] = now;
-		//set up special case for correct token range on first minigame 
+		//set up special case for correct token range on first minigame
 		if (tokenSupply != 0) {
 			miniGameTokenRangeMin[miniGameCount] = tokenSupply + 1;
 		} else {
 			miniGameTokenRangeMin[miniGameCount] = 0;
 		}
-		//genreate tokens and update accounting 
+		//genreate tokens and update accounting
 		miniGameTokens[miniGameCount] = generateTokens();
 		miniGameTokensLeft[miniGameCount] = miniGameTokens[miniGameCount];
 		miniGameTokenRangeMax[miniGameCount] = tokenSupply;
-		//increment token price after 1st minigame 
+		//increment token price after 1st minigame
 		if (miniGameCount > 1) {
 			tokenPrice += tokenPriceIncrement;
 		}
-		//award prizes and start new round if current round is complete 
+		//award prizes and start new round if current round is complete
 		if (miniGameCount % miniGamesPerRound == 0 && miniGameCount > 1) {
 			awardRoundPrize();
 			roundStart();
 			tokenPrice = 0.001 ether + 0.0005 ether * roundCount.sub(1);
 		}
-		//award prize if cycle is complete 
+		//award prize if cycle is complete
 		if (miniGameCount % (miniGamesPerCycle + 1) == 0 && miniGameCount > 1) {
 			awardCyclePrize();
 		}
@@ -880,13 +880,13 @@ contract OneHundredthMonkey {
 
 		roundCount++;
 		roundStartTime[roundCount] = now;
-		//set up special case for correct token range on first round 
+		//set up special case for correct token range on first round
 		if (tokenSupply != 0) {
 			roundTokenRangeMin[roundCount] = miniGameTokenRangeMax[miniGameCount.sub(1)] + 1;
 		} else {
 			roundTokenRangeMin[roundCount] = 0;
 		}
-		//log max only when round is complete 
+		//log max only when round is complete
 		if (roundCount >= 2) {
 			roundTokenRangeMax[roundCount.sub(1)] = miniGameTokenRangeMax[miniGameCount.sub(1)];
 			roundTokens[roundCount.sub(1)] = tokenSupply.sub(roundTokenRangeMin[roundCount.sub(1)]);
@@ -913,10 +913,10 @@ contract OneHundredthMonkey {
 	function generateSeedA() internal {
 		require (miniGameProcessing == false || miniGameProcessing == true && block.number > miniGameProcessingBegun + 256, "seed A cannot be regenerated right now");
 		require (miniGameTokensLeft[miniGameCount] == 0 || earlyResolveACalled == true, "active tokens remain in this minigame");
-		
+
 		miniGameProcessing = true;
 		miniGameProcessingBegun = block.number;
-		//generate seed 
+		//generate seed
 		hashA = blockhash(miniGameProcessingBegun - 1);
 		//log end times
 		if (miniGameCount > 1) {
@@ -936,12 +936,12 @@ contract OneHundredthMonkey {
 	}
 
 	function generateSeedB() internal {
-		//gererate seed 
+		//gererate seed
 		hashB = blockhash(miniGameProcessingBegun + RNGblockDelay);
-		//awared prizes 
+		//awared prizes
 		awardMiniGamePrize();
 		awardMiniGameAirdrop();
-		//award processing bounty 
+		//award processing bounty
 		if (miniGameSeedBawarded[miniGameCount] == false) {
 			userBalance[msg.sender] += seedBreward;
 			miniGameSeedBawarded[miniGameCount] = true;
@@ -978,13 +978,13 @@ contract OneHundredthMonkey {
 		uint256 currentRoundTokens;
 		if (miniGameCount > 1) {
 			currentRoundTokens = miniGameTokenRangeMax[miniGameCount.sub(1)].sub(roundTokenRangeMin[roundCount]);
-		//handles edge case of early resolve during the first minigame 
+		//handles edge case of early resolve during the first minigame
 		} else if (miniGameCount == 1) {
 			currentRoundTokens = miniGameTokensActive[1];
 		}
 	    uint256 winningNumber = uint256(hash).mod(currentRoundTokens);
 	    roundPrizeNumber[roundCount] = winningNumber + roundTokenRangeMin[roundCount];
-	    //calculate round prize here 
+	    //calculate round prize here
 	    uint256 roundPrize = cycleProgressivePot.mul(roundPotRate).div(100);
 		uint256 adminShare = cycleProgressivePot.mul(4).div(100);
 		foundationBalance += adminShare;
@@ -1001,7 +1001,7 @@ contract OneHundredthMonkey {
 	    uint256 winningNumber;
 	    if (miniGameCount > 1) {
 	    	winningNumber = uint256(hash).mod(miniGameTokenRangeMax[miniGameCount - 1]);
-	    //handles edge case of early resolve during the first minigame 
+	    //handles edge case of early resolve during the first minigame
 	    } else if (miniGameCount == 1) {
 	    	winningNumber = uint256(hash).mod(miniGameTokensActive[1]);
 	    }
@@ -1018,7 +1018,7 @@ contract OneHundredthMonkey {
 	function resolveCycle() internal {
 		//generate hashB here in instead of calling generateSeedB
 		hashB = blockhash(miniGameProcessingBegun + RNGblockDelay);
-		//award prizes 
+		//award prizes
 		awardMiniGamePrize();
 		awardMiniGameAirdrop();
 		awardRoundPrize();
@@ -1029,10 +1029,10 @@ contract OneHundredthMonkey {
 	}
 
 	//narrows down the token range of a round to a specific miniGame
-	//reduces the search space on user prize updates 
+	//reduces the search space on user prize updates
 	function narrowRoundPrize(uint256 _ID) internal returns(uint256 _miniGameID) {
 		//set up local accounting
-		uint256 miniGameRangeMin; 
+		uint256 miniGameRangeMin;
 		uint256 miniGameRangeMax;
 		if (_ID == 1) {
 			miniGameRangeMin = 1;
@@ -1040,9 +1040,9 @@ contract OneHundredthMonkey {
 		} else if (_ID >= 2) {
 			miniGameRangeMin = _ID.mul(miniGamesPerRound);
 			miniGameRangeMax = miniGameRangeMin + miniGamesPerRound - 1;
-		}	
+		}
 		//loop through each minigame to check prize number
-		//log globaly so this only needs to be called once per prize 
+		//log globaly so this only needs to be called once per prize
 	    for (uint256 i = miniGameRangeMin; i <= miniGameRangeMax; i++) {
 		    if (roundPrizeNumber[_ID] >= miniGameTokenRangeMin[i] && roundPrizeNumber[_ID] <= miniGameTokenRangeMax[i]) {
 	        roundPrizeInMinigame[_ID] = i;
@@ -1050,21 +1050,21 @@ contract OneHundredthMonkey {
 	        return roundPrizeInMinigame[_ID];
 	        break;
 		    }
-	    }	
+	    }
 	}
 
 	//narrows down the token range of a round to a specific miniGame
-	//reduces the search space on user prize updates 
+	//reduces the search space on user prize updates
 	function narrowCyclePrize() internal returns(uint256 _miniGameID) {
-		//first identify round 
+		//first identify round
 	    for (uint256 i = 1; i <= roundCount; i++) {
 	      if (cyclePrizeWinningNumber >= roundTokenRangeMin[i] && cyclePrizeWinningNumber <= roundTokenRangeMax[i]) {
 	        cyclePrizeInRound = i;
 	        break;
 	      }
 	    }
-	    //set up minigame local accounting 
-	    uint256 miniGameRangeMin; 
+	    //set up minigame local accounting
+	    uint256 miniGameRangeMin;
 		uint256 miniGameRangeMax;
 		uint256 _ID = cyclePrizeInRound;
 		if (_ID == 1) {
@@ -1073,9 +1073,9 @@ contract OneHundredthMonkey {
 		} else if (_ID >= 2) {
 			miniGameRangeMin = _ID.mul(miniGamesPerRound);
 			miniGameRangeMax = miniGameRangeMin + miniGamesPerRound - 1;
-		}	
+		}
 		//loop through each minigame to check prize number
-		//log globaly so this only needs to be called once per prize  
+		//log globaly so this only needs to be called once per prize
 	    for (i = miniGameRangeMin; i <= miniGameRangeMax; i++) {
 			if (cyclePrizeWinningNumber >= miniGameTokenRangeMin[i] && cyclePrizeWinningNumber <= miniGameTokenRangeMax[i]) {
 				cyclePrizeInMinigame = i;
@@ -1083,7 +1083,7 @@ contract OneHundredthMonkey {
 				return cyclePrizeInMinigame;
 				break;
 			}
-	    }	
+	    }
 	}
 
 	//helper function for up to date front end balances without state change
@@ -1093,14 +1093,14 @@ contract OneHundredthMonkey {
 		uint256 mgShare = userShareMiniGame[_user][_mg];
 		uint256 mgTotal = userDivsMiniGameTotal[_user][_mg];
 		uint256 mgUnclaimed = userDivsMiniGameUnclaimed[_user][_mg];
-		//calculate minigame divs 
+		//calculate minigame divs
 		mgShare = userMiniGameTokens[_user][_mg].mul(10 ** (precisionFactor + 1)).div(miniGameTokens[_mg] + 5).div(10);
 	    mgTotal = miniGameDivs[_mg].mul(mgShare).div(10 ** precisionFactor);
 	    mgUnclaimed = mgTotal.sub(userDivsMiniGameClaimed[_user][_mg]);
 
 	    return mgUnclaimed;
 	}
-	
+
 	//helper function for up to date front end balances without state change
 	function checkDivsRndView(address _user) internal view returns(uint256 _divs) {
 		//set up local shorthand
@@ -1108,7 +1108,7 @@ contract OneHundredthMonkey {
 		uint256 rndShare = userShareRound[_user][_rnd];
 		uint256 rndTotal = userDivsRoundTotal[_user][_rnd];
 		uint256 rndUnclaimed = userDivsRoundUnclaimed[_user][_rnd];
-        //calculate round divs 
+        //calculate round divs
 		rndShare = userRoundTokens[_user][_rnd].mul(10 ** (precisionFactor + 1)).div(roundTokensActive[_rnd] + 5).div(10);
 	    rndTotal = roundDivs[_rnd].mul(rndShare).div(10 ** precisionFactor);
 	    rndUnclaimed = rndTotal.sub(userDivsRoundClaimed[_user][_rnd]);
@@ -1122,7 +1122,7 @@ contract OneHundredthMonkey {
 		uint256 prizeValue;
 		//push cycle prizes to persistent storage
 		if (cycleOver == true && userCycleChecked[_user] == false) {
-			//get minigame cycle prize was in 
+			//get minigame cycle prize was in
 			uint256 mg;
 			if (cyclePrizeTokenRangeIdentified == true) {
 				mg = cyclePrizeInMinigame;
@@ -1130,13 +1130,13 @@ contract OneHundredthMonkey {
 				narrowCyclePrizeView();
 				mg = cyclePrizeInMinigame;
 			}
-			//check if user won cycle prize 
+			//check if user won cycle prize
 			if (cylcePrizeClaimed == false && userMiniGameTokensMax[_user][mg].length > 0) {
-				//check if user won minigame 
+				//check if user won minigame
 				//loop iterations bounded to a max of 10 on buy()
 				for (uint256 i = 0; i < userMiniGameTokensMin[_user][mg].length; i++) {
 					if (cyclePrizeWinningNumber >= userMiniGameTokensMin[_user][mg][i] && cyclePrizeWinningNumber <= userMiniGameTokensMax[_user][mg][i]) {
-						prizeValue += cycleProgressivePot;			
+						prizeValue += cycleProgressivePot;
 						break;
 					}
 				}
@@ -1144,7 +1144,7 @@ contract OneHundredthMonkey {
 		}
 		//push round prizes to persistent storage
 		if (userLastRoundChecked[_user] < userLastRoundInteractedWith[_user] && roundCount > userLastRoundInteractedWith[_user]) {
-			//get minigame round prize was in 
+			//get minigame round prize was in
 			uint256 mgp;
 			uint256 _ID = userLastRoundChecked[_user];
 			if (roundPrizeTokenRangeIdentified[_ID] == true) {
@@ -1156,18 +1156,18 @@ contract OneHundredthMonkey {
 			//check if user won round prize
 			for (i = 0; i < userMiniGameTokensMin[_user][mgp].length; i++) {
 				if (roundPrizeNumber[_ID] >= userMiniGameTokensMin[_user][mgp][i] && roundPrizeNumber[_ID] <= userMiniGameTokensMax[_user][mgp][i]) {
-					prizeValue += roundPrizePot[mgp];	
+					prizeValue += roundPrizePot[mgp];
 					break;
 				}
 			}
 		}
 		//push minigame prizes to persistent storage
 		if (userLastMiniGameChecked[_user] < userLastMiniGameInteractedWith[_user] && miniGameCount > userLastMiniGameInteractedWith[_user]) {
-			//check if user won minigame 
+			//check if user won minigame
 			mg = userLastMiniGameInteractedWith[_user];
 			for (i = 0; i < userMiniGameTokensMin[_user][mg].length; i++) {
 				if (miniGamePrizeNumber[mg] >= userMiniGameTokensMin[_user][mg][i] && miniGamePrizeNumber[mg] <= userMiniGameTokensMax[_user][mg][i]) {
-					prizeValue += miniGamePrizePot[mg];			
+					prizeValue += miniGamePrizePot[mg];
 					break;
 				}
 			}
@@ -1186,7 +1186,7 @@ contract OneHundredthMonkey {
 	function narrowRoundPrizeView(uint256 _ID) internal view returns(uint256 _miniGameID) {
 		//set up local accounting
 		uint256 winningNumber = roundPrizeNumber[_ID];
-		uint256 miniGameRangeMin; 
+		uint256 miniGameRangeMin;
 		uint256 miniGameRangeMax;
 		if (_ID == 1) {
 			miniGameRangeMin = 1;
@@ -1194,15 +1194,15 @@ contract OneHundredthMonkey {
 		} else if (_ID >= 2) {
 			miniGameRangeMin = _ID.mul(miniGamesPerRound);
 			miniGameRangeMax = miniGameRangeMin + miniGamesPerRound - 1;
-		}	
+		}
 		//loop through each minigame to check prize number
-		//log globaly so this only needs to be called once per prize 
+		//log globaly so this only needs to be called once per prize
 	    for (uint256 i = miniGameRangeMin; i <= miniGameRangeMax; i++) {
 			if (winningNumber >= miniGameTokenRangeMin[i] && winningNumber <= miniGameTokenRangeMax[i]) {
 				return i;
 				break;
 			}
-	    }		
+	    }
 	}
 
 	//helper function for up to date front end balances without state change
@@ -1210,15 +1210,15 @@ contract OneHundredthMonkey {
 		//set up local accounting
 		uint256 winningNumber = cyclePrizeWinningNumber;
 		uint256 rnd;
-		//first identify round 
+		//first identify round
 	    for (uint256 i = 1; i <= roundCount; i++) {
 			if (winningNumber >= roundTokenRangeMin[i] && winningNumber <= roundTokenRangeMax[i]) {
 				rnd = i;
 				break;
 			}
 	    }
-	    //set up minigame local accounting 
-	    uint256 miniGameRangeMin; 
+	    //set up minigame local accounting
+	    uint256 miniGameRangeMin;
 			uint256 miniGameRangeMax;
 			uint256 _ID = rnd;
 			if (_ID == 1) {
@@ -1227,14 +1227,29 @@ contract OneHundredthMonkey {
 			} else if (_ID >= 2) {
 				miniGameRangeMin = _ID.mul(miniGamesPerRound);
 				miniGameRangeMax = miniGameRangeMin + miniGamesPerRound - 1;
-			}	
+			}
 			//loop through each minigame to check prize number
-			//log globaly so this only needs to be called once per prize  
+			//log globaly so this only needs to be called once per prize
 	    for (i = miniGameRangeMin; i <= miniGameRangeMax; i++) {
 			if (winningNumber >= miniGameTokenRangeMin[i] && winningNumber <= miniGameTokenRangeMax[i]) {
 				return i;
 				break;
 			}
-	    }			
+	    }
 	}
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

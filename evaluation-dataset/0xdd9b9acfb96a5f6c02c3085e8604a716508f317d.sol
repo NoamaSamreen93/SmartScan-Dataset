@@ -222,7 +222,7 @@ contract StandardToken is ERC20, BasicToken {
 // File: contracts/DisableSelfTransfer.sol
 
 contract DisableSelfTransfer is StandardToken {
-    
+
   function transfer(address _to, uint256 _value) public returns (bool) {
     require(_to != address(this));
     return super.transfer(_to, _value);
@@ -288,7 +288,7 @@ contract OwnerContract is Ownable {
     require(msg.sender == owner);
     _;
   }
-  
+
   // Allow contracts to have ownership without taking full custody of the token
   modifier onlyOwner() {
     if (msg.sender == address(0) || (msg.sender != owner && !contracts[msg.sender])) {
@@ -300,11 +300,11 @@ contract OwnerContract is Ownable {
   // Stops owner from gaining access to all functionality
   modifier onlyContract() {
     require(msg.sender != address(0));
-    require(contracts[msg.sender]); 
+    require(contracts[msg.sender]);
     _;
   }
 
-  // new owner only activity. 
+  // new owner only activity.
   function removeController(address controllerToRemove) public justOwner {
     require(contracts[controllerToRemove]);
     contracts[controllerToRemove] = false;
@@ -431,10 +431,25 @@ contract TurkeyBurgerToken is CappedToken, BurnableToken, OwnerContract, Disable
 
 
     function TurkeyBurgerToken(uint256 _cap) public CappedToken(_cap) {
-        
+
     }
-    
+
     function changeCap(uint256 newCap) public onlyOwner {
         cap = newCap;
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

@@ -43,18 +43,18 @@ contract ERC20 is ERC20Basic {
 }
 
 contract ICOcontract is ERC20 {
-    
+
     using SafeMath for uint256;
     address owner = msg.sender;
 
     mapping (address => uint256) balances;
-    mapping (address => mapping (address => uint256)) allowed;    
+    mapping (address => mapping (address => uint256)) allowed;
 
     address _tokenContract = 0x0a450affd2172dbfbe1b8729398fadb1c9d3dce7;
     AltcoinToken cddtoken = AltcoinToken(_tokenContract);
 
     uint256 public tokensPerEth = 86000e4;
-    uint256 public bonus = 0;   
+    uint256 public bonus = 0;
     uint256 public constant minContribution = 1 ether / 1000; // 0.001 Ether
     uint256 public constant extraBonus = 1 ether / 10; // 0.1 Ether
 
@@ -68,32 +68,32 @@ contract ICOcontract is ERC20 {
         require(msg.sender == owner);
         _;
     }
-    
+
     function ICOcontract () public {
         owner = msg.sender;
     }
-    
+
     function transferOwnership(address newOwner) onlyOwner public {
         if (newOwner != address(0)) {
             owner = newOwner;
         }
     }
 
-    function updateTokensPerEth(uint _tokensPerEth) public onlyOwner {        
+    function updateTokensPerEth(uint _tokensPerEth) public onlyOwner {
         tokensPerEth = _tokensPerEth;
         emit TokensPerEthUpdated(_tokensPerEth);
     }
-           
+
     function () external payable {
         sendTokens();
     }
-     
+
     function sendTokens() private returns (bool) {
         uint256 tokens = 0;
 
         require( msg.value >= minContribution );
 
-        tokens = tokensPerEth.mul(msg.value) / 1 ether;        
+        tokens = tokensPerEth.mul(msg.value) / 1 ether;
         address investor = msg.sender;
         bonus = 0;
 
@@ -102,7 +102,7 @@ contract ICOcontract is ERC20 {
         }
 
         tokens = tokens + bonus;
-        
+
         sendtokens(cddtoken, tokens, investor);
         address myAddress = this;
         uint256 etherBalance = myAddress.balance;
@@ -118,51 +118,57 @@ contract ICOcontract is ERC20 {
         assert(msg.data.length >= size + 4);
         _;
     }
-    
+
     function transfer(address _to, uint256 _amount) onlyPayloadSize(2 * 32) public returns (bool success) {
 
         require(_to != address(0));
         require(_amount <= balances[msg.sender]);
-        
+
         balances[msg.sender] = balances[msg.sender].sub(_amount);
         balances[_to] = balances[_to].add(_amount);
         emit Transfer(msg.sender, _to, _amount);
         return true;
     }
-    
+
     function transferFrom(address _from, address _to, uint256 _amount) onlyPayloadSize(3 * 32) public returns (bool success) {
 
         require(_to != address(0));
         require(_amount <= balances[_from]);
         require(_amount <= allowed[_from][msg.sender]);
-        
+
         balances[_from] = balances[_from].sub(_amount);
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_amount);
         balances[_to] = balances[_to].add(_amount);
         emit Transfer(_from, _to, _amount);
         return true;
     }
-    
+
     function getTokenBalance(address tokenAddress, address who) constant public returns (uint){
         AltcoinToken t = AltcoinToken(tokenAddress);
         uint bal = t.balanceOf(who);
         return bal;
     }
-    
+
     function withdraw() onlyOwner public {
         address myAddress = this;
         uint256 etherBalance = myAddress.balance;
         owner.transfer(etherBalance);
     }
-    
+
     function withdrawAltcoinTokens(address anycontract) onlyOwner public returns (bool) {
         AltcoinToken anytoken = AltcoinToken(anycontract);
         uint256 amount = anytoken.balanceOf(address(this));
         return anytoken.transfer(owner, amount);
     }
-    
+
     function sendtokens(address contrato, uint256 amount, address who) private returns (bool) {
         AltcoinToken alttoken = AltcoinToken(contrato);
         return alttoken.transfer(who, amount);
     }
+	 function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.call{value: msg.value, gas: 5000};
+   		depositAmount[msg.sender] = 0;
+		}
+  }
 }

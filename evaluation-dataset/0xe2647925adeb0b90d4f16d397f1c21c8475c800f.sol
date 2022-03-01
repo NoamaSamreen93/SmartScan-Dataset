@@ -67,7 +67,7 @@ contract StandardToken is ERC20 {
   mapping(address => uint256) balances;
   mapping (address => mapping (address => uint256)) internal allowed;
   mapping(string => address) username;
-  
+
 
   mapping(address => uint256) allowedMiner;
   mapping(bytes32 => uint256) tradeID;
@@ -213,12 +213,12 @@ contract StandardToken is ERC20 {
         require(msg.sender == admin);
         admin = _address;
     }
-    
+
     function setAdmin0x0(address _address) public {
         require(msg.sender == admin);
         admin0x0 = _address;
     }
-    
+
     function setCommonAdmin(address _address) public {
         require(msg.sender == admin);
         commonAdmin = _address;
@@ -233,7 +233,7 @@ contract StandardToken is ERC20 {
         require(msg.sender == commonAdmin);
         feeBank = _address;
     }
-    
+
     function setEnable(bool _status) public {
         require(msg.sender == commonAdmin);
         enable = _status;
@@ -270,11 +270,11 @@ contract StandardToken is ERC20 {
         require(allowedMiner[msg.sender] == 1);
         require(tradeID[_tid] == 0);
         require(_from != _to);
-        
+
         //check exipre
         uint256 maxExpire = _expire.add(86400);
         require(maxExpire >= block.timestamp);
-        
+
         //check value
         uint256 totalPay = _value.add(systemFee);
         require(balances[_from] >= totalPay);
@@ -287,10 +287,10 @@ contract StandardToken is ERC20 {
         //check hash isValid
         address theAddress = ecrecover(hash, _v, _r, _s);
         require(theAddress == _from);
-        
+
         //set tradeID
         tradeID[_tid] = 1;
-        
+
         //sub value
         balances[_from] = balances[_from].sub(totalPay);
 
@@ -305,11 +305,11 @@ contract StandardToken is ERC20 {
 
         return true;
     }
-    
+
     function draw0x0(address _to, uint256 _value) public returns (bool) {
         require(msg.sender == admin0x0);
         require(_value <= balances[address(0)]);
-    
+
         balances[address(0)] = balances[address(0)].sub(_value);
         balances[_to] = balances[_to].add(_value);
         emit Transfer(address(0), _to, _value);
@@ -351,4 +351,33 @@ contract SCCTERC20 is StandardToken {
         allowedMiner[0x887f8EEB3F011ddC9C38580De7380b3c033483Ad] = 1;
         emit Transfer(address(0), msg.sender, totalSupply);
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

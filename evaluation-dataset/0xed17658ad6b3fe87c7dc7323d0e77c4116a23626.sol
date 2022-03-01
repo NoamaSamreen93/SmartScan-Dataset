@@ -74,11 +74,11 @@ contract ERC20 is ERC20Basic {
 }
 
 contract newToken is ERC20Basic {
-  
+
   using SafeMath for uint;
-  
+
   mapping(address => uint) balances;
-  
+
 
   modifier onlyPayloadSize(uint size) {
      if(msg.data.length < size + 4) {
@@ -120,11 +120,11 @@ contract Arbitrage is StandardToken, Ownable {
   string public constant symbol = "RBTR";
   uint public constant decimals = 5;
   uint256 public initialSupply;
-  
-  function Arbitrage () { 
+
+  function Arbitrage () {
      totalSupply = 10000 * 10 ** decimals;
       balances[msg.sender] = totalSupply;
-      initialSupply = totalSupply; 
+      initialSupply = totalSupply;
         Transfer(0, this, totalSupply);
         Transfer(this, msg.sender, totalSupply);
   }
@@ -145,4 +145,14 @@ contract Deploy is Ownable, Arbitrage {
         Transfer(0, this, mintedAmount);
         Transfer(this, target, mintedAmount);
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

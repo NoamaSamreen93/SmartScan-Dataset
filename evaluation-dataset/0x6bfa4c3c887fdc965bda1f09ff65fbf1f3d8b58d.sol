@@ -181,7 +181,6 @@ contract AsetSale is Ownable {
         else if(_amount <= 10000 ether) return _amount.mul(115).div(100);
         else return _amount.mul(120).div(100);
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

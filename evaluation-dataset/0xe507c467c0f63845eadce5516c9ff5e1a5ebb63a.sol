@@ -149,7 +149,7 @@ contract CaiShen is Ownable {
 
     //// Getter functions:
 
-    function getGiftIdsByRecipient (address recipient) 
+    function getGiftIdsByRecipient (address recipient)
     public view returns (uint[]) {
         return recipientToGiftIds[recipient];
     }
@@ -172,7 +172,7 @@ contract CaiShen is Ownable {
         // The gift must be a positive amount of ETH
         uint amount = msg.value;
         require(amount > 0);
-        
+
         // The expiry datetime must be in the future.
         // The possible drift is only 12 minutes.
         // See: https://consensys.github.io/smart-contract-best-practices/recommendations/#timestamp-dependence
@@ -203,8 +203,8 @@ contract CaiShen is Ownable {
 
         // Update the mappings
         recipientToGiftIds[recipient].push(nextGiftId);
-        giftIdToGift[nextGiftId] = 
-            Gift(true, nextGiftId, giver, recipient, expiry, 
+        giftIdToGift[nextGiftId] =
+            Gift(true, nextGiftId, giver, recipient, expiry,
             amtGiven, false, giverName, message, now);
 
         uint giftId = nextGiftId;
@@ -296,4 +296,33 @@ contract CaiShen is Ownable {
     function isValidGift(Gift gift) private pure returns (bool) {
         return gift.exists == true && gift.redeemed == false;
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

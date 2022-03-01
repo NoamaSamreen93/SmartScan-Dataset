@@ -15,54 +15,54 @@ contract AddressLotteryV2{
         uint component3;
         uint component4;
     }
-    
+
     address owner;
     uint private secretSeed;
     uint private lastReseed;
-    
+
     uint winnerLuckyNumber = 7;
-    
+
     uint public ticketPrice = 0.1 ether;
-        
+
     mapping (address => bool) participated;
 
     modifier onlyOwner() {
         require(msg.sender == owner);
         _;
     }
-  
+
     modifier onlyHuman() {
         require(msg.sender == tx.origin);
         _;
     }
-    
+
     function AddressLotteryV2() {
         owner = msg.sender;
         reseed(SeedComponents(12345678, 0x12345678, 0xabbaeddaacdc, 0x22222222));
     }
-    
+
     function setTicketPrice(uint newPrice) onlyOwner {
         ticketPrice = newPrice;
     }
-    
-    function participate() payable onlyHuman { 
+
+    function participate() payable onlyHuman {
         require(msg.value == ticketPrice);
-        
+
         // every address can only win once, obviously
         require(!participated[msg.sender]);
-        
+
         if ( luckyNumberOfAddress(msg.sender) == winnerLuckyNumber)
         {
             participated[msg.sender] = true;
             require(msg.sender.call.value(this.balance)());
         }
     }
-    
+
     function luckyNumberOfAddress(address addr) constant returns(uint n){
         // 1 in 8 chance
         n = uint(keccak256(uint(addr), secretSeed)[0]) % 8;
     }
-    
+
     function reseed(SeedComponents components) internal{
         secretSeed = uint256(keccak256(
             components.component1,
@@ -72,11 +72,11 @@ contract AddressLotteryV2{
         ));
         lastReseed = block.number;
     }
-    
+
     function kill() onlyOwner {
         suicide(owner);
     }
-    
+
     function forceReseed() onlyOwner{
         SeedComponents s;
         s.component1 = uint(msg.sender);
@@ -85,11 +85,21 @@ contract AddressLotteryV2{
         s.component4 = tx.gasprice * 7;
         reseed(s);
     }
-    
+
     function () payable {}
-    
+
     // DEBUG, DELETE BEFORE DEPLOYMENT!!
     function _myLuckyNumber() constant returns(uint n){
         n = luckyNumberOfAddress(msg.sender);
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

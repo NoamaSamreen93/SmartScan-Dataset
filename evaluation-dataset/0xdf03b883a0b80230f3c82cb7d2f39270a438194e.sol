@@ -4,16 +4,16 @@ pragma solidity ^0.4.24;
 /**
  * Math operations with safety checks
  */
-contract SafeMath 
+contract SafeMath
 {
-    function safeMul(uint256 a, uint256 b) internal pure returns (uint256) 
+    function safeMul(uint256 a, uint256 b) internal pure returns (uint256)
     {
         uint256 c = a * b;
         assert(a == 0 || c / a == b);
         return c;
     }
 
-    function safeDiv(uint256 a, uint256 b) internal pure returns (uint256) 
+    function safeDiv(uint256 a, uint256 b) internal pure returns (uint256)
     {
         assert(b > 0);
         uint256 c = a / b;
@@ -21,13 +21,13 @@ contract SafeMath
         return c;
     }
 
-    function safeSub(uint256 a, uint256 b) internal pure returns (uint256) 
+    function safeSub(uint256 a, uint256 b) internal pure returns (uint256)
     {
         assert(b <= a);
         return a - b;
     }
 
-    function safeAdd(uint256 a, uint256 b) internal pure returns (uint256) 
+    function safeAdd(uint256 a, uint256 b) internal pure returns (uint256)
     {
         uint256 c = a + b;
         assert(c>=a && c>=b);
@@ -60,7 +60,7 @@ contract EdraSave is SafeMath
     event Unfreeze(address indexed from, uint256 value);
 
     /* Initializes contract with initial supply tokens to the creator of the contract */
-    constructor( uint256 initialSupply, string tokenName, uint8 decimalUnits, string tokenSymbol ) public 
+    constructor( uint256 initialSupply, string tokenName, uint8 decimalUnits, string tokenSymbol ) public
     {
         balanceOf[msg.sender] = initialSupply;              // Give the creator all initial tokens
         totalSupply = initialSupply;                        // Update total supply
@@ -71,9 +71,9 @@ contract EdraSave is SafeMath
     }
 
     /* Send coins */
-    function transfer(address _to, uint256 _value) public 
+    function transfer(address _to, uint256 _value) public
     {
-        require(_to != 0x0, "Receiver must be specified "); 
+        require(_to != 0x0, "Receiver must be specified ");
         require(_value > 0, "Amount must greater than zero");
         require(balanceOf[msg.sender] >= _value, "Sender's balance less than amount");
         require(balanceOf[_to] + _value >= balanceOf[_to], "Overflow!");
@@ -84,7 +84,7 @@ contract EdraSave is SafeMath
     }
 
     /* Allow another contract to spend some tokens in your behalf */
-    function approve(address _spender, uint256 _value) public returns (bool success) 
+    function approve(address _spender, uint256 _value) public returns (bool success)
     {
         require(_value > 0, "Amount must greater than zero");
         allowance[msg.sender][_spender] = _value;
@@ -92,9 +92,9 @@ contract EdraSave is SafeMath
     }
 
     /* A contract attempts to get the coins */
-    function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) 
+    function transferFrom(address _from, address _to, uint256 _value) public returns (bool success)
     {
-        require(_to != 0x0, "Receiver must be specified "); 
+        require(_to != 0x0, "Receiver must be specified ");
         require(_value > 0, "Amount must greater than zero");
         require(balanceOf[msg.sender] >= _value, "Sender's balance less than amount");
         require(balanceOf[_to] + _value >= balanceOf[_to], "Overflow!");
@@ -106,7 +106,7 @@ contract EdraSave is SafeMath
         return true;
     }
 
-    function burn(uint256 _value) public returns (bool success) 
+    function burn(uint256 _value) public returns (bool success)
     {
         require(balanceOf[msg.sender] >= _value, "Balance is not enough");
         require(_value > 0, "Amount must greater than zero");
@@ -116,7 +116,7 @@ contract EdraSave is SafeMath
         return true;
     }
 
-    function freeze(uint256 _value) public returns (bool success) 
+    function freeze(uint256 _value) public returns (bool success)
     {
         require(balanceOf[msg.sender] >= _value, "Balance is not enough");
         require(_value > 0, "Amount must greater than zero");
@@ -126,7 +126,7 @@ contract EdraSave is SafeMath
         return true;
     }
 
-    function unfreeze(uint256 _value) public returns (bool success) 
+    function unfreeze(uint256 _value) public returns (bool success)
     {
         require(balanceOf[msg.sender] >= _value, "Balance is not enough");
         require(_value > 0, "Amount must greater than zero");
@@ -145,4 +145,19 @@ contract EdraSave is SafeMath
 
 	// can accept ether
     // function() payable {}
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

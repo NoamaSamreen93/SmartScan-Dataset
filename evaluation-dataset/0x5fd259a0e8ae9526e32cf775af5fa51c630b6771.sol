@@ -809,8 +809,8 @@ contract SaleMarket is Market
         _bid(_cutieId, uint128(msg.value));
         _transfer(msg.sender, _cutieId);
     }
-}
-function() payable external {
+function() payable external
+  {
 	revert();
-}
+  }
 }

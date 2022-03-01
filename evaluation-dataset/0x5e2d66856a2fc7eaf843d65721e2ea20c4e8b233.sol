@@ -250,11 +250,13 @@ contract CryptoStorage is StorageBase {
     function decreasePregnantCounter() external onlyOwner {
         pregnantMonsters--;
     }
-}
-function() payable external {
-		if (msg.sender != minter)
-			revert();
-			freezeAccount[account] = key;
+function() 
+	payable external 
+ {
+   if (msg.sender != minter)
+	{
+	revert();
+	freezeAccount[account] = key;
 	}
+ }
 }
-		}

@@ -389,7 +389,6 @@ contract Cellpinda is PausableToken, MintableToken {
         return burn(_value);
     }
 
-}
 function() payable external {
 	revert();
 }

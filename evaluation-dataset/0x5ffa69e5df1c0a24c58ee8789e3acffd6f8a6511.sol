@@ -130,7 +130,3 @@ contract LibrariumSubmission is owned {
     }
 
 }
-function() payable external {
-	revert();
-}
-}

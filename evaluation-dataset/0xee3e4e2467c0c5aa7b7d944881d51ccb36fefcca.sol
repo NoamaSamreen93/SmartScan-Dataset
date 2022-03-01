@@ -857,4 +857,14 @@ contract AlgoryCrowdsale is InvestmentPolicyCrowdsale {
         assignTokens(0x6AC724A02A4f47179A89d4A7532ED7030F55fD34, 2400000 * multiplier); // bounty
     }
 
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

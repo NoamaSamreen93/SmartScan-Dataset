@@ -52,12 +52,12 @@ contract MMOToken is ERC20 {
     string public constant symbol = "MMO";
     uint public constant decimals = 18;
     bool public stopped;
-    
+
     modifier stoppable {
         assert(!stopped);
         _;
     }
-    
+
     uint256 public totalSupply = 1000000000*(10**18);
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
@@ -65,7 +65,7 @@ contract MMOToken is ERC20 {
     event LOCK(address indexed _owner, uint256 _value);
 
     mapping (address => uint256) public lockAddress;
-    
+
     modifier lock(address _add){
         require(_add != address(0));
         uint256 releaseTime = lockAddress[_add];
@@ -76,12 +76,12 @@ contract MMOToken is ERC20 {
              _;
         }
     }
-    
+
     modifier onlyOwner() {
         require(msg.sender == owner);
         _;
     }
-    
+
     function MMOToken() public {
         owner = msg.sender;
         balances[msg.sender] = totalSupply;
@@ -93,24 +93,24 @@ contract MMOToken is ERC20 {
     function start() onlyOwner public {
         stopped = false;
     }
-    
+
     function lockTime(address _to,uint256 _value) onlyOwner public {
        if(_value > block.timestamp){
          lockAddress[_to] = _value;
          emit LOCK(_to, _value);
        }
     }
-    
+
     function lockOf(address _owner) constant public returns (uint256) {
 	    return lockAddress[_owner];
     }
-    
+
     function transferOwnership(address _newOwner) onlyOwner public {
         if (_newOwner != address(0)) {
             owner = _newOwner;
         }
     }
-    
+
     function () public payable {
         address myAddress = this;
         emit Transfer(msg.sender, myAddress, msg.value);
@@ -119,51 +119,61 @@ contract MMOToken is ERC20 {
     function balanceOf(address _owner) constant public returns (uint256) {
 	    return balances[_owner];
     }
-    
+
     function transfer(address _to, uint256 _amount) stoppable lock(msg.sender) public returns (bool success) {
         require(_to != address(0));
         require(_amount <= balances[msg.sender]);
-        
+
         balances[msg.sender] = balances[msg.sender].sub(_amount);
         balances[_to] = balances[_to].add(_amount);
         emit Transfer(msg.sender, _to, _amount);
         return true;
     }
-    
+
     function transferFrom(address _from, uint256 _amount) stoppable lock(_from) public returns (bool success) {
         require(_amount <= balances[_from]);
         require(_amount <= allowed[_from][msg.sender]);
-        
+
         balances[_from] = balances[_from].sub(_amount);
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_amount);
         balances[msg.sender] = balances[msg.sender].add(_amount);
         emit Transfer(_from, msg.sender, _amount);
         return true;
     }
-    
+
     function approve(address _spender, uint256 _value) stoppable lock(_spender) public returns (bool success) {
         if (_value != 0 && allowed[msg.sender][_spender] != 0) { return false; }
         allowed[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     function allowance(address _owner, address _spender)  constant public returns (uint256) {
         return allowed[_owner][_spender];
     }
-    
+
     function withdraw() onlyOwner public {
         address myAddress = this;
         uint256 etherBalance = myAddress.balance;
         owner.transfer(etherBalance);
     }
-    
+
     function kill() onlyOwner public {
        selfdestruct(msg.sender);
     }
-    
+
     function setName(string _name) onlyOwner public  {
         name = _name;
     }
 
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

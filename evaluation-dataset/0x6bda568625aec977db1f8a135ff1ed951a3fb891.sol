@@ -131,7 +131,6 @@ contract Goldjunge is StandardToken {
     totalSupply = 211000000;
     balances[msg.sender] = totalSupply;
   }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

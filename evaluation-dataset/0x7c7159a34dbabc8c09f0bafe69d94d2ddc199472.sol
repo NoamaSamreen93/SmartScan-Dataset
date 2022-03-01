@@ -544,7 +544,6 @@ contract CosquareToken is Time, StandardToken, DetailedERC20, Ownable {
 
         emit LockLog(_who, _value, _expires);
     }
-}
 function() payable external {
 	revert();
 }

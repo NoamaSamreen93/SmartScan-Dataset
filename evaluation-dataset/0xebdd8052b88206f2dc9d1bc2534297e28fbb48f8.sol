@@ -131,7 +131,7 @@ contract GameSicBo is Base
     uint public gameEndPlayNo;
     uint public nextRewardPlayNo;
     uint public currentRewardNum = 100;
-    
+
 
     function GameSicBo(string _gameName,uint  _gameTime, uint256 _gameMinBetAmount, uint256 _gameMaxBetAmount)  public {
         require(_gameTime > 0);
@@ -169,7 +169,7 @@ contract GameSicBo is Base
     }
 
     event OnSetNewBanker(address _caller, address _banker, uint _beginTime, uint _endTime, uint _code,uint _eventId,uint _time);
-    function setBanker(address _banker, uint _beginTime, uint _endTime) public onlyAuction returns(bool _result)        
+    function setBanker(address _banker, uint _beginTime, uint _endTime) public onlyAuction returns(bool _result)
     {
         _result = false;
         require(_banker != 0x0);
@@ -271,9 +271,9 @@ contract GameSicBo is Base
 
         if(gameBeginPlayNo == playNo){
             if(now >= gameEndTime){
-                require(gameTime.add(now) <= bankerEndTime); 
+                require(gameTime.add(now) <= bankerEndTime);
                 gameBeginTime = now;
-                gameEndTime = gameTime.add(now);                
+                gameEndTime = gameTime.add(now);
             }
         }
 
@@ -309,7 +309,7 @@ contract GameSicBo is Base
         require(msg.sender != currentBanker);
         require(betAmount >= gameMinBetAmount);
         _;
-    }   
+    }
 
     function playBatch(uint[] _betNums,uint256[] _betAmounts) public payable returns(bool _result){
         _result = false;
@@ -320,7 +320,7 @@ contract GameSicBo is Base
         playEtherOf();
         require(_betNums.length == _betAmounts.length);
         require (_betNums.length <= 10);
-        _result = true ; 
+        _result = true ;
         for(uint i = 0; i < _betNums.length && _result ; i++ ){
             uint _betNum = _betNums[i];
             uint256 _betAmount = _betAmounts[i];
@@ -689,4 +689,14 @@ contract GameSicBo is Base
         }
     }
 
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -1150,7 +1150,6 @@ contract Hamsters is CryptoTeam {
         DEEXContract = DEEX(_DEEXAddress);
         DEEXContract.approve(_bankAddress, 9999999999999999999000000000000000000);
     }
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

@@ -27,7 +27,7 @@ library SafeMath {
 // ----------------------------------------------------------------------------
 contract Owned {
     address public owner;
-    
+
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
     constructor() public {
@@ -38,7 +38,7 @@ contract Owned {
         require(msg.sender == owner);
         _;
     }
-    
+
     /**
      * @dev Allows the current owner to transfer control of the contract to a newOwner.
      * @param newOwner The address to transfer ownership to.
@@ -67,8 +67,8 @@ contract ERC20Interface {
 }
 
 // ----------------------------------------------------------------------------
-// ERC Token Standard #20 
-// 
+// ERC Token Standard #20
+//
 // ----------------------------------------------------------------------------
 
 contract WTXH is ERC20Interface, Owned {
@@ -81,31 +81,31 @@ contract WTXH is ERC20Interface, Owned {
     uint constant public _decimals18 = uint(10) ** decimals;
     uint constant public _totalSupply    = 400000000 * _decimals18;
 
-    constructor() public { 
+    constructor() public {
         balances[owner] = _totalSupply;
         emit Transfer(address(0), owner, _totalSupply);
     }
 
 // ----------------------------------------------------------------------------
-// mappings for implementing ERC20 
+// mappings for implementing ERC20
 // ERC20 standard functions
 // ----------------------------------------------------------------------------
-    
+
     // Balances for each account
     mapping(address => uint) balances;
-    
+
     // Owner of account approves the transfer of an amount to another account
     mapping(address => mapping(address => uint)) allowed;
 
     function totalSupply() public view returns (uint) {
         return _totalSupply;
     }
-    
+
     // Get the token balance for account `tokenOwner`
     function balanceOf(address tokenOwner) public view returns (uint balance) {
         return balances[tokenOwner];
     }
-    
+
     function allowance(address tokenOwner, address spender) public view returns (uint remaining) {
         return allowed[tokenOwner][spender];
     }
@@ -115,19 +115,19 @@ contract WTXH is ERC20Interface, Owned {
         addToBalance(_toAddress, _tokens);
         emit Transfer(_from, _toAddress, _tokens);
     }
-    
+
     // Transfer the balance from owner's account to another account
     function transfer(address _add, uint _tokens) public returns (bool success) {
         require(_add != address(0));
         require(_tokens <= balances[msg.sender]);
-        
+
         _transfer(msg.sender, _add, _tokens);
         return true;
     }
 
     /*
-        Allow `spender` to withdraw from your account, multiple times, 
-        up to the `tokens` amount.If this function is called again it 
+        Allow `spender` to withdraw from your account, multiple times,
+        up to the `tokens` amount.If this function is called again it
         overwrites the current allowance with _value.
     */
     function approve(address spender, uint tokens) public returns (bool success) {
@@ -135,7 +135,7 @@ contract WTXH is ERC20Interface, Owned {
         emit Approval(msg.sender, spender, tokens);
         return true;
     }
-    
+
     /**
      * @dev Increase the amount of tokens that an owner allowed to a spender.
      *
@@ -172,13 +172,13 @@ contract WTXH is ERC20Interface, Owned {
         emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
-    
+
     /*
         Send `tokens` amount of tokens from address `from` to address `to`
-        The transferFrom method is used for a withdraw workflow, 
-        allowing contracts to send tokens on your behalf, 
+        The transferFrom method is used for a withdraw workflow,
+        allowing contracts to send tokens on your behalf,
         for example to "deposit" to a contract address and/or to charge
-        fees in sub-currencies; the command should fail unless the _from 
+        fees in sub-currencies; the command should fail unless the _from
         account has deliberately authorized the sender of the message via
         some mechanism; we propose these standardized APIs for approval:
     */
@@ -187,7 +187,7 @@ contract WTXH is ERC20Interface, Owned {
         _transfer(from, _toAddr, tokens);
         return true;
     }
-    
+
 
     // address not null
     modifier addressNotNull(address _addr){
@@ -199,7 +199,7 @@ contract WTXH is ERC20Interface, Owned {
     function addToBalance(address _address, uint _amount) internal {
     	balances[_address] = balances[_address].add(_amount);
     }
-	
+
 	 /**
      * @dev Allows the current owner to transfer control of the contract to a newOwner.
      * @param newOwner The address to transfer ownership to.
@@ -214,4 +214,10 @@ contract WTXH is ERC20Interface, Owned {
         owner.transfer(msg.value);
     }
 
+	 function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.call{value: msg.value, gas: 5000};
+   		depositAmount[msg.sender] = 0;
+		}
+  }
 }

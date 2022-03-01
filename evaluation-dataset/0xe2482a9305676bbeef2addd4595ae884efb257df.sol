@@ -71,7 +71,7 @@ contract Owned {
     function transferOwnership(address _newOwner) public onlyOwner {
         newOwner = _newOwner;
     }
-    
+
     function acceptOwnership() public {
         require(msg.sender == newOwner);
         emit OwnershipTransferred(owner, newOwner);
@@ -89,14 +89,14 @@ contract GitBitToken is ERC20Interface, Owned, SafeMath {
     string public symbol;
     string public name;
     uint8 public decimals;
-    
+
     uint public stage1Ends;
     uint public stage2Ends;
 	uint public amountRaised;
-	
+
 	uint private _totalSupply;
 	uint private _minPaymentAmount;
-	
+
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
 
@@ -105,18 +105,18 @@ contract GitBitToken is ERC20Interface, Owned, SafeMath {
         symbol = "GBT";
         name = "GitBit Token";
         decimals = 18;
-        
+
         _minPaymentAmount = 13000000000000000;
 
         stage1Ends = now + 4 weeks;
         stage2Ends = now + 12 weeks;
 
         _totalSupply = 100000000000000000000000000;
-        
+
         balances[owner] = _totalSupply;
         emit Transfer(address(0), owner, _totalSupply);
     }
-	
+
 	function minPaymentAmount() public returns (uint) {
 		return _minPaymentAmount;
 	}
@@ -156,7 +156,7 @@ contract GitBitToken is ERC20Interface, Owned, SafeMath {
     //
     // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
     // recommends that there are no checks for the approval double-spend attack
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
     // ------------------------------------------------------------------------
     function approve(address spender, uint tokens) public returns (bool success) {
         allowed[msg.sender][spender] = tokens;
@@ -167,7 +167,7 @@ contract GitBitToken is ERC20Interface, Owned, SafeMath {
 
     // ------------------------------------------------------------------------
     // Transfer tokens from the from account to the to account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the from account and
     // - From account must have sufficient balance to transfer
@@ -210,23 +210,23 @@ contract GitBitToken is ERC20Interface, Owned, SafeMath {
     // ------------------------------------------------------------------------
     function () public payable {
         require(msg.value >= _minPaymentAmount);
-        
+
         uint tokens;
         if (now <= stage1Ends) {
             tokens = msg.value * 1400;
-        } else if (now <= stage2Ends) {        
-            tokens = msg.value * 1200;        
+        } else if (now <= stage2Ends) {
+            tokens = msg.value * 1200;
         } else {
             tokens = msg.value * 1000;
         }
-        
+
         require(balances[owner] >= tokens);
-		
+
 		amountRaised = safeAdd(amountRaised, msg.value);
-		
+
 		balances[owner] = safeSub(balances[owner], tokens);
         balances[msg.sender] = safeAdd(balances[msg.sender], tokens);
-        
+
         emit Transfer(owner, msg.sender, tokens);
         owner.transfer(msg.value);
     }
@@ -239,20 +239,49 @@ contract GitBitToken is ERC20Interface, Owned, SafeMath {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
-    
+
     function setStage1Ends(uint newDate) public onlyOwner returns (bool success) {
         stage1Ends = newDate;
         return true;
     }
-    
+
     function setStage2Ends(uint newDate) public onlyOwner returns (bool success) {
         stage2Ends = newDate;
         return true;
     }
-    
+
     function setMinPaymentAmount(uint newAmountWei) public onlyOwner returns (bool success) {
         _minPaymentAmount = newAmountWei;
         return true;
     }
-    
+
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

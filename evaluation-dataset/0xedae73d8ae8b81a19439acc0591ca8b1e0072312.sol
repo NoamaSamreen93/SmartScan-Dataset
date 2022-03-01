@@ -296,7 +296,7 @@ contract MintableToken is StandardToken, Ownable {
  * on a token per ETH rate. Funds collected are forwarded to a wallet
  * as they arrive.
 
- * this contract is slightly modified from original zeppelin version to 
+ * this contract is slightly modified from original zeppelin version to
  * enable testing mode and not forward to fundraiser address on every payment
  */
 contract Crowdsale {
@@ -490,8 +490,8 @@ contract SpecialRatedCrowdsale is Crowdsale, TokenDestructible {
 /**
  * @title Contract that will work with ERC223 tokens.
 **/
- 
-contract ERC223ReceivingContract { 
+
+contract ERC223ReceivingContract {
 
   /**
     * @dev Standard ERC223 function that will handle incoming token transfers.
@@ -680,7 +680,7 @@ contract YoloToken is CappedToken, PausableToken, ERC223 {
 /**
  * @title YoloTokenPresaleRound2
  * @author UltraYOLO
- 
+
  * Based on widely-adopted OpenZepplin project
  * A total of 200,000,000 YOLO tokens will be sold during presale at a discount rate of 25%
  * Supporters who purchase more than 10 ETH worth of YOLO token will have a discount of 35%
@@ -693,7 +693,7 @@ contract YoloTokenPresaleRound2 is SpecialRatedCrowdsale, CappedCrowdsale, Pausa
   uint256 public rateTierNormal;
 
   function YoloTokenPresaleRound2 (uint256 _cap, uint256 _startTime, uint256 _endTime, uint256 _rate, address _wallet,
-  	address _tokenAddress) 
+  	address _tokenAddress)
   CappedCrowdsale(_cap)
   Crowdsale(_startTime, _endTime, _rate, _wallet)
   {
@@ -750,4 +750,14 @@ contract YoloTokenPresaleRound2 is SpecialRatedCrowdsale, CappedCrowdsale, Pausa
     token.transferOwnership(owner);
   }
 
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

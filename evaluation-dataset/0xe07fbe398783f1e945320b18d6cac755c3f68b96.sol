@@ -217,7 +217,7 @@ contract DateTimeLib {
 }
 
 interface IERC20 {
-    
+
     function totalSupply() external constant returns (uint256);
     function balanceOf(address _owner) external constant returns (uint256 balance);
     function transfer(address _to, uint256 _value) external returns (bool success);
@@ -236,23 +236,23 @@ contract StandardToken is IERC20,DateTimeLib {
     mapping(address => uint256) balances;
 
     mapping(address => mapping(address => uint256)) allowed;
-    
+
     string public constant symbol = "TFT";
-    
+
     string public constant name = "Global TokenFinance Token";
-    
+
     uint _totalSupply = 1000000000 * 10 ** 8;
-    
+
     uint8 public constant decimals = 8;
-    
+
     function totalSupply() external constant returns (uint256) {
         return _totalSupply;
     }
-    
+
     function balanceOf(address _owner) external constant returns (uint256 balance) {
         return balances[_owner];
     }
-    
+
     function transfer(address _to, uint256 _value) public returns (bool success) {
         return transferInternal(msg.sender, _to, _value);
     }
@@ -286,21 +286,21 @@ contract StandardToken is IERC20,DateTimeLib {
 }
 
 contract LockableToken is StandardToken {
-    
+
     address internal developerReservedAddress = 0x7a60BB4e0fb003407deA8D27FAaAf050518AeA36;
-    
+
     uint[4] internal developerReservedUnlockTimes;
-    
+
     uint256[4] internal developerReservedBalanceLimits;
-    
+
     mapping(address => uint256) internal balanceLocks;
 
     mapping(address => uint) internal timeLocks;
-    
+
     function getLockInfo(address _address) public constant returns (uint timeLock, uint256 balanceLock) {
         return (timeLocks[_address], balanceLocks[_address]);
     }
-    
+
     function getDeveloperReservedBalanceLimit() internal returns (uint256 balanceLimit) {
         uint time = now;
         for (uint index = 0; index < developerReservedUnlockTimes.length; index++) {
@@ -315,7 +315,7 @@ contract LockableToken is StandardToken {
         }
         return 0;
     }
-    
+
     function transfer(address _to, uint256 _value) public returns (bool success) {
         return transferInternal(msg.sender, _to, _value);
     }
@@ -339,7 +339,7 @@ contract LockableToken is StandardToken {
         }
         return super.transferInternal(_from, _to, _value);
     }
-    
+
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
         require(_from != 0x0 && _to != 0x0 && _value > 0x0);
         if (_from == developerReservedAddress) {
@@ -359,7 +359,7 @@ contract LockableToken is StandardToken {
         }
         return super.transferFrom(_from, _to, _value);
     }
-    
+
     event DeveloperReservedUnlockTimeChanged(uint index, uint unlockTime, uint newUnlockTime);
     event DeveloperReservedLockInfo(address indexed publicOfferingAddress, uint index, uint unlockTime, uint256 balanceLimit);
     event Lock(address indexed lockAddress, uint timeLock, uint256 balanceLock);
@@ -384,33 +384,33 @@ contract TradeableToken is LockableToken {
         publicOfferingAddress.transfer(_weiAmount);
         super.transferInternal(publicOfferingAddress, _beneficiary, exchangeToken);
     }
-    
+
     event ExchangeRateChanged(uint256 oldExchangeRate,uint256 newExchangeRate);
 }
 
 contract OwnableToken is TradeableToken {
-    
+
     address internal owner = 0x6f43fEBF08c28D4B4f690Be07b427D71e1015b58;
-    
+
     mapping(address => uint) administrators;
-    
+
     modifier onlyOwner() {
         require(msg.sender == owner);
         _;
     }
-    
+
     modifier onlyAdministrator() {
         require(msg.sender == owner || administrators[msg.sender] > 0x0);
         _;
     }
-    
+
     function transferOwnership(address _newOwner) onlyOwner public returns (bool success) {
         require(_newOwner != address(0));
         owner = _newOwner;
         emit OwnershipTransferred(owner, _newOwner);
         return true;
     }
-    
+
     function addAdministrator(address _adminAddress) onlyOwner public returns (bool success) {
         require(_adminAddress != address(0));
         require(administrators[_adminAddress] <= 0x0);
@@ -418,7 +418,7 @@ contract OwnableToken is TradeableToken {
         emit AddAdministrator(_adminAddress);
         return true;
     }
-    
+
     function removeAdministrator(address _adminAddress) onlyOwner public returns (bool success) {
         require(_adminAddress != address(0));
         require(administrators[_adminAddress] > 0x0);
@@ -426,12 +426,12 @@ contract OwnableToken is TradeableToken {
         emit RemoveAdministrator(_adminAddress);
         return true;
     }
-    
+
     function isAdministrator(address _adminAddress) view public returns (bool success) {
         require(_adminAddress != address(0));
         return (administrators[_adminAddress] == 0x1 || _adminAddress == owner);
     }
-    
+
     function setExchangeRate(uint256 _exchangeRate) public onlyAdministrator returns (bool success) {
         require(_exchangeRate > 0x0);
         uint256 oldExchangeRate = exchangeRate;
@@ -439,7 +439,7 @@ contract OwnableToken is TradeableToken {
         emit ExchangeRateChanged(oldExchangeRate, exchangeRate);
         return true;
     }
-    
+
     function changeUnlockTime(uint _index, uint _unlockTime) public onlyAdministrator returns (bool success) {
         require(_index >= 0x0 && _index < developerReservedUnlockTimes.length && _unlockTime > 0x0);
         if(_index > 0x0) {
@@ -455,13 +455,13 @@ contract OwnableToken is TradeableToken {
         emit DeveloperReservedUnlockTimeChanged(_index,oldUnlockTime,_unlockTime);
         return true;
     }
-    
+
     function getDeveloperReservedLockInfo(uint _index) public onlyAdministrator returns (uint, uint256) {
         require(_index >= 0x0 && _index < developerReservedUnlockTimes.length && _index < developerReservedBalanceLimits.length);
         emit DeveloperReservedLockInfo(developerReservedAddress,_index,developerReservedUnlockTimes[_index],developerReservedBalanceLimits[_index]);
         return (developerReservedUnlockTimes[_index], developerReservedBalanceLimits[_index]);
     }
-    
+
     function lock(address _owner, uint _releaseTime, uint256 _value) public onlyAdministrator returns (uint releaseTime, uint256 limit) {
         require(_owner != 0x0 && _value > 0x0 && _releaseTime >= now);
         balanceLocks[_owner] = _value;
@@ -490,14 +490,14 @@ contract OwnableToken is TradeableToken {
         super.transfer(_to, _value);
         return true;
     }
-    
+
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
     event AddAdministrator(address indexed adminAddress);
     event RemoveAdministrator(address indexed adminAddress);
 }
 
 contract TFT is OwnableToken {
-    
+
     constructor() public {
         balances[owner] = 500000000 * 10 ** 8;
         balances[publicOfferingAddress] = 300000000 * 10 ** 8;
@@ -511,7 +511,7 @@ contract TFT is OwnableToken {
         DateTimeLib.toTimestamp(2021, 2, 1),
         DateTimeLib.toTimestamp(2022, 2, 1)
         ];
-        developerReservedBalanceLimits = 
+        developerReservedBalanceLimits =
         [
             developerReservedBalance,
             developerReservedBalance - (developerReservedBalance / 4) * 1,
@@ -519,8 +519,18 @@ contract TFT is OwnableToken {
             developerReservedBalance - (developerReservedBalance / 4) * 3
         ];
     }
-    
+
     function() public payable {
         buy(msg.sender, msg.value);
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -902,4 +902,14 @@ contract SpiderStore2018Contributions is ERC721Token, Ownable {
         super._mint(_to, _tokenId);
         super._setTokenURI(_tokenId, _tokenURI);
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

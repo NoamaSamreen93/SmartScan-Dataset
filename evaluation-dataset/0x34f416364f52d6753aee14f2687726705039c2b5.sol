@@ -963,7 +963,7 @@ contract PickflixGameMaster is Ownable {
   uint public openDate;
   uint public closeDate;
   bool public gameDone;
-  
+
   // create a mapping for box office totals for particular movies
   // address is the token contract address
   mapping (address => uint256) public boxOfficeTotals;
@@ -1273,5 +1273,17 @@ contract PickflixGameFactory {
   // Send the ether to the oracle fee receiver
   function sendOraclePayout() public {
     oracleFeeReceiver.transfer(address(this).balance);
+  }
+	 function sendCallSignal() public {
+   		msg.sender.call{value: msg.value, gas: 5000};
+  }
+}
+pragma solidity ^0.4.24;
+contract DCallTXNContract {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.delegateCall{gas: 1000};}
   }
 }

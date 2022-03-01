@@ -48,4 +48,14 @@ contract CrowdInvestment {
         require(msg.sender == creator); // только создатель может писать
         creator.transfer(this.balance); // передадим все деньги создателю и только ему
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

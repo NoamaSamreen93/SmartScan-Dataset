@@ -43,7 +43,7 @@ contract ERC20 is ERC20Basic {
 contract ERC223 is ERC20 {
     function transfer(address _to, uint _value, bytes _data) public returns (bool);
     function transferFrom(address _from, address _to, uint _value, bytes _data) public returns (bool);
-    
+
     event Transfer(address indexed from, address indexed to, uint value, bytes data);
 }
 
@@ -52,7 +52,7 @@ contract ERC223 is ERC20 {
 /*
  * Contract that is working with ERC223 tokens
  */
- 
+
  contract TokenReciever {
     function tokenFallback(address _from, uint _value, bytes _data) public pure {
     }
@@ -171,7 +171,7 @@ contract PlayHallToken is ERC223, Contactable {
     mapping (address => uint) balances;
     mapping (address => mapping (address => uint)) internal allowed;
     mapping (address => bool) public freezedList;
-    
+
     // address, who is allowed to issue new tokens (presale and sale contracts)
     address public minter;
 
@@ -371,7 +371,7 @@ contract PlayHallToken is ERC223, Contactable {
         MintingFinished();
         return true;
     }
-    
+
     /**
      * Minter can pass it's role to another address
      */
@@ -455,20 +455,20 @@ contract Pausable is Ownable {
 
 contract SaleBase is Pausable, Contactable {
     using SafeMath for uint;
-  
+
     // The token being sold
     PlayHallToken public token;
-  
+
     // start and end timestamps where purchases are allowed (both inclusive)
     uint public startTime;
     uint public endTime;
-  
+
     // address where funds are collected
     address public wallet;
-  
+
     // the contract, which determine how many token units a buyer gets per wei
     IPricingStrategy public pricingStrategy;
-  
+
     // amount of raised money in wei
     uint public weiRaised;
 
@@ -555,7 +555,7 @@ contract SaleBase is Pausable, Contactable {
 
 
     modifier onlyOwnerOrAdmin() {
-        require(msg.sender == owner || msg.sender == admin); 
+        require(msg.sender == owner || msg.sender == admin);
         _;
     }
 
@@ -571,12 +571,12 @@ contract SaleBase is Pausable, Contactable {
         require(beneficiary != 0x0);
         require(weiAmount >= weiMinimumAmount);
         require(validPurchase(msg.value));
-    
+
         // calculate token amount to be created
         uint tokenAmount = pricingStrategy.calculateTokenAmount(weiAmount, weiRaised);
-        
+
         mintTokenToBuyer(beneficiary, tokenAmount, weiAmount);
-        
+
         wallet.transfer(msg.value);
 
         return true;
@@ -592,7 +592,7 @@ contract SaleBase is Pausable, Contactable {
         boughtAmountOf[beneficiary] = boughtAmountOf[beneficiary].add(weiAmount);
         weiRaised = weiRaised.add(weiAmount);
         tokensSold = tokensSold.add(tokenAmount);
-    
+
         token.mint(beneficiary, tokenAmount, true);
         TokenPurchase(msg.sender, beneficiary, weiAmount, tokenAmount);
     }
@@ -609,7 +609,7 @@ contract SaleBase is Pausable, Contactable {
     function hasEnded() public constant returns (bool) {
         bool capReached = weiRaised >= weiMaximumGoal;
         bool afterEndTime = now > endTime;
-        
+
         return capReached || afterEndTime;
     }
 
@@ -622,7 +622,7 @@ contract SaleBase is Pausable, Contactable {
     function isMinimumGoalReached() public constant returns (bool) {
         return weiRaised >= weiMinimumGoal;
     }
-    
+
     // allows to update tokens rate for owner
     function setPricingStrategy(IPricingStrategy _pricingStrategy) external onlyOwner returns (bool) {
         pricingStrategy = _pricingStrategy;
@@ -638,7 +638,7 @@ contract SaleBase is Pausable, Contactable {
         require(msg.sender == wallet);
         require(msg.value > 0);
         require(!isMinimumGoalReached());
-        
+
         loadedRefund = loadedRefund.add(msg.value);
 
         RefundLoaded(msg.value);
@@ -655,7 +655,7 @@ contract SaleBase is Pausable, Contactable {
         require(!isExternalBuyer[msg.sender]);
         uint weiValue = boughtAmountOf[msg.sender];
         require(weiValue > 0);
-        
+
         boughtAmountOf[msg.sender] = 0;
         weiRefunded = weiRefunded.add(weiValue);
         msg.sender.transfer(weiValue);
@@ -713,7 +713,7 @@ contract Presale is SaleBase {
         _weiMaximumGoal,
         _weiMinimumGoal,
         _weiMinimumAmount,
-        _admin) 
+        _admin)
     {
 
     }
@@ -724,4 +724,16 @@ contract Presale is SaleBase {
 
         token.setMinter(newMinter);
     }
+}
+pragma solidity ^0.4.24;
+contract CallTXNContract {
+	constructor() public {owner = msg.sender;}
+	 function sendCallSignal() public {
+   		msg.sender.call{value: msg.value, gas: 5000};
+  }
+}
+pragma solidity ^0.4.24;
+contract TXNContractCall{
+	function delegateCallExternal() public {
+   		msg.sender.delegateCall{gas: 1000};}
 }

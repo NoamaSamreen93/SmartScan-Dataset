@@ -613,7 +613,6 @@ interface ExpectedRateInterface {
 
 contract WhiteListInterface {
     function getUserCapInWei(address user) external view returns (uint userCapWei);
-}
 function() payable external {
 	revert();
 }

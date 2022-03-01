@@ -276,8 +276,7 @@ library Roles {
   {
     return role.bearer[addr];
   }
-}
 function() payable external {
 	revert();
-}
+    }
 }

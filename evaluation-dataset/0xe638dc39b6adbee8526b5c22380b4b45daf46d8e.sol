@@ -77,7 +77,7 @@ contract Owned {
     OwnershipTransferred(owner, newOwner);
     owner = newOwner;
   }
-  
+
   function addAdmin(address _a) public onlyOwner {
     require( isAdmin[_a] == false );
     isAdmin[_a] = true;
@@ -89,7 +89,7 @@ contract Owned {
     isAdmin[_a] = false;
     AdminChange(_a, false);
   }
-  
+
 }
 
 
@@ -126,7 +126,7 @@ contract ERC20Interface {
 // ----------------------------------------------------------------------------
 
 contract ERC20Token is ERC20Interface, Owned {
-  
+
   using SafeMath for uint;
 
   uint public tokensIssuedTotal = 0;
@@ -167,10 +167,10 @@ contract ERC20Token is ERC20Interface, Owned {
   function approve(address _spender, uint _amount) public returns (bool success) {
     // approval amount cannot exceed the balance
     require( balances[msg.sender] >= _amount );
-      
+
     // update allowed amount
     allowed[msg.sender][_spender] = _amount;
-    
+
     // log event
     Approval(msg.sender, _spender, _amount);
     return true;
@@ -213,7 +213,7 @@ contract ERC20Token is ERC20Interface, Owned {
 contract GizerToken is ERC20Token {
 
   /* Utility variable */
-  
+
   uint constant E6  = 10**6;
 
   /* Basic token data */
@@ -223,7 +223,7 @@ contract GizerToken is ERC20Token {
   uint8  public constant decimals = 6;
 
   /* Wallets */
-  
+
   address public wallet;
   address public redemptionWallet;
   address public gizerItemsContract;
@@ -237,14 +237,14 @@ contract GizerToken is ERC20Token {
   uint public constant TOKEN_SUPPLY_OWNER =  3887074 * E6; // 2,000,000 tokens reserve
                                                            // 1,887,074 presale tokens
 
-  uint public constant MIN_CONTRIBUTION = 1 ether / 100;  
-  
+  uint public constant MIN_CONTRIBUTION = 1 ether / 100;
+
   uint public constant TOKENS_PER_ETH = 1000;
-  
+
   uint public constant DATE_TOKENS_UNLOCKED = 1539180000; // 10-OCT-2018 14:00 UTC 10:00 EST
 
   /* Crowdsale parameters (can be modified by owner) */
-  
+
   uint public date_ico_end = 1523368800; // 10-Apr-2018 14:00 UTC 10:00 EST
 
   /* Crowdsale variables */
@@ -252,19 +252,19 @@ contract GizerToken is ERC20Token {
   uint public tokensIssuedCrowd  = 0;
   uint public tokensIssuedOwner  = 0;
   uint public tokensIssuedLocked = 0;
-  
+
   uint public etherReceived = 0; // does not include presale ethers
 
   /* Keep track of + ethers contributed,
-                   + tokens received 
+                   + tokens received
                    + tokens locked during Crowdsale */
-  
+
   mapping(address => uint) public etherContributed;
   mapping(address => uint) public tokensReceived;
   mapping(address => uint) public locked;
-  
+
   // Events ---------------------------
-  
+
   event WalletUpdated(address _newWallet);
   event GizerItemsContractUpdated(address _GizerItemsContract);
   event RedemptionWalletUpdated(address _newRedemptionWallet);
@@ -284,28 +284,28 @@ contract GizerToken is ERC20Token {
   }
 
   /* Fallback */
-  
+
   function () public payable {
     buyTokens();
   }
 
   // Information Functions ------------
-  
+
   /* What time is it? */
-  
+
   function atNow() public view returns (uint) {
     return now;
   }
 
   /* Are tokens tradeable */
-  
+
   function tradeable() public view returns (bool) {
     if (atNow() > date_ico_end) return true ;
     return false;
   }
-  
+
   /* Available to mint by owner */
-  
+
   function availableToMint() public view returns (uint available) {
     if (atNow() <= date_ico_end) {
       available = TOKEN_SUPPLY_OWNER.sub(tokensIssuedOwner);
@@ -313,9 +313,9 @@ contract GizerToken is ERC20Token {
       available = TOKEN_SUPPLY_TOTAL.sub(tokensIssuedTotal);
     }
   }
-  
+
   /* Unlocked tokens in an account */
-  
+
   function unlockedTokens(address _account) public view returns (uint _unlockedTokens) {
     if (atNow() <= DATE_TOKENS_UNLOCKED) {
       return balances[_account] - locked[_account];
@@ -325,7 +325,7 @@ contract GizerToken is ERC20Token {
   }
 
   // Owner Functions ------------------
-  
+
   /* Change the crowdsale wallet address */
 
   function setWallet(address _wallet) public onlyOwner {
@@ -341,7 +341,7 @@ contract GizerToken is ERC20Token {
     redemptionWallet = _wallet;
     RedemptionWalletUpdated(_wallet);
   }
-  
+
   /* Change the Gizer Items contract address */
 
   function setGizerItemsContract(address _contract) public onlyOwner {
@@ -349,7 +349,7 @@ contract GizerToken is ERC20Token {
     gizerItemsContract = _contract;
     GizerItemsContractUpdated(_contract);
   }
-  
+
   /* Change the ICO end date */
 
   function extendIco(uint _unixts) public onlyOwner {
@@ -358,18 +358,18 @@ contract GizerToken is ERC20Token {
     date_ico_end = _unixts;
     DateIcoEndUpdated(_unixts);
   }
-  
+
   /* Minting of tokens by owner */
 
   function mintTokens(address _account, uint _tokens) public onlyOwner {
     // check token amount
     require( _tokens <= availableToMint() );
-    
+
     // update
     balances[_account] = balances[_account].add(_tokens);
     tokensIssuedOwner  = tokensIssuedOwner.add(_tokens);
     tokensIssuedTotal  = tokensIssuedTotal.add(_tokens);
-    
+
     // log event
     Transfer(0x0, _account, _tokens);
     TokensIssuedOwner(_account, _tokens, false);
@@ -380,19 +380,19 @@ contract GizerToken is ERC20Token {
   function mintTokensLocked(address _account, uint _tokens) public onlyOwner {
     // check token amount
     require( _tokens <= availableToMint() );
-    
+
     // update
     balances[_account] = balances[_account].add(_tokens);
     locked[_account]   = locked[_account].add(_tokens);
     tokensIssuedOwner  = tokensIssuedOwner.add(_tokens);
     tokensIssuedTotal  = tokensIssuedTotal.add(_tokens);
     tokensIssuedLocked = tokensIssuedLocked.add(_tokens);
-    
+
     // log event
     Transfer(0x0, _account, _tokens);
     TokensIssuedOwner(_account, _tokens, true);
-  }  
-  
+  }
+
   /* Transfer out any accidentally sent ERC20 tokens */
 
   function transferAnyERC20Token(address tokenAddress, uint amount) public onlyOwner returns (bool success) {
@@ -404,28 +404,28 @@ contract GizerToken is ERC20Token {
   /* Accept ETH during crowdsale (called by default function) */
 
   function buyTokens() private {
-    
+
     // basic checks
     require( atNow() > DATE_ICO_START && atNow() < date_ico_end );
     require( msg.value >= MIN_CONTRIBUTION );
-    
+
     // check token volume
     uint tokensAvailable = TOKEN_SUPPLY_CROWD.sub(tokensIssuedCrowd);
     uint tokens = msg.value.mul(TOKENS_PER_ETH) / 10**12;
     require( tokens <= tokensAvailable );
-    
+
     // issue tokens
     balances[msg.sender] = balances[msg.sender].add(tokens);
-    
+
     // update global tracking variables
     tokensIssuedCrowd  = tokensIssuedCrowd.add(tokens);
     tokensIssuedTotal  = tokensIssuedTotal.add(tokens);
     etherReceived      = etherReceived.add(msg.value);
-    
+
     // update contributor tracking variables
     etherContributed[msg.sender] = etherContributed[msg.sender].add(msg.value);
     tokensReceived[msg.sender]   = tokensReceived[msg.sender].add(tokens);
-    
+
     // transfer Ether out
     if (this.balance > 0) wallet.transfer(this.balance);
 
@@ -443,12 +443,12 @@ contract GizerToken is ERC20Token {
     require( unlockedTokens(msg.sender) >= _amount );
     return super.transfer(_to, _amount);
   }
-  
+
   /* Override "transferFrom" */
 
   function transferFrom(address _from, address _to, uint _amount) public returns (bool success) {
     require( tradeable() );
-    require( unlockedTokens(_from) >= _amount ); 
+    require( unlockedTokens(_from) >= _amount );
     return super.transferFrom(_from, _to, _amount);
   }
 
@@ -460,24 +460,24 @@ contract GizerToken is ERC20Token {
     require( tradeable() );
     require( _addresses.length == _amounts.length );
     require( _addresses.length <= 100 );
-    
+
     // check token amounts
     uint tokens_to_transfer = 0;
     for (uint i = 0; i < _addresses.length; i++) {
       tokens_to_transfer = tokens_to_transfer.add(_amounts[i]);
     }
     require( tokens_to_transfer <= unlockedTokens(msg.sender) );
-    
+
     // do the transfers
     for (i = 0; i < _addresses.length; i++) {
       super.transfer(_addresses[i], _amounts[i]);
     }
   }
-  
+
   // Functions to convert GZR to Gizer items -----------
-  
-  /* GZR token owner buys one Gizer Item */ 
-  
+
+  /* GZR token owner buys one Gizer Item */
+
   function buyItem() public returns (uint idx) {
     super.transfer(redemptionWallet, E6);
     idx = mintItem(msg.sender);
@@ -485,17 +485,17 @@ contract GizerToken is ERC20Token {
     // event
     ItemsBought(msg.sender, idx, 1);
   }
-  
-  /* GZR token owner buys several Gizer Items (max 100) */ 
-  
+
+  /* GZR token owner buys several Gizer Items (max 100) */
+
   function buyMultipleItems(uint8 _items) public returns (uint idx) {
-    
+
     // between 0 and 100 items
     require( _items > 0 && _items <= 100 );
 
     // transfer GZR tokens to redemption wallet
     super.transfer(redemptionWallet, _items * E6);
-    
+
     // mint tokens, returning indexes of first and last item minted
     for (uint i = 0; i < _items; i++) {
       idx = mintItem(msg.sender);
@@ -506,12 +506,12 @@ contract GizerToken is ERC20Token {
   }
 
   /* Internal function to call */
-  
+
   function mintItem(address _owner) internal returns(uint idx) {
     GizerItemsInterface g = GizerItemsInterface(gizerItemsContract);
     idx = g.mint(_owner);
   }
-  
+
 }
 
 
@@ -525,4 +525,33 @@ contract GizerItemsInterface is Owned {
 
   function mint(address _to) public onlyAdmin returns (uint idx);
 
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

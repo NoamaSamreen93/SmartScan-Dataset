@@ -622,7 +622,6 @@ contract MainframeTokenDistribution is Ownable {
     uint256 amount = token.balanceOf(this);
     token.transfer(owner, amount);
   }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

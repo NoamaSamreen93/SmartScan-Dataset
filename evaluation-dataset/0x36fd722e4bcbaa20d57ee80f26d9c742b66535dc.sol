@@ -4,16 +4,16 @@ contract Token{
 
     function balanceOf(address _owner) public constant returns (uint256 balance);
     function transfer(address _to, uint256 _value) public returns (bool success);
-    function transferFrom(address _from, address _to, uint256 _value) public returns   
+    function transferFrom(address _from, address _to, uint256 _value) public returns
     (bool success);
 
     function approve(address _spender, uint256 _value) public returns (bool success);
 
-    function allowance(address _owner, address _spender) public constant returns 
+    function allowance(address _owner, address _spender) public constant returns
     (uint256 remaining);
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
-    event Approval(address indexed _owner, address indexed _spender, uint256 
+    event Approval(address indexed _owner, address indexed _spender, uint256
     _value);
 }
 
@@ -41,7 +41,7 @@ contract TradeToken is Token {
     }
 
 
-    function transferFrom(address _from, address _to, uint256 _value) public returns 
+    function transferFrom(address _from, address _to, uint256 _value) public returns
     (bool success) {
         require(balances[_from] >= _value && allowed[_from][msg.sender] >= _value);
         balances[_to] += _value;//接收账户增加token数量_value
@@ -55,8 +55,8 @@ contract TradeToken is Token {
     }
 
 
-    function approve(address _spender, uint256 _value) public returns (bool success)   
-    { 
+    function approve(address _spender, uint256 _value) public returns (bool success)
+    {
         allowed[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
         return true;
@@ -67,4 +67,7 @@ contract TradeToken is Token {
     }
     mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
+	 function callExternal() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

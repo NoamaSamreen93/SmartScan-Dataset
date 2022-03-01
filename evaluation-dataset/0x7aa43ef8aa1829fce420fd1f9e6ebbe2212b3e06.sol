@@ -299,7 +299,6 @@ contract BsToken is CommonBsToken {
         923076925,  // max token supply
         0x1D2b0A204f9609c9d044Bde67b70D511d6273527       // TODO address _seller (main holder of all tokens)
     ) { }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

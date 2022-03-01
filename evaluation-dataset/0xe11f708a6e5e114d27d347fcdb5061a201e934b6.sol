@@ -237,9 +237,9 @@ contract EtherWords is ERC721 {
     TokenSold(_tokenId, sellingPrice, personIndexToPrice[_tokenId], oldOwner, newOwner, numbers[_tokenId].name);
 
     msg.sender.transfer(purchaseExcess);
-    
+
     personIndexToPrice[0] = SafeMath.div(SafeMath.mul(personIndexToPrice[0], 101), 100);
-    
+
     if (_tokenId == 0) {
         cooAddress = msg.sender;
         personIndexToPrice[0] = SafeMath.div(SafeMath.mul(personIndexToPrice[0], 110), 100);
@@ -265,7 +265,7 @@ contract EtherWords is ERC721 {
 
     cooAddress = _newCOO;
   }
-  
+
   /// @dev creates the genesis word.
   function genesisCreation() public onlyCEO {
       if (numbers.length == 0) {
@@ -459,5 +459,15 @@ library SafeMath {
     uint256 c = a + b;
     assert(c >= a);
     return c;
+  }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
 }

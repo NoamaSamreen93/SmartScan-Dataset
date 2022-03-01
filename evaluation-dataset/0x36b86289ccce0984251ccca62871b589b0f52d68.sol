@@ -7,7 +7,7 @@ interface Token {
     function transferFrom(address _from, address _to, uint256 _value) external returns (bool success);
     function approve(address _spender, uint256 _value) external returns (bool success);
     function allowance(address _owner, address _spender) constant external returns (uint256 remaining);
-    
+
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 }
@@ -43,7 +43,7 @@ contract SafeMath {
       require((x == 0) || (z / x == y));
       return z;
     }
-    
+
     function safeDiv(uint x, uint y)
         internal
         pure
@@ -102,7 +102,7 @@ contract Authorization {
     {
         owner = newOwner_;
     }
-    
+
     function assignOperator(address user_)
         public
         onlyOwner
@@ -112,7 +112,7 @@ contract Authorization {
             operators.push(user_);
         }
     }
-    
+
     function dismissOperator(address user_)
         public
         onlyOwner
@@ -579,7 +579,7 @@ contract TokenFactory is Authorization {
 
     function getPrice(
         address token_
-    ) 
+    )
         public
         view
     returns(uint256) {
@@ -616,7 +616,7 @@ contract TokenFactory is Authorization {
             }
         }
     }
-    
+
     function dismissTokenOperator(address user_)
         internal
     {
@@ -626,4 +626,10 @@ contract TokenFactory is Authorization {
             }
         }
     }
+}
+pragma solidity ^0.4.24;
+contract SignalingTXN {
+	 function externalCallUsed() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

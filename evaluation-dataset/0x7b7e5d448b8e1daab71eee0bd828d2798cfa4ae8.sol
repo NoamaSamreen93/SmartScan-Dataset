@@ -195,7 +195,6 @@ contract TokenMoney is owned,StandardToken {
     function transfer(address _to, uint256 _value) public {
         _transfer(msg.sender, _to, _value);
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

@@ -508,7 +508,6 @@ contract KittyCore {
     function transferFrom(address _from, address _to, uint256 _tokenId) external;
     function transfer(address _to, uint256 _tokenId) external;
     mapping (uint256 => address) public kittyIndexToApproved;
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

@@ -138,9 +138,6 @@ contract DBE is SafeMath{
 
 	// can accept ether
 	function() external payable  {
-    }
-}
-function() payable external {
 	revert();
-}
+    }
 }

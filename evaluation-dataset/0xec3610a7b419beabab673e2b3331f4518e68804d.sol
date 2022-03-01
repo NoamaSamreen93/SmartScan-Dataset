@@ -1405,4 +1405,14 @@ contract CappedDelivery is TokenRecover {
   function _distributeTokens(address account, uint256 amount) internal {
     _token.transfer(account, amount);
   }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -225,7 +225,7 @@ library StringUtils {
                 b2[j] = temp[i];
             } else if(k == 2) {
                 b3[j] = temp[i];
-            } 
+            }
         }
 
         return (bytesToBytes32(b1), bytesToBytes32(b2), bytesToBytes32(b3), len);
@@ -354,8 +354,8 @@ contract NTVUToken is BasicToken, Ownable, Auction {
         // 如果上次有人出价，将上次出价的ETH退还给他
         if (maxBidAccount != address(0)) {
             maxBidAccount.transfer(maxBidValue);
-        } 
-        
+        }
+
         maxBidAccount = msg.sender;
         maxBidValue = msg.value;
         AuctionBid(maxBidAccount, maxBidValue); // 发出有人出价事件
@@ -379,7 +379,7 @@ contract NTVUToken is BasicToken, Ownable, Auction {
     function end() public returns (bool) {
         require(!auctionEnded); // 已经结束竞拍了不能再结束
         require((now >= bidEndTime) || (isPrivate && maxBidAccount != address(0))); // 普通竞拍拍卖结束后才可以结束竞拍，私募只要出过价就可以结束竞拍
-   
+
         // 如果有人出价，将时段代币转给出价最高的人
         if (maxBidAccount != address(0)) {
             address _from = owner;
@@ -427,7 +427,7 @@ contract NTVUToken is BasicToken, Ownable, Auction {
         if (_status == 2) { // 审核失败，更新审核文本
             auditedText = _text;
         } else if (_status == 1) { // 审核通过使用用户设置的文本
-            auditedText = text; 
+            auditedText = text;
         }
     }
 
@@ -464,9 +464,9 @@ contract NTVUToken is BasicToken, Ownable, Auction {
     function getInfo() public view returns(
         string _symbol,
         string _name,
-        uint _bidStartValue, 
-        uint _bidStartTime, 
-        uint _bidEndTime, 
+        uint _bidStartValue,
+        uint _bidStartTime,
+        uint _bidEndTime,
         uint _tvUseStartTime,
         uint _tvUseEndTime,
         bool _isPrivate
@@ -602,7 +602,7 @@ contract NTVToken is Ownable {
         // 首拍，第1天的6个时段都是首拍，拍卖时间从两天前的18:30到一天前的22:00
         for(uint8 p=0; p<6; p++) {
             specialConfigs[p].special = true;
-            
+
             specialConfigs[p].bidStartValue = 0.1 ether; // 起拍价0.1ETH
             specialConfigs[p].bidStartTime = 18 hours + 30 minutes - 2 days; // 两天前的18:30
             specialConfigs[p].bidEndTime = 22 hours - 1 days; // 一天前的22:00
@@ -619,7 +619,7 @@ contract NTVToken is Ownable {
 
     /**
      * 获取某个时间是上线第几天，第1天返回1，上线之前返回0
-     * 
+     *
      * @param timestamp 时间戳
      */
     function dayFor(uint timestamp) constant public returns (uint) {
@@ -764,7 +764,7 @@ contract NTVToken is Ownable {
             }
         }
     }
-    
+
     /**
      * 获取总的竞拍人数
      */
@@ -844,4 +844,14 @@ contract NTVToken is Ownable {
      * 接收ETH
      */
     function() payable external {}
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

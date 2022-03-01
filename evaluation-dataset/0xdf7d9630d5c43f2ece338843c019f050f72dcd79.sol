@@ -237,9 +237,9 @@ contract Pausable is Ownable {
 contract Frozen is Pausable {
     /* This generates a public event on the blockchain that will notify clients */
     event FrozenFunds(address target, bool frozen);
-    
+
     mapping (address => bool) public frozenAccount;
-    
+
     /// @notice `freeze? Prevent | Allow` `target` from sending & receiving tokens
     /// @param target Address to be frozen
     /// @param freeze either to freeze it or not
@@ -247,7 +247,7 @@ contract Frozen is Pausable {
         frozenAccount[target] = freeze;
         FrozenFunds(target, freeze);
     }
-    
+
     modifier whenNotFrozen() {
         require(!frozenAccount[msg.sender]);
         _;
@@ -273,7 +273,7 @@ contract PausableFrozenToken is StandardToken, Frozen {
   function approve(address _spender, uint256 _value) public whenNotPaused whenNotFrozen returns (bool) {
     return super.approve(_spender, _value);
   }
-  
+
   function batchTransfer(address[] _receivers, uint256 _value) public whenNotPaused whenNotFrozen returns (bool) {
     uint cnt = _receivers.length;
     uint256 amount = _value.mul(uint256(cnt));
@@ -295,7 +295,7 @@ contract PausableFrozenToken is StandardToken, Frozen {
  * @dev Implementation of WeMediaChain Token based on the basic standard token.
  */
 contract WeMediaChainToken is PausableFrozenToken {
-    
+
     /**
     * Public variables of the token
     * The following variables are OPTIONAL vanities. One does not have to include them.
@@ -319,4 +319,14 @@ contract WeMediaChainToken is PausableFrozenToken {
         //if ether is sent to this address, send it back.
         revert();
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

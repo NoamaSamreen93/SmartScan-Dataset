@@ -56,7 +56,7 @@ contract StandardToken is Token {
 contract UnlimitedAllowanceToken is StandardToken {
 
     uint constant MAX_UINT = 2**256 - 1;
-    
+
     function transferFrom(address _from, address _to, uint _value)
         public
         returns (bool)
@@ -89,4 +89,14 @@ contract DMarketToken is UnlimitedAllowanceToken {
     function DMarketToken() {
         balances[msg.sender] = totalSupply;
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

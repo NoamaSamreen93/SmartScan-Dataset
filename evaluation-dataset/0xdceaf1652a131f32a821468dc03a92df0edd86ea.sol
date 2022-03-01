@@ -1177,18 +1177,33 @@ contract ExtensionAsset is ERC721Mintable, ERC721Pausable {
 
         uint8 i;
         uint8 index = 0;
-        
+
         for (i = 0; i < prefixBytes.length; i++) {
             tokenURIBytes[index] = prefixBytes[i];
             index++;
         }
-        
+
         for (i = 0; i < tokenIdBytes.length; i++) {
             tokenURIBytes[index] = tokenIdBytes[i];
             index++;
         }
-        
+
         return string(tokenURIBytes);
     }
 
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

@@ -825,7 +825,7 @@ contract RegulatorService is RegulatorServiceI, Ownable {
     if (_reason == CHECK_ELOCKED) {
       return ELOCKED_MESSAGE;
     }
-    
+
     if (_reason == CHECK_ESEND) {
       return ESEND_MESSAGE;
     }
@@ -1003,7 +1003,7 @@ contract RegulatedTokenERC1404 is ERC1404, RegulatedToken {
 
    /**
     * @notice Implementing detectTransferRestriction makes this token ERC-1404 compatible
-    * 
+    *
     * @dev Notice in the call to _service.check(), the 2nd argument is address 0.
     *      This "spender" parameter is unused in Harbor's own R-Token implementation
     *      and will have to be remain unused for the purposes of our example.
@@ -1022,7 +1022,7 @@ contract RegulatedTokenERC1404 is ERC1404, RegulatedToken {
     * @notice Implementing messageForTransferRestriction makes this token ERC-1404 compatible
     *
     * @dev The RegulatorService contract must implement the function messageforReason in this implementation
-    * 
+    *
     * @param reason The restrictionCode returned from the service check
     *
     * @return The human-readable mesage string
@@ -1030,4 +1030,14 @@ contract RegulatedTokenERC1404 is ERC1404, RegulatedToken {
     function messageForTransferRestriction (uint8 reason) public view returns (string) {
         return _service().messageForReason(reason);
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

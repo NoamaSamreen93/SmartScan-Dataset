@@ -8,19 +8,19 @@ contract token {
 contract StudioCrowdsale {
     address public beneficiary;
     address public owner;
-  
+
     uint public amountRaised;
     uint public tokensSold;
     uint public deadline;
     uint public price;
     token public tokenReward;
-    
+
     mapping(address => uint256) public contributions;
     bool crowdSaleStart;
     bool crowdSalePause;
     bool crowdSaleClosed;
 
-   
+
     event FundTransfer(address participant, uint amount);
 
     modifier onlyOwner() {
@@ -46,66 +46,95 @@ contract StudioCrowdsale {
         contributions[msg.sender] += amount;
         amountRaised += amount;
         tokensSold += amount / price;
-        
+
         if (tokensSold >  250000000000000 && tokensSold  <=  850000000000000 ) { price = .00000000003333333 ether; }
         if (tokensSold >  850000000000000 && tokensSold  <= 1350000000000000 ) { price = .00000000003636363 ether; }
         if (tokensSold > 1350000000000000 && tokensSold <=  1850000000000000 ) { price = .00000000004444444 ether; }
         if (tokensSold > 1850000000000000 ) { price = .00000000005 ether; }
-        
+
         tokenReward.transfer(msg.sender, amount / price);
         FundTransfer(msg.sender, amount );
         beneficiary.transfer( amount );
-       
+
     }
 
     // Start this October 27
     function startCrowdsale() onlyOwner  {
-        
+
         crowdSaleStart = true;
         deadline = now + 120 days;
         price =  .000000000033333333 ether;
     }
 
     function endCrowdsale() onlyOwner  {
-        
-        
+
+
         crowdSaleClosed = true;
     }
 
 
     function pauseCrowdsale() onlyOwner {
-        
+
         crowdSalePause = true;
-        
-        
+
+
     }
 
     function unpauseCrowdsale() onlyOwner {
-        
+
         crowdSalePause = false;
-        
-        
+
+
     }
-    
+
     function transferOwnership ( address _newowner ) onlyOwner {
-        
+
         owner = _newowner;
-        
+
     }
-    
+
     function transferBeneficiary ( address _newbeneficiary ) onlyOwner {
-        
+
         beneficiary = _newbeneficiary;
-        
+
     }
-    
+
     function withdrawStudios() onlyOwner{
-        
+
         uint256 balance = tokenReward.balanceOf(address(this));
-        
+
         tokenReward.transfer( beneficiary, balance );
-        
-        
+
+
     }
-    
+
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

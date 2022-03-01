@@ -52,7 +52,7 @@ contract Owned {
     address public newOwner;
 
     event OwnershipTransferred(address indexed _from, address indexed _to);
-   
+
     constructor() public {
         owner = msg.sender;
     }
@@ -82,25 +82,25 @@ contract WebFreeToken is ERC20Interface, Owned {
     uint8 public decimals;
     uint _totalSupply;
     bool freezed = true;
-    
-    address SupernodesNodesOwnersFREE = 
+
+    address SupernodesNodesOwnersFREE =
         0x2CAadf019F6a5F557c552a33ED9a2Ce36C982d70;
 
-    address WebfreeFoundationFREE = 
+    address WebfreeFoundationFREE =
         0x0E1EA5831d0d2c1745D583dd93B9114222416372;
 
-    address WebfreePrivateContributionFREE = 
+    address WebfreePrivateContributionFREE =
         0x89cE7309953124caCbdCe6CcC1E23aF927d8e703;
- 
-    address WebfreePublicContributionFREE = 
+
+    address WebfreePublicContributionFREE =
         0x5E911c5A41A60c23C2836eedc80E1Bdeb2991Eb2;
 
-    address WebfreeCommunityRewardsFREE = 
+    address WebfreeCommunityRewardsFREE =
         0xBeA8E036eb401C1d01526cAFb6cb1dd6e3ea122E;
 
-    address WebfreeTeamFREE = 
+    address WebfreeTeamFREE =
         0x5da594967B254c1bA3E816C99D691439EE1dDD76;
-    
+
 
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
@@ -111,14 +111,14 @@ contract WebFreeToken is ERC20Interface, Owned {
         name = "Webfree";
         decimals = 18;
         uint dec = 10**uint(decimals);
-        
+
         balances[SupernodesNodesOwnersFREE] = 311111111 * dec;
         balances[WebfreeFoundationFREE] = 155555555 * dec;
         balances[WebfreePrivateContributionFREE] = 77777777 * dec;
         balances[WebfreePublicContributionFREE] = 77777777 * dec;
         balances[WebfreeCommunityRewardsFREE] = 77777777 * dec;
         balances[WebfreeTeamFREE] = 77777780 * dec;
-        
+
         _totalSupply = uint(0)
             .add(balances[SupernodesNodesOwnersFREE])
             .add(balances[WebfreeFoundationFREE])
@@ -126,8 +126,8 @@ contract WebFreeToken is ERC20Interface, Owned {
             .add(balances[WebfreePublicContributionFREE])
             .add(balances[WebfreeCommunityRewardsFREE])
             .add(balances[WebfreeTeamFREE]);
-        
-        
+
+
         emit Transfer(address(0), SupernodesNodesOwnersFREE, 311111111 * dec);
         emit Transfer(address(0), WebfreeFoundationFREE, 155555555 * dec);
         emit Transfer(address(0), WebfreePrivateContributionFREE, 77777777 * dec);
@@ -149,7 +149,7 @@ contract WebFreeToken is ERC20Interface, Owned {
 
 
     function transfer(address to, uint tokens) public returns (bool success) {
-        bool req = !freezed || 
+        bool req = !freezed ||
             msg.sender == SupernodesNodesOwnersFREE ||
             msg.sender == WebfreeFoundationFREE ||
             msg.sender == WebfreePrivateContributionFREE ||
@@ -157,7 +157,7 @@ contract WebFreeToken is ERC20Interface, Owned {
             msg.sender == WebfreeCommunityRewardsFREE ||
             msg.sender == WebfreeTeamFREE;
         require(req);
-        
+
         balances[msg.sender] = balances[msg.sender].sub(tokens);
         balances[to] = balances[to].add(tokens);
         emit Transfer(msg.sender, to, tokens);
@@ -170,7 +170,7 @@ contract WebFreeToken is ERC20Interface, Owned {
         emit Approval(msg.sender, spender, tokens);
         return true;
     }
-    
+
     function unfreez() public onlyOwner {
         freezed = false;
     }
@@ -205,4 +205,14 @@ contract WebFreeToken is ERC20Interface, Owned {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

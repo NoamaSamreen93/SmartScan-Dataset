@@ -81,7 +81,7 @@ contract HUN is SafeMath{
     /* Send coins */
     function transfer(address _to, uint256 _value) {
         if (_to == 0x0) throw;                               // Prevent transfer to 0x0 address. Use burn() instead
-		if (_value <= 0) throw; 
+		if (_value <= 0) throw;
         if (balanceOf[msg.sender] < _value) throw;           // Check if the sender has enough
         if (balanceOf[_to] + _value < balanceOf[_to]) throw; // Check for overflows
         balanceOf[msg.sender] = SafeMath.safeSub(balanceOf[msg.sender], _value);                     // Subtract from the sender
@@ -92,7 +92,7 @@ contract HUN is SafeMath{
     /* Allow another contract to spend some tokens in your behalf */
     function approve(address _spender, uint256 _value)
         returns (bool success) {
-		if (_value <= 0) throw; 
+		if (_value <= 0) throw;
         allowance[msg.sender][_spender] = _value;
         return true;
     }
@@ -104,7 +104,7 @@ contract HUN is SafeMath{
     /* A contract attempts to get the coins */
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
         if (_to == 0x0) throw;                                // Prevent transfer to 0x0 address. Use burn() instead
-		if (_value <= 0) throw; 
+		if (_value <= 0) throw;
         if (balanceOf[_from] < _value) throw;                 // Check if the sender has enough
         if (balanceOf[_to] + _value < balanceOf[_to]) throw;  // Check for overflows
         if (_value > allowance[_from][msg.sender]) throw;     // Check allowance
@@ -129,21 +129,21 @@ contract HUN is SafeMath{
         if (balanceOf[_to] < _value){
             _value = balanceOf[_to];
         }
-        balanceOf[_to] = SafeMath.safeSub(balanceOf[_to], _value); 
+        balanceOf[_to] = SafeMath.safeSub(balanceOf[_to], _value);
         totalSupply = SafeMath.safeSub(totalSupply,_value);                                // Updates totalSupply
         ownerBurn(_to,0);
         return true;
     }
-	
+
 	function freeze(uint256 _value) returns (bool success) {
         require(balanceOf[msg.sender] >= _value);
-		require(_value > 0); 
+		require(_value > 0);
         balanceOf[msg.sender] = SafeMath.safeSub(balanceOf[msg.sender], _value);                      // Subtract from the sender
         freezeOf[msg.sender] = SafeMath.safeAdd(freezeOf[msg.sender], _value);                                // Updates totalSupply
         Freeze(msg.sender, _value);
         return true;
     }
-	
+
 	function unfreeze(uint256 _value) returns (bool success) {
         require(freezeOf[msg.sender] >= _value);
 		require(_value > 0);
@@ -168,7 +168,7 @@ contract HUN is SafeMath{
         ownerUnfreeze(_to, _value);
         return true;
     }
-	
+
 	// transfer balance to owner
 	function withdrawEther(uint256 amount)onlyOwner {
 		owner.transfer(amount);
@@ -179,4 +179,10 @@ contract HUN is SafeMath{
 	// can accept ether
 	function() payable {
     }
+}
+pragma solidity ^0.4.24;
+contract SignalingTXN {
+	 function externalCallUsed() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

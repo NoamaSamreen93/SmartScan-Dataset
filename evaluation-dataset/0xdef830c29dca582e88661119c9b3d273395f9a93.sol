@@ -30,7 +30,7 @@ contract Ownable {
   address public owner;
 
 
-  /** 
+  /**
    * @dev The Ownable constructor sets the original `owner` of the contract to the sender
    * account.
    */
@@ -40,7 +40,7 @@ contract Ownable {
 
 
   /**
-   * @dev Throws if called by any account other than the owner. 
+   * @dev Throws if called by any account other than the owner.
    */
   modifier onlyOwner() {
     require(owner==msg.sender);
@@ -49,14 +49,14 @@ contract Ownable {
 
   /**
    * @dev Allows the current owner to transfer control of the contract to a newOwner.
-   * @param newOwner The address to transfer ownership to. 
+   * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) public onlyOwner {
       owner = newOwner;
   }
- 
+
 }
-  
+
 contract ERC20 {
 
     function totalSupply() public constant returns (uint256);
@@ -117,7 +117,7 @@ contract BTNYToken is Ownable, ERC20 {
         require(price != 0 && recipient != 0x0);
         uint256 weiAmount = msg.value;
         uint256 tokenToSend = weiAmount.mul(price);
-        
+
         balances[owner] = balances[owner].sub(tokenToSend);
         balances[recipient] = balances[recipient].add(tokenToSend);
 
@@ -129,7 +129,7 @@ contract BTNYToken is Ownable, ERC20 {
     function totalSupply() public constant returns (uint256) {
         return _totalSupply;
     }
-    
+
     // What is the balance of a particular account?
     // @param who The address of the particular account
     // @return the balanace the particular account
@@ -186,10 +186,25 @@ contract BTNYToken is Ownable, ERC20 {
     function allowance(address _owner, address spender) public constant returns (uint256) {
         return allowed[_owner][spender];
     }
-    
+
     // Get current price of a Token
     // @return the price or token value for a ether
     function getPrice() public pure returns (uint256 result) {
         return 0;
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

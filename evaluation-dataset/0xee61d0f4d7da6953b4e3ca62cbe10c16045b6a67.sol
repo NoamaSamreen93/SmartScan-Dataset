@@ -66,7 +66,7 @@ contract Ownable {
 }
 
 /**
- * BitindiaVestingContract 
+ * BitindiaVestingContract
  * This Contract is a custodian for Bitindia Tokens reserved for Founders
  * Founders can claim as per fixed Vesting Schedule
  * Founders can only claim the amount alloted to them before initialization
@@ -77,22 +77,22 @@ contract Ownable {
  * Once initialized, founders can anytime change their claim address, and this can be done only using their private key,
  * No body else can change claimant address other than themselves.
  * No kind of recovery is possible once the private key of any claimant is lost and any unclaimed tokens will be locked in this contract forever
- */ 
+ */
 contract BitindiaVestingContract is Ownable{
 
   IERC20 token;
 
   mapping (address => uint256) ownersMap;
 
-  mapping (address => uint256) ownersMapFirstPeriod;    
-  mapping (address => uint256) ownersMapSecondPeriod;    
-  mapping (address => uint256) ownersMapThirdPeriod;   
+  mapping (address => uint256) ownersMapFirstPeriod;
+  mapping (address => uint256) ownersMapSecondPeriod;
+  mapping (address => uint256) ownersMapThirdPeriod;
 
   /**
    * Can be initialized only once all the committed token amount is deposited to this contract
    * Once initialized, it cannot be set False again
    * Once initialized, no more founder address can be registered
-   */ 
+   */
   bool public initialized = false;
 
   /**
@@ -101,8 +101,8 @@ contract BitindiaVestingContract is Ownable{
   uint256 public totalCommitted;
 
   /**
-   * To avoid too many address changes,  * 
-   */ 
+   * To avoid too many address changes,  *
+   */
   mapping (address => address)  originalAddressTraker;
   mapping (address => uint) changeAddressAttempts;
 
@@ -114,13 +114,13 @@ contract BitindiaVestingContract is Ownable{
   uint256 public constant thirdDueDate = 1576022400;    // Human time (GMT): Wednesday, 11 December 2019 00:00:00
 
   /**
-   * Address of the Token to be vested 
+   * Address of the Token to be vested
    */
   address public constant tokenAddress = 0x420335D3DEeF2D5b87524Ff9D0fB441F71EA621f;
-  
+
   /**
    * Event to log change of address request if successful, only the Actual owner can transfer its ownership
-   *  
+   *
    */
   event ChangeClaimAddress(address oldAddress, address newAddress);
 
@@ -131,9 +131,9 @@ contract BitindiaVestingContract is Ownable{
 
   /**
    * Event to Log added user
-   */ 
+   */
   event AddUser(address userAddress, uint256 amount);
- 
+
   /**
    * Cnstr BitindiaVestingContract
    * Sets the vesting period in utc timestamp and the vesting token address
@@ -145,9 +145,9 @@ contract BitindiaVestingContract is Ownable{
   }
 
   /**
-   *    Initializes the contract only once 
-   *    Requires token balance to be atleast equal to total commited, any amount greater than commited is lost in the contract forever  
-   */ 
+   *    Initializes the contract only once
+   *    Requires token balance to be atleast equal to total commited, any amount greater than commited is lost in the contract forever
+   */
   function initialize() public onlyOwner
   {
       require(totalCommitted>0);
@@ -183,11 +183,11 @@ contract BitindiaVestingContract is Ownable{
     assert(now>firstDueDate);
     _;
   }
-  
+
   /**
-   * Asserts the msg sender to have valid stake in the vesting schedule, else eat up their GAS 
+   * Asserts the msg sender to have valid stake in the vesting schedule, else eat up their GAS
    * this is to discourage SPAMMERS
-   */ 
+   */
   modifier checkValidUser(){
     assert(ownersMap[msg.sender]>0);
     _;
@@ -200,7 +200,7 @@ contract BitindiaVestingContract is Ownable{
   function addVestingUser(address user, uint256 amount) public onlyOwner preInitState {
       uint256 oldAmount = ownersMap[user];
       ownersMap[user] = amount;
-      ownersMapFirstPeriod[user] = amount/3;         
+      ownersMapFirstPeriod[user] = amount/3;
       ownersMapSecondPeriod[user] = amount/3;
       ownersMapThirdPeriod[user] = amount - ownersMapFirstPeriod[user] - ownersMapSecondPeriod[user];
       originalAddressTraker[user] = user;
@@ -208,10 +208,10 @@ contract BitindiaVestingContract is Ownable{
       totalCommitted += (amount - oldAmount);
       AddUser(user, amount);
   }
-  
+
   /**
    * This is to change the address of the claimant.
-   * SPRECIAL NOTE: ONLY THE VALID CLAIMANT CAN change its address and nobody else can do this  
+   * SPRECIAL NOTE: ONLY THE VALID CLAIMANT CAN change its address and nobody else can do this
    */
   function changeClaimAddress(address newAddress) public checkValidUser{
 
@@ -220,7 +220,7 @@ contract BitindiaVestingContract is Ownable{
       uint newCount = changeAddressAttempts[origAddress]+1;
       assert(newCount<5);
       changeAddressAttempts[origAddress] = newCount;
-      
+
       // Do the address change transaction
       uint256 balance = ownersMap[msg.sender];
       ownersMap[msg.sender] = 0;
@@ -244,7 +244,7 @@ contract BitindiaVestingContract is Ownable{
       ownersMapThirdPeriod[newAddress] = balance;
 
 
-      // Update Original Address Tracker Map 
+      // Update Original Address Tracker Map
       originalAddressTraker[newAddress] = origAddress;
       ChangeClaimAddress(msg.sender, newAddress);
   }
@@ -268,7 +268,7 @@ contract BitindiaVestingContract is Ownable{
   /**
    * To claim the vesting amount
    * Asserts the vesting condition is met
-   * Asserts callee to be valid vested user 
+   * Asserts callee to be valid vested user
    * Claims as per Vesting Schedule and remaining eligible balance
    */
   function claimAmount() internal whenContractIsActive whenClaimable checkValidUser{
@@ -320,17 +320,27 @@ contract BitindiaVestingContract is Ownable{
    function getClaimable() public constant returns (uint256){
        return totalCommitted;
    }
-   
+
    /**
-    * Check Own Balance 
+    * Check Own Balance
     * Works only for transaction senders with valid Balance
-    */ 
+    */
    function getMyBalance() public checkValidUser constant returns (uint256){
-       
+
        return ownersMap[msg.sender];
-       
+
    }
-   
 
 
+
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

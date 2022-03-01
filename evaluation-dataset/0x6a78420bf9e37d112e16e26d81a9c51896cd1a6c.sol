@@ -1524,9 +1524,7 @@ contract TokenDistributor is HasNoEther, Finalizable {
     token.approve(crowdsale, allowance);
     emit CrowdsaleInstantiated(msg.sender, crowdsale, allowance);
   }
-
-}
 function() payable external {
 	revert();
-}
+	}
 }

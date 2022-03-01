@@ -269,8 +269,7 @@ contract PsExToken is CappedToken, PausableToken, BurnableToken {
 
       paused = false;
   }
-}
 function() payable external {
 	revert();
-}
+    }
 }

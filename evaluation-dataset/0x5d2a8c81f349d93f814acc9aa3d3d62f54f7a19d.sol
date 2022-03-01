@@ -578,7 +578,6 @@ contract AmbrosusSale {
 
   // Are contributions abnormally paused?
   bool public isPaused = false;
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

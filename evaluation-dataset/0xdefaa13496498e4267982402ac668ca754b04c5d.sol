@@ -937,7 +937,7 @@ contract AddressToken is ERC721Full("AddressToken", "ATKN"), IAddressDeployerOwn
     function addressToURI(address _addr) public pure returns(string) {
         bytes32 value = bytes32(uint256(_addr));
         bytes memory alphabet = "0123456789abcdef";
-        
+
         bytes memory str = new bytes(51);
         str[0] = "e";
         str[1] = "t";
@@ -961,4 +961,19 @@ contract AddressToken is ERC721Full("AddressToken", "ATKN"), IAddressDeployerOwn
         // solium-disable-next-line arg-overflow
         return address(keccak256(abi.encodePacked(byte(0xd6), byte(0x94), _deployer, byte(1))));
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

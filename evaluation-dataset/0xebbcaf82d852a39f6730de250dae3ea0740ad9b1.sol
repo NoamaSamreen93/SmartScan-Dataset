@@ -66,7 +66,7 @@ contract TOSPrivateHoldingContract {
 
 
     uint256 public released = 0;
-    uint256 public totalLockAmount = 0; 
+    uint256 public totalLockAmount = 0;
     function TOSPrivateHoldingContract() public {}
     function release() public {
 
@@ -85,4 +85,14 @@ contract TOSPrivateHoldingContract {
             released = releasePercentages[num];
         }
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

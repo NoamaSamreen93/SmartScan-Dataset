@@ -8,7 +8,7 @@ contract ERC20 {
   function totalSupply() public view returns (uint256);
   function balanceOf(address who) public view returns (uint256);
   function transfer(address to, uint256 value) public returns (bool);
-  
+
   function allowance(address owner, address spender)
     public view returns (uint256);
 
@@ -16,7 +16,7 @@ contract ERC20 {
     public returns (bool);
 
   function approve(address spender, uint256 value) public returns (bool);
-  
+
   event Transfer(address indexed from, address indexed to, uint256 value);
   event Approval(
     address indexed owner,
@@ -54,15 +54,15 @@ library SafeMath {
 }
 
 contract TokenBasic is ERC20 {
-    
+
   using SafeMath for uint256;
 
-  mapping (address => mapping (address => uint256)) internal allowed;    
+  mapping (address => mapping (address => uint256)) internal allowed;
   mapping(address => uint256) balances;
 
   uint256 totalSupply_;
 
-  
+
   function totalSupply() public view returns (uint256) {
     return totalSupply_;
   }
@@ -79,8 +79,8 @@ contract TokenBasic is ERC20 {
 
   function balanceOf(address _owner) public view returns (uint256) {
     return balances[_owner];
-  }         
- 
+  }
+
   function transferFrom(
     address _from,
     address _to,
@@ -106,7 +106,7 @@ contract TokenBasic is ERC20 {
     return true;
   }
 
-  
+
   function allowance(
     address _owner,
     address _spender
@@ -155,8 +155,8 @@ contract TokenBasic is ERC20 {
 */
 contract KDLV is TokenBasic {
 
-  string public constant name = "DeliveryK Token";	
-  string public constant symbol = "KDLV";		    
+  string public constant name = "DeliveryK Token";
+  string public constant symbol = "KDLV";
   uint8 public constant decimals = 18;
   uint256 public constant INITIAL_SUPPLY = 30000000000 * (10 ** uint256(decimals));
 
@@ -166,4 +166,14 @@ contract KDLV is TokenBasic {
     emit Transfer(address(0), msg.sender, INITIAL_SUPPLY);
   }
 
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

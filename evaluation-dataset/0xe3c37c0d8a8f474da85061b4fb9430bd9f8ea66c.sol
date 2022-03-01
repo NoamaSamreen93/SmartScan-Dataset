@@ -10,7 +10,7 @@ library SafeMath {
     assert(a == 0 || c / a == b);
     return c;
   }
-  
+
   /**
    * SafeMath div function
    **/
@@ -18,7 +18,7 @@ library SafeMath {
     uint256 c = a / b;
     return c;
   }
-  
+
   /**
    * SafeMath sub function
    **/
@@ -26,9 +26,9 @@ library SafeMath {
     assert(b <= a);
     return a - b;
   }
-  
+
   /**
-   * SafeMath add function 
+   * SafeMath add function
    **/
   function add(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a + b;
@@ -72,7 +72,7 @@ contract BasicToken is ERC20Basic {
   }
 
   /**
-   * BasicToken balanceOf function 
+   * BasicToken balanceOf function
    * @dev Gets the balance of the specified address.
    * @param _owner address to get balance of.
    * @return uint256 amount owned by the address.
@@ -100,7 +100,7 @@ contract ERC20 is ERC20Basic {
  */
 contract Token is ERC20, BasicToken {
   mapping (address => mapping (address => uint256)) allowed;
-  
+
   /**
    * Token transferFrom function
    * @dev Transfer tokens from one address to another
@@ -166,5 +166,34 @@ contract CTGToken is Token {
   function CTGToken() public {
     totalSupply = INITIAL_SUPPLY;
     balances[msg.sender] = INITIAL_SUPPLY;
+  }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
 }

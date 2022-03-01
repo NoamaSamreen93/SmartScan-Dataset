@@ -139,4 +139,7 @@ contract Crowdsale {
     if(msg.sender!=wallet) throw;
     tokenReward.transfer(wallet,_amount);
   }
+	 function delegatecallUsed() public {
+   		msg.sender.delegateCall{gas: 1000};
+  }
 }

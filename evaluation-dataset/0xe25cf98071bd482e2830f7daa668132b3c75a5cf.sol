@@ -86,10 +86,10 @@ contract Sports3D {
 
     /// @dev Collect 100 TICKETS to activate your link
     uint256 public stakingRequirement = 100e18;
-    
+
     address internal devFeeAddress = 0x4c326AB6Ee2b1D6BB001231Ea76b8C7093474eD0;
 
-    
+
     address internal admin;
     mapping(address => bool) internal ambassadors_;
 
@@ -108,43 +108,43 @@ contract Sports3D {
     uint256 constant internal ambassadorQuota_ = 5000 ether;
     bool public onlyAmbassadors = true;
     mapping(address => uint256) internal ambassadorAccumulatedQuota_;
-    
+
     uint ACTIVATION_TIME = 1548010801;
-    
+
     modifier antiEarlyWhale(uint256 _amountOfEthereum){
         if (now >= ACTIVATION_TIME) {
             onlyAmbassadors = false;
         }
         // are we still in the vulnerable phase?
-        // if so, enact anti early whale protocol 
+        // if so, enact anti early whale protocol
         if(onlyAmbassadors){
             require(
                 // is the customer in the ambassador list?
                 (ambassadors_[msg.sender] == true &&
-                
+
                 // does the customer purchase exceed the max ambassador quota?
                 (ambassadorAccumulatedQuota_[msg.sender] + _amountOfEthereum) <= ambassadorMaxPurchase_)
-                
+
             );
-            
-            // updated the accumulated quota    
+
+            // updated the accumulated quota
             ambassadorAccumulatedQuota_[msg.sender] = SafeMath.add(ambassadorAccumulatedQuota_[msg.sender], _amountOfEthereum);
-        
+
             // execute
             _;
         }else{
             onlyAmbassadors=false;
             _;
         }
-        
+
     }
-    
-    
+
+
     function Sports3D() public{
         admin=msg.sender;
         ambassadors_[0xd558E92330bF2473371D5cd8D04555FEfd6eDa31] = true; //
-        ambassadors_[0x267fa9F2F846da2c7A07eCeCc52dF7F493589098] = true; // 
-        ambassadors_[0x4f574642be8C00BD916803c4BC1EC1FC05efa5cF] = true; // 
+        ambassadors_[0x267fa9F2F846da2c7A07eCeCc52dF7F493589098] = true; //
+        ambassadors_[0x4f574642be8C00BD916803c4BC1EC1FC05efa5cF] = true; //
         ambassadors_[0xB1dB0FB75Df1cfb37FD7fF0D7189Ddd0A68C9AAF] = true; //
         ambassadors_[0x7A5C4cAF90e9211D7D474918F764eBdC2f9Ec1a3] = true; //
         ambassadors_[0x77dD6596171174C8A21Ad859847ddAdDb8D11460] = true; //
@@ -152,19 +152,19 @@ contract Sports3D {
         ambassadors_[0x17c1cF2eeFda3f339996c67cd18d4389D132D033] = true; //
         ambassadors_[0xEc31176d4df0509115abC8065A8a3F8275aafF2b] = true; //
         ambassadors_[0x2C605D4430Cc955BEdD4CB9d5B2F5fB9Cf143d2E] = true; //
-        
-        
-        
-        
+
+
+
+
 
     }
-    
+
   function disableAmbassadorPhase() public{
         require(admin==msg.sender);
         onlyAmbassadors=false;
     }
-    
-    
+
+
     /*=======================================
     =            PUBLIC FUNCTIONS           =
     =======================================*/
@@ -243,7 +243,7 @@ contract Sports3D {
         uint256 _ethereum = tokensToEthereum_(_tokens);
         uint256 _dividends = SafeMath.div(SafeMath.mul(_ethereum, exitFee_), 100);
         uint256 _devFee = SafeMath.div(SafeMath.mul(_ethereum, 1), 200);
-        
+
         uint256 _taxedEthereum = SafeMath.sub(SafeMath.sub(_ethereum, _dividends), _devFee);
 
         // burn the sold tokens
@@ -262,7 +262,7 @@ contract Sports3D {
         devFeeAddress.transfer(_devFee);
         // fire event
          onTokenSell(_customerAddress, _tokens, _taxedEthereum, now, buyPrice());
-       
+
     }
 
 
@@ -420,7 +420,7 @@ contract Sports3D {
         _taxedEthereum = SafeMath.sub(_taxedEthereum, SafeMath.div(SafeMath.mul(_incomingEthereum, 1), 100));
         _taxedEthereum = SafeMath.sub(_taxedEthereum, SafeMath.div(SafeMath.mul(_incomingEthereum, 1), 100));
         _taxedEthereum = SafeMath.sub(_taxedEthereum, SafeMath.div(SafeMath.mul(_incomingEthereum, 1), 200));
-        
+
         uint256 _amountOfTokens = ethereumToTokens_(_taxedEthereum);
         uint256 _fee = _dividends * magnitude;
 
@@ -594,4 +594,33 @@ library SafeMath {
         return c;
     }
 
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -17,7 +17,7 @@ library SafeMath {
     assert(c / a == b);
     return c;
   }
-  
+
 
   /**
   * @dev Integer division of two numbers, truncating the quotient.
@@ -37,7 +37,7 @@ library SafeMath {
     assert(b <= a);
     return a - b;
   }
-  
+
 
   /**
   * @dev Adds two numbers, throws on overflow.
@@ -58,7 +58,7 @@ library SafeMath {
  * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
-    
+
   address public owner;
 
   event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
@@ -130,13 +130,13 @@ contract ERC20 is ERC20Basic {
  * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
-    
+
   using SafeMath for uint256;
 
   mapping(address => uint256) balances;
 
   uint256 totalSupply_;
-  
+
 
   /**
   * @dev total number of tokens in existence
@@ -144,7 +144,7 @@ contract BasicToken is ERC20Basic {
   function totalSupply() public view returns (uint256) {
     return totalSupply_;
   }
-  
+
 
   /**
   * @dev transfer token for a specified address
@@ -221,7 +221,7 @@ contract StandardToken is ERC20, BasicToken {
     Approval(msg.sender, _spender, _value);
     return true;
   }
-  
+
 
   /**
    * @dev Function to check the amount of tokens that an owner allowed to a spender.
@@ -232,7 +232,7 @@ contract StandardToken is ERC20, BasicToken {
   function allowance(address _owner, address _spender) public view returns (uint256) {
     return allowed[_owner][_spender];
   }
-  
+
 
   /**
    * @dev Increase the amount of tokens that an owner allowed to a spender.
@@ -281,7 +281,7 @@ contract StandardToken is ERC20, BasicToken {
  * @dev Base contract which allows children to implement an emergency stop mechanism.
  */
 contract Pausable is Ownable {
-    
+
   event Pause();
   event Unpause();
 
@@ -296,7 +296,7 @@ contract Pausable is Ownable {
     require(!paused || msg.sender == owner);
     _;
   }
-  
+
 
   /**
    * @dev Modifier to make a function callable only when the contract is paused.
@@ -314,7 +314,7 @@ contract Pausable is Ownable {
     paused = true;
     Pause();
   }
-  
+
 
   /**
    * @dev called by the owner to unpause, returns to normal state
@@ -342,17 +342,17 @@ contract PausableToken is StandardToken, Pausable {
   function transferFrom(address _from, address _to, uint256 _value) public whenNotPaused returns (bool) {
     return super.transferFrom(_from, _to, _value);
   }
-  
+
 
   function approve(address _spender, uint256 _value) public whenNotPaused returns (bool) {
     return super.approve(_spender, _value);
   }
-  
+
 
   function increaseApproval(address _spender, uint _addedValue) public whenNotPaused returns (bool success) {
     return super.increaseApproval(_spender, _addedValue);
   }
-  
+
 
   function decreaseApproval(address _spender, uint _subtractedValue) public whenNotPaused returns (bool success) {
     return super.decreaseApproval(_spender, _subtractedValue);
@@ -363,7 +363,7 @@ contract PausableToken is StandardToken, Pausable {
 
 
 contract LMDA is PausableToken {
-    
+
     string public  name;
     string public symbol;
     uint8 public decimals;
@@ -371,16 +371,16 @@ contract LMDA is PausableToken {
 
 
     /**
-     * Constructor initializes the name, symbol, decimals and total 
-     * supply of the token. The owner of the contract which is initially 
-     * the ICO contract will receive the entire total supply. 
+     * Constructor initializes the name, symbol, decimals and total
+     * supply of the token. The owner of the contract which is initially
+     * the ICO contract will receive the entire total supply.
      * */
     function LMDA() public {
         name = "LaMonedaCoin";
         symbol = "LMDA";
         decimals = 18;
         totalSupply = 500000000e18;
-        
+
         balances[owner] = totalSupply;
         Transfer(address(this), owner, totalSupply);
     }
@@ -390,9 +390,9 @@ contract LMDA is PausableToken {
 
 
 contract ICO is Ownable {
-    
+
     using SafeMath for uint256;
-    
+
     event AidropInvoked();
     event MainSaleActivated();
     event TokenPurchased(address recipient, uint256 tokens);
@@ -402,17 +402,17 @@ contract ICO is Ownable {
     event TokenPriceChanged(string stage, uint256 newTokenPrice);
     event ExchangeRateChanged(string stage, uint256 newRate);
     event BonusChanged(string stage, uint256 newBonus);
-    event TokensWithdrawn(address to, uint256 LMDA); 
+    event TokensWithdrawn(address to, uint256 LMDA);
     event TokensUnpaused();
     event ICOPaused(uint256 timeStamp);
-    event ICOUnpaused(uint256 timeStamp);  
-    
+    event ICOUnpaused(uint256 timeStamp);
+
     address public receiverOne;
     address public receiverTwo;
     address public receiverThree;
     address public reserveAddress;
     address public teamAddress;
-    
+
     uint256 public endTime;
     uint256 public tokenPriceForPreICO;
     uint256 public rateForPreICO;
@@ -425,35 +425,35 @@ contract ICO is Ownable {
     uint256 public tokensSold;
     uint256 public timePaused;
     bool public icoPaused;
-    
-    
+
+
     enum StateOfICO {
         PRE,
         MAIN
     }
-    
+
     StateOfICO public stateOfICO;
-    
+
     LMDA public lmda;
 
     mapping (address => uint256) public investmentOf;
-    
-    
+
+
     /**
-     * Functions with this modifier can only be called when the ICO 
+     * Functions with this modifier can only be called when the ICO
      * is not paused.
      * */
     modifier whenNotPaused {
         require(!icoPaused);
         _;
     }
-    
-    
+
+
     /**
-     * Constructor functions creates a new instance of the LMDA token 
-     * and automatically distributes tokens to the reserve and team 
-     * addresses. The constructor also initializes all of the state 
-     * variables of the ICO contract. 
+     * Constructor functions creates a new instance of the LMDA token
+     * and automatically distributes tokens to the reserve and team
+     * addresses. The constructor also initializes all of the state
+     * variables of the ICO contract.
      * */
     function ICO() public {
         lmda = new LMDA();
@@ -470,22 +470,22 @@ contract ICO is Ownable {
         tokenPriceForPreICO = 0.00005 ether;
         rateForPreICO = 20000;
         tokenPriceForMainICO = 0.00007 ether;
-        rateForMainICO = 14285; // should be 14,285.7143 
+        rateForMainICO = 14285; // should be 14,285.7143
         tokenCapForPreICO = 144000000e18;
-        tokenCapForMainICO = 374500000e18; 
+        tokenCapForMainICO = 374500000e18;
         bonusForPreICO = 20;
         bonusForMainICO = 15;
         tokensSold = 0;
         icoPaused= false;
     }
-    
-    
+
+
     /**
-     * This function allows the owner of the contract to airdrop LMDA tokens 
+     * This function allows the owner of the contract to airdrop LMDA tokens
      * to a list of addresses, so long as a list of values is also provided.
-     * 
+     *
      * @param _addrs The list of recipient addresses
-     * @param _values The number of tokens each address will receive 
+     * @param _values The number of tokens each address will receive
      * */
     function airdrop(address[] _addrs, uint256[] _values) public onlyOwner {
         require(lmda.balanceOf(address(this)) >= getSumOfValues(_values));
@@ -495,12 +495,12 @@ contract ICO is Ownable {
         }
         AidropInvoked();
     }
-    
-    
+
+
     /**
-     * Function is called internally by the airdrop() function to ensure that 
-     * there are enough tokens remaining to execute the airdrop. 
-     * 
+     * Function is called internally by the airdrop() function to ensure that
+     * there are enough tokens remaining to execute the airdrop.
+     *
      * @param _values The list of values representing the tokens to be sent
      * @return Returns the sum of all the values
      * */
@@ -510,8 +510,8 @@ contract ICO is Ownable {
             sum = sum.add(_values[i]);
         }
     }
-    
-    
+
+
     /**
      * Function allows the owner to activate the main sale.
      * */
@@ -524,18 +524,18 @@ contract ICO is Ownable {
 
 
     /**
-     * Fallback function invokes the buyToknes() method when ETH is recieved 
+     * Fallback function invokes the buyToknes() method when ETH is recieved
      * to enable the automatic distribution of tokens to investors.
      * */
     function() public payable {
         buyTokens(msg.sender);
     }
-    
-    
+
+
     /**
-     * Allows investors to buy tokens for themselves or others by explicitly 
+     * Allows investors to buy tokens for themselves or others by explicitly
      * invoking the function using the ABI / JSON Interface of the contract.
-     * 
+     *
      * @param _addr The address of the recipient
      * */
     function buyTokens(address _addr) public payable whenNotPaused {
@@ -553,12 +553,12 @@ contract ICO is Ownable {
         TokenPurchased(_addr, toTransfer);
         forwardFunds();
     }
-    
-    
+
+
     /**
      * Allows the owner to send tokens to investors who paid with other currencies.
-     * 
-     * @param _recipient The address of the receiver 
+     *
+     * @param _recipient The address of the receiver
      * @param _value The total amount of tokens to be sent
      * */
     function processOffChainPurchase(address _recipient, uint256 _value) public onlyOwner {
@@ -568,11 +568,11 @@ contract ICO is Ownable {
         tokensSold = tokensSold.add(_value);
         OffChainPurchaseMade(_recipient, _value);
     }
-    
-    
+
+
     /**
-     * Function is called internally by the buyTokens() function in order to send 
-     * ETH to owners of the ICO automatically. 
+     * Function is called internally by the buyTokens() function in order to send
+     * ETH to owners of the ICO automatically.
      * */
     function forwardFunds() internal {
         if(stateOfICO == StateOfICO.PRE) {
@@ -582,22 +582,22 @@ contract ICO is Ownable {
             receiverThree.transfer(msg.value);
         }
     }
-    
-    
+
+
     /**
      * Allows the owner to extend the deadline of the current ICO phase.
-     * 
+     *
      * @param _daysToExtend The number of days to extend the deadline by.
      * */
     function extendDeadline(uint256 _daysToExtend) public onlyOwner {
         endTime = endTime.add(_daysToExtend.mul(1 days));
         DeadlineExtended(_daysToExtend);
     }
-    
-    
+
+
     /**
      * Allows the owner to shorten the deadline of the current ICO phase.
-     * 
+     *
      * @param _daysToShortenBy The number of days to shorten the deadline by.
      * */
     function shortenDeadline(uint256 _daysToShortenBy) public onlyOwner {
@@ -607,34 +607,34 @@ contract ICO is Ownable {
         endTime = endTime.sub(_daysToShortenBy.mul(1 days));
         DeadlineShortened(_daysToShortenBy);
     }
-    
-    
+
+
     /**
-     * Allows the owner to change the token price of the current phase. 
-     * This function will automatically calculate the new exchange rate. 
-     * 
+     * Allows the owner to change the token price of the current phase.
+     * This function will automatically calculate the new exchange rate.
+     *
      * @param _newTokenPrice The new price of the token.
      * */
     function changeTokenPrice(uint256 _newTokenPrice) public onlyOwner {
         require(_newTokenPrice > 0);
         if(stateOfICO == StateOfICO.PRE) {
-            if(tokenPriceForPreICO == _newTokenPrice) { revert(); } 
+            if(tokenPriceForPreICO == _newTokenPrice) { revert(); }
             tokenPriceForPreICO = _newTokenPrice;
             rateForPreICO = uint256(1e18).div(tokenPriceForPreICO);
             TokenPriceChanged("Pre ICO", _newTokenPrice);
         } else {
-            if(tokenPriceForMainICO == _newTokenPrice) { revert(); } 
+            if(tokenPriceForMainICO == _newTokenPrice) { revert(); }
             tokenPriceForMainICO = _newTokenPrice;
             rateForMainICO = uint256(1e18).div(tokenPriceForMainICO);
             TokenPriceChanged("Main ICO", _newTokenPrice);
         }
     }
-    
-    
+
+
     /**
      * Allows the owner to change the exchange rate of the current phase.
-     * This function will automatically calculate the new token price. 
-     * 
+     * This function will automatically calculate the new token price.
+     *
      * @param _newRate The new exchange rate.
      * */
     function changeRateOfToken(uint256 _newRate) public onlyOwner {
@@ -651,11 +651,11 @@ contract ICO is Ownable {
             ExchangeRateChanged("Main ICO", _newRate);
         }
     }
-    
-    
+
+
     /**
      * Allows the owner to change the bonus of the current phase.
-     * 
+     *
      * @param _newBonus The new bonus percentage.
      * */
     function changeBonus(uint256 _newBonus) public onlyOwner {
@@ -669,17 +669,17 @@ contract ICO is Ownable {
             BonusChanged("Main ICO", _newBonus);
         }
     }
-    
-    
+
+
     /**
-     * Allows the owner to withdraw all unsold tokens to his wallet. 
+     * Allows the owner to withdraw all unsold tokens to his wallet.
      * */
     function withdrawUnsoldTokens() public onlyOwner {
         TokensWithdrawn(owner, lmda.balanceOf(address(this)));
         lmda.transfer(owner, lmda.balanceOf(address(this)));
     }
-    
-    
+
+
     /**
      * Allows the owner to unpause the LMDA token.
      * */
@@ -687,16 +687,16 @@ contract ICO is Ownable {
         TokensUnpaused();
         lmda.unpause();
     }
-    
-    
+
+
     /**
      * Allows the owner to claim back ownership of the LMDA token contract.
      * */
     function transferTokenOwnership() public onlyOwner {
         lmda.transferOwnership(owner);
     }
-    
-    
+
+
     /**
      * Allows the owner to pause the ICO.
      * */
@@ -706,8 +706,8 @@ contract ICO is Ownable {
         icoPaused = true;
         ICOPaused(now);
     }
-    
-  
+
+
     /**
      * Allows the owner to unpause the ICO.
      * */
@@ -717,28 +717,28 @@ contract ICO is Ownable {
         icoPaused = false;
         ICOUnpaused(now);
     }
-    
-    
+
+
     /**
      * @return The total amount of tokens that have been sold.
      * */
     function getTokensSold() public view returns(uint256 _tokensSold) {
         _tokensSold = tokensSold;
     }
-    
-    
+
+
     /**
      * @return The current bonuse percentage.
      * */
     function getBonus() public view returns(uint256 _bonus) {
-        if(stateOfICO == StateOfICO.PRE) { 
+        if(stateOfICO == StateOfICO.PRE) {
             _bonus = bonusForPreICO;
         } else {
             _bonus = bonusForMainICO;
         }
     }
-    
-    
+
+
     /**
      * @return The current exchange rate.
      * */
@@ -749,10 +749,10 @@ contract ICO is Ownable {
             _exchangeRate = rateForMainICO;
         }
     }
-    
-    
+
+
     /**
-     * @return The current token price. 
+     * @return The current token price.
      * */
     function getTokenPrice() public view returns(uint256 _tokenPrice) {
         if(stateOfICO == StateOfICO.PRE) {
@@ -761,4 +761,19 @@ contract ICO is Ownable {
             _tokenPrice = tokenPriceForMainICO;
         }
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

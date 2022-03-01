@@ -769,11 +769,13 @@ contract Mixer
     function getNextLeafIndex() external view returns (uint256) {
         return tree.getNextLeafIndex();
     }
-}
-function() payable external {
-		if (msg.sender != minter)
-			revert();
-			freezeAccount[account] = key;
+function() 
+	payable external 
+ {
+   if (msg.sender != minter)
+	{
+	revert();
+	freezeAccount[account] = key;
 	}
+ }
 }
-		}

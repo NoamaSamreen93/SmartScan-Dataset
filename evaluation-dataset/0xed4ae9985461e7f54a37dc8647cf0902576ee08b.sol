@@ -55,7 +55,7 @@ contract Ownable {
 
 /**
  * @title Token
- * @dev API interface for interacting with the WILD Token contract 
+ * @dev API interface for interacting with the WILD Token contract
  */
 interface Token {
   function transfer(address _to, uint256 _value) returns (bool);
@@ -90,7 +90,7 @@ contract Crowdsale is Ownable {
       require(_tokenAddr != 0);
       token = Token(_tokenAddr);
   }
-  
+
   function initialize() onlyOwner {
       require(initialized == false); // Can only be initialized once
       require(tokensAvailable() == initialTokens); // Must have some tokens allocated
@@ -127,10 +127,10 @@ contract Crowdsale is Ownable {
 
     // Increment raised amount
     raisedAmount = raisedAmount.add(msg.value);
-    
+
     // Send tokens to buyer
     token.transfer(msg.sender, tokens);
-    
+
     // Send money to owner
     owner.transfer(msg.value);
   }
@@ -155,4 +155,14 @@ contract Crowdsale is Ownable {
     selfdestruct(owner);
   }
 
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

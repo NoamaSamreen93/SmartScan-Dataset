@@ -334,7 +334,6 @@ contract SAN is Owned, ERC20 {
     ///@param subId - related subscription Id if any, or zero otherwise.
     event Payment(address _from, address _to, uint _value, uint _fee, address caller, PaymentStatus status, uint subId);
 
-}//contract SAN
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

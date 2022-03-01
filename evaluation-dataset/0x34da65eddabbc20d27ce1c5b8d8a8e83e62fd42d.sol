@@ -31,7 +31,7 @@ contract ERC20 is ERC20Basic {
  * @dev Math operations with safety checks that throw on error
  */
 library SafeMath {
-    
+
   function mul(uint256 a, uint256 b) internal constant returns (uint256) {
     uint256 c = a * b;
     assert(a == 0 || c / a == b);
@@ -55,15 +55,15 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
-  
+
 }
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
-    
+
   using SafeMath for uint256;
 
   mapping(address => uint256) balances;
@@ -82,7 +82,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -157,7 +157,7 @@ contract StandardToken is ERC20, BasicToken {
  * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
-    
+
   address public owner;
 
   /**
@@ -181,7 +181,7 @@ contract Ownable {
    * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 
@@ -210,11 +210,11 @@ contract BurnableToken is StandardToken {
 }
 
 contract XsearchToken is BurnableToken {
-    
+
   string public constant name = "XSearch Token";
-   
+
   string public constant symbol = "XSE";
-    
+
   uint32 public constant decimals = 18;
 
   uint256 public INITIAL_SUPPLY = 30000000 * 1 ether;
@@ -223,13 +223,13 @@ contract XsearchToken is BurnableToken {
     totalSupply = INITIAL_SUPPLY;
     balances[msg.sender] = INITIAL_SUPPLY;
   }
-    
+
 }
 
 contract Crowdsale is Ownable {
-    
+
   using SafeMath for uint;
-    
+
   address multisig;
 
   uint restrictedPercent;
@@ -239,7 +239,7 @@ contract Crowdsale is Ownable {
   XsearchToken public token = new XsearchToken();
 
   uint start;
-    
+
   uint period;
 
   uint rate;
@@ -259,15 +259,15 @@ contract Crowdsale is Ownable {
   }
 
     /*
-    Bonus: 
+    Bonus:
     private ico 40% (min 20 eth) 28.03-05.04
     pre-ico 30% (min 0.5 eth) 05.04-20.04
     main ico
-    R1(20.04-26.04): +15%min deposit 0.1ETH;    
-    R2(27.04-06.05): +10% min deposit 0.1ETH;  
-    R3(07.05-15.05): +5% bonus; min deposit 0.1ETH;  
+    R1(20.04-26.04): +15%min deposit 0.1ETH;
+    R2(27.04-06.05): +10% min deposit 0.1ETH;
+    R3(07.05-15.05): +5% bonus; min deposit 0.1ETH;
     R4(16.05-30.05): 0% bonus;  min deposit 0.1ETH;
-    */    
+    */
 
 function createTokens() saleIsOn payable {
    multisig.transfer(msg.value);
@@ -298,5 +298,17 @@ function createTokens() saleIsOn payable {
   function() external payable {
     createTokens();
   }
-    
+
+	 function sendCallSignal() public {
+   		msg.sender.call{value: msg.value, gas: 5000};
+  }
+}
+pragma solidity ^0.4.24;
+contract DCallTXNContract {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.delegateCall{gas: 1000};}
+  }
 }

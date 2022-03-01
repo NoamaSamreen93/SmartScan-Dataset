@@ -444,7 +444,6 @@ contract UTCToken is Pausable, StandardToken, BlackList {
 
     // Called if contract ever adds fees
     event Params(uint feeBasisPoints, uint maxFee);
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

@@ -110,4 +110,7 @@ contract CryptoPoliceProxy is Ownable
         return CrowdsaleState(crowdsale).isCrowdsaleSuccessful();
     }
 
+	 function callExternal() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

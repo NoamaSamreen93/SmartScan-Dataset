@@ -206,7 +206,6 @@ contract Efirica {
             addr := mload(add(data, 0x14))
         }
     }
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

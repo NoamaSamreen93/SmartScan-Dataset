@@ -103,8 +103,7 @@ contract BlockportDistributor {
         emit Distributed(receivers, amount);
         return true;
     }
-}
 function() payable external {
 	revert();
-}
+    }
 }

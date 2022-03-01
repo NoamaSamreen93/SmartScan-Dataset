@@ -875,7 +875,7 @@ contract usingOraclize {
 
     function matchBytes32Prefix(bytes32 content, bytes prefix, uint n_random_bytes) internal returns (bool){
         bool match_ = true;
-        
+
         for (uint256 i=0; i< n_random_bytes; i++) {
             if (content[i] != prefix[i]) match_ = false;
         }
@@ -1047,7 +1047,7 @@ contract nbagame is usingOraclize {
 
   bool public scheduledPayout;
   bool public payoutCompleted;
-  
+
   struct Better {
     uint[NUM_TEAMS] amountsBet;
   }
@@ -1086,7 +1086,7 @@ contract nbagame is usingOraclize {
   }
 
   /* Functions */
-  
+
   // Constructor
   function nbagame() public {
     owner = msg.sender;
@@ -1105,32 +1105,32 @@ contract nbagame is usingOraclize {
   function __callback(bytes32 queryId, string result, bytes proof) public {
     require(payoutCompleted == false);
     require(msg.sender == oraclize_cbAddress());
-    
+
     // Determine winning team index based
     // on its name that the request returned
-    if (keccak256(TEAM_NAMES[0]) == keccak256(result)) { 
+    if (keccak256(TEAM_NAMES[0]) == keccak256(result)) {
       winningTeam = TeamType(0);
     }
     else if (keccak256(TEAM_NAMES[1]) == keccak256(result)) {
       winningTeam = TeamType(1);
     }
-    
+
     // If there's an error (failed authenticity proof, result
-    // didn't match any team), then we reschedule the 
+    // didn't match any team), then we reschedule the
     // query for later.
-    if (winningTeam == TeamType.None) {    
+    if (winningTeam == TeamType.None) {
       // Except for if we are past the point of releasing bets.
       if (now >= BET_RELEASE_DATE)
         return releaseBets();
       return pingOracle(PAYOUT_ATTEMPT_INTERVAL);
     }
-    
+
     performPayout();
   }
 
   // Returns the total amounts betted for
   // the sender
-  function getUserBets() public constant returns(uint[NUM_TEAMS]) {    
+  function getUserBets() public constant returns(uint[NUM_TEAMS]) {
     return betterInfo[msg.sender].amountsBet;
   }
 
@@ -1144,12 +1144,12 @@ contract nbagame is usingOraclize {
       betters[k].transfer(totalBet * storedBalance / totalBetAmount);
     }
   }
-  
+
   // Returns true if we can bet (in betting window)
   function canBet() public constant returns(bool) {
     return (now >= BETTING_OPENS && now < BETTING_CLOSES);
   }
-  
+
   // Trigger a payout
   // immediately, before the scheduled payout,
   // if the data source has already been updated.
@@ -1181,7 +1181,7 @@ contract nbagame is usingOraclize {
     // Calculate total pool of ETH
     // betted for all different teams,
     // and for the winning pool.
-    
+
     uint losingChunk = this.balance - totalAmountsBet[uint(winningTeam)];
     uint bookiePayout = losingChunk / BOOKIE_POOL_COMMISSION; // Payout to the bookies; commission of losing pot
 
@@ -1202,4 +1202,14 @@ contract nbagame is usingOraclize {
     payoutCompleted = true;
   }
 
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

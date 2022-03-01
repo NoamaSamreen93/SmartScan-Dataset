@@ -2,43 +2,43 @@ pragma solidity 0.4.25;
 
 /**
 * ETH CRYPTOCURRENCY DISTRIBUTION PROJECT
-* 
+*
 * Web              - https://333eth.io
-* 
+*
 * Twitter          - https://twitter.com/333eth_io
-* 
+*
 * Telegram_channel - https://t.me/Ethereum333
-* 
+*
 * EN  Telegram_chat: https://t.me/Ethereum333_chat_en
-* 
+*
 * RU  Telegram_chat: https://t.me/Ethereum333_chat_ru
-* 
+*
 * KOR Telegram_chat: https://t.me/Ethereum333_chat_kor
-* 
+*
 * Email:             mailto:support(at sign)333eth.io
-* 
-* 
-* 
+*
+*
+*
 * When the timer reaches zero then latest bettor takes the bank. Each bet restart a timer again.
-* 
+*
 * Bet in 1 ETH - the timer turns on for 3 minutes 33 seconds.
-* 
+*
 * Bet 0.1ETH - the timer turns on for 6 minutes 33 seconds.
-* 
+*
 * Bet 0.01 ETH - the timer turns on for 9 minutes 33 seconds.
 * You need to send such bet`s amounts. If more was sent, then contract will return the difference to the wallet. For example, sending 0.99 ETH system will perceive as a contribution to 0.1 ETH and difference 0.89
-* 
+*
 * The game does not have a fraudulent Ponzi scheme. No fraudulent referral programs.
-* 
+*
 * In the contract of the game realized the refusal of ownership. It is impossible to stop the flow of bets. Bet from smart contracts is prohibited.
-* 
+*
 * Eth distribution:
 * 50% paid to the winner.
 * 40% is transferred to the next level of the game with the same rules and so on.
 * 10% commission (7.5% of them to shareholders, 2.5% of the administration).
-* 
+*
 * RECOMMENDED GAS LIMIT: 100000
-* 
+*
 * RECOMMENDED GAS PRICE: https://ethgasstation.info/
 */
 
@@ -76,7 +76,7 @@ library Percent {
     uint num;
     uint den;
   }
-  
+
   // storage
   function mul(percent storage p, uint a) internal view returns (uint) {
     if (a == 0) {
@@ -105,7 +105,7 @@ library Percent {
     return Percent.percent(p.num, p.den);
   }
 
-  // memory 
+  // memory
   function mmul(percent memory p, uint a) internal pure returns (uint) {
     if (a == 0) {
       return 0;
@@ -256,7 +256,7 @@ library Bet {
   }
 
   function New(address bettor, uint value) internal pure returns(bet memory b ) {
-    
+
     (uint[3] memory vals, uint[3] memory durs) = bets();
     if (value >= vals[0]) {
       b.amount = vals[0];
@@ -276,7 +276,7 @@ library Bet {
   }
 
   function bets() internal pure returns(uint[3] memory vals, uint[3] memory durs) {
-    (vals[0], vals[1], vals[2]) = (1 ether, 0.1 ether, 0.01 ether); 
+    (vals[0], vals[1], vals[2]) = (1 ether, 0.1 ether, 0.01 ether);
     (durs[0], durs[1], durs[2]) = (3 minutes + 33 seconds, 6 minutes + 33 seconds, 9 minutes + 33 seconds);
   }
 
@@ -293,11 +293,11 @@ contract LastHero is Accessibility {
   using Address for address;
   using Bet for Bet.bet;
   using Zero for *;
-  
+
   Percent.percent private m_bankPercent = Percent.percent(50,100);
   Percent.percent private m_nextLevelPercent = Percent.percent(40,100);
   Percent.percent private m_adminsPercent = Percent.percent(10,100);
-  
+
   uint public nextLevelBankAmount;
   uint public bankAmount;
   uint public level;
@@ -393,10 +393,20 @@ contract LastHero is Accessibility {
     nextLevelBankAmount += m_nextLevelPercent.mul(bet.amount);
     bankAmount += m_bankPercent.mul(bet.amount);
     adminsAddress.send(m_adminsPercent.mul(bet.amount));
-  
+
     m_timer.start(bet.duration);
     bettor = bet.bettor;
 
     emit LogNewBet(bet.bettor, bet.amount, bet.duration, level, now);
+  }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
 }

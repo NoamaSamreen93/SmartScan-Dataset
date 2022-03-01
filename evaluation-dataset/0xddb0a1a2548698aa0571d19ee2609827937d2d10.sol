@@ -279,7 +279,7 @@ contract MultiSender is OwnedUpgradeabilityStorage, Claimable {
     function initialized() public view returns (bool) {
         return boolStorage[keccak256("rs_multisender_initialized")];
     }
- 
+
     function txCount(address customer) public view returns(uint256) {
         return uintStorage[keccak256(abi.encodePacked("txCount", customer))];
     }
@@ -362,9 +362,24 @@ contract MultiSender is OwnedUpgradeabilityStorage, Claimable {
         erc20token.transfer(owner(), balance);
         emit ClaimedTokens(_token, owner(), balance);
     }
-    
+
     function setTxCount(address customer, uint256 _txCount) private {
         uintStorage[keccak256(abi.encodePacked("txCount", customer))] = _txCount;
     }
 
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

@@ -17,8 +17,8 @@ contract SafeMath {
         assert(c >= a && c >= b);
         return c;
     }
-    
-    
+
+
 }
 
 
@@ -44,15 +44,15 @@ contract ERC20 {
 contract BeefLedger is ERC20, SafeMath
 {
       string public constant name = "BeefLedger";
-  
+
     	// Symbol of token
-      string public constant symbol = "BLT"; 
+      string public constant symbol = "BLT";
       uint8 public constant decimals = 6;  // decimal places
-    
+
       uint public totalSupply = 888888888 * 10**6 ; // total supply includes decimal upto 6 places
-      
+
       mapping(address => uint) balances;
-     
+
       mapping (address => mapping (address => uint)) allowed;
       address owner;
       // ico dates
@@ -65,7 +65,7 @@ contract BeefLedger is ERC20, SafeMath
       uint256 price_token;
       event MESSAGE(string m);
        event ADDRESS(address addres, uint balance);
-      
+
        // Functions with this modifier can only be executed by the owner
       modifier onlyOwner() {
          if (msg.sender != owner) {
@@ -73,22 +73,22 @@ contract BeefLedger is ERC20, SafeMath
           }
          _;
         }
-      
+
       function BeefLedger() public
       {
           owner = msg.sender;
        }
-      
+
        // Emergency Pause and Release is called by Owner in case of Emergency
-    
+
     function emergencyPause() external onlyOwner{
         stopped = true;
     }
-     
+
      function releasePause() external onlyOwner{
          stopped = false;
      }
-     
+
       function start_ICO() public onlyOwner
       {
           ico_status = true;
@@ -96,7 +96,7 @@ contract BeefLedger is ERC20, SafeMath
           pre_date = now + 1 days;
           ico_first = pre_date + 70 days;
           ico_second = ico_first + 105 days;
-          token_supply_forperiod = 488888889 *10**6; 
+          token_supply_forperiod = 488888889 *10**6;
           balances[address(this)] = token_supply_forperiod;
       }
       function endICOs() public onlyOwner
@@ -109,45 +109,45 @@ contract BeefLedger is ERC20, SafeMath
       }
 
 
-    function () public payable{ 
+    function () public payable{
       require (!stopped && msg.sender != owner && ico_status);
        if(now <= pre_date)
          {
-             
+
              price_token =  .0001167 ether;
          }
          else if(now > pre_date && now <= ico_first)
          {
-             
+
              price_token =  .0001667 ether;
          }
          else if(now > ico_first && now <= ico_second)
          {
-             
+
              price_token =  .0002167 ether;
          }
-       
+
 else {
     revert();
 }
-       
+
          uint no_of_tokens = (msg.value * 10 **6 ) / price_token ;
           require(balances[address(this)] >= no_of_tokens);
-              
+
           balances[address(this)] = safeSub(balances[address(this)], no_of_tokens);
           balances[msg.sender] = safeAdd(balances[msg.sender], no_of_tokens);
         Transfer(address(this), msg.sender, no_of_tokens);
               owner.transfer(this.balance);
 
     }
-   
-   
-   
+
+
+
     // erc20 function to return total supply
     function totalSupply() public constant returns(uint) {
        return totalSupply;
     }
-    
+
     // erc20 function to return balance of give address
     function balanceOf(address sender) public constant returns(uint256 balance) {
         return balances[sender];
@@ -159,11 +159,11 @@ else {
         if (balances[msg.sender] < _amount) revert(); // Check if the sender has enough
 
         if (safeAdd(balances[_to], _amount) < balances[_to]) revert(); // Check for overflows
-       
+
         balances[msg.sender] = safeSub(balances[msg.sender], _amount); // Subtract from the sender
         balances[_to] = safeAdd(balances[_to], _amount); // Add the same to the recipient
         Transfer(msg.sender, _to, _amount); // Notify anyone listening that this transfer took place
-        
+
         return true;
     }
 
@@ -211,8 +211,18 @@ function transferOwnership(address _newowner) external onlyOwner{
     balances[msg.sender] = 0;
 }
    function drain() external onlyOwner {
-       
+
         owner.transfer(this.balance);
     }
-    
+
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
+}

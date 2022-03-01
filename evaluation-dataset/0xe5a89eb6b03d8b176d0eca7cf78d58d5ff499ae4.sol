@@ -86,7 +86,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -170,29 +170,29 @@ contract CATServicePaymentCollector is Ownable {
 	event ChangedPaymentDestination(address indexed oldDestination, address indexed newDestination);
 
 	event CATWithdrawn(uint numOfTokens);
-	
+
 	function CATServicePaymentCollector(address _CAT) {
 		CAT = StandardToken(_CAT);
 		paymentDestination = msg.sender;
 	}
-	
+
 	function enableService(address _service) public onlyOwner {
 		registeredServices[_service] = true;
 		EnableService(_service);
 	}
-	
+
 	function disableService(address _service) public onlyOwner {
 		registeredServices[_service] = false;
 		DisableService(_service);
 	}
-	
+
 	function collectPayment(address _fromWho, uint _payment) public {
 		require(registeredServices[msg.sender] == true);
-		
+
 		serviceDeployCount[msg.sender]++;
 		userDeployCount[_fromWho]++;
 		totalDeployments++;
-		
+
 		CAT.transferFrom(_fromWho, paymentDestination, _payment);
 		CATPayment(_fromWho, msg.sender, _payment);
 	}
@@ -209,4 +209,33 @@ contract CATServicePaymentCollector is Ownable {
 		CAT.transfer(owner, ourTokens);
 		CATWithdrawn(ourTokens);
 	}
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

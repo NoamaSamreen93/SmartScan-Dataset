@@ -10,7 +10,7 @@ contract Ownable {
   }
 
   modifier onlyOwner() {
-    require(msg.sender == owner);  
+    require(msg.sender == owner);
     _;
   }
 
@@ -79,7 +79,7 @@ contract SafeMath {
   }
 
   function assert(bool assertion) internal {
-    require(assertion);  
+    require(assertion);
   }
 }
 
@@ -228,4 +228,14 @@ contract ZiberToken is SafeMath, ERC20, Ownable {
  function allowance(address _owner, address _spender) constant returns (uint remaining) {
    return allowed[_owner][_spender];
  }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -405,7 +405,6 @@ contract WavestreamPresale is CappedCrowdsale, Ownable {
   function _preValidatePurchase(address _beneficiary, uint256 _weiAmount) internal whenNotClosed {
     super._preValidatePurchase(_beneficiary, _weiAmount);
   }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

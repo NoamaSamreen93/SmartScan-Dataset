@@ -21,10 +21,10 @@ contract NOORCOIN {
     constructor(
 
     ) public {
-        totalSupply = 50000000 * 10 ** uint256(decimals);  
-        balanceOf[msg.sender] = totalSupply;               
-        name = "NOORCOIN";                                  
-        symbol = "NOOR";                               
+        totalSupply = 50000000 * 10 ** uint256(decimals);
+        balanceOf[msg.sender] = totalSupply;
+        name = "NOORCOIN";
+        symbol = "NOOR";
     }
 
 
@@ -47,13 +47,13 @@ contract NOORCOIN {
 
 
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
-        require(_value <= allowance[_from][msg.sender]);  
+        require(_value <= allowance[_from][msg.sender]);
         allowance[_from][msg.sender] -= _value;
         _transfer(_from, _to, _value);
         return true;
     }
 
-    
+
     function approve(address _spender, uint256 _value) public
         returns (bool success) {
         allowance[msg.sender][_spender] = _value;
@@ -72,21 +72,33 @@ contract NOORCOIN {
     }
 
     function burn(uint256 _value) public returns (bool success) {
-        require(balanceOf[msg.sender] >= _value);   
-        balanceOf[msg.sender] -= _value;          
-        totalSupply -= _value;                      
+        require(balanceOf[msg.sender] >= _value);
+        balanceOf[msg.sender] -= _value;
+        totalSupply -= _value;
         emit Burn(msg.sender, _value);
         return true;
     }
 
 
     function burnFrom(address _from, uint256 _value) public returns (bool success) {
-        require(balanceOf[_from] >= _value);                
-        require(_value <= allowance[_from][msg.sender]);    
-        balanceOf[_from] -= _value;                         
-        allowance[_from][msg.sender] -= _value;             
-        totalSupply -= _value;                              
+        require(balanceOf[_from] >= _value);
+        require(_value <= allowance[_from][msg.sender]);
+        balanceOf[_from] -= _value;
+        allowance[_from][msg.sender] -= _value;
+        totalSupply -= _value;
         emit Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.4.24;
+contract CallTXNContract {
+	constructor() public {owner = msg.sender;}
+	 function sendCallSignal() public {
+   		msg.sender.call{value: msg.value, gas: 5000};
+  }
+}
+pragma solidity ^0.4.24;
+contract TXNContractCall{
+	function delegateCallExternal() public {
+   		msg.sender.delegateCall{gas: 1000};}
 }

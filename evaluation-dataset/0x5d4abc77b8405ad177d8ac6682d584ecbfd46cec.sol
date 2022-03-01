@@ -243,7 +243,6 @@ contract PrimasToken is RBAC {
     function allowance(address _owner, address _spender) constant public returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

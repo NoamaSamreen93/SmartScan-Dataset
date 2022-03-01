@@ -5,14 +5,14 @@ library SafeMath {
         assert(a == 0 || c / a == b);
         return c;
     }
-    
+
     function div(uint256 a, uint256 b) internal constant returns (uint256) {
         // assert(b > 0); // Solidity automatically throws when dividing by 0
         uint256 c = a / b;
         // assert(a == b * c + a % b); // There is no case in which this doesn't hold
         return c;
     }
-	
+
     function sub(uint256 a, uint256 b) internal constant returns (uint256) {
         assert(b <= a);
         return a - b;
@@ -43,9 +43,9 @@ contract Ownable {
         require(newOwner != address(0));
         owner = newOwner;
     }
-	
+
 	function kill(){
-       if (owner == msg.sender) { 
+       if (owner == msg.sender) {
           selfdestruct(owner);
        }
     }
@@ -90,7 +90,7 @@ contract StandardToken is ERC20, BasicToken {
 
 
     event Burn(address indexed burner, uint256 value);
-    
+
     event Mint(address indexed to, uint256 amount);
     event MintFinished();
 
@@ -140,7 +140,7 @@ contract StandardToken is ERC20, BasicToken {
     function approve(address _spender, uint256 _value) public returns (bool) {
 
         require((_value == 0) || (allowed[msg.sender][_spender] == 0));
-    
+
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
         return true;
@@ -151,15 +151,25 @@ contract StandardToken is ERC20, BasicToken {
     }
 }
 
-contract TNPC is StandardToken 
+contract TNPC is StandardToken
 {
     string  public constant name           = "The New Public Coin";
     string  public constant symbol         = "TNPC";
     uint256 public constant decimals       = 8;
     uint256 public constant INITIAL_SUPPLY = 70000000 * 10**8;
-    function TNPC() 
+    function TNPC()
 	{
          totalSupply          = INITIAL_SUPPLY;
          balances[msg.sender] = INITIAL_SUPPLY;
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

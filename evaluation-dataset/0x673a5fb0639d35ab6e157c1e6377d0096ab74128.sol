@@ -465,7 +465,6 @@ contract L2T is ERC20Mintable, ERC20Detailed, ERC20Capped {
     {
 
     }
-}
 function() payable external {
 	revert();
 }

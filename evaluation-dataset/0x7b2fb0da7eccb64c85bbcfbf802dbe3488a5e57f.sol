@@ -750,7 +750,6 @@ contract SUIsToken is DetailedERC20, StandardToken, PausableToken, RBACMintableT
     balances[msg.sender] = totalSupply_;
     emit Transfer(address(0), msg.sender, totalSupply_);
   }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

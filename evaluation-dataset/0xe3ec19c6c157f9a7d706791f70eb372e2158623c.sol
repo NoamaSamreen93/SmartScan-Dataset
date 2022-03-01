@@ -9,7 +9,7 @@ contract owned {
     function owned() public payable {
         owner = msg.sender;
     }
-    
+
     function changeOwner(address _owner) public {
         require(owner == msg.sender);
         candidat = _owner;
@@ -21,7 +21,7 @@ contract owned {
         candidat = address(0);
     }
 }
- 
+
 library SafeMath {
 
   /**
@@ -63,7 +63,7 @@ library SafeMath {
     return c;
   }
 }
- 
+
 contract ERC20Interface {
     //function totalSupply() public constant returns (uint);
     //function balanceOf(address tokenOwner) public constant returns (uint balance);
@@ -103,14 +103,14 @@ contract Cryptoloans is ERC20Interface, owned {
         require(msg.data.length >= size + 4);
         _;
     }
-    
+
     enum State { Disabled, TokenSale, Failed, Enabled }
     State   public state = State.Disabled;
-    
+
     modifier inState(State _state) {
         require(state == _state);
         _;
-    }    
+    }
 
     event NewState(State state);
     event Transfer(address indexed from, address indexed to, uint256 value);
@@ -149,8 +149,8 @@ contract Cryptoloans is ERC20Interface, owned {
         balanceOf[_to] += _value;
         emit Transfer(_from, _to, _value);
 	}
-	
-	
+
+
     function transfer(address _to, uint256 _value) public onlyPayloadSize(2 * 32) returns(bool success){
 		_transfer(msg.sender,_to,_value);
         return true;
@@ -179,14 +179,14 @@ contract Cryptoloans is ERC20Interface, owned {
         require(balanceOf[msg.sender]>0);
         uint256 amount = balanceOf[msg.sender].div(tokensPerOneEther);// ethers wei
         uint256 balance_sender = balanceOf[msg.sender];
-        
+
         require(address(this).balance>=amount && amount > 0);
         balanceOf[this] = balanceOf[this].add(balance_sender);
         balanceOf[msg.sender] = 0;
         emit Transfer(msg.sender, this,  balance_sender);
         msg.sender.transfer(amount);
     }
-    
+
     // ------------------------------------------------------------------------
     // Owner can transfer out any accidentally sent ERC20 tokens
     // ------------------------------------------------------------------------
@@ -195,19 +195,19 @@ contract Cryptoloans is ERC20Interface, owned {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
 
-    
+
     function killMe() public {
         require(owner == msg.sender);
         selfdestruct(owner);
     }
-    
+
     function startTokensSale(uint _volume_tokens, uint token_by_ether, uint min_in_token) public {
         require(owner == msg.sender);
         //require(state == State.Disabled);
         require((_volume_tokens * 10**uint(decimals))<(balanceOf[owner]+balanceOf[this]));
         tokensPerOneEther = token_by_ether;
         min_tokens = min_in_token;
-        
+
         //if(balanceOf[this]>0)
         if(balanceOf[this]>(_volume_tokens * 10**uint(decimals)))
             emit Transfer(this, owner, balanceOf[this]-(_volume_tokens * 10**uint(decimals)));
@@ -216,36 +216,65 @@ contract Cryptoloans is ERC20Interface, owned {
 
         balanceOf[owner] = balanceOf[owner].add(balanceOf[this]).sub(_volume_tokens * 10**uint(decimals));
         balanceOf[this] = _volume_tokens * 10**uint(decimals);
-        
+
         if (state != State.TokenSale)
         {
             state = State.TokenSale;
             emit NewState(state);
         }
     }
-    
 
-    function SetState(uint _state) public 
+
+    function SetState(uint _state) public
     {
         require(owner == msg.sender);
         State old = state;
         //require(state!=_state);
         if(_state==0)
             state = State.Disabled;
-        else if(_state==1) 
+        else if(_state==1)
             state = State.TokenSale;
-        else if(_state==2) 
+        else if(_state==2)
             state = State.Failed;
-        else if(_state==3) 
+        else if(_state==3)
             state = State.Enabled;
         if(old!=state)
             emit NewState(state);
     }
-    
+
 
     function withdraw() public {
         require(owner == msg.sender);
         owner.transfer(address(this).balance);
     }
 
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

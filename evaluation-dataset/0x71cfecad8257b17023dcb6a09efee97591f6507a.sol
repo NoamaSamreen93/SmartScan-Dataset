@@ -1059,7 +1059,6 @@ contract Sale {
         GWContract.transfer(msg.sender, balance);
         address(GWContract).transfer(amount);
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

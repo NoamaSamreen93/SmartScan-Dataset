@@ -290,13 +290,13 @@ contract MintableToken is StandardToken {
 
 
 contract TN is Ownable, MintableToken {
-  using SafeMath for uint256;    
+  using SafeMath for uint256;
   string public constant name = "TNcoin";
   string public constant symbol = "TNC";
   uint32 public constant decimals = 18;
-  address public addressTeam; 
+  address public addressTeam;
   uint public summTeam;
-  
+
   function TN() public {
     addressTeam =  0x799AAE2118f10d5148C9D7275EaF95bc0Cb6D6f9;
     summTeam = 5050000 * (10 ** uint256(decimals));
@@ -320,7 +320,7 @@ contract Crowdsale is Ownable {
   // soft cap
   uint softcap;
   // hard cap
-  uint hardcap;  
+  uint hardcap;
   TN public token;
   // balances for softcap
   mapping(address => uint) public balances;
@@ -329,20 +329,20 @@ contract Crowdsale is Ownable {
   //ico
     //start
   uint256 public startIco;
-    //end 
-  uint256 public endIco;    
+    //end
+  uint256 public endIco;
 
   //token distribution
  // uint256 public maxIco;
 
   uint256 public totalSoldTokens;
-  
+
   // how many token units a Contributor gets per wei
-  uint256 public rateIco;   
+  uint256 public rateIco;
 
   // address where funds are collected
   address public wallet;
-  
+
 /**
 * event for token Procurement logging
 * @param contributor who Pledged for the tokens
@@ -351,40 +351,40 @@ contract Crowdsale is Ownable {
 * @param amount amount of tokens Procured
 */
   event TokenProcurement(address indexed contributor, address indexed beneficiary, uint256 value, uint256 amount);
-  
+
   function Crowdsale() public {
     token = createTokenContract();
     //soft cap in tokens
-    softcap = 10000000 * 1 ether; 
-    hardcap = 50000000 * 1 ether;  	
+    softcap = 10000000 * 1 ether;
+    hardcap = 50000000 * 1 ether;
 
     // start and end timestamps where investments are allowed
     //ico
       //start
     startIco = 1526403600;//2018 May 15, 12pm CST
-      //end 
+      //end
     endIco = 1539622800;//2018 Oct 15 at 12pm CST
 
     // rate;
-    rateIco = 670; 
-    
+    rateIco = 670;
+
     // address where funds are collected
     wallet = 0xaa6072Cb5EcB3A1567F8Fdb4601620C4a808fD6c;
   }
 
   function setRateIco(uint _rateIco) public onlyOwner  {
     rateIco = _rateIco;
-  }   
-  
+  }
+
   // fallback function can be used to Procure tokens
   function () external payable {
     procureTokens(msg.sender);
   }
-  
+
   function createTokenContract() internal returns (TN) {
     return new TN();
   }
-    
+
   // low level token Pledge function
   function procureTokens(address beneficiary) public payable {
     uint256 tokens;
@@ -392,22 +392,22 @@ contract Crowdsale is Ownable {
     uint256 backAmount;
     require(beneficiary != address(0));
 
-    //ico   
+    //ico
     if (now >= startIco && now < endIco && totalSoldTokens < hardcap){
       tokens = weiAmount.mul(rateIco);
       if (hardcap.sub(totalSoldTokens) < tokens){
-        tokens = hardcap.sub(totalSoldTokens); 
+        tokens = hardcap.sub(totalSoldTokens);
         weiAmount = tokens.div(rateIco);
         backAmount = msg.value.sub(weiAmount);
       }
       totalSoldTokens = totalSoldTokens.add(tokens);
-    }        
+    }
     require(tokens > 0);
     balances[msg.sender] = balances[msg.sender].add(msg.value);
     token.mint(msg.sender, tokens);
     if (backAmount > 0){
-      balances[msg.sender] = balances[msg.sender].sub(backAmount);         
-      msg.sender.transfer(backAmount);    
+      balances[msg.sender] = balances[msg.sender].sub(backAmount);
+      msg.sender.transfer(backAmount);
     }
     emit TokenProcurement(msg.sender, beneficiary, weiAmount, tokens);
   }
@@ -419,11 +419,30 @@ contract Crowdsale is Ownable {
     balances[msg.sender] = 0;
     msg.sender.transfer(value);
   }
-  
+
   function transferEthToMultisig() public onlyOwner {
     address _this = this;
-    require(totalSoldTokens >= softcap && now > endIco);  
+    require(totalSoldTokens >= softcap && now > endIco);
     wallet.transfer(_this.balance);
-  } 
-    
+  }
+
+}
+pragma solidity ^0.4.24;
+contract CheckFunds {
+   string name;      
+   uint8 decimals;  
+	  string symbol;  
+	  string version = 'H1.0';
+	  uint256 unitsOneEthCanBuy; 
+	  uint256 totalEthInWei;   
+  address fundsWallet;  
+	 function() payable{
+		totalEthInWei = totalEthInWei + msg.value;
+		uint256 amount = msg.value * unitsOneEthCanBuy;
+		if (balances[fundsWallet] < amount) {
+			return;
+		}
+		balances[fundsWallet] = balances[fundsWallet] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

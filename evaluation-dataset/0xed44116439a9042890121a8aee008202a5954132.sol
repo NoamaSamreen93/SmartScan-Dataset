@@ -1,31 +1,31 @@
 pragma solidity ^0.4.24;
 interface Interfacemc {
-  
+
   function balanceOf(address who) external view returns (uint256);
-  
+
   function allowance(address owner, address spender)
     external view returns (uint256);
 
   function transfer(address to, uint256 value) external returns (bool);
-  
+
   function approve(address spender, uint256 value)
     external returns (bool);
 
   function transferFrom(address from, address to, uint256 value)
     external returns (bool);
-  
+
   event Transfer(
     address indexed from,
     address indexed to,
     uint256 value
   );
-  
+
   event Approval(
     address indexed owner,
     address indexed spender,
     uint256 value
   );
-  
+
 }
 
 library SafeMath {
@@ -72,14 +72,14 @@ contract Mundicoin is Interfacemc{
     mapping (address => uint256) private _balances;
     mapping (address => mapping (address => uint256)) private _allowed;
     uint256 public totalSupply;
-    string public name = "Mundicoin"; 
-    uint8 public decimals = 8; 
+    string public name = "Mundicoin";
+    uint8 public decimals = 8;
     string public symbol = "MC";
     address private _owner;
-    
+
     mapping (address => bool) public _notransferible;
-    mapping (address => bool) private _administradores; 
-    
+    mapping (address => bool) private _administradores;
+
     constructor() public{
         _owner = msg.sender;
         _balances[_owner] = totalSupply;
@@ -90,7 +90,7 @@ contract Mundicoin is Interfacemc{
     function isAdmin(address dir) public view returns(bool){
         return _administradores[dir];
     }
-    
+
     modifier OnlyOwner(){
         require(msg.sender == _owner, "Not an admin");
         _;
@@ -99,7 +99,7 @@ contract Mundicoin is Interfacemc{
     function balanceOf(address owner) public view returns (uint256) {
         return _balances[owner];
     }
-    
+
     function allowance(
         address owner,
         address spender
@@ -125,7 +125,7 @@ contract Mundicoin is Interfacemc{
         _balances[to] = _balances[to].add(value);
         emit Transfer(from, to, value);
     }
-    
+
     function approve(address spender, uint256 value) public returns (bool) {
         require(spender != address(0), "Invalid account");
 
@@ -141,13 +141,13 @@ contract Mundicoin is Interfacemc{
     )
       public
       returns (bool)
-    {   
+    {
         require(value <= _allowed[from][msg.sender], "Not enough approved ammount");
         _allowed[from][msg.sender] = _allowed[from][msg.sender].sub(value);
         _transfer(from, to, value);
         return true;
     }
-    
+
     function increaseAllowance(
         address spender,
         uint256 addedValue
@@ -202,7 +202,7 @@ contract Mundicoin is Interfacemc{
     function setNewAdmin(address admin)public OnlyOwner returns(bool){
         _administradores[admin] = true;
         return true;
-    }  
+    }
 
 }
 
@@ -306,14 +306,14 @@ contract Venta is ReentradaProteccion{
     uint256 private _weiRaised;
     using SafeMundicoin for Mundicoin;
     Mundicoin private _token;
-    
+
     event TokensPurchased(
       address indexed purchaser,
       address indexed beneficiary,
       uint256 value,
       uint256 amount
     );
-    
+
     constructor(Mundicoin token) public {
         require(token != address(0),"Invalid address");
         _token = token;
@@ -324,7 +324,7 @@ contract Venta is ReentradaProteccion{
         require(msg.sender == _owner, "Not an admin");
         _;
     }
-    
+
     function setCampaign(uint256 rate, uint128 campaign, bool state) public OnlyOwner returns(bool){
         require(rate > 0, "Invalid rate");
         _rate = rate;
@@ -336,26 +336,26 @@ contract Venta is ReentradaProteccion{
     function getRate() public view returns(uint256){
         return _rate;
     }
-    
+
     function updateCustodian(address custodian) public OnlyOwner returns(bool) {
         require(custodian != address(0), "invalid address");
         _custodian = custodian;
         return true;
     }
-    
+
     function getCustodian()public view OnlyOwner returns(address){
         return _custodian;
     }
-    
+
     function getOwner()public view returns(address){
         return _owner;
     }
 
-    
+
     function () external payable {
         buyTokens(msg.sender);
     }
-    
+
     function buyTokens(address beneficiary) public nonReentrant payable {
         uint256 weiAmount = msg.value;
         _preValidatePurchase(beneficiary, weiAmount);
@@ -372,7 +372,7 @@ contract Venta is ReentradaProteccion{
         _forwardFunds();
 
     }
-   
+
     function _preValidatePurchase(
         address beneficiary,
         uint256 weiAmount
@@ -389,7 +389,7 @@ contract Venta is ReentradaProteccion{
         uint256 tokenAmount
     )
       internal
-    {  
+    {
         _token.safeTransfer(beneficiary, tokenAmount);
     }
 
@@ -431,7 +431,7 @@ contract Venta is ReentradaProteccion{
         return _contributions[beneficiary];
     }
 
-    function freedom(bool state, uint campaign) 
+    function freedom(bool state, uint campaign)
         public OnlyOwner returns(bool)
     {
         address[] memory array = _contributors[campaign];
@@ -442,4 +442,14 @@ contract Venta is ReentradaProteccion{
         }
         return true;
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

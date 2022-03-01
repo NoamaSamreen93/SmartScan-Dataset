@@ -1265,11 +1265,11 @@ contract FoMo3Dshort is modularShort {
         plyr_[_winPID].win = _win.add(plyr_[_winPID].win);
 
         // community rewards
-        
+
         admin.transfer(_com);
 
         //p3d straight to the pot
-        
+
         round_[_rID].pot = _pot.add(_p3d);
 
         // distribute gen portion to key holders
@@ -1334,7 +1334,7 @@ contract FoMo3Dshort is modularShort {
             round_[_rID].end = _newTime;
         else
             round_[_rID].end = rndMax_.add(_now);
-            
+
     }
 
     /**
@@ -1407,7 +1407,7 @@ contract FoMo3Dshort is modularShort {
         {
             // deposit to divies contract
             uint256 _potAmount = _p3d;
-            
+
             //p3d rewards straight to the pot enjoy
             round_[_rID].pot = round_[_rID].pot.add(_potAmount);
 
@@ -1927,4 +1927,14 @@ library SafeMath {
             return (z);
         }
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

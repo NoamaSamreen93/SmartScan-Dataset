@@ -20,80 +20,80 @@ interface IERC20 {
 }
 
 contract EBIC2019 {
-    
+
     event PackageSent(address indexed sender, address indexed wallet, uint256 packageIndex, uint256 time);
     event Withdraw(address indexed sender, address indexed wallet, uint256 amount);
     event WithdrawTokens(address indexed sender, address indexed wallet, address indexed token, uint256 amount);
     event DappPurpose(address indexed dappAddress);
     event Suicide();
-    
+
     address public owner;
     address public dapp;
-    
+
     struct Package {
         Token[] tokens;
         bool enabled;
     }
-    
+
     struct Token {
         address smartAddress;
         uint256 amount;
     }
-    
+
     Package[] packages;
     uint256 public packageCount;
-    
+
     mapping (address => uint256) public packageSent;
     uint256 public packageSentCount;
-    
-    constructor() 
+
+    constructor()
     {
         owner = msg.sender;
-        
+
         packages.length++;
     }
-    
-    function () 
-    external 
-    payable 
+
+    function ()
+    external
+    payable
     {
 	}
-	
+
 	function packageCreate()
 	public
 	returns (uint256 _index)
 	{
 	    require(msg.sender == owner);
-	    
+
 	    uint256 index = packages.length++;
 	    _index = index--;
 	    Package storage package = packages[_index];
 	    package.enabled = true;
 	    packageCount++;
 	}
-	
+
 	function packageTokenCreate(uint256 _packageIndex, address _token, uint256 _amount)
 	public
 	returns (bool _success)
 	{
 	    _success = false;
-	    
+
 	    require(msg.sender == owner);
 	    require(_packageIndex > 0 && _packageIndex <= packageCount);
 	    require(_token != address(0));
 	    require(_amount > 0);
-	    
+
 	    Token memory token = Token({
 	        smartAddress: _token,
 	        amount: _amount
 	    });
-	    
+
 	    Package storage package = packages[_packageIndex];
 	    package.tokens.push(token);
-	    
+
 	    _success = true;
 	}
-	
+
 	function packageEnabled(uint256 _packageIndex, bool _enabled)
 	public
 	returns (bool _success)
@@ -101,95 +101,95 @@ contract EBIC2019 {
 	    _success = false;
 	    require(msg.sender == owner);
 	    require(_packageIndex > 0 && _packageIndex <= packageCount);
-	    
+
 	    Package storage package = packages[_packageIndex];
 	    package.enabled = _enabled;
-	    
+
 	    _success = true;
 	}
-	
+
 	function packageView(uint256 _packageIndex)
 	view
 	public
 	returns (uint256 _tokensCount, bool _enabled)
 	{
 	    require(_packageIndex > 0 && _packageIndex <= packageCount);
-	    
+
 	    Package memory package = packages[_packageIndex];
-	    
+
 	    _tokensCount = package.tokens.length;
 	    _enabled = package.enabled;
 	}
-	
+
 	function packageTokenView(uint256 _packageIndex, uint256 _tokenIndex)
 	view
 	public
 	returns (address _token, uint256 _amount)
 	{
 	    require(_packageIndex > 0 && _packageIndex <= packageCount);
-	    
+
 	    Package memory package = packages[_packageIndex];
-	    
+
 	    require(_tokenIndex < package.tokens.length);
-	    
+
 	    Token memory token = package.tokens[_tokenIndex];
 	    _token = token.smartAddress;
 	    _amount = token.amount;
 	}
-	
+
 	function packageSend(address _wallet, uint256 _packageIndex)
 	public
 	returns (bool _success)
 	{
 	    _success = false;
-	    
+
 	    require(msg.sender == owner || msg.sender == dapp);
 	    require(_wallet != address(0));
 	    require(_packageIndex > 0);
 	    require(packageSent[_wallet] != _packageIndex);
-	    
+
 	    Package memory package = packages[_packageIndex];
 	    require(package.enabled);
-	    
+
 	    for(uint256 index = 0; index < package.tokens.length; index++){
 	        require(IERC20(package.tokens[index].smartAddress).transfer(_wallet, package.tokens[index].amount));
 	    }
-	    
+
 	    packageSent[_wallet] = _packageIndex;
 	    packageSentCount++;
-	    
+
 	    emit PackageSent(msg.sender, _wallet, _packageIndex, now);
-	    
+
 	    _success = true;
 	}
-	
+
 	function dappPurpose(address _dappAddress)
 	public
-	returns (bool _success) 
+	returns (bool _success)
 	{
 	    _success = false;
-	    
+
 	    require(msg.sender == owner);
-	    
+
         dapp = _dappAddress;
         emit DappPurpose(dapp);
-	    
+
 	    _success = true;
 	}
-	
+
 	function balanceOfTokens(address _token)
-    public 
+    public
     constant
-    returns (uint256 _amount) 
+    returns (uint256 _amount)
     {
         require(_token != address(0));
-        
+
         return IERC20(_token).balanceOf(address(this));
     }
-    
+
     function withdrawTokens(address _token, uint256 _amount)
-    public 
-    returns (bool _success) 
+    public
+    returns (bool _success)
     {
         require(msg.sender == owner);
         require(_token != address(0));
@@ -200,9 +200,9 @@ contract EBIC2019 {
         }
         return result;
     }
-    
+
     function withdraw()
-    public 
+    public
     returns (bool success)
     {
         require(msg.sender == owner);
@@ -211,16 +211,26 @@ contract EBIC2019 {
         owner.transfer(address(this).balance);
         return true;
     }
-    
+
     function suicide()
     public
     {
         require(msg.sender == owner);
-        
+
         emit Suicide();
         selfdestruct(owner);
     }
-    
-    
-    
+
+
+
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

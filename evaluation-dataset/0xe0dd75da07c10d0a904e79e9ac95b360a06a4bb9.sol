@@ -384,8 +384,18 @@ contract ERC20Detailed is IERC20 {
 
 contract BToken is ERC20Burnable, ERC20Detailed {
   uint constant private INITIAL_SUPPLY = 10 * 1e24;
-  
+
   constructor() ERC20Detailed("BurnToken", "BUTK", 18) public {
     super._mint(msg.sender, INITIAL_SUPPLY);
+  }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
 }

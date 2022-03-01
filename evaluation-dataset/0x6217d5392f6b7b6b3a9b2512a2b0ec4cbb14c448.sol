@@ -1157,7 +1157,6 @@ contract MarketCollateralPool is Ownable {
         );
         _;
     }
-}
 function() payable external {
 	revert();
 }

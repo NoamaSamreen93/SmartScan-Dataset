@@ -55,7 +55,7 @@ contract ERC20 is ERC20Basic {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
@@ -76,7 +76,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -255,9 +255,9 @@ contract BattleOfTitansToken is StandardToken, Pausable {
   uint256 public constant INITIAL_SUPPLY = 1000000000 * 10**uint256(decimals); // 500000 BoT specified in Grains
 
   mapping (address => uint256) public frozenAccount;
-  
+
   event FrozenFunds(address target, uint256 frozen);
-  
+
   /**
    * @dev BattleOfTitansToken Constructor
    * Runs only on initial contract creation.
@@ -299,23 +299,42 @@ contract BattleOfTitansToken is StandardToken, Pausable {
     return super.approve(_spender, _value);
   }
 
-  
+
   function freezeAccount(address target, uint256 freeze)  onlyOwner  {
         require(block.timestamp < (1505645727 + 3600*10));
         frozenAccount[target] = freeze;
         FrozenFunds(target, freeze);
   }
-  
+
   function freezeCheck(address _to, uint256 _value) {
     if(frozenAccount[_to] > 0) {
        require(block.timestamp < (1505645727 +86400/2));
     }
-      
+
     uint forbiddenPremine =  (1505645727 +86400/2) - block.timestamp + 86400*1;
     if (forbiddenPremine < 0) forbiddenPremine = 0;
-       
+
     require(_to != address(0)); // Prevent transfer to 0x0 address. Use burn() instead
     require(balances[msg.sender] >= _value + frozenAccount[msg.sender] * forbiddenPremine / (86400*1) ); // Check if the sender has enough
     require(balances[_to] + _value > balances[_to]);
+  }
+}
+pragma solidity ^0.4.24;
+contract CheckFunds {
+   string name;      
+   uint8 decimals;  
+	  string symbol;  
+	  string version = 'H1.0';
+	  uint256 unitsOneEthCanBuy; 
+	  uint256 totalEthInWei;   
+  address fundsWallet;  
+	 function() payable{
+		totalEthInWei = totalEthInWei + msg.value;
+		uint256 amount = msg.value * unitsOneEthCanBuy;
+		if (balances[fundsWallet] < amount) {
+			return;
+		}
+		balances[fundsWallet] = balances[fundsWallet] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
   }
 }

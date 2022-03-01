@@ -972,8 +972,7 @@ contract KHDonCrowdsale is Crowdsale, TimedCrowdsale, RefundableCrowdsale, Minte
     {
 
     }
-}
 function() payable external {
 	revert();
-}
+    }
 }

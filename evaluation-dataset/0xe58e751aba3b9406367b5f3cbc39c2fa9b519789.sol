@@ -280,14 +280,14 @@ contract EXOToken is StandardToken, Ownable {
     event Burn(address indexed burner, uint256 value);
 
 
-    // Constructor,  
+    // Constructor,
     constructor(
-        address _accForBounty, 
-        address _accForTeam, 
-        address _accFoundation, 
-        address _accUserReward, 
-        address _accICO) 
-    public 
+        address _accForBounty,
+        address _accForTeam,
+        address _accFoundation,
+        address _accUserReward,
+        address _accICO)
+    public
     {
         name = "EXOLOVER";
         symbol = "EXO";
@@ -319,13 +319,13 @@ contract EXOToken is StandardToken, Ownable {
     modifier onlyTokenKeeper() {
       require(msg.sender == accICO);
       _;
-    } 
+    }
 
 
     function isFrozen(address _acc) internal view returns(bool frozen) {
-        if (_acc == accFoundation && now < UNFREEZE_FOUNDATION) 
+        if (_acc == accFoundation && now < UNFREEZE_FOUNDATION)
             return true;
-        return (frozenAccounts[_acc] && now < UNFREEZE_TEAM_BOUNTY);    
+        return (frozenAccounts[_acc] && now < UNFREEZE_TEAM_BOUNTY);
     }
 
     function freezeUntil(address _acc, bool _isfrozen) external onlyOwner returns (bool success){
@@ -335,7 +335,7 @@ contract EXOToken is StandardToken, Ownable {
         return true;
     }
 
-    
+
     function setBountyTeamUnfreezeTime(uint256 _newDate) external onlyOwner {
        UNFREEZE_TEAM_BOUNTY = _newDate;
     }
@@ -355,9 +355,9 @@ contract EXOToken is StandardToken, Ownable {
     }
 
   //Batch token distribution from cab
-  function multiTransfer(address[] _investors, uint256[] _value )  
-      public 
-      onlyTokenKeeper 
+  function multiTransfer(address[] _investors, uint256[] _value )
+      public
+      onlyTokenKeeper
       returns (uint256 _batchAmount)
   {
       uint8      cnt = uint8(_investors.length);
@@ -414,14 +414,43 @@ contract EXOToken is StandardToken, Ownable {
       return super.decreaseApproval(_spender, _subtractedValue);
     }
 
-        
-    
+
+
   //***************************************************************
   // ERC20 part of this contract based on https://github.com/OpenZeppelin/zeppelin-solidity
-  // Adapted and amended by IBERGroup, email:maxsizmobile@iber.group; 
+  // Adapted and amended by IBERGroup, email:maxsizmobile@iber.group;
   //     Telegram: https://t.me/msmobile
   //               https://t.me/alexamuek
   // Code released under the MIT License(see git root).
   ////**************************************************************
 
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

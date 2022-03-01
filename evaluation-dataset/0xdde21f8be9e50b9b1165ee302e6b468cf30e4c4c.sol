@@ -497,7 +497,7 @@ contract OutcomeToken is StandardToken {
     {
         eventContract = msg.sender;
     }
-    
+
     /// @dev Events contract issues new tokens for address. Returns success
     /// @param _for Address of receiver
     /// @param outcomeTokenCount Number of tokens to issue
@@ -930,4 +930,19 @@ contract StandardMarketFactory {
         market = new StandardMarket(msg.sender, eventContract, marketMaker, fee);
         StandardMarketCreation(msg.sender, market, eventContract, marketMaker, fee);
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

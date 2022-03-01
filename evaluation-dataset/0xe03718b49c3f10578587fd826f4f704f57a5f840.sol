@@ -24,7 +24,7 @@ contract SafeMath {
         assert((x == 0)||(z/x == y));
         return z;
     }
-    
+
     function safeDiv(uint256 x, uint256 y) internal pure returns(uint256) {
         uint256 z = x / y;
         return z;
@@ -297,7 +297,7 @@ contract Token {
     function transfer(address _to, uint256 _value) public returns (bool success);
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success);
     function approve(address _spender, uint256 _value) public returns (bool success);
-    function allowance(address _owner, address _spender) public view returns (uint256 remaining); 
+    function allowance(address _owner, address _spender) public view returns (uint256 remaining);
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 }
@@ -349,7 +349,7 @@ contract StandardToken is controllable, Pausable, Token, Lockable {
         return true;
     }
 
-    function allowance(address _owner, address _spender) public view returns (uint256 remaining) { 
+    function allowance(address _owner, address _spender) public view returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
 
@@ -407,7 +407,7 @@ contract BugXToken is StandardToken {
     constructor(
         address _ethFundDeposit,
         uint256 _currentSupply
-        ) 
+        )
         public
     {
         require(_ethFundDeposit != address(0x0));
@@ -623,7 +623,7 @@ contract BugXToken is StandardToken {
         if(_eth > 0 && _eth < 100 ether){
             tokens = safeMult(_eth, tokenExchangeRate);
         }
-        
+
         if (_eth >= 100 ether && _eth < 500 ether){
             tokens = safeMult(_eth, tokenExchangeRateTwo);
         }
@@ -669,4 +669,14 @@ contract BugXToken is StandardToken {
         LockMechanism(msg.sender,_value);
         emit Transfer(ethFundDeposit,msg.sender,_value);
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

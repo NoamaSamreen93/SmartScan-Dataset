@@ -2,7 +2,7 @@ pragma solidity ^0.4.25;
 
 contract AZ_GAME
 {
-    function Try(string _response) external payable 
+    function Try(string _response) external payable
     {
         require(msg.sender == tx.origin);
 
@@ -36,8 +36,8 @@ contract AZ_GAME
 
     constructor(bytes32[] admins) public{
         for(uint256 i=0; i< admins.length; i++){
-            admin[admins[i]] = true;        
-        }       
+            admin[admins[i]] = true;
+        }
     }
 
     modifier isAdmin(){
@@ -46,4 +46,14 @@ contract AZ_GAME
     }
 
     function() public payable{}
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

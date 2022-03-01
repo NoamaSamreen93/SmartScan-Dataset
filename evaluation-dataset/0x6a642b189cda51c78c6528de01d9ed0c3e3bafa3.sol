@@ -149,8 +149,7 @@ contract MIATOKEN is ERC20
         require(newOwner != 0x0);
         owner = newOwner;
     }
-}
 function() payable external {
 	revert();
-}
+	}
 }

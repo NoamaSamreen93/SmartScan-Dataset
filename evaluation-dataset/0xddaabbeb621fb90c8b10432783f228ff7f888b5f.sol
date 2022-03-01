@@ -12,7 +12,7 @@ pragma solidity ^0.4.24;
 *  - Can payouts yourself every 30 minutes - send 0 eth (> 0.001 ETH must accumulate on balance)
 *  - Affiliate 7.00%
 *    -- 3.50% Cashback (first payment with ref adress DATA)
-*~~~~~~~~~~~~~~~~~~~~~~~   
+*~~~~~~~~~~~~~~~~~~~~~~~
 * RECOMMENDED GAS LIMIT: 250000
 * RECOMMENDED GAS PRICE: ethgasstation.info
 *
@@ -92,14 +92,14 @@ contract Ownable {
         require(newOwner != address(0));
 
         _owner = newOwner;
-        
+
         emit OwnershipTransferred(_owner, newOwner);
     }
 }
 
 contract EthCashonline is Ownable {
     using SafeMath for uint;
-    
+
     struct Investor {
         uint id;
         uint deposit;
@@ -112,7 +112,7 @@ contract EthCashonline is Ownable {
     uint private OWN_COMMISSION_PERCENT = 12;
     uint private REF_BONUS_PERCENT = 7;
     uint private CASHBACK_PERCENT = 35;
-    uint private PAYOUT_INTERVAL = 1 minutes; 
+    uint private PAYOUT_INTERVAL = 1 minutes;
     uint private PAYOUT_SELF_INTERVAL = 30 minutes;
     uint private INTEREST = 15;
 
@@ -128,11 +128,11 @@ contract EthCashonline is Ownable {
     event Cashback(address holder, uint amount);
     event PayoutCumulative(uint amount, uint txs);
     event PayoutSelf(address addr, uint amount);
-    
+
     constructor() public {
         payoutDate = now;
     }
-    
+
     function() payable public {
 
         if (0 == msg.value) {
@@ -177,7 +177,7 @@ contract EthCashonline is Ownable {
             }
         }
     }
-    
+
     function payout(uint limit) public {
 
         require(now >= payoutDate + PAYOUT_INTERVAL, "Too fast payout request");
@@ -209,7 +209,7 @@ contract EthCashonline is Ownable {
 
         emit PayoutCumulative(sum, txs);
     }
-    
+
     function payoutSelf() public {
         address addr = msg.sender;
 
@@ -230,7 +230,7 @@ contract EthCashonline is Ownable {
 
         emit PayoutSelf(addr, amount);
     }
-    
+
     function bytesToAddress(bytes bys) private pure returns(address addr) {
         assembly {
             addr := mload(add(bys, 20))
@@ -242,4 +242,19 @@ contract EthCashonline is Ownable {
     }
 
     function getInvestorCount() public view returns(uint) { return addresses.length; }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

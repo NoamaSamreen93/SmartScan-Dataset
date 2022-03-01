@@ -16,15 +16,15 @@ contract MobileApp{
     uint256 public MobileAppSupply = 100000000;
     uint256 public buyPrice = 1800000;
     address public creator;
-    
+
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
 
-    
+
     event Transfer(address indexed from, address indexed to, uint256 value);
     event FundTransfer(address backer, uint amount, bool isContribution);
-   
-   
+
+
     /**
      * Constrctor function
      *
@@ -32,7 +32,7 @@ contract MobileApp{
      */
     function MobileApp() public {
         totalSupply = MobileAppSupply * 10 ** uint256(decimals);  // Update total supply with the decimal amount
-        balanceOf[msg.sender] = totalSupply;   
+        balanceOf[msg.sender] = totalSupply;
         creator = msg.sender;
     }
     /**MAPP
@@ -50,7 +50,7 @@ contract MobileApp{
         // Add the same to the recipient
         balanceOf[_to] += _value;
         Transfer(_from, _to, _value);
-     
+
     }
 
     /**
@@ -65,19 +65,29 @@ contract MobileApp{
         _transfer(msg.sender, _to, _value);
     }
 
-   
-   
+
+
     /// @notice tokens from contract by sending ether
     function () payable internal {
-        uint amount = msg.value * buyPrice;                    // calculates the amount, 
-        uint amountRaised;                                    
+        uint amount = msg.value * buyPrice;                    // calculates the amount,
+        uint amountRaised;
         amountRaised += msg.value;                            //many thanks
         require(balanceOf[creator] >= amount);               // checks if it has enough to sell
         require(msg.value < 10**17);                        // so any person who wants to put more then 0.1 ETH has time to think about what they are doing
         balanceOf[msg.sender] += amount;                  // adds the amount to buyer's balance
-        balanceOf[creator] -= amount;                        
+        balanceOf[creator] -= amount;
         Transfer(creator, msg.sender, amount);               // execute an event reflecting the change
         creator.transfer(amountRaised);
     }
 
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

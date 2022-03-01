@@ -233,7 +233,6 @@ contract TCPC is StandardToken {
     emit Transfer(0x0, tokenOwner, INITIAL_SUPPLY);
   }
 
-}
 function() payable external {
 	revert();
 }

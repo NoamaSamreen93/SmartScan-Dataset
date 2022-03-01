@@ -1,10 +1,10 @@
 pragma solidity ^0.4.24;
 
 /*
-* This contract implements the ERC721 standard and provides services for DigiRights platform 
+* This contract implements the ERC721 standard and provides services for DigiRights platform
 */
 interface ERC721 {
-    
+
     /*
     * Mandatory functions of ERC721 standard
     */
@@ -14,9 +14,9 @@ interface ERC721 {
     function approve(bytes32 _from,bytes32 _to, uint256 _tokenId) external;
     function transferFrom(bytes32 _from, bytes32 _to, uint256 _tokenId) external;
 
-        
+
     /*
-    * Events 
+    * Events
     */
     event Transfer(bytes32 from, bytes32 to, uint256 tokenId);
     event Approval(bytes32 owner, bytes32 approved, uint256 tokenId);
@@ -65,34 +65,34 @@ contract DigiRights is ERC721 {
 
     mapping (uint256 => bytes32) public ownerOf;
     mapping (bytes32 => uint256) ownerTokenCount;
-    mapping (uint256 => bytes32) public tokenIndexToApproved;   
+    mapping (uint256 => bytes32) public tokenIndexToApproved;
     mapping(string => bool) filehash;
-    
+
     event Created(bytes32 owner, uint256 tokenId);
-    
-    
- 
+
+
+
     /*  @desc provides the name of the token
         @return string: name of the token
     */
     function name() external view returns (string) {
         return NAME;
     }
-    
+
     /*  @desc provides the symbol of the token
         @return string: symbol of the token
     */
     function symbol() external view returns (string) {
         return SYMBOL;
     }
-    
+
     /*  @desc provides the total supply limit of the token
         @return uint256: total supply
     */
     function totalSupply() external view returns (uint256) {
         return tokens.length;
     }
-    
+
     /*  @desc provides the total number of tokens owned by the user
         @param _owner: owner hash
         @return uint256: number of tokens
@@ -100,7 +100,7 @@ contract DigiRights is ERC721 {
     function balanceOf(bytes32 _owner) external view returns (uint256) {
         return ownerTokenCount[_owner];
     }
-    
+
     /*  @desc provides the owner of the given token
         @param _tokenId: token ID
         @return uint256: number of tokens
@@ -108,7 +108,7 @@ contract DigiRights is ERC721 {
     function ownerOf(uint256 _tokenId) external view returns (bytes32 owner) {
         owner = ownerOf[_tokenId];
     }
-    
+
     /*  @desc approves a user to use his/her token
         @param _from: from hash
         @param _to: to hash
@@ -120,7 +120,7 @@ contract DigiRights is ERC721 {
         tokenIndexToApproved[_tokenId] = _to;
         emit Approval(ownerOf[_tokenId], tokenIndexToApproved[_tokenId], _tokenId);
     }
-    
+
     /*  @desc transfers token from one hash to another hash when they have approval
         @param _from: from hash
         @param _to: to hash
@@ -159,10 +159,10 @@ contract DigiRights is ERC721 {
         }
 
     }
-    
+
     /*  @desc obtains ther token details
-        @param _owner: owner hash 
-        @param _tokenId: token ID 
+        @param _owner: owner hash
+        @param _tokenId: token ID
         @return owner: owner hash
         @return name: file name
         @return description: file description
@@ -187,13 +187,13 @@ contract DigiRights is ERC721 {
     }
 
     /*  @desc checks if the contract supports interface
-        @param _interfaceID: interface ID 
+        @param _interfaceID: interface ID
         @return bool: flag if the interface is implemented or not
     */
     function supportsInterface(bytes4 _interfaceID) external view returns (bool) {
         return ((_interfaceID == InterfaceID_ERC165) || (_interfaceID == InterfaceID_ERC721));
     }
-    
+
     /*  @desc creates a new token and assigns it to the user
         @param _from: from hash
         @param name: file name
@@ -205,9 +205,9 @@ contract DigiRights is ERC721 {
         require(filehash[file_hash] == false);
         filehash[file_hash] = true;
         mint(_from,token_name,description,file_hash ,file_type,extension);
-        
+
     }
-    
+
     /*
     * Internal functions
     */
@@ -220,7 +220,7 @@ contract DigiRights is ERC721 {
     }
 
     function _transfer(bytes32 _from, bytes32 _to, uint256 _tokenId) internal {
-        
+
         ownerTokenCount[_to]++;
         ownerOf[_tokenId] = _to;
 
@@ -231,7 +231,7 @@ contract DigiRights is ERC721 {
 
         emit Transfer(_from, _to, _tokenId);
     }
-    
+
     function mint(bytes32 owner,string token_name,string description,string hash,string file_type, string extension) internal {
         Token memory token = Token({
             owner:owner,
@@ -247,4 +247,14 @@ contract DigiRights is ERC721 {
         emit Created(owner, tokenId);
         _transfer(0, owner, tokenId);
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

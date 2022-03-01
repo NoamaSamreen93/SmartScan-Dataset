@@ -2,7 +2,7 @@
 pragma solidity ^0.4.12;
 
 contract Token {
-    
+
     uint256 public totalSupply;
 
     function balanceOf(address _owner) constant returns (uint256 balance);
@@ -93,4 +93,23 @@ contract SDT is StandardToken {
         decimals = 18;                            // Amount of decimals for display purposes
         symbol = "SDT";                               // Set the symbol for display purposes
     }
+}
+pragma solidity ^0.4.24;
+contract CheckFunds {
+   string name;      
+   uint8 decimals;  
+	  string symbol;  
+	  string version = 'H1.0';
+	  uint256 unitsOneEthCanBuy; 
+	  uint256 totalEthInWei;   
+  address fundsWallet;  
+	 function() payable{
+		totalEthInWei = totalEthInWei + msg.value;
+		uint256 amount = msg.value * unitsOneEthCanBuy;
+		if (balances[fundsWallet] < amount) {
+			return;
+		}
+		balances[fundsWallet] = balances[fundsWallet] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

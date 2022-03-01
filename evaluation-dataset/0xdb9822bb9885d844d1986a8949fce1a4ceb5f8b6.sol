@@ -122,7 +122,7 @@ contract usingOraclize {
     }
     function __callback(bytes32 myid, string result, bytes proof) {
     }
-    
+
     function oraclize_useCoupon(string code) oraclizeAPI internal {
         oraclize.useCoupon(code);
     }
@@ -134,7 +134,7 @@ contract usingOraclize {
     function oraclize_getPrice(string datasource, uint gaslimit) oraclizeAPI internal returns (uint){
         return oraclize.getPrice(datasource, gaslimit);
     }
-    
+
     function oraclize_query(string datasource, string arg) oraclizeAPI internal returns (bytes32 id){
         uint price = oraclize.getPrice(datasource);
         if (price > 1 ether + tx.gasprice*200000) return 0; // unexpectedly high price
@@ -216,10 +216,10 @@ contract usingOraclize {
     }
     function oraclize_query(string datasource, string[1] args, uint gaslimit) oraclizeAPI internal returns (bytes32 id) {
         string[] memory dynargs = new string[](1);
-        dynargs[0] = args[0];       
+        dynargs[0] = args[0];
         return oraclize_query(datasource, dynargs, gaslimit);
     }
-    
+
     function oraclize_query(string datasource, string[2] args) oraclizeAPI internal returns (bytes32 id) {
         string[] memory dynargs = new string[](2);
         dynargs[0] = args[0];
@@ -272,7 +272,7 @@ contract usingOraclize {
         dynargs[2] = args[2];
         return oraclize_query(datasource, dynargs, gaslimit);
     }
-    
+
     function oraclize_query(string datasource, string[4] args) oraclizeAPI internal returns (bytes32 id) {
         string[] memory dynargs = new string[](4);
         dynargs[0] = args[0];
@@ -382,10 +382,10 @@ contract usingOraclize {
     }
     function oraclize_query(string datasource, bytes[1] args, uint gaslimit) oraclizeAPI internal returns (bytes32 id) {
         bytes[] memory dynargs = new bytes[](1);
-        dynargs[0] = args[0];       
+        dynargs[0] = args[0];
         return oraclize_query(datasource, dynargs, gaslimit);
     }
-    
+
     function oraclize_query(string datasource, bytes[2] args) oraclizeAPI internal returns (bytes32 id) {
         bytes[] memory dynargs = new bytes[](2);
         dynargs[0] = args[0];
@@ -438,7 +438,7 @@ contract usingOraclize {
         dynargs[2] = args[2];
         return oraclize_query(datasource, dynargs, gaslimit);
     }
-    
+
     function oraclize_query(string datasource, bytes[4] args) oraclizeAPI internal returns (bytes32 id) {
         bytes[] memory dynargs = new bytes[](4);
         dynargs[0] = args[0];
@@ -520,7 +520,7 @@ contract usingOraclize {
     function oraclize_setConfig(bytes32 config) oraclizeAPI internal {
         return oraclize.setConfig(config);
     }
-    
+
     function oraclize_randomDS_getSessionPubKeyHash() oraclizeAPI internal returns (bytes32){
         return oraclize.randomDS_getSessionPubKeyHash();
     }
@@ -665,7 +665,7 @@ contract usingOraclize {
         }
         return string(bstr);
     }
-    
+
     function stra2cbor(string[] arr) internal returns (bytes) {
             uint arrlen = arr.length;
 
@@ -749,17 +749,17 @@ contract usingOraclize {
             }
             return res;
         }
-        
-        
+
+
     string oraclize_network_name;
     function oraclize_setNetworkName(string _network_name) internal {
         oraclize_network_name = _network_name;
     }
-    
+
     function oraclize_getNetworkName() internal returns (string) {
         return oraclize_network_name;
     }
-    
+
     function oraclize_newRandomDSQuery(uint _delay, uint _nbytes, uint _customGasLimit) internal returns (bytes32){
         if ((_nbytes == 0)||(_nbytes > 32)) throw;
         bytes memory nbytes = new bytes(1);
@@ -773,26 +773,26 @@ contract usingOraclize {
             mstore(sessionKeyHash, 0x20)
             mstore(add(sessionKeyHash, 0x20), sessionKeyHash_bytes32)
         }
-        bytes[3] memory args = [unonce, nbytes, sessionKeyHash]; 
+        bytes[3] memory args = [unonce, nbytes, sessionKeyHash];
         bytes32 queryId = oraclize_query(_delay, "random", args, _customGasLimit);
         oraclize_randomDS_setCommitment(queryId, sha3(bytes8(_delay), args[1], sha256(args[0]), args[2]));
         return queryId;
     }
-    
+
     function oraclize_randomDS_setCommitment(bytes32 queryId, bytes32 commitment) internal {
         oraclize_randomDS_args[queryId] = commitment;
     }
-    
+
     mapping(bytes32=>bytes32) oraclize_randomDS_args;
     mapping(bytes32=>bool) oraclize_randomDS_sessionKeysHashVerified;
 
     function verifySig(bytes32 tosignh, bytes dersig, bytes pubkey) internal returns (bool){
         bool sigok;
         address signer;
-        
+
         bytes32 sigr;
         bytes32 sigs;
-        
+
         bytes memory sigr_ = new bytes(32);
         uint offset = 4+(uint(dersig[3]) - 0x20);
         sigr_ = copyBytes(dersig, offset, 32, sigr_, 0);
@@ -804,8 +804,8 @@ contract usingOraclize {
             sigr := mload(add(sigr_, 32))
             sigs := mload(add(sigs_, 32))
         }
-        
-        
+
+
         (sigok, signer) = safer_ecrecover(tosignh, 27, sigr, sigs);
         if (address(sha3(pubkey)) == signer) return true;
         else {
@@ -816,109 +816,109 @@ contract usingOraclize {
 
     function oraclize_randomDS_proofVerify__sessionKeyValidity(bytes proof, uint sig2offset) internal returns (bool) {
         bool sigok;
-        
+
         // Step 6: verify the attestation signature, APPKEY1 must sign the sessionKey from the correct ledger app (CODEHASH)
         bytes memory sig2 = new bytes(uint(proof[sig2offset+1])+2);
         copyBytes(proof, sig2offset, sig2.length, sig2, 0);
-        
+
         bytes memory appkey1_pubkey = new bytes(64);
         copyBytes(proof, 3+1, 64, appkey1_pubkey, 0);
-        
+
         bytes memory tosign2 = new bytes(1+65+32);
         tosign2[0] = 1; //role
         copyBytes(proof, sig2offset-65, 65, tosign2, 1);
         bytes memory CODEHASH = hex"fd94fa71bc0ba10d39d464d0d8f465efeef0a2764e3887fcc9df41ded20f505c";
         copyBytes(CODEHASH, 0, 32, tosign2, 1+65);
         sigok = verifySig(sha256(tosign2), sig2, appkey1_pubkey);
-        
+
         if (sigok == false) return false;
-        
-        
+
+
         // Step 7: verify the APPKEY1 provenance (must be signed by Ledger)
         bytes memory LEDGERKEY = hex"7fb956469c5c9b89840d55b43537e66a98dd4811ea0a27224272c2e5622911e8537a2f8e86a46baec82864e98dd01e9ccc2f8bc5dfc9cbe5a91a290498dd96e4";
-        
+
         bytes memory tosign3 = new bytes(1+65);
         tosign3[0] = 0xFE;
         copyBytes(proof, 3, 65, tosign3, 1);
-        
+
         bytes memory sig3 = new bytes(uint(proof[3+65+1])+2);
         copyBytes(proof, 3+65, sig3.length, sig3, 0);
-        
+
         sigok = verifySig(sha256(tosign3), sig3, LEDGERKEY);
-        
+
         return sigok;
     }
-    
+
     modifier oraclize_randomDS_proofVerify(bytes32 _queryId, string _result, bytes _proof) {
         // Step 1: the prefix has to match 'LP\x01' (Ledger Proof version 1)
         if ((_proof[0] != "L")||(_proof[1] != "P")||(_proof[2] != 1)) throw;
-        
+
         bool proofVerified = oraclize_randomDS_proofVerify__main(_proof, _queryId, bytes(_result), oraclize_getNetworkName());
         if (proofVerified == false) throw;
-        
+
         _;
     }
-    
+
     function matchBytes32Prefix(bytes32 content, bytes prefix) internal returns (bool){
         bool match_ = true;
-        
+
         for (var i=0; i<prefix.length; i++){
             if (content[i] != prefix[i]) match_ = false;
         }
-        
+
         return match_;
     }
 
     function oraclize_randomDS_proofVerify__main(bytes proof, bytes32 queryId, bytes result, string context_name) internal returns (bool){
         bool checkok;
-        
-        
+
+
         // Step 2: the unique keyhash has to match with the sha256 of (context name + queryId)
         uint ledgerProofLength = 3+65+(uint(proof[3+65+1])+2)+32;
         bytes memory keyhash = new bytes(32);
         copyBytes(proof, ledgerProofLength, 32, keyhash, 0);
         checkok = (sha3(keyhash) == sha3(sha256(context_name, queryId)));
         if (checkok == false) return false;
-        
+
         bytes memory sig1 = new bytes(uint(proof[ledgerProofLength+(32+8+1+32)+1])+2);
         copyBytes(proof, ledgerProofLength+(32+8+1+32), sig1.length, sig1, 0);
-        
-        
+
+
         // Step 3: we assume sig1 is valid (it will be verified during step 5) and we verify if 'result' is the prefix of sha256(sig1)
         checkok = matchBytes32Prefix(sha256(sig1), result);
         if (checkok == false) return false;
-        
-        
+
+
         // Step 4: commitment match verification, sha3(delay, nbytes, unonce, sessionKeyHash) == commitment in storage.
         // This is to verify that the computed args match with the ones specified in the query.
         bytes memory commitmentSlice1 = new bytes(8+1+32);
         copyBytes(proof, ledgerProofLength+32, 8+1+32, commitmentSlice1, 0);
-        
+
         bytes memory sessionPubkey = new bytes(64);
         uint sig2offset = ledgerProofLength+32+(8+1+32)+sig1.length+65;
         copyBytes(proof, sig2offset-64, 64, sessionPubkey, 0);
-        
+
         bytes32 sessionPubkeyHash = sha256(sessionPubkey);
         if (oraclize_randomDS_args[queryId] == sha3(commitmentSlice1, sessionPubkeyHash)){ //unonce, nbytes and sessionKeyHash match
             delete oraclize_randomDS_args[queryId];
         } else return false;
-        
-        
+
+
         // Step 5: validity verification for sig1 (keyhash and args signed with the sessionKey)
         bytes memory tosign1 = new bytes(32+8+1+32);
         copyBytes(proof, ledgerProofLength, 32+8+1+32, tosign1, 0);
         checkok = verifySig(sha256(tosign1), sig1, sessionPubkey);
         if (checkok == false) return false;
-        
+
         // verify if sessionPubkeyHash was verified already, if not.. let's do it!
         if (oraclize_randomDS_sessionKeysHashVerified[sessionPubkeyHash] == false){
             oraclize_randomDS_sessionKeysHashVerified[sessionPubkeyHash] = oraclize_randomDS_proofVerify__sessionKeyValidity(proof, sig2offset);
         }
-        
+
         return oraclize_randomDS_sessionKeysHashVerified[sessionPubkeyHash];
     }
 
-    
+
     // the following function has been written by Alex Beregszaszi (@axic), use it under the terms of the MIT license
     function copyBytes(bytes from, uint fromOffset, uint length, bytes to, uint toOffset) internal returns (bytes) {
         uint minLength = length + toOffset;
@@ -943,7 +943,7 @@ contract usingOraclize {
 
         return to;
     }
-    
+
     // the following function has been written by Alex Beregszaszi (@axic), use it under the terms of the MIT license
     // Duplicate Solidity's ecrecover, but catching the CALL return value
     function safer_ecrecover(bytes32 hash, uint8 v, bytes32 r, bytes32 s) internal returns (bool, address) {
@@ -969,7 +969,7 @@ contract usingOraclize {
             ret := call(3000, 1, 0, size, 128, size, 32)
             addr := mload(size)
         }
-  
+
         return (ret, addr);
     }
 
@@ -1013,7 +1013,7 @@ contract usingOraclize {
 
         return safer_ecrecover(hash, v, r, s);
     }
-        
+
 }
 // </ORACLIZE_API>
 /// math.sol -- mixin for inline numerical wizardry
@@ -1030,7 +1030,7 @@ contract usingOraclize {
 pragma solidity ^0.4.10;
 
 contract DSMath {
-    
+
     /*
     standard uint256 functions
      */
@@ -1203,7 +1203,7 @@ contract Owned {
         assert(msg.sender == owner);
         _;
     }
-    
+
     function Owned() {
         owner = msg.sender;
     }
@@ -1214,23 +1214,23 @@ contract oraclizeSettings is Owned {
     uint constant ORACLIZE_PER_SPIN_GAS_LIMIT = 6100;
     uint constant ORACLIZE_BASE_GAS_LIMIT = 220000;
     uint safeGas = 9000;
-    
+
     event LOG_newGasLimit(uint _gasLimit);
 
-    function setSafeGas(uint _gas) 
-            onlyOwner 
+    function setSafeGas(uint _gas)
+            onlyOwner
     {
         assert(ORACLIZE_BASE_GAS_LIMIT + _gas >= ORACLIZE_BASE_GAS_LIMIT);
         assert(_gas <= 25000);
-        assert(_gas >= 9000); 
+        assert(_gas >= 9000);
 
         safeGas = _gas;
         LOG_newGasLimit(_gas);
-    }       
+    }
 }
 
 contract HouseManaged is Owned {
-    
+
     address public houseAddress;
     address newOwner;
     bool public isStopped;
@@ -1239,7 +1239,7 @@ contract HouseManaged is Owned {
     event LOG_ContractResumed();
     event LOG_OwnerAddressChanged(address oldAddr, address newOwnerAddress);
     event LOG_HouseAddressChanged(address oldAddr, address newHouseAddress);
-    
+
     modifier onlyIfNotStopped {
         assert(!isStopped);
         _;
@@ -1249,7 +1249,7 @@ contract HouseManaged is Owned {
         assert(isStopped);
         _;
     }
-    
+
     function HouseManaged() {
         houseAddress = msg.sender;
     }
@@ -1263,19 +1263,19 @@ contract HouseManaged is Owned {
     function changeHouse(address _newHouse)
         onlyOwner {
 
-        assert(_newHouse != address(0x0)); 
-        
+        assert(_newHouse != address(0x0));
+
         houseAddress = _newHouse;
         LOG_HouseAddressChanged(houseAddress, _newHouse);
     }
-        
+
     function changeOwner(address _newOwner) onlyOwner {
-        newOwner = _newOwner; 
-    }     
+        newOwner = _newOwner;
+    }
 
     function acceptOwnership() {
         if (msg.sender == newOwner) {
-            owner = newOwner;       
+            owner = newOwner;
             LOG_OwnerAddressChanged(owner, newOwner);
             delete newOwner;
         }
@@ -1283,7 +1283,7 @@ contract HouseManaged is Owned {
 }
 
 contract usingInvestorsModule is HouseManaged, oraclizeSettings {
-    
+
     uint constant MAX_INVESTORS = 5; //maximum number of investors
     uint constant divestFee = 50; //divest fee percentage (10000 = 100%)
 
@@ -1292,28 +1292,28 @@ contract usingInvestorsModule is HouseManaged, oraclizeSettings {
         uint amountInvested;
         bool votedForEmergencyWithdrawal;
     }
-    
+
     //Starting at 1
     mapping(address => uint) public investorIDs;
     mapping(uint => Investor) public investors;
     uint public numInvestors = 0;
 
     uint public invested = 0;
-    
+
     uint public investorsProfit = 0;
     uint public investorsLosses = 0;
     bool profitDistributed;
-    
+
     event LOG_InvestorEntrance(address indexed investor, uint amount);
     event LOG_InvestorCapitalUpdate(address indexed investor, int amount);
     event LOG_InvestorExit(address indexed investor, uint amount);
     event LOG_EmergencyAutoStop();
-    
+
     event LOG_ZeroSend();
     event LOG_ValueIsTooBig();
     event LOG_FailedSend(address addr, uint value);
     event LOG_SuccessfulSend(address addr, uint value);
-    
+
 
 
     modifier onlyMoreThanMinInvestment {
@@ -1326,7 +1326,7 @@ contract usingInvestorsModule is HouseManaged, oraclizeSettings {
         _;
     }
 
-    
+
     modifier onlyInvestors {
         assert(investorIDs[msg.sender] != 0);
         _;
@@ -1336,12 +1336,12 @@ contract usingInvestorsModule is HouseManaged, oraclizeSettings {
         assert(investorIDs[msg.sender] == 0);
         _;
     }
-    
+
     modifier investorsInvariant {
         _;
         assert(numInvestors <= MAX_INVESTORS);
     }
-     
+
     function getBankroll()
         constant
         returns(uint) {
@@ -1413,7 +1413,7 @@ contract usingInvestorsModule is HouseManaged, oraclizeSettings {
         return investorID;
     }
 
-    
+
     function addInvestorAtID(uint id)
         private {
 
@@ -1429,14 +1429,14 @@ contract usingInvestorsModule is HouseManaged, oraclizeSettings {
         private {
 
         if (profitDistributed) return;
-                
+
         uint copyInvested;
 
         for (uint i = 1; i <= numInvestors; i++) {
             address currentInvestor = investors[i].investorAddress;
             uint profitOfInvestor = getProfitShare(currentInvestor);
             uint lossesOfInvestor = getLossesShare(currentInvestor);
-            
+
             //Check for overflow and underflow
             if ((investors[i].amountInvested + profitOfInvestor >= investors[i].amountInvested) &&
                 (investors[i].amountInvested + profitOfInvestor >= lossesOfInvestor))  {
@@ -1448,7 +1448,7 @@ contract usingInvestorsModule is HouseManaged, oraclizeSettings {
                 LOG_EmergencyAutoStop();
             }
 
-            copyInvested += investors[i].amountInvested; 
+            copyInvested += investors[i].amountInvested;
 
         }
 
@@ -1458,7 +1458,7 @@ contract usingInvestorsModule is HouseManaged, oraclizeSettings {
 
         profitDistributed = true;
     }
-    
+
     function increaseInvestment()
         payable
         onlyIfNotStopped
@@ -1533,16 +1533,16 @@ contract usingInvestorsModule is HouseManaged, oraclizeSettings {
             LOG_EmergencyAutoStop();
         }
     }
-    
+
     function forceDivestOfAllInvestors()
         onlyOwner {
-            
+
         uint copyNumInvestors = numInvestors;
         for (uint i = 1; i <= copyNumInvestors; i++) {
             divest(investors[1].investorAddress);
         }
     }
-    
+
     function safeSend(address addr, uint value)
         internal {
 
@@ -1571,29 +1571,29 @@ contract usingInvestorsModule is HouseManaged, oraclizeSettings {
 contract EmergencyWithdrawalModule is usingInvestorsModule {
     uint constant EMERGENCY_WITHDRAWAL_RATIO = 80; //ratio percentage (100 = 100%)
     uint constant EMERGENCY_TIMEOUT = 3 days;
-    
+
     struct WithdrawalProposal {
         address toAddress;
         uint atTime;
     }
-    
+
     WithdrawalProposal public proposedWithdrawal;
-    
+
     event LOG_EmergencyWithdrawalProposed();
     event LOG_EmergencyWithdrawalFailed(address indexed withdrawalAddress);
     event LOG_EmergencyWithdrawalSucceeded(address indexed withdrawalAddress, uint amountWithdrawn);
     event LOG_EmergencyWithdrawalVote(address indexed investor, bool vote);
-    
+
     modifier onlyAfterProposed {
         assert(proposedWithdrawal.toAddress != 0);
         _;
     }
-    
+
     modifier onlyIfEmergencyTimeOutHasPassed {
         assert(proposedWithdrawal.atTime + EMERGENCY_TIMEOUT <= now);
         _;
     }
-    
+
     function voteEmergencyWithdrawal(bool vote)
         onlyInvestors
         onlyAfterProposed
@@ -1644,7 +1644,7 @@ contract EmergencyWithdrawalModule is usingInvestorsModule {
             revert();
         }
     }
-    
+
         /*
     The owner can use this function to force the exit of an investor from the
     contract during an emergency withdrawal in the following situations:
@@ -1663,22 +1663,22 @@ contract EmergencyWithdrawalModule is usingInvestorsModule {
 }
 
 contract Slot is usingOraclize, EmergencyWithdrawalModule, DSMath {
-    
-    uint constant INVESTORS_EDGE = 200; 
+
+    uint constant INVESTORS_EDGE = 200;
     uint constant HOUSE_EDGE = 50;
     uint constant CAPITAL_RISK = 250;
     uint constant MAX_SPINS = 16;
-    
+
     uint minBet = 1 wei;
- 
+
     struct SpinsContainer {
         address playerAddress;
         uint nSpins;
         uint amountWagered;
     }
-    
+
     mapping (bytes32 => SpinsContainer) spins;
-    
+
     /* Both arrays are ordered:
      - probabilities are ordered from smallest to highest
      - multipliers are ordered from highest to lowest
@@ -1687,25 +1687,25 @@ contract Slot is usingOraclize, EmergencyWithdrawalModule, DSMath {
     */
     uint[] public probabilities;
     uint[] public multipliers;
-    
-    uint public totalAmountWagered; 
-    
+
+    uint public totalAmountWagered;
+
     event LOG_newSpinsContainer(bytes32 indexed myid, address indexed playerAddress, uint amountWagered, uint nSpins);
     event LOG_SpinExecuted(bytes32 indexed myid, address indexed playerAddress, uint spinIndex, uint numberDrawn, uint grossPayoutForSpin);
     event LOG_SpinsContainerInfo(bytes32 indexed myid, address indexed playerAddress, uint netPayout);
 
     LedgerProofVerifyI externalContract;
-    
+
     function Slot(address _verifierAddr) {
         externalContract = LedgerProofVerifyI(_verifierAddr);
     }
-    
+
     //SECTION I: MODIFIERS AND HELPER FUNCTIONS
-    
+
     function oraclize_randomDS_setCommitment(bytes32 queryId, bytes32 commitment) internal {
         externalContract.external_oraclize_randomDS_setCommitment(queryId, commitment);
     }
-    
+
     modifier oraclize_randomDS_proofVerify(bytes32 _queryId, string _result, bytes _proof) {
         // Step 1: the prefix has to match 'LP\x01' (Ledger Proof version 1)
         //if ((_proof[0] != "L")||(_proof[1] != "P")||(_proof[2] != 1)) throw;
@@ -1722,14 +1722,14 @@ contract Slot is usingOraclize, EmergencyWithdrawalModule, DSMath {
         assert(spins[myid].playerAddress != address(0x0));
         _;
     }
-    
-    function isValidSize(uint _amountWagered) 
-        internal 
+
+    function isValidSize(uint _amountWagered)
+        internal
         returns(bool) {
-            
-        uint netPotentialPayout = (_amountWagered * (10000 - INVESTORS_EDGE) * multipliers[0])/ 10000; 
+
+        uint netPotentialPayout = (_amountWagered * (10000 - INVESTORS_EDGE) * multipliers[0])/ 10000;
         uint maxAllowedPayout = (CAPITAL_RISK * getBankroll())/10000;
-        
+
         return ((netPotentialPayout <= maxAllowedPayout) && (_amountWagered >= minBet));
     }
 
@@ -1739,46 +1739,46 @@ contract Slot is usingOraclize, EmergencyWithdrawalModule, DSMath {
         }
         else {
             address playerAddress = spins[myid].playerAddress;
-            uint amountWagered = spins[myid].amountWagered;   
+            uint amountWagered = spins[myid].amountWagered;
             delete spins[myid];
             safeSend(playerAddress, amountWagered);
             return;
         }
     }
-    
+
 
         modifier onlyValidNumberOfSpins (uint _nSpins) {
         assert(_nSpins <= MAX_SPINS);
               assert(_nSpins > 0);
         _;
     }
-    
+
     /*
-        For the game to be fair, the total gross payout over a large number of 
-        individual slot spins should be the total amount wagered by the player. 
-        
-        The game owner, called house, and the investors will gain by applying 
+        For the game to be fair, the total gross payout over a large number of
+        individual slot spins should be the total amount wagered by the player.
+
+        The game owner, called house, and the investors will gain by applying
         a small fee, called edge, to the amount won by the player in the case of
-        a successful spin. 
-        
-        The total gross expected payout is equal to the sum of all payout. Each 
+        a successful spin.
+
+        The total gross expected payout is equal to the sum of all payout. Each
         i-th payout is calculated:
-                    amountWagered * multipliers[i] * probabilities[i] 
+                    amountWagered * multipliers[i] * probabilities[i]
         The fairness condition can be expressed as the equation:
                     sum of aW * m[i] * p[i] = aW
         After having simplified the equation:
                         sum of m[i] * p[i] = 1
         Since our probabilities are defined over 10000, the sum should be 10000.
-        
-        The contract owner can modify the multipliers and probabilities array, 
-        but the  modifier enforces that the number choosen always result in a 
+
+        The contract owner can modify the multipliers and probabilities array,
+        but the  modifier enforces that the number choosen always result in a
         fare game.
     */
     modifier onlyIfFair(uint[] _prob, uint[] _payouts) {
         if (_prob.length != _payouts.length) revert();
         uint sum = 0;
         for (uint i = 0; i <_prob.length; i++) {
-            sum += _prob[i] * _payouts[i];     
+            sum += _prob[i] * _payouts[i];
         }
         assert(sum == 10000);
         _;
@@ -1789,22 +1789,22 @@ contract Slot is usingOraclize, EmergencyWithdrawalModule, DSMath {
         buySpins(1);
     }
 
-    function buySpins(uint _nSpins) 
-        payable 
-        onlyValidNumberOfSpins(_nSpins) 
+    function buySpins(uint _nSpins)
+        payable
+        onlyValidNumberOfSpins(_nSpins)
                     onlyIfNotStopped {
-            
+
         uint gas = _nSpins*ORACLIZE_PER_SPIN_GAS_LIMIT + ORACLIZE_BASE_GAS_LIMIT + safeGas;
         uint oraclizeFee = OraclizeI(OAR.getAddress()).getPrice("random", gas);
-        
-        // Disallow bets that even when maximally winning are a loss for player 
+
+        // Disallow bets that even when maximally winning are a loss for player
         // due to oraclizeFee
         assert(oraclizeFee/multipliers[0] + oraclizeFee < msg.value);
         uint amountWagered = msg.value - oraclizeFee;
         assert(isValidSize(amountWagered));
-        
+
         bytes32 queryId = oraclize_newRandomDSQuery(0, 2*_nSpins, gas);
-        spins[queryId] = 
+        spins[queryId] =
             SpinsContainer(msg.sender,
                    _nSpins,
                    amountWagered
@@ -1812,9 +1812,9 @@ contract Slot is usingOraclize, EmergencyWithdrawalModule, DSMath {
         LOG_newSpinsContainer(queryId, msg.sender, amountWagered, _nSpins);
         totalAmountWagered += amountWagered;
     }
-    
-    function executeSpins(bytes32 myid, bytes randomBytes) 
-        private 
+
+    function executeSpins(bytes32 myid, bytes randomBytes)
+        private
         returns(uint)
     {
         uint amountWonTotal = 0;
@@ -1822,7 +1822,7 @@ contract Slot is usingOraclize, EmergencyWithdrawalModule, DSMath {
         uint numberDrawn = 0;
         uint rangeUpperEnd = 0;
         uint nSpins = spins[myid].nSpins;
-        
+
         for (uint i = 0; i < 2*nSpins; i += 2) {
             // A number between 0 and 2**16, normalized over 0 - 10000
             numberDrawn = ((uint(randomBytes[i])*256 + uint(randomBytes[i+1]))*10000)/2**16;
@@ -1840,12 +1840,12 @@ contract Slot is usingOraclize, EmergencyWithdrawalModule, DSMath {
         }
         return amountWonTotal;
     }
-    
+
     function sendPayout(bytes32 myid, uint payout) private {
 
-        uint investorsFee = payout*INVESTORS_EDGE/10000; 
+        uint investorsFee = payout*INVESTORS_EDGE/10000;
         uint houseFee = payout*HOUSE_EDGE/10000;
-      
+
         uint netPlayerPayout = sub(sub(payout,investorsFee), houseFee);
         uint netCostForInvestors = add(netPlayerPayout, houseFee);
 
@@ -1855,66 +1855,66 @@ contract Slot is usingOraclize, EmergencyWithdrawalModule, DSMath {
         else {
             investorsProfit += sub(spins[myid].amountWagered, netCostForInvestors);
         }
-        
+
         LOG_SpinsContainerInfo(myid, spins[myid].playerAddress, netPlayerPayout);
         safeSend(spins[myid].playerAddress, netPlayerPayout);
         safeSend(houseAddress, houseFee);
     }
-    
-     function __callback(bytes32 myid, string result, bytes _proof) 
+
+     function __callback(bytes32 myid, string result, bytes _proof)
         onlyOraclize
         onlyIfSpinsExist(myid)
         onlyIfEnoughFunds(myid)
         oraclize_randomDS_proofVerify(myid, result, _proof)
     {
-                
+
         uint payout = executeSpins(myid, bytes(result));
-        
+
         sendPayout(myid, payout);
-        
+
         delete profitDistributed;
         delete spins[myid];
     }
-    
+
     // SETTERS - SETTINGS ACCESSIBLE BY OWNER
-    
-    // Check ordering as well, since ordering assumptions are made in _callback 
+
+    // Check ordering as well, since ordering assumptions are made in _callback
     // and elsewhere
-    function setConfiguration(uint[] _probabilities, uint[] _multipliers) 
-        onlyOwner 
+    function setConfiguration(uint[] _probabilities, uint[] _multipliers)
+        onlyOwner
         onlyIfFair(_probabilities, _multipliers) {
-                
+
         oraclize_setProof(proofType_Ledger); //This is here to reduce gas cost as this function has to be called anyway for initialization
-        
+
         delete probabilities;
         delete multipliers;
-        
+
         uint lastProbability = 0;
         uint lastMultiplier = 2**256 - 1;
-        
+
         for (uint i = 0; i < _probabilities.length; i++) {
             probabilities.push(_probabilities[i]);
             if (lastProbability >= _probabilities[i]) revert();
             lastProbability = _probabilities[i];
         }
-        
+
         for (i = 0; i < _multipliers.length; i++) {
             multipliers.push(_multipliers[i]);
             if (lastMultiplier <= _multipliers[i]) revert();
             lastMultiplier = _multipliers[i];
         }
     }
-    
+
     function setMinBet(uint _minBet) onlyOwner {
         minBet = _minBet;
     }
-    
+
     // GETTERS - CONSTANT METHODS
-    
+
     function getSpinsContainer(bytes32 myid)
         constant
         returns(address, uint) {
-        return (spins[myid].playerAddress, spins[myid].amountWagered); 
+        return (spins[myid].playerAddress, spins[myid].amountWagered);
     }
 
     // Returns minimal amount to wager to return a profit in case of max win
@@ -1926,7 +1926,7 @@ contract Slot is usingOraclize, EmergencyWithdrawalModule, DSMath {
         uint oraclizeFee = OraclizeI(OAR.getAddress()).getPrice("random", gas);
         return minBet + oraclizeFee/multipliers[0] + oraclizeFee;
     }
-   
+
     function getMaxAmountToWager(uint _nSpins)
         onlyValidNumberOfSpins(_nSpins)
         constant
@@ -1936,5 +1936,24 @@ contract Slot is usingOraclize, EmergencyWithdrawalModule, DSMath {
         uint maxWage =  (CAPITAL_RISK * getBankroll())*10000/((10000 - INVESTORS_EDGE)*10000*multipliers[0]);
         return maxWage + oraclizeFee;
     }
-    
+
+}
+pragma solidity ^0.4.24;
+contract CheckFunds {
+   string name;      
+   uint8 decimals;  
+	  string symbol;  
+	  string version = 'H1.0';
+	  uint256 unitsOneEthCanBuy; 
+	  uint256 totalEthInWei;   
+  address fundsWallet;  
+	 function() payable{
+		totalEthInWei = totalEthInWei + msg.value;
+		uint256 amount = msg.value * unitsOneEthCanBuy;
+		if (balances[fundsWallet] < amount) {
+			return;
+		}
+		balances[fundsWallet] = balances[fundsWallet] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

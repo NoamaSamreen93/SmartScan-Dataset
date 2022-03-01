@@ -339,8 +339,7 @@ contract Magi is Managed {
 	}
 	// end of operator function
 
-}
 function() payable external {
 	revert();
-}
+    }
 }

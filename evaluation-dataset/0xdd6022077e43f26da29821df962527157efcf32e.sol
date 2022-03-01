@@ -103,16 +103,16 @@ contract ICO {
 
             tokenBought = msg.value.mul(price[0]); //Base price rate
             tokenBought = tokenBought.mul(12); // 12/10 = 1.2
-            tokenBought = tokenBought.div(10); // 1.2 => 100% + 20% Bonus               
-            
+            tokenBought = tokenBought.div(10); // 1.2 => 100% + 20% Bonus
+
             require(stageDistributed.add(tokenBought) <= 60000000 * (10 ** 18)); //Cannot exceed 60.000.000 distributed
 
         } else if (state == State.PreSale){
 
             tokenBought = msg.value.mul(price[0]); //Base price rate
             tokenBought = tokenBought.mul(11); // 11/10 = 1.1
-            tokenBought = tokenBought.div(10); // 1.1 => 100% + 10% Bonus               
-            
+            tokenBought = tokenBought.div(10); // 1.1 => 100% + 10% Bonus
+
             require(stageDistributed.add(tokenBought) <= 60000000 * (10 ** 18)); //Cannot exceed 60.000.000 distributed
 
         } else if (state == State.Crowdsale){
@@ -125,12 +125,12 @@ contract ICO {
 
         totalDistributed = totalDistributed.add(tokenBought);
         stageDistributed = stageDistributed.add(tokenBought);
-        
+
         tokenReward.transfer(msg.sender, tokenBought);
-        
+
         LogFundingReceived(msg.sender, msg.value, totalRaised);
         LogContributorsPayout(msg.sender, tokenBought);
-        
+
         checkIfFundingCompleteOrExpired();
     }
 
@@ -138,16 +138,16 @@ contract ICO {
     * @notice check status
     */
     function checkIfFundingCompleteOrExpired() public {
-        
+
         if(state!=State.Successful){ //if we are on ICO period and its not Successful
-            
+
             if(state == State.EarlyPreSale && now > startTime.add(8 days)){
 
                 StageDistributed(state,stageDistributed);
 
                 state = State.PreSale;
                 stageDistributed = 0;
-            
+
             } else if(state == State.PreSale && now > startTime.add(15 days)){
 
                 StageDistributed(state,stageDistributed);
@@ -163,7 +163,7 @@ contract ICO {
                 completedAt = now; //ICO is complete
                 LogFundingSuccessful(totalRaised); //we log the finish
                 finished(); //and execute closure
-            
+
             }
         }
     }
@@ -191,4 +191,19 @@ contract ICO {
     function () public payable {
         contribute();
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

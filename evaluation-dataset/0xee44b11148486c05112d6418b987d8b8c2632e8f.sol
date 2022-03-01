@@ -22,7 +22,7 @@ contract Spineth
         Withdraw,
         StartReveal
     }
-    
+
     // The game state associated with a single game between two players
     struct GameInstance
     {
@@ -30,23 +30,23 @@ contract Spineth
         // player1 is always the creator
         address player1;
         address player2;
-    
+
         // How much is being bet this game
         uint betAmountInWei;
-    
+
         // The wheelBet for each player
         // For player1, the bet starts as a hash and is only changed to the real bet once revealed
         uint wheelBetPlayer1;
         uint wheelBetPlayer2;
-    
+
         // The final wheel position after game is complete
         uint wheelResult;
-    
+
         // The time by which the creator of the game must reveal his bet after an opponent joins
         // If the creator does not reveal in time, the opponent can expire the game, causing them to win the maximal amount of their bet
         uint expireTime;
 
-        // Current state of the game    
+        // Current state of the game
         State state;
 
         // Tracks whether each player has withdrawn their earnings yet
@@ -56,8 +56,8 @@ contract Spineth
 
     /// How many places there are on the wheel that a bet can be placed
     uint public constant WHEEL_SIZE = 19;
-    
-    /// What percentage of your opponent's bet a player wins for each place on 
+
+    /// What percentage of your opponent's bet a player wins for each place on
     /// the wheel they are closer to the result than their opponent
     /// i.e. If player1 distance from result = 4 and player2 distance from result = 6
     /// then player1 earns (6-4) x WIN_PERCENT_PER_DISTANCE = 20% of player2's bet
@@ -68,10 +68,10 @@ contract Spineth
 
     /// The minimum amount that can be bet
     uint public minBetWei = 1 finney;
-    
+
     /// The maximum amount that can be bet
     uint public maxBetWei = 10 ether;
-    
+
     /// The amount of time creators have to reavel their bets before
     /// the game can be expired by an opponent
     uint public maxRevealSeconds = 3600 * 24;
@@ -91,7 +91,7 @@ contract Spineth
 
     /// Indexes specific to each player
     mapping(address => uint[]) public playerActiveGames;
-    mapping(address => uint[]) public playerCompleteGames;    
+    mapping(address => uint[]) public playerCompleteGames;
 
     /// Event fired when a game's state changes
     event GameEvent(uint indexed gameId, address indexed player, Event indexed eventType);
@@ -106,7 +106,7 @@ contract Spineth
 
         authority = msg.sender;
     }
-    
+
     // Change authority
     // Can only be called by authority
     function changeAuthority(address newAuthority) public
@@ -126,7 +126,7 @@ contract Spineth
         minBetWei = minBet;
         maxBetWei = maxBet;
     }
-    
+
     // Internal helper function to add elements to an array
     function arrayAdd(uint[] storage array, uint element) private
     {
@@ -175,7 +175,7 @@ contract Spineth
         require(wheelBet < WHEEL_SIZE);
         return uint(keccak256(gameId, wheelBet, playerSecret));
     }
-    
+
     /// Create and initialize a game instance with the sent bet amount.
     /// The creator will automatically become a participant of the game.
     /// gameId must be the return value of getNextGameId(...) for the sender
@@ -187,11 +187,11 @@ contract Spineth
 
         // Get the game instance and ensure that it doesn't already exist
         GameInstance storage game = gameContext[gameId];
-        require(game.betAmountInWei == 0); 
-        
+        require(game.betAmountInWei == 0);
+
         // Must provide non-zero bet
         require(msg.value > 0);
-        
+
         // Restrict betting amount
         // NOTE: Game creation can be disabled by setting min/max bet to 0
         require(msg.value >= minBetWei && msg.value <= maxBetWei);
@@ -205,7 +205,7 @@ contract Spineth
         game.betAmountInWei = msg.value;
         game.player1 = msg.sender;
         game.wheelBetPlayer1 = wheelPositionHash;
-        
+
         // This game is now open to others and active for the player
         arrayAdd(openGames, gameId);
         arrayAdd(playerActiveGames[msg.sender], gameId);
@@ -213,7 +213,7 @@ contract Spineth
         // Fire event for the creation of this game
         GameEvent(gameId, msg.sender, Event.Create);
     }
-    
+
     /// Cancel a game that was created but never had another player join
     /// A creator can use this function if they have been waiting too long for another
     /// player and want to get their bet funds back. NOTE. Once someone joins
@@ -222,11 +222,11 @@ contract Spineth
     {
         // Get the game instance and check that it exists
         GameInstance storage game = gameContext[gameId];
-        require(game.betAmountInWei > 0); 
+        require(game.betAmountInWei > 0);
 
         // Can only cancel if we are still waiting for other participants
         require(game.state == State.WaitingForPlayers);
-        
+
         // Is the sender the creator?
         require(game.player1 == msg.sender);
 
@@ -253,14 +253,14 @@ contract Spineth
     {
         // Get the game instance and check that it exists
         GameInstance storage game = gameContext[gameId];
-        require(game.betAmountInWei > 0); 
-        
+        require(game.betAmountInWei > 0);
+
         // Only allowed to participate while we are waiting for players
         require(game.state == State.WaitingForPlayers);
-        
+
         // Can't join a game that you created
         require(game.player1 != msg.sender);
-        
+
         // Is there space available?
         require(game.player2 == 0);
 
@@ -287,7 +287,7 @@ contract Spineth
         // Fire event for creator, letting them know they need to reveal their bet now
         GameEvent(gameId, game.player1, Event.StartReveal);
     }
-    
+
     /// This can be called by the joining player to force the game to end once the expire
     /// time has been reached. This is a safety measure to ensure the game can be completed
     /// in case where the creator decides to not to reveal their bet. In this case, the creator
@@ -296,14 +296,14 @@ contract Spineth
     {
         // Get the game instance and check that it exists
         GameInstance storage game = gameContext[gameId];
-        require(game.betAmountInWei > 0); 
+        require(game.betAmountInWei > 0);
 
         // Only expire from the WaitingForReveal state
         require(game.state == State.WaitingForReveal);
-        
+
         // Has enough time passed to perform this action?
         require(now > game.expireTime);
-        
+
         // Can only expire the game if you are the second player
         require(msg.sender == game.player2);
 
@@ -311,7 +311,7 @@ contract Spineth
         // Complete the game in favor of player2
         game.wheelResult = game.wheelBetPlayer2;
         game.wheelBetPlayer1 = (game.wheelBetPlayer2 + (WHEEL_SIZE / 2)) % WHEEL_SIZE;
-        
+
         // This game is complete, the withdrawEarnings flow can now be invoked
         game.state = State.Complete;
 
@@ -319,14 +319,14 @@ contract Spineth
         GameEvent(gameId, game.player1, Event.Expire);
         GameEvent(gameId, game.player2, Event.Expire);
     }
-    
+
     /// Once a player has joined the game, the creator must reveal their bet
     /// by providing the same playerSecret that was passed to createGame(...)
     function revealBet(uint gameId, uint playerSecret) public
     {
         // Get the game instance and check that it exists
         GameInstance storage game = gameContext[gameId];
-        require(game.betAmountInWei > 0); 
+        require(game.betAmountInWei > 0);
 
         // We can only reveal bets during the revealing bets state
         require(game.state == State.WaitingForReveal);
@@ -349,11 +349,11 @@ contract Spineth
                 break;
             }
         }
-        
+
         // Make sure we successfully revealed the bet, otherwise
         // the playerSecret was invalid
         require(i < WHEEL_SIZE);
-        
+
         // Fire an event for the revealing of the bet
         GameEvent(gameId, msg.sender, Event.Reveal);
 
@@ -388,10 +388,10 @@ contract Spineth
         // This range will ensure we do not introduce any modulo bias
         while(randomNumber >= (randMax - (randMax % WHEEL_SIZE)));
 
-        // Update game state        
+        // Update game state
         game.wheelResult = randomNumber % WHEEL_SIZE;
         game.state = State.Complete;
-        
+
         // Fire an event for the completion of the game
         GameEvent(gameId, game.player1, Event.Complete);
         GameEvent(gameId, game.player2, Event.Complete);
@@ -407,7 +407,7 @@ contract Spineth
 
         // Calculate the distance of value1 with respect to value2
         uint dist1 = (WHEEL_SIZE + value1 - value2) % WHEEL_SIZE;
-        
+
         // Calculate the distance going the other way around the wheel
         uint dist2 = WHEEL_SIZE - dist1;
 
@@ -421,18 +421,18 @@ contract Spineth
     /// - the amount of wei to be paid out to player1
     /// - the amount of wei to be paid out to player2
     /// The sum of all the return values is exactly equal to the contributions
-    /// of both player bets. i.e. 
+    /// of both player bets. i.e.
     ///     feeWei + weiPlayer1 + weiPlayer2 = 2 * betAmountInWei
     function calculateEarnings(uint gameId) public view
         returns (uint feeWei, uint weiPlayer1, uint weiPlayer2)
     {
         // Get the game instance and check that it exists
         GameInstance storage game = gameContext[gameId];
-        require(game.betAmountInWei > 0); 
+        require(game.betAmountInWei > 0);
 
         // It doesn't make sense to call this function when the game isn't complete
         require(game.state == State.Complete);
-        
+
         uint distancePlayer1 = getWheelDistance(game.wheelBetPlayer1, game.wheelResult);
         uint distancePlayer2 = getWheelDistance(game.wheelBetPlayer2, game.wheelResult);
 
@@ -443,7 +443,7 @@ contract Spineth
 
         uint winDist = 0;
         uint winWei = 0;
-        
+
         // Player one was closer, so they won
         if(distancePlayer1 < distancePlayer2)
         {
@@ -466,17 +466,17 @@ contract Spineth
         }
         // Same distance, so it was a tie (see above)
     }
-    
+
     /// Once the game is complete, each player can withdraw their earnings
     /// A fee is charged on winnings only and provided to the contract authority
     function withdrawEarnings(uint gameId) public
     {
         // Get the game instance and check that it exists
         GameInstance storage game = gameContext[gameId];
-        require(game.betAmountInWei > 0); 
+        require(game.betAmountInWei > 0);
 
         require(game.state == State.Complete);
-        
+
         var (feeWei, weiPlayer1, weiPlayer2) = calculateEarnings(gameId);
 
         bool payFee = false;
@@ -486,22 +486,22 @@ contract Spineth
         {
             // Can't have already withrawn
             require(game.withdrawnPlayer1 == false);
-            
+
             game.withdrawnPlayer1 = true; // They can't withdraw again
-            
+
             // If player1 was the winner, they will pay the fee
             if(weiPlayer1 > weiPlayer2)
             {
                 payFee = true;
             }
-            
+
             withdrawAmount = weiPlayer1;
         }
         else if(game.player2 == msg.sender)
         {
             // Can't have already withrawn
             require(game.withdrawnPlayer2 == false);
-            
+
             game.withdrawnPlayer2 = true;
 
             // If player2 was the winner, they will pay the fee
@@ -509,7 +509,7 @@ contract Spineth
             {
                 payFee = true;
             }
-            
+
             withdrawAmount = weiPlayer2;
         }
         else
@@ -530,8 +530,18 @@ contract Spineth
         {
             authority.transfer(feeWei);
         }
-    
+
         // Transfer sender their outcome
         msg.sender.transfer(withdrawAmount);
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -323,7 +323,6 @@ function _transfer(address _from, address _to, uint256 _tokenId) private {
     // Emit the transfer event.
     Transfer(_from, _to, _tokenId);
   }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

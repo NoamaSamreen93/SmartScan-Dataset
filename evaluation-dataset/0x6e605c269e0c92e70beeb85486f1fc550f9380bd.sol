@@ -234,7 +234,6 @@ contract CatexToken is PausableToken, BurnableToken {
     totalSupply_ = 10000000000 * 10 ** 18;
     balances[msg.sender] = totalSupply_;
   }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

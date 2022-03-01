@@ -4,11 +4,11 @@ pragma solidity ^0.4.6;
 //
 // **** START:  WORK IN PROGRESS DISCLAIMER ****
 // This is a work in progress and not intended for reuse.
-// So don't reuse unless you know exactly what are you doing! 
+// So don't reuse unless you know exactly what are you doing!
 // **** END:  WORK IN PROGRESS DISCLAIMER ****
 //
 // **** START:  PARANOIA DISCLAIMER ****
-// A careful reader will find here some unnecessary checks and excessive code consuming some extra valuable gas. It is intentionally. 
+// A careful reader will find here some unnecessary checks and excessive code consuming some extra valuable gas. It is intentionally.
 // Even contract will works without these parts, they make the code more secure in production as well for future refactoring.
 // Additionally it shows more clearly what we have took care of.
 // You are welcome to discuss that places.
@@ -31,23 +31,23 @@ contract Presale {
 
 
 	address public constant OWNER = 0xA4769870EB607A4fDaBFfbcC3AD066c8213bD87D;
-	
+
     uint public constant MIN_TOTAL_AMOUNT_TO_RECEIVE_ETH = 1;
     uint public constant MAX_TOTAL_AMOUNT_TO_RECEIVE_ETH = 5;
     uint public constant MIN_ACCEPTED_AMOUNT_FINNEY = 1;
 
     /* ====== configuration END ====== */
-	
+
     string[5] private stateNames = ["BEFORE_START",  "PRESALE_RUNNING", "WITHDRAWAL_RUNNING", "REFUND_RUNNING", "CLOSED" ];
     enum State { BEFORE_START,  PRESALE_RUNNING, WITHDRAWAL_RUNNING, REFUND_RUNNING, CLOSED }
 
     uint public total_received_amount;
 	mapping (address => uint) public balances;
-	
+
     uint private constant MIN_TOTAL_AMOUNT_TO_RECEIVE = MIN_TOTAL_AMOUNT_TO_RECEIVE_ETH * 1 ether;
     uint private constant MAX_TOTAL_AMOUNT_TO_RECEIVE = MAX_TOTAL_AMOUNT_TO_RECEIVE_ETH * 1 ether;
     uint private constant MIN_ACCEPTED_AMOUNT = MIN_ACCEPTED_AMOUNT_FINNEY * 1 finney;
-	
+
 
     //constructor
     function Presale () validSetupOnly() { }
@@ -142,8 +142,8 @@ contract Presale {
         } else if (this.balance > 0){
             return State.REFUND_RUNNING;
         } else {
-            return State.CLOSED;		
-		} 
+            return State.CLOSED;
+		}
     }
 
     //
@@ -159,9 +159,9 @@ contract Presale {
 
     //fails if something in setup is looking weird
     modifier validSetupOnly() {
-        if ( OWNER == 0x0 
-            || PRESALE_START == 0 
-            || PRESALE_END == 0 
+        if ( OWNER == 0x0
+            || PRESALE_START == 0
+            || PRESALE_END == 0
             || WITHDRAWAL_END ==0
             || PRESALE_START <= block.number
             || PRESALE_START >= PRESALE_END
@@ -187,7 +187,7 @@ contract Presale {
 
 
     // don`t accept transactions with value less than allowed minimum
-    modifier notTooSmallAmountOnly(){	
+    modifier notTooSmallAmountOnly(){
         if (msg.value < MIN_ACCEPTED_AMOUNT) throw;
         _;
     }
@@ -202,3 +202,32 @@ contract Presale {
         locked = false;
     }
 }//contract
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
+}

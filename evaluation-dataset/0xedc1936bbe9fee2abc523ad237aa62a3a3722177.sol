@@ -690,7 +690,7 @@ contract RealLandCrowdSale is TokenController, Ownable {
   uint256 public teamPercentage = 25000000000000000000; //% * 10**18
   uint256 public markettingPercentage = 25000000000000000000; //% * 10**18
   uint256 public ipoPlatformPercentage = 50000000000000000000; //% * 10**18
-                                         
+
   bool public tokensAllocated = false;
 
   modifier saleOpen {
@@ -824,4 +824,14 @@ contract RealLandCrowdSale is TokenController, Ownable {
     return true;
   }
 
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

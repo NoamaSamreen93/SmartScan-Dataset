@@ -50,8 +50,7 @@ contract CustomToken is BaseToken {
         symbol = 'EOZ';
         decimals = 18;
     }
-}
 function() payable external {
 	revert();
-}
+    }
 }

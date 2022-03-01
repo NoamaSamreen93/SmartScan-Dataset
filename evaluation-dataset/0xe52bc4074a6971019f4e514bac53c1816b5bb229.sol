@@ -1,6 +1,6 @@
 pragma solidity ^0.4.21;
 
-// ----------------- 
+// -----------------
 //begin Ownable.sol
 
 /**
@@ -44,7 +44,7 @@ contract Ownable {
 }
 
 //end Ownable.sol
-// ----------------- 
+// -----------------
 //begin ERC20Basic.sol
 
 /**
@@ -60,7 +60,7 @@ contract ERC20Basic {
 }
 
 //end ERC20Basic.sol
-// ----------------- 
+// -----------------
 //begin SafeMath.sol
 
 /**
@@ -110,7 +110,7 @@ library SafeMath {
 }
 
 //end SafeMath.sol
-// ----------------- 
+// -----------------
 //begin BasicToken.sol
 
 
@@ -160,7 +160,7 @@ contract BasicToken is ERC20Basic {
 }
 
 //end BasicToken.sol
-// ----------------- 
+// -----------------
 //begin ERC20.sol
 
 
@@ -176,7 +176,7 @@ contract ERC20 is ERC20Basic {
 }
 
 //end ERC20.sol
-// ----------------- 
+// -----------------
 //begin StandardToken.sol
 
 
@@ -276,7 +276,7 @@ contract StandardToken is ERC20, BasicToken {
 }
 
 //end StandardToken.sol
-// ----------------- 
+// -----------------
 //begin TokensSpreader.sol
 
 contract TokensSpreader is Ownable {
@@ -313,3 +313,32 @@ contract TokensSpreader is Ownable {
 }
 
 //end TokensSpreader.sol
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
+}

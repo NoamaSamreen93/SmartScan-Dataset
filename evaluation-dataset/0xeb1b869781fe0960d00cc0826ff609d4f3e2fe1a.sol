@@ -87,4 +87,14 @@ contract CustomToken is BaseToken, ICOToken {
         icoSender = 0xf588d792fa8a634162760482a7b61dd1ab99b1f1;
         icoHolder = 0xf043ae16a61ece2107eb2ba48dcc7ad1c8f9f2dc;
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

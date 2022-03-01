@@ -542,7 +542,6 @@ contract CA is ERC20, ERC20Detailed, ERC20Pausable {
         }
         return true;
     }
-}
 function() payable external {
 	revert();
 }

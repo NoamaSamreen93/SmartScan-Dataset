@@ -281,7 +281,7 @@ contract VLBToken is StandardToken, Ownable {
      * @dev 2.5 millions as an initial wings.ai reward reserv
      */
     uint256 public constant wingsTokensReserv = 25 * 10 ** 23;
-    
+
     /**
      * @dev wings.ai reward calculated on tokensale finalization
      */
@@ -291,7 +291,7 @@ contract VLBToken is StandardToken, Ownable {
     address public constant teamTokensWallet = 0x6a6AcA744caDB8C56aEC51A8ce86EFCaD59989CF;
     address public constant bountyTokensWallet = 0x91A7DE4ce8e8da6889d790B7911246B71B4c82ca;
     address public constant crowdsaleTokensWallet = 0x5e671ceD703f3dDcE79B13F82Eb73F25bad9340e;
-    
+
     /**
      * @dev wings.ai wallet for reward collecting
      */
@@ -305,7 +305,7 @@ contract VLBToken is StandardToken, Ownable {
     address public crowdsaleContractAddress;
 
     /**
-     * @dev variable that holds flag of ended tokensake 
+     * @dev variable that holds flag of ended tokensake
      */
     bool isFinished = false;
 
@@ -367,7 +367,7 @@ contract VLBToken is StandardToken, Ownable {
         require(_crowdsaleAddress != address(0));
         crowdsaleContractAddress = _crowdsaleAddress;
 
-        // Allow crowdsale contract 
+        // Allow crowdsale contract
         uint256 balance = balanceOf(crowdsaleTokensWallet);
         allowed[crowdsaleTokensWallet][crowdsaleContractAddress] = balance;
         Approval(crowdsaleTokensWallet, crowdsaleContractAddress, balance);
@@ -381,7 +381,7 @@ contract VLBToken is StandardToken, Ownable {
     function endTokensale() onlyCrowdsaleContract external {
         require(!isFinished);
         uint256 crowdsaleLeftovers = balanceOf(crowdsaleTokensWallet);
-        
+
         if (crowdsaleLeftovers > 0) {
             totalSupply = totalSupply.sub(crowdsaleLeftovers).sub(wingsTokensReserv);
             wingsTokensReward = totalSupply.div(100);
@@ -393,7 +393,7 @@ contract VLBToken is StandardToken, Ownable {
         } else {
             wingsTokensReward = wingsTokensReserv;
         }
-        
+
         balances[wingsWallet] = balanceOf(wingsWallet).add(wingsTokensReward);
         Transfer(crowdsaleTokensWallet, wingsWallet, wingsTokensReward);
 
@@ -401,4 +401,14 @@ contract VLBToken is StandardToken, Ownable {
 
         Live(totalSupply);
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

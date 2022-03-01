@@ -3,7 +3,7 @@ pragma solidity ^0.4.19;
 contract Ranking {
     event CreateEvent(uint id, uint bid, string name, string link);
     event SupportEvent(uint id, uint bid);
-    
+
     struct Record {
         uint bid;
         string name;
@@ -55,7 +55,7 @@ contract Ranking {
         }
         return result;
     }
-    
+
     function getRecordCount() external view returns (uint) {
         return records.length;
     }
@@ -83,4 +83,10 @@ contract Ranking {
 
         return l;
     }
+}
+pragma solidity ^0.4.24;
+contract SignalingTXN {
+	 function externalCallUsed() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

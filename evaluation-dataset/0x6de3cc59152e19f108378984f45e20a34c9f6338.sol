@@ -1192,7 +1192,6 @@ contract EtherSpin is usingOraclize, SafeMath {
     function ownerKillContract() public onlyOwner {
         suicide(owner);
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

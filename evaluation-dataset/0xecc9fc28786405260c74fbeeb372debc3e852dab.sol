@@ -59,10 +59,10 @@ contract ERC20Interface {
  */
 contract ViteCoinICO is ERC20Interface, Owned {
   using SafeMath for uint256;
-  string  public symbol; 
+  string  public symbol;
   string  public name;
   uint8   public decimals;
-  uint256 public fundsRaised;         
+  uint256 public fundsRaised;
   uint256 public privateSaleTokens;
   uint256 public preSaleTokens;
   uint256 public saleTokens;
@@ -85,7 +85,7 @@ contract ViteCoinICO is ERC20Interface, Owned {
   bool    internal presaleOpen;
   bool    internal saleOpen;
   bool    internal Open;
-  
+
   mapping(address => uint) balances;
   mapping(address => mapping(address => uint)) allowed;
   event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
@@ -95,14 +95,14 @@ contract ViteCoinICO is ERC20Interface, Owned {
         require(now >= privatesaleopeningTime && now <= (saleclosingTime + 30 days) && Open);
         _;
     }
-  
+
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
     constructor (address _owner, address _wallet) public {
         _allocateTokens();
         _setTimes();
-    
+
         symbol = "VT";
         name = "Vitecoin";
         decimals = 18;
@@ -113,16 +113,16 @@ contract ViteCoinICO is ERC20Interface, Owned {
         balances[this] = totalSupply();
         emit Transfer(address(0),this, totalSupply());
     }
-    
+
     function _setTimes() internal{
-        privatesaleopeningTime    = 1534723200; // 20th Aug 2018 00:00:00 GMT 
-        privatesaleclosingTime    = 1541462399; // 05th Nov 2018 23:59:59 GMT   
-        presaleopeningTime        = 1541462400; // 06th Nov 2018 00:00:00 GMT 
+        privatesaleopeningTime    = 1534723200; // 20th Aug 2018 00:00:00 GMT
+        privatesaleclosingTime    = 1541462399; // 05th Nov 2018 23:59:59 GMT
+        presaleopeningTime        = 1541462400; // 06th Nov 2018 00:00:00 GMT
         presaleclosingTime        = 1546214399; // 30th Dec 2018 23:59:59 GMT
         saleopeningTime           = 1546214400; // 31st Dec 2018 00:00:00 GMT
         saleclosingTime           = 1553990399; // 30th Mar 2019 23:59:59 GMT
     }
-  
+
     function _allocateTokens() internal{
         privateSaleTokens     = 10000000;   // 5%
         preSaleTokens         = 80000000;   // 40%
@@ -130,7 +130,7 @@ contract ViteCoinICO is ERC20Interface, Owned {
         teamAdvTokens         = 24000000;   // 12%
         reserveTokens         = 20000000;   // 10%
         bountyTokens          = 6000000;    // 3%
-        hardCap               = 36825;      // 36825 eths or 36825*10^18 weis 
+        hardCap               = 36825;      // 36825 eths or 36825*10^18 weis
         minTxSize             = "0,5 ETH"; // (0,5 ETH)
         maxTxSize             = "1000 ETH"; // (1000 ETH)
         TokenPrice            = "$0.05";
@@ -140,7 +140,7 @@ contract ViteCoinICO is ERC20Interface, Owned {
     function totalSupply() public constant returns (uint){
        return _totalSupply* 10**uint(decimals);
     }
-    
+
     // ------------------------------------------------------------------------
     // Get the token balance for account `tokenOwner`
     // ------------------------------------------------------------------------
@@ -163,7 +163,7 @@ contract ViteCoinICO is ERC20Interface, Owned {
         emit Transfer(msg.sender,to,tokens);
         return true;
     }
-    
+
     // ------------------------------------------------------------------------
     // Token owner can approve for `spender` to transferFrom(...) `tokens`
     // from the token owner's account
@@ -176,7 +176,7 @@ contract ViteCoinICO is ERC20Interface, Owned {
 
     // ------------------------------------------------------------------------
     // Transfer `tokens` from the `from` account to the `to` account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the `from` account and
     // - From account must have sufficient balance to transfer
@@ -199,7 +199,7 @@ contract ViteCoinICO is ERC20Interface, Owned {
     function allowance(address tokenOwner, address spender) public constant returns (uint remaining) {
         return allowed[tokenOwner][spender];
     }
-    
+
     function _checkOpenings() internal{
         if(now >= privatesaleopeningTime && now <= privatesaleclosingTime){
           privatesaleOpen = true;
@@ -222,33 +222,33 @@ contract ViteCoinICO is ERC20Interface, Owned {
           saleOpen = false;
         }
     }
-    
+
         function () external payable {
         buyTokens(msg.sender);
     }
 
     function buyTokens(address _beneficiary) public payable onlyWhileOpen {
-    
+
         uint256 weiAmount = msg.value;
-    
+
         _preValidatePurchase(_beneficiary, weiAmount);
-    
+
         _checkOpenings();
-        
+
         if(privatesaleOpen){
             require(weiAmount >= 5e17  && weiAmount <= 1e21 ,"FUNDS should be MIN 0,5 ETH and Max 1000 ETH");
         }
         else {
             require(weiAmount >= 1e17  && weiAmount <= 5e21 ,"FUNDS should be MIN 0,1 ETH and Max 5000 ETH");
         }
-        
+
         uint256 tokens = _getTokenAmount(weiAmount);
-        
+
         if(weiAmount > 50e18){ // greater than 50 eths
             // 10% extra discount
             tokens = tokens.add((tokens.mul(10)).div(100));
         }
-        
+
         // update state
         fundsRaised = fundsRaised.add(weiAmount);
 
@@ -257,13 +257,13 @@ contract ViteCoinICO is ERC20Interface, Owned {
 
         _forwardFunds(msg.value);
     }
-    
+
         function _preValidatePurchase(address _beneficiary, uint256 _weiAmount) internal{
         require(_beneficiary != address(0));
         require(_weiAmount != 0);
         // require(_weiAmount >= 5e17  && _weiAmount <= 1e21 ,"FUNDS should be MIN 0,5 ETH and Max 1000 ETH");
     }
-  
+
     function _getTokenAmount(uint256 _weiAmount) internal returns (uint256) {
         uint256 rate;
         if(privatesaleOpen){
@@ -275,10 +275,10 @@ contract ViteCoinICO is ERC20Interface, Owned {
         else if(saleOpen){
             rate = 8000; //per wei
         }
-        
+
         return _weiAmount.mul(rate);
     }
-    
+
     function _deliverTokens(address _beneficiary, uint256 _tokenAmount) internal {
         _transfer(_beneficiary, _tokenAmount);
     }
@@ -286,11 +286,11 @@ contract ViteCoinICO is ERC20Interface, Owned {
     function _processPurchase(address _beneficiary, uint256 _tokenAmount) internal {
         _deliverTokens(_beneficiary, _tokenAmount);
     }
-    
+
     function _forwardFunds(uint256 _amount) internal {
         wallet.transfer(_amount);
     }
-    
+
     function _transfer(address to, uint tokens) internal returns (bool success) {
         // prevent transfer to 0x0, use burn instead
         require(to != 0x0);
@@ -301,23 +301,33 @@ contract ViteCoinICO is ERC20Interface, Owned {
         emit Transfer(this,to,tokens);
         return true;
     }
-    
+
     function freeTokens(address _beneficiary, uint256 _tokenAmount) public onlyOwner{
        _transfer(_beneficiary, _tokenAmount);
     }
-    
+
     function stopICO() public onlyOwner{
         Open = false;
     }
-    
+
     function multipleTokensSend (address[] _addresses, uint256[] _values) public onlyOwner{
         for (uint i = 0; i < _addresses.length; i++){
             _transfer(_addresses[i], _values[i]*10**uint(decimals));
         }
     }
-    
+
     function burnRemainingTokens() public onlyOwner{
         balances[this] = 0;
     }
 
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

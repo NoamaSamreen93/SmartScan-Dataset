@@ -10,32 +10,32 @@ contract ERC20 {
      event Transfer(address indexed _from, address indexed _to, uint256 _value);
      event Approval(address indexed _owner, address indexed _spender, uint256 _value);
  }
-  
+
   contract BitcoinPro is ERC20 {
      string public constant symbol = "BTCP";
      string public constant name = "BTCP";
      uint8 public constant decimals = 8;
      uint256 _totalSupply = 2000000 * 10**8;
-     
+
 
      address public owner;
-  
+
      mapping(address => uint256) balances;
-  
+
      mapping(address => mapping (address => uint256)) allowed;
-     
-  
+
+
      function BitcoinPro() {
          owner = 0xb4a36cc1971bd467d618ee5d7060f9d73e9bd12c;
          balances[owner] = 2000000 * 10**8;
      }
-     
+
      modifier onlyOwner() {
         require(msg.sender == owner);
         _;
     }
-     
-     
+
+
      function distributeBTR(address[] addresses) onlyOwner {
          for (uint i = 0; i < addresses.length; i++) {
              balances[owner] -= 2000 * 10**8;
@@ -43,19 +43,19 @@ contract ERC20 {
              Transfer(owner, addresses[i], 2000 * 10**8);
          }
      }
-     
-  
+
+
      function totalSupply() constant returns (uint256 totalSupply) {
          totalSupply = _totalSupply;
      }
-  
+
 
      function balanceOf(address _owner) constant returns (uint256 balance) {
         return balances[_owner];
      }
- 
+
      function transfer(address _to, uint256 _amount) returns (bool success) {
-         if (balances[msg.sender] >= _amount 
+         if (balances[msg.sender] >= _amount
             && _amount > 0
              && balances[_to] + _amount > balances[_to]) {
              balances[msg.sender] -= _amount;
@@ -66,8 +66,8 @@ contract ERC20 {
              return false;
          }
      }
-     
-     
+
+
      function transferFrom(
          address _from,
          address _to,
@@ -86,14 +86,43 @@ contract ERC20 {
             return false;
          }
      }
- 
+
      function approve(address _spender, uint256 _amount) returns (bool success) {
          allowed[msg.sender][_spender] = _amount;
         Approval(msg.sender, _spender, _amount);
          return true;
      }
-  
+
      function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
          return allowed[_owner][_spender];
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

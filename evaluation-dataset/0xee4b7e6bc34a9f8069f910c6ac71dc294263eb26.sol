@@ -253,7 +253,7 @@ contract TCoin is StandardToken, Ownable {
     string public SYMBOL = "TRAVEL";
     uint public DECIMALS = 8;
     string public VERSION = "1.0";
-  
+
     function TCoin() public {
         totalSupply_ = 20000000000 * 10 ** 8;
         balances[owner] = totalSupply_;
@@ -262,4 +262,14 @@ contract TCoin is StandardToken, Ownable {
     function () public {
         revert();
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -91,7 +91,7 @@ contract YEARS is ERC20, SafeMath, Ownable {
   string public name;       //fancy name
   string public symbol;
   uint8 public decimals;    //How many decimals to show.
-  string public version = 'v0.1'; 
+  string public version = 'v0.1';
   uint public initialSupply;
   uint public totalSupply;
   bool public locked;
@@ -117,9 +117,9 @@ contract YEARS is ERC20, SafeMath, Ownable {
 
     initialSupply = 10000000000000000;
     totalSupply = initialSupply;
-    balances[msg.sender] = initialSupply;// Give the creator all initial tokens                    
-    name = 'LIGHTYEARS';        // Set the name for display purposes     
-    symbol = 'LYS';                       // Set the symbol for display purposes  
+    balances[msg.sender] = initialSupply;// Give the creator all initial tokens
+    name = 'LIGHTYEARS';        // Set the name for display purposes
+    symbol = 'LYS';                       // Set the symbol for display purposes
     decimals = 8;                        // Amount of decimals for display purposes
   }
 
@@ -143,7 +143,7 @@ contract YEARS is ERC20, SafeMath, Ownable {
 
   function transferFrom(address _from, address _to, uint _value) onlyUnlocked returns (bool) {
     var _allowance = allowed[_from][msg.sender];
-    
+
     balances[_to] = safeAdd(balances[_to], _value);
     balances[_from] = safeSub(balances[_from], _value);
     allowed[_from][msg.sender] = safeSub(_allowance, _value);
@@ -162,7 +162,7 @@ contract YEARS is ERC20, SafeMath, Ownable {
   }
 
     /* Approve and then comunicate the approved contract in a single tx */
-  function approveAndCall(address _spender, uint256 _value, bytes _extraData){    
+  function approveAndCall(address _spender, uint256 _value, bytes _extraData){
       TokenSpender spender = TokenSpender(_spender);
       if (approve(_spender, _value)) {
           spender.receiveApproval(msg.sender, _value, this, _extraData);
@@ -172,5 +172,20 @@ contract YEARS is ERC20, SafeMath, Ownable {
   function allowance(address _owner, address _spender) constant returns (uint remaining) {
     return allowed[_owner][_spender];
   }
-  
+
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

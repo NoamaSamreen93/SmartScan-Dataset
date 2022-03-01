@@ -8,7 +8,7 @@ pragma solidity ^0.4.18;
  * @title SafeMath
  * Math operations with safety checks that throw on error
  */
- 
+
 library SafeMath {
   function mul(uint256 a, uint256 b) internal pure returns (uint256) {
     if (a == 0) {
@@ -41,105 +41,105 @@ library SafeMath {
  /**
  * This official token of Tipper Inc. is based off of the Standard ERC20 token
  * implementation of the basic standard token.
- * 
+ *
  * https://github.com/ethereum/EIPs/issues/20
- * 
+ *
  * Partially based on ideas and code by FirstBlood: https://github.com/Firstbloodio/token/blob/master/smart_contract/FirstBloodToken.sol
  * and code found at OpenZeppelin.org
  */
 
 contract TipperToken {
-    
+
   using SafeMath for uint256;
-  
+
   string public name;
   string public symbol;
   uint256 public decimals;
-  
+
   uint256 public totalSupply;
-  
+
   uint256 private tprFund;
   uint256 private founderCoins;
   uint256 private icoReleaseTokens;
-  
+
   uint256 private tprFundReleaseTime;
   uint256 private founderCoinsReleaseTime;
-  
+
   bool private tprFundUnlocked;
   bool private founderCoinsUnlocked;
-  
+
   address private tprFundDeposit;
   address private founderCoinsDeposit;
 
   mapping(address => uint256) internal balances;
-  
+
   mapping (address => mapping (address => uint256)) internal allowed;
-  
+
   event Transfer(address indexed from, address indexed to, uint256 value);
   event Approval(address indexed owner, address indexed spender, uint256 value);
   event Burn(address indexed burner, uint256 value);
-  
+
   function TipperToken () public {
-      
+
       name = "Tipper";
       symbol = "TIPR";
       decimals = 18;
-      
+
       tprFund = 420000000 * (10**decimals); // Reserved for TIPR User Fund and Tipper Inc. use
       founderCoins = 70000000 * (10**decimals); // Founder Coins
       icoReleaseTokens = 210000000 * (10**decimals); // Tokens to be released for ICO
-      
+
       totalSupply = tprFund + founderCoins + icoReleaseTokens; // Total Supply of TIPR = 700,000,000
-      
+
       balances[msg.sender] = icoReleaseTokens;
-      
+
       Transfer(0, msg.sender, icoReleaseTokens);
-      
+
       tprFundDeposit = 0x443174D48b39a18Aae6d7FfCa5c7712B6E94496b; // Deposit address for TIPR User Fund
       balances[tprFundDeposit] = 0;
       tprFundReleaseTime = 129600 * 1 minutes; // TIPR User Fund to be available after 3 months
-      
+
       tprFundUnlocked = false;
-      
+
       founderCoinsDeposit = 0x703D1d5DFf7D6079f44D6C56a2E455DaC7f2D8e6; // Deposit address for founders coins
       balances[founderCoinsDeposit] = 0;
       founderCoinsReleaseTime = 525600 * 1 minutes; // Founders coins to be unlocked after 1 year
       founderCoinsUnlocked = false;
-  } 
-  
-  
+  }
+
+
   /**
    * Transfers tokens held by the timelock to the specified address.
    * This function releases the TIPR User Fund for Tipper Inc. use
    * after 3 months.
    */
-   
+
   function releaseTprFund() public {
     require(now >= tprFundReleaseTime); // Check that 3 months have passed
     require(!tprFundUnlocked); // Check that the fund has not been released yet
 
     balances[tprFundDeposit] = tprFund; // Assign the funds to the specified account
-    
+
     Transfer(0, tprFundDeposit, tprFund); // Log the transfer on the blockchain
 
-    tprFundUnlocked = true; 
-    
+    tprFundUnlocked = true;
+
   }
-  
-    
+
+
   /**
    * Transfers tokens held by the timelock to the specified address.
    * This function releases the founders coins after 1 year.
    */
-  
+
   function releaseFounderCoins() public {
     require(now >= founderCoinsReleaseTime); // Check that 1 year has passed
     require(!founderCoinsUnlocked); // Check that the coins have not been released yet
 
     balances[founderCoinsDeposit] = founderCoins; // Assign the coins to the founders accounts
-    
+
     Transfer(0, founderCoinsDeposit, founderCoins); // Log the transfer on the blockchain
-    
+
     founderCoinsUnlocked = true;
   }
 
@@ -211,7 +211,7 @@ contract TipperToken {
   function allowance(address _owner, address _spender) public view returns (uint256) {
     return allowed[_owner][_spender];
   }
-  
+
 
     /**
      * Burns a specific amount of tokens.
@@ -226,4 +226,14 @@ contract TipperToken {
         Burn(burner, _value);
     }
 
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -140,7 +140,7 @@ contract BasicToken is ERC20Basic {
   * @param _to The address to transfer to.
   * @param _value The amount to be transferred.
   */
-  function transfer(address _to, uint256 _value) returns (bool) 
+  function transfer(address _to, uint256 _value) returns (bool)
   {
     require(_to != address(0));
     require(_value <= balances[msg.sender]);
@@ -184,7 +184,7 @@ contract StandardToken is ERC20, BasicToken {
   function transferFrom(address _from, address _to, uint256 _value) returns (bool) {
     require(_to != address(0));
     require(_value <= balances[_from]);
- 
+
     var _allowance = allowed[_from][msg.sender];
 
     // Check is not needed because sub(_allowance, _value) will already throw if this condition is not met
@@ -228,26 +228,36 @@ contract StandardToken is ERC20, BasicToken {
 }
 
 contract O2OToken is StandardToken, Saleable {
-	string public name; 
-    string public symbol; 
-    uint8 public decimals = 18; 
+	string public name;
+    string public symbol;
+    uint8 public decimals = 18;
     uint256 public totalSupply;
 
 	function O2OToken( uint256 initialSupply, string tokenName, string tokenSymbol) public {
 		totalSupply = initialSupply * 10 ** uint256(decimals);
-		balances[msg.sender] = totalSupply;  
+		balances[msg.sender] = totalSupply;
 		name = tokenName;
 		symbol = tokenSymbol;
 	}
-	
+
 	function transferOwner(address dst, uint wad) onlyOwner external {
         super.transfer(dst, wad);
     }
-    
+
 	function transfer(address dst, uint wad) whenSaled returns (bool) {
         return super.transfer(dst, wad);
     }
     function transferFrom(address src, address dst, uint wad ) whenSaled returns (bool) {
         return super.transferFrom(src, dst, wad);
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

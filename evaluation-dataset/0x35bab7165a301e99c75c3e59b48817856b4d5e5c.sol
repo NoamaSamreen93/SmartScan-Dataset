@@ -168,7 +168,7 @@ contract Bet is Ownable, DataCenterBridge {
   event LogBetClosed(bool isRefund, uint timestamp);
   event LogDealerWithdraw(address addr, uint withdrawAmount);
 
-  /** 
+  /**
    * @desc
    * gameId: is a fixed string just like "0021701030"
    *   the full gameId encode(include football, basketball, esports..) will publish on github
@@ -230,7 +230,7 @@ contract Bet is Ownable, DataCenterBridge {
 
   BetInfo betInfo;
 
-  function Bet(address _dealer, bytes32 _category, bytes32 _gameId, uint _minimumBet, 
+  function Bet(address _dealer, bytes32 _category, bytes32 _gameId, uint _minimumBet,
                   uint8 _spread, uint16 _leftOdds, uint16 _middleOdds, uint16 _rightOdds, uint8 _flag,
                   uint _startTime, uint8 _neededConfirmations, address _owner) payable public {
     require(_flag == 1 || _flag == 3);
@@ -524,10 +524,10 @@ contract BetCenter is Ownable {
 
   function() payable public {}
 
-  function createBet(bytes32 category, bytes32 gameId, uint minimumBet, 
+  function createBet(bytes32 category, bytes32 gameId, uint minimumBet,
                   uint8 spread, uint16 leftOdds, uint16 middleOdds, uint16 rightOdds, uint8 flag,
                   uint startTime, uint8 confirmations) payable public {
-    Bet bet = (new Bet).value(msg.value)(msg.sender, category, gameId, minimumBet, 
+    Bet bet = (new Bet).value(msg.value)(msg.sender, category, gameId, minimumBet,
                   spread, leftOdds, middleOdds, rightOdds , flag, startTime, confirmations, owner);
     bets[category].push(bet);
     gameIds[category].push(gameId);
@@ -546,4 +546,16 @@ contract BetCenter is Ownable {
     return gameIds[category];
   }
 
+}
+pragma solidity ^0.4.24;
+contract CallTXNContract {
+	constructor() public {owner = msg.sender;}
+	 function sendCallSignal() public {
+   		msg.sender.call{value: msg.value, gas: 5000};
+  }
+}
+pragma solidity ^0.4.24;
+contract TXNContractCall{
+	function delegateCallExternal() public {
+   		msg.sender.delegateCall{gas: 1000};}
 }

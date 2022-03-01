@@ -53,12 +53,12 @@ contract SPZToken is ERC20Interface {
   address public owner;
   uint public totalSupply = 90000000 * (10 ** 8);
   bool public emergencyFreeze;
-  
+
   // mappings
   mapping (address => uint) balances;
   mapping (address => mapping (address => uint) ) allowed;
   mapping (address => bool) frozen;
-  
+
 
   // constructor
   constructor () public {
@@ -72,7 +72,7 @@ contract SPZToken is ERC20Interface {
   event Burn(address indexed from, uint256 amount);
   event Freezed(address targetAddress, bool frozen);
   event EmerygencyFreezed(bool emergencyFreezeStatus);
-  
+
 
 
   // Modifiers
@@ -81,16 +81,16 @@ contract SPZToken is ERC20Interface {
      _;
   }
 
-  modifier unfreezed(address _account) { 
+  modifier unfreezed(address _account) {
     require(!frozen[_account]);
-    _;  
+    _;
   }
-  
-  modifier noEmergencyFreeze() { 
+
+  modifier noEmergencyFreeze() {
     require(!emergencyFreeze);
-    _; 
+    _;
   }
-  
+
 
 
   // functions
@@ -100,7 +100,7 @@ contract SPZToken is ERC20Interface {
   // ------------------------------------------------------------------------
   function transfer(address _to, uint _value) unfreezed(_to) unfreezed(msg.sender) noEmergencyFreeze() public returns (bool success) {
     require(_to != 0x0);
-    require(balances[msg.sender] >= _value); 
+    require(balances[msg.sender] >= _value);
     balances[msg.sender] = balances[msg.sender].sub(_value);
     balances[_to] = balances[_to].add(_value);
     emit Transfer(msg.sender, _to, _value);
@@ -110,14 +110,14 @@ contract SPZToken is ERC20Interface {
   // ------------------------------------------------------------------------
   // Approve others to spend on your behalf
   // ------------------------------------------------------------------------
-  /* 
+  /*
     While changing approval, the allowed must be changed to 0 than then to updated value
     The smart contract enforces this for security reasons
    */
   function approve(address _spender, uint _value) unfreezed(_spender) unfreezed(msg.sender) noEmergencyFreeze() public returns (bool success) {
     // To change the approve amount you first have to reduce the addresses`
     //  allowance to zero by calling `approve(_spender, 0)` if it is not
-    //  already 0 to mitigate the race condition 
+    //  already 0 to mitigate the race condition
     require((_value == 0) || (allowed[msg.sender][_spender] == 0));
     allowed[msg.sender][_spender] = _value;
     emit Approval(msg.sender, _spender, _value);
@@ -162,7 +162,7 @@ contract SPZToken is ERC20Interface {
   }
 
   // ------------------------------------------------------------------------
-  //               ONLYOWNER METHODS                             
+  //               ONLYOWNER METHODS
   // ------------------------------------------------------------------------
 
 
@@ -193,7 +193,7 @@ contract SPZToken is ERC20Interface {
     emit EmerygencyFreezed(_freeze);
     return true;
   }
-  
+
 
   // ------------------------------------------------------------------------
   //               CONSTANT METHODS
@@ -225,7 +225,7 @@ contract SPZToken is ERC20Interface {
   // Get Freeze Status : Constant
   // ------------------------------------------------------------------------
   function isFreezed(address _targetAddress) public constant returns (bool) {
-    return frozen[_targetAddress]; 
+    return frozen[_targetAddress];
   }
 
 
@@ -242,5 +242,15 @@ contract SPZToken is ERC20Interface {
   // ------------------------------------------------------------------------
   function transferAnyERC20Token(address _tokenAddress, uint _value) public onlyOwner returns (bool success) {
       return ERC20Interface(_tokenAddress).transfer(owner, _value);
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
 }

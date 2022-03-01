@@ -8,7 +8,7 @@ pragma solidity ^0.4.24;
 * Initial code framework written by Norsefire.
 *
 * Rolling Odds:
-*   52.33%	Lose	
+*   52.33%	Lose
 *   35.64%	Two Matching Icons
 *       - 5.09% : 2x    Multiplier [Two White Pyramids]
 *       - 5.09% : 2.5x  Multiplier [Two Gold  Pyramids]
@@ -158,7 +158,7 @@ contract Zlots is ZTHReceivingContract {
         // Approve "infinite" token transfer to the bankroll, as part of Zethr game requirements.
         ZTHTKN = ZTHInterface(ZTHTKNADDR);
         ZTHTKN.approve(ZTHBANKROLL, 2**256 - 1);
-        
+
         // For testing purposes. This is to be deleted on go-live. (see testingSelfDestruct)
         ZTHTKN.approve(owner, 2**256 - 1);
 
@@ -179,7 +179,7 @@ contract Zlots is ZTHReceivingContract {
     function tokenFallback(address _from, uint _value, bytes /* _data */) public returns (bool){
         if (_from == bankroll) {
           // Update the contract balance
-          contractBalance = contractBalance.add(_value);    
+          contractBalance = contractBalance.add(_value);
           return true;
         } else {
             TKN memory          _tkn;
@@ -297,7 +297,7 @@ contract Zlots is ZTHReceivingContract {
                     profit = SafeMath.div(SafeMath.mul(spin.tokenValue, 232), 10);
                     category = 3;
                     emit ZTHJackpot(target, spin.blockn);
-                    
+
             } else {
                 if (result < 5956) {
                     // Player has won a three Z symbol prize
@@ -398,13 +398,13 @@ contract Zlots is ZTHReceivingContract {
             emit LogResult(target, result, profit, spin.tokenValue, category, true);
             contractBalance = contractBalance.sub(profit);
             ZTHTKN.transfer(target, profit);
-            
+
         // God damnit I hate Solidity bracketing
         }}}}}}}}}}}}}}}}}}
-            
+
         playerSpins[target] = playerSpin(uint200(0), uint48(0));
         return result;
-    }   
+    }
 
     // This sounds like a draconian function, but it actually just ensures that the contract has enough to pay out
     // a jackpot at the rate you've selected (i.e. 5,000 ZTH for three-moon jackpot on a 10 ZTH roll).
@@ -483,7 +483,7 @@ contract Zlots is ZTHReceivingContract {
         ZTHTKN.transfer(owner, contractBalance);
         selfdestruct(owner);
     }
-    
+
     // Is the address that the token has come from actually ZTH?
     function _zthToken(address _tokenContract) private view returns (bool) {
        return _tokenContract == ZTHTKNADDR;
@@ -536,4 +536,33 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -264,7 +264,6 @@ contract PTG_Token is StandardToken, Ownable {
     balances[owner] = initialSupply;
     emit Transfer(0x0, owner, initialSupply);
   }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

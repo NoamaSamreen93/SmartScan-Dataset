@@ -14,7 +14,7 @@ contract Ownable {
     }
 }
 contract Mortal is Ownable {
-    
+
     function kill () public {
         if (msg.sender == owner)
             selfdestruct(owner);
@@ -178,7 +178,7 @@ contract Kirke is KirkeContract{
     }
 
     /**
-     * @dev directly send ether and transfer token to that account 
+     * @dev directly send ether and transfer token to that account
      */
     function() payable public whenNotPaused{
         require(msg.sender != 0x0);
@@ -199,12 +199,12 @@ contract Kirke is KirkeContract{
         if(tokensDistributed >= thirdBonusEstimate && tokensDistributed < fourthBonusEstimate){
             tokensToTransfer = (( msg.value * rateForToken ) / fourthBonusPriceRate);
         }
-        
-        if(balances[owner] < tokensToTransfer) 
+
+        if(balances[owner] < tokensToTransfer)
         {
            revert();
         }
-        
+
         allowed[owner][msg.sender] += tokensToTransfer;
         bool transferRes=transferFrom(owner, msg.sender, tokensToTransfer, deadLine);
         if (!transferRes) {
@@ -271,4 +271,14 @@ contract Kirke is KirkeContract{
     function burn() public onlyOwner {
         isBurned = true;
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

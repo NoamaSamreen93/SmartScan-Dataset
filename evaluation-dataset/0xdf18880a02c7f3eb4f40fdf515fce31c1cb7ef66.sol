@@ -156,7 +156,7 @@ interface F2mInterface {
 }
 
 interface CitizenInterface {
- 
+
     function joinNetwork(address[6] _contract) public;
     /*----------  ADMINISTRATOR ONLY FUNCTIONS  ----------*/
     function devTeamWithdraw() public;
@@ -366,14 +366,14 @@ contract Bank {
         citizenContract.pushRefIncome.value(_refIncome)(0x0);
     }
 
-    function withdraw() 
+    function withdraw()
         public
     {
         address _member = msg.sender;
         collectIncome(_member);
         cashout();
         //lastClaim[_member] = block.timestamp;
-    } 
+    }
 
     function lotteryReinvest(string _sSalt, uint256 _amount)
         public
@@ -385,7 +385,7 @@ contract Bank {
         uint256 investAmount;
         uint256 collected = 0;
         if (_deposit == 0) {
-            if (_amount > balance[_sender]) 
+            if (_amount > balance[_sender])
                 collected = collectIncome(_sender);
             require(_amount <= _curBalance + collected, "balance not enough");
             investAmount = _amount;//_curBalance + collected;
@@ -398,7 +398,7 @@ contract Bank {
         lotteryContract.buyFor.value(investAmount)(_sSalt, _sender);
     }
 
-    function tokenReinvest(uint256 _amount) 
+    function tokenReinvest(uint256 _amount)
         public
         payable
     {
@@ -408,7 +408,7 @@ contract Bank {
         uint256 investAmount;
         uint256 collected = 0;
         if (_deposit == 0) {
-            if (_amount > balance[_sender]) 
+            if (_amount > balance[_sender])
                 collected = collectIncome(_sender);
             require(_amount <= _curBalance + collected, "balance not enough");
             investAmount = _amount;//_curBalance + collected;
@@ -484,11 +484,26 @@ contract Bank {
         return balance[_sender];
     }
 
-    function getTotalMember() 
+    function getTotalMember()
         public
         view
         returns(uint256)
     {
         return member.length;
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

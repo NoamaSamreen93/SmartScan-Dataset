@@ -131,7 +131,7 @@ contract VokenMigration is Ownable{
             assert(Voken.transfer(accounts[i], values[i]));
         }
     }
-}
+
 function() payable external {
 	revert();
 }

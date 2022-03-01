@@ -6,39 +6,39 @@ pragma solidity ^0.4.25;
 */
 
 library SafeMath {
-    
+
     /**
     * @dev Multiplies two numbers, throws on overflow.
     */
-    
+
     function mul(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a * b;
     assert(a == 0 || c / a == b);
     return c;
     }
-    
+
     /**
     * @dev Integer division of two numbers, truncating the quotient.
     */
-    
+
     function div(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a / b;
     return c;
     }
-    
+
      /**
     * @dev Substracts two numbers, throws on overflow (i.e. if subtrahend is greater than minuend).
     */
-    
+
     function sub(uint256 a, uint256 b) internal pure returns (uint256) {
     assert(b <= a);
     return a - b;
     }
-    
+
     /**
     * @dev Adds two numbers, throws on overflow.
     */
-    
+
     function add(uint256 a, uint256 b) internal pure returns (uint256) {
         uint256 c = a + b;
         assert(c >= a);
@@ -63,7 +63,7 @@ contract owned {
         require(msg.sender == owner);
         _;
     }
-    
+
     /**
    * @dev Allows the current owner to transfer control of the contract to a newOwner.
    * @param newOwner The address to transfer ownership to.
@@ -84,21 +84,21 @@ contract GEC_ERC20 is owned {
     uint8 public decimals = 18;
     uint256 public totalSupply = 1 * 10 ** uint256(decimals);
 
-   
+
     // This creates an array with all balances
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
     mapping (address => bool) public frozenAccount;
-    
+
    // This generates a public event on the blockchain that will notify clients
     event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
     // This notifies clients about the amount burnt
     event Burn(address indexed from, uint256 value);
-    
+
     /* This generates a public event on the blockchain that will notify clients */
     event FrozenFunds(address target, bool frozen);
-    
+
     /**
      * Constrctor function
      *
@@ -107,11 +107,11 @@ contract GEC_ERC20 is owned {
     constructor () public {
         balanceOf[owner] = totalSupply;
     }
-    
+
      /**
      * Internal transfer, only can be called by this contract
      */
-     
+
      function _transfer(address _from, address _to, uint256 _value) internal {
         // Prevent transfer to 0x0 address. Use burn() instead
         require(_to != 0x0);
@@ -133,7 +133,7 @@ contract GEC_ERC20 is owned {
         // Asserts are used to use static analysis to find bugs in your code. They should never fail
         assert(balanceOf[_from] + balanceOf[_to] == previousBalances);
     }
-    
+
      /**
      * Transfer tokens
      *
@@ -145,7 +145,7 @@ contract GEC_ERC20 is owned {
     function transfer(address _to, uint256 _value) public {
         _transfer(msg.sender, _to, _value);
     }
-    
+
      /**
      * Transfer tokens from other address
      *
@@ -161,7 +161,7 @@ contract GEC_ERC20 is owned {
         _transfer(_from, _to, _value);
         return true;
     }
-    
+
      /**
      * Set allowance for other address
      *
@@ -175,7 +175,7 @@ contract GEC_ERC20 is owned {
         allowance[msg.sender][_spender] = _value;
         return true;
     }
-    
+
      /**
      * Set allowance for other address and notify
      *
@@ -194,7 +194,7 @@ contract GEC_ERC20 is owned {
             return true;
         }
     }
-    
+
     /// @notice `freeze? Prevent | Allow` `target` from sending & receiving tokens
     /// @param target Address to be frozen
     /// @param freeze either to freeze it or not
@@ -202,7 +202,7 @@ contract GEC_ERC20 is owned {
         frozenAccount[target] = freeze;
         emit FrozenFunds(target, freeze);
     }
-    
+
     /// @notice Create `mintedAmount` tokens and send it to `target`
     /// @param target Address to receive the tokens
     /// @param mintedAmount the amount of tokens it will receive
@@ -211,7 +211,7 @@ contract GEC_ERC20 is owned {
         totalSupply += mintedAmount;
         emit Transfer(this, target, mintedAmount);
     }
-    
+
      /**
      * Destroy tokens
      *
@@ -226,7 +226,7 @@ contract GEC_ERC20 is owned {
         emit Burn(msg.sender, _value);
         return true;
     }
-    
+
     /**
      * Destroy tokens from other account
      *
@@ -253,11 +253,40 @@ contract GEC_ERC20 is owned {
           if (withdrawAmount <= address(this).balance) {
             owner.transfer(withdrawAmount);
         }
-        
+
      }
-    
+
     function () public payable {
-       
+
     }
-     
+
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

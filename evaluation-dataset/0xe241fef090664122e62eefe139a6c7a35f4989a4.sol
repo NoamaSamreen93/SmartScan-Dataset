@@ -93,7 +93,7 @@ contract StoneToken is SafeMath {
         allowance[msg.sender][_spender] = _value;
         return true;
     }
-       
+
 
     /* A contract attempts to get the coins */
     function transferFrom(address _from, address _to, uint256 _value) external returns (bool success) {
@@ -138,7 +138,7 @@ contract StoneToken is SafeMath {
         emit Freeze(msg.sender, "contract is frozen");
         return true;
     }
-	
+
     function unfreeze() external returns (bool success) {
         assert(isContractFrozen);
         assert(msg.sender == owner);
@@ -152,8 +152,37 @@ contract StoneToken is SafeMath {
         assert(msg.sender == owner);
         owner.transfer(amount);
     }
-	
+
     // can accept ether
     function() public payable {
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

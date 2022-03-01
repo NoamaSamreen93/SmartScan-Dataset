@@ -58,24 +58,24 @@ contract STE is owned {
     uint8 public decimals;
     uint256 public totalSupply;
     // ---
-    
+
     uint256 public icoRaisedETH; // amount of raised in ETH
-    uint256 public soldedSupply; // total amount of token solded supply         
-	
+    uint256 public soldedSupply; // total amount of token solded supply
+
 	// current speed of network
 	uint256 public blocksPerHour;
-	
-    /* 
-    	Sell/Buy prices in wei 
+
+    /*
+    	Sell/Buy prices in wei
     	1 ETH = 10^18 of wei
     */
     uint256 public sellPrice;
     uint256 public buyPrice;
-    
+
     // What percent will be returned to Presalers after ICO (in percents from ICO sum)
     uint32  public percentToPresalersFromICO;	// in % * 100, example 10% = 1000
     uint256 public weiToPresalersFromICO;		// in wei
-    
+
 	/* preSale params */
 	uint256 public presaleAmountETH;
 
@@ -85,9 +85,9 @@ contract STE is owned {
     uint256 public gracePeriodMinTran;			// minimum sum of transaction for ICO in wei
     uint256 public gracePeriodMaxTarget;		// in STE * 10^8
     uint256 public gracePeriodAmount;			// in STE * 10^8
-    
+
     uint256 public burnAfterSoldAmount;
-    
+
     bool public icoFinished;	// ICO is finished ?
 
     uint32 public percentToFoundersAfterICO; // in % * 100, example 30% = 3000
@@ -106,16 +106,16 @@ contract STE is owned {
     mapping (address => uint256) public icoInvestors;
 
     // Dividends variables
-    uint32 public dividendsRound; // round number of dividends    
+    uint32 public dividendsRound; // round number of dividends
     uint256 public dividendsSum; // sum for dividends in current round (in wei)
     uint256 public dividendsBuffer; // sum for dividends in current round (in wei)
 
     /* Paid dividends */
     mapping(address => mapping(uint32 => uint256)) public paidDividends;
-	
+
 	/* Trusted accounts list */
     mapping(address => mapping(address => uint256)) public allowance;
-        
+
     /* Events of token */
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Burn(address indexed from, uint256 value);
@@ -138,7 +138,7 @@ contract STE is owned {
         decimals = 8;
 
         icoRaisedETH = 0;
-        
+
         blocksPerHour = 260;
 
         // % of company cost transfer to founders after ICO * 100, 30% = 3000
@@ -235,7 +235,7 @@ contract STE is owned {
     function transferFrom(address _from, address _to, uint256 _value) public returns(bool success) {
         if (_to == 0x0) revert();
         if (balanceOf[_from] < _value) revert(); // Check if the sender has enough
-        if ((balanceOf[_to] + _value) < balanceOf[_to]) revert(); // Check for overflows        
+        if ((balanceOf[_to] + _value) < balanceOf[_to]) revert(); // Check for overflows
         if (_value > allowance[_from][msg.sender]) revert(); // Check allowance
         // Cancel transfer transactions before Ico and gracePeriod was finished
         if ((!icoFinished) && (_from != bountyAddr) && (!transferFromWhiteList[_from]) && (!allowTransfers)) revert();
@@ -265,12 +265,12 @@ contract STE is owned {
         Transfer(_from, _to, _value);
         return true;
     }
-    
+
     /* Admin function for transfer coins */
     function transferFromAdmin(address _from, address _to, uint256 _value) public onlyOwner returns(bool success) {
         if (_to == 0x0) revert();
         if (balanceOf[_from] < _value) revert(); // Check if the sender has enough
-        if ((balanceOf[_to] + _value) < balanceOf[_to]) revert(); // Check for overflows        
+        if ((balanceOf[_to] + _value) < balanceOf[_to]) revert(); // Check for overflows
 
         // Calc dividends for _from and for _to addresses
         uint256 divAmount_from = 0;
@@ -296,7 +296,7 @@ contract STE is owned {
         Transfer(_from, _to, _value);
         return true;
     }
-    
+
     // This function is called when anyone send ETHs to this token
     function buy() public payable {
         if (isOwner()) {
@@ -330,10 +330,10 @@ contract STE is owned {
 
 			if (buyPrice > 0) {
 				if (balanceOf[this] < amount) revert();				// checks if it has enough to sell
-				balanceOf[this] -= amount;							// subtracts amount from token balance    		    
-				balanceOf[msg.sender] += amount;					// adds the amount to buyer's balance    		    
+				balanceOf[this] -= amount;							// subtracts amount from token balance
+				balanceOf[msg.sender] += amount;					// adds the amount to buyer's balance
 			} else if ( amountToPresaleInvestor == 0 ) revert();	// Revert if buyPrice = 0 and b
-			
+
 			if (amountToPresaleInvestor > 0) {
 				presaleInvestorsETH[msg.sender] = 0;
 				if ( !msg.sender.send(amountToPresaleInvestor) ) revert(); // Send amountToPresaleInvestor to presaleer after Ico
@@ -353,9 +353,9 @@ contract STE is owned {
     }
 
 
-    /* 
+    /*
     	Set params of ICO
-    	
+
     	_auctionsStartBlock, _auctionsStopBlock - block number of start and stop of Ico
     	_auctionsMinTran - minimum transaction amount for Ico in wei
     */
@@ -364,10 +364,10 @@ contract STE is owned {
         gracePeriodStopBlock = _gracePeriodStopBlock;
         gracePeriodMaxTarget = _gracePeriodMaxTarget;
         gracePeriodMinTran = _gracePeriodMinTran;
-        
-        buyPrice = _gracePeriodPrice;    	
-    	
-        icoFinished = false;        
+
+        buyPrice = _gracePeriodPrice;
+
+        icoFinished = false;
 
         if (_resetAmount) icoRaisedETH = 0;
     }
@@ -419,7 +419,7 @@ contract STE is owned {
     // Stop ICO
     function stopICO() public onlyOwner {
         if ( gracePeriodStopBlock > block.number ) gracePeriodStopBlock = block.number;
-        
+
         icoFinished = true;
 
         weiToPresalersFromICO = icoRaisedETH * percentToPresalersFromICO / 10000;
@@ -428,10 +428,10 @@ contract STE is owned {
 
             uint256 companyCost = soldedSupply * 1000000 * 10000;
             companyCost = companyCost / (10000 - percentToFoundersAfterICO) / 1000000;
-            
+
             uint256 amountToFounders = companyCost - soldedSupply;
 
-            // Burn extra coins if current balance of token greater than amountToFounders 
+            // Burn extra coins if current balance of token greater than amountToFounders
             if (balanceOf[this] > amountToFounders) {
                 Burn(this, (balanceOf[this]-amountToFounders));
                 balanceOf[this] = 0;
@@ -448,52 +448,52 @@ contract STE is owned {
         buyPrice = 0;
         sellPrice = 0;
     }
-    
-    
-    // Withdraw ETH to founders 
+
+
+    // Withdraw ETH to founders
     function withdrawToFounders(uint256 amount) public onlyOwner {
     	uint256 amount_to_withdraw = amount * 1000000000000000; // 0.001 ETH
         if ((this.balance - weiToPresalersFromICO) < amount_to_withdraw) revert();
         amount_to_withdraw = amount_to_withdraw / foundersAddresses.length;
         uint8 i = 0;
         uint8 errors = 0;
-        
+
         for (i = 0; i < foundersAddresses.length; i++) {
 			if (!foundersAddresses[i].send(amount_to_withdraw)) {
 				errors++;
 			}
 		}
     }
-    
+
     function setBlockPerHour(uint256 _blocksPerHour) public onlyOwner {
     	blocksPerHour = _blocksPerHour;
     }
-    
+
     function setBurnAfterSoldAmount(uint256 _burnAfterSoldAmount)  public onlyOwner {
     	burnAfterSoldAmount = _burnAfterSoldAmount;
     }
-    
+
     function setTransferFromWhiteList(address _from, bool _allow) public onlyOwner {
     	transferFromWhiteList[_from] = _allow;
     }
-    
-    function addPresaleInvestor(address _addr, uint256 _amountETH, uint256 _amountSTE ) public onlyOwner {    	
+
+    function addPresaleInvestor(address _addr, uint256 _amountETH, uint256 _amountSTE ) public onlyOwner {
 	    presaleInvestors[_addr] += _amountSTE;
 	    balanceOf[this] -= _amountSTE;
 		balanceOf[_addr] += _amountSTE;
-	    
+
 	    if ( _amountETH > 0 ) {
 	    	presaleInvestorsETH[_addr] += _amountETH;
 			balanceOf[this] -= _amountSTE / 10;
 			balanceOf[bountyAddr] += _amountSTE / 10;
 			//presaleAmountETH += _amountETH;
 		}
-		
+
 	    Transfer(this, _addr, _amountSTE);
     }
-    
-    /**/    
-        
+
+    /**/
+
     // BURN coins in HELL! (sender balance)
     function burn(uint256 amount) public {
         if (balanceOf[msg.sender] < amount) revert(); // Check if the sender has enough
@@ -514,4 +514,14 @@ contract STE is owned {
     function() internal payable {
         buy();
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

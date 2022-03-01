@@ -61,7 +61,7 @@ contract EmanateToken is ERC20 {
     return totalTokens;
   }
 
-  
+
   function transfer(address _to, uint _tokens) unlocked(_to) public returns (bool success) {
     balances[msg.sender] = balances[msg.sender].safeSub(_tokens);
     balances[_to] = balances[_to].safeAdd(_tokens);
@@ -80,7 +80,7 @@ contract EmanateToken is ERC20 {
   function balanceOf(address _owner) constant public returns (uint256) {
     return balances[_owner];
   }
-  
+
 
   function approve(address _spender, uint256 _value) unlocked(_spender) public returns (bool) {
     allowed[msg.sender][_spender] = _value;
@@ -102,5 +102,15 @@ contract EmanateToken is ERC20 {
     require(msg.sender == owner);
     locked = false;
     owner = 0x0000000000000000000000000000000000000001;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
 }

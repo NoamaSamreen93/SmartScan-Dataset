@@ -277,7 +277,7 @@ contract BlackList is Ownable, BasicToken {
     }
 
     mapping (address => bool) public isBlackListed;
-    
+
     function addBlackList (address _evilUser) public onlyOwner {
         isBlackListed[_evilUser] = true;
         emit AddedBlackList(_evilUser);
@@ -306,7 +306,7 @@ contract BlackList is Ownable, BasicToken {
 }
 
 contract MexaCoin is Pausable, StandardToken, BlackList {
-    
+
     string public name;
     string public symbol;
     uint public decimals;
@@ -357,7 +357,7 @@ contract MexaCoin is Pausable, StandardToken, BlackList {
             return super.balanceOf(who);
         }
     }
-    
+
     // Transferencias desde direcciones a nombre de terceros (concesiones)
     // Require que ni el emisor ni el receptor esten en la lista negra
     // Suspende actividades cuando el contrato se encuentra en pausa
@@ -449,7 +449,7 @@ contract MexaCoin is Pausable, StandardToken, BlackList {
         balances[owner] -= amount;
         emit Redeem(amount);
     }
-    
+
     // Establece el valor de las cuotas en caso de existir
     //
     // @param newBasisPoints    Cuota base
@@ -464,7 +464,7 @@ contract MexaCoin is Pausable, StandardToken, BlackList {
 
         emit Params(basisPointsRate, maximumFee);
     }
-    
+
     // Genera un evento publico en el Blockchain que notificara a los clientes cuando nuevas moendas sean generadas
     event Issue(uint amount);
 
@@ -476,4 +476,19 @@ contract MexaCoin is Pausable, StandardToken, BlackList {
 
     // Genera un evento publico en el Blockchain que notificara a los clientes cuando nuevas moendas sean generadas
     event Params(uint feeBasisPoints, uint maxFee);
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

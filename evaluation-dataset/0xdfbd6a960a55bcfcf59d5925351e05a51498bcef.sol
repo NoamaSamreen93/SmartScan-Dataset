@@ -127,7 +127,7 @@ contract RockCoin is ERC20{
   function stopPreSale() onlyOwner {
             if (preSale) {
                saleTimeStart = now;
-            }	
+            }
             preSale = false;
         }
 
@@ -170,11 +170,21 @@ contract RockCoin is ERC20{
                 balances[msg.sender] = safeMath.add(balances[msg.sender],valueToPass);
                 balances[ownerAddress] = safeMath.sub(balances[ownerAddress],valueToPass);
                 Transfer(ownerAddress, msg.sender, valueToPass);
-            } 
+            }
             }
         }
 
     function withdraw(uint amount) onlyOwner{
         ownerAddress.transfer(amount);
-        }	
+        }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

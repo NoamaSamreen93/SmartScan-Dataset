@@ -876,4 +876,14 @@ contract OasisHandler is ExchangeHandler, AllowanceSetter {
             errorReporter.revertTx("EOA cannot send ether to primary fallback");
         }
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

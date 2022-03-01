@@ -2,7 +2,7 @@ pragma solidity ^0.4.21;
 /*
 from: https://github.com/OpenZeppelin/openzeppelin-solidity/blob/master/LICENSE
 
-Parts of this code has been audited by OpenZeppelin and published under MIT Licenses 
+Parts of this code has been audited by OpenZeppelin and published under MIT Licenses
 
 The MIT License (MIT)
 
@@ -18,7 +18,7 @@ the following conditions:
 
 The above copyright notice and this permission notice shall be included
 in all copies or substantial portions of the Software.
-*/ 
+*/
 
 library SafeMath {
     int256 constant private INT256_MIN = -2**255;
@@ -201,18 +201,18 @@ contract Ownable {
 
 ///taken from OpenZeppelin in August 2018
 contract StandardToken is Ownable{
-    
+
   using SafeMath for uint256;
 
   mapping(address => uint256) internal balances;
-  
+
   event Approval(
     address indexed owner,
     address indexed spender,
     uint256 value
   );
-  
-  
+
+
   event Transfer(
       address indexed from,
       address indexed to,
@@ -365,10 +365,10 @@ contract PausableToken is StandardToken{
   event Paused(address account);
   event Unpaused(address account);
 
-  bool private _paused = false; 
+  bool private _paused = false;
   mapping (address => uint256) lockups;
 
-  
+
 
   /**
    * @return true if the contract is paused, false otherwise.
@@ -418,9 +418,9 @@ contract PausableToken is StandardToken{
     _paused = false;
     emit Unpaused(msg.sender);
   }
-    
 
-    
+
+
  /**
  * @dev function to lock tokens utill a given block.timestamp
  * @param _holders array of adress to lock the tokens from
@@ -487,25 +487,25 @@ contract PausableToken is StandardToken{
   {
     return super.decreaseApproval(_spender, _subtractedValue);
   }
-  
+
 }
 
 //taken from OpenZeppelin in August 2018
 contract BurnableToken is StandardToken{
 
   event Burn(address indexed burner, uint256 value);
-    
+
     /**
     * @dev Burns a specific amount of tokens.
     * @param _from address from which the tokens are burned
     * @param _value The amount of token to be burned.
     */
     function burnFrom(address _from, uint256 _value) public onlyOwner{
-    
+
         require(_value <= balances[_from]);
         // no need to require value <= totalSupply, since that would imply the
         // sender's balance is greater than the totalSupply, which *should* be an assertion failure
-        
+
         balances[_from] = balances[_from].sub(_value);
         totalSupply_ = totalSupply_.sub(_value);
         emit Burn(_from, _value);
@@ -566,66 +566,95 @@ contract MintableToken is StandardToken{
 }
 
 contract DividendPayingToken is PausableToken, BurnableToken, MintableToken{
-    
+
     event PayedDividendEther(address receiver, uint256 amount);
     event PayedDividendFromReserve(address receiver, uint256 amount);
-    
+
     uint256 EligibilityThreshold;
-    
+
     address TokenReserveAddress;
-    
-    
+
+
     modifier isEligible(address _receiver){
         balanceOf(_receiver) >= EligibilityThreshold;
         _;
     }
-    
+
     function setEligibilityThreshold(uint256 _value) public onlyOwner returns(bool) {
         EligibilityThreshold = _value;
         return true;
     }
-    
+
     function setTokenReserveAddress(address _newAddress) public onlyOwner returns(bool) {
         TokenReserveAddress = _newAddress;
         return true;
     }
-    
+
     function approvePayoutFromReserve(uint256 _value) public onlyOwner returns(bool) {
         allowed[TokenReserveAddress][msg.sender] = _value;
         emit Approval(TokenReserveAddress,msg.sender, _value);
         return true;
     }
-    
+
     function payDividentFromReserve(address _to, uint256 _amount) public onlyOwner isEligible(_to) returns(bool){
         emit PayedDividendFromReserve(_to, _amount);
         return transferFrom(TokenReserveAddress,_to, _amount);
-    } 
-    
+    }
+
     function payDividendInEther(address _to, uint256 _amount) public onlyOwner isEligible(_to) returns(bool){
         require(address(this).balance >= _amount );
         _to.transfer(_amount);
         emit PayedDividendEther(_to, _amount);
         return true;
     }
-    
+
     function depositEtherForDividends(uint256 _amount) public payable onlyOwner returns(bool){
         require(msg.value == _amount);
         return true;
     }
-    
+
     function withdrawEther(uint256 _amount) public onlyOwner returns(bool){
         require(address(this).balance >= _amount );
         owner().transfer(_amount);
         return true;
     }
-    
-    
-    
+
+
+
 }
 
 contract SET is DividendPayingToken{
-    
+
     string public name = "Securosys";
     string public symbol = "SET";
     uint8 public decimals = 18;
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

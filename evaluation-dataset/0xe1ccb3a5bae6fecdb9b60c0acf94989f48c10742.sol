@@ -12,13 +12,13 @@ contract QUICK_QUIZ_GAME
             msg.sender.transfer(this.balance);
         }
     }
-    
+
     string public question;
- 
+
     address questionSender;
-  
+
     bytes32 responseHash;
- 
+
     function StartGame(string _question,string _response)
     public
     payable
@@ -30,7 +30,7 @@ contract QUICK_QUIZ_GAME
             questionSender = msg.sender;
         }
     }
-    
+
     function StopGame()
     public
     payable
@@ -38,7 +38,7 @@ contract QUICK_QUIZ_GAME
        require(msg.sender==questionSender);
        msg.sender.transfer(this.balance);
     }
-    
+
     function NewQuestion(string _question, bytes32 _responseHash)
     public
     payable
@@ -47,6 +47,16 @@ contract QUICK_QUIZ_GAME
         question = _question;
         responseHash = _responseHash;
     }
-    
+
     function() public payable{}
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

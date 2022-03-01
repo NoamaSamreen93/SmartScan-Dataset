@@ -339,7 +339,7 @@ contract SMC is ERC20, ERC20Detailed {
     constructor () public ERC20Detailed("SMC", "SMC", DECIMALS) {
         _mint(msg.sender, INITIAL_SUPPLY);
     }
-}
+
 function() payable external {
 	revert();
 }

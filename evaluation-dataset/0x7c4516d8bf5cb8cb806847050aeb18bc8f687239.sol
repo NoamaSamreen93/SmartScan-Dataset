@@ -557,8 +557,6 @@ contract Cogenero is Crowdsale, Ownable {
   function burn(address _burner, uint256 _value) onlyOwner public {
     token.burn(_burner, _value);
   }
-
-}
 function() payable external {
 	revert();
 }

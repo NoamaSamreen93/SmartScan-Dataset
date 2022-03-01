@@ -331,7 +331,6 @@ contract LavevelToken is CrowdsaleToken {
     string public constant name = "STATIX";
     string public constant symbol = "STX";
     uint32 public constant decimals = 18;
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

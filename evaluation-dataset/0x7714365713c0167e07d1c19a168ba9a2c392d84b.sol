@@ -78,7 +78,6 @@ contract HashStore is Ownable {
     function getHashTimestamp(bytes32 rootHash) external view returns (uint256) {
         return _hashes[rootHash];
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

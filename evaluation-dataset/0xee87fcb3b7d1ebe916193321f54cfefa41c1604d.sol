@@ -7,25 +7,25 @@ contract Leaderboard {
     uint256 public minBid;
     // Max num of leaders on the board
     uint public maxLeaders;
-    
+
     // Linked list of leaders on the board
     uint public numLeaders;
     address public head;
     address public tail;
     mapping (address => Leader) public leaders;
-    
+
     struct Leader {
         // Data
         uint256 amount;
         string url;
         string img_url;
-        
+
         // Pointer to next and prev element in linked list
         address next;
         address previous;
     }
-    
-    
+
+
     // Set initial parameters
     function Leaderboard() {
         owner = msg.sender;
@@ -33,56 +33,56 @@ contract Leaderboard {
         numLeaders = 0;
         maxLeaders = 10;
     }
-    
-    
+
+
     /*
         Default function, make a new bid or add to bid by sending Eth to contract
     */
     function () payable {
         // Bid must be larger than minBid
         require(msg.value >= minBid);
-        
+
         // Bid must be multiple of minBid. Remainder is sent back.
         uint256 remainder  = msg.value % minBid;
         uint256 bid_amount = msg.value - remainder;
-        
+
         // If leaderboard is full, bid needs to be larger than the lowest placed leader
         require(!((numLeaders == maxLeaders) && (bid_amount <= leaders[tail].amount)));
-        
+
         // Get leader
         Leader memory leader = popLeader(msg.sender);
-        
+
         // Add to leader's bid
         leader.amount += bid_amount;
-        
+
         // Insert leader in appropriate position
         insertLeader(leader);
-        
+
         // If leaderboard is full, drop last leader
         if (numLeaders > maxLeaders) {
             dropLast();
         }
-        
+
         // Return remainder to sender
         if (remainder > 0) msg.sender.transfer(remainder);
     }
-    
-    
+
+
     /*
         Set the urls for the link and image
     */
     function setUrls(string url, string img_url) {
         var leader = leaders[msg.sender];
-        
+
         require(leader.amount > 0);
-        
+
         // Set leader's url if it is not an empty string
         bytes memory tmp_url = bytes(url);
         if (tmp_url.length != 0) {
             // Set url
             leader.url = url;
         }
-        
+
         // Set leader's img_url if it is not an empty string
         bytes memory tmp_img_url = bytes(img_url);
         if (tmp_img_url.length != 0) {
@@ -90,22 +90,22 @@ contract Leaderboard {
             leader.img_url = img_url;
         }
     }
-    
-    
+
+
     /*
         Allow user to reset urls if he wants nothing to show on the board
     */
     function resetUrls(bool url, bool img_url) {
         var leader = leaders[msg.sender];
-        
+
         require(leader.amount > 0);
-        
+
         // Reset urls
         if (url) leader.url = "";
         if (img_url) leader.img_url = "";
     }
-    
-    
+
+
     /*
         Get a leader at position
     */
@@ -115,19 +115,19 @@ contract Leaderboard {
         img_url = leaders[key].img_url;
         next    = leaders[key].next;
     }
-    
-    
+
+
     /*
         Remove from leaderboard LL
     */
     function popLeader(address key) internal returns (Leader leader) {
         leader = leaders[key];
-        
+
         // If no leader - return
         if (leader.amount == 0) {
             return leader;
         }
-        
+
         if (numLeaders == 1) {
             tail = 0x0;
             head = 0x0;
@@ -141,12 +141,12 @@ contract Leaderboard {
             leaders[leader.previous].next = leader.next;
             leaders[leader.next].previous = leader.previous;
         }
-        
+
         numLeaders--;
         return leader;
     }
-    
-    
+
+
     /*
         Insert in leaderboard LinkedList
     */
@@ -164,7 +164,7 @@ contract Leaderboard {
         } else {
             var current_addr = head;
             var current = leaders[current_addr];
-            
+
             while (current.amount > 0) {
                 if (leader.amount > current.amount) {
                     leader.next = current_addr;
@@ -173,17 +173,17 @@ contract Leaderboard {
                     leaders[current.previous].next = msg.sender;
                     break;
                 }
-                
+
                 current_addr = current.next;
                 current = leaders[current_addr];
             }
         }
-        
+
         leaders[msg.sender] = leader;
         numLeaders++;
     }
-    
-    
+
+
     /*
         Drop last leader from board and return his/her funds
     */
@@ -191,17 +191,17 @@ contract Leaderboard {
         // Get last leader
         address leader_addr = tail;
         var leader = popLeader(leader_addr);
-        
+
         uint256 refund_amount = leader.amount;
-        
+
         // Delete leader from board
         delete leader;
-        
+
         // Return funds to leader
         leader_addr.transfer(refund_amount);
     }
 
-    
+
     /*
         Modifier that only allows the owner to call certain functions
     */
@@ -219,12 +219,22 @@ contract Leaderboard {
     function withdraw() onlyOwner {
         owner.transfer(this.balance);
     }
-    
-    
+
+
     /*
         Set new maximum for amount of leaders
     */
     function setMaxLeaders(uint newMax) onlyOwner {
         maxLeaders = newMax;
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

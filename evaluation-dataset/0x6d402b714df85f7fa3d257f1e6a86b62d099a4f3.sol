@@ -174,7 +174,6 @@ contract BWCToken is Ownable{
 
     event Burn(address indexed burner, uint256 value);
 
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

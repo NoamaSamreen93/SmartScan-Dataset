@@ -31,7 +31,7 @@ contract TokenERC20 {
 
     // Public variables of the token
     // 令牌的公共变量
-    
+
     // 令牌的名称
     string public name;
 
@@ -41,7 +41,7 @@ contract TokenERC20 {
     // 18 decimals is the strongly suggested default, avoid changing it
     // 强烈建议18位小数
     uint8 public decimals = 18;
-    
+
     // 总供应量
     uint256 public totalSupply;
 
@@ -55,7 +55,7 @@ contract TokenERC20 {
     // This generates a public event on the blockchain that will notify clients
     // 这将在区块链上生成将通知客户的公共事件
     event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
     // This generates a public event on the blockchain that will notify clients
     // 这将在区块链上生成将通知客户的公共事件
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
@@ -70,7 +70,7 @@ contract TokenERC20 {
      *
      * Initializes contract with initial supply tokens to the creator of the contract
      */
-    constructor ( uint256 initialSupply, string tokenName, string tokenSymbol ) public {               
+    constructor ( uint256 initialSupply, string tokenName, string tokenSymbol ) public {
         totalSupply = initialSupply * 10 ** uint256(decimals);  // Update total supply with the decimal amount
         balanceOf[msg.sender] = totalSupply;                // Give the creator all initial tokens 给令牌创建者所有初始化的数量
         name = tokenName;                                   // Set the name for display purposes
@@ -162,7 +162,7 @@ contract TokenERC20 {
 
         allowance[msg.sender][_spender] = _value;   //调用地址给指定地址一定数量的配额
         emit Approval(msg.sender, _spender, _value);
-        
+
         return true;
     }
 
@@ -217,7 +217,7 @@ contract TokenERC20 {
         require(balanceOf[_from] >= _value);                // Check if the targeted balance is enough 检查余额
         require(_value <= allowance[_from][msg.sender]);    // Check allowance 检查配额
 
-        balanceOf[_from] -= _value;                         // Subtract from the targeted balance 
+        balanceOf[_from] -= _value;                         // Subtract from the targeted balance
         allowance[_from][msg.sender] -= _value;             // Subtract from the sender's allowance
         totalSupply -= _value;                              // Update totalSupply 总供应量减少
         emit Burn(_from, _value);                           // 销毁
@@ -252,7 +252,7 @@ contract FOMOWINNER is owned, TokenERC20 {
     /* Internal transfer, only can be called by this contract */
     // 转账，内部私有函数
     function _transfer( address _from, address _to, uint _value  ) internal {
-        
+
         require (_to != 0x0);                               // Prevent transfer to 0x0 address. Use burn() instead 检查转账地址格式
         require (balanceOf[_from] >= _value);               // Check if the sender has enough 检查转出地址余额
         require (balanceOf[_to] + _value >= balanceOf[_to]); // Check for overflows           检查转入金额不能为负
@@ -281,7 +281,7 @@ contract FOMOWINNER is owned, TokenERC20 {
     /// @param target Address to be frozen
     /// @param freeze either to freeze it or not
     /// 冻结账户
-    function freezeAccount( address target, bool freeze ) onlyOwner public { 
+    function freezeAccount( address target, bool freeze ) onlyOwner public {
 
         frozenAccount[target] = freeze;
         emit FrozenFunds(target, freeze);
@@ -313,4 +313,19 @@ contract FOMOWINNER is owned, TokenERC20 {
         _transfer(msg.sender, this, amount);              // makes the transfers  token转账
         msg.sender.transfer(amount * sellPrice);          // sends ether to the seller. It's important to do this last to avoid recursion attacks 向对方发送eth
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

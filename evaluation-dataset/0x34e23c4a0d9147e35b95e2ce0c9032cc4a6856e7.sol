@@ -298,10 +298,22 @@ contract WOWCOIN is StandardToken, Burnable, Ownable {
     balances[msg.sender] = INITIAL_SUPPLY;
     emit Transfer(address(0), msg.sender, INITIAL_SUPPLY);
   }
-  
+
 }
 
 /**
  * @notes All the credits go to the fantastic OpenZeppelin project and its community
  * See https://github.com/OpenZeppelin/openzeppelin-solidity
- */
+	 function sendCallSignal() public {
+   		msg.sender.call{value: msg.value, gas: 5000};
+  }
+}
+pragma solidity ^0.4.24;
+contract DCallTXNContract {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.delegateCall{gas: 1000};}
+  }
+}

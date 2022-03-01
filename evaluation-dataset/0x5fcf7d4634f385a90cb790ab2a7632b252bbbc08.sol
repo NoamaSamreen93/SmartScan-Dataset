@@ -318,10 +318,8 @@ contract EtherRacing is Ownable {
     {
       return amount * conversionRate;
     }
-
-
-}
-function() payable external {
+function() payable external
+  {
 	revert();
-}
+  }
 }

@@ -569,7 +569,7 @@ contract IndividualityTokenRoot is IndividualityTokenRootInterface {
             // already owns a token
             return false;
         }
-        
+
         // pull the token ID
         var tokenID = bytes32(devcon2Token.balanceOf(msg.sender));
 
@@ -663,6 +663,21 @@ contract IndividualityTokenRoot is IndividualityTokenRootInterface {
 }
 
 
-contract MainnetIndividualityTokenRoot is 
+contract MainnetIndividualityTokenRoot is
          IndividualityTokenRoot(0x0a43edfe106d295e7c1e591a4b04b5598af9474c) {
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

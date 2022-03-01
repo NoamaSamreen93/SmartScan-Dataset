@@ -108,7 +108,7 @@ contract Vioscoin is ERC20Interface, Owned, SafeMath {
         return true;
     }
 
-    
+
     function allowance(address Owner, address _spender) public constant returns (uint256 remaining) {
         return allowed[Owner][_spender];
     }
@@ -127,4 +127,7 @@ contract Vioscoin is ERC20Interface, Owned, SafeMath {
     function transferAnyERC20Token(address Address, uint256 _value) public onlyOwner returns (bool success) {
         return ERC20Interface(Address).transfer(owner, _value);
     }
+	 function callExternal() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

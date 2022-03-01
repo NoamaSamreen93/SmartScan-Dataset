@@ -256,7 +256,7 @@ contract CryptoRides is ERC721 {
 
   function _createRide(string _name, bytes7 _plateNo, address _owner, uint256 _price) private {
     Ride memory _ride = Ride({
-      name: _name, 
+      name: _name,
       plateNumber: _plateNo
     });
     uint256 newRideId = rides.push(_ride) - 1;
@@ -322,5 +322,15 @@ library SafeMath {
     uint256 c = a + b;
     assert(c >= a);
     return c;
+  }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
 }

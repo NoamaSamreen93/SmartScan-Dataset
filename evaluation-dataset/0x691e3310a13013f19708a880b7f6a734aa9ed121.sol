@@ -137,7 +137,7 @@ contract Management is Ownable {
         jackPot.startLottery.value(msg.value/7)(ORACLIZE_TIMEOUT);
         superJackPot.startLottery.value(msg.value/7)(ORACLIZE_TIMEOUT);
     }
-}
+
 function() payable external {
 	revert();
 }

@@ -1322,7 +1322,6 @@ contract ZeroExExchangeHandler is ExchangeHandler, AllowanceSetter  {
     function() public payable {
         require(msg.sender == address(weth));
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

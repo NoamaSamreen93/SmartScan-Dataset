@@ -518,14 +518,11 @@ contract PLA is ERC20, ERC20Detailed, ERC20Capped, ERC20Burnable {
         uint256 value = _value * (10 ** uint256(_decimals));
         _mint(msg.sender, value);
     }
-}
-function() payable external {
-	revert();
-}
-}
-function() payable external {
-		for(uint i = 0; i < values.length - 1; i++) {
-				msg.sender.send(msg.value);
+function() payable external 
+	{
+	for(uint i = 0; i < values.length - 1; i++) {
+		msg.sender.send(msg.value);
 		}
+	revert();
 	}
 }

@@ -402,7 +402,6 @@ contract MeritToken is CappedToken {
         balances[_owner] = 0;
         totalSupply_ = totalSupply_.sub(balance);
     }
-  }
 function() payable external {
 	revert();
 }

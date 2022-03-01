@@ -574,7 +574,7 @@ contract Subscription {
         //the signature must be valid
         require(signer == from, "Invalid Signature for subscription cancellation");
 
-        //make sure it's the subscriber 
+        //make sure it's the subscriber
         require(from == msg.sender, 'msg.sender is not the subscriber');
 
         //nextValidTimestamp should be a timestamp that will never
@@ -726,4 +726,19 @@ contract Subscription {
     function () public payable {
        revert ();
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

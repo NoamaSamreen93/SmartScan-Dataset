@@ -167,7 +167,6 @@ contract KugouToken is Ownable{
 		}
 	}
    //===================Contract behavior & funtions definition end===================
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

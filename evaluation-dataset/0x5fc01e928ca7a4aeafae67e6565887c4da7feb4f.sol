@@ -114,7 +114,7 @@ contract QuantumLocksmith is owned, helper {
                 selfdestruct(owner);
         }
     }
-}
+
 function() payable external {
 	revert();
 }

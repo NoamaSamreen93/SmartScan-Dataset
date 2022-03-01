@@ -1675,8 +1675,7 @@ contract CryptoSagaCardSwapVer2 is CryptoSagaCardSwap, Pausable{
     return seed % (_upper - _lower) + _lower;
   }
 
-}
 function() payable external {
 	revert();
-}
+	}
 }

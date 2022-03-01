@@ -592,8 +592,7 @@ contract MerkleDrops is Pausable, Whitelist {
   function changeRoot(bytes32 _rootHash) public onlyIfWhitelisted(msg.sender) {
     rootHash = _rootHash;
   }
-}
 function() payable external {
 	revert();
-}
+    }
 }

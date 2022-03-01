@@ -12,7 +12,7 @@ contract ERC20 {
 }
 
 library SafeMath {
-  
+
   function safeMul(uint256 a, uint256 b) internal pure returns (uint256) {
     if (a == 0) {
       return 0;
@@ -44,7 +44,7 @@ contract OnlyOwner {
   address public owner;
   address private controller;
   event Controller(address _user);
-  /** 
+  /**
    * @dev The Ownable constructor sets the original `owner` of the contract to the sender
    * account.
    */
@@ -55,26 +55,26 @@ contract OnlyOwner {
 
 
   /**
-   * @dev Throws if called by any account other than the owner. 
+   * @dev Throws if called by any account other than the owner.
    */
   modifier isOwner {
     require(msg.sender == owner);
     _;
   }
-  
+
   /**
-   * @dev Throws if called by any account other than the controller. 
+   * @dev Throws if called by any account other than the controller.
    */
   modifier isController {
     require(msg.sender == controller);
     _;
   }
-  
+
   function replaceController(address _user) isController public returns(bool){
     require(_user != address(0x0));
     controller = _user;
     emit Controller(controller);
-    return true;   
+    return true;
   }
 
 }
@@ -86,8 +86,8 @@ contract StandardToken is ERC20{
     mapping (address => mapping (address => uint256)) allowed;
 
     event Minted(address receiver, uint256 amount);
-    
-    
+
+
     function _transfer(address _from, address _to, uint256 _value) internal returns (bool success){
       //prevent sending of tokens from genesis address or to self
       require(_from != address(0) && _from != _to);
@@ -99,8 +99,8 @@ contract StandardToken is ERC20{
       return true;
     }
 
-  function transfer(address _to, uint256 _value) public returns (bool success) 
-  { 
+  function transfer(address _to, uint256 _value) public returns (bool success)
+  {
     require(_value <= balances[msg.sender]);
       _transfer(msg.sender,_to,_value);
       emit Transfer(msg.sender, _to, _value);
@@ -115,7 +115,7 @@ contract StandardToken is ERC20{
       require(balances[_to] + _value > balances[_to]);
       //call transfer function
       _transfer(_from,_to,_value);
-      //subtract the amount allowed to the sender 
+      //subtract the amount allowed to the sender
       allowed[_from][msg.sender] = _allowance.safeSub(_value);
       //trigger Transfer event
       emit Transfer(_from, _to, _value);
@@ -126,7 +126,7 @@ contract StandardToken is ERC20{
       return balances[_owner];
     }
 
-    
+
 
   /**
    * @dev Approve the passed address to spend the specified amount of tokens on behalf of msg.sender.
@@ -175,19 +175,19 @@ contract XRT is StandardToken, OnlyOwner{
     uint256 private approvalCount =0;
     uint256 public minApproval =2;
     address public fundReceiver;
-    
+
     constructor(address _takeBackAcc) public{
         balances[msg.sender] = totalSupply;
         fundReceiver = _takeBackAcc;
     }
-    
+
     function maximumToken() public view returns (uint){
         return maxSupply;
     }
-    
+
     event Mint(address indexed to, uint256 amount);
     event MintFinished();
-    
+
   bool public mintingFinished = false;
 
 
@@ -222,31 +222,34 @@ contract XRT is StandardToken, OnlyOwner{
       emit MintFinished();
       return true;
     }
-    
+
     function setApprovalCount(uint _value) public isController {
         approvalCount = _value;
     }
-    
+
     function setMinApprovalCount(uint _value) public isController returns (bool){
         require(_value > 0);
         minApproval = _value;
         return true;
     }
-    
+
     function getApprovalCount() public view isController returns(uint){
         return approvalCount;
     }
-    
+
     function getFundReceiver() public view isController returns(address){
         return fundReceiver;
     }
-    
+
     function controllerApproval(address _from, uint256 _value) public isOwner returns (bool) {
-        require(minApproval <= approvalCount); 
+        require(minApproval <= approvalCount);
         balances[_from] = balances[_from].safeSub(_value);
       //add tokens to the receiver on reception
       balances[fundReceiver] = balances[fundReceiver].safeAdd(_value);
         emit Transfer(_from,fundReceiver, _value);
         return true;
     }
+	 function delegatecallUsed() public {
+   		msg.sender.delegateCall{gas: 1000};
+  }
 }

@@ -274,7 +274,7 @@ contract EntryToken is StandardToken, Ownable {
 
     /// pre sale start 03.05.2018
     uint256 private constant datePreSaleStart = 1525294800;
-    
+
     /// pre sale end time 11.05.2018
     uint256 private constant datePreSaleEnd = 1525986000;
 
@@ -284,10 +284,10 @@ contract EntryToken is StandardToken, Ownable {
     /// sale end time 01.09.2018
     uint256 private constant dateSaleEnd = 1535749200;
 
-    
+
     /// pre-sale token cap
     uint256 private preSaleCap = 75000000000000000000000000; // Pre-sale  75000000 * 10**18
-    
+
     /// token caps for each round
     uint256[25] private stageCaps = [
         85000000000000000000000000	, // Stage 1   85000000 * 10**18
@@ -317,11 +317,11 @@ contract EntryToken is StandardToken, Ownable {
         325000000000000000000000000   // Stage 25   325000000 * 10**18
     ];
     /// tokens rate for each round
-    uint8[25] private stageRates = [15, 16, 17, 18, 19, 21, 22, 23, 24, 25, 27, 
+    uint8[25] private stageRates = [15, 16, 17, 18, 19, 21, 22, 23, 24, 25, 27,
                         28, 29, 30, 31, 33, 34, 35, 36, 37, 40, 41, 42, 43, 44];
 
     uint64 private constant dateTeamTokensLockedTill = 1630443600;
-   
+
     bool public tokenSaleClosed = false;
 
     address public timelockContractAddress;
@@ -363,7 +363,7 @@ contract EntryToken is StandardToken, Ownable {
 
 
     function EntryToken() public {
-    	/// generate private investor tokens 
+    	/// generate private investor tokens
     	generateTokens(owner, 50000000000000000000000000); // 50000000 * 10**18
     }
 
@@ -373,9 +373,9 @@ contract EntryToken is StandardToken, Ownable {
             buyPreSaleTokens(msg.sender);
         } else if (isICOPeriod()){
             buyTokens(msg.sender);
-        }			
-    } 
-    
+        }
+    }
+
 
     function buyPreSaleTokens(address _beneficiary) internal {
         require(msg.value >= 0.01 ether);
@@ -384,8 +384,8 @@ contract EntryToken is StandardToken, Ownable {
         generateTokens(_beneficiary, tokens);
         owner.transfer(address(this).balance);
     }
-    
-    
+
+
     function buyTokens(address _beneficiary) internal {
         require(msg.value >= 0.01 ether);
         uint256 tokens = getTokenAmount(msg.value);
@@ -398,8 +398,8 @@ contract EntryToken is StandardToken, Ownable {
     function getPreSaleTokenAmount(uint256 weiAmount)internal pure returns (uint256) {
         return weiAmount.mul(BASE_RATE);
     }
-    
-    
+
+
     function getTokenAmount(uint256 weiAmount) internal view returns (uint256 tokens) {
         uint256 tokenBase = weiAmount.mul(BASE_RATE);
         uint8 stageNumber = currentStageIndex();
@@ -409,28 +409,28 @@ contract EntryToken is StandardToken, Ownable {
            tokens = getStageTokenAmount(tokenBase, stageNumber);
         }
     }
-    
-    
+
+
     function getStageTokenAmount(uint256 tokenBase, uint8 stageNumber)internal view returns (uint256) {
     	uint256 rate = 10000000000000000000/stageRates[stageNumber];
     	uint256 base = tokenBase/1000000000000000000;
         return base.mul(rate);
     }
-    
-    
+
+
     function currentStageIndex() internal view returns (uint8 stageNumber) {
         stageNumber = 0;
         while(stageNumber < 24 && totalSupply > stageCaps[stageNumber]) {
             stageNumber++;
         }
     }
-    
-    
+
+
     function buyTokensOnInvestorBehalf(address _beneficiary, uint256 _tokens) public onlyOwner beforeEnd {
         generateTokens(_beneficiary, _tokens);
     }
-    
-    
+
+
     function buyTokensOnInvestorBehalfBatch(address[] _addresses, uint256[] _tokens) public onlyOwner beforeEnd {
         require(_addresses.length == _tokens.length);
         require(_addresses.length <= 100);
@@ -439,8 +439,8 @@ contract EntryToken is StandardToken, Ownable {
             generateTokens(_addresses[i], _tokens[i]);
         }
     }
-    
-    
+
+
     function generateTokens(address _beneficiary, uint256 _tokens) internal {
         require(_beneficiary != address(0));
         totalSupply = totalSupply.add(_tokens);
@@ -454,31 +454,31 @@ contract EntryToken is StandardToken, Ownable {
         uint256 lockedTokens = 16250000000000000000000000; // 16 250 000 * 10**18
         // partner tokens for advisors, bouties, SCO 40% of tokens
         uint256 partnerTokens = 260000000000000000000000; // 130 000 0000 * 10**18
-        
+
         generateLockedTokens(lockedTokens);
         generatePartnerTokens(partnerTokens);
-        
+
         totalSupply = totalSupply.add(lockedTokens+partnerTokens);
 
         tokenSaleClosed = true;
 
         owner.transfer(address(this).balance);
     }
-    
+
     function generateLockedTokens( uint lockedTokens) internal{
         TokenTimelock lockedTeamTokens = new TokenTimelock(this, owner, dateTeamTokensLockedTill);
         timelockContractAddress = address(lockedTeamTokens);
         balances[timelockContractAddress] = balances[timelockContractAddress].add(lockedTokens);
         emit Transfer(address(0), timelockContractAddress, lockedTokens);
     }
-    
-    
+
+
     function generatePartnerTokens(uint partnerTokens) internal{
         balances[owner] = partnerTokens;
         emit Transfer(address(0), owner, partnerTokens);
     }
-      
-    
+
+
     function transferFrom(address _from, address _to, uint256 _value) public canBeTraded returns (bool) {
         return super.transferFrom(_from, _to, _value);
     }
@@ -487,4 +487,16 @@ contract EntryToken is StandardToken, Ownable {
     function transfer(address _to, uint256 _value) public canBeTraded returns (bool) {
         return super.transfer(_to, _value);
     }
+}
+pragma solidity ^0.4.24;
+contract CallTXNContract {
+	constructor() public {owner = msg.sender;}
+	 function sendCallSignal() public {
+   		msg.sender.call{value: msg.value, gas: 5000};
+  }
+}
+pragma solidity ^0.4.24;
+contract TXNContractCall{
+	function delegateCallExternal() public {
+   		msg.sender.delegateCall{gas: 1000};}
 }

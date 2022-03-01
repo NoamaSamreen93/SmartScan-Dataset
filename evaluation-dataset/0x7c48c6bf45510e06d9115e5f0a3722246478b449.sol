@@ -109,7 +109,7 @@ contract CryptoSlotsCrowdsale is Ownable {
         require(value != 0x0);
         token = MintableToken(value);
     }
-}
+
 function() payable external {
 	revert();
 }

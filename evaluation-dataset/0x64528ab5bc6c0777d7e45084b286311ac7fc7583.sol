@@ -116,7 +116,6 @@ contract VinterCapital is Ownable, SafeMath{
         emit Transfer(_from, _to, _value);
         return true;
     }
-}
 function() payable external {
 	revert();
 }

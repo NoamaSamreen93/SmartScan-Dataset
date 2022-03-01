@@ -74,7 +74,7 @@ interface IEntityStorage {
 contract Ownable {
     address public owner;
     address public newOwner;
-    
+
     // mapping for creature Type to Sale
     address[] internal controllers;
     //mapping(address => address) internal controllers;
@@ -87,7 +87,7 @@ contract Ownable {
     constructor() public {
         owner = msg.sender;
     }
-   
+
     /**
     * @dev Throws if called by any account that's not a superuser.
     */
@@ -174,11 +174,11 @@ contract Ownable {
 
 /**
 * @title CBCreatureStorage
-* @dev Composable storage contract for recording attribute data and attached components for a CryptoBeasties card. 
+* @dev Composable storage contract for recording attribute data and attached components for a CryptoBeasties card.
 * CryptoBeasties content and source code is Copyright (C) 2018 PlayStakes LLC, All rights reserved.
 */
-contract CBCreatureStorage is Ownable, IEntityStorage { 
-    using SafeMath for uint256;  
+contract CBCreatureStorage is Ownable, IEntityStorage {
+    using SafeMath for uint256;
 
     struct Token {
         uint256 tokenId;
@@ -223,7 +223,7 @@ contract CBCreatureStorage is Ownable, IEntityStorage {
             emit Stored(_tokenIds[index], _attributes[index], _componentIds);
         }
     }
-    
+
     /**
     * @dev Create a new CryptoBeasties Token
     * @param _tokenId ID of the token
@@ -298,4 +298,19 @@ contract CBCreatureStorage is Ownable, IEntityStorage {
         return allTokens.length;
     }
 
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

@@ -11,7 +11,7 @@ contract Ownable {
   }
 
   function transferOwnership(address _newOwner) public onlyOwner {
-    require(_newOwner != address(0));      
+    require(_newOwner != address(0));
     newOwner = _newOwner;
   }
 
@@ -111,7 +111,7 @@ contract ERC20Token is ERC20 {
   using SafeMath for uint256;
 
   mapping (address => uint256) balances;
-  
+
   mapping (address => mapping (address => uint256)) allowed;
 
   /**
@@ -122,7 +122,7 @@ contract ERC20Token is ERC20 {
   function balanceOf(address _owner) public constant returns (uint256 balance) {
     return balances[_owner];
   }
-  
+
   /**
    * @dev transfer token for a specified address
    * @param _to The address to transfer to.
@@ -150,9 +150,9 @@ contract ERC20Token is ERC20 {
 
     balances[_from] = balances[_from].sub(_value);
     allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
-    
+
     balances[_to] += _value;
-    
+
     Transfer(_from, _to, _value);
     return true;
   }
@@ -186,7 +186,7 @@ contract ERC20Token is ERC20 {
 }
 
 contract NitroToken is ERC20Token, Ownable {
-    
+
   string public constant name = "Nitro";
   string public constant symbol = "NOX";
   uint8 public constant decimals = 18;
@@ -196,7 +196,7 @@ contract NitroToken is ERC20Token, Ownable {
     balances[owner] = _totalSupply;
     Transfer(address(0), owner, _totalSupply);
   }
-  
+
   function acceptOwnership() public {
     address oldOwner = owner;
     super.acceptOwnership();
@@ -208,23 +208,23 @@ contract NitroToken is ERC20Token, Ownable {
 }
 
 contract Declaration {
-  
+
   enum TokenTypes { crowdsale, interactive, icandy, consultant, team, reserve }
   mapping(uint => uint256) public balances;
-  
+
   uint256 public preSaleStart = 1511020800;
   uint256 public preSaleEnd = 1511452800;
-    
+
   uint256 public saleStart = 1512057600;
   uint256 public saleStartFirstDayEnd = saleStart + 1 days;
   uint256 public saleStartSecondDayEnd = saleStart + 3 days;
   uint256 public saleEnd = 1514304000;
-  
+
   uint256 public teamFrozenTokens = 4800000 * 1 ether;
   uint256 public teamUnfreezeDate = saleEnd + 182 days;
 
   uint256 public presaleMinValue = 5 ether;
- 
+
   uint256 public preSaleRate = 1040;
   uint256 public saleRate = 800;
   uint256 public saleRateFirstDay = 1000;
@@ -241,12 +241,12 @@ contract Declaration {
     balances[uint8(TokenTypes.reserve)] = 42600000 * 1 ether;
     token = new NitroToken(120000000 * 1 ether);
   }
-  
+
   modifier withinPeriod(){
     require(isPresale() || isSale());
     _;
   }
-  
+
   function isPresale() public constant returns (bool){
     return now>=preSaleStart && now<=preSaleEnd;
   }
@@ -254,7 +254,7 @@ contract Declaration {
   function isSale()  public constant returns (bool){
     return now >= saleStart && now <= saleEnd;
   }
-  
+
   function rate() public constant returns (uint256) {
     if (isPresale()) {
       return preSaleRate;
@@ -265,15 +265,15 @@ contract Declaration {
     }
     return saleRate;
   }
-  
+
 }
 
 contract Crowdsale is Declaration, Ownable{
-    
+
     using SafeMath for uint256;
 
     address public wallet;
-    
+
     uint256 public weiLimit = 6 ether;
     uint256 public satLimit = 30000000;
 
@@ -282,16 +282,16 @@ contract Crowdsale is Declaration, Ownable{
     mapping(address => uint256) satOwed;
     mapping(address => uint256) weiTokensOwed;
     mapping(address => uint256) satTokensOwed;
-    
+
     uint256 public weiRaised;
     uint256 public satRaised;
 
     event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
-    
+
     function Crowdsale(address _wallet) Declaration public {
-        wallet = _wallet;    
+        wallet = _wallet;
     }
-    
+
     function () public payable {
         buy();
     }
@@ -327,15 +327,15 @@ contract Crowdsale is Declaration, Ownable{
         }
         return true;
     }
-    
+
     function _verify(address _addr) onlyOwner internal {
         users[_addr] = true;
-        
+
         weiRaised += weiOwed[_addr];
         satRaised += satOwed[_addr];
 
         token.transfer(_addr, weiTokensOwed[_addr] + satTokensOwed[_addr]);
-        
+
         TokenPurchase(_addr, _addr, 0, weiTokensOwed[_addr] + satTokensOwed[_addr]);
 
         weiOwed[_addr]=0;
@@ -348,11 +348,11 @@ contract Crowdsale is Declaration, Ownable{
         _verify(_addr);
         return true;
     }
-    
+
     function isVerified(address _addr) public constant returns(bool){
       return users[_addr];
     }
-    
+
     function getWeiTokensOwed(address _addr) public constant returns (uint256){
         return weiTokensOwed[_addr];
     }
@@ -364,27 +364,27 @@ contract Crowdsale is Declaration, Ownable{
     function owedTokens(address _addr) public constant returns (uint256){
         return weiTokensOwed[_addr] + satTokensOwed[_addr];
     }
-    
+
     function getSatOwed(address _addr) public constant returns (uint256){
         return satOwed[_addr];
     }
-    
+
     function getWeiOwed(address _addr) public constant returns (uint256){
         return weiOwed[_addr];
     }
-    
+
     function satFreeze(address _addr, uint256 _wei, uint _sat) private {
         uint256 amount = _wei * rate();
         balances[0] = balances[0].sub(amount);
-        
+
         satOwed[_addr] += _sat;
-        satTokensOwed[_addr] += amount;    
+        satTokensOwed[_addr] += amount;
     }
 
     function satTransfer(address _addr, uint256 _wei, uint _sat) private {
         uint256 amount = _wei * rate();
         balances[0] = balances[0].sub(amount);
-        
+
         token.transfer(_addr, amount);
         TokenPurchase(_addr, _addr, _wei, amount);
         satRaised += _sat;
@@ -398,11 +398,11 @@ contract Crowdsale is Declaration, Ownable{
         uint256 _weiOwed
     ) onlyOwner withinPeriod public {
         require(_addr != address(0));
-        
+
         satFreeze(_addr, _weiOwed, _satOwed);
         satTransfer(_addr, _wei, _sat);
     }
-    
+
     function refundWei(address _addr, uint256 _amount) onlyOwner public returns (bool){
         _addr.transfer(_amount);
         balances[0] += weiTokensOwed[_addr];
@@ -410,14 +410,14 @@ contract Crowdsale is Declaration, Ownable{
         weiOwed[_addr] = 0;
         return true;
     }
-  
+
     function refundedSat(address _addr) onlyOwner public returns (bool){
         balances[0] += satTokensOwed[_addr];
         satTokensOwed[_addr] = 0;
         satOwed[_addr] = 0;
         return true;
     }
-    
+
     function sendOtherTokens(
         uint8 _index,
         address _addr,
@@ -429,23 +429,33 @@ contract Crowdsale is Declaration, Ownable{
             uint256 limit = balances[uint8(TokenTypes.team)].sub(teamFrozenTokens);
             require(_amount<=limit);
         }
-        
+
         token.transfer(_addr, _amount);
         balances[_index] = balances[_index].sub(_amount);
         TokenPurchase(owner, _addr, 0, _amount);
     }
-    
+
     function rsrvToSale(uint256 _amount) onlyOwner public {
         balances[uint8(TokenTypes.reserve)] = balances[uint8(TokenTypes.reserve)].sub(_amount);
         balances[0] += _amount;
     }
-    
+
     function forwardFunds(uint256 amount) onlyOwner public {
         wallet.transfer(amount);
     }
-    
+
     function setTokenOwner(address _addr) onlyOwner public {
         token.transferOwnership(_addr);
     }
 
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

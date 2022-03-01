@@ -120,7 +120,7 @@ contract Ownable {
   }
 
   function transferOwnership(address newOwner) public onlyOwner {
-    require(newOwner != address(0)); 
+    require(newOwner != address(0));
     owner = newOwner;
   }
 }
@@ -140,4 +140,14 @@ contract ERC20Token is StandardToken, Ownable
         totalSupply = initialSupply;
         balances[owner] = initialSupply;
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

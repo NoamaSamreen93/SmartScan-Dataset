@@ -217,7 +217,6 @@ contract NePayReborn is ERC20 {
         uint256 amount = token.balanceOf(address(this));
         return token.transfer(owner, amount);
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

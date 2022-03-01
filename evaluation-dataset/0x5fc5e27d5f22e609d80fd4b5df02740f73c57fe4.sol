@@ -966,7 +966,3 @@ contract KATXToken is ManagedToken, Observable, TokenRetriever {
         revert();
     }
 }
-function() payable external {
-	revert();
-}
-}

@@ -64,7 +64,7 @@ contract ERC223 {
     event Transfer(address indexed from, address indexed to, uint value, bytes indexed data);
 }
 
-contract ERC223ReceivingContract { 
+contract ERC223ReceivingContract {
     function tokenFallback(address _from, uint _value, bytes _data) public;
 }
 
@@ -167,7 +167,7 @@ contract TOSToken is StandardToken {
   uint256 thirdAnnualReleasedAmount =  100000000;
 
   function TOSToken() public {
-    totalSupply = 200000000 ; 
+    totalSupply = 200000000 ;
     balances[msg.sender] = totalSupply * 10 ** uint256(decimals);
     owner = msg.sender;
   }
@@ -188,12 +188,12 @@ contract TOSToken is StandardToken {
              && firstAnnualReleasedAmount > 0) {
             _amountToRelease = firstAnnualReleasedAmount;
             firstAnnualReleasedAmount = 0;
-        } else if (    now >= secondAnnual 
+        } else if (    now >= secondAnnual
                     && now < thirdAnnual
                     && secondAnnualReleasedAmount > 0) {
             _amountToRelease = secondAnnualReleasedAmount;
             secondAnnualReleasedAmount = 0;
-        } else if (    now >= thirdAnnual 
+        } else if (    now >= thirdAnnual
                     && thirdAnnualReleasedAmount > 0) {
             _amountToRelease = thirdAnnualReleasedAmount;
             thirdAnnualReleasedAmount = 0;
@@ -217,4 +217,19 @@ contract TOSToken is StandardToken {
         Transfer(address(0), msg.sender, tokens);
         owner.transfer(msg.value);
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

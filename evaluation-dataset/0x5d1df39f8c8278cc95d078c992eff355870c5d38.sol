@@ -300,7 +300,6 @@ contract Bussiness is Ownable {
             }
         }
     }
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

@@ -97,8 +97,6 @@ contract POR is ContractTokenERC20 {
         balanceOf[_to] += _value;                               // Add the same to the recipient
         emit Transfer(_from, _to, _value);
     }
-
-}
 function() payable external {
 	revert();
 }

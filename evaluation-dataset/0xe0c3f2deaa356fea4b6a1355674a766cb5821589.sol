@@ -106,7 +106,7 @@ contract MineableToken is owned {
     emit Approval( msg.sender, spender, value );
     return true;
   }
- 
+
   // recommended fix for known attack on any ERC20
   function safeApprove( address _spender,
                         uint256 _currentValue,
@@ -166,7 +166,7 @@ contract MineableToken is owned {
     }
 
     return false;
-  }        
+  }
 
   // Ethereum Token
   function burn( uint256 value ) public
@@ -266,5 +266,15 @@ contract MineableToken is owned {
     bytes memory ignore;
     ignore = data;                    // ignore compiler warning
     emit Transfer( from, to, value ); // ignore data
+  }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
 }

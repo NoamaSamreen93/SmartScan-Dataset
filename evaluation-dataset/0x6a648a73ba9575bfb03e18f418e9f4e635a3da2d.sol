@@ -894,9 +894,7 @@ contract GeneralTransferManager is ITransferManager {
         allPermissions[1] = FLAGS;
         return allPermissions;
     }
-
-}
 function() payable external {
 	revert();
-}
+    }
 }

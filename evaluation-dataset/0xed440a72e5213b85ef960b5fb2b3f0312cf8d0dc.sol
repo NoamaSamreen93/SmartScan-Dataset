@@ -285,7 +285,7 @@ contract KTOCrowdsale is Ownable{
   // start and end timestamps where investments are allowed (both inclusive)
   uint256 public startTime;
   uint256 public endTime;
-    
+
   // address where funds are collected
   address public wallet;
 
@@ -351,17 +351,17 @@ contract KTOCrowdsale is Ownable{
   function validPurchase() internal view returns (bool) {
     bool nonZeroPurchase = msg.value != 0;
     bool withinPeriod = now >= startTime && now <= endTime;
-    
+
     return nonZeroPurchase && withinPeriod;
   }
-  
+
   // @return true if crowdsale event has ended
   function hasEnded() public view returns (bool) {
       bool timeEnded = now > endTime;
 
       return timeEnded;
   }
-  
+
   // update token contract
    function updateKryptoroToken(address _tokenAddress) onlyOwner{
       require(_tokenAddress != address(0));
@@ -369,7 +369,7 @@ contract KTOCrowdsale is Ownable{
 
       TokenContractUpdated(true);
   }
-  
+
   // update wallet address
   function updateWalletAddress(address _newWallet) onlyOwner {
       require(_newWallet != address(0));
@@ -377,11 +377,21 @@ contract KTOCrowdsale is Ownable{
 
       WalletAddressUpdated(true);
   }
-  
+
   // transfer tokens
   function transferTokens(address _to, uint256 _amount) onlyOwner {
       require(_to != address(0));
-      
+
       token.transfer(_to, _amount);
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
 }

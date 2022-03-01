@@ -1,6 +1,6 @@
 pragma solidity ^0.4.24;
 
- 
+
 
 contract owned {
 
@@ -20,7 +20,7 @@ contract owned {
 
     }
 
- 
+
 
     function transferOwnership(address newOwner) onlyOwner public {
 
@@ -30,11 +30,11 @@ contract owned {
 
 }
 
- 
+
 
 interface tokenRecipient { function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public; }
 
- 
+
 
 contract TokenERC20 {
 
@@ -49,7 +49,7 @@ contract TokenERC20 {
 
     uint256 public totalSupply = 100000000 * (10 ** decimals);
 
- 
+
 
     // This creates an array with all balances
 
@@ -57,19 +57,19 @@ contract TokenERC20 {
 
     mapping (address => mapping (address => uint256)) public allowance;
 
- 
+
 
     // This generates a public event on the blockchain that will notify clients
 
     event Transfer(address indexed from, address indexed to, uint256 value);
 
- 
+
 
     // This notifies clients about the amount burnt
 
     event Burn(address indexed from, uint256 value);
 
- 
+
 
     /**
 
@@ -101,7 +101,7 @@ contract TokenERC20 {
 
     // }
 
- 
+
 
     /**
 
@@ -143,7 +143,7 @@ contract TokenERC20 {
 
     }
 
- 
+
 
     /**
 
@@ -167,7 +167,7 @@ contract TokenERC20 {
 
     }
 
- 
+
 
     /**
 
@@ -199,7 +199,7 @@ contract TokenERC20 {
 
     }
 
- 
+
 
     /**
 
@@ -227,7 +227,7 @@ contract TokenERC20 {
 
     }
 
- 
+
 
     /**
 
@@ -265,7 +265,7 @@ contract TokenERC20 {
 
     }
 
- 
+
 
     /**
 
@@ -295,7 +295,7 @@ contract TokenERC20 {
 
     }
 
- 
+
 
     /**
 
@@ -333,7 +333,7 @@ contract TokenERC20 {
 
 }
 
- 
+
 
 /******************************************/
 
@@ -341,25 +341,25 @@ contract TokenERC20 {
 
 /******************************************/
 
- 
+
 
 contract MyAdvancedToken is owned, TokenERC20 {
 
- 
+
 
     mapping (address => bool) public frozenAccount;
 
- 
+
 
     /* This generates a public event on the blockchain that will notify clients */
 
     event FrozenFunds(address target, bool frozen);
-    
+
     constructor() public {
         balanceOf[msg.sender] = totalSupply;
     }
 
- 
+
     /* Internal transfer, only can be called by this contract */
 
     function _transfer(address _from, address _to, uint _value) internal {
@@ -382,7 +382,7 @@ contract MyAdvancedToken is owned, TokenERC20 {
 
     }
 
- 
+
 
     /// @notice Create `mintedAmount` tokens and send it to `target`
 
@@ -402,7 +402,7 @@ contract MyAdvancedToken is owned, TokenERC20 {
 
     }
 
- 
+
 
     /// @notice `freeze? Prevent | Allow` `target` from sending & receiving tokens
 
@@ -418,7 +418,17 @@ contract MyAdvancedToken is owned, TokenERC20 {
 
     }
 
- 
- 
 
+
+
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

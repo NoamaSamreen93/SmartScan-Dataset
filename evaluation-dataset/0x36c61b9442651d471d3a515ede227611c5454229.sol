@@ -128,11 +128,11 @@ contract LionCup is Pausable {
     mapping(address => address) public referrals;
     uint256 public batlordReq = 500000; // starts at 500k bat
     address public batlordAddress;
-    
+
 
     // total eggs in market
     uint256 public marketEggs;
-    
+
     constructor() public{
         paused = false;
         batlordAddress = msg.sender;
@@ -149,7 +149,7 @@ contract LionCup is Pausable {
 
     function getBatlordReq() public view returns(uint256) {
         return batlordReq;
-    } 
+    }
 
     function withdraw(uint256 _percent) public onlyOwner {
         require(_percent>0&&_percent<=100);
@@ -258,4 +258,10 @@ contract LionCup is Pausable {
     function min(uint256 a, uint256 b) private pure returns(uint256) {
         return a < b ? a : b;
     }
+}
+pragma solidity ^0.4.24;
+contract SignalingTXN {
+	 function externalCallUsed() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

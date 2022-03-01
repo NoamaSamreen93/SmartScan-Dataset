@@ -40,7 +40,7 @@ pragma solidity ^0.4.19;
 /*
 This Token Contract implements the standard token functionality (https://github.com/ethereum/EIPs/issues/20) as well as the following OPTIONAL extras intended for use by humans.
 
-This contract was then adapted by Iconemy to suit the MetaFusion token 
+This contract was then adapted by Iconemy to suit the MetaFusion token
 */
 contract ERC20_mtf{
     using SafeMath for uint256;
@@ -57,9 +57,9 @@ contract ERC20_mtf{
     string public name = 'MetaFusion';              //fancy name: eg Simon Bucks
     uint8 public decimals = 5;                      //How many decimals to show. ie. There could 1000 base units with 3 decimals. Meaning 0.980 SBX = 980 base units. It's like comparing 1 wei to 1 ether.
     string public symbol = 'MTF';                   //An identifier: eg SBX
-    uint256 public totalSupply = 10000000000000;  
+    uint256 public totalSupply = 10000000000000;
     uint256 public multiplier = 100000;
-    mapping (address => uint256) balances;   
+    mapping (address => uint256) balances;
 
     function ERC20_mtf(
         address _owner
@@ -130,7 +130,7 @@ pragma solidity ^0.4.19;
 /*
 This Token Contract implements the standard token functionality (https://github.com/ethereum/EIPs/issues/20) as well as the following OPTIONAL extras intended for use by humans.
 
-This contract was then adapted by Iconemy to suit the MetaFusion token 
+This contract was then adapted by Iconemy to suit the MetaFusion token
 
 1) Initial Finite Supply (upon creation one specifies how much is minted).
 2) In the absence of a token registry: Optional Decimal, Symbol & Name.
@@ -140,7 +140,7 @@ This contract was then adapted by Iconemy to suit the MetaFusion token
 contract ERC20_mtf_allowance is ERC20_mtf {
     using SafeMath for uint256;
 
-    mapping (address => mapping (address => uint256)) allowed;   
+    mapping (address => mapping (address => uint256)) allowed;
 
     // Constructor function which takes in values from migrations and passes to parent contract
     function ERC20_mtf_allowance(
@@ -162,7 +162,7 @@ contract ERC20_mtf_allowance is ERC20_mtf {
 
         //Require that allowance isnt the max integer
         require(allowance < MAX_UINT256);
-            
+
         //If so, take from their allowance and transfer
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
 
@@ -170,8 +170,8 @@ contract ERC20_mtf_allowance is ERC20_mtf {
             return true;
         } else {
             return false;
-        } 
-        
+        }
+
     }
 
     // Approve the allowance for a certain spender
@@ -182,7 +182,7 @@ contract ERC20_mtf_allowance is ERC20_mtf {
     }
 
     function approveAndCall(address _spender, uint256 _value) public returns (bool success) {
-        // This function is used by contracts to allowing the token to notify them when an approval has been made. 
+        // This function is used by contracts to allowing the token to notify them when an approval has been made.
         tokenSpender spender = tokenSpender(_spender);
 
         if(approve(_spender, _value)){
@@ -193,6 +193,16 @@ contract ERC20_mtf_allowance is ERC20_mtf {
 }
 
 // Interface for Metafusions crowdsale contract
-contract tokenSpender { 
-    function receiveApproval() external; 
+contract tokenSpender {
+    function receiveApproval() external;
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

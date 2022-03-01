@@ -72,7 +72,7 @@ contract UsingAdmin is
         require(msg.sender == getAdmin());
         _;
     }
-    
+
     function getAdmin()
         public
         constant
@@ -84,7 +84,7 @@ contract UsingAdmin is
 
 /**
     This is a simple class that maintains a doubly linked list of
-    address => uint amounts. Address balances can be added to 
+    address => uint amounts. Address balances can be added to
     or removed from via add() and subtract(). All balances can
     be obtain by calling balances(). If an address has a 0 amount,
     it is removed from the Ledger.
@@ -155,7 +155,7 @@ contract Ledger {
 
         uint _maxAmt = entry.balance;
         if (_maxAmt == 0) return;
-        
+
         if (_amt >= _maxAmt) {
             // Subtract the max amount, and delete entry.
             total -= _maxAmt;
@@ -225,7 +225,7 @@ contract Ledger {
     capital. It provides transparency, governence, and security.
 
     In the future, the Admin account can be set to be a DAO.
-    
+
     A Request:
         - can only be created by Admin
         - can be cancelled by Admin, if not yet executed
@@ -235,7 +235,7 @@ contract Ledger {
         - when executed, calls corresponding `execute${type}()` method
 */
 contract Requestable is
-    UsingAdmin 
+    UsingAdmin
 {
     uint32 public constant WAITING_TIME = 60*60*24*7;   // 1 week
     uint32 public constant TIMEOUT_TIME = 60*60*24*14;  // 2 weeks
@@ -317,13 +317,13 @@ contract Requestable is
         Request storage r = requests[_id];
         require(r.id != 0 && r.dateCancelled == 0 && r.dateExecuted == 0);
         require(uint32(now) > r.dateCreated + WAITING_TIME);
-        
+
         // If request timed out, cancel it.
         if (uint32(now) > r.dateCreated + TIMEOUT_TIME) {
             cancelRequest(_id, "Request timed out.");
             return;
         }
-                
+
         // Execute concrete method after setting as executed.
         r.dateExecuted = uint32(now);
         string memory _msg;
@@ -396,7 +396,7 @@ contract Requestable is
         uint32 _id, uint8 _typeId, address _target, uint _value,
         bool _executedSuccessfully,
         uint32 _dateCreated, uint32 _dateCancelled, uint32 _dateExecuted,
-        string _createdMsg, string _cancelledMsg, string _executedMsg       
+        string _createdMsg, string _cancelledMsg, string _executedMsg
     ) {
         Request memory r = requests[_requestId];
         return (
@@ -484,7 +484,7 @@ contract Treasury is
     // Balances
     uint public capital;  // Ether held as capital. Sendable/Recallable via Requests
     uint public profits;  // Ether received via fallback fn. Distributable only to Token.
-    
+
     // Capital Management
     uint public capitalRaised;        // The amount of capital raised from Comptroller.
     uint public capitalRaisedTarget;  // The target amount of capitalRaised.
@@ -590,7 +590,7 @@ contract Treasury is
 
     /*************************************************************/
     /*************** ADDING CAPITAL ******************************/
-    /*************************************************************/ 
+    /*************************************************************/
 
     // Anyone can add capital at any time.
     // If it comes from Comptroller, it counts as capitalRaised.
@@ -644,7 +644,7 @@ contract Treasury is
         _ITrBankrollable(_bankrollable).removeBankroll(_value, "addCapital()");
         uint _recalled = capital - _prevCapital;
         capitalLedger.subtract(_bankrollable, _recalled);
-        
+
         // Emit and return
         emit ExecutedRecallCapital(now, _bankrollable, _recalled);
         return (true, "Received bankoll back from target.");
@@ -766,4 +766,19 @@ contract Treasury is
         }
         return _success ? _response == address(this) : false;
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

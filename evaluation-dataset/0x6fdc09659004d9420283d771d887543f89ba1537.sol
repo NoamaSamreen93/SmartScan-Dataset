@@ -777,7 +777,6 @@ contract MTComicsArtefact  is Ownable, ERC721Token {
     function setDistribution(uint id, bool isDistributionStarted) public onlyOwnerOrManager {
         types[id].distributionStarted = isDistributionStarted;
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

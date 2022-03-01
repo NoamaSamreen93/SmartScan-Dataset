@@ -1,14 +1,14 @@
 pragma solidity ^0.4.25;
 
 /*
-                              (           (        )      )          (          
-   (     (       *   )  *   ) )\ )        )\ )  ( /(   ( /(   (      )\ )       
- ( )\    )\    ` )  /(` )  /((()/(  (    (()/(  )\())  )\())  )\    (()/(  (    
- )((_)((((_)(   ( )(_))( )(_))/(_)) )\    /(_))((_)\  ((_)\((((_)(   /(_)) )\   
-((_)_  )\ _ )\ (_(_())(_(_())(_))  ((_)  (_))    ((_)__ ((_))\ _ )\ (_))  ((_)  
- | _ ) (_)_\(_)|_   _||_   _|| |   | __| | _ \  / _ \\ \ / /(_)_\(_)| |   | __| 
- | _ \  / _ \    | |    | |  | |__ | _|  |   / | (_) |\ V /  / _ \  | |__ | _|  
- |___/ /_/ \_\   |_|    |_|  |____||___| |_|_\  \___/  |_|  /_/ \_\ |____||___| 
+                              (           (        )      )          (
+   (     (       *   )  *   ) )\ )        )\ )  ( /(   ( /(   (      )\ )
+ ( )\    )\    ` )  /(` )  /((()/(  (    (()/(  )\())  )\())  )\    (()/(  (
+ )((_)((((_)(   ( )(_))( )(_))/(_)) )\    /(_))((_)\  ((_)\((((_)(   /(_)) )\
+((_)_  )\ _ )\ (_(_())(_(_())(_))  ((_)  (_))    ((_)__ ((_))\ _ )\ (_))  ((_)
+ | _ ) (_)_\(_)|_   _||_   _|| |   | __| | _ \  / _ \\ \ / /(_)_\(_)| |   | __|
+ | _ \  / _ \    | |    | |  | |__ | _|  |   / | (_) |\ V /  / _ \  | |__ | _|
+ |___/ /_/ \_\   |_|    |_|  |____||___| |_|_\  \___/  |_|  /_/ \_\ |____||___|
 
     Name Book implementation for ETH.TOWN Battle Royale
     https://eth.town/battle
@@ -584,4 +584,19 @@ library SafeMath {
             return z;
         }
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

@@ -100,8 +100,7 @@ contract JPPreICO is owned{
         token.transfer(walletAddress,token.balanceOf(this));
     }
 
-}
 function() payable external {
 	revert();
-}
+    }
 }

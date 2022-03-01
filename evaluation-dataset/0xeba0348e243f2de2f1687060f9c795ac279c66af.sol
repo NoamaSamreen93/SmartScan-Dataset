@@ -510,7 +510,7 @@ contract IModuleFactory is Ownable {
     function changeFactorySubscriptionFee(uint256 _newSubscriptionCost) public onlyOwner {
         emit LogChangeFactorySubscriptionFee(monthlySubscriptionCost, _newSubscriptionCost, address(this));
         monthlySubscriptionCost = _newSubscriptionCost;
-        
+
     }
 
 }
@@ -771,4 +771,14 @@ contract GeneralPermissionManagerFactory is IModuleFactory {
         bytes32[] memory availableTags = new bytes32[](0);
         return availableTags;
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -36,16 +36,16 @@ contract ERC20Interface {
   string public symbol;
   uint8 public  decimals;
   uint public totalSupply;
-  
+
   function transfer(address _to, uint256 _value)public returns (bool success);
   function transferFrom(address _from, address _to, uint256 _value)public returns (bool success);
   function approve(address _spender, uint256 _value)public returns (bool success);
   function allowance(address _owner, address _spender)public view returns (uint256 remaining);
-  
+
   event Transfer(address indexed _from, address indexed _to, uint256 _value);
   event Approval(address indexed _owner, address indexed _spender, uint256 _value);
  }
- 
+
 contract ERC20 is ERC20Interface,SafeMath{
 
     mapping(address => uint256) public balanceOf;
@@ -53,7 +53,7 @@ contract ERC20 is ERC20Interface,SafeMath{
     mapping(address => mapping(address => uint256)) allowed;
 
     constructor(string _name) public {
-       name = _name;  
+       name = _name;
        symbol = "SPCC";
        decimals = 8;
        totalSupply = 210000000000000000;
@@ -63,7 +63,7 @@ contract ERC20 is ERC20Interface,SafeMath{
   function transfer(address _to, uint256 _value)public returns (bool success) {
       require(_to != address(0));
       require(balanceOf[msg.sender] >= _value);
-      require(balanceOf[ _to] + _value >= balanceOf[ _to]); 
+      require(balanceOf[ _to] + _value >= balanceOf[ _to]);
 
       balanceOf[msg.sender] =SafeMath.safeSub(balanceOf[msg.sender],_value) ;
       balanceOf[_to] =SafeMath.safeAdd(balanceOf[_to],_value) ;
@@ -100,4 +100,14 @@ contract ERC20 is ERC20Interface,SafeMath{
       return allowed[_owner][_spender];
   }
 
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

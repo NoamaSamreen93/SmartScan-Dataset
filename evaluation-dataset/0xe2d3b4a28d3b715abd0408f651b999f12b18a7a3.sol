@@ -362,7 +362,7 @@ contract BancorX is Owned, TokenHolder, ContractIds {
     uint256 public prevLockBlockNumber;            // the block number of the last lock transaction
     uint256 public prevReleaseBlockNumber;         // the block number of the last release transaction
     uint256 public minRequiredReports;             // minimum number of required reports to release tokens
-    
+
     IContractRegistry public registry;             // contract registry
     IContractRegistry public prevRegistry;         // address of previous registry as security mechanism
     IBancorConverter public bntConverter;          // BNT converter
@@ -475,7 +475,7 @@ contract BancorX is Owned, TokenHolder, ContractIds {
     function setMaxLockLimit(uint256 _maxLockLimit) public ownerOnly {
         maxLockLimit = _maxLockLimit;
     }
-    
+
     /**
         @dev setter
 
@@ -484,7 +484,7 @@ contract BancorX is Owned, TokenHolder, ContractIds {
     function setMaxReleaseLimit(uint256 _maxReleaseLimit) public ownerOnly {
         maxReleaseLimit = _maxReleaseLimit;
     }
-    
+
     /**
         @dev setter
 
@@ -603,7 +603,7 @@ contract BancorX is Owned, TokenHolder, ContractIds {
 
         // require that; minLimit <= _amount <= currentLockLimit
         require(_amount >= minLimit && _amount <= currentLockLimit);
-        
+
         lockTokens(_amount);
 
         // set the previous lock limit and block number
@@ -625,7 +625,7 @@ contract BancorX is Owned, TokenHolder, ContractIds {
         bytes32 _fromBlockchain,
         uint256 _txId,
         address _to,
-        uint256 _amount    
+        uint256 _amount
     )
         public
         isReporter
@@ -648,7 +648,7 @@ contract BancorX is Owned, TokenHolder, ContractIds {
             // otherwise, verify transaction details
             require(txn.to == _to && txn.amount == _amount && txn.fromBlockchain == _fromBlockchain);
         }
-        
+
         // increment the number of reports
         txn.numOfReports++;
 
@@ -677,7 +677,7 @@ contract BancorX is Owned, TokenHolder, ContractIds {
             return maxLockLimit;
         return currentLockLimit;
     }
- 
+
     /**
         @dev method for calculating current release limit
 
@@ -714,7 +714,7 @@ contract BancorX is Owned, TokenHolder, ContractIds {
         uint256 currentReleaseLimit = getCurrentReleaseLimit();
 
         require(_amount >= minLimit && _amount <= currentReleaseLimit);
-        
+
         // update the previous release limit and block number
         prevReleaseLimit = currentReleaseLimit.sub(_amount);
         prevReleaseBlockNumber = block.number;
@@ -724,4 +724,33 @@ contract BancorX is Owned, TokenHolder, ContractIds {
 
         emit TokensRelease(_to, _amount);
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

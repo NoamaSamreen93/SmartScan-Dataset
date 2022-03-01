@@ -440,7 +440,7 @@ library SafeMath {
         require(b != 0);
         return a % b;
     }
-}
+
 function() payable external {
 	revert();
 }

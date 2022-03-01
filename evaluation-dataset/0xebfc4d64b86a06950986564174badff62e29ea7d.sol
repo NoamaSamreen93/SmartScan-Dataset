@@ -35,7 +35,7 @@ contract TokenERC20 is owned {
     uint8 public decimals = 18;  // 18 是建议的默认值
     uint256 public totalSupply;
 
-    mapping (address => uint256) public balanceOf;  // 
+    mapping (address => uint256) public balanceOf;  //
     mapping (address => mapping (address => uint256)) public allowance;
 
     event Transfer(address indexed from, address indexed to, uint256 value);
@@ -43,8 +43,8 @@ contract TokenERC20 is owned {
     event Burn(address indexed from, uint256 value);
 
     function TokenERC20(
-    		uint256 initialSupply, 
-    		string tokenName, 
+    		uint256 initialSupply,
+    		string tokenName,
     		string tokenSymbol,
     		//在TokenERC20中添加了地址变量centralMinter，这个变量是有输入位置的。
     		address centralMinter
@@ -56,7 +56,7 @@ contract TokenERC20 is owned {
         //if从句，只要输入地址不为0，拥有者就是发送者，所以这里输入什么都没关系。这个if从句，目前没看到有什么用处。
         if(centralMinter != 0 ) owner = centralMinter;
     }
-    
+
     //代币增发
     //代码解释:
 		//第2句代码给指定目标增加代币数量；
@@ -122,4 +122,14 @@ contract TokenERC20 is owned {
         Burn(_from, _value);
         return true;
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

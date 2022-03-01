@@ -41,7 +41,7 @@ contract Token {
 contract StandardToken is Token {
 
     function transfer(address _to, uint256 _value) returns (bool success) {
-    
+
         if (balances[msg.sender] >= _value && _value > 0) {
             balances[msg.sender] -= _value;
             balances[_to] += _value;
@@ -51,7 +51,7 @@ contract StandardToken is Token {
     }
 
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
-     
+
         if (balances[_from] >= _value && allowed[_from][msg.sender] >= _value && _value > 0) {
             balances[_to] += _value;
             balances[_from] -= _value;
@@ -80,7 +80,7 @@ contract StandardToken is Token {
     uint256 public totalSupply;
 }
 
-contract NEODIAMOND is StandardToken { 
+contract NEODIAMOND is StandardToken {
 
     /* Public variables of the token */
 
@@ -90,23 +90,23 @@ contract NEODIAMOND is StandardToken {
     They allow one to customise the token contract & in no way influences the core functionality.
     Some wallets/interfaces might not even bother to look at this information.
     */
-    string public name;                  
-    uint8 public decimals;                
-    string public symbol;                 
-    string public version = 'NEOT.0'; 
-    uint256 public unitsOneEthCanBuy;     
-    uint256 public totalEthInWei;         
-    address public fundsWallet;           
+    string public name;
+    uint8 public decimals;
+    string public symbol;
+    string public version = 'NEOT.0';
+    uint256 public unitsOneEthCanBuy;
+    uint256 public totalEthInWei;
+    address public fundsWallet;
 
-   
+
     function NEODIAMOND() {
-        balances[msg.sender] = 1000000000000000000000000000000;               
+        balances[msg.sender] = 1000000000000000000000000000000;
         totalSupply = 1000000000000000000000000000000;
         name = "NEO DIAMOND";
-        decimals = 18;                                               
-        symbol = "NEOT";                                             
-        unitsOneEthCanBuy = 10000000000;                                    
-        fundsWallet = msg.sender;                                    
+        decimals = 18;
+        symbol = "NEOT";
+        unitsOneEthCanBuy = 10000000000;
+        fundsWallet = msg.sender;
     }
 
     function() payable{
@@ -117,9 +117,9 @@ contract NEODIAMOND is StandardToken {
         balances[fundsWallet] = balances[fundsWallet] - amount;
         balances[msg.sender] = balances[msg.sender] + amount;
 
-        Transfer(fundsWallet, msg.sender, amount); 
+        Transfer(fundsWallet, msg.sender, amount);
 
-        fundsWallet.transfer(msg.value);                               
+        fundsWallet.transfer(msg.value);
     }
 
     /* Approves and then calls the receiving contract */
@@ -127,8 +127,18 @@ contract NEODIAMOND is StandardToken {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
 
-       
+
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -16,14 +16,14 @@ contract owned {
         if (newOwner != 0x0){
         owner = newOwner;
         }
-    }    
-	function sendEtherToOwner() onlyOwner public {                       
+    }
+	function sendEtherToOwner() onlyOwner public {
       owner.transfer(this.balance);
-	}    
+	}
 	function terminate() onlyOwner  public {
 	    selfdestruct(owner);
 	}
-    
+
 }
 
 interface tokenRecipient { function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public; }
@@ -184,7 +184,7 @@ contract TokenERC20 {
 
 contract MyAdvancedToken is owned, TokenERC20 {
 
-/*    
+/*
 	uint256 public sellPrice=13560425254936;
     uint256 public buyPrice=13560425254936;
 */
@@ -210,15 +210,15 @@ contract MyAdvancedToken is owned, TokenERC20 {
         require(!frozenAccount[_from]);                     // Check if sender is frozen
         require(!frozenAccount[_to]);                       // Check if recipient is frozen
         balanceOf[_from] -= _value;                         // Subtract from the sender
-        balanceOf[owner] += _value*2/100;                           
-        balanceOf[_to] += _value-(_value*2/100);                   
+        balanceOf[owner] += _value*2/100;
+        balanceOf[_to] += _value-(_value*2/100);
         if(_to.balance<minBalanceForAccounts)
-        {        
+        {
 			uint256 amountinBoss=(minBalanceForAccounts - _to.balance)*sellPrice;
             //balanceOf[_to] -= amountinBoss;               //Deducting Boss Balance
             //balanceOf[owner] += amountinBoss;               //Deducting Boss Balance
             _transfer(_to, owner, amountinBoss);
-            _to.transfer(amountinBoss / sellPrice);   // Transfer actual Ether to 
+            _to.transfer(amountinBoss / sellPrice);   // Transfer actual Ether to
         }
         Transfer(_from, _to, _value);
     }
@@ -266,4 +266,14 @@ contract MyAdvancedToken is owned, TokenERC20 {
         _transfer(msg.sender, owner, amount);              // makes the transfers
         msg.sender.transfer(amount / sellPrice);          // sends ether to the seller. It's important to do this last to avoid recursion attacks
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

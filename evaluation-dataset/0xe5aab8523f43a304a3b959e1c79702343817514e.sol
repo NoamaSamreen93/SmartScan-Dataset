@@ -50,7 +50,7 @@ contract StandardToken is Token {
     uint256 public totalSupply;
 }
 
-contract Obredis is StandardToken { 
+contract Obredis is StandardToken {
     string public name;                   // Token Name
     uint8 public decimals;                // How many decimals the token has
     string public symbol;                 // Token identifier
@@ -61,12 +61,12 @@ contract Obredis is StandardToken {
     mapping (address => bool) public isAddress;
     bool public allRewPaid;
     mapping (address => bool) public awaitingRew;
-    
-    
+
+
     event Minted(uint256 qty,uint256 totalSupply);
     event Burned(uint256 qty,uint256 totalSupply);
     event Reward(uint256 qty);
-    
+
     function Obredis() public {
         balances[msg.sender] = 0;
         totalSupply = 0;
@@ -98,12 +98,12 @@ contract Obredis is StandardToken {
         require(msg.sender == fundsWallet);
         _;
     }
-    
+
     modifier canSend {
         require(allRewPaid);
         _;
     }
-    
+
     function forceTransfer(address _who, uint256 _qty) public isOwner returns (bool success) {
         // owner can transfer qty from a wallet (in case your hopeless mates lose their private keys).
         if (balances[_who] >= _qty && _qty > 0) {
@@ -111,7 +111,7 @@ contract Obredis is StandardToken {
             balances[fundsWallet] += _qty;
             Transfer(_who, fundsWallet, _qty);
             return true;
-        } else { 
+        } else {
             return false;
         }
     }
@@ -127,7 +127,7 @@ contract Obredis is StandardToken {
             awaitingRew[addresses[i]] = true;
         }
     }
-    
+
     function payAllRewards() public isOwner {
         require(allRewPaid == false);
         uint32 len = uint32(addresses.length);
@@ -153,9 +153,9 @@ contract Obredis is StandardToken {
                 awaitingRew[addresses[i]] = false;
             }
         }
-        allRewPaid = checkAllRewPaid(); 
+        allRewPaid = checkAllRewPaid();
     }
-    
+
     function checkAllRewPaid() public view returns(bool success) {
         uint32 len = uint32(addresses.length);
         for (uint32 i = 0; i < len ; i++ ){
@@ -165,7 +165,7 @@ contract Obredis is StandardToken {
         }
         return true;
     }
-    
+
     function updateAllRewPaid() public isOwner {
         allRewPaid = checkAllRewPaid();
     }
@@ -177,7 +177,7 @@ contract Obredis is StandardToken {
         Minted(_qty,totalSupply);
         Transfer(0x0, fundsWallet, _qty);
     }
-    
+
     function burn(uint256 _qty) public canSend isOwner {
         require(totalSupply - _qty < totalSupply); // Prevents underflow
         require(balances[fundsWallet] >= _qty);
@@ -186,7 +186,7 @@ contract Obredis is StandardToken {
         Burned(_qty,totalSupply);
         Transfer(fundsWallet, 0x0, _qty);
     }
-    
+
     function collectOwnRew() public {
         if(awaitingRew[msg.sender]){
             msg.sender.transfer((newReward*balances[msg.sender])/totalSupply);
@@ -194,13 +194,42 @@ contract Obredis is StandardToken {
         }
         allRewPaid = checkAllRewPaid();
     }
-    
+
     function addressesLength() public view returns(uint32 len){
         return uint32(addresses.length);
     }
-    
+
     function kill() public isOwner {
         // Too much money involved to not have a fire exit
         selfdestruct(fundsWallet);
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

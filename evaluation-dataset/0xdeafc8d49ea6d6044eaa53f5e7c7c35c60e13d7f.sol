@@ -242,8 +242,8 @@ contract ButtonClickGameControls is ButtonClickRBAC {
 
     /**
      * In order to reduce the likelihood of someone spamming the button click continually with
-     * multiple ether addresses, which would effectively prevent the button from ever decrementing, 
-     * we have introduced the concept of a minimum fee required to click the button. 
+     * multiple ether addresses, which would effectively prevent the button from ever decrementing,
+     * we have introduced the concept of a minimum fee required to click the button.
      */
     uint256 public minimumFee;
 
@@ -268,7 +268,7 @@ contract ButtonClickGameControls is ButtonClickRBAC {
     function setRequiredBlocksElapsedForVictory(uint256 _requiredBlocksElapsedForVictory) external onlyAdmin {
         requiredBlocksElapsedForVictory = _requiredBlocksElapsedForVictory;
     }
-    
+
     /**
      * @dev Changes the minimum fee. This may ONLY be called by the "finance" role
      */
@@ -282,7 +282,7 @@ contract ButtonClickGameControls is ButtonClickRBAC {
     function withdrawBalance() external onlyFinance {
         msg.sender.transfer(address(this).balance);
     }
-    
+
 }
 
 // File: zeppelin-solidity/contracts/math/Math.sol
@@ -318,20 +318,20 @@ library Math {
 contract ERC721Basic {
   event Transfer(address indexed _from, address indexed _to, uint256 _tokenId);
   event Approval(address indexed _owner, address indexed _approved, uint256 _tokenId);
-  event ApprovalForAll(address indexed _owner, address indexed _operator, bool _approved);  
+  event ApprovalForAll(address indexed _owner, address indexed _operator, bool _approved);
 
   function balanceOf(address _owner) public view returns (uint256 _balance);
   function ownerOf(uint256 _tokenId) public view returns (address _owner);
   function exists(uint256 _tokenId) public view returns (bool _exists);
-  
+
   function approve(address _to, uint256 _tokenId) public;
   function getApproved(uint256 _tokenId) public view returns (address _operator);
-  
+
   function setApprovalForAll(address _operator, bool _approved) public;
   function isApprovedForAll(address _owner, address _operator) public view returns (bool);
 
   function transferFrom(address _from, address _to, uint256 _tokenId) public;
-  function safeTransferFrom(address _from, address _to, uint256 _tokenId) public;  
+  function safeTransferFrom(address _from, address _to, uint256 _tokenId) public;
   function safeTransferFrom(address _from, address _to, uint256 _tokenId, bytes _data) public;
 }
 
@@ -460,7 +460,7 @@ contract ERC721Receiver {
    *  Equals to `bytes4(keccak256("onERC721Received(address,uint256,bytes)"))`,
    *  which can be also obtained as `ERC721Receiver(0).onERC721Received.selector`
    */
-  bytes4 constant ERC721_RECEIVED = 0xf0b9e5ba; 
+  bytes4 constant ERC721_RECEIVED = 0xf0b9e5ba;
 
   /**
    * @notice Handle the receipt of an NFT
@@ -469,7 +469,7 @@ contract ERC721Receiver {
    *  transfer. This function MUST use 50,000 gas or less. Return of other
    *  than the magic value MUST result in the transaction being reverted.
    *  Note: the contract address is always the message sender.
-   * @param _from The sending address 
+   * @param _from The sending address
    * @param _tokenId The NFT identifier which is being transfered
    * @param _data Additional data with no specified format
    * @return `bytes4(keccak256("onERC721Received(address,uint256,bytes)"))`
@@ -486,10 +486,10 @@ contract ERC721Receiver {
 contract ERC721BasicToken is ERC721Basic {
   using SafeMath for uint256;
   using AddressUtils for address;
-  
+
   // Equals to `bytes4(keccak256("onERC721Received(address,uint256,bytes)"))`
   // which can be also obtained as `ERC721Receiver(0).onERC721Received.selector`
-  bytes4 constant ERC721_RECEIVED = 0xf0b9e5ba; 
+  bytes4 constant ERC721_RECEIVED = 0xf0b9e5ba;
 
   // Mapping from token ID to owner
   mapping (uint256 => address) internal tokenOwner;
@@ -618,7 +618,7 @@ contract ERC721BasicToken is ERC721Basic {
     clearApproval(_from, _tokenId);
     removeTokenFrom(_from, _tokenId);
     addTokenTo(_to, _tokenId);
-    
+
     Transfer(_from, _to, _tokenId);
   }
 
@@ -770,7 +770,7 @@ contract ERC721Token is ERC721, ERC721BasicToken {
   // Mapping from token id to position in the allTokens array
   mapping(uint256 => uint256) internal allTokensIndex;
 
-  // Optional mapping for token URIs 
+  // Optional mapping for token URIs
   mapping(uint256 => string) internal tokenURIs;
 
   /**
@@ -891,7 +891,7 @@ contract ERC721Token is ERC721, ERC721BasicToken {
   */
   function _mint(address _to, uint256 _tokenId) internal {
     super._mint(_to, _tokenId);
-    
+
     allTokensIndex[_tokenId] = allTokens.length;
     allTokens.push(_tokenId);
   }
@@ -978,7 +978,7 @@ contract ButtonClickGame is ERC721Token("The Ether Button", "Butt"), ButtonClick
 
     /**
      * A mapping from a specific address to which generation the user last clicked the button
-     * during. Regardless of whether a user transfers his/her click token, we only allow a 
+     * during. Regardless of whether a user transfers his/her click token, we only allow a
      * single button click per game generation
      */
     mapping (address => uint256) public addressLastClickedForGeneration;
@@ -990,8 +990,8 @@ contract ButtonClickGame is ERC721Token("The Ether Button", "Butt"), ButtonClick
     mapping (uint8 => uint256) public numberOfClicksAtBlocksRemaining;
 
     /**
-     * @dev This method contains the core game logic, tracking a distinct button "click" event and 
-     * saving all relevant metadata associated with it. This method will generate both a ButtonClick 
+     * @dev This method contains the core game logic, tracking a distinct button "click" event and
+     * saving all relevant metadata associated with it. This method will generate both a ButtonClick
      * and Transfer event. Callers can ONLY call this method a single time per game generation.
      *
      * @return the id in our array, which is the latest click
@@ -1051,7 +1051,7 @@ contract ButtonClickGame is ERC721Token("The Ether Button", "Butt"), ButtonClick
 
     /**
      * Fetches information about a specific click event
-     * 
+     *
      * @param _id The ID of a specific button click token
      */
     function getClickMetadata(uint256 _id) external view returns (
@@ -1084,7 +1084,7 @@ contract ButtonClickGameContract is ButtonClickGame {
 
         minimumFee = 500000000000000; // 0.0005 ETH (hopefully low enough to not deter users, but high enough to avoid bots)
         requiredBlocksElapsedForVictory = 20; // 20 blocks must elapse to win
-    }    
+    }
 
     /**
      * @dev Officially starts the game and configures all initial details
@@ -1097,10 +1097,25 @@ contract ButtonClickGameContract is ButtonClickGame {
 
     /**
      * @dev A simple function to allow for deposits into this contract. We use this
-     * instead of the fallback function to ensure that deposits are intentional 
+     * instead of the fallback function to ensure that deposits are intentional
      */
     function sendDeposit() external payable {
-        
+
     }
 
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

@@ -85,7 +85,7 @@ contract Owned {
     function transferOwnership(address _newOwner) public onlyOwner {
         newOwner = _newOwner;
     }
-    
+
     function acceptOwnership() public {
         require(msg.sender == newOwner);
         emit OwnershipTransferred(owner, newOwner);
@@ -101,7 +101,7 @@ contract Owned {
 // ----------------------------------------------------------------------------
 contract WeiDexBeta is ERC20Interface, Owned {
     using SafeMath for uint;
-    
+
     // ------------------------------------------------------------------------
     // Metadata
     // ------------------------------------------------------------------------
@@ -122,7 +122,7 @@ contract WeiDexBeta is ERC20Interface, Owned {
         decimals = 18;
         _totalSupply = 5000000 * 10**uint(decimals);
         balances[owner] = _totalSupply;
-        
+
         emit Transfer(address(0), owner, _totalSupply);
     }
 
@@ -162,7 +162,7 @@ contract WeiDexBeta is ERC20Interface, Owned {
     //
     // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
     // recommends that there are no checks for the approval double-spend attack
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
     // ------------------------------------------------------------------------
     function approve(address spender, uint tokens) public returns (bool success) {
         allowed[msg.sender][spender] = tokens;
@@ -173,7 +173,7 @@ contract WeiDexBeta is ERC20Interface, Owned {
 
     // ------------------------------------------------------------------------
     // Transfer `tokens` from the `from` account to the `to` account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the `from` account and
     // - From account must have sufficient balance to transfer
@@ -217,7 +217,7 @@ contract WeiDexBeta is ERC20Interface, Owned {
     function () public payable {
         revert();
     }
-    
+
 
     // ------------------------------------------------------------------------
     // Owner can transfer out any accidentally sent ERC20 tokens
@@ -225,4 +225,33 @@ contract WeiDexBeta is ERC20Interface, Owned {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

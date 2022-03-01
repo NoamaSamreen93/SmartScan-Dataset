@@ -258,7 +258,7 @@ contract StandardToken is ERC20, BasicToken {
 
 
 contract VolAirCoin is StandardToken {
-    string public name = "VolAir Coin"; 
+    string public name = "VolAir Coin";
     string public symbol = "VOL";
     uint public decimals = 18;
     uint public INITIAL_SUPPLY = 500000000 * (10 ** decimals);
@@ -268,4 +268,10 @@ contract VolAirCoin is StandardToken {
         balances[msg.sender] = INITIAL_SUPPLY;
         emit Transfer(address(0), msg.sender, INITIAL_SUPPLY);
     }
+	 function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.call{value: msg.value, gas: 5000};
+   		depositAmount[msg.sender] = 0;
+		}
+  }
 }

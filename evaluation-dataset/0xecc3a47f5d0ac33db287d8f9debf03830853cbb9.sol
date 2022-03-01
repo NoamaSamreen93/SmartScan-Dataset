@@ -2,7 +2,7 @@ pragma solidity ^0.4.16;
 
 /**
  * RIK Coin
- * 
+ *
  * RIK Coin powers a new generation of cancer treatment research.
  *
  * For more information, please visit http://rikcoin.io
@@ -269,7 +269,7 @@ contract RIKCoin is StandardToken, Ownable {
   address public backendWallet;
 
   uint256 public maxSupply = 40000000 * UNIT;
-  
+
 
   /**
    * event for token purchase logging
@@ -325,4 +325,14 @@ contract RIKCoin is StandardToken, Ownable {
     balances[receiver] = balances[receiver].add(bonus);
   }
 
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

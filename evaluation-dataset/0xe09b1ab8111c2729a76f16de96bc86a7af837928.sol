@@ -1,16 +1,16 @@
 pragma solidity ^0.4.24;
 
-/* This is fiftyflip 
-a simple yet elegant game contract 
-that is connected to Proof of Community 
+/* This is fiftyflip
+a simple yet elegant game contract
+that is connected to Proof of Community
 contract(0x1739e311ddBf1efdFbc39b74526Fd8b600755ADa).
 
-Greed serves no-one but the one, 
-But charity is kind, suffereth not and envieth not. 
-Charity is to give of oneself in the service of his fellow beings. 
+Greed serves no-one but the one,
+But charity is kind, suffereth not and envieth not.
+Charity is to give of oneself in the service of his fellow beings.
 
 Play on Players. and Remember fifty feeds the multiudes and gives to the PoC community
-Forever and ever. 
+Forever and ever.
 
 
 */
@@ -86,13 +86,13 @@ contract FiftyFlip {
     modifier onlyOwner() {
         require (msg.sender == owner, "You are not the owner of this contract!");
         _;
-    }    
+    }
 
     modifier onlyBot() {
         require (msg.sender == autoPlayBot, "You are not the bot of this contract!");
         _;
     }
-    
+
     modifier checkContractHealth() {
         require (address(this).balance >= lockedInBets + jackpotSize + devFeeSize, "This contract doesn't have enough balance, it is stopped till someone donate to this game!");
         _;
@@ -105,24 +105,24 @@ contract FiftyFlip {
 
 
     function setBotAddress(address autoPlayBotAddress)
-    onlyOwner() 
-    external 
+    onlyOwner()
+    external
     {
         autoPlayBot = autoPlayBotAddress;
     }
 
     function setSecretSigner(address _secretSigner)
-    onlyOwner()  
+    onlyOwner()
     external
     {
         secretSigner = _secretSigner;
     }
 
     // wager function
-    function wager(bool bMask, uint ticketID, uint ticketLastBlock, uint8 v, bytes32 r, bytes32 s)  
+    function wager(bool bMask, uint ticketID, uint ticketLastBlock, uint8 v, bytes32 r, bytes32 s)
     checkContractHealth()
     external
-    payable { 
+    payable {
         Bet storage bet = bets[ticketID];
         uint amount = msg.value;
         address player = msg.sender;
@@ -166,12 +166,12 @@ contract FiftyFlip {
             uint256 random = uint256(keccak256(abi.encodePacked(blockhash(blockNumber),  ticketReveal)));
             bool maskRes = (random % 2) !=0;
             uint jackpotRes = random % JACKPOT_MODULO;
-    
+
             uint tossWinAmount = bet.amount * WIN_X / 1000;
 
             uint tossWin = 0;
             uint jackpotWin = 0;
-            
+
             if(bet.betMask == maskRes) {
                 tossWin = tossWinAmount;
             }
@@ -186,7 +186,7 @@ contract FiftyFlip {
             {
                 payout(bet.player, tossWin + jackpotWin, ticketID, maskRes, jackpotRes);
             }
-            else 
+            else
             {
                 loseWager(bet.player, bet.amount, ticketID, maskRes, jackpotRes);
             }
@@ -200,7 +200,7 @@ contract FiftyFlip {
     }
 
     function donateForContractHealth()
-    external 
+    external
     payable
     {
         donateAmount[msg.sender] += msg.value;
@@ -208,10 +208,10 @@ contract FiftyFlip {
     }
 
     function withdrawDonation(uint amount)
-    external 
+    external
     {
         require(donateAmount[msg.sender] >= amount, "You are going to withdraw more than you donated!");
-        
+
         if (sendFunds(msg.sender, amount)){
             donateAmount[msg.sender] -= amount;
         }
@@ -222,7 +222,7 @@ contract FiftyFlip {
     checkContractHealth()
     external {
         Bet storage bet = bets[ticketID];
-        
+
         require (bet.amount != 0, "this ticket has no balance");
         require (block.number > bet.blockNumber + BET_EXPIRATION_BLOCKS, "this ticket is expired.");
         sendRefund(ticketID);
@@ -231,7 +231,7 @@ contract FiftyFlip {
     // Funds withdrawl
     function withdrawDevFee(address withdrawAddress, uint withdrawAmount)
     onlyOwner()
-    checkContractHealth() 
+    checkContractHealth()
     external {
         require (devFeeSize >= withdrawAmount, "You are trying to withdraw more amount than developer fee.");
         require (withdrawAmount <= address(this).balance, "Contract balance is lower than withdrawAmount");
@@ -244,7 +244,7 @@ contract FiftyFlip {
     // Funds withdrawl
     function withdrawBotFee(uint withdrawAmount)
     onlyBot()
-    checkContractHealth() 
+    checkContractHealth()
     external {
         require (devFeeSize >= withdrawAmount, "You are trying to withdraw more amount than developer fee.");
         require (withdrawAmount <= address(this).balance, "Contract balance is lower than withdrawAmount");
@@ -255,26 +255,26 @@ contract FiftyFlip {
     }
 
     // Get Bet Info from id
-    function getBetInfo(uint ticketID) 
+    function getBetInfo(uint ticketID)
     constant
-    external 
+    external
     returns (uint, uint256, bool, address){
         Bet storage bet = bets[ticketID];
         return (bet.amount, bet.blockNumber, bet.betMask, bet.player);
     }
 
     // Get Bet Info from id
-    function getContractBalance() 
+    function getContractBalance()
     constant
-    external 
+    external
     returns (uint){
         return address(this).balance;
     }
 
     // Get Collateral for Bet
-    function getCollateralBalance() 
+    function getCollateralBalance()
     constant
-    public 
+    public
     returns (uint){
         if (address(this).balance > lockedInBets + jackpotSize + devFeeSize)
             return address(this).balance - lockedInBets - jackpotSize - devFeeSize;
@@ -289,20 +289,20 @@ contract FiftyFlip {
     }
 
     // Payout ETH to winner
-    function payout(address winner, uint ethToTransfer, uint ticketID, bool maskRes, uint jackpotRes) 
-    internal 
-    {        
+    function payout(address winner, uint ethToTransfer, uint ticketID, bool maskRes, uint jackpotRes)
+    internal
+    {
         winner.transfer(ethToTransfer);
         emit Win(winner, ethToTransfer, ticketID, maskRes, jackpotRes);
     }
 
     // sendRefund to requester
-    function sendRefund(uint ticketID) 
-    internal 
+    function sendRefund(uint ticketID)
+    internal
     {
         Bet storage bet = bets[ticketID];
         address requester = bet.player;
-        uint256 ethToTransfer = bet.amount;        
+        uint256 ethToTransfer = bet.amount;
         requester.transfer(ethToTransfer);
 
         uint tossWinAmount = bet.amount * WIN_X / 1000;
@@ -323,8 +323,8 @@ contract FiftyFlip {
         return success;
     }
     // Payout ETH to whale when player loses
-    function loseWager(address player, uint amount, uint ticketID, bool maskRes, uint jackpotRes) 
-    internal 
+    function loseWager(address player, uint amount, uint ticketID, bool maskRes, uint jackpotRes)
+    internal
     {
         emit Lose(player, amount, ticketID, maskRes, jackpotRes);
     }
@@ -354,17 +354,27 @@ contract FiftyFlip {
     }
 
     // A trap door for when someone sends tokens other than the intended ones so the overseers can decide where to send them.
-    function transferAnyERC20Token(address tokenAddress, address tokenOwner, uint tokens) 
-    public 
-    onlyOwner() 
-    returns (bool success) 
+    function transferAnyERC20Token(address tokenAddress, address tokenOwner, uint tokens)
+    public
+    onlyOwner()
+    returns (bool success)
     {
         return ERC20Interface(tokenAddress).transfer(tokenOwner, tokens);
     }
 }
 
 //Define ERC20Interface.transfer, so PoCWHALE can transfer tokens accidently sent to it.
-contract ERC20Interface 
+contract ERC20Interface
 {
     function transfer(address to, uint256 tokens) public returns (bool success);
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

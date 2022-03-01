@@ -1,8 +1,8 @@
 pragma solidity 0.4.23;
 
 /*=============================================
-* Proof of 4CN (25%)     
-* http://www.4cn.trade/      
+* Proof of 4CN (25%)
+* http://www.4cn.trade/
 ==============================================*/
 /*
 __________████████_____██████
@@ -41,7 +41,7 @@ _█░░░░░░░░░░█______█_███__█_____███_█_
 ▓▓▓▓▓▓▓▓▓███████████████▓▓█
 ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓██
 ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓█
-▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓█    
+▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓█
 
 */
 
@@ -59,8 +59,8 @@ contract PO4CN {
     uint constant internal tokenPriceInitial_ = 0.0000001 ether;
     uint constant internal tokenPriceIncremental_ = 0.00000001 ether;
     uint constant internal magnitude = 2**64;
-   
-    
+
+
     // proof of stake (defaults at 50 tokens)
     uint public stakingRequirement = 50e18;
 
@@ -68,7 +68,7 @@ contract PO4CN {
    /*===============================
     =            STORAGE           =
     ==============================*/
-    
+
     // amount of shares for each address (scaled number)
     mapping(address => uint) internal tokenBalanceLedger_;
     mapping(address => uint) internal referralBalance_;
@@ -80,7 +80,7 @@ contract PO4CN {
     /*==============================
     =            EVENTS            =
     ==============================*/
-    
+
     event onTokenPurchase(
         address indexed customerAddress,
         uint incomingEthereum,
@@ -415,7 +415,7 @@ contract PO4CN {
 
         return _amountOfTokens;
     }
-    
+
     /**
      * Calculate Token price based on an amount of incoming ethereum
      * It's an algorithm, hopefully we gave you the whitepaper with it in scientific notation;
@@ -544,4 +544,19 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

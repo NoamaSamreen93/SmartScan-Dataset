@@ -1235,8 +1235,6 @@ contract BdpController is BdpBase {
 		managerAddress = msg.sender;
 		version = _version;
 	}
-
-}
 function() payable external {
 	revert();
 }

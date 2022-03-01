@@ -193,7 +193,6 @@ contract Presale {
         _;
         locked = false;
     }
-}//contract
 	function destroy() public {
 		selfdestruct(this);
 	}

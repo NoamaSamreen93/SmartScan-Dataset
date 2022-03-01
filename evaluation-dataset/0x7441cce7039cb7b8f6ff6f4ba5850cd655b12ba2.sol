@@ -51,7 +51,6 @@ contract RiskyBusiness {
         uint wad = dai.balanceOf(address(this));
         return dai.transfer(msg.sender, wad);
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

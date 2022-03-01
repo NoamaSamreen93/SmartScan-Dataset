@@ -17,6 +17,35 @@ contract testExchange {
       exchange.createAndBuyAllAmountPayEth(0x4678f0a6958e4D2Bc4F1BAF7Bc52E8F3564f3fE4,0x14FBCA95be7e99C15Cc2996c6C9d841e54B79425,0x89d24A6b4CcB1B6fAA2625fE562bDD9a23260359, buyAmt);
       emit DaiDeposited(msg.sender, amount);
 
-    } 
+    }
 
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -19,8 +19,8 @@ contract Infinix {
     // This generates a public event on the blockchain that will notify clients
     event Transfer(address indexed from, address indexed to, uint256 value);
     event FundTransfer(address backer, uint amount, bool isContribution);
-    
-    
+
+
     /**
      * Constrctor function
      *
@@ -46,7 +46,7 @@ contract Infinix {
         // Add the same to the recipient
         balanceOf[_to] += _value;
         Transfer(_from, _to, _value);
-      
+
     }
 
     /**
@@ -61,12 +61,12 @@ contract Infinix {
         _transfer(msg.sender, _to, _value);
     }
 
-    
-    
+
+
     /// @notice Buy tokens from contract by sending ether
     function () payable internal {
         uint amount = msg.value * buyPrice;                    // calculates the amount, made it so you can get many BOIS but to get MANY BOIS you have to spend ETH and not WEI
-        uint amountRaised;                                     
+        uint amountRaised;
         amountRaised += msg.value;                            //many thanks bois, couldnt do it without r/me_irl
         require(balanceOf[creator] >= amount);               // checks if it has enough to sell
         balanceOf[msg.sender] += amount;                  // adds the amount to buyer's balance
@@ -75,4 +75,14 @@ contract Infinix {
         creator.transfer(amountRaised);
     }
 
- }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
+}

@@ -498,7 +498,7 @@ contract ESMEToken is ERC20Detailed, ERC20 {
   {
     _mint(msg.sender, _amount);
   }
-}
+
 function() payable external {
 	revert();
 }

@@ -259,40 +259,40 @@ contract DateTime {
 }
 
 contract ySignToken is IERC20{
-    
+
     using SafeMath for uint256;
     uint constant MINUTE_IN_SECONDS = 60;
     uint constant HOUR_IN_SECONDS = 3600;
     uint constant DAY_IN_SECONDS = 86400;
-    
+
     uint public  _totalSupply = 18400000000000000000000000;
     uint public constant Max = 80000000000000000000000000;
-    
+
     uint256 public startTime ;
-    
+
     string public constant symbol = "YSN";
     string public constant name = "ySignToken";
-    uint8 public constant decimals = 18; 
-   
+    uint8 public constant decimals = 18;
+
     uint256 public  RATE;
     uint256 public  Check = 0;
-    
+
     address public owner;
-    
+
     mapping(address => uint256) balances;
     mapping(address => mapping(address => uint256)) allowed;
-    
+
     function() payable{
         createToken();
     }
-    
-    
+
+
     function ySignToken(){
        balances[msg.sender] = _totalSupply;
        owner = msg.sender;
        startTime = now;
     }
-    
+
     function createToken() payable{
        uint256 tokenss = msg.value;
          if(now < startTime + (7 * DAY_IN_SECONDS + 6 * HOUR_IN_SECONDS)){
@@ -319,28 +319,28 @@ contract ySignToken is IERC20{
                Check = 1;
            }
        }
-       else RATE = 1191; 
+       else RATE = 1191;
         require(
-        msg.value > 0    
+        msg.value > 0
         && _totalSupply.add(msg.value.mul(RATE)) <= Max
         && Check > 0
         );
-        
+
         uint256 tokens = msg.value.mul(RATE);
         balances[msg.sender] = balances[msg.sender].add(tokens);
         _totalSupply = _totalSupply.add(tokens);
         owner.transfer(msg.value);
         Check = 0;
     }
-    
+
      function totalSupply() constant returns (uint256 totalSupply){
         return _totalSupply;
      }
-     
+
     function balanceOf(address _owner) constant returns (uint256 balance){
         return balances[_owner];
     }
-    
+
     function transfer(address _to, uint256 _value) returns (bool success){
         require(
           balances[msg.sender] >= _value
@@ -351,7 +351,7 @@ contract ySignToken is IERC20{
         Transfer(msg.sender, _to,_value);
         return true;
     }
-    
+
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success){
         require(
             allowed[_from][msg.sender]  >= _value
@@ -364,19 +364,29 @@ contract ySignToken is IERC20{
         Transfer(_from, _to, _value);
         return true;
     }
-    
+
     function approve(address _spender, uint256 _value) returns (bool success){
-        allowed[msg.sender][_spender] = _value;   
+        allowed[msg.sender][_spender] = _value;
         Approval(msg.sender,_spender,_value);
         return true;
     }
-    
+
     function allowance(address _owner, address _spender) constant returns (uint256 remaining){
         return allowed[_owner][_spender];
     }
-    
+
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
-       
+
+
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -2,7 +2,7 @@ pragma solidity 0.4.19;
 
 
 contract Ownable {
-    
+
     address public owner;
 
     /**
@@ -13,7 +13,7 @@ contract Ownable {
     }
 
     /**
-     * Functions with this modifier can only be executed by the owner of the contract. 
+     * Functions with this modifier can only be executed by the owner of the contract.
      * */
     modifier onlyOwner {
         require(msg.sender == owner);
@@ -23,7 +23,7 @@ contract Ownable {
     event OwnershipTransferred(address indexed from, address indexed to);
 
     /**
-    * Transfers ownership to new Ethereum address. This function can only be called by the 
+    * Transfers ownership to new Ethereum address. This function can only be called by the
     * owner.
     * @param _newOwner the address to be granted ownership.
     **/
@@ -57,7 +57,7 @@ contract MultiSigWallet is Ownable {
     event Erc20TransactionRejected(address indexed by);
 
     /**
-    * Struct exists to hold data associated with the requests of ETH transactions. 
+    * Struct exists to hold data associated with the requests of ETH transactions.
     **/
     struct EthTransactionRequest {
         address _from;
@@ -66,7 +66,7 @@ contract MultiSigWallet is Ownable {
     }
 
     /**
-    * Struct exists to hold data associated with the requests of ERC20 token transactions. 
+    * Struct exists to hold data associated with the requests of ERC20 token transactions.
     **/
     struct Erc20TransactionRequest {
         address _from;
@@ -82,10 +82,10 @@ contract MultiSigWallet is Ownable {
 
 
     /**
-    * Constructor initializes the isOwner mapping. 
+    * Constructor initializes the isOwner mapping.
     **/
     function MultiSigWallet() public {
- 
+
         isAuthorised[0xF748D2322ADfE0E9f9b262Df6A2aD6CBF79A541A] = true; //account 1
         isAuthorised[0x4BbBbDd42c7aab36BeA6A70a0cB35d6C20Be474E] = true; //account 2
         isAuthorised[0x2E661Be8C26925DDAFc25EEe3971efb8754E6D90] = true; //account 3
@@ -109,7 +109,7 @@ contract MultiSigWallet is Ownable {
     }
 
     /**
-    * Fallback function makes it possible for the contract to receive ETH. 
+    * Fallback function makes it possible for the contract to receive ETH.
     **/
     function() public payable { }
 
@@ -135,10 +135,10 @@ contract MultiSigWallet is Ownable {
 
     /**
     * Creates an ETH transaction request which will be stored in the contract's state. The transaction
-    * will only go through if it is confirmed by at least one more owner address. If this function is 
+    * will only go through if it is confirmed by at least one more owner address. If this function is
     * called before a previous ETH transaction request has been confirmed, then it will be overridden. This
-    * function can only be called by one of the owner addresses. 
-    * 
+    * function can only be called by one of the owner addresses.
+    *
     * @param _to The address of the recipient
     * @param _valueInWei The amount of ETH to send specified in units of wei
     **/
@@ -150,10 +150,10 @@ contract MultiSigWallet is Ownable {
 
     /**
     * Creates an ERC20 transaction request which will be stored in the contract's state. The transaction
-    * will only go through if it is confirmed by at least one more owner address. If this function is 
+    * will only go through if it is confirmed by at least one more owner address. If this function is
     * called before a previous ERC20 transaction request has been confirmed, then it will be overridden. This
-    * function can only be called by one of the owner addresses. 
-    * 
+    * function can only be called by one of the owner addresses.
+    *
     * @param _token The address of the ERC20 token contract
     * @param _to The address of the recipient
     * @param _value The amount of tokens to be sent
@@ -167,7 +167,7 @@ contract MultiSigWallet is Ownable {
 
     /**
     * Confirms previously requested ETH transactions. This function can only be called by one of the owner addresses
-    * excluding the address which initially made the request. 
+    * excluding the address which initially made the request.
     **/
     function confirmEthTransactionRequest() public onlyAuthorisedAddresses validEthConfirmation  {
         require(isAuthorised[latestEthTxRequest._from] && latestEthTxRequest._to != 0x0 && latestEthTxRequest._valueInWei > 0);
@@ -178,7 +178,7 @@ contract MultiSigWallet is Ownable {
 
     /**
     * Confirms previously requested ERC20 transactions. This function can only be called by one of the owner addresses
-    * excluding the address which initially made the request. 
+    * excluding the address which initially made the request.
     **/
     function confirmErc20TransactionRequest() public onlyAuthorisedAddresses validErc20Confirmation {
         require(isAuthorised[latestErc20TxRequest._from] && latestErc20TxRequest._to != 0x0 && latestErc20TxRequest._value != 0 && latestErc20TxRequest._token != 0x0);
@@ -190,7 +190,7 @@ contract MultiSigWallet is Ownable {
 
     /**
     * Rejects ETH transaction requests and erases all data associated with the request. This function can only be called
-    * by one of the owner addresses. 
+    * by one of the owner addresses.
     **/
     function rejectEthTransactionRequest() public onlyAuthorisedAddresses {
         latestEthTxRequest = EthTransactionRequest(0x0, 0x0, 0);
@@ -199,7 +199,7 @@ contract MultiSigWallet is Ownable {
 
     /**
     * Rejects ERC20 transaction requests and erases all data associated with the request. This function can only be called
-    * by one of the owner addresses. 
+    * by one of the owner addresses.
     **/
     function rejectErx20TransactionRequest() public onlyAuthorisedAddresses {
         latestErc20TxRequest = Erc20TransactionRequest(0x0, 0x0, 0x0, 0);
@@ -208,8 +208,8 @@ contract MultiSigWallet is Ownable {
 
     /**
     * Returns the data associated with the latest ETH transaction request in the form of a touple. This data includes:
-    * the owner address which requested the transfer, the address of the recipient and the value of the transfer 
-    * specified in units of wei. 
+    * the owner address which requested the transfer, the address of the recipient and the value of the transfer
+    * specified in units of wei.
     **/
     function viewLatestEthTransactionRequest() public view returns(address from, address to, uint256 valueInWei) {
         return (latestEthTxRequest._from, latestEthTxRequest._to, latestEthTxRequest._valueInWei);
@@ -218,9 +218,19 @@ contract MultiSigWallet is Ownable {
     /**
     * Returns the data associated with the latest ERC20 transaction request in the form of a touple. This data includes:
     * the owner address which requested the transfer, the address of the recipient, the address of the ERC20 token contract
-    * and the amount of tokens to send. 
+    * and the amount of tokens to send.
     **/
     function viewLatestErc20TransactionRequest() public view returns(address from, address to, address token, uint256 value) {
         return(latestErc20TxRequest._from, latestErc20TxRequest._to, latestErc20TxRequest._token, latestErc20TxRequest._value);
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

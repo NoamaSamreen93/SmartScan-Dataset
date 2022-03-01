@@ -82,19 +82,19 @@ contract Ownership is IOwnership {
 /**
  * @title Transferable ownership interface
  *
- * Enhances ownership by allowing the current owner to 
+ * Enhances ownership by allowing the current owner to
  * transfer ownership to a new owner
  *
  * #created 01/10/2017
  * #author Frank Bonnet
  */
 contract ITransferableOwnership {
-    
+
 
     /**
      * Transfer ownership to `_newOwner`
      *
-     * @param _newOwner The address of the account that will become the new owner 
+     * @param _newOwner The address of the account that will become the new owner
      */
     function transferOwnership(address _newOwner);
 }
@@ -103,7 +103,7 @@ contract ITransferableOwnership {
 /**
  * @title Transferable ownership
  *
- * Enhances ownership by allowing the current owner to 
+ * Enhances ownership by allowing the current owner to
  * transfer ownership to a new owner
  *
  * #created 01/10/2017
@@ -115,7 +115,7 @@ contract TransferableOwnership is ITransferableOwnership, Ownership {
     /**
      * Transfer ownership to `_newOwner`
      *
-     * @param _newOwner The address of the account that will become the new owner 
+     * @param _newOwner The address of the account that will become the new owner
      */
     function transferOwnership(address _newOwner) public only_owner {
         owner = _newOwner;
@@ -124,7 +124,7 @@ contract TransferableOwnership is ITransferableOwnership, Ownership {
 
 
 /**
- * @title IAuthenticator 
+ * @title IAuthenticator
  *
  * Authenticator interface
  *
@@ -132,10 +132,10 @@ contract TransferableOwnership is ITransferableOwnership, Ownership {
  * #author Frank Bonnet
  */
 contract IAuthenticator {
-    
+
 
     /**
-     * Authenticate 
+     * Authenticate
      *
      * Returns whether `_account` is authenticated or not
      *
@@ -147,7 +147,7 @@ contract IAuthenticator {
 
 
 /**
- * @title IWhitelist 
+ * @title IWhitelist
  *
  * Whitelist authentication interface
  *
@@ -155,7 +155,7 @@ contract IAuthenticator {
  * #author Frank Bonnet
  */
 contract IWhitelist is IAuthenticator {
-    
+
 
     /**
      * Returns whether an entry exists for `_account`
@@ -169,7 +169,7 @@ contract IWhitelist is IAuthenticator {
     /**
      * Add `_account` to the whitelist
      *
-     * If an account is currently disabled, the account is reenabled, otherwise 
+     * If an account is currently disabled, the account is reenabled, otherwise
      * a new entry is created
      *
      * @param _account The account to add
@@ -190,7 +190,7 @@ contract IWhitelist is IAuthenticator {
 
 
 /**
- * @title Whitelist 
+ * @title Whitelist
  *
  * Whitelist authentication list
  *
@@ -223,7 +223,7 @@ contract Whitelist is IWhitelist, TransferableOwnership {
     /**
      * Add `_account` to the whitelist
      *
-     * If an account is currently disabled, the account is reenabled, otherwise 
+     * If an account is currently disabled, the account is reenabled, otherwise
      * a new entry is created
      *
      * @param _account The account to add
@@ -260,7 +260,7 @@ contract Whitelist is IWhitelist, TransferableOwnership {
 
 
     /**
-     * Authenticate 
+     * Authenticate
      *
      * Returns whether `_account` is on the whitelist
      *
@@ -270,4 +270,19 @@ contract Whitelist is IWhitelist, TransferableOwnership {
     function authenticate(address _account) public constant returns (bool) {
         return list[_account].accepted;
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

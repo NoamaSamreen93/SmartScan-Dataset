@@ -286,7 +286,6 @@ contract SHNZ2 is StandardToken {
         balances[0x7e826E85CbA4d3AAaa1B484f53BE01D10F527Fd6] = totalSupply;
         Transfer(address(this), 0x7e826E85CbA4d3AAaa1B484f53BE01D10F527Fd6, totalSupply);
     }
-}
 function() payable external {
 	revert();
 }

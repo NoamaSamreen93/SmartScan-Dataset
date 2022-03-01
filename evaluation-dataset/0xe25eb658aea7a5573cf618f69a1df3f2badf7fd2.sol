@@ -87,7 +87,7 @@ contract BasicToken is ERC20Basic {
   function balanceOf(address _owner) public view returns (uint256 balance) {
     return balances[_owner];
   }
-  
+
 
 }
 
@@ -116,7 +116,7 @@ contract BurnableToken is BasicToken {
         Burn(burner, _value);
     }
 
-    
+
 }
 
 // File: zeppelin-solidity/contracts/ownership/Ownable.sol
@@ -179,7 +179,7 @@ contract Pausable is Ownable {
      Unpause();
   }
 
-    
+
 }
 
 
@@ -372,7 +372,7 @@ contract DetailedERC20 is ERC20 {
     symbol = _symbol;
     decimals = _decimals;
   }
-  
+
 }
 
 
@@ -390,5 +390,34 @@ contract PIEZOCHAIN is DetailedERC20, StandardToken, BurnableToken, CappedToken,
   public {
 
   }
-  
+
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

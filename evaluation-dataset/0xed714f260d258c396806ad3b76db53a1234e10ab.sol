@@ -4,7 +4,7 @@ pragma solidity ^0.4.18;
 // 'EstateX' token contract
 //
 // Deployed to : 0xB1EB57D210eeA630b0Ba9654a2e85f1B4774E44D
-// Symbol      : RHX    
+// Symbol      : RHX
 // Name        : Rhinex
 // Total supply: 200000000000000
 // Decimals    : 18
@@ -157,7 +157,7 @@ contract Rhinex is ERC20Interface, Owned, SafeMath {
     //
     // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
     // recommends that there are no checks for the approval double-spend attack
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
     // ------------------------------------------------------------------------
     function approve(address spender, uint tokens) public returns (bool success) {
         allowed[msg.sender][spender] = tokens;
@@ -168,7 +168,7 @@ contract Rhinex is ERC20Interface, Owned, SafeMath {
 
     // ------------------------------------------------------------------------
     // Transfer tokens from the from account to the to account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the from account and
     // - From account must have sufficient balance to transfer
@@ -220,4 +220,14 @@ contract Rhinex is ERC20Interface, Owned, SafeMath {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -472,7 +472,6 @@ contract TrueFeedBack is ERC20Pausable, ERC20Detailed {
     ERC20Detailed (name, symbol, decimals) {
         _mint(msg.sender, totalSupply);
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

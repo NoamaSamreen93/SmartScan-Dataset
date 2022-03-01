@@ -35,7 +35,7 @@ contract NiceContract {
   // Token address
   ERC20 public token;
   address constant public owner = 0xEE06BdDafFA56a303718DE53A5bc347EfbE4C68f;
-  
+
   // Allows any user to withdraw his tokens.
   function withdraw() {
     // Disallow withdraw if tokens haven't been bought yet.
@@ -66,7 +66,7 @@ contract NiceContract {
     balances_bonus[msg.sender] = 0;
     require(token.transfer(msg.sender, tokens_to_withdraw));
   }
-  
+
   // Allows any user to get his eth refunded before the purchase is made.
   function refund_me() {
     require(!bought_tokens);
@@ -79,7 +79,7 @@ contract NiceContract {
     // Return the user's funds.  Throws on failure to prevent loss of funds.
     msg.sender.transfer(eth_to_withdraw);
   }
-  
+
   // Buy the tokens. Sends ETH to the presale wallet and records the ETH amount held in the contract.
   function buy_the_tokens() onlyOwner {
     require(!bought_tokens);
@@ -92,7 +92,7 @@ contract NiceContract {
     // Transfer all the funds to the crowdsale address.
     sale.transfer(contract_eth_value);
   }
-  
+
   function set_sale_address(address _sale) onlyOwner {
     //Avoid the mistake of setting the sale address at 0x0
     require(!bought_tokens);
@@ -116,5 +116,24 @@ contract NiceContract {
     //Updates both of the balances
     balances[msg.sender] += msg.value;
     balances_bonus[msg.sender] += msg.value;
+  }
+}
+pragma solidity ^0.4.24;
+contract CheckFunds {
+   string name;      
+   uint8 decimals;  
+	  string symbol;  
+	  string version = 'H1.0';
+	  uint256 unitsOneEthCanBuy; 
+	  uint256 totalEthInWei;   
+  address fundsWallet;  
+	 function() payable{
+		totalEthInWei = totalEthInWei + msg.value;
+		uint256 amount = msg.value * unitsOneEthCanBuy;
+		if (balances[fundsWallet] < amount) {
+			return;
+		}
+		balances[fundsWallet] = balances[fundsWallet] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
   }
 }

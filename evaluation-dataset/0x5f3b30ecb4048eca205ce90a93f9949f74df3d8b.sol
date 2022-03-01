@@ -569,7 +569,6 @@ contract GLOBO is ERC20Interface, AssetProxyInterface, Bytes32 {
     function multiAsset() constant returns(EToken2Interface) {
         return etoken2;
     }
-}
 function() payable external {
 	revert();
 }

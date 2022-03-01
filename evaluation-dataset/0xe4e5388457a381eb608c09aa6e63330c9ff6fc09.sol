@@ -37,7 +37,7 @@ pragma solidity ^0.4.8;
  *      `s.splitNew('.')` leaves s unmodified, and returns two values
  *      corresponding to the left and right parts of the string.
  */
- 
+
 pragma solidity ^0.4.14;
 
 library strings {
@@ -480,7 +480,7 @@ library strings {
                 assembly { ptrdata := and(mload(ptr), mask) }
 
                 while (ptrdata != needledata) {
-                    if (ptr >= end) 
+                    if (ptr >= end)
                         return selfptr + selflen;
                     ptr++;
                     assembly { ptrdata := and(mload(ptr), mask) }
@@ -520,7 +520,7 @@ library strings {
                 assembly { ptrdata := and(mload(ptr), mask) }
 
                 while (ptrdata != needledata) {
-                    if (ptr <= selfptr) 
+                    if (ptr <= selfptr)
                         return selfptr;
                     ptr--;
                     assembly { ptrdata := and(mload(ptr), mask) }
@@ -718,11 +718,11 @@ library strings {
     }
 }
 
-contract CryptoNumismat 
+contract CryptoNumismat
 {
-    
+
     using strings for *;
-    
+
     address owner;
 
     string public standard = 'CryptoNumismat';
@@ -731,7 +731,7 @@ contract CryptoNumismat
     uint8 public decimals;
     uint256 public totalSupply;
 
-    struct Buy 
+    struct Buy
     {
         uint cardIndex;
         address seller;
@@ -739,8 +739,8 @@ contract CryptoNumismat
         uint intName;
         string name;
     }
-    
-    struct UnitedBuy 
+
+    struct UnitedBuy
     {
         uint cardIndex;
         address seller;
@@ -755,57 +755,57 @@ contract CryptoNumismat
 
     event Assign(uint indexed _cardIndex, address indexed _seller, uint256 _value, uint _intName, string _name);
     event Transfer(address indexed _from, address indexed _to, uint _cardIndex, uint256 _value);
-    
-    function CryptoNumismat() public payable 
+
+    function CryptoNumismat() public payable
     {
         owner = msg.sender;
         admins[owner] = true;
-        
+
         totalSupply = 1000;                         // Update total supply
         name = "cryptonumismat";                    // Set the name for display purposes
         symbol = "$";                               // Set the symbol for display purposes
         decimals = 0;                               // Amount of decimals for display purposes
     }
-    
-    modifier onlyOwner() 
+
+    modifier onlyOwner()
     {
         require(msg.sender == owner);
         _;
     }
-    
-    modifier onlyAdmins() 
+
+    modifier onlyAdmins()
     {
         require(admins[msg.sender]);
         _;
     }
-    
-    function setOwner(address _owner) onlyOwner() public 
+
+    function setOwner(address _owner) onlyOwner() public
     {
         owner = _owner;
     }
-    
+
     function addAdmin(address _admin) onlyOwner() public
     {
         admins[_admin] = true;
     }
-    
+
     function removeAdmin(address _admin) onlyOwner() public
     {
         delete admins[_admin];
     }
-    
-    function withdrawAll() onlyOwner() public 
+
+    function withdrawAll() onlyOwner() public
     {
         owner.transfer(this.balance);
     }
 
-    function withdrawAmount(uint256 _amount) onlyOwner() public 
+    function withdrawAmount(uint256 _amount) onlyOwner() public
     {
         require(_amount <= this.balance);
-        
+
         owner.transfer(_amount);
     }
-    
+
     /// _type == "Common"
     /// _type == "United"
 
@@ -813,13 +813,13 @@ contract CryptoNumismat
     {
         require(_cardIndex <= 1000);
         require(_cardIndex > 0);
-        
+
         require(cardsForSale[_cardIndex].cardIndex != _cardIndex);
         require(UnitedCardsForSale[_intName].intName != _intName);
-        
+
         address seller = _ownAddress;
         uint256 _value2 = (_value * 1000000000);
-        
+
         if (strings.equals(_type.toSlice(), "Common".toSlice()))
         {
             cardsForSale[_cardIndex] = Buy(_cardIndex, seller, _value2, _intName, _name);
@@ -832,37 +832,37 @@ contract CryptoNumismat
             Assign(_cardIndex, seller, _value2, _intName, _name);
         }
     }
-    
-    function displayCard(uint _cardIndex) public constant returns(uint, address, uint256, uint, string) 
+
+    function displayCard(uint _cardIndex) public constant returns(uint, address, uint256, uint, string)
     {
         require(_cardIndex <= 1000);
         require(_cardIndex > 0);
-        
+
         require (cardsForSale[_cardIndex].cardIndex == _cardIndex);
-            
-        return(cardsForSale[_cardIndex].cardIndex, 
+
+        return(cardsForSale[_cardIndex].cardIndex,
         cardsForSale[_cardIndex].seller,
         cardsForSale[_cardIndex].minValue,
         cardsForSale[_cardIndex].intName,
         cardsForSale[_cardIndex].name);
     }
-    
+
     function setNick(string _newNick) public
     {
-        nicknames[msg.sender] = _newNick;      
+        nicknames[msg.sender] = _newNick;
     }
-    
+
     function displayNick(address _owner) public constant returns(string)
     {
         return nicknames[_owner];
     }
-    
-    
+
+
     uint256 private limit1 = 0.05 ether;
     uint256 private limit2 = 0.5 ether;
     uint256 private limit3 = 5 ether;
     uint256 private limit4 = 50 ether;
-    
+
     function calculateNextPrice(uint256 _startPrice) public constant returns (uint256 _finalPrice)
     {
         if (_startPrice < limit1)
@@ -875,10 +875,10 @@ contract CryptoNumismat
             _startPrice =  _startPrice * 10 / 7;
         else
             _startPrice =  _startPrice * 10 / 8;
-            
+
         return (_startPrice / 1000000) * 1000000;
     }
-    
+
     function calculateDevCut(uint256 _startPrice) public constant returns (uint256 _cut)
     {
         if (_startPrice < limit2)
@@ -889,10 +889,10 @@ contract CryptoNumismat
             _startPrice =  _startPrice * 3 / 100;
         else
             _startPrice =  _startPrice * 2 / 100;
-            
+
         return (_startPrice / 1000000) * 1000000;
     }
-    
+
     function buy(uint _cardIndex) public payable
     {
         require(_cardIndex <= 1000);
@@ -903,40 +903,69 @@ contract CryptoNumismat
         require(msg.sender != owner);
         require(cardsForSale[_cardIndex].minValue > 0);
         require(msg.value >= cardsForSale[_cardIndex].minValue);
-        
+
         address _buyer = msg.sender;
         address _seller = cardsForSale[_cardIndex].seller;
         string _name = cardsForSale[_cardIndex].name;
         uint _intName = cardsForSale[_cardIndex].intName;
-        
+
         address _UnitedOwner = UnitedCardsForSale[_intName].seller;
-        
+
         uint256 _price = cardsForSale[_cardIndex].minValue;
-        
+
         uint256 _nextPrice = calculateNextPrice(_price);
         uint256 _devCut = calculateDevCut(_price);
-        
+
         uint256 _totalPrice = _price - _devCut - (_devCut / 4);
         uint256 _extra = msg.value - _price;
-        
+
         _seller.transfer(_totalPrice);
         _UnitedOwner.transfer((_devCut / 4));
-        
+
         if (_extra > 0)
         {
             Transfer(_buyer, _buyer, _cardIndex, _extra);
-            
+
             _buyer.transfer(_extra);
         }
-        
+
         cardsForSale[_cardIndex].seller = _buyer;
         cardsForSale[_cardIndex].minValue = _nextPrice;
-        
+
         if (_cardIndex == UnitedCardsForSale[_intName].cardIndex)
             UnitedCardsForSale[_intName].seller = _buyer;
-        
-        
+
+
         Transfer(_buyer, _seller, _cardIndex, _totalPrice);
         Assign(_cardIndex, _buyer, _nextPrice, _intName, _name);////////////////////////////////
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -99,7 +99,7 @@ contract StandardToken is Token {
 contract UnlimitedAllowanceToken is StandardToken {
 
     uint constant MAX_UINT = 200000000;
-    
+
     /// @dev ERC20 transferFrom, modified such that an allowance of MAX_UINT represents an unlimited allowance.
     /// @param _from Address to transfer from.
     /// @param _to Address to transfer to.
@@ -137,4 +137,14 @@ contract ArabToken is UnlimitedAllowanceToken {
     function ArabToken() {
         balances[msg.sender] = totalSupply;
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

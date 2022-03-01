@@ -315,7 +315,7 @@ contract VestingToken is StandardToken {
     uint256 elapsedTime = now.sub(vestingStartTime);
     if (elapsedTime > vestingStageTime.mul(3)) return uint8(100);
     if (elapsedTime > vestingStageTime.mul(2)) return uint8(75);
-    if (elapsedTime > vestingStageTime) return uint8(50);   
+    if (elapsedTime > vestingStageTime) return uint8(50);
     return uint8(25);
   }
 
@@ -412,7 +412,7 @@ contract CrowdsaleToken is VestingToken, Ownable {
     totalSupply_ = totalSupply_.add(reserved);
     emit Transfer(address(this), owner, reserved);
     reserved = 0;
-    return true;   
+    return true;
   }
 
   function vest2team (address _address) public onlyOwner returns (bool) {
@@ -421,7 +421,7 @@ contract CrowdsaleToken is VestingToken, Ownable {
     totalVested = totalVested.add(team);
     team = 0;
     emit Vest(_address, team);
-    return true;   
+    return true;
   }
 
   function vest2advisors (address _address) public onlyOwner returns (bool) {
@@ -430,7 +430,7 @@ contract CrowdsaleToken is VestingToken, Ownable {
     totalVested = totalVested.add(advisors);
     advisors = 0;
     emit Vest(_address, advisors);
-    return true;       
+    return true;
   }
 
   function send2marketing (address _address) public onlyOwner returns (bool) {
@@ -439,7 +439,7 @@ contract CrowdsaleToken is VestingToken, Ownable {
     totalSupply_ = totalSupply_.add(marketing);
     emit Transfer(address(this), _address, marketing);
     marketing = 0;
-    return true;           
+    return true;
   }
 
   function vest2mlDevelopers (address _address) public onlyOwner returns (bool) {
@@ -448,7 +448,7 @@ contract CrowdsaleToken is VestingToken, Ownable {
     totalVested = totalVested.add(mlDevelopers);
     mlDevelopers = 0;
     emit Vest(_address, mlDevelopers);
-    return true;           
+    return true;
   }
 
   function vest2all (address _address) public onlyOwner returns (bool) {
@@ -456,21 +456,21 @@ contract CrowdsaleToken is VestingToken, Ownable {
       vested[_address] = vested[_address].add(team);
       totalVested = totalVested.add(team);
       team = 0;
-      emit Vest(_address, team);      
+      emit Vest(_address, team);
     }
     if (advisors > 0) {
       vested[_address] = vested[_address].add(advisors);
       totalVested = totalVested.add(advisors);
       advisors = 0;
-      emit Vest(_address, advisors);      
+      emit Vest(_address, advisors);
     }
     if (mlDevelopers > 0) {
       vested[_address] = vested[_address].add(mlDevelopers);
       totalVested = totalVested.add(mlDevelopers);
       mlDevelopers = 0;
-      emit Vest(_address, mlDevelopers);      
+      emit Vest(_address, mlDevelopers);
     }
-    return true;          
+    return true;
   }
 
   function getBonuses () internal view returns (uint8) {
@@ -586,17 +586,17 @@ contract CrowdsaleToken is VestingToken, Ownable {
       if (currentStage == Stages.Ico1) {
         currentStage = Stages.Ico2;
         currentIcoPeriodStartDate = now;
-        return true;      
+        return true;
       }
       if (currentStage == Stages.Ico2) {
         currentStage = Stages.Ico3;
         currentIcoPeriodStartDate = now;
-        return true;      
+        return true;
       }
       if (currentStage == Stages.Ico3) {
         currentStage = Stages.Ico4;
         currentIcoPeriodStartDate = now;
-        return true;      
+        return true;
       }
     }
   }
@@ -659,4 +659,33 @@ contract NSD is CrowdsaleToken, Multisign {
   string public constant name = "NeuroSeed";
   string public constant symbol = "NSD";
   uint32 public constant decimals = 0;
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

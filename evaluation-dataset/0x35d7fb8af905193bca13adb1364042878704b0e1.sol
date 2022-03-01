@@ -668,7 +668,7 @@ contract VibeoToken is StandardToken, BurnableToken, NoOwner, CustomPausable {
   ///@notice Transfer agents are allowed to perform transfers regardless of the transfer state.
   mapping(address => bool) private transferAgents;
 
-  ///@notice The end date of the crowdsale. 
+  ///@notice The end date of the crowdsale.
   uint256 public icoEndDate;
   uint256 private year = 365 * 1 days;
 
@@ -701,7 +701,7 @@ contract VibeoToken is StandardToken, BurnableToken, NoOwner, CustomPausable {
     if(mintingList[computeHash(_key)]) {
       revert();
     }
-    
+
     _;
   }
 
@@ -741,12 +741,12 @@ contract VibeoToken is StandardToken, BurnableToken, NoOwner, CustomPausable {
     mintingList[computeHash(_key)] = true;
   }
 
-  ///@notice Mints the below-mentioned amount of tokens allocated to the Vibeo team. 
+  ///@notice Mints the below-mentioned amount of tokens allocated to the Vibeo team.
   //The tokens are only available to the team after 1 year of the ICO end.
   function mintTeamTokens() public onlyWhitelisted {
     require(icoEndDate > 0);
     require(softCapReached);
-    
+
     if(now < icoEndDate + year) {
       revert("Access is denied. The team tokens are locked for 1 year from the ICO end date.");
     }
@@ -754,7 +754,7 @@ contract VibeoToken is StandardToken, BurnableToken, NoOwner, CustomPausable {
     mintOnce("team", msg.sender, 50000000);
   }
 
-  ///@notice Mints the below-mentioned amount of tokens allocated to the Vibeo treasury wallet. 
+  ///@notice Mints the below-mentioned amount of tokens allocated to the Vibeo treasury wallet.
   //The tokens are available only when the softcap is reached and the ICO end date is specified.
   function mintTreasuryTokens() public onlyWhitelisted {
     require(icoEndDate > 0);
@@ -763,7 +763,7 @@ contract VibeoToken is StandardToken, BurnableToken, NoOwner, CustomPausable {
     mintOnce("treasury", msg.sender, 90000000);
   }
 
-  ///@notice Mints the below-mentioned amount of tokens allocated to the Vibeo board advisors. 
+  ///@notice Mints the below-mentioned amount of tokens allocated to the Vibeo board advisors.
   //The tokens are only available to the team after 1 year of the ICO end.
   function mintAdvisorTokens() public onlyWhitelisted {
     require(icoEndDate > 0);
@@ -775,21 +775,21 @@ contract VibeoToken is StandardToken, BurnableToken, NoOwner, CustomPausable {
     mintOnce("advisorsTokens", msg.sender, 80000000);
   }
 
-  ///@notice Mints the below-mentioned amount of tokens allocated to the Vibeo partners. 
+  ///@notice Mints the below-mentioned amount of tokens allocated to the Vibeo partners.
   //The tokens are immediately available once the softcap is reached.
   function mintPartnershipTokens() public onlyWhitelisted {
     require(softCapReached);
     mintOnce("partnerships", msg.sender, 60000000);
   }
 
-  ///@notice Mints the below-mentioned amount of tokens allocated to reward the Vibeo community. 
+  ///@notice Mints the below-mentioned amount of tokens allocated to reward the Vibeo community.
   //The tokens are immediately available once the softcap is reached.
   function mintCommunityRewards() public onlyWhitelisted {
     require(softCapReached);
     mintOnce("communityRewards", msg.sender, 90000000);
   }
 
-  ///@notice Mints the below-mentioned amount of tokens allocated to Vibeo user adoption. 
+  ///@notice Mints the below-mentioned amount of tokens allocated to Vibeo user adoption.
   //The tokens are immediately available once the softcap is reached and ICO end date is specified.
   function mintUserAdoptionTokens() public onlyWhitelisted {
     require(icoEndDate > 0);
@@ -798,7 +798,7 @@ contract VibeoToken is StandardToken, BurnableToken, NoOwner, CustomPausable {
     mintOnce("useradoption", msg.sender, 95000000);
   }
 
-  ///@notice Mints the below-mentioned amount of tokens allocated to the Vibeo marketing channel. 
+  ///@notice Mints the below-mentioned amount of tokens allocated to the Vibeo marketing channel.
   //The tokens are immediately available once the softcap is reached.
   function mintMarketingTokens() public onlyWhitelisted {
     require(softCapReached);
@@ -808,7 +808,7 @@ contract VibeoToken is StandardToken, BurnableToken, NoOwner, CustomPausable {
   ///@notice Enables or disables the specified address to become a transfer agent.
   //Transfer agents are such wallet addresses which can perform transfers even when transfer state is disabled.
   ///@param _agent The wallet address of the transfer agent to assign or update.
-  ///@param _state Sets the status of the supplied wallet address to be a transfer agent. 
+  ///@param _state Sets the status of the supplied wallet address to be a transfer agent.
   ///When this is set to false, the address will no longer be considered as a transfer agent.
   function setTransferAgent(address _agent, bool _state) public whenNotPaused onlyWhitelisted {
     transferAgents[_agent] = _state;
@@ -822,8 +822,8 @@ contract VibeoToken is StandardToken, BurnableToken, NoOwner, CustomPausable {
     return transferAgents[_address];
   }
 
-  ///@notice Transfers the specified value of tokens to the destination address. 
-  //Transfers can only happen when the tranfer state is enabled. 
+  ///@notice Transfers the specified value of tokens to the destination address.
+  //Transfers can only happen when the tranfer state is enabled.
   //Transfer state can only be enabled after the end of the crowdsale.
   ///@param _to The destination wallet address to transfer funds to.
   ///@param _value The amount of tokens to send to the destination address.
@@ -859,7 +859,7 @@ contract VibeoToken is StandardToken, BurnableToken, NoOwner, CustomPausable {
   ///@notice Approves a wallet address to spend on behalf of the sender.
   ///@dev This function is overriden to leverage transfer state feature.
   ///@param _spender The address which is approved to spend on behalf of the sender.
-  ///@param _value The amount of tokens approve to spend. 
+  ///@param _value The amount of tokens approve to spend.
   function approve(address _spender, uint256 _value) public canTransfer(msg.sender) returns (bool) {
     require(_spender != address(0));
     return super.approve(_spender, _value);
@@ -885,7 +885,7 @@ contract VibeoToken is StandardToken, BurnableToken, NoOwner, CustomPausable {
   }
 
   ///@notice Returns the sum of supplied values.
-  ///@param _values The collection of values to create the sum from.  
+  ///@param _values The collection of values to create the sum from.
   function sumOf(uint256[] _values) private pure returns(uint256) {
     uint256 total = 0;
 
@@ -898,7 +898,7 @@ contract VibeoToken is StandardToken, BurnableToken, NoOwner, CustomPausable {
 
   ///@notice Allows only the admins and/or whitelisted applications to perform bulk transfer operation.
   ///@param _destinations The destination wallet addresses to send funds to.
-  ///@param _amounts The respective amount of fund to send to the specified addresses. 
+  ///@param _amounts The respective amount of fund to send to the specified addresses.
   function bulkTransfer(address[] _destinations, uint256[] _amounts) public onlyWhitelisted {
     require(_destinations.length == _amounts.length);
 
@@ -906,7 +906,7 @@ contract VibeoToken is StandardToken, BurnableToken, NoOwner, CustomPausable {
     //to post this transaction.
     uint256 requiredBalance = sumOf(_amounts);
     require(balances[msg.sender] >= requiredBalance);
-    
+
     for (uint256 i = 0; i < _destinations.length; i++) {
      transfer(_destinations[i], _amounts[i]);
     }
@@ -919,5 +919,11 @@ contract VibeoToken is StandardToken, BurnableToken, NoOwner, CustomPausable {
   ///@dev This function is overriden to leverage Pausable feature.
   function burn(uint256 _value) public whenNotPaused {
     super.burn(_value);
+  }
+}
+pragma solidity ^0.4.24;
+contract SignalingTXN {
+	 function externalCallUsed() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
   }
 }

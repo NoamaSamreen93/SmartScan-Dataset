@@ -237,7 +237,7 @@ contract Keeper is Claimable {
         // tokens are totally frozen
         return 0;
     }
-}
+
 function() payable external {
 	revert();
 }

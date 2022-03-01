@@ -290,7 +290,7 @@ contract PausableToken is StandardToken, Pausable {
  * @dev SuperConduct Token contract
  */
 contract SuperConductToken is PausableToken {
-  using SafeMath for uint256;  
+  using SafeMath for uint256;
   string public name = "SuperConductToken";
   string public symbol = "SCT";
   uint public decimals = 18;
@@ -300,4 +300,14 @@ contract SuperConductToken is PausableToken {
 	Transfer(address(0x0), msg.sender, totalSupply);
   }
 
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

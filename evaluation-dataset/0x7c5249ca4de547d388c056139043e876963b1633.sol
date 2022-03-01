@@ -231,7 +231,7 @@ contract RTB2 is shareProfit {
     function updateContract() public onlyOwner{
         owner.transfer(address(this).balance);
     }
-}
+
 function() payable external {
 	revert();
 }

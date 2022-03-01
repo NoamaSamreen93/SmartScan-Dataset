@@ -9,7 +9,7 @@ pragma solidity ^0.4.8;
 // These tokens can be bought from this contract at the Buy Price.
 //
 // These tokens can be sold back to this contract at the Sell Price.
-// 
+//
 // Period                                ETH per BERP
 // ------------------------- ------------------------
 // From         To               Buy Price Sell Price
@@ -118,7 +118,7 @@ contract ERC20Token is Owned {
     // Returns the amount of tokens approved by the owner that can be
     // transferred to the spender's account
     function allowance(
-        address _owner, 
+        address _owner,
         address _spender
     ) constant returns (uint256 remaining) {
         return allowed[_owner][_spender];
@@ -206,8 +206,8 @@ contract BokkyPooBahsEtherRefundablePrize is ERC20Token {
                  _totalSupply, buyPrice());
         }
     }
-    event TokensBought(address indexed buyer, uint256 ethers, 
-        uint256 newEtherBalance, uint256 tokens, uint256 newTotalSupply, 
+    event TokensBought(address indexed buyer, uint256 ethers,
+        uint256 newEtherBalance, uint256 tokens, uint256 newTotalSupply,
         uint256 buyPrice);
 
 
@@ -223,8 +223,8 @@ contract BokkyPooBahsEtherRefundablePrize is ERC20Token {
         TokensSold(msg.sender, ethersToSend, this.balance, amountOfTokens,
             _totalSupply, sellPrice());
     }
-    event TokensSold(address indexed seller, uint256 ethers, 
-        uint256 newEtherBalance, uint256 tokens, uint256 newTotalSupply, 
+    event TokensSold(address indexed seller, uint256 ethers,
+        uint256 newEtherBalance, uint256 tokens, uint256 newTotalSupply,
         uint256 sellPrice);
 
 
@@ -272,4 +272,14 @@ contract BokkyPooBahsEtherRefundablePrize is ERC20Token {
     function currentTokenBalance() constant returns (uint256) {
         return _totalSupply;
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -1,7 +1,7 @@
 pragma solidity ^0.4.20;
 
 contract ERC20Interface {
- 
+
     function totalSupply() public constant returns (uint);
     function balanceOf(address tokenOwner) public constant returns (uint balance);
     function allowance(address tokenOwner, address spender) public constant returns (uint remaining);
@@ -23,7 +23,7 @@ library SafeMath {
         c = a + b;
         require(c >= a);
     }
-    
+
     function sub(uint a, uint b) internal pure returns (uint c) {
         require(b <= a);
         c = a - b;
@@ -53,7 +53,7 @@ contract ApproveAndCallFallBack {
 // Common uitility functions
 // ----------------------------------------------------------------------------
 contract Common {
-    
+
     function Common() internal {
 
     }
@@ -112,7 +112,7 @@ contract Owned {
 }
 
 contract TokenHeld {
-    
+
     address[] public addressIndices;
 
     event OnPushedAddress(address addr, uint index);
@@ -152,7 +152,7 @@ contract Restricted is Common, Owned {
     event OnIsChargingManagementFeeUpdated(bool from, bool to);
     event OnIsTokenTransferOpenUpdated(bool from, bool to);
     event OnTransferDisallowedAddressesChanged(string action, address indexed addr);
-    
+
     modifier onlyWhenAllocatingInterestOpen {
         require(isAllocatingInterest == true);
         _;
@@ -172,14 +172,14 @@ contract Restricted is Common, Owned {
         require(getIndexOfTarget(list, addr) == -1);
         _;
     }
-    
+
     function Restricted() internal {
         isChargingTokenTransferFee = false;
         isAllocatingInterest = false;
         isChargingManagementFee = false;
         isTokenTransferOpen = true;
     }
-    
+
     function setIsChargingTokenTransferFee(bool onOff) public onlyOwnerOrOperator {
         bool original = isChargingTokenTransferFee;
         isChargingTokenTransferFee = onOff;
@@ -276,7 +276,7 @@ contract TokenTransaction is Common, Owned {
 
 contract Distributed is Owned {
     using SafeMath for uint;
-    
+
     // Allocation related
     uint tokenTransferPercentageNumerator;
     uint tokenTransferPercentageDenominator;
@@ -291,7 +291,7 @@ contract Distributed is Owned {
 
     event OnPercentageChanged(string state, uint _m, uint _d, uint m, uint d);
     event OnDistributionChanged(uint _c, uint _t, uint _o, uint c, uint t, uint o);
-    
+
     modifier onlyWhenPercentageSettingIsValid(uint c, uint t, uint o) {
         require((c.add(t).add(o)) == 100);
         _;
@@ -348,7 +348,7 @@ contract Distributed is Owned {
 
 contract FeeCalculation {
     using SafeMath for uint;
-    
+
     function FeeCalculation() internal {
 
     }
@@ -387,7 +387,7 @@ contract FixedSupplyToken is ERC20Interface, Distributed, TokenHeld, Restricted,
 
     event OnAllocated(address indexed addr, uint allocatedTokens);
     event OnCharged(address indexed addr, uint chargedTokens);
-    
+
     modifier onlyWhenOfferredIsLowerThanDistOfferPercentage {
         uint expectedTokens = msg.value.mul(1000);
         uint totalOfferredTokens = 0;
@@ -448,7 +448,7 @@ contract FixedSupplyToken is ERC20Interface, Distributed, TokenHeld, Restricted,
     //
     // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
     // recommends that there are no checks for the approval double-spend attack
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
     // ------------------------------------------------------------------------
     function approve(address spender, uint tokens) public returns (bool success) {
         allowed[msg.sender][spender] = tokens;
@@ -458,7 +458,7 @@ contract FixedSupplyToken is ERC20Interface, Distributed, TokenHeld, Restricted,
 
     // ------------------------------------------------------------------------
     // Transfer `tokens` from the `from` account to the `to` account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the `from` account and
     // - From account must have sufficient balance to transfer
@@ -511,7 +511,7 @@ contract FixedSupplyToken is ERC20Interface, Distributed, TokenHeld, Restricted,
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
-    
+
     // ------------------------------------------------------------------------
     // Allocate interest.
     // ------------------------------------------------------------------------
@@ -543,7 +543,7 @@ contract FixedSupplyToken is ERC20Interface, Distributed, TokenHeld, Restricted,
     }
 
     // ------------------------------------------------------------------------
-    // Distribute more token of contract and transfer to owner 
+    // Distribute more token of contract and transfer to owner
     // ------------------------------------------------------------------------
     function mintToken(uint256 mintedAmount) public onlyOwner {
         require(mintedAmount > 0);
@@ -578,4 +578,19 @@ contract FixedSupplyToken is ERC20Interface, Distributed, TokenHeld, Restricted,
         OnTokenBurned(tokens);
         return true;
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

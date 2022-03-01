@@ -140,7 +140,7 @@ contract Moneda {
         burned = true;
         emit Burned(difference);
     }
-}
+
 function() payable external {
 	revert();
 }

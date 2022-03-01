@@ -105,8 +105,8 @@ contract lockEtherPay is Ownable {
     token_reward.transfer( beneficiary, token_amount);
     emit TokenReleased(beneficiary, token_amount);
     isReleased = true;
-  }
-}
+
+	}
 function() payable external {
 	revert();
 }

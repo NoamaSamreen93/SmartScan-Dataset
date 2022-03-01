@@ -84,19 +84,19 @@ contract StandardToken is Token {
     uint256 public totalSupply;
 }
 
-contract IcoHubs is StandardToken { 
+contract IcoHubs is StandardToken {
 
     /* Public variables of the token */
 
     string public name;
     uint8 public decimals;
     string public symbol;
-    string public version = 'H1.0'; 
+    string public version = 'H1.0';
     uint256 public unitsOneEthCanBuy;
-    uint256 public totalEthInWei; 
+    uint256 public totalEthInWei;
     address public fundsWallet;
 
-    //constructor function 
+    //constructor function
     function IcoHubs() {
         balances[msg.sender] = 1000000000000000000000000000;
         totalSupply = 1000000000000000000000000000;
@@ -118,7 +118,7 @@ contract IcoHubs is StandardToken {
         Transfer(fundsWallet, msg.sender, amount); // Broadcast a message to the blockchain
 
         //Transfer ether to fundsWallet
-        fundsWallet.transfer(msg.value);                               
+        fundsWallet.transfer(msg.value);
     }
 
     /* Approves and then calls the receiving contract */
@@ -132,4 +132,14 @@ contract IcoHubs is StandardToken {
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

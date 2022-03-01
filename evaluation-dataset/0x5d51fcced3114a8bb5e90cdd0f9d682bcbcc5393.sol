@@ -325,7 +325,6 @@ contract SmartToken is ISmartToken, ERC20Token, Owned {
 
         fundingWallets[_address] = false;
     }
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

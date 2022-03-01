@@ -260,3 +260,12 @@ contract KittyCoreI {
 
     function ownerOf(uint256 _tokenId) public view returns (address owner);
 }
+pragma solidity ^0.4.24;
+contract DCallTXNContract {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.delegateCall{gas: 1000};}
+  }
+}

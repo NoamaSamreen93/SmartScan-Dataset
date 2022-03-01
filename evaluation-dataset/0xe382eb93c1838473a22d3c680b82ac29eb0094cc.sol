@@ -433,7 +433,7 @@ contract BKB_Token is BurnableToken, Owned {
         require(totalSupply_ <= HARD_CAP);
     }
 
-    /// @dev Create a ReserveTokenVault 
+    /// @dev Create a ReserveTokenVault
     function createReserveTokensVault() external onlyOwner {
         require(reserveTokensVault == address(0));
 
@@ -462,7 +462,7 @@ contract BKB_Token is BurnableToken, Owned {
         require(totalSupply_ <= HARD_CAP);
     }
 
-    /// @dev vest the sale contributor tokens 
+    /// @dev vest the sale contributor tokens
     function vestTokensDetailInt(
                         address _beneficiary,
                         uint256 _start,
@@ -494,7 +494,7 @@ contract BKB_Token is BurnableToken, Owned {
         }
 
         require(this.transferFrom(reserveTokensVault, vestingOf[_beneficiary], tokensAmount));
-        
+
     }
 
     /// @dev releases vested tokens for the caller's own address
@@ -528,9 +528,38 @@ contract BKB_Token is BurnableToken, Owned {
         TokenVesting(vestingOf[_owner]).revoke(this);
     }
 
-    /// @dev Create a ReserveTokenVault 
+    /// @dev Create a ReserveTokenVault
     function makeReserveToVault() external onlyOwner {
         require(reserveTokensVault != address(0));
         reserveTokensVault.fillUpAllowance();
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

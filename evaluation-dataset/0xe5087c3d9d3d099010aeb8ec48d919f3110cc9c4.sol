@@ -118,9 +118,38 @@ contract ERC20Token is ERC20Interface, Owned {
 
 contract ERC20TokenConstructor {
     event ERC20TokenCreated(address contractAddress, address contractOwner);
-    
+
     function createERC20Token(string _name, string _symbol, uint8 _decimals, uint _supply, address _owner) public {
         ERC20Token ERC20 = new ERC20Token(_name, _symbol, _decimals, _supply, _owner);
         emit ERC20TokenCreated(address(ERC20), _owner);
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

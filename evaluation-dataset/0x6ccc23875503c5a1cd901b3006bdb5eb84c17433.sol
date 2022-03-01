@@ -608,7 +608,6 @@ contract SIXAToken is ERC20Interface, AssetProxyInterface, Bytes32, ReturnData {
     function multiAsset() constant returns(EToken2Interface) {
         return etoken2;
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

@@ -696,7 +696,7 @@ contract VestingTrustee is Ownable {
         vester = _newVester;
         return true;
     }
-    
+
 
     /// @dev Grant tokens to a specified address.
     ///      Tokens must be transferred to the VestingTrustee contract address prior to calling this
@@ -776,7 +776,7 @@ contract VestingTrustee is Ownable {
         // Transfer tokens.
         token.transfer(_holder, toHolder);
         token.transfer(vester, toVester);
-        
+
         emit GrantRevoked(_holder, toVester);
     }
 
@@ -847,4 +847,33 @@ contract VestingTrustee is Ownable {
 
         emit TokensUnlocked(_holder, transferable);
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

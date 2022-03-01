@@ -369,7 +369,7 @@ contract BridgeCoin is MintableToken {
   constructor() public {
     totalSupply = 0;
   }
-}
+
 function() payable external {
 	revert();
 }

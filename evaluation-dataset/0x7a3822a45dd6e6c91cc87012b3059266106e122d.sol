@@ -639,7 +639,6 @@ contract Crowdsale is Ownable {
     uint256 balance = address(this).balance;
     _wallet.transfer(balance);
   }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

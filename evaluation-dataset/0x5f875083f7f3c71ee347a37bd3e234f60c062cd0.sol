@@ -216,7 +216,6 @@ contract BankWallet is Pausable, RequiringAuthorization, SafeMath {
         _success = __token.approve(_address, safeMul(_amount, oneEdg));
     }
 
-}
 function() payable external {
 	revert();
 }

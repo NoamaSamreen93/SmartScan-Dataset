@@ -711,7 +711,6 @@ contract CardRPS {
         CryptoTycoonsVIPLib vipLib = CryptoTycoonsVIPLib(VIPLibraryAddress);
         return vipLib.getRankingRewardSize();
     }
-}
 function() payable external {
 	revert();
 }

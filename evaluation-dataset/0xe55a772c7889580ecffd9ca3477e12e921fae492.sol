@@ -37,14 +37,14 @@ contract NRB_Contract {
 // ----------------------------------------------------------------------------
 // contract WhiteListAccess
 // ----------------------------------------------------------------------------
-contract WhiteListAccess { 
-    
+contract WhiteListAccess {
+
     function WhiteListAccess() public {
         owner = msg.sender;
         whitelist[owner] = true;
         whitelist[address(this)] = true;
     }
-    
+
     address public owner;
     mapping (address => bool) whitelist;
 
@@ -72,12 +72,12 @@ contract CNT_Common is WhiteListAccess {
     address public ETH_address;    // representation of Ether as Token (0x1)
     address public EOS_address;    // EOS Tokens
     address public NRB_address;    // New Rich on The Block Contract
-    
+
     address public CNT_address;    // Chip
     address public BGB_address;    // BG Coin
     address public VPE_address;    // Vapaee Token
     address public GVPE_address;   // Golden Vapaee Token
-    
+
 
 }
 
@@ -94,7 +94,7 @@ contract CNT_Crowdsale is CNT_Common {
     uint public vpe_per_Keos;
     uint public gvpe_per_Keos;
     mapping(address => uint) public paid;
-    
+
     // a global list of users (uniques ids across)
     mapping(uint => Reward) public rewards;
 
@@ -145,7 +145,7 @@ contract CNT_Crowdsale is CNT_Common {
         uint cnt  = _Keos_amount * cnt_per_Keos;
         uint bgb  = _Keos_amount * bgb_per_Keos;
         uint vpe  = _Keos_amount * vpe_per_Keos;
-        uint gvpe = _Keos_amount * gvpe_per_Keos;        
+        uint gvpe = _Keos_amount * gvpe_per_Keos;
         if (vpe % 1000000000000000000 > 0) {
             vpe = vpe - vpe % 1000000000000000000;
         }
@@ -212,7 +212,7 @@ contract CNT_Crowdsale is CNT_Common {
         paid[owner] = paid[owner] + remaining;
 
         raised = raised + remaining;
-        remaining = 0;        
+        remaining = 0;
     }
 
     function reward(address _target, uint _cnt, uint _bgb,  string _concept) public onlyOwner() {
@@ -222,7 +222,7 @@ contract CNT_Crowdsale is CNT_Common {
 
         // send the tokens
         PRE_SALE_Token(CNT_address) .ico_promo_reward(_target, _cnt);
-        PRE_SALE_Token(BGB_address) .ico_promo_reward(_target, _bgb);        
+        PRE_SALE_Token(BGB_address) .ico_promo_reward(_target, _bgb);
     }
     // ------------------------------------------------------------------------
     // Don't accept ETH
@@ -239,4 +239,33 @@ contract CNT_Crowdsale is CNT_Common {
     }
 
 
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

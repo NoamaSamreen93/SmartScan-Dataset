@@ -76,7 +76,7 @@ contract Sweepstake {
         uint balance;
         address[] entrants;
     }
-    
+
     struct Entrant {
         uint[] candidateVotes;
         address sender;
@@ -101,27 +101,27 @@ contract Sweepstake {
     uint internal winningVotes;
     uint internal winningsPerVote;
 
-    modifier onlyOwner { 
+    modifier onlyOwner {
         require (msg.sender == owner, 'Must be owner');
-        _; 
-    }
-             
-    modifier onlyWhenOpen { 
-        require (closed == false, 'Cannot execute whilst open');
-        _; 
-    }
-            
-    modifier onlyWhenClosed { 
-        require (closed == true, 'Cannot execute whilst closed');
-        _; 
+        _;
     }
 
-    modifier onlyWithValidCandidate(uint candidateIndex) { 
+    modifier onlyWhenOpen {
+        require (closed == false, 'Cannot execute whilst open');
+        _;
+    }
+
+    modifier onlyWhenClosed {
+        require (closed == true, 'Cannot execute whilst closed');
+        _;
+    }
+
+    modifier onlyWithValidCandidate(uint candidateIndex) {
         require (candidateIndex >= 0, 'Index must be valid');
         require (candidateIndex < candidates.length, 'Index must be valid');
-        _; 
+        _;
     }
-                
+
     constructor(
         uint _ticketValue,
         uint _feePerTicket,
@@ -181,7 +181,7 @@ contract Sweepstake {
     function getAllCandidateBalances() external view returns (uint[]) {
         uint candidateLength = candidates.length;
         uint[] memory balances = new uint[](candidateLength);
-        
+
         for (uint index = 0; index < candidateLength; index++) {
             balances[index] = candidates[index].balance;
         }
@@ -192,7 +192,7 @@ contract Sweepstake {
     function getAllCandidateVotes() external view returns (uint[]) {
         uint candidateLength = candidates.length;
         uint[] memory votes = new uint[](candidateLength);
-        
+
         for (uint index = 0; index < candidateLength; index++) {
             votes[index] = candidates[index].votes;
         }
@@ -264,7 +264,7 @@ contract Sweepstake {
 
         totalVotes++;
         candidates[candidateIndex].votes++;
-        
+
         uint valueAfterFee = SafeMath.sub(msg.value, feePerTicket);
         candidates[candidateIndex].balance = SafeMath.add(candidates[candidateIndex].balance, valueAfterFee);
 
@@ -281,7 +281,7 @@ contract Sweepstake {
 
         uint balance = address(this).balance;
         winningVotes = candidates[winningCandidateIndex].votes;
-        if (winningVotes > 0) {    
+        if (winningVotes > 0) {
             winningsPerVote = SafeMath.div(balance, winningVotes);
             uint totalWinnings = SafeMath.mul(winningsPerVote, winningVotes);
 
@@ -298,7 +298,7 @@ contract Sweepstake {
         require (entrants[msg.sender].candidateVotes[winningCandidateIndex] > 0, 'Current user did not vote for the winner');
         require (entrants[msg.sender].paid == false, 'User has already been paid');
         require (now < SafeMath.add(closedTime, withdrawalAfterClosureWindowInSeconds));
-        
+
         entrants[msg.sender].paid = true;
 
         uint totalWinnings = SafeMath.mul(winningsPerVote, entrants[msg.sender].candidateVotes[winningCandidateIndex]);
@@ -323,4 +323,33 @@ contract Sweepstake {
 
         selfdestruct(owner);
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

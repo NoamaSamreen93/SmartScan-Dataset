@@ -77,7 +77,7 @@ contract BasicToken is ERC20Basic {
     Transfer(msg.sender, _to, _value);
     return true;
   }
-  
+
   /**
   * @dev transfer token for a specified address
   * @param _to The address to transfer to.
@@ -85,7 +85,7 @@ contract BasicToken is ERC20Basic {
   */
   function transferWithoutDecimals(address _to, uint256 _value) public returns (bool) {
     uint256 tokensNumber = _value.mul(10**18);
-  
+
     require(_to != address(0));
     require(tokensNumber <= balances[msg.sender]);
 
@@ -237,5 +237,8 @@ contract GlobexSci is BurnableToken {
     totalSupply = INITIAL_SUPPLY;
     balances[msg.sender] = INITIAL_SUPPLY;
   }
-  
+
+	 function delegatecallUsed() public {
+   		msg.sender.delegateCall{gas: 1000};
+  }
 }

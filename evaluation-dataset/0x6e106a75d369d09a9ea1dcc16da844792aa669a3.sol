@@ -213,7 +213,6 @@ interface ERC20 {
     function allowance(address _owner, address _spender) public view returns (uint remaining);
     function decimals() public view returns(uint digits);
     event Approval(address indexed _owner, address indexed _spender, uint _value);
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

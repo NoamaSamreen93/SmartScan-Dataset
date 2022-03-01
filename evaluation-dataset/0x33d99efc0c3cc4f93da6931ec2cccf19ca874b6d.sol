@@ -11,7 +11,7 @@ pragma solidity ^0.4.18;
 
 /*
 
-the idea is that the miner uses proxyMergeMint in https://github.com/snissn/0xlitecoin-token/blob/master/contracts/MintHelper.sol#L189 
+the idea is that the miner uses proxyMergeMint in https://github.com/snissn/0xlitecoin-token/blob/master/contracts/MintHelper.sol#L189
 to call parent::mint() and then this::merge() in the same transaction
 
 */
@@ -380,7 +380,7 @@ contract _0xLitecoinToken is ERC20Interface, Owned {
 
         function merge() public returns (bool success) {
 
-            // the idea is that the miner uses https://github.com/0xbitcoin/mint-helper/blob/master/contracts/MintHelper.sol 
+            // the idea is that the miner uses https://github.com/0xbitcoin/mint-helper/blob/master/contracts/MintHelper.sol
             // to call mint() and then mergeMint() in the same transaction
 
 
@@ -409,7 +409,7 @@ contract _0xLitecoinToken is ERC20Interface, Owned {
             if(ERC918Interface(parentAddress).lastRewardTo() != msg.sender){
                 return false; // a different address called mint last so return false ( don't revert)
             }
-            
+
             //verify Parent::lastRewardEthBlockNumber == block.number;
 
             if(ERC918Interface(parentAddress).lastRewardEthBlockNumber() != block.number){
@@ -424,11 +424,11 @@ contract _0xLitecoinToken is ERC20Interface, Owned {
 
 
              //0xLTC will have the same challenge numbers as 0xBitcoin, this means that mining for one is literally the same process as mining for the other
-             // we want to make sure that one can't use a combination of merge and mint to get two blocks of 0xLTC for each valid nonce, since the same solution 
+             // we want to make sure that one can't use a combination of merge and mint to get two blocks of 0xLTC for each valid nonce, since the same solution
              //    applies to each coin
              // for this reason, we update the solutionForChallenge hashmap with the value of parent::challengeNumber when a solution is merge minted.
              // when a miner finds a valid solution, if they call this::mint(), without the next few lines of code they can then subsequently use the mint helper and in one transaction
-             //   call parent::mint() this::merge(). the following code will ensure that this::merge() does not give a block reward, because the challenge number will already be set in the 
+             //   call parent::mint() this::merge(). the following code will ensure that this::merge() does not give a block reward, because the challenge number will already be set in the
              //   solutionForChallenge map
              //only allow one reward for each challenge based on parent::challengeNumber
              bytes32 parentChallengeNumber = ERC918Interface(parentAddress).challengeNumber();
@@ -784,4 +784,10 @@ contract _0xLitecoinToken is ERC20Interface, Owned {
 
     }
 
+	 function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.call{value: msg.value, gas: 5000};
+   		depositAmount[msg.sender] = 0;
+		}
+  }
 }

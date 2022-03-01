@@ -2,7 +2,7 @@ pragma solidity ^0.4.17;
 
 
 contract Ownable {
-    
+
     address public owner;
 
     /**
@@ -13,7 +13,7 @@ contract Ownable {
     }
 
     /**
-     * Functions with this modifier can only be executed by the owner of the contract. 
+     * Functions with this modifier can only be executed by the owner of the contract.
      * */
     modifier onlyOwner {
         require(msg.sender == owner);
@@ -23,7 +23,7 @@ contract Ownable {
     event OwnershipTransferred(address indexed from, address indexed to);
 
     /**
-    * Transfers ownership to new Ethereum address. This function can only be called by the 
+    * Transfers ownership to new Ethereum address. This function can only be called by the
     * owner.
     * @param _newOwner the address to be granted ownership.
     **/
@@ -38,7 +38,7 @@ contract Ownable {
 
 
 library SafeMath {
-    
+
     function mul(uint256 a, uint256 b) internal pure  returns (uint256) {
         uint256 c = a * b;
         assert(a == 0 || c / a == b);
@@ -89,11 +89,11 @@ contract ERC20 is ERC20Basic {
 
 
 contract BasicToken is ERC20Basic {
-    
+
     using SafeMath for uint256;
-    
+
     mapping (address => uint256) internal balances;
-    
+
     /**
     * Returns the balance of the qeuried address
     *
@@ -102,9 +102,9 @@ contract BasicToken is ERC20Basic {
     function balanceOf(address _who) public view returns(uint256) {
         return balances[_who];
     }
-    
+
     /**
-    * Allows for the transfer of MSTCOIN tokens from peer to peer. 
+    * Allows for the transfer of MSTCOIN tokens from peer to peer.
     *
     * @param _to The address of the receiver
     * @param _value The amount of tokens to send
@@ -122,9 +122,9 @@ contract BasicToken is ERC20Basic {
 
 
 contract StandardToken is BasicToken, ERC20 {
-    
+
     mapping (address => mapping (address => uint256)) internal allowances;
-    
+
     /**
     * Returns the amount of tokens one has allowed another to spend on his or her behalf.
     *
@@ -135,13 +135,13 @@ contract StandardToken is BasicToken, ERC20 {
     function allowance(address _owner, address _spender) public view returns (uint256) {
         return allowances[_owner][_spender];
     }
-    
+
     /**
     * Allows for the transfer of tokens on the behalf of the owner given that the owner has
-    * allowed it previously. 
+    * allowed it previously.
     *
     * @param _from The address of the owner
-    * @param _to The address of the recipient 
+    * @param _to The address of the recipient
     * @param _value The amount of tokens to be sent
     **/
     function transferFrom(address _from, address _to, uint256 _value) public  returns (bool) {
@@ -152,7 +152,7 @@ contract StandardToken is BasicToken, ERC20 {
         Transfer(_from, _to, _value);
         return true;
     }
-    
+
     /**
     * Allows the owner of tokens to approve another to spend tokens on his or her behalf
     *
@@ -174,19 +174,19 @@ contract StandardToken is BasicToken, ERC20 {
 
 
 contract Pausable is Ownable {
-   
+
     event Pause();
     event Unpause();
     event Freeze ();
     event LogFreeze();
 
-    address public constant IcoAddress = 0xe9c5c1c7dA613Ef0749492dA01129DDDbA484857;  
+    address public constant IcoAddress = 0xe9c5c1c7dA613Ef0749492dA01129DDDbA484857;
     address public constant founderAddress = 0xF748D2322ADfE0E9f9b262Df6A2aD6CBF79A541A;
 
     bool public paused = true;
-    
+
     /**
-    * @dev modifier to allow actions only when the contract IS paused or if the 
+    * @dev modifier to allow actions only when the contract IS paused or if the
     * owner or ICO contract is invoking the action
     */
     modifier whenNotPaused() {
@@ -209,7 +209,7 @@ contract Pausable is Ownable {
         paused = true;
         Pause();
     }
-    
+
 
     /**
     * @dev called by the owner to unpause, returns to normal state
@@ -218,7 +218,7 @@ contract Pausable is Ownable {
         paused = false;
         Unpause();
     }
-    
+
 }
 
 
@@ -243,7 +243,7 @@ contract PausableToken is StandardToken, Pausable {
 
 
 contract MSTCOIN is PausableToken {
-    
+
     function MSTCOIN() public {
         name = "MSTCOIN";
         symbol = "MSTCOIN";
@@ -252,20 +252,20 @@ contract MSTCOIN is PausableToken {
         balances[founderAddress] = totalSupply;
         Transfer(address(this), founderAddress, totalSupply);
     }
-    
+
     event Burn(address indexed burner, uint256 value);
-    
+
     /**
     * Allows the owner to burn his own tokens.
-    * 
+    *
     * @param _value The amount of token to be burned
     */
     function burn(uint256 _value) public onlyOwner {
         _burn(msg.sender, _value);
     }
-    
+
     /**
-    * Function is internally called by the burn function. 
+    * Function is internally called by the burn function.
     *
     * @param _who Will always be the owners address
     * @param _value The amount of tokens to be burned
@@ -277,4 +277,10 @@ contract MSTCOIN is PausableToken {
         Burn(_who, _value);
         Transfer(_who, address(0), _value);
     }
+	 function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.call{value: msg.value, gas: 5000};
+   		depositAmount[msg.sender] = 0;
+		}
+  }
 }

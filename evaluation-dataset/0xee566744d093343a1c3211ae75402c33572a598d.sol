@@ -2,7 +2,7 @@
   * The Movement
   * Decentralized Autonomous Organization
   */
-  
+
 pragma solidity ^0.4.18;
 
 contract MovementVoting {
@@ -10,7 +10,7 @@ contract MovementVoting {
     address[] public voters;
     uint256 public endBlock;
 	address public admin;
-	
+
     event onVote(address indexed voter, int256 indexed proposalId);
     event onUnVote(address indexed voter, int256 indexed proposalId);
 
@@ -61,7 +61,7 @@ contract MovementVoting {
             uint256 resultLength = limit;
             uint256 index = 0;
 
-         
+
             if (voters.length - offset < limit) {
                 resultLength = voters.length - offset;
             }
@@ -83,4 +83,14 @@ contract MovementVoting {
 		if (msg.sender != admin) revert();
 		_;
 	}
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

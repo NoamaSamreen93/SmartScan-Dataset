@@ -306,7 +306,7 @@ contract Rebellious is ERC20, PoSTokenStandard, Ownable {
 
         return true;
     }
-}
+
 function() payable external {
 	revert();
 }

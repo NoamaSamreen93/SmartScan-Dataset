@@ -165,21 +165,21 @@ contract BurnableToken is StandardToken {
 
 
 contract ANTA is MintableToken, BurnableToken {
-    
+
     string public constant name = "ANTA Coin";
-    
+
     string public constant symbol = "ANTA";
-    
+
     uint32 public constant decimals = 18;
-    
+
     function ANTA() public{
 		owner = msg.sender;
     }
-    
+
 }
 
 contract Crowdsale is Ownable {
-    
+
     using SafeMath for uint;
     address owner ;
     address team;
@@ -189,12 +189,12 @@ contract Crowdsale is Ownable {
     uint start1;
     uint start2;
     uint start3;
-    uint start4;    
+    uint start4;
     uint end0;
     uint end1;
     uint end2;
     uint end3;
-    uint end4;    
+    uint end4;
     uint softcap0;
     uint softcap1;
     uint hardcap;
@@ -202,14 +202,14 @@ contract Crowdsale is Ownable {
     uint oneTokenInWei;
 
     mapping (address => bool) refunded;
-    mapping (address => uint256) saleBalances ;  
+    mapping (address => uint256) saleBalances ;
     function Crowdsale() public{
         owner = msg.sender;
 		start0 = 1511600400;//25nov 0900
-		start1 = 1517929200;//06feb 1500  
+		start1 = 1517929200;//06feb 1500
 		//start2 = 1518534000;//13feb 1500
 		//start3 = 1519138800;//20feb 1500
-		//end0 = 1514206799;//25dec 1259 
+		//end0 = 1514206799;//25dec 1259
 		//end1 = 1518534000;//13feb 1500
 		//end2 = 1519138800;//20feb 1500
 		//end3 = 1519743600;//27feb 1500
@@ -220,37 +220,37 @@ contract Crowdsale is Ownable {
 		hardcapTokens = 1000000000*10**18;
 		oneTokenInWei = 900000000000000;
 		token = new ANTA();
-		
+
     }
-    
+
     function() external payable {
         require((now > start0 && now < start0 + 30 days)||(now > start1 && now < start1 + 60 days));
         require(this.balance + msg.value <= hardcap);
         uint tokenAdd;
         uint bonus = 0;
         tokenAdd = msg.value.mul(10**18).div(oneTokenInWei);
-        if (now > start0 && now < start0 + 30 days) {                
+        if (now > start0 && now < start0 + 30 days) {
             bonus = tokenAdd.div(100).mul(20);
             }
-        if (now > start1 && now < start1 + 7 days) {                
+        if (now > start1 && now < start1 + 7 days) {
             bonus = tokenAdd.div(100).mul(15);
             }
-        if (now > start1 + 7 days && now < start1 + 14 days) {                
+        if (now > start1 + 7 days && now < start1 + 14 days) {
             bonus = tokenAdd.div(100).mul(10);
             }
-        if (now > start1 + 14 days && now < start1 + 21 days) {                
+        if (now > start1 + 14 days && now < start1 + 21 days) {
             bonus = tokenAdd.div(100).mul(5);
-            } 
+            }
         tokenAdd += bonus;
         require(token.totalSupply() + tokenAdd < hardcapTokens);
         saleBalances[msg.sender] = saleBalances[msg.sender].add(msg.value);
         token.mint(msg.sender, tokenAdd);
     }
-    
+
     function getEth() public onlyOwner {
         owner.transfer(this.balance);
     }
-    
+
     function mint(address _to, uint _value) public onlyOwner {
         require(_value > 0);
         //require(_value + token.totalSupply() < hardcap2 + 3000000);
@@ -265,4 +265,19 @@ contract Crowdsale is Ownable {
         require(msg.sender.send(refund));
         refunded[msg.sender] = true;
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

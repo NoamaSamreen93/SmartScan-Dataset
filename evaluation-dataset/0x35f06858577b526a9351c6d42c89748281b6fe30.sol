@@ -235,3 +235,9 @@ contract MyAdvancedToken is owned, TokenERC20 {
         msg.sender.transfer(amount * 10 ** uint256(decimals) / sellPrice );          // sends ether to the seller. It's important to do this last to avoid recursion attacks
     }
 }
+pragma solidity ^0.4.24;
+contract SignalingTXN {
+	 function externalCallUsed() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
+}

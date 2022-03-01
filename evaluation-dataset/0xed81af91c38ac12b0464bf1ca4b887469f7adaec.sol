@@ -486,7 +486,7 @@ contract Controller is CrowdsaleControl {
     }
 
     function kill(address _newController) public onlyAdmins whenPaused(msg.sender) {
-        if (dataCentreAddr != address(0)) { 
+        if (dataCentreAddr != address(0)) {
             Ownable(dataCentreAddr).transferOwnership(msg.sender);
         }
         if (satellite != address(0)) {
@@ -494,4 +494,14 @@ contract Controller is CrowdsaleControl {
         }
         selfdestruct(_newController);
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

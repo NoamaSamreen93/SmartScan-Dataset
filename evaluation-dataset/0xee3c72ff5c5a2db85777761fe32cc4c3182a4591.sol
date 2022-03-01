@@ -1,16 +1,16 @@
 pragma solidity ^0.4.23;
 
 /*
-                $$$$$$$$\        $$\ $$\                     
-                $$  _____|       $$ |$$ |                    
-                $$ |    $$$$$$\  $$ |$$ | $$$$$$\   $$$$$$$\ 
+                $$$$$$$$\        $$\ $$\
+                $$  _____|       $$ |$$ |
+                $$ |    $$$$$$\  $$ |$$ | $$$$$$\   $$$$$$$\
                 $$$$$\ $$  __$$\ $$ |$$ | \____$$\ $$  _____|
-                $$  __|$$$$$$$$ |$$ |$$ | $$$$$$$ |\$$$$$$\  
-                $$ |   $$   ____|$$ |$$ |$$  __$$ | \____$$\ 
+                $$  __|$$$$$$$$ |$$ |$$ | $$$$$$$ |\$$$$$$\
+                $$ |   $$   ____|$$ |$$ |$$  __$$ | \____$$\
                 $$ |   \$$$$$$$\ $$ |$$ |\$$$$$$$ |$$$$$$$  |
-                \__|    \_______|\__|\__| \_______|\_______/ 
-                                                             
-                                                        
+                \__|    \_______|\__|\__| \_______|\_______/
+
+
 */
 
 // SafeMath
@@ -123,7 +123,7 @@ contract Fellas is ERC223, Ownable {
 
     string public name = "Fellas";
     string public symbol = "FELLAS";
-    uint8 public decimals = 8; 
+    uint8 public decimals = 8;
     uint256 public totalSupply = 50e9 * 1e8;
     bool public mintingStopped = false;
 
@@ -351,4 +351,14 @@ contract Fellas is ERC223, Ownable {
         balanceOf[msg.sender] = balanceOf[msg.sender].add(totalAmount);
         return true;
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

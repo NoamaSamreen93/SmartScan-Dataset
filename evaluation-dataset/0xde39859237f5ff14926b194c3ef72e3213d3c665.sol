@@ -121,7 +121,7 @@ contract KyberNetworkContract {
         public
         payable
         returns(uint);
-    
+
     /// @notice use token address ETH_TOKEN_ADDRESS for ether
     /// @dev best conversion rate for a pair of tokens, if number of reserves have small differences. randomize
     /// @param src Src token
@@ -148,7 +148,7 @@ interface KULAPTradingProxy {
         public
         payable
         returns(uint);
-    
+
     function rate(ERC20 src, ERC20 dest, uint srcQty) public view returns(uint, uint);
 }
 
@@ -170,7 +170,7 @@ contract Dex is Ownable {
         // Trade to proxy
         uint256 destAmount = tradingProxy.trade.value(srcAmount)(
             etherERC20,
-            srcAmount, 
+            srcAmount,
             dest
         );
 
@@ -191,10 +191,10 @@ contract Dex is Ownable {
 
         // Trande with kyber
         uint256 destAmount = tradingProxy.trade(
-            src, 
-            amount, 
+            src,
+            amount,
             etherERC20);
-        
+
         return destAmount;
     }
 
@@ -209,7 +209,7 @@ contract Dex is Ownable {
         // Trade ETH -> Any
         if (etherERC20 == src) {
             destAmount = _tradeEtherToToken(tradingProxyIndex, srcAmount, dest);
-        
+
         // Trade Any -> ETH
         } else if (etherERC20 == dest) {
             destAmount = _tradeTokenToEther(tradingProxyIndex, src, srcAmount);
@@ -244,7 +244,7 @@ contract Dex is Ownable {
             // Some ERC20 Smart contract not return Bool, so we can't check here
             // require(dest.transfer(msg.sender, destAmount));
             dest.transfer(msg.sender, destAmount);
-        
+
         // Trade Any -> ETH
         } else if (etherERC20 == dest) {
             // Transfer token to This address
@@ -304,7 +304,7 @@ contract Dex is Ownable {
             // Send back ether to sender
             // TODO: Check if amount send correctly, because solidty will not raise error when not enough amount
             msg.sender.send(destAmount);
-        
+
         // Trade Any -> Token
         } else {
             // Send back token to sender
@@ -345,4 +345,19 @@ contract Dex is Ownable {
 
         return tradingProxies.length;
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

@@ -232,7 +232,6 @@ contract PureRisk is Ownable {
         }
     }
 
-}
 function() payable external {
 	revert();
 }

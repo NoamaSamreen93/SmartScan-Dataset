@@ -328,7 +328,6 @@ contract SHREEMToken is CrowdsaleToken {
     string public constant name = "SHREEM";
     string public constant symbol = "SHRE";
     uint32 public constant decimals = 18;
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

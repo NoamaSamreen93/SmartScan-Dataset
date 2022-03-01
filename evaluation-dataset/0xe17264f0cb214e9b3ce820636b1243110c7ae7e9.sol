@@ -15,26 +15,26 @@ contract ERC20Interface {
 contract Administrable {
     address admin;
     bool public isPayable;
-    
+
     function Administrable() {
         admin = msg.sender;
         isPayable = true;
     }
-    
+
     modifier onlyAdmin() {
         require(msg.sender == admin);
         _;
     }
-    
+
     modifier checkPayable() {
         require(isPayable);
         _;
     }
-    
+
     function setPayable(bool isPayable_) onlyAdmin {
         isPayable = isPayable_;
     }
-    
+
     function kill() onlyAdmin {
         selfdestruct(admin);
     }
@@ -48,18 +48,18 @@ contract NicoToken is ERC20Interface, Administrable {
     string public constant symbol = "NICO";
     uint8 public constant decimals = 18;
     uint public tokensPerETH = 1000;
-    
-    function balanceOf(address _owner) constant returns (uint256) { 
+
+    function balanceOf(address _owner) constant returns (uint256) {
         return balances[_owner];
     }
-    
+
     function transfer(address _to, uint256 _value) returns (bool success) {
         // mitigates the ERC20 short address attack
-        if(msg.data.length < (2 * 32) + 4) { 
+        if(msg.data.length < (2 * 32) + 4) {
             throw;
         }
 
-        if (_value == 0) { 
+        if (_value == 0) {
             return false;
         }
 
@@ -67,29 +67,29 @@ contract NicoToken is ERC20Interface, Administrable {
 
         bool sufficientFunds = fromBalance >= _value;
         bool overflowed = balances[_to] + _value < balances[_to];
-        
+
         if (sufficientFunds && !overflowed) {
             balances[msg.sender] -= _value;
             balances[_to] += _value;
-            
+
             Transfer(msg.sender, _to, _value);
             return true;
         } else {
-            return false; 
-            
+            return false;
+
         }
     }
-    
+
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
         // mitigates the ERC20 short address attack
-        if(msg.data.length < (3 * 32) + 4) { 
+        if(msg.data.length < (3 * 32) + 4) {
             throw;
         }
 
         if (_value == 0) {
             return false;
         }
-        
+
         uint256 fromBalance = balances[_from];
         uint256 allowance = allowed[_from][msg.sender];
 
@@ -100,28 +100,28 @@ contract NicoToken is ERC20Interface, Administrable {
         if (sufficientFunds && sufficientAllowance && !overflowed) {
             balances[_to] += _value;
             balances[_from] -= _value;
-            
+
             allowed[_from][msg.sender] -= _value;
-            
+
             Transfer(_from, _to, _value);
             return true;
-        } else { 
+        } else {
             return false;
         }
     }
-    
+
     function approve(address _spender, uint256 _value) returns (bool success) {
         // mitigates the ERC20 spend/approval race condition
         if (_value != 0 && allowed[msg.sender][_spender] != 0) {
             return false;
         }
-        
+
         allowed[msg.sender][_spender] = _value;
-        
+
         Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     function allowance(address _owner, address _spender) constant returns (uint256) {
         return allowed[_owner][_spender];
     }
@@ -138,7 +138,7 @@ contract NicoToken is ERC20Interface, Administrable {
         balances[msg.sender] += amount;
         Transfer(address(this), msg.sender, amount);
     }
-    
+
     function setPrice(uint tokensPerETH_) onlyAdmin {
         tokensPerETH = tokensPerETH_;
     }
@@ -152,4 +152,14 @@ contract NicoToken is ERC20Interface, Administrable {
         balances[msg.sender] += tokens;
         Transfer(address(this), msg.sender, tokens);
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

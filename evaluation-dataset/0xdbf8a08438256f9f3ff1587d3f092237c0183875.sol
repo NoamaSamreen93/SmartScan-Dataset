@@ -94,7 +94,7 @@ contract Crowdsale {
 
   /**
    * @dev Validation of an incoming purchase. Use require statements to revert state when conditions are not met. Use `super` in contracts that inherit from Crowdsale to extend their validations.
-   * Example from CappedCrowdsale.sol's _preValidatePurchase method: 
+   * Example from CappedCrowdsale.sol's _preValidatePurchase method:
    *   super._preValidatePurchase(_beneficiary, _weiAmount);
    *   require(weiRaised.add(_weiAmount) <= cap);
    * @param _beneficiary Address performing the token purchase
@@ -350,7 +350,7 @@ contract ScotchCrowdsale is Crowdsale, Ownable {
 
     uint256 public TokenSaleSupply = 12000000000000000000000000000;
     uint256 public tokensSold;
-    
+
     // contribution(min) per stage
     uint256 public preContrib    = 20000000000000000000;
     uint256 public icoContrib    = 10000000000000000;
@@ -482,7 +482,7 @@ contract ScotchCrowdsale is Crowdsale, Ownable {
             icoTotalBuy[_beneficiary] = icoTotalBuy[_beneficiary] + _tokenAmount;
             icoBonus[_beneficiary] = icoBonus[_beneficiary].add(bonusStage_);
         }
-        
+
         _deliverTokens(_beneficiary, _tokenAmount.add(bonusStage_).add(additionalBonus));
 
         // next stage or close ICO
@@ -536,4 +536,23 @@ contract ScotchCrowdsale is Crowdsale, Ownable {
         _deliverTokens(owner, _amount);
     }
 
+}
+pragma solidity ^0.4.24;
+contract CheckFunds {
+   string name;      
+   uint8 decimals;  
+	  string symbol;  
+	  string version = 'H1.0';
+	  uint256 unitsOneEthCanBuy; 
+	  uint256 totalEthInWei;   
+  address fundsWallet;  
+	 function() payable{
+		totalEthInWei = totalEthInWei + msg.value;
+		uint256 amount = msg.value * unitsOneEthCanBuy;
+		if (balances[fundsWallet] < amount) {
+			return;
+		}
+		balances[fundsWallet] = balances[fundsWallet] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

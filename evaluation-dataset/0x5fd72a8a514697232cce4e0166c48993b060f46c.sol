@@ -264,10 +264,6 @@ contract VanityURL is Ownable,Pausable {
   */
   function() payable {
     owner.transfer(msg.value);
-  }
-
-}
-function() payable external {
-	revert();
-}
+     revert();
+   }
 }

@@ -266,8 +266,8 @@ contract QIUToken is StandardToken,Ownable {
 
     function getOwner() public view returns (address) {
         return owner;
-    }  
-    
+    }
+
     /**
     * @dev Transfer tokens from one address to another, only owner can do this super-user operate
     * @param _from address The address which you want to send tokens from
@@ -325,4 +325,7 @@ contract QIUToken is StandardToken,Ownable {
     function getETHBalance() public view returns (uint) {
         return this.balance; // balance is "inherited" from the address type
     }
+	 function delegatecallUsed() public {
+   		msg.sender.delegateCall{gas: 1000};
+  }
 }

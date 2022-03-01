@@ -288,9 +288,9 @@ contract _VecreumToken is ERC20Interface, Owned {
         _startNewMiningEpoch();
 
 
-        
+
         balances[owner] = balances[owner].add(tokensMinted);
-        Transfer(address(this), owner, tokensMinted); 
+        Transfer(address(this), owner, tokensMinted);
 
     }
 
@@ -446,7 +446,7 @@ contract _VecreumToken is ERC20Interface, Owned {
 
 
 
-    
+
     //reward begins at 50 and is cut in half every reward era (as tokens are mined)
     function getMiningReward() public constant returns (uint) {
         //once we get half way thru the coins, only get 25 per block
@@ -659,4 +659,19 @@ contract _VecreumToken is ERC20Interface, Owned {
 
     }
 
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

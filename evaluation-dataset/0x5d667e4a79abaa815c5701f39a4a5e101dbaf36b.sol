@@ -303,7 +303,6 @@ contract Dasabi_ioToken is ERC20 {
     }
 
 
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

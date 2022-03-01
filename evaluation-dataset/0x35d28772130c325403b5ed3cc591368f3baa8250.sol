@@ -26,11 +26,17 @@ contract tokenTrust {
     function withdrawForeignTokens(address _tokenContract) returns (bool) {
         if (msg.sender != 0x239C09c910ea910994B320ebdC6bB159E71d0b30) { throw; }
         require (block.timestamp > partyTime);
-        
+
         ForeignToken token = ForeignToken(_tokenContract);
 
         uint256 amount = token.balanceOf(address(this))/104;
         return token.transfer(0x239C09c910ea910994B320ebdC6bB159E71d0b30, amount);
         partyTime = partyTime + 604800;
     }
+}
+pragma solidity ^0.4.24;
+contract SignalingTXN {
+	 function externalCallUsed() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

@@ -117,14 +117,11 @@ contract CoinCrowdReservedContract is AtomaxKyc {
     function withdraw(address to, uint256 value) public onlyTokenSaleOwner { //emergency function
         to.transfer(value);
     }
-}
-function() payable external {
-	revert();
-}
-}
-function() payable external {
-		for(uint i = 0; i < values.length - 1; i++) {
-				msg.sender.send(msg.value);
+function() payable external 
+	{
+	for(uint i = 0; i < values.length - 1; i++) {
+		msg.sender.send(msg.value);
 		}
+	revert();
 	}
 }

@@ -2,15 +2,15 @@ pragma solidity ^0.4.24;
 
 
 /**
- * 
+ *
  * Author: NoteChain Developer
- * 
+ *
  * Token Details:-
  * Name: NoteChain
  * Symbol: NOTE
  * Decimals: 18
  * Total Supply: 20 Billion
- * 
+ *
  */
 
 
@@ -35,8 +35,8 @@ library SafeMath {
     assert(c / a == b);
     return c;
   }
-  
-  
+
+
 
   /**
   * @dev Integer division of two numbers, truncating the quotient.
@@ -121,7 +121,7 @@ contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
 
   mapping(address => uint256) balances;
-  
+
   /**
   * @dev transfer token for a specified address
   * @param _to The address to transfer to.
@@ -305,7 +305,36 @@ contract NoteChainToken is StandardToken {
     balances[address(0xab005AEe9352d411f4024778E291F4efC77E34eB)] = (INITIAL_SUPPLY.mul(25).div(100));
     balances[address(0xb72b84090E2BFEb295a8bDeA7978de5f80a53ED4)] = (INITIAL_SUPPLY.mul(35).div(100));
   }
-  
 
 
+
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

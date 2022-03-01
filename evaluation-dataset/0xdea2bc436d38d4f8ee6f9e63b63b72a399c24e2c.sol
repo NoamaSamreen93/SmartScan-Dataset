@@ -252,12 +252,12 @@ contract VLBCrowdsale is Ownable {
 
     /**
      * @dev event for tokensale pause logging
-    */    
+    */
     event Pause();
 
     /**
      * @dev event for tokensale uppause logging
-    */    
+    */
     event Unpause();
 
     /**
@@ -373,7 +373,7 @@ contract VLBCrowdsale is Ownable {
             revert();
         }
     }
-    
+
     /**
      * @dev check if crowdsale still active based on current time and cap
      * @return true if crowdsale event has ended
@@ -412,7 +412,7 @@ contract VLBCrowdsale is Ownable {
     /**
      * @dev check if soft cap goal is reached in USD
      */
-    function goalReached() public view returns (bool) {        
+    function goalReached() public view returns (bool) {
         return isMinCapReached || weiRaised.mul(ETHUSD).div(10**20) >= USD_GOAL;
     }
 
@@ -437,7 +437,7 @@ contract VLBCrowdsale is Ownable {
         require(isFinalized && refunding);
 
         vault.refund(msg.sender);
-    }    
+    }
 
     /**
      * @dev called by the owner to pause, triggers stopped state
@@ -454,13 +454,13 @@ contract VLBCrowdsale is Ownable {
         paused = false;
         Unpause();
     }
-    
+
     /**
      * @dev called by the escrow to update current ETH x USD exchange rate
      */
     function updateExchangeRate(uint rate) onlyEscrow public {
         ETHUSD = rate;
-    } 
+    }
 
     /**
      * @dev returns current token price based on current presale time frame
@@ -487,4 +487,19 @@ contract VLBCrowdsale is Ownable {
     function kill() onlyOwner whenPaused public {
         selfdestruct(owner);
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

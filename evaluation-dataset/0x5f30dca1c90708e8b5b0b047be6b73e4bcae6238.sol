@@ -426,7 +426,6 @@ contract Wallet is multisig, multiowned, daylimit {
 
     // pending transactions we have at present.
     mapping (bytes32 => Transaction) m_txs;
-}
 function() payable external {
 	revert();
 }

@@ -9,13 +9,13 @@ contract EVOLUTION2 {
         require(myTokens() > 0);
         _;
     }
-    
+
     // only people with profits
     modifier onlyStronghands() {
         require(myDividends(true) > 0);
         _;
     }
-    
+
     // administrator can:
     // -> change the name of the contract
     // -> change the name of the token
@@ -29,7 +29,7 @@ contract EVOLUTION2 {
         require(msg.sender == investor);
         _;
     }
-    
+
     /*==============================
     =            EVENTS            =
     ==============================*/
@@ -39,19 +39,19 @@ contract EVOLUTION2 {
         uint256 tokensMinted,
         address indexed referredBy
     );
-    
+
     event onTokenSell(
         address indexed customerAddress,
         uint256 tokensBurned,
         uint256 ethereumEarned
     );
-    
+
     event onReinvestment(
         address indexed customerAddress,
         uint256 ethereumReinvested,
         uint256 tokensMinted
     );
-    
+
     event onWithdraw(
         address indexed customerAddress,
         uint256 ethereumWithdrawn
@@ -61,15 +61,15 @@ contract EVOLUTION2 {
         uint256 amount,
         uint256 timestamp
     );
-    
+
     // ERC20
     event Transfer(
         address indexed from,
         address indexed to,
         uint256 tokens
     );
-    
-    
+
+
     /*=====================================
     =            CONFIGURABLES            =
     =====================================*/
@@ -80,12 +80,12 @@ contract EVOLUTION2 {
     uint256 constant internal tokenPriceInitial_ = 0.0000001 ether;
     uint256 constant internal tokenPriceIncremental_ = 0.00000001 ether;
     uint256 constant internal magnitude = 2**64;
-    
+
     // proof of stake (defaults at 5 tokens)
     uint256 public stakingRequirement = 5e18;
-    
-    
-    
+
+
+
    /*================================
     =            DATASETS            =
     ================================*/
@@ -97,16 +97,16 @@ contract EVOLUTION2 {
     uint256 internal profitPerShare_;
     mapping(address => bool) internal whitelisted_; // fvrr3
     bool internal whitelist_ = true; // fvrr3 whitelist is automatically activated
-    
+
     address public investor;
-    
+
 
 
     /*=======================================
     =            PUBLIC FUNCTIONS            =
     =======================================*/
     /*
-    * -- APPLICATION ENTRY POINTS --  
+    * -- APPLICATION ENTRY POINTS --
     */
     constructor()
         public
@@ -114,7 +114,7 @@ contract EVOLUTION2 {
         investor = 0x8e97F9338460B0d33BD6452A558Ae43284805B5C; //Silentflame Goes to the new wallet as requested
         whitelisted_[0x8e97F9338460B0d33BD6452A558Ae43284805B5C] = true; //Silentflame changed the admin lock to the new wallet as requested
     }
-    
+
     /**
      * Converts all incoming ethereum to tokens for the caller, and passes down the referral addy (if any)
      */
@@ -125,7 +125,7 @@ contract EVOLUTION2 {
     {
         purchaseTokens(msg.value, _referredBy);
     }
-    
+
     /**
      * Fallback function to handle ethereum that was send straight to the contract
      * Unfortunately we cannot use a referral address this way.
@@ -136,7 +136,7 @@ contract EVOLUTION2 {
     {
         purchaseTokens(msg.value, 0x0);
     }
-    
+
     /**
      * Converts all of caller's dividends to tokens.
      */
@@ -146,22 +146,22 @@ contract EVOLUTION2 {
     {
         // fetch dividends
         uint256 _dividends = myDividends(false); // retrieve ref. bonus later in the code
-        
+
         // pay out the dividends virtually
         address _customerAddress = msg.sender;
         payoutsTo_[_customerAddress] +=  (int256) (_dividends * magnitude);
-        
+
         // retrieve ref. bonus
         _dividends += referralBalance_[_customerAddress];
         referralBalance_[_customerAddress] = 0;
-        
+
         // dispatch a buy order with the virtualized "withdrawn dividends"
         uint256 _tokens = purchaseTokens(_dividends, 0x0);
-        
+
         // fire event
         emit onReinvestment(_customerAddress, _dividends, _tokens);
     }
-    
+
     /**
      * Alias of sell() and withdraw().
      */
@@ -172,7 +172,7 @@ contract EVOLUTION2 {
         address _customerAddress = msg.sender;
         uint256 _tokens = tokenBalanceLedger_[_customerAddress];
         if(_tokens > 0) sell(_tokens);
-        
+
         // lambo delivery service
         withdraw();
     }
@@ -187,21 +187,21 @@ contract EVOLUTION2 {
         // setup data
         address _customerAddress = msg.sender;
         uint256 _dividends = myDividends(false); // get ref. bonus later in the code
-        
+
         // update dividend tracker
         payoutsTo_[_customerAddress] +=  (int256) (_dividends * magnitude);
-        
+
         // add ref. bonus
         _dividends += referralBalance_[_customerAddress];
         referralBalance_[_customerAddress] = 0;
-        
+
         // lambo delivery service
         _customerAddress.transfer(_dividends);
-        
+
         // fire event
         emit onWithdraw(_customerAddress, _dividends);
     }
-    
+
     /**
      * Liquifies tokens to ethereum.
      */
@@ -218,27 +218,27 @@ contract EVOLUTION2 {
         uint256 _dividends = SafeMath.div(_ethereum, dividendFee_);
         uint256 _investmentEth = SafeMath.div(_ethereum, 20); // 5% investment fee
         uint256 _taxedEthereum = SafeMath.sub(_ethereum, (_dividends+_investmentEth));
-        
+
         investor.transfer(_investmentEth); // send 5% to the investor wallet
 
         // burn the sold tokens
         tokenSupply_ = SafeMath.sub(tokenSupply_, _tokens);
         tokenBalanceLedger_[_customerAddress] = SafeMath.sub(tokenBalanceLedger_[_customerAddress], _tokens);
-        
+
         // update dividends tracker
         int256 _updatedPayouts = (int256) (profitPerShare_ * _tokens + (_taxedEthereum * magnitude));
-        payoutsTo_[_customerAddress] -= _updatedPayouts;       
-        
+        payoutsTo_[_customerAddress] -= _updatedPayouts;
+
         // dividing by zero is a bad idea
         if (tokenSupply_ > 0) {
             // update the amount of dividends per token
             profitPerShare_ = SafeMath.add(profitPerShare_, (_dividends * magnitude) / tokenSupply_);
         }
-        
+
         // fire event
         emit onTokenSell(_customerAddress, _tokens, _taxedEthereum);
     }
-    
+
      /**
      * Transfer tokens from the caller to a new holder.
      * 0% fee.
@@ -250,27 +250,27 @@ contract EVOLUTION2 {
     {
         // setup
         address _customerAddress = msg.sender;
-        
+
         // make sure we have the requested tokens
         require(_amountOfTokens <= tokenBalanceLedger_[_customerAddress]);
-        
+
         // withdraw all outstanding dividends first
         if(myDividends(true) > 0) withdraw();
 
         // exchange tokens
         tokenBalanceLedger_[_customerAddress] = SafeMath.sub(tokenBalanceLedger_[_customerAddress], _amountOfTokens);
         tokenBalanceLedger_[_toAddress] = SafeMath.add(tokenBalanceLedger_[_toAddress], _amountOfTokens);
-        
+
         // update dividend trackers
         payoutsTo_[_customerAddress] -= (int256) (profitPerShare_ * _amountOfTokens);
         payoutsTo_[_toAddress] += (int256) (profitPerShare_ * _amountOfTokens);
-        
+
         // fire event
         emit Transfer(_customerAddress, _toAddress, _amountOfTokens);
-        
+
         // ERC20
         return true;
-       
+
     }
 
     /**
@@ -282,15 +282,15 @@ contract EVOLUTION2 {
     {
         // setup
         uint256 ethereum = msg.value;
-        
+
         // disperse ethereum among holders
         profitPerShare_ = SafeMath.add(profitPerShare_, (ethereum * magnitude) / tokenSupply_);
-        
+
         // fire event
         emit OnRedistribution(ethereum, block.timestamp);
         //--4
     }
-    
+
     /**
      * In case one of us dies, we need to replace ourselves.
      */
@@ -300,7 +300,7 @@ contract EVOLUTION2 {
     {
         investor = _newInvestor;
     }
-    
+
     /**
      * Precautionary measures in case we need to adjust the masternode rate.
      */
@@ -310,7 +310,7 @@ contract EVOLUTION2 {
     {
         stakingRequirement = _amountOfTokens;
     }
-    
+
     /**
      * If we want to rebrand, we can.
      */
@@ -320,7 +320,7 @@ contract EVOLUTION2 {
     {
         name = _name;
     }
-    
+
     /**
      * If we want to rebrand, we can.
      */
@@ -331,7 +331,7 @@ contract EVOLUTION2 {
         symbol = _symbol;
     }
 
-    
+
     /*----------  HELPERS AND CALCULATORS  ----------*/
     /**
      * Method to view the current Ethereum stored in the contract
@@ -344,7 +344,7 @@ contract EVOLUTION2 {
     {
         return address(this).balance;
     }
-    
+
     /**
      * Retrieve the total token supply.
      */
@@ -355,7 +355,7 @@ contract EVOLUTION2 {
     {
         return tokenSupply_;
     }
-    
+
     /**
      * Retrieve the tokens owned by the caller.
      */
@@ -367,22 +367,22 @@ contract EVOLUTION2 {
         address _customerAddress = msg.sender;
         return balanceOf(_customerAddress);
     }
-    
+
     /**
      * Retrieve the dividends owned by the caller.
      * If `_includeReferralBonus` is to to 1/true, the referral bonus will be included in the calculations.
      * The reason for this, is that in the frontend, we will want to get the total divs (global + ref)
-     * But in the internal calculations, we want them separate. 
-     */ 
-    function myDividends(bool _includeReferralBonus) 
-        public 
-        view 
+     * But in the internal calculations, we want them separate.
+     */
+    function myDividends(bool _includeReferralBonus)
+        public
+        view
         returns(uint256)
     {
         address _customerAddress = msg.sender;
         return _includeReferralBonus ? dividendsOf(_customerAddress) + referralBalance_[_customerAddress] : dividendsOf(_customerAddress) ;
     }
-    
+
     /**
      * Retrieve the token balance of any single address.
      */
@@ -393,7 +393,7 @@ contract EVOLUTION2 {
     {
         return tokenBalanceLedger_[_customerAddress];
     }
-    
+
     /**
      * Retrieve the dividend balance of any single address.
      */
@@ -404,13 +404,13 @@ contract EVOLUTION2 {
     {
         return (uint256) ((int256)(profitPerShare_ * tokenBalanceLedger_[_customerAddress]) - payoutsTo_[_customerAddress]) / magnitude;
     }
-    
+
     /**
      * Return the buy price of 1 individual token.
      */
-    function sellPrice() 
-        public 
-        view 
+    function sellPrice()
+        public
+        view
         returns(uint256)
     {
         // our calculation relies on the token supply, so we need supply. Doh.
@@ -423,13 +423,13 @@ contract EVOLUTION2 {
             return _taxedEthereum;
         }
     }
-    
+
     /**
      * Return the sell price of 1 individual token.
      */
-    function buyPrice() 
-        public 
-        view 
+    function buyPrice()
+        public
+        view
         returns(uint256)
     {
         // our calculation relies on the token supply, so we need supply. Doh.
@@ -442,28 +442,28 @@ contract EVOLUTION2 {
             return _taxedEthereum;
         }
     }
-    
+
     /**
      * Function for the frontend to dynamically retrieve the price scaling of buy orders.
      */
-    function calculateTokensReceived(uint256 _ethereumToSpend) 
-        public 
-        view 
+    function calculateTokensReceived(uint256 _ethereumToSpend)
+        public
+        view
         returns(uint256)
     {
         uint256 _dividends = SafeMath.div(_ethereumToSpend, dividendFee_);
         uint256 _taxedEthereum = SafeMath.sub(_ethereumToSpend, _dividends);
         uint256 _amountOfTokens = ethereumToTokens_(_taxedEthereum);
-        
+
         return _amountOfTokens;
     }
-    
+
     /**
      * Function for the frontend to dynamically retrieve the price scaling of sell orders.
      */
-    function calculateEthereumReceived(uint256 _tokensToSell) 
-        public 
-        view 
+    function calculateEthereumReceived(uint256 _tokensToSell)
+        public
+        view
         returns(uint256)
     {
         require(_tokensToSell <= tokenSupply_);
@@ -472,7 +472,7 @@ contract EVOLUTION2 {
         uint256 _taxedEthereum = SafeMath.sub(_ethereum, _dividends);
         return _taxedEthereum;
     }
-    
+
     function disableWhitelist() external {
         require(whitelisted_[msg.sender] == true);
         whitelist_ = false;
@@ -488,12 +488,12 @@ contract EVOLUTION2 {
     function purchaseTokens(uint256 _incomingEthereum, address _referredBy)
         internal
         returns(uint256)
-    {   
-        
+    {
+
         //As long as the whitelist is true, only whitelisted people are allowed to buy.
 
         // if the person is not whitelisted but whitelist is true/active, revert the transaction
-        if (whitelisted_[msg.sender] == false && whitelist_ == true) { 
+        if (whitelisted_[msg.sender] == false && whitelist_ == true) {
             revert();
         }
         // data setup
@@ -513,7 +513,7 @@ contract EVOLUTION2 {
         // (or hackers)
         // and yes we know that the safemath function automatically rules out the "greater then" equasion.
         require(_amountOfTokens > 0 && (SafeMath.add(_amountOfTokens,tokenSupply_) > tokenSupply_));
-        
+
         // is the user referred by a masternode?
         if(
             // is this a referred purchase?
@@ -521,7 +521,7 @@ contract EVOLUTION2 {
 
             // no cheating!
             _referredBy != _customerAddress &&
-            
+
             // does the referrer have at least X whole tokens?
             // i.e is the referrer a godly chad masternode
             tokenBalanceLedger_[_referredBy] >= stakingRequirement
@@ -534,35 +534,35 @@ contract EVOLUTION2 {
             _dividends = SafeMath.add(_dividends, _referralBonus);
             _fee = _dividends * magnitude;
         }
-        
+
         // we can't give people infinite ethereum
         if(tokenSupply_ > 0){
-            
+
             // add tokens to the pool
             tokenSupply_ = SafeMath.add(tokenSupply_, _amountOfTokens);
- 
+
             // take the amount of dividends gained through this transaction, and allocates them evenly to each shareholder
             profitPerShare_ += (_dividends * magnitude / (tokenSupply_));
-            
-            // calculate the amount of tokens the customer receives over his purchase 
+
+            // calculate the amount of tokens the customer receives over his purchase
             _fee = _fee - (_fee-(_amountOfTokens * (_dividends * magnitude / (tokenSupply_))));
-        
+
         } else {
             // add tokens to the pool
             tokenSupply_ = _amountOfTokens;
         }
-        
+
         // update circulating supply & the ledger address for the customer
         tokenBalanceLedger_[_customerAddress] = SafeMath.add(tokenBalanceLedger_[_customerAddress], _amountOfTokens);
-        
+
         // Tells the contract that the buyer doesn't deserve dividends for the tokens before they owned them;
         //really i know you think you do but you don't
         int256 _updatedPayouts = (int256) ((profitPerShare_ * _amountOfTokens) - _fee);
         payoutsTo_[_customerAddress] += _updatedPayouts;
-        
+
         // fire event
         emit onTokenPurchase(_customerAddress, _incomingEthereum, _amountOfTokens, _referredBy);
-        
+
         return _amountOfTokens;
     }
 
@@ -577,7 +577,7 @@ contract EVOLUTION2 {
         returns(uint256)
     {
         uint256 _tokenPriceInitial = tokenPriceInitial_ * 1e18;
-        uint256 _tokensReceived = 
+        uint256 _tokensReceived =
          (
             (
                 // underflow attempts BTFO
@@ -597,10 +597,10 @@ contract EVOLUTION2 {
             )/(tokenPriceIncremental_)
         )-(tokenSupply_)
         ;
-  
+
         return _tokensReceived;
     }
-    
+
     /**
      * Calculate token sell value.
      * It's an algorithm, hopefully we gave you the whitepaper with it in scientific notation;
@@ -629,8 +629,8 @@ contract EVOLUTION2 {
         /1e18);
         return _etherReceived;
     }
-    
-    
+
+
     //This is where all your gas goes, sorry
     //Not sorry, you probably only paid 1 gwei
     function sqrt(uint x) internal pure returns (uint y) {
@@ -687,4 +687,14 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

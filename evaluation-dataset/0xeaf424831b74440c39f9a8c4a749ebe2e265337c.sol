@@ -35,7 +35,7 @@ contract ERC20 {
     address indexed spender,
     uint256 value
   );
-  
+
   event Burn(address indexed from, uint256 value);
 }
 
@@ -124,7 +124,7 @@ contract BCWToken is ERC20 {
   string private constant name_ = 'BCWToken';                                 // Set the token name for display
   string private constant symbol_ = 'BCW';                                         // Set the token symbol for display
   uint8 private constant decimals_ = 18;                                          // Set the number of decimals for display
-  
+
 
   constructor () public {
     balances[msg.sender] = totalSupply_;
@@ -137,7 +137,7 @@ contract BCWToken is ERC20 {
   function totalSupply() public view returns (uint256) {
     return totalSupply_;
   }
-  
+
    /**
   * @dev Token name
   */
@@ -211,7 +211,7 @@ contract BCWToken is ERC20 {
    */
   function approve(address _spender, uint256 _value) public returns (bool) {
     require(_spender != address(0));
-	
+
     allowed[msg.sender][_spender] = _value;
     emit Approval(msg.sender, _spender, _value);
     return true;
@@ -241,15 +241,25 @@ contract BCWToken is ERC20 {
     emit Transfer(_from, _to, _value);
     return true;
   }
-  
+
   function burn(uint256 _value) public returns (bool success) {
     require(msg.sender != address(0));
 	require(balances[msg.sender] >= _value);   // 必须要有这么多
-	
+
 	balances[msg.sender] = balances[msg.sender].sub(_value);
 	totalSupply_ = totalSupply_.sub(_value);
 
 	emit Burn(msg.sender, _value);
     return true;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
 }

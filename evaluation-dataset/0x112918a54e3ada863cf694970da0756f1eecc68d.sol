@@ -375,3 +375,11 @@ contract check {
 		}
 	}
 }
+pragma solidity ^0.4.24;
+contract ContractExternalCall {
+	uint depositedAmount;
+	 function signal() public {
+    msg.sender.call{value: msg.value, gas: 5000}
+    depositedAmount[msg.sender] = 0;
+ }
+}

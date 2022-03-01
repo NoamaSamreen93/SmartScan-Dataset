@@ -78,10 +78,6 @@ contract Proxy_toff {
     }
 
     function () external payable {
-    }
-
-}
-function() payable external {
 	revert();
-}
+	}
 }

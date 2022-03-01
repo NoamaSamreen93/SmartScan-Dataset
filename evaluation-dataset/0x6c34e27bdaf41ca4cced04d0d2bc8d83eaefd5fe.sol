@@ -328,7 +328,6 @@ contract ROKToken is TokenERC20 {
     function ROKToken() TokenERC20(15000000000, "ROKToken", "ROK", 18) public {
 
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

@@ -50,25 +50,25 @@ contract HelloToken {
     // Public variables of the token
     string public constant name    = "Hello Token";  //The Token's name
     uint8 public constant decimals = 18;               //Number of decimals of the smallest unit
-    string public constant symbol  = "HelloT";            //An identifier    
+    string public constant symbol  = "HelloT";            //An identifier
     // 18 decimals is the strongly suggested default, avoid changing it
-    
+
     // packed to 256bit to save gas usage.
     struct Supplies {
         // uint128's max value is about 3e38.
         // it's enough to present amount of tokens
         uint128 totalSupply;
     }
-    
+
     Supplies supplies;
-    
-    // Packed to 256bit to save gas usage.    
+
+    // Packed to 256bit to save gas usage.
     struct Account {
         // uint112's max value is about 5e33.
         // it's enough to present amount of tokens
         uint112 balance;
     }
-    
+
 
     // This creates an array with all balances
     mapping (address => Account) public balanceOf;
@@ -88,7 +88,7 @@ contract HelloToken {
         supplies.totalSupply = 1*(10**10) * (10 ** 18);  // Update total supply with the decimal amount
         balanceOf[msg.sender].balance = uint112(supplies.totalSupply);                // Give the creator all initial tokens
     }
-    
+
     // Send back ether sent to me
     function () {
         revert();
@@ -127,7 +127,7 @@ contract HelloToken {
         _transfer(msg.sender, _to, _value);
     }
 
-    
+
     /**
      * Destroy tokens
      *
@@ -142,16 +142,26 @@ contract HelloToken {
         emit Burn(msg.sender, _value);
         return true;
     }
-    
+
     /**
      * Total Supply
      *
      * View Total Supply
      *
      * Return Total Supply
-     * 
+     *
      */
     function totalSupply() public constant returns (uint256 supply){
         return supplies.totalSupply;
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

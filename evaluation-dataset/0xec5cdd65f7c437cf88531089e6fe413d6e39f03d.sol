@@ -539,7 +539,7 @@ contract DroneMadnessToken is CappedToken, PausableToken {
     string public constant symbol               = "DRNMD";
     uint public constant decimals               = 18;
 
-    constructor(uint256 _totalSupply) 
+    constructor(uint256 _totalSupply)
         CappedToken(_totalSupply) public {
         paused = true;
     }
@@ -577,7 +577,7 @@ library SafeERC20 {
 // File: contracts\TokenPool.sol
 
 /**
- * @title TokenPool 
+ * @title TokenPool
  * @dev Token Pool contract used to store tokens for special purposes
  * The pool can receive tokens and can transfer tokens to multiple beneficiaries.
  * It can be used for airdrops or similar cases.
@@ -602,7 +602,7 @@ contract TokenPool is Ownable {
     }
 
     /**
-     * @dev Transfer different amounts of tokens to multiple beneficiaries 
+     * @dev Transfer different amounts of tokens to multiple beneficiaries
      * @param _beneficiaries addresses of the beneficiaries
      * @param _amounts uint256[] amounts for each beneficiary
      */
@@ -615,7 +615,7 @@ contract TokenPool is Ownable {
     }
 
     /**
-     * @dev Transfer the same amount of tokens to multiple beneficiaries 
+     * @dev Transfer the same amount of tokens to multiple beneficiaries
      * @param _beneficiaries addresses of the beneficiaries
      * @param _amounts uint256[] amounts for each beneficiary
      */
@@ -1248,12 +1248,12 @@ contract TokenTimelock {
  * - Tokens are minted on each purchase
  * - Sale can be paused if needed by the admin
  */
-contract DroneMadnessCrowdsale is 
+contract DroneMadnessCrowdsale is
     MintedCrowdsale,
     CappedCrowdsale,
     TimedCrowdsale,
     FinalizableCrowdsale,
-    WhitelistedCrowdsale, 
+    WhitelistedCrowdsale,
     RefundableCrowdsale,
     Pausable {
     using SafeMath for uint256;
@@ -1278,12 +1278,12 @@ contract DroneMadnessCrowdsale is
         1541066400, // 1st of Nov - 30rd of Oct -> 10% Bonus
         1543658400  // 1st of Dec - 31st of Dec -> 0% Bonus
     ];
-    
+
     // Min investment
     uint256 public minInvestmentInWei;
     // Max individual investment
     uint256 public maxInvestmentInWei;
-    
+
     mapping (address => uint256) internal invested;
 
     TokenTimelock public teamWallet;
@@ -1312,15 +1312,15 @@ contract DroneMadnessCrowdsale is
      * @param _token DroneMadnessToken our token
      */
     constructor(
-        uint256 _cap, 
-        uint256 _goal, 
-        uint256 _openingTime, 
-        uint256 _closingTime, 
-        uint256 _rate, 
+        uint256 _cap,
+        uint256 _goal,
+        uint256 _openingTime,
+        uint256 _closingTime,
+        uint256 _rate,
         uint256 _minInvestmentInWei,
         uint256 _maxInvestmentInWei,
         address _wallet,
-        DroneMadnessToken _token) 
+        DroneMadnessToken _token)
         Crowdsale(_rate, _wallet, _token)
         CappedCrowdsale(_cap)
         TimedCrowdsale(_openingTime, _closingTime)
@@ -1342,10 +1342,10 @@ contract DroneMadnessCrowdsale is
         address _prizePoolAddress,
         address _reservePoolAdddress) external onlyOwner {
 
-        // Create locks for team and reserve pools        
+        // Create locks for team and reserve pools
         teamWallet = new TokenTimelock(token, _teamAddress, closingTime.add(TEAM_LOCK_TIME));
         reservePool = new TokenTimelock(token, _reservePoolAdddress, closingTime.add(RESERVE_LOCK_TIME));
-        
+
         // Perform initial distribution
         uint256 tokenCap = CappedToken(token).cap();
 
@@ -1405,10 +1405,10 @@ contract DroneMadnessCrowdsale is
     }
 
     /**
-    * @dev Transfer the ownership of the token conctract 
+    * @dev Transfer the ownership of the token conctract
     * @param _newOwner address the new owner of the token
     */
-    function transferTokenOwnership(address _newOwner) onlyOwner public { 
+    function transferTokenOwnership(address _newOwner) onlyOwner public {
         Ownable(token).transferOwnership(_newOwner);
     }
 
@@ -1435,7 +1435,7 @@ contract DroneMadnessCrowdsale is
     }
 
      /**
-    * @dev Perform crowdsale finalization. 
+    * @dev Perform crowdsale finalization.
     * - Finish token minting
     * - Enable transfers
     * - Give back the token ownership to the admin
@@ -1462,7 +1462,7 @@ contract DroneMadnessCrowdsale is
  * - Only for whitelisted participants to purchase tokens
  * - Tokens are minted on each purchase
  */
-contract DroneMadnessPresale is 
+contract DroneMadnessPresale is
     MintedCrowdsale,
     CappedCrowdsale,
     TimedCrowdsale,
@@ -1471,7 +1471,7 @@ contract DroneMadnessPresale is
 
     // Min investment
     uint256 public minInvestmentInWei;
-    
+
     // Investments
     mapping (address => uint256) internal invested;
 
@@ -1485,13 +1485,13 @@ contract DroneMadnessPresale is
      * @param _token DroneMadnessToken our token
      */
     constructor(
-        uint256 _cap, 
-        uint256 _openingTime, 
-        uint256 _closingTime, 
-        uint256 _rate, 
+        uint256 _cap,
+        uint256 _openingTime,
+        uint256 _closingTime,
+        uint256 _rate,
         uint256 _minInvestmentInWei,
-        address _wallet, 
-        DroneMadnessToken _token) 
+        address _wallet,
+        DroneMadnessToken _token)
         Crowdsale(_rate, _wallet, _token)
         CappedCrowdsale(_cap)
         TimedCrowdsale(_openingTime, _closingTime) public {
@@ -1509,10 +1509,20 @@ contract DroneMadnessPresale is
     }
 
     /**
-    * @dev Transfer the ownership of the token conctract 
+    * @dev Transfer the ownership of the token conctract
     * @param _newOwner address the new owner of the token
     */
-    function transferTokenOwnership(address _newOwner) onlyOwner public { 
+    function transferTokenOwnership(address _newOwner) onlyOwner public {
         Ownable(token).transferOwnership(_newOwner);
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

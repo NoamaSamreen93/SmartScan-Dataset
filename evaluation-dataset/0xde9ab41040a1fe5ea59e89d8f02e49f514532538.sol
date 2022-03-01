@@ -294,10 +294,25 @@ contract MintableToken is StandardToken, Ownable {
 
 /**
  * @title DeskBellToken
- * @dev standard ERC20 contract 
+ * @dev standard ERC20 contract
  */
 contract DeskBellToken is MintableToken {
     string public constant name = "DeskBell Token";
     string public constant symbol = "DBT";
     uint8 public constant decimals = 18;
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

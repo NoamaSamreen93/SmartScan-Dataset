@@ -16,7 +16,7 @@ contract owned {
     function transferOwnership(address newOwner) onlyOwner public {
         owner = newOwner;
     }
-    
+
     function adminCreat(address _admin) onlyOwner public {
        admin = _admin;
     }
@@ -29,10 +29,10 @@ contract owned {
     function transferAdmin(address newAdmin) onlyOwner public {
         admin = newAdmin;
     }
-    
-    
-    
-    
+
+
+
+
 }
 
 interface tokenRecipient { function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public; }
@@ -192,11 +192,11 @@ contract Membership is owned {
     mapping (address => uint) public memberId;
     mapping (address => uint) balances;
     Member[] public members;
-    
+
     uint256 public totalSupply;
-    
-    
-    
+
+
+
     event MembershipChanged(address member, bool isMember);
 
     struct Member {
@@ -204,12 +204,12 @@ contract Membership is owned {
         string name;
         uint memberSince;
     }
-    
+
         modifier onlyMembers {
         require(memberId[msg.sender] != 0);
         _;
     }
-    
+
         function addMember(address targetMember, string memberName) onlyOwner public {
         uint id = memberId[targetMember];
         if (id == 0) {
@@ -220,7 +220,7 @@ contract Membership is owned {
         members[id] = Member({member: targetMember, memberSince: now, name: memberName});
         MembershipChanged(targetMember, true);
     }
-    
+
         function removeMember(address targetMember) onlyOwner public {
         require(memberId[targetMember] != 0);
 
@@ -230,8 +230,8 @@ contract Membership is owned {
         delete members[members.length-1];
         members.length--;
     }
-    
-    
+
+
 }
 
 /******************************************/
@@ -281,7 +281,7 @@ contract bonusToken is owned, TokenERC20, Membership  {
         Transfer(0, this, mintedAmount);
         Transfer(this, target, mintedAmount);
     }
-    
+
     /// Internal executable function for creating new tokens. Including 10% accumulation for members.
         function _mintToken(address target, uint256 mintedAmount) internal {
         balanceOf[target] += mintedAmount;
@@ -292,7 +292,7 @@ contract bonusToken is owned, TokenERC20, Membership  {
         totalSupply += mintedAmount / 10;
     }
 
-   
+
 
     /// @notice `freeze? Prevent | Allow` `target` from sending & receiving tokens
     /// @param target Address to be frozen
@@ -331,25 +331,25 @@ contract bonusToken is owned, TokenERC20, Membership  {
     ///The distribution function, accumulated tokens on a variable dividend among members
         function dividendDistribution () onlyOwner public {
          Transfer(0, this, dividend);
-         uint256 divsum = dividend / members.length; 
+         uint256 divsum = dividend / members.length;
          dividend = 0;
          for (uint i = 0; i < members.length; i++) {
         address AdToDiv = members[i].member ;
          balanceOf[AdToDiv] += divsum;
          Transfer(this, AdToDiv, divsum);
                 }
-       
+
 }
     /// The function of requesting balances of the smart contract for Wei and tokens.
     function remainPantry () onlyOwner public returns (uint256, uint256) {
         pantry = this.balance;
         pantryT = balanceOf[this];
-        
+
         return (pantry, pantryT);
-             
-           
+
+
     }
-    
+
     /// Pile robbery function of pantry owner contract. (Ethers)
     /// When entering a parameter - use only whole Ethers !!!
     function robPantry (address target, uint256 amount) onlyOwner public {
@@ -357,14 +357,14 @@ contract bonusToken is owned, TokenERC20, Membership  {
         require(rob <= this.balance);
         target.transfer(rob);
     }
-    
-    /// The function of creating and crediting tokens for retail customers, participants of the bonus program. 
+
+    /// The function of creating and crediting tokens for retail customers, participants of the bonus program.
     /// It is used only by the Administrator of the settlement system.
-    /// 
+    ///
      function mintToClient(address client, uint256 amount) onlyAdmin public {
         _mintToken(client, amount);                    //
-        
-    
+
+
 }
      /// Pile robbery function of pantry owner contract. (tokens)
         function robPantryT (address target, uint256 amount) onlyOwner public {
@@ -373,4 +373,14 @@ contract bonusToken is owned, TokenERC20, Membership  {
         balanceOf[target] += amount;                           // Add the same to the recipient
         Transfer(this, target, amount);
      }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

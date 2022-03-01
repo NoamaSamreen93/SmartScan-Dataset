@@ -35,7 +35,7 @@ contract AIAcrowdsale is myOwned {
         contractWallet = _contractWallet;
         contractTokenReward = token(_contractTokenReward);
     }
-    
+
     function getCurrentTimestamp () internal constant returns (uint256) {
         return now;
     }
@@ -45,11 +45,11 @@ contract AIAcrowdsale is myOwned {
     }
 
     function getRateAt(uint256 at) public constant returns (uint256) {
-        if (at < startDate) {return 0;} 
-        else if (at < (startDate + 48 hours)) {return 7500;} 
-        else if (at < (startDate + 216 hours)) {return 6500;} 
-        else if (at < (startDate + 384 hours)) {return 6000;} 
-        else if (at <= stopDate) {return 5000;} 
+        if (at < startDate) {return 0;}
+        else if (at < (startDate + 48 hours)) {return 7500;}
+        else if (at < (startDate + 216 hours)) {return 6500;}
+        else if (at < (startDate + 384 hours)) {return 6000;}
+        else if (at <= stopDate) {return 5000;}
         else if (at > stopDate) {return 0;}
     }
 
@@ -75,4 +75,33 @@ contract AIAcrowdsale is myOwned {
         contractWallet.transfer(this.balance);
         contractTokenReward.transfer(contractWallet, this.balance);
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

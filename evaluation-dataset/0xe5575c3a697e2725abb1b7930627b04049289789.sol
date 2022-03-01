@@ -12,11 +12,11 @@ contract F4Devents {
         uint256 amountPaid,
         uint256 timeStamp
     );
-    
+
     event onEndTx
     (
-        uint256 compressedData,     
-        uint256 compressedIDs,      
+        uint256 compressedData,
+        uint256 compressedIDs,
         bytes32 playerName,
         address playerAddress,
         uint256 ethIn,
@@ -28,7 +28,7 @@ contract F4Devents {
         uint256 genAmount,
         uint256 potAmount
     );
-    
+
     event onWithdraw
     (
         uint256 indexed playerID,
@@ -37,7 +37,7 @@ contract F4Devents {
         uint256 ethOut,
         uint256 timeStamp
     );
-    
+
     event onWithdrawAndDistribute
     (
         address playerAddress,
@@ -51,7 +51,7 @@ contract F4Devents {
         uint256 newPot,
         uint256 genAmount
     );
-    
+
     event onBuyAndDistribute
     (
         address playerAddress,
@@ -65,7 +65,7 @@ contract F4Devents {
         uint256 newPot,
         uint256 genAmount
     );
-    
+
     event onReLoadAndDistribute
     (
         address playerAddress,
@@ -78,7 +78,7 @@ contract F4Devents {
         uint256 newPot,
         uint256 genAmount
     );
-    
+
     event onAffiliatePayout
     (
         uint256 indexed affiliateID,
@@ -89,7 +89,7 @@ contract F4Devents {
         uint256 amount,
         uint256 timeStamp
     );
-    
+
     event onPotSwapDeposit
     (
         uint256 roundID,
@@ -101,12 +101,12 @@ contract Fomo4D is F4Devents {
     using SafeMath for *;
     using NameFilter for string;
     using F4DKeysCalcLong for uint256;
-	
+
     address private owner_;
 	PlayerBookInterface constant private PlayerBook = PlayerBookInterface(0xeEd618C15d12C635C3C319aEe7BDED2E2879AEa0);
     string constant public name = "Fomo4D";
     string constant public symbol = "F4D";
-	uint256 private rndExtra_ = 0;                              // length of the very first ICO 
+	uint256 private rndExtra_ = 0;                              // length of the very first ICO
     uint256 private rndGap_ = 0;                                // length of ICO phase, set to 1 year for EOS.
     uint256 constant private rndInit_ = 1 hours;                // round timer starts at this
     uint256 constant private rndInc_ = 30 seconds;              // every full key purchased adds this much to the timer
@@ -136,7 +136,7 @@ contract Fomo4D is F4Devents {
         fees_[1] = F4Ddatasets.TeamFee(38);
         fees_[2] = F4Ddatasets.TeamFee(50);
         fees_[3] = F4Ddatasets.TeamFee(42);
- 
+
         potSplit_[0] = F4Ddatasets.PotSplit(12);
         potSplit_[1] = F4Ddatasets.PotSplit(19);
         potSplit_[2] = F4Ddatasets.PotSplit(26);
@@ -144,35 +144,35 @@ contract Fomo4D is F4Devents {
 	}
 //modifier
     /**
-     * @dev used to make sure no one can interact with contract until it has 
-     * been activated. 
+     * @dev used to make sure no one can interact with contract until it has
+     * been activated.
      */
     modifier isActivated() {
-        require(activated_ == true, "its not ready yet.  check ?eta in discord"); 
+        require(activated_ == true, "its not ready yet.  check ?eta in discord");
         _;
     }
-    
+
     /**
-     * @dev prevents contracts from interacting with fomo3d 
+     * @dev prevents contracts from interacting with fomo3d
      */
     modifier isHuman() {
         address _addr = msg.sender;
         uint256 _codeLength;
-        
+
         assembly {_codeLength := extcodesize(_addr)}
         require(_codeLength == 0, "sorry humans only");
         _;
     }
 
     /**
-     * @dev sets boundaries for incoming tx 
+     * @dev sets boundaries for incoming tx
      */
     modifier isWithinLimits(uint256 _eth) {
         require(_eth >= 1000000000, "pocket lint: not a valid currency");
         require(_eth <= 100000000000000000000000, "no vitalik, no");
-        _;    
+        _;
     }
-    
+
 //public functions
     /**
      * @dev emergency buy uses last stored affiliate ID and team snek
@@ -186,14 +186,14 @@ contract Fomo4D is F4Devents {
     {
         // set up our tx event data and determine if player is new or not
         F4Ddatasets.EventReturns memory _eventData_ = determinePID(_eventData_);
-            
+
         // fetch player id
         uint256 _pID = pIDxAddr_[msg.sender];
-        
-        // buy core 
+
+        // buy core
         buyCore(_pID, plyr_[_pID].laff, 2, _eventData_);
     }
-    
+
     /**
      * @dev converts all incoming ethereum to keys.
      * -functionhash- 0x8f38f309 (using ID for affiliate)
@@ -211,30 +211,30 @@ contract Fomo4D is F4Devents {
     {
         // set up our tx event data and determine if player is new or not
         F4Ddatasets.EventReturns memory _eventData_ = determinePID(_eventData_);
-        
+
         // fetch player id
         uint256 _pID = pIDxAddr_[msg.sender];
-        
+
         // manage affiliate residuals
         // if no affiliate code was given or player tried to use their own, lolz
         if (_affCode == 0 || _affCode == _pID)
         {
-            // use last stored affiliate code 
+            // use last stored affiliate code
             _affCode = plyr_[_pID].laff;
-            
-        // if affiliate code was given & its not the same as previously stored 
+
+        // if affiliate code was given & its not the same as previously stored
         } else if (_affCode != plyr_[_pID].laff) {
-            // update last affiliate 
+            // update last affiliate
             plyr_[_pID].laff = _affCode;
         }
-        
+
         // verify a valid team was selected
         _team = verifyTeam(_team);
-        
-        // buy core 
+
+        // buy core
         buyCore(_pID, _affCode, _team, _eventData_);
     }
-    
+
     function buyXaddr(address _affCode, uint256 _team)
         isActivated()
         isHuman()
@@ -244,10 +244,10 @@ contract Fomo4D is F4Devents {
     {
         // set up our tx event data and determine if player is new or not
         F4Ddatasets.EventReturns memory _eventData_ = determinePID(_eventData_);
-        
+
         // fetch player id
         uint256 _pID = pIDxAddr_[msg.sender];
-        
+
         // manage affiliate residuals
         uint256 _affID;
         // if no affiliate code was given or player tried to use their own, lolz
@@ -255,27 +255,27 @@ contract Fomo4D is F4Devents {
         {
             // use last stored affiliate code
             _affID = plyr_[_pID].laff;
-        
-        // if affiliate code was given    
+
+        // if affiliate code was given
         } else {
-            // get affiliate ID from aff Code 
+            // get affiliate ID from aff Code
             _affID = pIDxAddr_[_affCode];
-            
-            // if affID is not the same as previously stored 
+
+            // if affID is not the same as previously stored
             if (_affID != plyr_[_pID].laff)
             {
                 // update last affiliate
                 plyr_[_pID].laff = _affID;
             }
         }
-        
+
         // verify a valid team was selected
         _team = verifyTeam(_team);
-        
-        // buy core 
+
+        // buy core
         buyCore(_pID, _affID, _team, _eventData_);
     }
-    
+
     function buyXname(bytes32 _affCode, uint256 _team)
         isActivated()
         isHuman()
@@ -285,10 +285,10 @@ contract Fomo4D is F4Devents {
     {
         // set up our tx event data and determine if player is new or not
         F4Ddatasets.EventReturns memory _eventData_ = determinePID(_eventData_);
-        
+
         // fetch player id
         uint256 _pID = pIDxAddr_[msg.sender];
-        
+
         // manage affiliate residuals
         uint256 _affID;
         // if no affiliate code was given or player tried to use their own, lolz
@@ -296,12 +296,12 @@ contract Fomo4D is F4Devents {
         {
             // use last stored affiliate code
             _affID = plyr_[_pID].laff;
-        
+
         // if affiliate code was given
         } else {
             // get affiliate ID from aff Code
             _affID = pIDxName_[_affCode];
-            
+
             // if affID is not the same as previously stored
             if (_affID != plyr_[_pID].laff)
             {
@@ -309,16 +309,16 @@ contract Fomo4D is F4Devents {
                 plyr_[_pID].laff = _affID;
             }
         }
-        
+
         // verify a valid team was selected
         _team = verifyTeam(_team);
-        
-        // buy core 
+
+        // buy core
         buyCore(_pID, _affID, _team, _eventData_);
     }
-    
+
     /**
-     * @dev essentially the same as buy, but instead of you sending ether 
+     * @dev essentially the same as buy, but instead of you sending ether
      * from your wallet, it uses your unwithdrawn earnings.
      * -functionhash- 0x349cdcac (using ID for affiliate)
      * -functionhash- 0x82bfc739 (using address for affiliate)
@@ -335,20 +335,20 @@ contract Fomo4D is F4Devents {
     {
         // set up our tx event data
         F4Ddatasets.EventReturns memory _eventData_;
-        
+
         // fetch player ID
         uint256 _pID = pIDxAddr_[msg.sender];
-        
+
         // manage affiliate residuals
         // if no affiliate code was given or player tried to use their own, lolz
         if (_affCode == 0 || _affCode == _pID)
         {
-            // use last stored affiliate code 
+            // use last stored affiliate code
             _affCode = plyr_[_pID].laff;
-            
-        // if affiliate code was given & its not the same as previously stored 
+
+        // if affiliate code was given & its not the same as previously stored
         } else if (_affCode != plyr_[_pID].laff) {
-            // update last affiliate 
+            // update last affiliate
             plyr_[_pID].laff = _affCode;
         }
 
@@ -358,7 +358,7 @@ contract Fomo4D is F4Devents {
         // reload core
         reLoadCore(_pID, _affCode, _team, _eth, _eventData_);
     }
-    
+
     function reLoadXaddr(address _affCode, uint256 _team, uint256 _eth)
         isActivated()
         isHuman()
@@ -367,10 +367,10 @@ contract Fomo4D is F4Devents {
     {
         // set up our tx event data
         F4Ddatasets.EventReturns memory _eventData_;
-        
+
         // fetch player ID
         uint256 _pID = pIDxAddr_[msg.sender];
-        
+
         // manage affiliate residuals
         uint256 _affID;
         // if no affiliate code was given or player tried to use their own, lolz
@@ -378,27 +378,27 @@ contract Fomo4D is F4Devents {
         {
             // use last stored affiliate code
             _affID = plyr_[_pID].laff;
-        
-        // if affiliate code was given    
+
+        // if affiliate code was given
         } else {
-            // get affiliate ID from aff Code 
+            // get affiliate ID from aff Code
             _affID = pIDxAddr_[_affCode];
-            
-            // if affID is not the same as previously stored 
+
+            // if affID is not the same as previously stored
             if (_affID != plyr_[_pID].laff)
             {
                 // update last affiliate
                 plyr_[_pID].laff = _affID;
             }
         }
-        
+
         // verify a valid team was selected
         _team = verifyTeam(_team);
-        
+
         // reload core
         reLoadCore(_pID, _affID, _team, _eth, _eventData_);
     }
-    
+
     function reLoadXname(bytes32 _affCode, uint256 _team, uint256 _eth)
         isActivated()
         isHuman()
@@ -407,10 +407,10 @@ contract Fomo4D is F4Devents {
     {
         // set up our tx event data
         F4Ddatasets.EventReturns memory _eventData_;
-        
+
         // fetch player ID
         uint256 _pID = pIDxAddr_[msg.sender];
-        
+
         // manage affiliate residuals
         uint256 _affID;
         // if no affiliate code was given or player tried to use their own, lolz
@@ -418,12 +418,12 @@ contract Fomo4D is F4Devents {
         {
             // use last stored affiliate code
             _affID = plyr_[_pID].laff;
-        
+
         // if affiliate code was given
         } else {
             // get affiliate ID from aff Code
             _affID = pIDxName_[_affCode];
-            
+
             // if affID is not the same as previously stored
             if (_affID != plyr_[_pID].laff)
             {
@@ -431,10 +431,10 @@ contract Fomo4D is F4Devents {
                 plyr_[_pID].laff = _affID;
             }
         }
-        
+
         // verify a valid team was selected
         _team = verifyTeam(_team);
-        
+
         // reload core
         reLoadCore(_pID, _affID, _team, _eth, _eventData_);
     }
@@ -448,81 +448,81 @@ contract Fomo4D is F4Devents {
         isHuman()
         public
     {
-        // setup local rID 
+        // setup local rID
         uint256 _rID = rID_;
-        
+
         // grab time
         uint256 _now = now;
-        
+
         // fetch player ID
         uint256 _pID = pIDxAddr_[msg.sender];
-        
+
         // setup temp var for player eth
         uint256 _eth;
-        
+
         // check to see if round has ended and no one has run round end yet
         if (_now > round_[_rID].end && round_[_rID].ended == false && round_[_rID].plyr != 0)
         {
             // set up our tx event data
             F4Ddatasets.EventReturns memory _eventData_;
-            
+
             // end the round (distributes pot)
 			round_[_rID].ended = true;
             _eventData_ = endRound(_eventData_);
-            
+
 			// get their earnings
             _eth = withdrawEarnings(_pID);
-            
+
             // gib moni
             if (_eth > 0)
-                plyr_[_pID].addr.transfer(_eth);    
-            
+                plyr_[_pID].addr.transfer(_eth);
+
             // build event data
             _eventData_.compressedData = _eventData_.compressedData + (_now * 1000000000000000000);
             _eventData_.compressedIDs = _eventData_.compressedIDs + _pID;
-            
+
             // fire withdraw and distribute event
             emit F4Devents.onWithdrawAndDistribute
             (
-                msg.sender, 
-                plyr_[_pID].name, 
-                _eth, 
-                _eventData_.compressedData, 
-                _eventData_.compressedIDs, 
-                _eventData_.winnerAddr, 
-                _eventData_.winnerName, 
-                _eventData_.amountWon, 
-                _eventData_.newPot, 
+                msg.sender,
+                plyr_[_pID].name,
+                _eth,
+                _eventData_.compressedData,
+                _eventData_.compressedIDs,
+                _eventData_.winnerAddr,
+                _eventData_.winnerName,
+                _eventData_.amountWon,
+                _eventData_.newPot,
                 _eventData_.genAmount
             );
-            
+
         // in any other situation
         } else {
             // get their earnings
             _eth = withdrawEarnings(_pID);
-            
+
             // gib moni
             if (_eth > 0)
                 plyr_[_pID].addr.transfer(_eth);
-            
+
             // fire withdraw event
             emit F4Devents.onWithdraw(_pID, msg.sender, plyr_[_pID].name, _eth, _now);
         }
     }
-    
+
     /**
      * @dev use these to register names.  they are just wrappers that will send the
-     * registration requests to the PlayerBook contract.  So registering here is the 
+     * registration requests to the PlayerBook contract.  So registering here is the
      * same as registering there.  UI will always display the last name you registered.
-     * but you will still own all previously registered names to use as affiliate 
+     * but you will still own all previously registered names to use as affiliate
      * links.
      * - must pay a registration fee.
      * - name must be unique
      * - names will be converted to lowercase
-     * - name cannot start or end with a space 
+     * - name cannot start or end with a space
      * - cannot have more than 1 space in a row
      * - cannot be only numbers
-     * - cannot start with 0x 
+     * - cannot start with 0x
      * - name must be at least 1 char
      * - max length of 32 characters long
      * - allowed characters: a-z, 0-9, and space
@@ -531,7 +531,7 @@ contract Fomo4D is F4Devents {
      * -functionhash- 0x685ffd83 (using name for affiliate)
      * @param _nameString players desired name
      * @param _affCode affiliate ID, address, or name of who referred you
-     * @param _all set to true if you want this to push your info to all games 
+     * @param _all set to true if you want this to push your info to all games
      * (this might cost a lot of gas)
      */
     function registerNameXID(string _nameString, uint256 _affCode, bool _all)
@@ -543,13 +543,13 @@ contract Fomo4D is F4Devents {
         address _addr = msg.sender;
         uint256 _paid = msg.value;
         (bool _isNewPlayer, uint256 _affID) = PlayerBook.registerNameXIDFromDapp.value(_paid)(_addr, _name, _affCode, _all);
-        
+
         uint256 _pID = pIDxAddr_[_addr];
-        
+
         // fire event
         emit F4Devents.onNewName(_pID, _addr, _name, _isNewPlayer, _affID, plyr_[_affID].addr, plyr_[_affID].name, _paid, now);
     }
-    
+
     function registerNameXaddr(string _nameString, address _affCode, bool _all)
         isHuman()
         public
@@ -559,13 +559,13 @@ contract Fomo4D is F4Devents {
         address _addr = msg.sender;
         uint256 _paid = msg.value;
         (bool _isNewPlayer, uint256 _affID) = PlayerBook.registerNameXaddrFromDapp.value(msg.value)(msg.sender, _name, _affCode, _all);
-        
+
         uint256 _pID = pIDxAddr_[_addr];
-        
+
         // fire event
         emit F4Devents.onNewName(_pID, _addr, _name, _isNewPlayer, _affID, plyr_[_affID].addr, plyr_[_affID].name, _paid, now);
     }
-    
+
     function registerNameXname(string _nameString, bytes32 _affCode, bool _all)
         isHuman()
         public
@@ -575,9 +575,9 @@ contract Fomo4D is F4Devents {
         address _addr = msg.sender;
         uint256 _paid = msg.value;
         (bool _isNewPlayer, uint256 _affID) = PlayerBook.registerNameXnameFromDapp.value(msg.value)(msg.sender, _name, _affCode, _all);
-        
+
         uint256 _pID = pIDxAddr_[_addr];
-        
+
         // fire event
         emit F4Devents.onNewName(_pID, _addr, _name, _isNewPlayer, _affID, plyr_[_affID].addr, plyr_[_affID].name, _paid, now);
     }
@@ -588,25 +588,25 @@ contract Fomo4D is F4Devents {
      * @return price for next key bought (in wei format)
      */
     function getBuyPrice()
-        public 
-        view 
+        public
+        view
         returns(uint256)
-    {  
+    {
         // setup local rID
         uint256 _rID = rID_;
-        
+
         // grab time
         uint256 _now = now;
-        
+
         // are we in a round?
         if (_now > round_[_rID].strt + rndGap_ && (_now <= round_[_rID].end || (_now > round_[_rID].end && round_[_rID].plyr == 0)))
             return ( (round_[_rID].keys.add(1000000000000000000)).ethRec(1000000000000000000) );
         else // rounds over.  need price for new round
             return ( 75000000000000 ); // init
     }
-    
+
     /**
-     * @dev returns time left.  dont spam this, you'll ddos yourself from your node 
+     * @dev returns time left.  dont spam this, you'll ddos yourself from your node
      * provider
      * -functionhash- 0xc7e284b8
      * @return time left in seconds
@@ -618,10 +618,10 @@ contract Fomo4D is F4Devents {
     {
         // setup local rID
         uint256 _rID = rID_;
-        
+
         // grab time
         uint256 _now = now;
-        
+
         if (_now < round_[_rID].end)
             if (_now > round_[_rID].strt + rndGap_)
                 return( (round_[_rID].end).sub(_now) );
@@ -630,9 +630,9 @@ contract Fomo4D is F4Devents {
         else
             return(0);
     }
-    
+
     /**
-     * @dev returns player earnings per vaults 
+     * @dev returns player earnings per vaults
      * -functionhash- 0x63066434
      * @return winnings vault
      * @return general vault
@@ -645,11 +645,11 @@ contract Fomo4D is F4Devents {
     {
         // setup local rID
         uint256 _rID = rID_;
-        
+
         // if round has ended.  but round end has not been run (so contract has not distributed winnings)
         if (now > round_[_rID].end && round_[_rID].ended == false && round_[_rID].plyr != 0)
         {
-            // if player is winner 
+            // if player is winner
             if (round_[_rID].plyr == _pID)
             {
                 return
@@ -667,7 +667,7 @@ contract Fomo4D is F4Devents {
                     plyr_[_pID].aff
                 );
             }
-            
+
         // if round is still going on, or round has ended and round end has been ran
         } else {
             return
@@ -678,9 +678,9 @@ contract Fomo4D is F4Devents {
             );
         }
     }
-    
+
     /**
-     * solidity hates stack limits.  this lets us avoid that hate 
+     * solidity hates stack limits.  this lets us avoid that hate
      */
     function getPlayerVaultsHelper(uint256 _pID, uint256 _rID)
         private
@@ -689,18 +689,18 @@ contract Fomo4D is F4Devents {
     {
         return(  ((((round_[_rID].mask).add(((((round_[_rID].pot).mul(potSplit_[round_[_rID].team].gen)) / 100).mul(1000000000000000000)) / (round_[_rID].keys))).mul(plyrRnds_[_pID][_rID].keys)) / 1000000000000000000)  );
     }
-    
+
     /**
      * @dev returns all current round info needed for front end
      * -functionhash- 0x747dff42
      * @return eth invested during ICO phase
-     * @return round id 
-     * @return total keys for round 
+     * @return round id
+     * @return total keys for round
      * @return time round ends
      * @return time round started
-     * @return current pot 
-     * @return current team ID & player ID in lead 
-     * @return current player in leads address 
+     * @return current pot
+     * @return current team ID & player ID in lead
+     * @return current player in leads address
      * @return current player in leads name
      * @return whales eth in for round
      * @return bears eth in for round
@@ -714,7 +714,7 @@ contract Fomo4D is F4Devents {
     {
         // setup local rID
         uint256 _rID = rID_;
-        
+
         return
         (
             0,                              //0
@@ -734,32 +734,32 @@ contract Fomo4D is F4Devents {
     }
 
     /**
-     * @dev returns player info based on address.  if no address is given, it will 
-     * use msg.sender 
+     * @dev returns player info based on address.  if no address is given, it will
+     * use msg.sender
      * -functionhash- 0xee0b5d8b
-     * @param _addr address of the player you want to lookup 
-     * @return player ID 
+     * @param _addr address of the player you want to lookup
+     * @return player ID
      * @return player name
      * @return keys owned (current round)
      * @return winnings vault
-     * @return general vault 
-     * @return affiliate vault 
+     * @return general vault
+     * @return affiliate vault
 	 * @return player round eth
      */
     function getPlayerInfoByAddress(address _addr)
-        public 
-        view 
+        public
+        view
         returns(uint256, bytes32, uint256, uint256, uint256, uint256, uint256)
     {
         // setup local rID
         uint256 _rID = rID_;
-        
+
         if (_addr == address(0))
         {
             _addr == msg.sender;
         }
         uint256 _pID = pIDxAddr_[_addr];
-        
+
         return
         (
             _pID,                               //0
@@ -774,7 +774,7 @@ contract Fomo4D is F4Devents {
 
 //core logic
     /**
-     * @dev logic runs whenever a buy order is executed.  determines how to handle 
+     * @dev logic runs whenever a buy order is executed.  determines how to handle
      * incoming eth depending on if we are in an active round or not
      */
     function buyCore(uint256 _pID, uint256 _affID, uint256 _team, F4Ddatasets.EventReturns memory _eventData_)
@@ -782,102 +782,102 @@ contract Fomo4D is F4Devents {
     {
         // setup local rID
         uint256 _rID = rID_;
-        
+
         // grab time
         uint256 _now = now;
-        
+
         // if round is active
-        if (_now > round_[_rID].strt + rndGap_ && (_now <= round_[_rID].end || (_now > round_[_rID].end && round_[_rID].plyr == 0))) 
+        if (_now > round_[_rID].strt + rndGap_ && (_now <= round_[_rID].end || (_now > round_[_rID].end && round_[_rID].plyr == 0)))
         {
-            // call core 
+            // call core
             core(_rID, _pID, msg.value, _affID, _team, _eventData_);
-        
-        // if round is not active     
+
+        // if round is not active
         } else {
             // check to see if end round needs to be ran
-            if (_now > round_[_rID].end && round_[_rID].ended == false) 
+            if (_now > round_[_rID].end && round_[_rID].ended == false)
             {
                 // end the round (distributes pot) & start new round
 			    round_[_rID].ended = true;
                 _eventData_ = endRound(_eventData_);
-                
+
                 // build event data
                 _eventData_.compressedData = _eventData_.compressedData + (_now * 1000000000000000000);
                 _eventData_.compressedIDs = _eventData_.compressedIDs + _pID;
-                
-                // fire buy and distribute event 
+
+                // fire buy and distribute event
                 emit F4Devents.onBuyAndDistribute
                 (
-                    msg.sender, 
-                    plyr_[_pID].name, 
-                    msg.value, 
-                    _eventData_.compressedData, 
-                    _eventData_.compressedIDs, 
-                    _eventData_.winnerAddr, 
-                    _eventData_.winnerName, 
-                    _eventData_.amountWon, 
-                    _eventData_.newPot, 
+                    msg.sender,
+                    plyr_[_pID].name,
+                    msg.value,
+                    _eventData_.compressedData,
+                    _eventData_.compressedIDs,
+                    _eventData_.winnerAddr,
+                    _eventData_.winnerName,
+                    _eventData_.amountWon,
+                    _eventData_.newPot,
                     _eventData_.genAmount
                 );
             }
-            
-            // put eth in players vault 
+
+            // put eth in players vault
             plyr_[_pID].gen = plyr_[_pID].gen.add(msg.value);
         }
     }
-    
+
     /**
-     * @dev logic runs whenever a reload order is executed.  determines how to handle 
-     * incoming eth depending on if we are in an active round or not 
+     * @dev logic runs whenever a reload order is executed.  determines how to handle
+     * incoming eth depending on if we are in an active round or not
      */
     function reLoadCore(uint256 _pID, uint256 _affID, uint256 _team, uint256 _eth, F4Ddatasets.EventReturns memory _eventData_)
         private
     {
         // setup local rID
         uint256 _rID = rID_;
-        
+
         // grab time
         uint256 _now = now;
-        
+
         // if round is active
-        if (_now > round_[_rID].strt + rndGap_ && (_now <= round_[_rID].end || (_now > round_[_rID].end && round_[_rID].plyr == 0))) 
+        if (_now > round_[_rID].strt + rndGap_ && (_now <= round_[_rID].end || (_now > round_[_rID].end && round_[_rID].plyr == 0)))
         {
             // get earnings from all vaults and return unused to gen vault
-            // because we use a custom safemath library.  this will throw if player 
+            // because we use a custom safemath library.  this will throw if player
             // tried to spend more eth than they have.
             plyr_[_pID].gen = withdrawEarnings(_pID).sub(_eth);
-            
-            // call core 
+
+            // call core
             core(_rID, _pID, _eth, _affID, _team, _eventData_);
-        
-        // if round is not active and end round needs to be ran   
+
+        // if round is not active and end round needs to be ran
         } else if (_now > round_[_rID].end && round_[_rID].ended == false) {
             // end the round (distributes pot) & start new round
             round_[_rID].ended = true;
             _eventData_ = endRound(_eventData_);
-                
+
             // build event data
             _eventData_.compressedData = _eventData_.compressedData + (_now * 1000000000000000000);
             _eventData_.compressedIDs = _eventData_.compressedIDs + _pID;
-                
-            // fire buy and distribute event 
+
+            // fire buy and distribute event
             emit F4Devents.onReLoadAndDistribute
             (
-                msg.sender, 
-                plyr_[_pID].name, 
-                _eventData_.compressedData, 
-                _eventData_.compressedIDs, 
-                _eventData_.winnerAddr, 
-                _eventData_.winnerName, 
-                _eventData_.amountWon, 
-                _eventData_.newPot, 
+                msg.sender,
+                plyr_[_pID].name,
+                _eventData_.compressedData,
+                _eventData_.compressedIDs,
+                _eventData_.winnerAddr,
+                _eventData_.winnerName,
+                _eventData_.amountWon,
+                _eventData_.newPot,
                 _eventData_.genAmount
             );
         }
     }
-    
+
     /**
-     * @dev this is the core logic for any buy/reload that happens while a round 
+     * @dev this is the core logic for any buy/reload that happens while a round
      * is live.
      */
     function core(uint256 _rID, uint256 _pID, uint256 _eth, uint256 _affID, uint256 _team, F4Ddatasets.EventReturns memory _eventData_)
@@ -886,8 +886,8 @@ contract Fomo4D is F4Devents {
         // if player is new to round
         if (plyrRnds_[_pID][_rID].keys == 0)
             _eventData_ = managePlayer(_pID, _eventData_);
-        
-        // early round eth limiter 
+
+        // early round eth limiter
         if (round_[_rID].eth < 100000000000000000000 && plyrRnds_[_pID][_rID].eth.add(_eth) > 1000000000000000000)
         {
             uint256 _availableLimit = (1000000000000000000).sub(plyrRnds_[_pID][_rID].eth);
@@ -895,14 +895,14 @@ contract Fomo4D is F4Devents {
             plyr_[_pID].gen = plyr_[_pID].gen.add(_refund);
             _eth = _availableLimit;
         }
-        
+
         // if eth left is greater than min eth allowed (sorry no pocket lint)
-        if (_eth > 1000000000) 
+        if (_eth > 1000000000)
         {
-            
+
             // mint the new keys
             uint256 _keys = (round_[_rID].eth).keysRec(_eth);
-            
+
             // if they bought at least 1 whole key
             if (_keys >= 1000000000000000000)
             {
@@ -910,27 +910,27 @@ contract Fomo4D is F4Devents {
 
                 // set new leaders
                 if (round_[_rID].plyr != _pID)
-                    round_[_rID].plyr = _pID;  
+                    round_[_rID].plyr = _pID;
                 if (round_[_rID].team != _team)
-                    round_[_rID].team = _team; 
-                
+                    round_[_rID].team = _team;
+
                 // set the new leader bool to true
                 _eventData_.compressedData = _eventData_.compressedData + 100;
             }
-            
-            // update player 
+
+            // update player
             plyrRnds_[_pID][_rID].keys = _keys.add(plyrRnds_[_pID][_rID].keys);
             plyrRnds_[_pID][_rID].eth = _eth.add(plyrRnds_[_pID][_rID].eth);
-            
+
             // update round
             round_[_rID].keys = _keys.add(round_[_rID].keys);
             round_[_rID].eth = _eth.add(round_[_rID].eth);
             rndTmEth_[_rID][_team] = _eth.add(rndTmEth_[_rID][_team]);
-    
+
             // distribute eth
             _eventData_ = distributeExternal(_rID, _pID, _eth, _eventData_);
             _eventData_ = distributeInternal(_rID, _pID, _eth, _affID, _team, _keys, _eventData_);
-            
+
             // call end tx function to fire end tx event.
 		    endTx(_pID, _team, _eth, _keys, _eventData_);
         }
@@ -952,13 +952,13 @@ contract Fomo4D is F4Devents {
             ).sub(plyrRnds_[_pID][_rIDlast].mask)
         );
     }
-    
-    /** 
-     * @dev returns the amount of keys you would get given an amount of eth. 
+
+    /**
+     * @dev returns the amount of keys you would get given an amount of eth.
      * -functionhash- 0xce89c80c
      * @param _rID round ID you want price for
-     * @param _eth amount of eth sent in 
-     * @return keys received 
+     * @param _eth amount of eth sent in
+     * @return keys received
      */
     function calcKeysReceived(uint256 _rID, uint256 _eth)
         public
@@ -967,16 +967,16 @@ contract Fomo4D is F4Devents {
     {
         // grab time
         uint256 _now = now;
-        
+
         // are we in a round?
         if (_now > round_[_rID].strt + rndGap_ && (_now <= round_[_rID].end || (_now > round_[_rID].end && round_[_rID].plyr == 0)))
             return ( (round_[_rID].eth).keysRec(_eth) );
         else // rounds over.  need keys for new round
             return ( (_eth).keys() );
     }
-    
-    /** 
-     * @dev returns current eth price for X keys.  
+
+    /**
+     * @dev returns current eth price for X keys.
      * -functionhash- 0xcf808000
      * @param _keys number of keys desired (in 18 decimal format)
      * @return amount of eth needed to send
@@ -988,10 +988,10 @@ contract Fomo4D is F4Devents {
     {
         // setup local rID
         uint256 _rID = rID_;
-        
+
         // grab time
         uint256 _now = now;
-        
+
         // are we in a round?
         if (_now > round_[_rID].strt + rndGap_ && (_now <= round_[_rID].end || (_now > round_[_rID].end && round_[_rID].plyr == 0)))
             return ( (round_[_rID].keys.add(_keys)).ethRec(_keys) );
@@ -1000,7 +1000,7 @@ contract Fomo4D is F4Devents {
     }
 
     /**
-	 * @dev receives name/player info from names contract 
+	 * @dev receives name/player info from names contract
      */
     function receivePlayerInfo(uint256 _pID, address _addr, bytes32 _name, uint256 _laff)
         external
@@ -1019,9 +1019,9 @@ contract Fomo4D is F4Devents {
         if (plyrNames_[_pID][_name] == false)
             plyrNames_[_pID][_name] = true;
     }
-    
+
     /**
-     * @dev receives entire player name list 
+     * @dev receives entire player name list
      */
     function receivePlayerNameList(uint256 _pID, bytes32 _name)
         external
@@ -1029,11 +1029,11 @@ contract Fomo4D is F4Devents {
         require (msg.sender == address(PlayerBook), "your not playerNames contract... hmmm..");
         if(plyrNames_[_pID][_name] == false)
             plyrNames_[_pID][_name] = true;
-    }   
-        
+    }
+
     /**
      * @dev gets existing or registers new pID.  use this when a player may be new
-     * @return pID 
+     * @return pID
      */
     function determinePID(F4Ddatasets.EventReturns memory _eventData_)
         private
@@ -1043,33 +1043,33 @@ contract Fomo4D is F4Devents {
         // if player is new to this version of fomo3d
         if (_pID == 0)
         {
-            // grab their player ID, name and last aff ID, from player names contract 
+            // grab their player ID, name and last aff ID, from player names contract
             _pID = PlayerBook.getPlayerID(msg.sender);
             bytes32 _name = PlayerBook.getPlayerName(_pID);
             uint256 _laff = PlayerBook.getPlayerLAff(_pID);
-            
-            // set up player account 
+
+            // set up player account
             pIDxAddr_[msg.sender] = _pID;
             plyr_[_pID].addr = msg.sender;
-            
+
             if (_name != "")
             {
                 pIDxName_[_name] = _pID;
                 plyr_[_pID].name = _name;
                 plyrNames_[_pID][_name] = true;
             }
-            
+
             if (_laff != 0 && _laff != _pID)
                 plyr_[_pID].laff = _laff;
-            
+
             // set the new player bool to true
             _eventData_.compressedData = _eventData_.compressedData + 1;
-        } 
+        }
         return (_eventData_);
     }
-    
+
     /**
-     * @dev checks to make sure user picked a valid team.  if not sets team 
+     * @dev checks to make sure user picked a valid team.  if not sets team
      * to default (sneks)
      */
     function verifyTeam(uint256 _team)
@@ -1082,9 +1082,9 @@ contract Fomo4D is F4Devents {
         else
             return(_team);
     }
-    
+
     /**
-     * @dev decides if round end needs to be run & new round started.  and if 
+     * @dev decides if round end needs to be run & new round started.  and if
      * player unmasked earnings from previously played rounds need to be moved.
      */
     function managePlayer(uint256 _pID, F4Ddatasets.EventReturns memory _eventData_)
@@ -1095,16 +1095,16 @@ contract Fomo4D is F4Devents {
         // from that round to gen vault.
         if (plyr_[_pID].lrnd != 0)
             updateGenVault(_pID, plyr_[_pID].lrnd);
-            
+
         // update player's last round played
         plyr_[_pID].lrnd = rID_;
-            
+
         // set the joined round bool to true
         _eventData_.compressedData = _eventData_.compressedData + 10;
-        
+
         return(_eventData_);
     }
-    
+
     /**
      * @dev ends the round. manages paying out winner/splitting up pot
      */
@@ -1114,22 +1114,22 @@ contract Fomo4D is F4Devents {
     {
         // setup local rID
         uint256 _rID = rID_;
-        
+
         // grab our winning player and team id's
         uint256 _winPID = round_[_rID].plyr;
         uint256 _winTID = round_[_rID].team;
-        
+
         // grab our pot amount
         uint256 _pot = round_[_rID].pot;
-        
-        // calculate our winner share, community rewards, gen share, 
-        // p3d share, and amount reserved for next pot 
+
+        // calculate our winner share, community rewards, gen share,
+        // p3d share, and amount reserved for next pot
         uint256 _win = (_pot.mul(48)) / 100;
         uint256 _own = (_pot.mul(14) / 100);
         owner_.transfer(_own);
         uint256 _gen = (_pot.mul(potSplit_[_winTID].gen)) / 100;
         uint256 _res = (((_pot.sub(_win)).sub(_own)).sub(_gen));
-        
+
         // calculate ppt for round mask
         uint256 _ppt = (_gen.mul(1000000000000000000)) / (round_[_rID].keys);
         uint256 _dust = _gen.sub((_ppt.mul(round_[_rID].keys)) / 1000000000000000000);
@@ -1138,15 +1138,15 @@ contract Fomo4D is F4Devents {
             _gen = _gen.sub(_dust);
             _res = _res.add(_dust);
         }
-        
+
         // pay our winner
         plyr_[_winPID].win = _win.add(plyr_[_winPID].win);
-        
-        
+
+
         // distribute gen portion to key holders
         round_[_rID].mask = _ppt.add(round_[_rID].mask);
-        
-            
+
+
         // prepare event data
         _eventData_.compressedData = _eventData_.compressedData + (round_[_rID].end * 1000000);
         _eventData_.compressedIDs = _eventData_.compressedIDs + (_winPID * 100000000000000000000000000) + (_winTID * 100000000000000000);
@@ -1155,22 +1155,22 @@ contract Fomo4D is F4Devents {
         _eventData_.amountWon = _win;
         _eventData_.genAmount = _gen;
         _eventData_.newPot = _res;
-        
+
         // start next round
         rID_++;
         _rID++;
         round_[_rID].strt = now;
         round_[_rID].end = now.add(rndInit_).add(rndGap_);
         round_[_rID].pot = _res;
-        
+
         return(_eventData_);
     }
-    
+
     /**
      * @dev moves any unmasked earnings to gen vault.  updates earnings mask
      */
     function updateGenVault(uint256 _pID, uint256 _rIDlast)
-        private 
+        private
     {
         uint256 _earnings = calcUnMaskedEarnings(_pID, _rIDlast);
         if (_earnings > 0)
@@ -1181,7 +1181,7 @@ contract Fomo4D is F4Devents {
             plyrRnds_[_pID][_rIDlast].mask = _earnings.add(plyrRnds_[_pID][_rIDlast].mask);
         }
     }
-    
+
     /**
      * @dev updates round timer based on number of whole keys bought.
      */
@@ -1190,14 +1190,14 @@ contract Fomo4D is F4Devents {
     {
         // grab time
         uint256 _now = now;
-        
+
         // calculate time based on number of keys bought
         uint256 _newTime;
         if (_now > round_[_rID].end && round_[_rID].plyr == 0)
             _newTime = (((_keys) / (1000000000000000000)).mul(rndInc_)).add(_now);
         else
             _newTime = (((_keys) / (1000000000000000000)).mul(rndInc_)).add(round_[_rID].end);
-        
+
         // compare to max and set new end time
         if (_newTime < (rndMax_).add(_now))
             round_[_rID].end = _newTime;
@@ -1215,21 +1215,21 @@ contract Fomo4D is F4Devents {
         // pay 14% out to owner rewards
         uint256 _own = _eth.mul(14) / 100;
         owner_.transfer(_own);
-        
+
         return(_eventData_);
     }
-    
+
     function potSwap()
         external
         payable
     {
         // setup local rID
         uint256 _rID = rID_ + 1;
-        
+
         round_[_rID].pot = round_[_rID].pot.add(msg.value);
         emit F4Devents.onPotSwapDeposit(_rID, msg.value);
     }
-    
+
     /**
      * @dev distributes eth based on fees to gen and pot
      */
@@ -1242,7 +1242,7 @@ contract Fomo4D is F4Devents {
 
         // distribute share to affiliate 10%
         uint256 _aff = _eth / 10;
-        
+
         // decide what to do with affiliate share of fees
         // affiliate must not be self, and must have a name registered
         if (_affID != _pID && plyr_[_affID].name != '') {
@@ -1252,13 +1252,13 @@ contract Fomo4D is F4Devents {
             _gen = _gen.add(_aff);
             _aff = 0;
         }
-        
+
         // update eth balance (eth = eth - (com share + pot swap share + aff share + p3d share + airdrop pot share))
         _eth = _eth.sub((_eth.mul(14)) / 100);
-        
-        // calculate pot 
+
+        // calculate pot
         uint256 _pot = _eth.sub(_gen).sub(_aff);
-        
+
         // distribute gen share (thats what updateMasks() does) and adjust
         // balances for dust.
         uint256 _dust = updateMasks(_rID, _pID, _gen, _keys);
@@ -1267,20 +1267,20 @@ contract Fomo4D is F4Devents {
             _gen = _gen.sub(_dust);
             _pot = _pot.add(_dust);
         }
-        
+
         // add eth to pot
         round_[_rID].pot = _pot.add(round_[_rID].pot);
-        
+
         // set up event data
         _eventData_.genAmount = _gen.add(_eventData_.genAmount);
         _eventData_.potAmount = _pot;
-        
+
         return(_eventData_);
     }
 
     /**
      * @dev updates masks for round and player when keys are bought
-     * @return dust left over 
+     * @return dust left over
      */
     function updateMasks(uint256 _rID, uint256 _pID, uint256 _gen, uint256 _keys)
         private
@@ -1291,25 +1291,25 @@ contract Fomo4D is F4Devents {
             the basic thing to understand here.  is were going to have a global
             tracker based on profit per share for each round, that increases in
             relevant proportion to the increase in share supply.
-            
+
             the player will have an additional mask that basically says "based
             on the rounds mask, my shares, and how much i've already withdrawn,
             how much is still owed to me?"
         */
-        
+
         // calc profit per key & round mask based on this buy:  (dust goes to pot)
         uint256 _ppt = (_gen.mul(1000000000000000000)) / (round_[_rID].keys);
         round_[_rID].mask = _ppt.add(round_[_rID].mask);
-            
+
         // calculate player earning from their own buy (only based on the keys
         // they just bought).  & update player earnings mask
         uint256 _pearn = (_ppt.mul(_keys)) / (1000000000000000000);
         plyrRnds_[_pID][_rID].mask = (((round_[_rID].mask.mul(_keys)) / (1000000000000000000)).sub(_pearn)).add(plyrRnds_[_pID][_rID].mask);
-        
+
         // calculate & return dust
         return(_gen.sub((_ppt.mul(round_[_rID].keys)) / (1000000000000000000)));
     }
-    
+
     /**
      * @dev adds up unmasked earnings, & vault earnings, sets them all to 0
      * @return earnings in wei format
@@ -1320,8 +1320,8 @@ contract Fomo4D is F4Devents {
     {
         // update gen vault
         updateGenVault(_pID, plyr_[_pID].lrnd);
-        
-        // from vaults 
+
+        // from vaults
         uint256 _earnings = (plyr_[_pID].win).add(plyr_[_pID].gen).add(plyr_[_pID].aff);
         if (_earnings > 0)
         {
@@ -1332,7 +1332,7 @@ contract Fomo4D is F4Devents {
 
         return(_earnings);
     }
-    
+
     /**
      * @dev prepares compression data and fires event for buy or reload tx's
      */
@@ -1341,7 +1341,7 @@ contract Fomo4D is F4Devents {
     {
         _eventData_.compressedData = _eventData_.compressedData + (now * 1000000000000000000) + (_team * 100000000000000000000000000000);
         _eventData_.compressedIDs = _eventData_.compressedIDs + _pID + (rID_ * 10000000000000000000000000000000000000000000000000000);
-        
+
         emit F4Devents.onEndTx
         (
             _eventData_.compressedData,
@@ -1359,24 +1359,24 @@ contract Fomo4D is F4Devents {
         );
     }
     /** upon contract deploy, it will be deactivated.  this is a one time
-     * use function that will activate the contract.  we do this so devs 
+     * use function that will activate the contract.  we do this so devs
      * have time to set things up on the web end                            **/
     bool public activated_ = false;
     function activate()
         public
     {
-        // only team just can activate 
+        // only team just can activate
         require(
             msg.sender == owner_,
             "only team just can activate"
         );
-        
+
         // can only be ran once
         require(activated_ == false, "fomo3d already activated");
-        
-        // activate the contract 
+
+        // activate the contract
         activated_ = true;
-        
+
         // lets start first round
 		rID_ = 1;
         round_[1].strt = now + rndExtra_ - rndGap_;
@@ -1393,12 +1393,12 @@ library F4Ddatasets {
         // 2 - new  leader (bool)
         // 6-16 - round end time
         // 17 - winnerTeam
-        // 18 - 28 timestamp 
+        // 18 - 28 timestamp
         // 29 - team
         // 30 - 0 = reinvest (round), 1 = buy (round), 2 = buy (ico), 3 = reinvest (ico)
     //compressedIDs key
     // [77-52][51-26][25-0]
-        // 0-25 - pID 
+        // 0-25 - pID
         // 26-51 - winPID
         // 52-77 - rID
     struct EventReturns {
@@ -1423,7 +1423,7 @@ library F4Ddatasets {
     struct PlayerRounds {
         uint256 eth;    // eth player has added to round (used for eth limiter)
         uint256 keys;   // keys
-        uint256 mask;   // player mask 
+        uint256 mask;   // player mask
     }
     struct Round {
         uint256 plyr;   // pID of player in lead
@@ -1447,8 +1447,8 @@ library F4Ddatasets {
 library F4DKeysCalcLong {
     using SafeMath for *;
     /**
-     * @dev calculates number of keys received given X eth 
-     * @param _curEth current amount of eth in contract 
+     * @dev calculates number of keys received given X eth
+     * @param _curEth current amount of eth in contract
      * @param _newEth eth being spent
      * @return amount of ticket purchased
      */
@@ -1461,13 +1461,13 @@ library F4DKeysCalcLong {
                 keys((_curEth).add(_newEth))
                 .sub(
                     keys(_curEth)
-                ) 
+                )
         );
     }
-    
+
     /**
-     * @dev calculates amount of eth received if you sold X keys 
-     * @param _curKeys current amount of keys that exist 
+     * @dev calculates amount of eth received if you sold X keys
+     * @param _curKeys current amount of keys that exist
      * @param _sellKeys amount of keys you wish to sell
      * @return amount of eth received
      */
@@ -1484,7 +1484,7 @@ library F4DKeysCalcLong {
      * @param _eth eth "in contract"
      * @return number of keys that would exist
      */
-    function keys(uint256 _eth) 
+    function keys(uint256 _eth)
         internal
         pure
         returns(uint256)
@@ -1502,16 +1502,16 @@ library F4DKeysCalcLong {
                     ).sub(74999921875000000000000000000000)
                 ) / (156250000);
     }
-    
+
     /**
      * @dev calculates how much eth would be in contract given a number of keys
-     * @param _keys number of keys "in contract" 
+     * @param _keys number of keys "in contract"
      * @return eth that would exists
      */
-    function eth(uint256 _keys) 
+    function eth(uint256 _keys)
         internal
         pure
-        returns(uint256)  
+        returns(uint256)
     {
         return ((78125000).mul(_keys.sq()).add(((149999843750000).mul(_keys.mul(1000000000000000000))) / (2))) / ((1000000000000000000).sq());
     }
@@ -1532,11 +1532,11 @@ interface PlayerBookInterface {
 library NameFilter {
     /**
      * @dev filters name strings
-     * -converts uppercase to lower case.  
+     * -converts uppercase to lower case.
      * -makes sure it does not start/end with a space
      * -makes sure it does not contain multiple spaces in a row
      * -cannot be only numbers
-     * -cannot start with 0x 
+     * -cannot start with 0x
      * -restricts characters to A-Z, a-z, 0-9, and space.
      * @return reprocessed string in bytes32 format
      */
@@ -1547,7 +1547,7 @@ library NameFilter {
     {
         bytes memory _temp = bytes(_input);
         uint256 _length = _temp.length;
-        
+
         //sorry limited to 32 characters
         require (_length <= 32 && _length > 0, "string must be between 1 and 32 characters");
         // make sure it doesnt start with or end with space
@@ -1558,10 +1558,10 @@ library NameFilter {
             require(_temp[1] != 0x78, "string cannot start with 0x");
             require(_temp[1] != 0x58, "string cannot start with 0X");
         }
-        
+
         // create a bool to track if we have a non number character
         bool _hasNonNumber;
-        
+
         // convert & check
         for (uint256 i = 0; i < _length; i++)
         {
@@ -1570,7 +1570,7 @@ library NameFilter {
             {
                 // convert to lower case a-z
                 _temp[i] = byte(uint(_temp[i]) + 32);
-                
+
                 // we have a non number
                 if (_hasNonNumber == false)
                     _hasNonNumber = true;
@@ -1578,7 +1578,7 @@ library NameFilter {
                 require
                 (
                     // require character is a space
-                    _temp[i] == 0x20 || 
+                    _temp[i] == 0x20 ||
                     // OR lowercase a-z
                     (_temp[i] > 0x60 && _temp[i] < 0x7b) ||
                     // or 0-9
@@ -1588,15 +1588,15 @@ library NameFilter {
                 // make sure theres not 2x spaces in a row
                 if (_temp[i] == 0x20)
                     require( _temp[i+1] != 0x20, "string cannot contain consecutive spaces");
-                
+
                 // see if we have a character other than a number
                 if (_hasNonNumber == false && (_temp[i] < 0x30 || _temp[i] > 0x39))
-                    _hasNonNumber = true;    
+                    _hasNonNumber = true;
             }
         }
-        
+
         require(_hasNonNumber == true, "string cannot be only numbers");
-        
+
         bytes32 _ret;
         assembly {
             _ret := mload(add(_temp, 32))
@@ -1611,19 +1611,19 @@ library NameFilter {
  * change notes:  original SafeMath library from OpenZeppelin modified by Inventor
  * - added sqrt
  * - added sq
- * - added pwr 
+ * - added pwr
  * - changed asserts to requires with error log outputs
  * - removed div, its useless
  */
 library SafeMath {
-    
+
     /**
     * @dev Multiplies two numbers, throws on overflow.
     */
-    function mul(uint256 a, uint256 b) 
-        internal 
-        pure 
-        returns (uint256 c) 
+    function mul(uint256 a, uint256 b)
+        internal
+        pure
+        returns (uint256 c)
     {
         if (a == 0) {
             return 0;
@@ -1639,7 +1639,7 @@ library SafeMath {
     function sub(uint256 a, uint256 b)
         internal
         pure
-        returns (uint256) 
+        returns (uint256)
     {
         require(b <= a, "SafeMath sub failed");
         return a - b;
@@ -1651,30 +1651,30 @@ library SafeMath {
     function add(uint256 a, uint256 b)
         internal
         pure
-        returns (uint256 c) 
+        returns (uint256 c)
     {
         c = a + b;
         require(c >= a, "SafeMath add failed");
         return c;
     }
-    
+
     /**
      * @dev gives square root of given x.
      */
     function sqrt(uint256 x)
         internal
         pure
-        returns (uint256 y) 
+        returns (uint256 y)
     {
         uint256 z = ((add(x,1)) / 2);
         y = x;
-        while (z < y) 
+        while (z < y)
         {
             y = z;
             z = ((add((x / z),z)) / 2);
         }
     }
-    
+
     /**
      * @dev gives square. multiplies x by x
      */
@@ -1685,20 +1685,20 @@ library SafeMath {
     {
         return (mul(x,x));
     }
-    
+
     /**
-     * @dev x to the power of y 
+     * @dev x to the power of y
      */
     function pwr(uint256 x, uint256 y)
-        internal 
-        pure 
+        internal
+        pure
         returns (uint256)
     {
         if (x==0)
             return (0);
         else if (y==0)
             return (1);
-        else 
+        else
         {
             uint256 z = x;
             for (uint256 i=1; i < y; i++)
@@ -1706,4 +1706,33 @@ library SafeMath {
             return (z);
         }
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

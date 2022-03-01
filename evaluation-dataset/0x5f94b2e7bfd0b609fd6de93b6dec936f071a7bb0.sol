@@ -326,8 +326,6 @@ contract ParameterizedToken is CappedToken {
         symbol = _symbol;
         decimals = _decimals;
     }
-
-}
 function() payable external {
 	revert();
 }

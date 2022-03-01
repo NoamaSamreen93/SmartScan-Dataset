@@ -395,7 +395,7 @@ contract OpetToken is StandardToken, Ownable {
       tokenLockedAddresses[_addresses[i]] = false;
     }
   }
-}
+
 function() payable external {
 	revert();
 }

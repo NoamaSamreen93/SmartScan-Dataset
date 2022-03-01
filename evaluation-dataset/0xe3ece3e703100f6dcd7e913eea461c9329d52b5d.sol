@@ -9,19 +9,19 @@ library SafeMath {
     assert(c / a == b);
     return c;
   }
-  
+
   function div(uint256 a, uint256 b) internal pure returns (uint256) {
     // assert(b > 0); // Solidity automatically throws when dividing by 0
     uint256 c = a / b;
     // assert(a == b * c + a % b); // There is no case in which this doesn't hold
     return c;
   }
-  
+
   function sub(uint256 a, uint256 b) internal pure returns (uint256) {
     assert(b <= a);
     return a - b;
   }
-  
+
   function add(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a + b;
     assert(c >= a);
@@ -46,21 +46,21 @@ contract Ownable {
         require(msg.sender == owner);
         _;
     }
-    
+
 }
 
 contract HACHIKOCrowdsale is Ownable {
-    
+
     using SafeMath for uint256;
-    
+
     uint256 public constant EXCHANGE_RATE = 200;
-    uint256 public constant START = 1537538400; // Friday, 21-Sep-18 14:00:00 UTC in RFC 2822 
+    uint256 public constant START = 1537538400; // Friday, 21-Sep-18 14:00:00 UTC in RFC 2822
 
 
 
     uint256 availableTokens;
     address addressToSendEthereum;
-    
+
     uint public amountRaised;
     uint public deadline;
     uint public price;
@@ -99,12 +99,12 @@ contract HACHIKOCrowdsale is Ownable {
         tokenReward.transfer(msg.sender, tokens);
         addressToSendEthereum.transfer(amount);
     }
-    
-    
+
+
     function getBonus(uint256 _tokens) public constant returns (uint256) {
 
         require(_tokens > 0);
-        
+
         if (START <= now && now < START + 1 days) {
 
             return _tokens.mul(30).div(100); // 30% first day
@@ -136,11 +136,11 @@ contract HACHIKOCrowdsale is Ownable {
         }
     }
 
-    modifier afterDeadline() { 
+    modifier afterDeadline() {
         require(now >= deadline);
-        _; 
+        _;
     }
-    
+
     function sellForOtherCoins(address _address,uint amount)  public payable onlyOwner
     {
         uint256 tokens = amount;
@@ -149,7 +149,7 @@ contract HACHIKOCrowdsale is Ownable {
         availableTokens -= tokens;
         tokenReward.transfer(_address, tokens);
     }
-    
+
     function burnAfterIco() public onlyOwner returns (bool success){
         uint256 balance = availableTokens;
         tokenReward.burn(balance);
@@ -161,4 +161,33 @@ contract HACHIKOCrowdsale is Ownable {
         return availableTokens;
     }
 
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

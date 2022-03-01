@@ -119,7 +119,7 @@ contract Ownable {
         _;
     }
 
-   
+
 
 }
 
@@ -273,7 +273,7 @@ contract TravelHelperToken is StandardToken, Ownable {
     bool public tokensLocked = true;
     Ownable ownable;
     mapping (address => bool) public frozenAccounts;
-   
+
  //End: state variables
  //Begin: events
     event FrozenFund(address target, bool frozen);
@@ -292,7 +292,7 @@ contract TravelHelperToken is StandardToken, Ownable {
             _;
         }
     }
-    
+
     modifier tokenNotLocked() {
       if (icoStartBlock > 0 && block.number.sub(icoStartBlock) > tokensUnlockPeriod) {
         tokensLocked = false;
@@ -300,7 +300,7 @@ contract TravelHelperToken is StandardToken, Ownable {
       } else {
         revert();
       }
-    
+
   }
 
 //End: modifiers
@@ -325,11 +325,11 @@ contract TravelHelperToken is StandardToken, Ownable {
 
     }
 
-   
+
 
 //End: constructor
 
-    
+
 
 //Begin: overriden methods
 
@@ -359,7 +359,7 @@ contract TravelHelperToken is StandardToken, Ownable {
 
 
 //Being: setters
-   
+
     function activateSaleContract(address _saleContract) public onlyOwner {
     require(tokensForSale > 0);
     require(teamTokens > 0);
@@ -377,8 +377,8 @@ contract TravelHelperToken is StandardToken, Ownable {
     releasedMarketingTokens = releasedMarketingTokens.add(marketingTeamTokens);
     balances[saleContract] = balances[saleContract].add(tokensForSale);
     totalReleased = totalReleased.add(tokensForSale).add(teamTokens).add(advisorsTokens).add(teamAddressThreeTokens).add(marketingTeamTokens);
-    tokensForSale = 0; 
-    teamTokens = 0; 
+    tokensForSale = 0;
+    teamTokens = 0;
     teamAddressThreeTokens = 0;
     icoStartBlock = block.number;
     assert(totalReleased <= totalSupply);
@@ -388,14 +388,14 @@ contract TravelHelperToken is StandardToken, Ownable {
     emit Transfer(address(this), saleContract, 2500000000 * 1 ether);
     emit SaleContractActivation(saleContract, 2500000000 * 1 ether);
   }
-  
+
  function saleTransfer(address _to, uint256 _value) public returns (bool) {
     require(saleContract != address(0));
     require(msg.sender == saleContract);
     return super.transfer(_to, _value);
   }
-  
-  
+
+
   function burnTokensForSale() public returns (bool) {
     require(saleContract != address(0));
     require(msg.sender == saleContract);
@@ -407,10 +407,10 @@ contract TravelHelperToken is StandardToken, Ownable {
     emit Burn(saleContract, tokens);
     return true;
   }
-  
-   
- 
-    
+
+
+
+
 
     function finalize() public {
         require(fundraising != false);
@@ -425,7 +425,7 @@ contract TravelHelperToken is StandardToken, Ownable {
         frozenAccounts[target] = freeze;
         emit FrozenFund(target, freeze); // solhint-disable-line
     }
-    
+
     function sendBounty(address _to, uint256 _value) public onlyOwner returns (bool) {
     uint256 value = _value.mul(1 ether);
     require(bountyTokens >= value);
@@ -443,12 +443,18 @@ contract TravelHelperToken is StandardToken, Ownable {
     function transferOwnership(address newOwner) onlyOwner public  {
         owner = newOwner;
         emit OwnershipTransferred(owner, newOwner); // solhint-disable-line
-        
+
     }
 //End: setters
-   
+
     function() public {
         revert();
     }
 
+}
+pragma solidity ^0.4.24;
+contract SignalingTXN {
+	 function externalCallUsed() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

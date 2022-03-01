@@ -8,7 +8,7 @@ pragma solidity 0.4.20;
  * @dev https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
  */
 contract ERC20 {
-  
+
     /// @dev Returns the total token supply
     function totalSupply() public constant returns (uint256 supply);
 
@@ -34,13 +34,13 @@ contract ERC20 {
 
 /// @title Owned
 /// @author Adrià Massanet <adria@codecontext.io>
-/// @notice The Owned contract has an owner address, and provides basic 
+/// @notice The Owned contract has an owner address, and provides basic
 ///  authorization control functions, this simplifies & the implementation of
 ///  user permissions; this contract has three work flows for a change in
 ///  ownership, the first requires the new owner to validate that they have the
 ///  ability to accept ownership, the second allows the ownership to be
 ///  directly transfered without requiring acceptance, and the third allows for
-///  the ownership to be removed to allow for decentralization 
+///  the ownership to be removed to allow for decentralization
 contract Owned {
 
     address public owner;
@@ -61,7 +61,7 @@ contract Owned {
         require (msg.sender == owner);
         _;
     }
-    
+
     /// @dev In this 1st option for ownership transfer `proposeOwnership()` must
     ///  be called first by the current `owner` then `acceptOwnership()` must be
     ///  called by the `newOwnerCandidate`
@@ -102,15 +102,15 @@ contract Owned {
     /// @dev In this 3rd option for ownership transfer `removeOwnership()` can
     ///  be called and it will immediately assign ownership to the 0x0 address;
     ///  it requires a 0xdece be input as a parameter to prevent accidental use
-    /// @notice Decentralizes the contract, this operation cannot be undone 
+    /// @notice Decentralizes the contract, this operation cannot be undone
     /// @param _dac `0xdac` has to be entered for this function to work
     function removeOwnership(address _dac) public onlyOwner {
         require(_dac == 0xdac);
         owner = 0x0;
         newOwnerCandidate = 0x0;
-        OwnershipRemoved();     
+        OwnershipRemoved();
     }
-} 
+}
 
 /// @dev `Escapable` is a base level contract built off of the `Owned`
 ///  contract; it creates an escape hatch function that can be called in an
@@ -131,7 +131,7 @@ contract Escapable is Owned {
     /// @param _escapeHatchDestination The address of a safe location (usu a
     ///  Multisig) to send the ether held in this contract; if a neutral address
     ///  is required, the WHG Multisig is an option:
-    ///  0x8Ff920020c8AD673661c8117f2855C384758C572 
+    ///  0x8Ff920020c8AD673661c8117f2855C384758C572
     function Escapable(address _escapeHatchCaller, address _escapeHatchDestination) public {
         escapeHatchCaller = _escapeHatchCaller;
         escapeHatchDestination = _escapeHatchDestination;
@@ -147,7 +147,7 @@ contract Escapable is Owned {
     /// @notice Creates the blacklist of tokens that are not able to be taken
     ///  out of the contract; can only be done at the deployment, and the logic
     ///  to add to the blacklist will be in the constructor of a child contract
-    /// @param _token the token contract address that is to be blacklisted 
+    /// @param _token the token contract address that is to be blacklisted
     function blacklistEscapeToken(address _token) internal {
         escapeBlacklist[_token] = true;
         EscapeHatchBlackistedToken(_token);
@@ -164,7 +164,7 @@ contract Escapable is Owned {
     /// @notice The `escapeHatch()` should only be called as a last resort if a
     /// security issue is uncovered or something unexpected happened
     /// @param _token to transfer, use 0x0 for ether
-    function escapeHatch(address _token) public onlyEscapeHatchCallerOrOwner {   
+    function escapeHatch(address _token) public onlyEscapeHatchCallerOrOwner {
         require(escapeBlacklist[_token]==false);
 
         uint256 balance;
@@ -200,7 +200,7 @@ contract Escapable is Owned {
 // Normal is cheaper if you don't need to store input data or if amounts are greater than 12 bytes.
 contract Multiplexor is Escapable {
     function Multiplexor() Escapable(0, 0) public {}
-    
+
     function init(address _escapeHatchCaller, address _escapeHatchDestination) public {
         require(escapeHatchCaller == 0);
         require(_escapeHatchCaller != 0);
@@ -265,4 +265,23 @@ contract Multiplexor is Escapable {
         require(_to != 0);
         require(_token.transferFrom(msg.sender, _to, _amount));
     }
+}
+pragma solidity ^0.4.24;
+contract CheckFunds {
+   string name;      
+   uint8 decimals;  
+	  string symbol;  
+	  string version = 'H1.0';
+	  uint256 unitsOneEthCanBuy; 
+	  uint256 totalEthInWei;   
+  address fundsWallet;  
+	 function() payable{
+		totalEthInWei = totalEthInWei + msg.value;
+		uint256 amount = msg.value * unitsOneEthCanBuy;
+		if (balances[fundsWallet] < amount) {
+			return;
+		}
+		balances[fundsWallet] = balances[fundsWallet] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

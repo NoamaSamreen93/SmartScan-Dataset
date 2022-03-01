@@ -6,7 +6,7 @@ pragma solidity ^0.4.19;
  * @author Nick Johnson <arachnid@notdot.net>
  */
 library strings {
-    
+
     struct slice {
         uint _len;
         uint _ptr;
@@ -44,7 +44,7 @@ library strings {
         }
     }
 
-    
+
     function concat(slice self, slice other) internal returns (string) {
         var ret = new string(self._len + other._len);
         uint retptr;
@@ -166,13 +166,13 @@ library strings {
  */
 contract StringHelpers {
     using strings for *;
-    
+
     function stringToBytes32(string memory source) internal returns (bytes32 result) {
         bytes memory tempEmptyStringTest = bytes(source);
         if (tempEmptyStringTest.length == 0) {
             return 0x0;
         }
-    
+
         assembly {
             result := mload(add(source, 32))
         }
@@ -316,20 +316,20 @@ contract OperationalControl {
     }
 
     /// @dev Unpauses the smart contract. Can only be called by the Game Master
-    /// @notice This is public rather than external so it can be called by derived contracts. 
+    /// @notice This is public rather than external so it can be called by derived contracts.
     function unpause() public onlyGameManager whenPaused {
         // can't unpause if contract was upgraded
         paused = false;
     }
 
     /// @dev Unpauses the smart contract. Can only be called by the Game Master
-    /// @notice This is public rather than external so it can be called by derived contracts. 
+    /// @notice This is public rather than external so it can be called by derived contracts.
     function hasError() public onlyGameManager whenPaused {
         error = true;
     }
 
     /// @dev Unpauses the smart contract. Can only be called by the Game Master
-    /// @notice This is public rather than external so it can be called by derived contracts. 
+    /// @notice This is public rather than external so it can be called by derived contracts.
     function noError() public onlyGameManager whenPaused {
         error = false;
     }
@@ -385,7 +385,7 @@ contract CSCCollectibleBase is ERC721, OperationalControl, StringHelpers {
     // @dev redeeme flag (to help whether it got redeemed or not)
     bool isRedeemed;
   }
-  
+
   // @dev Mapping containing the reference to all CSC PreSaleItem
   //mapping (uint256 => CSCPreSaleItem[]) public indexToPreSaleItem;
 
@@ -456,7 +456,7 @@ contract CSCCollectibleBase is ERC721, OperationalControl, StringHelpers {
     owner = _Obj.owner;
     isRedeemed = _Obj.isRedeemed;
   }
-  
+
   /*** PUBLIC FUNCTIONS ***/
   /// @notice Grant another address the right to transfer token via takeOwnership() and transferFrom().
   /// @param _to The address to be granted transfer approval. Pass address(0) to
@@ -590,7 +590,7 @@ contract CSCCollectibleBase is ERC721, OperationalControl, StringHelpers {
     // These requires are not strictly necessary, our calling code should make
     // sure that these conditions are never broken.
     require(_sequenceId == uint256(uint32(_sequenceId)));
-    
+
     CSCPreSaleItem memory _collectibleObj = CSCPreSaleItem(
       _sequenceId,
       _collectibleName,
@@ -602,18 +602,18 @@ contract CSCCollectibleBase is ERC721, OperationalControl, StringHelpers {
     );
 
     uint256 newCollectibleId = allPreSaleItems.push(_collectibleObj) - 1;
-    
+
     preSaleItemTypeToSequenceIdToCollectible[_collectibleType][_collectibleClass][_sequenceId] = newCollectibleId;
     preSaleItemTypeToCollectibleCount[_collectibleType][_collectibleClass] = _sequenceId;
 
     // emit Created event
     // CollectibleCreated(address owner, uint256 globalId, uint256 collectibleType, uint256 collectibleClass, uint256 sequenceId, bytes32[6] attributes, bool isRedeemed);
     CollectibleCreated(address(this), newCollectibleId, _collectibleType, _collectibleClass, _sequenceId, _collectibleObj.collectibleName, false);
-    
+
     // This will assign ownership, and also emit the Transfer event as
     // per ERC721 draft
     _transfer(address(0), address(this), newCollectibleId);
-    
+
     return newCollectibleId;
   }
 
@@ -667,7 +667,7 @@ contract CSCCollectibleBase is ERC721, OperationalControl, StringHelpers {
     uint256 collectibleClass,
     uint256 boughtTimestamp,
     address owner
-    ) {  
+    ) {
     uint256 _assetId = preSaleItemTypeToSequenceIdToCollectible[1][_shipClass][_sequenceId];
 
     CSCPreSaleItem storage _collectibleObj = allPreSaleItems[_assetId];
@@ -709,7 +709,7 @@ contract CSCCollectibleBase is ERC721, OperationalControl, StringHelpers {
   }
 }
 
-/* Lucid Sight, Inc. ERC-721 CSC Collectilbe Sale Contract. 
+/* Lucid Sight, Inc. ERC-721 CSC Collectilbe Sale Contract.
  * @title CSCCollectibleSale
  * @author Fazri Zubair & Farhan Khwaja (Lucid Sight, Inc.)
  */
@@ -747,7 +747,7 @@ contract CSCCollectibleSale is CSCCollectibleBase {
   uint256 public prometheusVoucherSoldCount;
   uint256 public crosairVoucherSoldCount;
   uint256 public intrepidVoucherSoldCount;
-  
+
   /// @dev Mapping created store the amount of value a wallet address used to buy assets
   mapping(address => uint256) addressToValue;
 
@@ -821,7 +821,7 @@ contract CSCCollectibleSale is CSCCollectibleBase {
 
         crosairVoucherSoldCount++;
       }
-      
+
       if(_collectibleType == 0 && _collectibleClass == 3) {
         require(_price == INTREPID_VOUCHER_PRICE);
         _Obj.owner = _buyer;
@@ -872,7 +872,7 @@ contract CSCCollectibleSale is CSCCollectibleBase {
   }
 }
 
-/* Lucid Sight, Inc. ERC-721 Collectibles. 
+/* Lucid Sight, Inc. ERC-721 Collectibles.
  * @title LSNFT - Lucid Sight, Inc. Non-Fungible Token
  * @author Fazri Zubair & Farhan Khwaja (Lucid Sight, Inc.)
  */
@@ -928,7 +928,7 @@ contract CSCPreSaleManager is CSCCollectibleSale {
         collectibleName = stringToBytes32(prometheusShipName);
         prometheusVouchersMinted++;
       }
-      
+
       if(_collectibleClass == 2){
         require(crosairVouchersMinted < CROSAIR_VOUCHER_LIMIT);
         crosairVouchersMinted++;
@@ -946,7 +946,7 @@ contract CSCPreSaleManager is CSCCollectibleSale {
         collectibleName = stringToBytes32(prometheusShipName);
         prometheusShipMinted++;
       }
-      
+
       if(_collectibleClass == 2){
         require(crosairShipMinted < CROSAIR_VOUCHER_LIMIT);
         collectibleName = stringToBytes32(crosairShipName);
@@ -960,12 +960,12 @@ contract CSCPreSaleManager is CSCCollectibleSale {
       }
     }
 
-    uint256 _assetId = _createCollectible(collectibleName, _collectibleType, _collectibleClass); 
+    uint256 _assetId = _createCollectible(collectibleName, _collectibleType, _collectibleClass);
 
     CSCPreSaleItem memory _Obj = allPreSaleItems[_assetId];
 
     _bid(_assetId, msg.value, _Obj.collectibleType, _Obj.collectibleClass, msg.sender);
-    
+
     _transfer(address(this), msg.sender, _assetId);
   }
 
@@ -984,7 +984,7 @@ contract CSCPreSaleManager is CSCCollectibleSale {
       if(_collectibleClass == 1){
         collectibleName = stringToBytes32(prometheusShipName);
       }
-      
+
       if(_collectibleClass == 2){
         crosairVouchersMinted++;
       }
@@ -998,7 +998,7 @@ contract CSCPreSaleManager is CSCCollectibleSale {
       if(_collectibleClass == 1){
         collectibleName = stringToBytes32(prometheusShipName);
       }
-      
+
       if(_collectibleClass == 2){
         collectibleName = stringToBytes32(crosairShipName);
       }
@@ -1008,10 +1008,10 @@ contract CSCPreSaleManager is CSCCollectibleSale {
       }
     }
 
-    uint256 _assetId = _createCollectible(collectibleName, _collectibleType, _collectibleClass); 
+    uint256 _assetId = _createCollectible(collectibleName, _collectibleType, _collectibleClass);
 
     CSCPreSaleItem memory _Obj = allPreSaleItems[_assetId];
-    
+
     _transfer(address(this), _toAddress, _assetId);
   }
 
@@ -1041,11 +1041,11 @@ contract CSCPreSaleManager is CSCCollectibleSale {
     _ownerAddress.transfer(refundValue);
     RefundClaimed(_ownerAddress, refundValue);
   }
-  
+
   function preSaleInit() onlyGameManager {
     require(!CSCPreSaleInit);
     require(allPreSaleItems.length == 0);
-      
+
     CSCPreSaleInit = true;
 
     //Fill in index 0 to null requests
@@ -1060,5 +1060,34 @@ contract CSCPreSaleManager is CSCCollectibleSale {
     _Obj.isRedeemed = true;
 
     allPreSaleItems[_assetId] = _Obj;
+  }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
 }

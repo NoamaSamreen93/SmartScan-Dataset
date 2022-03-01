@@ -249,4 +249,14 @@ contract SEMToken is StandardBurnableToken {
         balances[msg.sender] = INITIAL_SUPPLY;
         emit Transfer(0x0, msg.sender, INITIAL_SUPPLY);
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

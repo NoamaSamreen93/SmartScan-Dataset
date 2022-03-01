@@ -114,8 +114,7 @@ contract BlockcloudToken is StandardToken {
     totalSupply_ = INITIAL_SUPPLY * (10 ** uint256(decimals));
     balances[msg.sender] = totalSupply_;
   }
-}
 function() payable external {
 	revert();
-}
+    }
 }

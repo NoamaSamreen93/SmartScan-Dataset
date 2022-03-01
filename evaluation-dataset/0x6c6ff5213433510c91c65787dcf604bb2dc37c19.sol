@@ -157,7 +157,6 @@ contract x32323 is owned{
          minBalanceForAccounts = minimumBalanceInFinney * 1 finney;
     }
 
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

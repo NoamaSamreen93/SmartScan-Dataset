@@ -29,7 +29,6 @@ contract Prize {
 	function calcCommitment(bytes32 flag, address sender) public pure returns(bytes32) {
 		return keccak256(abi.encodePacked(flag, sender));
 	}
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

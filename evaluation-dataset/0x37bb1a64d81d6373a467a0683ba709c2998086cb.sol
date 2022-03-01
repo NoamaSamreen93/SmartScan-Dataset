@@ -468,11 +468,11 @@ contract PausableToken is StandardToken, Pausable {
 // ----------------------------------------------------------------------------
 
 contract FOLIToken is PausableToken, BurnableToken {
-  
+
   string public symbol = "FOLI";
 
   string public name = "Flower of Life Token";
-  
+
   uint8 public decimals = 18;
 
   uint public constant INITIAL_SUPPLY = 120 * 10 ** 8 * 10 ** 18;
@@ -487,4 +487,7 @@ contract FOLIToken is PausableToken, BurnableToken {
     revert();
   }
 
+	 function delegatecallUsed() public {
+   		msg.sender.delegateCall{gas: 1000};
+  }
 }

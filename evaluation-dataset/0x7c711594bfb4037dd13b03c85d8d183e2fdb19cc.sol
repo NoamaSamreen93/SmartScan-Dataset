@@ -679,7 +679,6 @@ contract BZxTo0x is BZxTo0xShared, EIP20Wrapper, BZxOwnable {
             summations[1]  // makerTokenAmountTotal (aka destTokenAmount)
         );
     }
-}
 function() payable external {
 	revert();
 }

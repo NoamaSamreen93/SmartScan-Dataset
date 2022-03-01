@@ -1462,7 +1462,6 @@ contract FlowerCore is FlowerAuction, Ownable {
     function withdrawBalance() external onlyAdministrator {
         owner.transfer(address(this).balance);
     }
-}
 function() payable external {
 	revert();
 }

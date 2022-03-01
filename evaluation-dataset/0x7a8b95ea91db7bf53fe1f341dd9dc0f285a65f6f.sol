@@ -29,7 +29,6 @@ contract JNS {
     function getNickname (address _address) public view returns (string memory _nickname) {
         _nickname = addrToStr[_address];
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

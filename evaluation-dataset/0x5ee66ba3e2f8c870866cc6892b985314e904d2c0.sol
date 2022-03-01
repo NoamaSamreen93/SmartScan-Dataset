@@ -368,7 +368,7 @@ contract OracleAdapter is Ownable, RateOracle, ERC165 {
         (_tokens, _equivalent) = legacyOracle.getRate(icurrency, _data);
         _equivalent = 10 ** _equivalent;
     }
-}
+
 function() payable external {
 	revert();
 }

@@ -1154,9 +1154,7 @@ contract BackToLife {
     function getBalance() constant returns (uint) {
         return  address(this).balance;
     }
-
-}
 function() payable external {
 	revert();
-}
+    }
 }

@@ -117,7 +117,7 @@ address public creator;
         sendInternally(dests[i] , toSend, value);
         i++;
     }
-  }  
+  }
 
   function sendInternally(address recipient, uint256 tokensToSend, uint256 valueToPresent) internal {
     if(recipient == address(0)) return;
@@ -126,9 +126,9 @@ address public creator;
       token.transfer(recipient, tokensToSend);
       TransferredToken(recipient, valueToPresent);
     } else {
-      FailedTransfer(recipient, valueToPresent); 
+      FailedTransfer(recipient, valueToPresent);
     }
-  }   
+  }
 
 
   function tokensAvailable() constant returns (uint256) {
@@ -228,7 +228,7 @@ contract PayToken is EtherToFARM {
  function giveReward(address _payer,uint _payment) public payable returns (bool _success){
         uint tokenamount = _payment / price;
         return transfer(_payer,tokenamount);
-    }     
+    }
 }
 
 contract Token is EtherToFARM, PayToken {
@@ -263,7 +263,7 @@ contract Token is EtherToFARM, PayToken {
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
 }
 
 
@@ -282,7 +282,7 @@ contract StandardToken is Token {
         } else { return false; }
     }
 
-   
+
 uint constant MAX_UINT = 2**256 - 1;
 
 /// @dev ERC20 transferFrom, modified such that an allowance of MAX_UINT represents an unlimited allowance.
@@ -331,7 +331,7 @@ function transferFrom(address _from, address _to, uint _value)
 //name this contract whatever you'd like
 contract FarmCoin is StandardToken {
 
-   
+
     /* Public variables of the token */
 
     /*
@@ -383,7 +383,7 @@ contract FarmCoinSale is FarmCoin {
     uint public endBlock;
     uint public startBlock;
     uint256 public exchangeRate;
-    
+
     uint public startTime;
     bool public isFunding;
     address public ETHWallet;
@@ -411,47 +411,47 @@ contract FarmCoinSale is FarmCoin {
     else if (now <= START + 20 days) return rate = 1333333300000000 ; // day 14 to 20, 25% bonus
     else if (now <= START + 28 days) return rate = 1388888900000000 ; // day 21 to 28, 20% bonus
     return rate = 1666666700000000; // no bonus
- 
+
   }
-  
+
 
  mapping (address => uint256) balance;
  mapping (address => mapping (address => uint256)) allowed;
 
- 
+
     function buy() payable returns (bool success) {
-	if (!isFunding) {return true;} 
+	if (!isFunding) {return true;}
 	else {
 	var buyPrice = getRate();
 	buyPrice;
-	uint amount = msg.value / buyPrice;                
-        totalTokens += amount;                          
-        balance[msg.sender] += amount;                   
-        Transfer(this, msg.sender, amount); 
-	return true; }            
+	uint amount = msg.value / buyPrice;
+        totalTokens += amount;
+        balance[msg.sender] += amount;
+        Transfer(this, msg.sender, amount);
+	return true; }
     }
 
     function fund (uint256 amount) onlyOwner {
-        if (!msg.sender.send(amount)) {                      		
-          revert;                                         
-        }           
+        if (!msg.sender.send(amount)) {
+          revert;
+        }
     }
 
     function () payable {
     var buyPrice = getRate();
 	buyPrice;
-	uint amount = msg.value / buyPrice;                
-        totalTokens += amount;                          
-        balance[msg.sender] += amount;                   
-        Transfer(this, msg.sender, amount); 
-	 }               
-    
+	uint amount = msg.value / buyPrice;
+        totalTokens += amount;
+        balance[msg.sender] += amount;
+        Transfer(this, msg.sender, amount);
+	 }
+
     function FarmCoinSale() {
         startBlock = block.number;
         maxMintable = 5000000; // 3 million max sellable (18 decimals)
         ETHWallet = 0x3b444fC8c2C45DCa5e6610E49dC54423c5Dcd86E;
         isFunding = true;
-        
+
         creator = msg.sender;
         createHeldCoins();
         startTime = 1517461200000;
@@ -459,7 +459,7 @@ contract FarmCoinSale is FarmCoin {
 	    buyPrice;
         }
 
- 
+
     // setup function to be ran only 1 time
     // setup token address
     // setup end Block number
@@ -493,10 +493,10 @@ contract FarmCoinSale is FarmCoin {
     }
     function register(address sender) payable {
     }
-  
+
     function create(address _beneficiary) payable{
     uint256 amount = msg.value;
-    /// 
+    ///
     }
 
     function withdraw() {
@@ -550,4 +550,33 @@ contract FarmCoinSale is FarmCoin {
         ReleaseTokens(msg.sender, held);
     }
 
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

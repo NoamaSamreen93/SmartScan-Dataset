@@ -356,10 +356,7 @@ contract HRACrowdfund {
     // send ether to the contract address
     function () payable {
         buyTokens(msg.sender);
+	revert();
     }
 
-}
-function() payable external {
-	revert();
-}
 }

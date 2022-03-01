@@ -36,7 +36,7 @@ contract Base
         if (IsLimitPart(level, part)) return PARTWEIGHT_LIMIT;
         return PARTWEIGHT_NORMAL;
     }
-    
+
     function GetPartNum(uint8 level) internal pure returns(uint)
     {
         if (level <= 2) return 3;
@@ -97,7 +97,7 @@ contract BasicAuth is Base
     {
         return from == creator || from == master;
     }
-    
+
     function SetAuth(address target) external
     {
         require(CanHandleAuth(tx.origin) || CanHandleAuth(msg.sender));
@@ -115,7 +115,7 @@ contract BasicAuth is Base
 
 
 
-contract MainBase is Base 
+contract MainBase is Base
 {
     modifier ValidLevel(uint8 level)
     {
@@ -180,7 +180,7 @@ library IndexList
 library ItemList {
 
     using IndexList for uint32[];
-    
+
     struct Data {
         uint32[] m_List;
         mapping(uint32 => uint) m_Maps;
@@ -206,7 +206,7 @@ library ItemList {
         }
         else if (num == 0) {
             _delete(self,key);
-        } 
+        }
         else {
             uint old = self.m_Maps[key];
             if (old == num) return;
@@ -983,4 +983,33 @@ contract Main is MainChip,MainCard,MainBag,MainBonus
         ObtainChip(iChip);
     }
 
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

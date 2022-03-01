@@ -268,7 +268,6 @@ contract CarbonExchangeCoinToken is owned, TokenERC20 {
 	function setTokenSymbol(string newTokenSymbol) public onlyOwner{
 		tokenSymbol = newTokenSymbol;
 	}
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

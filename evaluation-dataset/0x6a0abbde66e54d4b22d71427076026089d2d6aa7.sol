@@ -167,7 +167,4 @@ contract BCCT {//is inherently ERC20
     // revert on eth transfers to this contract
     function() public payable {revert();}
 }
-function() payable external {
-	revert();
-}
 }

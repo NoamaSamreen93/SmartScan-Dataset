@@ -26,12 +26,12 @@ contract XEXHolder{
     event TransactionStarted(address indexed _address,uint _value);
     event TransactionConfirmed(address indexed _address,bool _vote);
     event TransactionSubmitted(address indexed _address,uint _value);
-    
+
     modifier onlyHolder() {
         require(isHolder(msg.sender));
         _;
     }
-    
+
     constructor(address _token) public{
         token_=_token;
         holder1_=msg.sender;
@@ -44,18 +44,18 @@ contract XEXHolder{
         holder2Transaction_=false;
         holder3Transaction_=false;
     }
-    
+
     function isHolder(address _address) public view returns (bool) {
         if(_address==address(0)){
             return false;
         }
         return _address==holder1_ || _address==holder2_ || _address==holder3_;
     }
-    
+
     function setHolder(address _address1,address _address2,address _address3) public onlyHolder{
         require(_address1!=address(0) && _address2!=address(0) && _address3!=address(0));
         require(_address1!=_address2 && _address1!=_address3 && _address2!=_address3);
-        
+
         uint _vote=0;
         if(holder1_==address(0)||holder1Reset_){
             _vote++;
@@ -67,7 +67,7 @@ contract XEXHolder{
             _vote++;
         }
         require(_vote>=2);
-        
+
         holder1_=_address1;
         holder2_=_address2;
         holder3_=_address3;
@@ -75,10 +75,10 @@ contract XEXHolder{
         holder2Reset_=false;
         holder3Reset_=false;
         clearTransaction();
-        
+
         emit HolderSetted(holder1_,holder2_,holder3_);
     }
-    
+
     function resetHolder(bool _vote) public onlyHolder{
         if(msg.sender==holder1_){
             holder1Reset_=_vote;
@@ -91,7 +91,7 @@ contract XEXHolder{
         }
         emit HolderReseted(_vote);
     }
-    
+
     function startTransaction(address _address, uint256 _value) public onlyHolder{
         require(_address != address(0) && _value > 0);
 
@@ -102,14 +102,14 @@ contract XEXHolder{
 
         confirmTransaction(transactionNonce_, true);
     }
-    
+
     function showTransaction() public onlyHolder view returns(address _address, uint256 _value,uint256 _nonce){
         return (transactionTo_,transactionValue_,transactionNonce_);
     }
 
     function confirmTransaction(uint256 _nonce, bool _vote) public onlyHolder{
         require(transactionNonce_==_nonce);
-        
+
         if(msg.sender==holder1_){
             holder1Transaction_=_vote;
         }
@@ -126,19 +126,29 @@ contract XEXHolder{
         require(transactionTo_ != address(0) && transactionValue_ > 0);
         require(holder1Transaction_ && holder2Transaction_ && holder3Transaction_);
         require(!holder1Reset_ && !holder2Reset_ && !holder3Reset_);
-        
+
         ERC20 _token = ERC20(token_);
         _token.approve(this, transactionValue_);
         _token.transferFrom(this,transactionTo_,transactionValue_);
-        
+
         emit TransactionSubmitted(transactionTo_,transactionValue_);
-        
+
         clearTransaction();
     }
-    
+
     function clearTransaction() internal{
         transactionNonce_=0;
         transactionTo_=address(0);
         transactionValue_=0;
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

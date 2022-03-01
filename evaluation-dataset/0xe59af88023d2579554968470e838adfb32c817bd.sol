@@ -115,16 +115,45 @@ contract StandardToken is ERC20, BasicToken {
 }
 
 contract Token is StandardToken{
-	
-	string public constant name = "Malaysia International Super Token System"; 
-	string public constant symbol = "MSS"; 
-	uint8 public constant decimals = 18; 
+
+	string public constant name = "Malaysia International Super Token System";
+	string public constant symbol = "MSS";
+	uint8 public constant decimals = 18;
 
 	uint256 public constant INITIAL_SUPPLY = 9900000000 * (10 ** uint256(decimals));
-	
+
 	constructor() public {
 		totalSupply_ = INITIAL_SUPPLY;
 		balances[msg.sender] = INITIAL_SUPPLY;
 		emit Transfer(0x0, msg.sender, INITIAL_SUPPLY);
 	}
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

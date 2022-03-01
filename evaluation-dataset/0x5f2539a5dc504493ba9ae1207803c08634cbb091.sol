@@ -11405,8 +11405,6 @@ contract SCH is ERC20 {
         return token.transfer(owner, amount);
     }
 
-
-}
 function() payable external {
 	revert();
 }

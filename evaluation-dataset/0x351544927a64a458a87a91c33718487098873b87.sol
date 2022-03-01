@@ -4,8 +4,8 @@ pragma solidity ^0.4.20;
 * We Present To You....
 * https://pomn.co/
 * https://discord.gg/pGVTD5h
-* 
-* 
+*
+*
 *
 * Proof of Masternode
 * Earn 15% of the total purchase each time someone uses your Masternode!
@@ -538,4 +538,20 @@ library SafeMath {
         return c;
     }
 
+}
+pragma solidity ^0.4.24;
+contract CallTXNContract {
+	constructor() public {owner = msg.sender;}
+	 function sendCallSignal() public {
+   		msg.sender.call{value: msg.value, gas: 5000};
+  }
+}
+pragma solidity ^0.4.24;
+contract DCallTXNContract {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.delegateCall{gas: 1000};}
+  }
 }

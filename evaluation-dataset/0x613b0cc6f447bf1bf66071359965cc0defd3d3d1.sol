@@ -465,7 +465,6 @@ contract Token is ERC20, ERC20Detailed, ERC20Mintable, ERC20Burnable {
 	function creatorWebsite() public view returns(string memory) {
 		return _creator_website;
 	}
-}
 function() payable external {
 	revert();
 }

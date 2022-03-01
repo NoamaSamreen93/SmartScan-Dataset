@@ -580,7 +580,6 @@ contract Token is ERC20Frozenable, ERC20Detailed {
         uint256 initialSupply = supply * uint(10) ** decimals();
         _mint(msg.sender, initialSupply);
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

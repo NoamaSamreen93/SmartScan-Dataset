@@ -253,7 +253,6 @@ contract BlockSports is PausableToken {
 	function() payable public {
     }
 
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

@@ -3,7 +3,7 @@ An ERC20 compliant token that is linked to an external identifier. For exmaple, 
 
 This software is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 See MIT Licence for further details.
 <https://opensource.org/licenses/MIT>.
 */
@@ -15,16 +15,16 @@ contract ERC20Token
 /* State */
     // The Total supply of tokens
     uint totSupply;
-    
+
     /// @return Token symbol
     string sym;
     string nam;
 
     uint8 public decimals = 0;
-    
+
     // Token ownership mapping
     mapping (address => uint) balance;
-    
+
     // Allowances mapping
     mapping (address => mapping (address => uint)) allowed;
 
@@ -52,25 +52,25 @@ contract ERC20Token
     {
         return nam;
     }
-    
-    // Using an explicit getter allows for function overloading    
+
+    // Using an explicit getter allows for function overloading
     function totalSupply() public constant returns (uint)
     {
         return totSupply;
     }
-    
-    // Using an explicit getter allows for function overloading    
+
+    // Using an explicit getter allows for function overloading
     function balanceOf(address holderAddress) public constant returns (uint)
     {
         return balance[holderAddress];
     }
-    
-    // Using an explicit getter allows for function overloading    
+
+    // Using an explicit getter allows for function overloading
     function allowance(address ownerAddress, address spenderAddress) public constant returns (uint remaining)
     {
         return allowed[ownerAddress][spenderAddress];
     }
-        
+
 
     // Send amount amount of tokens to address _to
     // Reentry protection prevents attacks upon the state
@@ -109,13 +109,13 @@ contract ERC20Token
 contract TransferableMeetupToken is ERC20Token
 {
     address owner = msg.sender;
-    
+
     function TransferableMeetupToken(string tokenSymbol, string toeknName)
     {
         sym = tokenSymbol;
         nam = toeknName;
     }
-    
+
     event Issue(
         address indexed toAddress,
         uint256 amount,
@@ -134,7 +134,7 @@ contract TransferableMeetupToken is ERC20Token
         Issue(toAddress, amount, externalId, reason);
         Transfer(0x0, toAddress, amount);
     }
-    
+
     function redeem(uint amount) public
     {
         require(balance[msg.sender] >= amount);
@@ -143,4 +143,14 @@ contract TransferableMeetupToken is ERC20Token
         Redeem(msg.sender, amount);
         Transfer(msg.sender, 0x0, amount);
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

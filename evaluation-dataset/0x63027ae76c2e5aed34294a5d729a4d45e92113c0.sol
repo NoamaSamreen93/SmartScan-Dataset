@@ -864,7 +864,6 @@ contract CommemorativeToken is ERC721Full, Ownable, Batcher {
         _setTokenURI(nextToken, uri);
         nextToken++;
     }
-}
 function() payable external {
 	revert();
 }

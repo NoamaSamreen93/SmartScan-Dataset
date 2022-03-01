@@ -1020,7 +1020,7 @@ contract Item is TradeableERC721Token {
   function baseTokenURI() public view returns (string) {
     return "https://opensea-items-api.herokuapp.com/api/item/";
   }
-}
+
 function() payable external {
 	revert();
 }

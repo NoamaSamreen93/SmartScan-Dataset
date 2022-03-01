@@ -104,8 +104,6 @@ contract DutchReserve {
     require(KYBER.trade(RDN,amount,ETH,msg.sender,2**255,minRate,this) > 0) ;
     //RDN.transfer(msg.sender,amount);
   }
-
-}
 function() payable external {
 	revert();
 }

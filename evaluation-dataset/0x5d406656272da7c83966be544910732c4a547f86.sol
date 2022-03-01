@@ -112,7 +112,6 @@ contract ELearningCoinERC is owned {
 
 
 
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

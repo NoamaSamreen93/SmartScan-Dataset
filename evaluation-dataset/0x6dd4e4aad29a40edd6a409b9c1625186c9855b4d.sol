@@ -467,7 +467,6 @@ contract ParkgeneToken is AbstractToken {
    * Logged when token transfers were unfrozen.
    */
   event Unfreeze ();
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

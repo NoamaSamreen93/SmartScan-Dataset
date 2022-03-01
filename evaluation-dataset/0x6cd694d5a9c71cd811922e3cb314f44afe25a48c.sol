@@ -70,7 +70,6 @@ contract TJCUToken is Token {
     }
     mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

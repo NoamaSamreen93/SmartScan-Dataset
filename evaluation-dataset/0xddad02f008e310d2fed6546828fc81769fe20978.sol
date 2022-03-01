@@ -6,14 +6,14 @@ pragma solidity ^0.4.20;
 
 /**
  * @title Ownable
- * @dev The Ownable contract has an owner address, and provides basic authorization control 
- * functions, this simplifies the implementation of "user permissions". 
+ * @dev The Ownable contract has an owner address, and provides basic authorization control
+ * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
   address public owner;
 
 
-  /** 
+  /**
    * @dev The Ownable constructor sets the original `owner` of the contract to the sender
    * account.
    */
@@ -23,7 +23,7 @@ contract Ownable {
 
 
   /**
-   * @dev Throws if called by any account other than the owner. 
+   * @dev Throws if called by any account other than the owner.
    */
   modifier onlyOwner() {
     require(msg.sender == owner);
@@ -33,7 +33,7 @@ contract Ownable {
 
   /**
    * @dev Allows the current owner to transfer control of the contract to a newOwner.
-   * @param newOwner The address to transfer ownership to. 
+   * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner public {
     require(newOwner != address(0));
@@ -309,7 +309,7 @@ contract StandardToken is EIP20Token, Burnable, Mintable {
     // We can remove this after there is a standardized minting event
     Transfer(0, receiver, amount);
   }
-  
+
 }
 
 /**
@@ -487,7 +487,7 @@ contract UpgradeableToken is EIP20Token, Burnable {
 
     // Upgrade agent reissues the tokens
     upgradeAgent.upgradeFrom(msg.sender, value);
-    
+
     // Take tokens out from circulation
     burnTokens(msg.sender, value);
     totalUpgraded = totalUpgraded.add(value);
@@ -840,7 +840,7 @@ contract GenericCrowdsale is Haltable {
     (weiAmount, tokenAmount) = calculateTokenAmount(msg.value, receiver);
     // Sanity check against bad implementation.
     assert(weiAmount <= msg.value);
-    
+
     // Dust transaction if no tokens can be given
     require(tokenAmount != 0);
 
@@ -908,7 +908,7 @@ contract GenericCrowdsale is Haltable {
 
   /**
    * Investing function that recognizes the receiver.
-   * 
+   *
    * @param customerId UUIDv4 that identifies this contributor
    */
   function buyOnBehalfWithCustomerId(address receiver, uint128 customerId) public payable validCustomerId(customerId) unsignedBuyAllowed {
@@ -943,7 +943,7 @@ contract GenericCrowdsale is Haltable {
 
   /**
    * Investing function that recognizes the payer.
-   * 
+   *
    * @param customerId UUIDv4 that identifies this contributor
    */
   function buyWithCustomerId(uint128 customerId) public payable {
@@ -1032,7 +1032,7 @@ contract GenericCrowdsale is Haltable {
 
   /**
    * Returns any excess wei received
-   * 
+   *
    * This function can be overriden to provide a different refunding method.
    */
   function returnExcedent(uint excedent, address receiver) internal {
@@ -1041,7 +1041,7 @@ contract GenericCrowdsale is Haltable {
     }
   }
 
-  /** 
+  /**
    *  Calculate the amount of tokens that corresponds to the received amount.
    *  The wei amount is returned too in case not all of it can be invested.
    *
@@ -1189,7 +1189,7 @@ contract Crowdsale is GenericCrowdsale, LostAndFoundToken, TokenTranchePricing, 
   uint private constant token_initial_supply = 4 * (10 ** 8) * (10 ** uint(token_decimals));
   bool private constant token_mintable = true;
   uint private constant sellable_tokens = 6 * (10 ** 8) * (10 ** uint(token_decimals));
-  
+
   // Sets minimum value that can be bought
   uint public minimum_buy_value = 18 * 1 ether / 1000;
   // Eth price multiplied by 1000;
@@ -1213,7 +1213,7 @@ contract Crowdsale is GenericCrowdsale, LostAndFoundToken, TokenTranchePricing, 
     require(end == tranches[tranches.length.sub(1)].end);
     // Testing values
     token = new CrowdsaleToken(token_initial_supply, token_decimals, team_multisig, token_mintable, token_retriever);
-    
+
     //Set eth price in EUR (multiplied by one thousand)
     updateEursPerEth(eth_price_in_eurs);
 
@@ -1287,7 +1287,7 @@ contract Crowdsale is GenericCrowdsale, LostAndFoundToken, TokenTranchePricing, 
 
   /**
    * Investing function that recognizes the payer.
-   * 
+   *
    * @param customerId UUIDv4 that identifies this contributor
    */
   function buyWithCustomerId(uint128 customerId) public payable investmentIsBigEnough(msg.sender) validCustomerId(customerId) unsignedBuyAllowed {
@@ -1347,5 +1347,20 @@ contract Crowdsale is GenericCrowdsale, LostAndFoundToken, TokenTranchePricing, 
   modifier investmentIsBigEnough(address agent) {
     require(msg.value.add(investedAmountOf[agent]) >= minimum_buy_value);
     _;
+  }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
   }
 }

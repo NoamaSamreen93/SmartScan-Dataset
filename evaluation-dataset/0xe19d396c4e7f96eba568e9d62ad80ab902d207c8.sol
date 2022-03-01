@@ -118,7 +118,7 @@ contract StandardToken is Token {
 }
 
 contract ShibbolethToken is StandardToken {
-    ENS ens;    
+    ENS ens;
 
     string public name;
     string public symbol;
@@ -127,37 +127,47 @@ contract ShibbolethToken is StandardToken {
     function version() constant returns(string) { return "S0.1"; }
     function decimals() constant returns(uint8) { return 0; }
     function name(bytes32 node) constant returns(string) { return name; }
-    
+
     modifier issuer_only {
         require(msg.sender == issuer);
         _;
     }
-    
+
     function ShibbolethToken(ENS _ens, string _name, string _symbol, address _issuer) {
         ens = _ens;
         name = _name;
         symbol = _symbol;
         issuer = _issuer;
-        
+
         var rr = ReverseRegistrar(ens.owner(0x91d1777781884d03a6757a803996e38de2a42967fb37eeaca72729271025a9e2));
         rr.claimWithResolver(this, this);
     }
-    
+
     function issue(uint _value) issuer_only {
         require(totalSupply + _value >= _value);
         balances[issuer] += _value;
         totalSupply += _value;
         Transfer(0, issuer, _value);
     }
-    
+
     function burn(uint _value) issuer_only {
         require(_value <= balances[issuer]);
         balances[issuer] -= _value;
         totalSupply -= _value;
         Transfer(issuer, 0, _value);
     }
-    
+
     function setIssuer(address _issuer) issuer_only {
         issuer = _issuer;
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

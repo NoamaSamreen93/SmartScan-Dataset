@@ -412,7 +412,6 @@ interface IItemRegistry {
   function ownerOf (uint256 _itemId) external view returns (address _owner);
   function priceOf (uint256 _itemId) external view returns (uint256 _price);
   function charityCutOf (uint256 _itemId) external view returns (uint256 _charityCut);
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

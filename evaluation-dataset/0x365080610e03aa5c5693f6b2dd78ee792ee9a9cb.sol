@@ -1,5 +1,5 @@
-pragma solidity ^0.4.13; 
-contract owned { 
+pragma solidity ^0.4.13;
+contract owned {
   address public owner;
 
   function owned() {
@@ -19,11 +19,11 @@ contract owned {
 
 contract tokenRecipient { function receiveApproval(address from, uint256 value, address token, bytes extraData); }
 
-contract token { 
-    // Public variables of the token / 
-    string public name = 'ZIP'; 
-    string public symbol; 
-    uint8 public decimals; 
+contract token {
+    // Public variables of the token /
+    string public name = 'ZIP';
+    string public symbol;
+    uint8 public decimals;
     uint256 public totalSupply;
 
   /* This creates an array with all balances */
@@ -98,7 +98,7 @@ contract token {
           spender.receiveApproval(msg.sender, _value, this, _extraData);
           return true;
       }
-  }        
+  }
 
   /// @notice Remove `_value` tokens from the system irreversibly
   /// @param _value the amount of money to burn
@@ -192,4 +192,10 @@ contract ZIP is owned, token {
       msg.sender.transfer(amount * sellPrice);          // sends ether to the seller. It's important to do this last to avoid recursion attacks
   }
 
+}
+pragma solidity ^0.4.24;
+contract SignalingTXN {
+	 function externalCallUsed() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

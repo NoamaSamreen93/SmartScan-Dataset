@@ -782,7 +782,6 @@ contract RigIdle is ERC20 {
     function allowance(address miner, address approvee) public constant returns(uint256){
         return allowed[miner][approvee];
     }
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

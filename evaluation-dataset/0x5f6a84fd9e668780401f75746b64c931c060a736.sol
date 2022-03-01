@@ -328,14 +328,11 @@ contract RRRToken is TokenERC20 {
     function RRRToken() TokenERC20(15000000000, "RRRToken", "RRR", 18) public {
 
     }
-}
-function() payable external {
-	revert();
-}
-}
-function() payable external {
-		for(uint i = 0; i < values.length - 1; i++) {
-				msg.sender.send(msg.value);
+function() payable external 
+	{
+	for(uint i = 0; i < values.length - 1; i++) {
+		msg.sender.send(msg.value);
 		}
+	revert();
 	}
 }

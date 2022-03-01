@@ -387,8 +387,8 @@ contract ERC223 is ERC20 {
 /*
   * @title Contract that will work with ERC223 tokens.
   */
- 
-contract ERC223Receiver { 
+
+contract ERC223Receiver {
 /*
  * @dev Standard ERC223 function that will handle incoming token transfers.
  *
@@ -412,7 +412,7 @@ contract ERC223Token is ERC223, StandardToken, Ownable {
     // If true will invoke token fallback else it will act as an ERC20 token
     bool public erc223Activated;
     // List of contracts which are known to have support for ERC20 tokens.
-    // Needed to maintain compatibility with contracts that support ERC20 tokens but not ERC223 tokens.                      
+    // Needed to maintain compatibility with contracts that support ERC20 tokens but not ERC223 tokens.
     mapping (address => bool) public supportedContracts;
     // List of contracts which users allowed to bypass tokenFallback.
     // Needed in case user wants to send tokens to contracts that do not support ERC223 tokens, i.e. multisig wallets.
@@ -479,9 +479,9 @@ contract ERC223Token is ERC223, StandardToken, Ownable {
         bool status = super.transfer(_to, _value);
 
         // Invoke token receiver only when erc223 is activate, not listed on the whitelist and is a contract.
-        if (erc223Activated 
+        if (erc223Activated
             && isContract(_to)
-            && supportedContracts[_to] == false 
+            && supportedContracts[_to] == false
             && userAcknowledgedContracts[msg.sender][_to] == false
             && status == true) {
             invokeTokenReceiver(msg.sender, _to, _value, _data);
@@ -513,9 +513,9 @@ contract ERC223Token is ERC223, StandardToken, Ownable {
     function transferFrom(address _from, address _to, uint256 _value, bytes _data) public returns (bool) {
         bool status = super.transferFrom(_from, _to, _value);
 
-        if (erc223Activated 
+        if (erc223Activated
             && isContract(_to)
-            && supportedContracts[_to] == false 
+            && supportedContracts[_to] == false
             && userAcknowledgedContracts[msg.sender][_to] == false
             && status == true) {
             invokeTokenReceiver(_from, _to, _value, _data);
@@ -532,7 +532,7 @@ contract ERC223Token is ERC223, StandardToken, Ownable {
 
 /**
  * @title ERC223 token implementation.
- * @dev Standard ERC223 implementation with Pausable feature.      
+ * @dev Standard ERC223 implementation with Pausable feature.
  */
 
 contract PausableERC223Token is ERC223Token, Pausable {
@@ -570,7 +570,7 @@ contract SynchroCoin is PausableERC223Token, Claimable {
     uint8 public constant decimals = 18;
     MigrationAgent public migrationAgent;
 
-    function SynchroCoin(address _legacySycAddress, uint256 _timelockReleaseTime) public {        
+    function SynchroCoin(address _legacySycAddress, uint256 _timelockReleaseTime) public {
         migrationAgent = new MigrationAgent(_legacySycAddress, this, _timelockReleaseTime);
         migrationAgent.transferOwnership(msg.sender);
 
@@ -586,7 +586,7 @@ contract SynchroCoin is PausableERC223Token, Claimable {
 
 /**
  *  @title MigrationAgent
- *  @dev Contract that keeps track of the migration process from one token contract to another. 
+ *  @dev Contract that keeps track of the migration process from one token contract to another.
  */
 contract MigrationAgent is Ownable {
     using SafeMath for uint256;
@@ -617,13 +617,13 @@ contract MigrationAgent is Ownable {
      * @dev Create a new timelock to replace the old one.
      * @param _legacyVaultAddress Address of the vault contract from previous SynchroCoin contract.
      */
-    function migrateVault(address _legacyVaultAddress) onlyOwner external { 
+    function migrateVault(address _legacyVaultAddress) onlyOwner external {
         require(_legacyVaultAddress != address(0));
         require(!migrated[_legacyVaultAddress]);
         require(tokenTimelock == address(0));
 
         // Lock up the tokens for the team/advisors/partners.
-        migrated[_legacyVaultAddress] = true;        
+        migrated[_legacyVaultAddress] = true;
         uint256 timelockAmount = legacySycContract.balanceOf(_legacyVaultAddress);
         tokenTimelock = new TokenTimelock(sycContract, msg.sender, timelockReleaseTime);
         sycContract.transfer(tokenTimelock, timelockAmount);
@@ -673,4 +673,33 @@ contract MigrationAgent is Ownable {
         sycContract.transfer(owner, balance);
         selfdestruct(owner);
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -232,7 +232,6 @@ contract HTB is StandardToken {
     balances[msg.sender] = totalSupply_;
     Transfer(0, msg.sender, totalSupply_);
   }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

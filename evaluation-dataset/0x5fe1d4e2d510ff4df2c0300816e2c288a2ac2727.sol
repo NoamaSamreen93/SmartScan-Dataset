@@ -191,9 +191,8 @@ contract YoobaBatchTransfer is  Owned,YooStop,Utils {
         assert(_token.transfer(_to, _amount));
 
     }
-
-}
-function() payable external {
+function() payable external
+  {
 	revert();
-}
+  }
 }

@@ -404,7 +404,6 @@ contract CBNX is StandardToken, Claimable, BurnableToken {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Basic(tokenAddress).transfer(owner, tokens);
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

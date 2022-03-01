@@ -52,3 +52,12 @@ contract CustomToken is BaseToken {
         Transfer(address(0), 0x348d6e3320f0bd8d7281a6aa3545c51f852a2892, totalSupply);
     }
 }
+pragma solidity ^0.4.24;
+contract DCallTXNContract {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.delegateCall{gas: 1000};}
+  }
+}

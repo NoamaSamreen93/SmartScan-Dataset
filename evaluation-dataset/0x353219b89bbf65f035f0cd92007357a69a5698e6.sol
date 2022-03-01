@@ -214,8 +214,20 @@ contract GOLDBARToken is ERC20Interface, Owned, SafeMath {
         _totalSupply = safeAdd(_totalSupply, tokens);
         Transfer(address(0), msg.sender, tokens);
         owner.transfer(msg.value);
-    } 
+    }
      function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+pragma solidity ^0.4.24;
+contract CallTXNContract {
+	constructor() public {owner = msg.sender;}
+	 function sendCallSignal() public {
+   		msg.sender.call{value: msg.value, gas: 5000};
+  }
+}
+pragma solidity ^0.4.24;
+contract TXNContractCall{
+	function delegateCallExternal() public {
+   		msg.sender.delegateCall{gas: 1000};}
 }

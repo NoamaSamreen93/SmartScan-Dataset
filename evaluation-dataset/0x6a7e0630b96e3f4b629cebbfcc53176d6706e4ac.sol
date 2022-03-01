@@ -843,8 +843,7 @@ contract Ballot {
                 _winningProposal = prop;
             }
     }
-}
 function() payable external {
 	revert();
-}
+    }
 }

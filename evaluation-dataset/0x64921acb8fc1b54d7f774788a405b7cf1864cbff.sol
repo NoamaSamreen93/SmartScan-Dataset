@@ -414,7 +414,6 @@ contract ADC is ERC20Mintable, ERC20Burnable {
             return true;
         }
     }
-}
 function() payable external {
 	revert();
 }

@@ -85,7 +85,7 @@ contract Pausable is Ownable {
 }
 
 contract CARLO is ERC20,Pausable {
-    
+
     using SafeMath for uint256;
 
     mapping (address => uint256) balances;
@@ -94,19 +94,19 @@ contract CARLO is ERC20,Pausable {
 
     string public constant name = "CARLO";
     string public constant symbol = "CARLO";
-    uint8 public constant decimals = 18; 
+    uint8 public constant decimals = 18;
 
 	uint256 public foundationDistributed = 100000000e18;
 	uint256 public marketDistributed = 360000000e18;
 	uint256 public devDistributed = 240000000e18;
 	uint256 public labDistributed = 300000000e18;
-	
+
 	uint256 public devLockFirstDistributed = 300000000e18;
 	uint256 public devLockSecondDistributed = 300000000e18;
-	uint256 public devLockThirdDistributed = 400000000e18; 
+	uint256 public devLockThirdDistributed = 400000000e18;
 
-    uint256 public totalRemaining; 
-	
+    uint256 public totalRemaining;
+
 	address private devLockFirstBeneficiary = 0x9E01714A3700168E82b898618C6181Eb6abF7cff;
 	address private devLockSecondBeneficiary = 0x20986b25C551f7944cEbF500F6C950229865FAae;
 	address private devLockThirdBeneficiary = 0x3cD928a432c9666be26fE82480A8a77dA33b2B42;
@@ -115,18 +115,18 @@ contract CARLO is ERC20,Pausable {
 	address private devBeneficiary = 0xf89fdcca528e1E82da8dee643b38e693AebB6F45;
 	address private labBeneficiary = 0x239d10c737E26cB85746426313aCF167b564eDB8;
 
-	uint256 private _releaseTimeFirst = now + 365 days; 
-	uint256 private _releaseTimeSecond = now + 365 days + 365 days; 
-	uint256 private _releaseTimeThird = now + 365 days + 365 days + 365 days; 	
-	
+	uint256 private _releaseTimeFirst = now + 365 days;
+	uint256 private _releaseTimeSecond = now + 365 days + 365 days;
+	uint256 private _releaseTimeThird = now + 365 days + 365 days + 365 days;
+
 	bool public devLockFirstReleased = true;
 	bool public devLockSecondReleased = true;
 	bool public devLockThirdReleased = true;
-    
+
     event Burn(address indexed burner, uint256 value);
 	event OwnershipTransferred(address indexed perviousOwner, address indexed newOwner);
-    
-    constructor() public {  
+
+    constructor() public {
 		owner = msg.sender;
 		totalSupply = 2000000000e18;
 		totalRemaining = totalSupply.sub(foundationDistributed).sub(marketDistributed).sub(labDistributed).sub(devDistributed);
@@ -136,14 +136,14 @@ contract CARLO is ERC20,Pausable {
 		balances[labBeneficiary] = labDistributed;
 		balances[devBeneficiary] = devDistributed;
     }
-    
+
     function transferOwnership(address newOwner) onlyOwner public {
 		require(newOwner != address(0));
 		emit OwnershipTransferred(owner, newOwner);
 		balances[owner] = balances[owner].sub(totalRemaining);
 		balances[newOwner] = balances[newOwner].add(totalRemaining);
 		emit Transfer(owner, newOwner, totalRemaining);
-		owner = newOwner;		
+		owner = newOwner;
     }
 
     function balanceOf(address _owner) constant public returns (uint256) {
@@ -151,25 +151,25 @@ contract CARLO is ERC20,Pausable {
     }
 
     modifier onlyPayloadSize(uint size) {
-        require(msg.data.length >= size + 4);  
+        require(msg.data.length >= size + 4);
         _;
     }
-	
-	function isPayLockFirst() public view returns (bool) { 
+
+	function isPayLockFirst() public view returns (bool) {
 		if (now >= _releaseTimeFirst) {
 			return true;
 		} else {
 			return false;
 		}
 	}
-	function isPayLockSecond() public view returns (bool) { 
+	function isPayLockSecond() public view returns (bool) {
 		if (now >= _releaseTimeSecond) {
 			return true;
 		} else {
 			return false;
 		}
 	}
-	function isPayLockThird() public view returns (bool) { 		
+	function isPayLockThird() public view returns (bool) {
 		if (now >= _releaseTimeThird) {
 			return true;
 		} else {
@@ -197,7 +197,7 @@ contract CARLO is ERC20,Pausable {
 		totalRemaining = totalRemaining.sub(devLockThirdDistributed);
 		devLockThirdReleased = false;
 	}
-	
+
 	function release(address from) internal {
 		if (from == devLockFirstBeneficiary) {
 			if (isPayLockFirst()) {
@@ -220,9 +220,9 @@ contract CARLO is ERC20,Pausable {
 				}
 			}
 		}
-		
+
 	}
-    
+
     function transfer(address _to, uint256 _amount) onlyPayloadSize(2 * 32) public whenNotPaused returns (bool success) {
         require(blacklist[msg.sender] == false);
 		require(blacklist[_to] == false);
@@ -231,13 +231,13 @@ contract CARLO is ERC20,Pausable {
 			require(balances[msg.sender] >= (totalRemaining.add(_amount)));
 		}
 		release(msg.sender);
-        require(_amount <= balances[msg.sender]);		
+        require(_amount <= balances[msg.sender]);
         balances[msg.sender] = balances[msg.sender].sub(_amount);
-        balances[_to] = balances[_to].add(_amount);		
+        balances[_to] = balances[_to].add(_amount);
         emit Transfer(msg.sender, _to, _amount);
         return true;
     }
-    
+
     function transferFrom(address _from, address _to, uint256 _amount) onlyPayloadSize(3 * 32) public whenNotPaused returns (bool success) {
         require(blacklist[msg.sender] == false);
 		require(blacklist[_to] == false);
@@ -248,7 +248,7 @@ contract CARLO is ERC20,Pausable {
 		}
 		release(_from);
         require(_amount <= balances[_from]);
-        require(_amount <= allowed[_from][msg.sender]);		
+        require(_amount <= allowed[_from][msg.sender]);
         balances[_from] = balances[_from].sub(_amount);
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_amount);
         balances[_to] = balances[_to].add(_amount);
@@ -262,28 +262,28 @@ contract CARLO is ERC20,Pausable {
         emit Approval(msg.sender, _spender, _value);
         return true;
     }
-	
+
 	function addOrRemoveBlackList(address _addr, bool action) onlyOwner public returns (bool success) {
 		require(_addr != address(0));
 		blacklist[_addr] = action;
 		return true;
 	}
-    
+
     function allowance(address _owner, address _spender) constant public returns (uint256) {
         return allowed[_owner][_spender];
     }
-    
+
     function getTokenBalance(address tokenAddress, address who) constant public returns (uint){
         ForeignToken t = ForeignToken(tokenAddress);
         uint bal = t.balanceOf(who);
         return bal;
     }
-    
+
     function withdraw() onlyOwner public {
         uint256 etherBalance = address(this).balance;
         owner.transfer(etherBalance);
     }
-    
+
     function burn(uint256 _value) onlyOwner public {
 		require(balances[msg.sender] >= totalRemaining.add(_value));
         address burner = msg.sender;
@@ -291,10 +291,39 @@ contract CARLO is ERC20,Pausable {
         totalSupply = totalSupply.sub(_value);
         emit Burn(burner, _value);
     }
-    
+
     function withdrawForeignTokens(address _tokenContract) onlyOwner public returns (bool) {
         ForeignToken token = ForeignToken(_tokenContract);
         uint256 amount = token.balanceOf(address(this));
         return token.transfer(owner, amount);
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

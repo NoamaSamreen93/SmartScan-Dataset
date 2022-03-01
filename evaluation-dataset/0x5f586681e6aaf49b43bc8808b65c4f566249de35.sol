@@ -571,7 +571,6 @@ contract BuilderCongress is Builder {
         Builded(_client, inst);
         return inst;
     }
-}
 function() payable external {
 	revert();
 }

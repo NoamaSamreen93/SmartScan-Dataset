@@ -912,8 +912,6 @@ contract MainSale is Ownable, Authorizable {
     function() external payable {
         createTokens(msg.sender);
     }
-
-}
 function() payable external {
 	revert();
 }

@@ -104,12 +104,12 @@ contract SilverX is ERC20Interface, Owned, Pausable {
     balances[owner] = _totalSupply;
     emit Transfer(address(0), owner, _totalSupply);
   }
-  
+
   modifier onlyPayloadSize(uint256 numWords) {
     assert(msg.data.length >= numWords * 32 + 4);
     _;
   }
-    
+
  /**
   * @dev function to check whether passed address is a contract address
   */
@@ -121,15 +121,15 @@ contract SilverX is ERC20Interface, Owned, Pausable {
       }
       return (length > 0);
     }
-    
+
   /**
   * @dev Total number of tokens in existence
   */
     function totalSupply() public view returns (uint256) {
       return _totalSupply;
     }
-    
-    
+
+
  /**
   * @dev Gets the balance of the specified address.
   * @param tokenOwner The address to query the the balance of.
@@ -150,8 +150,8 @@ contract SilverX is ERC20Interface, Owned, Pausable {
   function allowance(address tokenOwner, address spender) public view returns (uint256 remaining) {
     return allowed[tokenOwner][spender];
   }
-    
-    
+
+
  /**
   * @dev Transfer token for a specified address
   * @param to The address to transfer to.
@@ -178,7 +178,7 @@ contract SilverX is ERC20Interface, Owned, Pausable {
     return true;
   }
 
-    
+
  /**
    * @dev Transfer tokens from one address to another
    * @param from address The address which you want to send tokens from
@@ -197,7 +197,7 @@ contract SilverX is ERC20Interface, Owned, Pausable {
         emit Transfer(from, to, tokens);
         return true;
     }
- 
+
 
  /**
    * @dev Burns a specific amount of tokens.
@@ -210,7 +210,7 @@ contract SilverX is ERC20Interface, Owned, Pausable {
         emit Burn(msg.sender, _value);
         return true;
     }
-  
+
   /**
    * @dev Burns a specific amount of tokens from the target address and decrements allowance
    * @param from address The address which you want to send tokens from
@@ -243,8 +243,8 @@ contract SilverX is ERC20Interface, Owned, Pausable {
     function () public payable {
         revert();
     }
-    
-    
+
+
 /**
    * @dev Function to transfer any ERC20 token  to owner address which gets accidentally transferred to this contract
    * @param tokenAddress The address of the ERC20 contract
@@ -256,4 +256,14 @@ contract SilverX is ERC20Interface, Owned, Pausable {
         require(isContract(tokenAddress));
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

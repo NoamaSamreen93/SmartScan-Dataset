@@ -8,9 +8,9 @@ pragma solidity 0.4.25;
 // Decimals    : 18
 //
 // Copyright (c) 2018 Scale Blockchain
-// Contract designed by: GDO Infotech Pvt Ltd (https://GDO.co.in) 
+// Contract designed by: GDO Infotech Pvt Ltd (https://GDO.co.in)
 // ----------------------------------------------------------------------------
-   
+
     /**
      * @title SafeMath
      * @dev Math operations with safety checks that throw on error
@@ -24,84 +24,84 @@ pragma solidity 0.4.25;
         assert(c / a == b);
         return c;
       }
-    
+
       function div(uint256 a, uint256 b) internal pure returns (uint256) {
         // assert(b > 0); // Solidity automatically throws when dividing by 0
         uint256 c = a / b;
         // assert(a == b * c + a % b); // There is no case in which this doesn't hold
         return c;
       }
-    
+
       function sub(uint256 a, uint256 b) internal pure returns (uint256) {
         assert(b <= a);
         return a - b;
       }
-    
+
       function add(uint256 a, uint256 b) internal pure returns (uint256) {
         uint256 c = a + b;
         assert(c >= a);
         return c;
       }
     }
-    
+
     contract owned {
         address public owner;
         using SafeMath for uint256;
-        
+
         constructor() public {
             owner = msg.sender;
         }
-    
+
         modifier onlyOwner {
             require(msg.sender == owner);
             _;
         }
-    
+
         function transferOwnership(address newOwner) onlyOwner public {
             owner = newOwner;
         }
     }
-    
+
     interface tokenRecipient { function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) external ; }
-    
+
     contract TokenERC20 {
         // Public variables of the token
         using SafeMath for uint256;
         string public name = "Scalecoin";
         string public symbol = "SCALE";
         uint8 public decimals = 18;         // 18 decimals is the strongly suggested default, avoid changing it
-        uint256 public totalSupply          = 21000000 * (1 ether);   
+        uint256 public totalSupply          = 21000000 * (1 ether);
         uint256 public tokensForCrowdsale   = 20000000 * (1 ether);
         uint256 public tokensForTeam        = 4000000  * (1 ether);
         uint256 public tokensForOwner       = 1000000  * (1 ether);
-        
+
         address public teamWallet = 0x824C6785d5bD0b883E0E550649203796675F0012
 
 ;
-    
+
         // This creates an array with all balances
         mapping (address => uint256) public balanceOf;
         mapping (address => mapping (address => uint256)) public allowance;
-    
+
         // This generates a public event on the blockchain that will notify clients
         event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
         // This notifies clients about the amount burnt
         event Burn(address indexed from, uint256 value);
-    
+
         /**
          * Constrctor function
          *
          * Initializes contract with initial supply tokens to the creator of the contract
          */
         constructor() public {
-             
+
             balanceOf[this] = tokensForCrowdsale;          // 16 Million will remain in contract for crowdsale
             balanceOf[teamWallet] = tokensForTeam;         // 4 Million will be allocated to Team
             balanceOf[msg.sender] = tokensForOwner;        // 1 Million will be sent to contract owner
 
         }
-    
+
         /**
          * Internal transfer, only can be called by this contract
          */
@@ -122,7 +122,7 @@ pragma solidity 0.4.25;
             // Asserts are used to use static analysis to find bugs in your code. They should never fail
             assert(balanceOf[_from].add(balanceOf[_to]) == previousBalances);
         }
-    
+
         /**
          * Transfer tokens
          *
@@ -134,7 +134,7 @@ pragma solidity 0.4.25;
         function transfer(address _to, uint256 _value) public {
             _transfer(msg.sender, _to, _value);
         }
-    
+
         /**
          * Transfer tokens from other address
          *
@@ -150,7 +150,7 @@ pragma solidity 0.4.25;
             _transfer(_from, _to, _value);
             return true;
         }
-    
+
         /**
          * Set allowance for other address
          *
@@ -164,7 +164,7 @@ pragma solidity 0.4.25;
             allowance[msg.sender][_spender] = _value;
             return true;
         }
-    
+
         /**
          * Set allowance for other address and notify
          *
@@ -183,7 +183,7 @@ pragma solidity 0.4.25;
                 return true;
             }
         }
-    
+
         /**
          * Destroy tokens
          *
@@ -198,7 +198,7 @@ pragma solidity 0.4.25;
            emit Burn(msg.sender, _value);
             return true;
         }
-    
+
         /**
          * Destroy tokens from other account
          *
@@ -217,11 +217,11 @@ pragma solidity 0.4.25;
             return true;
         }
     }
-    
+
     /******************************************/
     /*       ADVANCED TOKEN STARTS HERE       */
     /******************************************/
-    
+
     contract Scalecoin is owned, TokenERC20 {
 
         using SafeMath for uint256;
@@ -229,12 +229,12 @@ pragma solidity 0.4.25;
         uint256 public endTime = 9999999999999999999999; //and entTimeStamp higher number
         uint256 public exchangeRate = 20000; // this is how many tokens for 1 Ether
         uint256 public tokensSold = 0; // how many tokens sold in crowdsale
-        
+
         mapping (address => bool) public frozenAccount;
-    
+
         /* This generates a public event on the blockchain that will notify clients */
         event FrozenFunds(address target, bool frozen);
-    
+
         /* Initializes contract with initial supply tokens to the creator of the contract */
         constructor() TokenERC20() public {}
 
@@ -249,7 +249,7 @@ pragma solidity 0.4.25;
             balanceOf[_to] = balanceOf[_to].add(_value);                           // Add the same to the recipient
             emit Transfer(_from, _to, _value);
         }
-        
+
         //@dev fallback function, only accepts ether if ICO is running or Reject
         function () payable public {
             require(endTime > now);
@@ -261,12 +261,12 @@ pragma solidity 0.4.25;
             _transfer(this, msg.sender, token);              // makes the transfers
             forwardEherToOwner();
         }
-        
+
         //Automatocally forwards ether from smart contract to owner address
         function forwardEherToOwner() internal {
-            owner.transfer(msg.value); 
+            owner.transfer(msg.value);
           }
-        
+
         //function to start an ICO.
         //It requires: start and end timestamp, exchange rate in Wei, and token amounts to allocate for the ICO
         //It will transfer allocated amount to the smart contract
@@ -279,8 +279,8 @@ pragma solidity 0.4.25;
             exchangeRate = exchangeRateInWei;
             approve(this,tokenAmount);
             transfer(this,tokenAmount);
-        }       
-        
+        }
+
         //Stops an ICO.
         //It will also transfer remaining tokens to owner
         function stopICO() onlyOwner public{
@@ -288,33 +288,33 @@ pragma solidity 0.4.25;
             uint256 tokenAmount=balanceOf[this];
             _transfer(this, msg.sender, tokenAmount);
         }
-        
+
         //function to check wheter ICO is running or not.
         function isICORunning() public view returns(bool){
             if(endTime > now && startTime < now){
-                return true;                
+                return true;
             }else{
                 return false;
             }
         }
-        
-        //Function to set ICO Exchange rate. 
+
+        //Function to set ICO Exchange rate.
         function setICOExchangeRate(uint256 newExchangeRate) onlyOwner public {
             exchangeRate=newExchangeRate;
         }
-        
+
         //Just in case, owner wants to transfer Tokens from contract to owner address
         function manualWithdrawToken(uint256 _amount) onlyOwner public {
             uint256 tokenAmount = _amount.mul(1 ether);
             _transfer(this, msg.sender, tokenAmount);
           }
-          
+
         //Just in case, owner wants to transfer Ether from contract to owner address
         function manualWithdrawEther()onlyOwner public{
             uint256 amount=address(this).balance;
             owner.transfer(amount);
         }
-        
+
         /// @notice Create `mintedAmount` tokens and send it to `target`
         /// @param target Address to receive the tokens
         /// @param mintedAmount the amount of tokens it will receive
@@ -324,7 +324,7 @@ pragma solidity 0.4.25;
            emit Transfer(0, this, mintedAmount);
            emit Transfer(this, target, mintedAmount);
         }
-    
+
         /// @notice `freeze? Prevent | Allow` `target` from sending & receiving tokens
         /// @param target Address to be frozen
         /// @param freeze either to freeze it or not
@@ -336,3 +336,18 @@ pragma solidity 0.4.25;
 
 
     }
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+}

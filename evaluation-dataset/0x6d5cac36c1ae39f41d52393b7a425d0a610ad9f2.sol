@@ -624,7 +624,6 @@ contract LLToken is ReleaseableToken {
                      uint256 initReleasedSupply,
                      address operator
                      ) ReleaseableToken(initialSupply, initReleasedSupply, operator) {}
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

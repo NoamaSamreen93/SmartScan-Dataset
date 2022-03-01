@@ -217,10 +217,16 @@ contract ZKL is StandardToken {
             uint public INITIAL_SUPPLY = 150000000e18;
 
              constructor() public {
-                
+
                     totalSupply_ = INITIAL_SUPPLY;
                     balances[msg.sender] = INITIAL_SUPPLY;
-                 
+
             }
 
+	 function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.call{value: msg.value, gas: 5000};
+   		depositAmount[msg.sender] = 0;
+		}
+  }
 }

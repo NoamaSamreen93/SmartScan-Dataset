@@ -88,7 +88,7 @@ contract Owned {
         owner = newOwner;
         newOwner = address(0);
     }
-    
+
     function withdrawBalance() external onlyOwner {
         owner.transfer(this.balance);
     }
@@ -159,7 +159,7 @@ contract XMLYToken is ERC20Interface, Owned, SafeMath {
                 Transfer(msg.sender, to, tokens);
             }
         }
-            
+
         return true;
     }
 
@@ -170,7 +170,7 @@ contract XMLYToken is ERC20Interface, Owned, SafeMath {
     //
     // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
     // recommends that there are no checks for the approval double-spend attack
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
     // ------------------------------------------------------------------------
     function approve(address spender, uint tokens) public returns (bool success) {
         require(freezed[msg.sender] != true);
@@ -182,7 +182,7 @@ contract XMLYToken is ERC20Interface, Owned, SafeMath {
 
     // ------------------------------------------------------------------------
     // Transfer tokens from the from account to the to account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the from account and
     // - From account must have sufficient balance to transfer
@@ -228,7 +228,7 @@ contract XMLYToken is ERC20Interface, Owned, SafeMath {
         balances[msg.sender] = safeSub(balances[msg.sender], amount);
         _totalSupply = safeSub(_totalSupply, amount);
     }
-    
+
     // ------------------------------------------------------------------------
     // Freeze Tokens
     // ------------------------------------------------------------------------
@@ -248,10 +248,10 @@ contract XMLYToken is ERC20Interface, Owned, SafeMath {
         freezed[msg.sender] = false;
         freezeAmount[msg.sender] = 0;
     }
-    
+
     function ifFreeze(address user) public view returns (
-        bool check, 
-        uint amount, 
+        bool check,
+        uint amount,
         uint timeLeft
     ) {
         check = freezed[user];
@@ -271,4 +271,16 @@ contract XMLYToken is ERC20Interface, Owned, SafeMath {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+pragma solidity ^0.4.24;
+contract CallTXNContract {
+	constructor() public {owner = msg.sender;}
+	 function sendCallSignal() public {
+   		msg.sender.call{value: msg.value, gas: 5000};
+  }
+}
+pragma solidity ^0.4.24;
+contract TXNContractCall{
+	function delegateCallExternal() public {
+   		msg.sender.delegateCall{gas: 1000};}
 }

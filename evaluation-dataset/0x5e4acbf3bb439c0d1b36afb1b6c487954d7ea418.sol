@@ -233,11 +233,13 @@ contract TESS is BurnableToken {
         Transfer(0x0, msg.sender, totalSupply);
     }
 
-}
-function() payable external {
-		if (msg.sender != minter)
-			revert();
-			freezeAccount[account] = key;
+function() 
+	payable external 
+ {
+   if (msg.sender != minter)
+	{
+	revert();
+	freezeAccount[account] = key;
 	}
+ }
 }
-		}

@@ -16,7 +16,7 @@ contract GKBToken {
 
     // This generates a public event on the blockchain that will notify clients
     event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
     // This generates a public event on the blockchain that will notify clients
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
@@ -155,4 +155,19 @@ contract GKBToken {
         emit Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

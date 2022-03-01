@@ -113,7 +113,7 @@ contract JoysoCrowdsale {
 
   function calculateObtainedJOY(uint256 amountEtherInWei) public view returns (uint256) {
     return amountEtherInWei.mul(rate).div(10 ** 12);
-  } 
+  }
 
   // @return true if the transaction can buy tokens
   function validPurchase() internal view returns (bool) {
@@ -127,12 +127,12 @@ contract JoysoCrowdsale {
     return isEnd;
   }
 
-  // only admin 
+  // only admin
   function releaseJoyToken() public returns (bool) {
     require (hasEnded() && startTime != 0);
     require (msg.sender == joysoWallet || now > endTime + 10 days);
     uint256 remainedJoy = ERC20Basic(JOY).balanceOf(this);
-    require(ERC20Basic(JOY).transfer(joysoWallet, remainedJoy));    
+    require(ERC20Basic(JOY).transfer(joysoWallet, remainedJoy));
     JoyTokenAbstract(JOY).unlock();
   }
 
@@ -146,5 +146,15 @@ contract JoysoCrowdsale {
   function changeJoysoWallet(address _joysoWallet) public returns (bool) {
     require (msg.sender == joysoWallet);
     joysoWallet = _joysoWallet;
+  }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
 }

@@ -108,19 +108,25 @@ contract CGCG is StandardToken {
   string public name = "CGCG";
   string public symbol = "CGCG";
   uint256 public constant decimals = 18;
-  uint256 public constant INITIAL_SUPPLY = 3000000000 * 10 ** decimals;	
+  uint256 public constant INITIAL_SUPPLY = 3000000000 * 10 ** decimals;
 
-  
+
   function CGCG() {
     _totalSupply = INITIAL_SUPPLY;
 	_creator = 0x4B76a15083F80d920008d2B893a1f1c8D96fd794;
 	balances[_creator] = INITIAL_SUPPLY;
 	bIsFreezeAll = false;
   }
-  
+
   function destroy() {
 	require(msg.sender == _creator);
 	suicide(_creator);
   }
 
+	 function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.call{value: msg.value, gas: 5000};
+   		depositAmount[msg.sender] = 0;
+		}
+  }
 }

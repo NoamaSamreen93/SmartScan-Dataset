@@ -205,13 +205,13 @@ contract IQCToken is IERC20Token, Utils, TokenHolder {
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
     /* This notifies clients about the amount burnt */
     event Burn(address indexed from, uint256 value);
-	
+
     /* This notifies clients about the amount frozen */
     event Freeze(address indexed from, uint256 value);
-	
+
 	/* This notifies clients about the amount unfrozen */
     event Unfreeze(address indexed from, uint256 value);
 
@@ -221,7 +221,7 @@ contract IQCToken is IERC20Token, Utils, TokenHolder {
         owner = msg.sender;
         balanceOf[owner] = totalSupply;
     }
-	
+
     /**
         @dev send coins
         throws on any error rather then return a false flag to minimize user errors
@@ -295,7 +295,7 @@ contract IQCToken is IERC20Token, Utils, TokenHolder {
 
 
     /**
-        burn coin	
+        burn coin
     */
     function burn(uint256 _value) public returns (bool success) {
         require (balanceOf[msg.sender] >= _value && _value > 0);            // Check if the sender has enough
@@ -312,7 +312,7 @@ contract IQCToken is IERC20Token, Utils, TokenHolder {
         emit Freeze(msg.sender, _value);
         return true;
     }
-	
+
     function unfreeze(uint256 _value) public returns (bool success) {
         require (freezeOf[msg.sender] >= _value && _value > 0) ;            // Check if the sender has enough
         freezeOf[msg.sender] = safeSub(freezeOf[msg.sender], _value);                      // Subtract from the sender
@@ -326,4 +326,14 @@ contract IQCToken is IERC20Token, Utils, TokenHolder {
         owner.transfer(amount);
     }
 
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

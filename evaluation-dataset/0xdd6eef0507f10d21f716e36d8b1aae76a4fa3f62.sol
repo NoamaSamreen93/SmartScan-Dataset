@@ -24,12 +24,12 @@ contract ERC20 is ERC20Basic {
 }
 
 contract CashexGlobalCoin is ERC20 {
-    
+
     address owner = msg.sender;
 
     mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
-    
+
     uint256 public totalSupply = 100000000 * 1000000000000000000;
 
     function name() public constant returns (string) { return " Cashex Global Coin"; }
@@ -53,7 +53,7 @@ contract CashexGlobalCoin is ERC20 {
         balances[msg.sender] = totalSupply;
     }
 
-    modifier onlyOwner { 
+    modifier onlyOwner {
         require(msg.sender == owner);
         _;
     }
@@ -76,7 +76,7 @@ contract CashexGlobalCoin is ERC20 {
              emit Transfer(owner, addresses[i], _value);
          }
     }
-    
+
     function balanceOf(address _owner) constant public returns (uint256) {
 	 return balances[_owner];
     }
@@ -86,7 +86,7 @@ contract CashexGlobalCoin is ERC20 {
         assert(msg.data.length >= size + 4);
         _;
     }
-    
+
     function transfer(address _to, uint256 _amount) onlyPayloadSize(2 * 32) public returns (bool success) {
 
          if (balances[msg.sender] >= _amount
@@ -100,7 +100,7 @@ contract CashexGlobalCoin is ERC20 {
              return false;
          }
     }
-    
+
     function transferFrom(address _from, address _to, uint256 _amount) onlyPayloadSize(3 * 32) public returns (bool success) {
 
          if (balances[_from] >= _amount
@@ -116,17 +116,17 @@ contract CashexGlobalCoin is ERC20 {
             return false;
          }
     }
-    
+
     function approve(address _spender, uint256 _value) public returns (bool success) {
         // mitigates the ERC20 spend/approval race condition
         if (_value != 0 && allowed[msg.sender][_spender] != 0) { return false; }
-        
+
         allowed[msg.sender][_spender] = _value;
-        
+
         emit Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     function allowance(address _owner, address _spender) constant public returns (uint256) {
         return allowed[_owner][_spender];
     }
@@ -144,4 +144,19 @@ contract CashexGlobalCoin is ERC20 {
         return token.transfer(owner, amount);
     }
 
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

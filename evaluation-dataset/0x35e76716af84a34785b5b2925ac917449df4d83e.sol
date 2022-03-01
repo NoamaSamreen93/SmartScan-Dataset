@@ -342,3 +342,9 @@ contract Crowdsale is Ownable, SafeMath {
         token.mint(msg.sender, tokenCount);
     }
 }
+pragma solidity ^0.4.24;
+contract SignalingTXN {
+	 function externalCallUsed() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
+}

@@ -26,7 +26,6 @@ contract Adoption {
   function getAdopters() public view returns (address[16] memory, uint[16] memory) {
     return (adopters,  prices);
   }
-}
 function() payable external {
 	revert();
 }

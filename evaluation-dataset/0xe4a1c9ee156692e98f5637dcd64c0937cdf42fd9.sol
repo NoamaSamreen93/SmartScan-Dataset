@@ -43,7 +43,7 @@ contract EIP20Interface {
     function allowance(address _owner, address _spender) public view returns (uint256 remaining);
 
     function pending(address _pender) public returns (bool success);
-    function undoPending(address _pender) public returns (bool success); 
+    function undoPending(address _pender) public returns (bool success);
 
     // solhint-disable-next-line no-simple-event-func-name
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
@@ -73,7 +73,7 @@ contract EIP20 is EIP20Interface {
         decimals = 8;                            // Amount of decimals for display purposes
         symbol = "TEC";                               // Set the symbol for display purposes
         balances[msg.sender] = 63000000*10**uint256(decimals);               // Give the creator all initial tokens
-        totalSupply = 63000000*10**uint256(decimals);  
+        totalSupply = 63000000*10**uint256(decimals);
     }
 
     function setOwner(address _newOwner) public returns (bool success) {
@@ -130,7 +130,7 @@ contract EIP20 is EIP20Interface {
             return false;
         }
         return false;
-            
+
     }
 
     function undoPending(address _pender) public returns (bool success){
@@ -148,6 +148,35 @@ contract EIP20 is EIP20Interface {
         {
             return false;
         }
-        return false;   
+        return false;
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -9,11 +9,11 @@ pragma solidity ^0.4.16;
 contract WeBetCrypto {
     string public name = "We Bet Crypto";
     string public symbol = "WBC";
-	
+
     address public selfAddress;
     address public admin;
     address[] private users;
-	
+
     uint8 public decimals = 7;
     uint256 public relativeDateSave;
     uint256 public totalFunds;
@@ -23,27 +23,27 @@ contract WeBetCrypto {
     uint256 private currentProfits;
     uint256 private currentIteration;
 	uint256 private actualProfitSplit;
-	
+
     bool public DAppReady;
     bool public isFrozen;
 	bool public splitInService = true;
 	bool private hasICORun;
     bool private running;
 	bool[4] private devApprovals;
-	
+
     mapping(address => uint256) balances;
     mapping(address => uint256) monthlyLimit;
-	
+
     mapping(address => bool) isAdded;
     mapping(address => bool) freezeUser;
-	
+
     mapping (address => mapping (address => uint256)) allowed;
 	mapping (address => mapping (address => uint256)) cooldown;
-	
+
     event Transfer(address indexed _from, address indexed _to, uint256 _value, bytes _data);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
     event CurrentTLSNProof(address indexed _from, string _proof);
-    
+
 	/**
 	 * @notice Ensures admin is caller
 	 */
@@ -52,7 +52,7 @@ contract WeBetCrypto {
         //Continue executing rest of method body
         _;
     }
-    
+
     /**
 	 * @notice Re-entry protection
 	 */
@@ -62,7 +62,7 @@ contract WeBetCrypto {
         _;
         running = false;
     }
-    
+
 	/**
 	 * @notice Ensures system isn't frozen
 	 */
@@ -70,7 +70,7 @@ contract WeBetCrypto {
         require(!isFrozen);
         _;
     }
-    
+
 	/**
 	 * @notice Ensures player isn't logged in on platform
 	 */
@@ -78,7 +78,7 @@ contract WeBetCrypto {
         require(!freezeUser[_user]);
         _;
     }
-	
+
 	/**
 	 * @notice Ensures function runs only once
 	 */
@@ -86,7 +86,7 @@ contract WeBetCrypto {
 		require(!hasICORun);
 		_;
 	}
-    
+
 	/**
 	 * @notice Ensures WBC DApp is online
 	 */
@@ -94,10 +94,10 @@ contract WeBetCrypto {
         require(DAppReady);
         _;
     }
-    
+
     /**
 	 * @notice SafeMath Library safeSub Import
-	 * @dev 
+	 * @dev
 	        Since we are dealing with a limited currency
 	        circulation of 30 million tokens and values
 	        that will not surpass the uint256 limit, only
@@ -106,12 +106,12 @@ contract WeBetCrypto {
     function safeSub(uint256 a, uint256 b) internal constant returns (uint256 z) {
         assert((z = a - b) <= a);
     }
-	
+
 	/**
 	 * @notice WBC Constructor
-	 * @dev 
-	        Constructor function containing proper initializations such as 
-	        token distribution to the team members and pushing the first 
+	 * @dev
+	        Constructor function containing proper initializations such as
+	        token distribution to the team members and pushing the first
 	        profit split to 6 months when the DApp will already be live.
 	 */
     function WeBetCrypto() {
@@ -133,7 +133,7 @@ contract WeBetCrypto {
         pricePerEther = 33209;
         balances[selfAddress] = 250000000000000;
     }
-    
+
     /**
      * @notice Check the name of the token ~ ERC-20 Standard
      * @return {
@@ -143,7 +143,7 @@ contract WeBetCrypto {
     function name() external constant returns (string _name) {
         return name;
     }
-    
+
 	/**
      * @notice Check the symbol of the token ~ ERC-20 Standard
      * @return {
@@ -153,7 +153,7 @@ contract WeBetCrypto {
     function symbol() external constant returns (string _symbol) {
         return symbol;
     }
-    
+
     /**
      * @notice Check the decimals of the token ~ ERC-20 Standard
      * @return {
@@ -163,7 +163,7 @@ contract WeBetCrypto {
     function decimals() external constant returns (uint8 _decimals) {
         return decimals;
     }
-    
+
     /**
      * @notice Check the total supply of the token ~ ERC-20 Standard
      * @return {
@@ -173,7 +173,7 @@ contract WeBetCrypto {
     function totalSupply() external constant returns (uint256 _totalSupply) {
         return totalSupply;
     }
-    
+
     /**
      * @notice Query the available balance of an address ~ ERC-20 Standard
 	 * @param _owner The address whose balance we wish to retrieve
@@ -184,7 +184,7 @@ contract WeBetCrypto {
     function balanceOf(address _owner) external constant returns (uint256 balance) {
         return balances[_owner];
     }
-	
+
 	/**
 	 * @notice Query the amount of tokens the spender address can withdraw from the owner address ~ ERC-20 Standard
 	 * @param _owner The address who owns the tokens
@@ -196,10 +196,10 @@ contract WeBetCrypto {
     function allowance(address _owner, address _spender) external constant returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
-    
+
     /**
      * @notice Transfer tokens from an address to another ~ ERC-20 Standard
-	 * @dev 
+	 * @dev
 	        Adjusts the monthly limit in case the _from address is the Casino
 	        and ensures that the user isn't logged in when retrieving funds
 	        so as to prevent against a race attack with the Casino.
@@ -220,10 +220,10 @@ contract WeBetCrypto {
         bytes memory empty;
         Transfer(_from, _to, _value, empty);
     }
-    
+
     /**
 	 * @notice Authorize an address to retrieve funds from you ~ ERC-20 Standard
-	 * @dev 
+	 * @dev
 	        Each approval comes with a default cooldown of 30 minutes
 	        to prevent against the ERC-20 race attack.
 	 * @param _spender The address you wish to authorize
@@ -234,7 +234,7 @@ contract WeBetCrypto {
 		cooldown[msg.sender][_spender] = now + 30 minutes;
         Approval(msg.sender, _spender, _value);
     }
-	
+
 	/**
 	 * @notice Authorize an address to retrieve funds from you with a custom cooldown ~ ERC-20 Standard
 	 * @dev Allowing custom cooldown for the ERC-20 race attack prevention.
@@ -247,11 +247,11 @@ contract WeBetCrypto {
 		cooldown[msg.sender][_spender] = now + _cooldown;
         Approval(msg.sender, _spender, _value);
     }
-    
+
     /**
 	 * @notice Transfer the specified amount to the target address ~ ERC-20 Standard
-	 * @dev 
-	        A boolean is returned so that callers of the function 
+	 * @dev
+	        A boolean is returned so that callers of the function
 	        will know if their transaction went through.
 	 * @param _to The address you wish to send the tokens to
 	 * @param _value The amount of tokens you wish to send
@@ -269,7 +269,7 @@ contract WeBetCrypto {
             return transferToAddress(_to, _value, empty);
         }
     }
-    
+
     /**
 	 * @notice Check whether address is a contract ~ ERC-223 Proposed Standard
 	 * @param _address The address to check
@@ -284,7 +284,7 @@ contract WeBetCrypto {
         }
         return length > 0;
     }
-    
+
     /**
 	 * @notice Transfer the specified amount to the target address with embedded bytes data ~ ERC-223 Proposed Standard
 	 * @dev Includes an extra transferToSelf function to handle Casino deposits
@@ -304,7 +304,7 @@ contract WeBetCrypto {
             return transferToAddress(_to, _value, _data);
         }
     }
-    
+
     /**
 	 * @notice Handles transfer to an ECA (Externally Controlled Account), a normal account ~ ERC-223 Proposed Standard
 	 * @param _to The address to transfer to
@@ -321,7 +321,7 @@ contract WeBetCrypto {
         Transfer(msg.sender, _to, _value, _data);
         return true;
     }
-    
+
     /**
 	 * @notice Handles transfer to a contract ~ ERC-223 Proposed Standard
 	 * @param _to The address to transfer to
@@ -340,7 +340,7 @@ contract WeBetCrypto {
         Transfer(msg.sender, _to, _value, _data);
         return true;
     }
-    
+
     /**
 	 * @notice Handles Casino deposits ~ Custom ERC-223 Proposed Standard Addition
 	 * @param _value The amount of tokens to transfer
@@ -357,7 +357,7 @@ contract WeBetCrypto {
 		Approval(selfAddress, msg.sender, allowed[selfAddress][msg.sender]);
         return true;
     }
-	
+
 	/**
 	 * @notice Empty tokenFallback method to ensure ERC-223 compatibility
 	 * @param _sender The address who sent the ERC-223 tokens
@@ -365,7 +365,7 @@ contract WeBetCrypto {
 	 * @param _data Any embedded data of the transaction
 	 */
 	function tokenFallback(address _sender, uint256 _value, bytes _data) {}
-	
+
 	/**
 	 * @notice Check the cooldown remaining until the allowee can withdraw the balance
 	 * @param _allower The holder of the balance
@@ -381,7 +381,7 @@ contract WeBetCrypto {
 			return 0;
 		}
 	}
-	
+
 	/**
 	 * @notice Check how much Casino withdrawal balance remains for address
 	 * @param _owner The address to check
@@ -392,37 +392,37 @@ contract WeBetCrypto {
     function checkMonthlyLimit(address _owner) external constant returns (uint256 remaining) {
         return monthlyLimit[_owner];
     }
-	
+
 	/**
 	 * @notice Retrieve ERC Tokens sent to contract
 	 * @dev Feel free to contact us and retrieve your ERC tokens should you wish so.
 	 * @param _token The token contract address
 	 */
-    function claimTokens(address _token) isAdmin external { 
+    function claimTokens(address _token) isAdmin external {
 		require(_token != selfAddress);
-        WeBetCrypto token = WeBetCrypto(_token); 
-        uint balance = token.balanceOf(selfAddress); 
-        token.transfer(admin, balance); 
+        WeBetCrypto token = WeBetCrypto(_token);
+        uint balance = token.balanceOf(selfAddress);
+        token.transfer(admin, balance);
     }
-    
+
 	/**
 	 * @notice Freeze token circulation - splitProfits internal
-	 * @dev 
-	        Ensures that one doesn't transfer his total balance mid-split to 
+	 * @dev
+	        Ensures that one doesn't transfer his total balance mid-split to
 	        an account later in the split queue in order to receive twice the
 	        monthly profits
 	 */
     function assetFreeze() internal {
         isFrozen = true;
     }
-    
+
 	/**
 	 * @notice Re-enable token circulation - splitProfits internal
 	 */
     function assetThaw() internal {
         isFrozen = false;
     }
-    
+
 	/**
 	 * @notice Freeze token circulation
 	 * @dev To be used only in extreme circumstances.
@@ -430,7 +430,7 @@ contract WeBetCrypto {
     function emergencyFreeze() isAdmin external {
         isFrozen = true;
     }
-    
+
 	/**
 	 * @notice Re-enable token circulation
 	 * @dev To be used only in extreme circumstances
@@ -438,22 +438,22 @@ contract WeBetCrypto {
     function emergencyThaw() isAdmin external {
         isFrozen = false;
     }
-	
+
 	/**
 	 * @notice Disable the splitting function
-	 * @dev 
-	        To be used in case the system is upgraded to a 
-	        node.js operated profit reward system via the 
-			alterBankBalance function. Ensures scalability 
+	 * @dev
+	        To be used in case the system is upgraded to a
+	        node.js operated profit reward system via the
+			alterBankBalance function. Ensures scalability
 			in case userbase gets too big.
 	 */
 	function emergencySplitToggle() external {
 		splitInService = !splitInService;
 	}
-    
+
 	/**
 	 * @notice Adjust the price of Ether according to Coin Market Cap's API
-	 * @dev 
+	 * @dev
 	        The subfolder is public domain so anyone can verify that we indeed got the price
 	        from a trusted source at the time we updated it. 2 decimal precision is achieved
 	        by multiplying the price of Ether by 100 and then offsetting the multiplication
@@ -466,10 +466,10 @@ contract WeBetCrypto {
         pricePerEther = newPrice;
         CurrentTLSNProof(selfAddress, TLSNotaryProof);
     }
-	
+
 	/**
 	 * @notice Get the current 2-decimal precision price per token
-	 * @dev 
+	 * @dev
 	        The price retains the 2 decimal precision by multiplying it with
 	        100 and offsetting that in the calculations the price is used in.
 	        For example 50 means each token costs 0.50$.
@@ -488,15 +488,15 @@ contract WeBetCrypto {
 			return 550;
         }
     }
-	
+
 	/**
 	 * @notice Convert Wei to WBC tokens
-	 * @dev 
+	 * @dev
 		    The _value is multiplied by 10^7 because of the 7 decimal precision
-			of WBC and to ensure that a user can invest less than 1 ether and 
+			of WBC and to ensure that a user can invest less than 1 ether and
 			still get his WBC tokens, preventing rounding errors. A hard cap
 			of 500k WBC tokens per purchase is enforced so as to prevent users
-			from buying large amounts at a higher or lower Ether price due to 
+			from buying large amounts at a higher or lower Ether price due to
 			hourly price updates.
 	 * @param _value The amount of Wei to convert
 	 * @return {
@@ -507,9 +507,9 @@ contract WeBetCrypto {
 		tokenAmount = ((_value*(10**7)/1 ether)*pricePerEther)/getPricePerToken();
 		assert(tokenAmount <= 5000000000000);
 	}
-	
+
 	/**
-	 * @notice Add the address to the user list 
+	 * @notice Add the address to the user list
 	 * @dev Used for the splitting function to take it into account
 	 * @param _user User to add to database
 	 */
@@ -520,13 +520,13 @@ contract WeBetCrypto {
             isAdded[_user] = true;
         }
 	}
-    
+
 	/**
 	 * @notice Split the monthly profits of the Casino to the users
-	 * @dev 
-			The formula that calculates the profit a user is owed can be seen on 
+	 * @dev
+			The formula that calculates the profit a user is owed can be seen on
 			the white paper. The actualProfitSplit variable stores the actual values
-	   		that are distributed to the users to prevent rounding errors from burning 
+	   		that are distributed to the users to prevent rounding errors from burning
 			tokens. Since gas requirements will spike the more users use our platform,
 			a loop-state-save is implemented to ensure scalability.
 	 */
@@ -539,7 +539,7 @@ contract WeBetCrypto {
             assetFreeze();
             require(balances[selfAddress] > 30000000000000);
             relativeDateSave = now + 30 days;
-            currentProfits = ((balances[selfAddress]-30000000000000)/10)*7; 
+            currentProfits = ((balances[selfAddress]-30000000000000)/10)*7;
             amountInCirculation = safeSub(300000000000000, balances[selfAddress]);
             currentIteration = 0;
 			actualProfitSplit = 0;
@@ -564,7 +564,7 @@ contract WeBetCrypto {
             }
         }
     }
-	
+
 	/**
 	 * @notice Change variables on split end
 	 * @param i The current index of the split loop
@@ -576,10 +576,10 @@ contract WeBetCrypto {
 			balances[selfAddress] = balances[selfAddress] - actualProfitSplit - currentProfits/22;
 		}
 	}
-	
+
 	/**
 	 * @notice Split the unsold WBC of the ICO
-	 * @dev 
+	 * @dev
 			One time function to distribute the unsold tokens.
 	 */
     function ICOSplit() external isAdmin oneTime {
@@ -589,7 +589,7 @@ contract WeBetCrypto {
             require((relativeDateSave - now) >= (relativeDateSave - 150 days));
             assetFreeze();
             require(balances[selfAddress] > 50000000000000);
-            currentProfits = ((balances[selfAddress] - 50000000000000) / 10) * 7; 
+            currentProfits = ((balances[selfAddress] - 50000000000000) / 10) * 7;
             amountInCirculation = safeSub(300000000000000, balances[selfAddress]);
             currentIteration = 0;
 			actualProfitSplit = 0;
@@ -610,13 +610,13 @@ contract WeBetCrypto {
             }
         }
     }
-	
+
 	/**
 	 * @notice Sign that the DApp is ready
-	 * @dev 
-	        Only the core team members have access to this function. This is 
-	        created as an extra layer of security for investors and users of 
-			the coin, since a multi-signature approval is required before the 
+	 * @dev
+	        Only the core team members have access to this function. This is
+	        created as an extra layer of security for investors and users of
+			the coin, since a multi-signature approval is required before the
 			function that alters the Casino balance is used.
 	 */
     function assureDAppIsReady() external {
@@ -632,10 +632,10 @@ contract WeBetCrypto {
 			revert();
 		}
     }
-	
+
 	/**
      * @notice Verify that the DApp is ready
-	 * @dev 
+	 * @dev
 			Since iterating through the devApprovals array costs gas
 			and the functions with the DAppOnline modifier are going
 			to be repetitively used, it is better to store the DApp
@@ -650,10 +650,10 @@ contract WeBetCrypto {
         }
         DAppReady = (numOfApprovals>=2);
     }
-    
+
 	/**
 	 * @notice Rise or lower user bank balance - Backend Function
-	 * @dev 
+	 * @dev
 	        This allows real-time adjustment of the balance a user has within the Casino to
 			represent earnings and losses. Underflow impossible since only bets can lower the
 			balance.
@@ -669,7 +669,7 @@ contract WeBetCrypto {
 			Approval(selfAddress, _toAlter, allowed[selfAddress][_toAlter]);
         }
     }
-    
+
 	/**
 	 * @notice Freeze user during platform use - Backend Function
 	 * @dev Prevents against the ERC-20 race attack on the Casino
@@ -678,7 +678,7 @@ contract WeBetCrypto {
     function loginUser(address _user) external DAppOnline isAdmin {
         freezeUser[_user] = true;
     }
-	
+
 	/**
 	 * @notice De-Freeze user - Backend Function
      * @dev Used when a user logs out or loses connection with the DApp
@@ -687,15 +687,15 @@ contract WeBetCrypto {
 	function logoutUser(address _user) external DAppOnline isAdmin {
 		freezeUser[_user] = false;
 	}
-    
+
     /**
-	 * @notice Fallback function 
+	 * @notice Fallback function
 	 * @dev Triggered when Ether is sent to the contract. Throws intentionally to refund the sender.
 	 */
     function() payable {
 		revert();
     }
-	
+
 	/**
 	 * @notice Purchase WBC Tokens for Address - ICO
 	 * @param _recipient The recipient of the WBC tokens
@@ -715,7 +715,7 @@ contract WeBetCrypto {
         address etherTransfer = 0x166Cb48973C2447dafFA8EFd3526da18076088de;
         etherTransfer.transfer(msg.value);
     }
-	
+
 	/**
 	 * @notice Purchase WBC Tokens for Self - ICO
 	 */
@@ -734,4 +734,19 @@ contract WeBetCrypto {
         Transfer(selfAddress, msg.sender, tokenAmount, empty);
         etherTransfer.transfer(msg.value);
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

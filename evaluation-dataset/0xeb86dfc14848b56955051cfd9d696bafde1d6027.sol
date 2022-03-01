@@ -36,7 +36,7 @@ contract Base
         if (IsLimitPart(level, part)) return PARTWEIGHT_LIMIT;
         return PARTWEIGHT_NORMAL;
     }
-    
+
     function GetPartNum(uint8 level) internal pure returns(uint)
     {
         if (level <= 2) return 3;
@@ -79,7 +79,7 @@ contract BasicAuth is Base
         require(tx.origin==creator || msg.sender==creator);
         _;
     }
-   
+
     function SetAuth(address target) external ValidHandleAuth
     {
         auth_list[target] = true;
@@ -149,4 +149,14 @@ contract StoreGift is BasicAuth
         return g_Exchange[acc][key];
     }
 
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

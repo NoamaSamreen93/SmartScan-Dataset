@@ -73,18 +73,18 @@ library SafeMath {
  */
 contract IntraCoin is owned {
     using SafeMath for uint256;
-    
+
     // Public variables of the token
     string public name;
     string public symbol;
-    uint8 public decimals = 18;  
+    uint8 public decimals = 18;
     uint256 public totalSupply_;
-    
+
   mapping (address => uint256) public balances;
   mapping (address => mapping (address => uint256)) internal allowed;
   mapping (address => bool) public frozenAccount;
-  
-    
+
+
     event Transfer(address indexed from, address indexed to, uint256 value);
     event FrozenFunds(address target, bool frozen);
     event Burn(address indexed burner, uint256 value);
@@ -102,7 +102,7 @@ contract IntraCoin is owned {
     require(!mintingFinished);
     _;
   }
-  
+
    /**
    * @dev Modifier to make a function callable only when the contract is not paused.
    */
@@ -118,7 +118,7 @@ contract IntraCoin is owned {
     require(paused);
     _;
   }
-    
+
 
  /**
      * Constructor function
@@ -136,7 +136,7 @@ contract IntraCoin is owned {
         balances[msg.sender] = totalSupply_;                // Give the creator all initial tokens
         name = tokenName;                                   // Set the name for display purposes
         symbol = tokenSymbol;                               // Set the symbol for display purposes
-        
+
     }
 
 
@@ -180,8 +180,8 @@ contract IntraCoin is owned {
     emit MintFinished();
     return true;
   }
-  
-  
+
+
 /* Function to freeze accounts*/
     function freezeAccount(address target, bool freeze) public onlyOwner {
         frozenAccount[target] = freeze;
@@ -204,8 +204,8 @@ contract IntraCoin is owned {
     emit Approval(msg.sender, _spender, _value);
     return true;
   }
-  
-  
+
+
   /**
    * @dev Function to check the amount of tokens that an owner allowed to a spender.
    * @param _owner address The address which owns the funds.
@@ -215,19 +215,19 @@ contract IntraCoin is owned {
   function allowance(address _owner, address _spender) public view returns (uint256) {
     return allowed[_owner][_spender];
   }
-  
-  
+
+
   function transfer(address _to, uint256 _value) public whenNotPaused returns (bool) {
       require(_to != address(0));
       require(!frozenAccount[msg.sender]);    // Check if sending account is frozen
       require(!frozenAccount[_to]);           // Check if To account is frozen
       require(_value <= balances[msg.sender]);
       require(balances[_to] + _value > balances[_to]);  //Check for overflows
-      
+
     _transfer(msg.sender, _to, _value);
   }
-    
-    
+
+
      /**
      * Internal transfer, only can be called by this contract
      */
@@ -246,23 +246,23 @@ contract IntraCoin is owned {
         require(balances[_to] + _value > balances[_to]);
         // Save this for an assertion in the future
         uint previousBalances = balances[_from] + balances[_to];
-        
+
         balances[_from] = balances[_from].sub(_value);   // Subtract from the sender
         balances[_to] = balances[_to].add(_value);     // Add the same to the recipient
-        
+
         emit Transfer(_from, _to, _value);
         // Asserts are used to use static analysis to find bugs in your code. They should never fail
         assert(balances[_from] + balances[_to] == previousBalances);
     }
-    
-    
+
+
   /**
    * @dev Transfer tokens from one address to another
    * @param _from address The address which you want to send tokens from
    * @param _to address The address which you want to transfer to
    * @param _value uint256 the amount of tokens to be transferred
    */
-   
+
 
   function transferFrom(address _from, address _to, uint256 _value) public whenNotPaused returns (bool) {
     require(_to != address(0));
@@ -279,7 +279,7 @@ contract IntraCoin is owned {
     return true;
   }
 
-  
+
     /**
   * @dev Gets the balance of the specified address.
   * @param _owner The address to query the the balance of.
@@ -288,16 +288,16 @@ contract IntraCoin is owned {
   function balanceOf(address _owner) public view returns (uint256 balance) {
     return balances[_owner];
   }
-  
-  
+
+
     /**
   * @dev total number of tokens in existence
   */
   function totalSupply() public view returns (uint256) {
     return totalSupply_;
   }
-  
-  
+
+
    /**
    * @dev Burns a specific amount of tokens.
    * @param _value The amount of token to be burned.
@@ -308,13 +308,23 @@ contract IntraCoin is owned {
 
     address burner = msg.sender;
     balances[burner] = balances[burner].sub(_value);
-    totalSupply_ = totalSupply_.sub(_value);    
+    totalSupply_ = totalSupply_.sub(_value);
     emit Burn(burner, _value);
     emit Transfer(burner, address(0), _value);
   }
-  
-  
+
+
       function kill() public onlyOwner() {
         selfdestruct(owner);
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

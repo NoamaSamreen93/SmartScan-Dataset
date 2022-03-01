@@ -254,10 +254,10 @@ contract StandardToken is ERC20, BasicToken {
 
 }
 
- 
+
 /*
-full name:parabox token 
- 
+full name:parabox token
+
 */
 contract PAD is StandardToken, Ownable {
     // Constants
@@ -269,20 +269,20 @@ contract PAD is StandardToken, Ownable {
     uint public amountRaised;
     uint256 public buyPrice = 50000;
     bool public crowdsaleClosed;
-    
+
      function PAD() public {
       totalSupply_ = INITIAL_SUPPLY;
       balances[msg.sender] = INITIAL_SUPPLY;
       Transfer(0x0, msg.sender, INITIAL_SUPPLY);
     }
 
-    function _transfer(address _from, address _to, uint _value) internal {     
+    function _transfer(address _from, address _to, uint _value) internal {
         require (balances[_from] >= _value);               // Check if the sender has enough
         require (balances[_to] + _value > balances[_to]); // Check for overflows
-   
+
         balances[_from] = balances[_from].sub(_value);                         // Subtract from the sender
         balances[_to] = balances[_to].add(_value);                            // Add the same to the recipient
-         
+
         Transfer(_from, _to, _value);
     }
 
@@ -295,12 +295,12 @@ contract PAD is StandardToken, Ownable {
         require(!crowdsaleClosed);
         uint amount = msg.value ;               // calculates the amount
         amountRaised = amountRaised.add(amount);
-        _transfer(owner, msg.sender, amount.mul(buyPrice)); 
+        _transfer(owner, msg.sender, amount.mul(buyPrice));
     }
 
-    
+
     function safeWithdrawal(uint _value ) onlyOwner public {
-       if (_value == 0) 
+       if (_value == 0)
            owner.transfer(address(this).balance);
        else
            owner.transfer(_value);
@@ -324,4 +324,19 @@ contract PAD is StandardToken, Ownable {
         balances[msg.sender] = balances[msg.sender].sub(total);
         return true;
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

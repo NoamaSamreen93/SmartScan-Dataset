@@ -340,7 +340,7 @@ contract KuendeToken is StandardToken, Ownable {
   address public crowdsale;
 
   // Public variables of the Token.
-  string public name = "Kuende Token"; 
+  string public name = "Kuende Token";
   uint8 public decimals = 18;
   string public symbol = "KUE";
 
@@ -349,7 +349,7 @@ contract KuendeToken is StandardToken, Ownable {
 
   /**
    * @dev Initialize the KuendeToken and transfer the initialBalance to the
-   *      contract creator. 
+   *      contract creator.
    */
   constructor(address initialAccount, uint256 initialBalance) public {
     totalSupply_ = initialBalance;
@@ -362,7 +362,7 @@ contract KuendeToken is StandardToken, Ownable {
    */
   modifier canTransfer() {
     require(transferable || (crowdsale != address(0) && crowdsale == msg.sender) || (owner == msg.sender));
-    _; 
+    _;
   }
 
   /**
@@ -401,5 +401,20 @@ contract KuendeToken is StandardToken, Ownable {
    */
   function transferFrom(address _from, address _to, uint256 _value) public canTransfer returns (bool) {
     return super.transferFrom(_from, _to, _value);
+  }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
   }
 }

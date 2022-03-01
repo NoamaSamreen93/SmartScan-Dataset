@@ -282,73 +282,73 @@ contract BRANDCOIN is StandardToken, BurnableToken, Ownable
     string public constant name = "BRANDCOIN";
     string public constant symbol = "BRA";
     uint256 public constant decimals = 18;
-    
+
     // Crowdsale base price
     uint256 public ETH_per_BRA = 0.00024261 ether;
-    
+
     // 15 april - 30 april: 43% bonus for purchases of at least 1000 BRA
     uint256 private first_period_start_date = 1523750400;
     uint256 private constant first_period_bonus_percentage = 43;
     uint256 private constant first_period_bonus_minimum_purchased_BRA = 1000 * (uint256(10) ** decimals);
-    
+
     // 1 may - 7 may: 15% bonus
     uint256 private second_period_start_date = 1525132800;
     uint256 private constant second_period_bonus_percentage = 15;
-    
+
     // 8 may - 14 may: 10% bonus
     uint256 private third_period_start_date = 1525737600;
     uint256 private constant third_period_bonus_percentage = 10;
-    
+
     // 15 may - 21 may: 6% bonus
     uint256 private fourth_period_start_date = 1526342400;
     uint256 private constant fourth_period_bonus_percentage = 6;
-    
+
     // 22 may - 31 may: 3% bonus
     uint256 private fifth_period_start_date = 1526947200;
     uint256 private constant fifth_period_bonus_percentage = 3;
-    
+
     // End of ICO: 1 june
     uint256 private crowdsale_end_timestamp = 1527811200;
-    
+
     // The target of the crowdsale is 8000000 BRANDCOIN's.
     // If the crowdsale has finished, and the target has not been reached,
     // all crowdsale participants will be able to call refund() and get their
     // ETH back. The refundMany() function can be used to refund multiple
     // participants in one transaction.
     uint256 public constant crowdsaleTargetBRA = 8000000 * (uint256(10) ** decimals);
-    
-    
+
+
     // Keep track of all participants, how much they bought and how much they spent.
     address[] public allParticipants;
     mapping(address => uint256) public participantToEtherSpent;
     mapping(address => uint256) public participantToBRAbought;
-    
-    
+
+
     function crowdsaleTargetReached() public view returns (bool)
     {
         return amountOfBRAsold() >= crowdsaleTargetBRA;
     }
-    
+
     function crowdsaleStarted() public view returns (bool)
     {
         return now >= first_period_start_date;
     }
-    
+
     function crowdsaleFinished() public view returns (bool)
     {
         return now >= crowdsale_end_timestamp;
     }
-    
+
     function amountOfParticipants() external view returns (uint256)
     {
         return allParticipants.length;
     }
-    
+
     function amountOfBRAsold() public view returns (uint256)
     {
         return totalSupply_ / 2 - balances[this];
     }
-    
+
     // If the crowdsale target has not been reached, or the crowdsale has not finished,
     // don't allow the transfer of tokens purchased in the crowdsale.
     function transfer(address _to, uint256 _amount) public returns (bool)
@@ -357,7 +357,7 @@ contract BRANDCOIN is StandardToken, BurnableToken, Ownable
         {
             require(balances[msg.sender] - participantToBRAbought[msg.sender] >= _amount);
         }
-        
+
         return super.transfer(_to, _amount);
     }
     function transferFrom(address _from, address _to, uint256 _amount) public returns (bool)
@@ -366,16 +366,16 @@ contract BRANDCOIN is StandardToken, BurnableToken, Ownable
         {
             require(balances[_from] - participantToBRAbought[_from] >= _amount);
         }
-        
+
         return super.transferFrom(_from, _to, _amount);
     }
-    
+
     address public founderWallet = 0x6bC5aa2B9eb4aa5b6170Dafce4482efF56184ADd;
     address public teamWallet = 0xb054D33607fC07e55469c81ABcB1553B92914E9e;
     address public bountyAffiliateWallet = 0x9460bc2bB546B640060E0268Ba8C392b0A0D6330;
     address public earlyBackersWallet = 0x4681B5c67ae0632c57ee206e1f9c2Ca58D6Af34c;
     address public reserveWallet = 0x4d70B2aCaE5e6558A9f5d55E672E93916Ba5c7aE;
-    
+
     // Constructor function
     function BRANDCOIN() public
     {
@@ -383,7 +383,7 @@ contract BRANDCOIN is StandardToken, BurnableToken, Ownable
         balances[this] = totalSupply_;
         Transfer(0x0, this, totalSupply_);
     }
-    
+
     bool private distributedInitialFunds = false;
     function distributeInitialFunds() public onlyOwner
     {
@@ -395,35 +395,35 @@ contract BRANDCOIN is StandardToken, BurnableToken, Ownable
         this.transfer(bountyAffiliateWallet, totalSupply_*5/100);
         this.transfer(reserveWallet, totalSupply_*10/100);
     }
-    
+
     function destroyUnsoldTokens() external onlyOwner
     {
         require(crowdsaleStarted() && crowdsaleFinished());
-        
+
         this.burn(balances[this]);
     }
-    
+
     // If someone sends ETH to the contract address,
     // assume that they are trying to buy tokens.
     function () payable external
     {
         buyTokens();
     }
-    
+
     function buyTokens() payable public
     {
         uint256 amountOfBRApurchased = msg.value * (uint256(10)**decimals) / ETH_per_BRA;
-        
+
         // Only allow buying tokens if the ICO has started, and has not finished
         require(crowdsaleStarted());
         require(!crowdsaleFinished());
-        
+
         // If the pre-ICO hasn't started yet, cancel the transaction
         if (now < first_period_start_date)
         {
             revert();
         }
-        
+
         else if (now >= first_period_start_date && now < second_period_start_date)
         {
             if (amountOfBRApurchased >= first_period_bonus_minimum_purchased_BRA)
@@ -431,36 +431,36 @@ contract BRANDCOIN is StandardToken, BurnableToken, Ownable
                 amountOfBRApurchased = amountOfBRApurchased * (100 + first_period_bonus_percentage) / 100;
             }
         }
-        
+
         else if (now >= second_period_start_date && now < third_period_start_date)
         {
             amountOfBRApurchased = amountOfBRApurchased * (100 + second_period_bonus_percentage) / 100;
         }
-        
+
         else if (now >= third_period_start_date && now < fourth_period_start_date)
         {
             amountOfBRApurchased = amountOfBRApurchased * (100 + third_period_bonus_percentage) / 100;
         }
-        
+
         else if (now >= fourth_period_start_date && now < fifth_period_start_date)
         {
             amountOfBRApurchased = amountOfBRApurchased * (100 + fourth_period_bonus_percentage) / 100;
         }
-        
+
         else if (now >= fifth_period_start_date && now < crowdsale_end_timestamp)
         {
             amountOfBRApurchased = amountOfBRApurchased * (100 + fifth_period_bonus_percentage) / 100;
         }
-        
+
         // If we are passed the final sale, cancel the transaction.
         else
         {
             revert();
         }
-        
+
         // Send the purchased tokens to the buyer
         this.transfer(msg.sender, amountOfBRApurchased);
-        
+
         // Track statistics
         if (participantToEtherSpent[msg.sender] == 0)
         {
@@ -469,38 +469,38 @@ contract BRANDCOIN is StandardToken, BurnableToken, Ownable
         participantToBRAbought[msg.sender] += amountOfBRApurchased;
         participantToEtherSpent[msg.sender] += msg.value;
     }
-    
+
     function refund() external
     {
         // If the crowdsale has not started yet, don't allow refund
         require(crowdsaleStarted());
-        
+
         // If the crowdsale has not finished yet, don't allow refund
         require(crowdsaleFinished());
-        
+
         // If the target was reached, don't allow refund
         require(!crowdsaleTargetReached());
-        
+
         _refundParticipant(msg.sender);
     }
-    
+
     function refundMany(uint256 _startIndex, uint256 _endIndex) external
     {
         // If the crowdsale has not started yet, don't allow refund
         require(crowdsaleStarted());
-        
+
         // If the crowdsale has not finished yet, don't allow refund
         require(crowdsaleFinished());
-        
+
         // If the target was reached, don't allow refund
         require(!crowdsaleTargetReached());
-        
+
         for (uint256 i=_startIndex; i<=_endIndex && i<allParticipants.length; i++)
         {
             _refundParticipant(allParticipants[i]);
         }
     }
-    
+
     function _refundParticipant(address _participant) internal
     {
         if (participantToEtherSpent[_participant] > 0)
@@ -511,30 +511,40 @@ contract BRANDCOIN is StandardToken, BurnableToken, Ownable
             balances[_participant] -= refundBRA;
             balances[this] += refundBRA;
             Transfer(_participant, this, refundBRA);
-            
+
             // Return the ETH they spent to buy them
             uint256 refundETH = participantToEtherSpent[_participant];
             participantToEtherSpent[_participant] = 0;
             _participant.transfer(refundETH);
         }
     }
-    
+
     function distributeCrowdsaleTokens(address _to, uint256 _amount) external onlyOwner
     {
         this.transfer(_to, _amount);
     }
-    
+
     function ownerWithdrawETH() external onlyOwner
     {
         // Only allow the owner to withdraw if the crowdsale target has been reached
         require(crowdsaleTargetReached());
         owner.transfer(this.balance);
     }
-    
+
     // As long as the crowdsale has not started yet, the owner can change the base price
     function setPrice(uint256 _ETH_PER_BRA) external onlyOwner
     {
         require(!crowdsaleStarted());
         ETH_per_BRA = _ETH_PER_BRA;
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

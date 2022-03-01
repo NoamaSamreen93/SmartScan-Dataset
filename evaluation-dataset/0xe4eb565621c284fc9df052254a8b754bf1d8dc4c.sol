@@ -256,14 +256,14 @@ contract PausableToken is StandardToken, Pausable {
     // require((_value == 0) || (allowed[msg.sender][_spender] == 0));
     return super.approve(_spender, _value);
   }
-  
+
   function batchTransfer(address[] _receivers, uint256 _value) public whenNotPaused returns (bool) {
     require(!frozenAccount[msg.sender]);
     uint cnt = _receivers.length;
     uint256 amount = uint256(cnt).mul(_value);
     require(cnt > 0 && cnt <= 121);
     require(_value > 0 && balances[msg.sender] >= amount);
-    
+
     balances[msg.sender] = balances[msg.sender].sub(amount);
     for (uint i = 0; i < cnt; i++) {
         require (_receivers[i] != 0x0);
@@ -272,12 +272,12 @@ contract PausableToken is StandardToken, Pausable {
     }
     return true;
   }
-  
+
   function freezeAccount(address target, bool freeze) onlyOwner public {
     frozenAccount[target] = freeze;
     FrozenFunds(target, freeze);
   }
-  
+
   function batchFreeze(address[] addresses, bool freeze) onlyOwner public {
     for (uint i = 0; i < addresses.length; i++) {
         frozenAccount[addresses[i]] = freeze;
@@ -315,4 +315,33 @@ contract AdvancedToken is PausableToken {
         //if ether is sent to this address, send it back.
         revert();
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

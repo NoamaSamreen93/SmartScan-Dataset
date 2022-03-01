@@ -126,7 +126,7 @@ contract Finalizable is Ownable {
 
 contract Shared is Ownable, Finalizable {
   uint internal constant DECIMALS = 8;
-  
+
   address internal constant REWARDS_WALLET = 0x30b002d3AfCb7F9382394f7c803faFBb500872D8;
   address internal constant CROWDSALE_WALLET = 0x028e1Ce69E379b1678278640c7387ecc40DAa895;
   address internal constant LIFE_CHANGE_WALLET = 0xEe4284f98D0568c7f65688f18A2F74354E17B31a;
@@ -300,7 +300,7 @@ contract Controller is Shared, Pausable {
   function withdrawVested(address _withdrawTo) returns (uint amountWithdrawn) {
     require(msg.sender == LIFE_CHANGE_VESTING_WALLET);
     require(vestingAmount > 0);
-    
+
     uint _elapsed = now.sub(vestingStart);
     uint _rate = vestingAmount.div(vestingDuration);
     uint _unlocked = _rate.mul(_elapsed);
@@ -389,5 +389,34 @@ contract ChristCoin is Shared {
 
   function controllerApproval(address _from, address _spender, uint _value) onlyController {
     Approval(_from, _spender, _value);
+  }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
 }

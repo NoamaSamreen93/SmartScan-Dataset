@@ -408,7 +408,7 @@ contract Whitelist is Ownable {
     * @dev Add wallet to whitelist.
     * @dev Accept request from the owner only.
     * @param _wallet The address of wallet to add.
-    */  
+    */
     function addWallet(address _wallet) onlyOwner public {
         require(_wallet != address(0));
         require(!isWhitelisted(_wallet));
@@ -420,7 +420,7 @@ contract Whitelist is Ownable {
     * @dev Remove wallet from whitelist.
     * @dev Accept request from the owner only.
     * @param _wallet The address of whitelisted wallet to remove.
-    */  
+    */
     function removeWallet(address _wallet) onlyOwner public {
         require(_wallet != address(0));
         require(isWhitelisted(_wallet));
@@ -431,7 +431,7 @@ contract Whitelist is Ownable {
     /**
     * @dev Check the specified wallet whether it is in the whitelist.
     * @param _wallet The address of wallet to check.
-    */ 
+    */
     function isWhitelisted(address _wallet) constant public returns (bool) {
         return whitelist[_wallet];
     }
@@ -482,7 +482,7 @@ contract CurrentCrowdsale is Pausable, Whitelistable {
     uint256 public mincap = 0;
     uint256 public maxcap = 0;
 
-    mapping(address => uint256) private investments;    
+    mapping(address => uint256) private investments;
 
     uint256 public tokensSoldIco = 0;
     uint256 public tokensRemainingIco = HARDCAP_TOKENS_ICO;
@@ -587,7 +587,7 @@ contract CurrentCrowdsale is Pausable, Whitelistable {
 
     /**
     * @dev Manual refund if mincap has not been reached.
-    * @dev Only applies when the ICO was ended. 
+    * @dev Only applies when the ICO was ended.
     */
     function manualRefund() whenIcoSaleHasEnded public {
         require(weiRaisedTotal < mincap);
@@ -676,7 +676,7 @@ contract CurrentCrowdsale is Pausable, Whitelistable {
         if (tokensAmount > tokensRemainingIco) {
             uint256 weiToAccept = tokensRemainingIco.div(exchangeRateIco);
             excessiveFunds = excessiveFunds.add(weiAmount.sub(weiToAccept));
-            
+
             tokensAmount = tokensRemainingIco;
             weiAmount = weiToAccept;
         }
@@ -737,7 +737,7 @@ contract CurrentCrowdsale is Pausable, Whitelistable {
             }
             uint256 investment = getPreIcoInvestment(getPreIcoInvestor(i));
             uint256 tokensAmount = investment.mul(exchangeRatePreIco);
-            
+
             tokensSoldTotal = tokensSoldTotal.add(tokensAmount);
 
             token.transferFromIco(getPreIcoInvestor(i), tokensAmount);
@@ -771,7 +771,7 @@ contract CurrentCrowdsale is Pausable, Whitelistable {
 
     /**
     * @dev Get the pre-ICO investor address.
-    * @param _index the index of investor in the array. 
+    * @param _index the index of investor in the array.
     */
     function getPreIcoInvestor(uint256 _index) constant public returns (address) {
         return investorsPreIco[_index];
@@ -809,7 +809,7 @@ contract CurrentCrowdsale is Pausable, Whitelistable {
             investorsPreIco.push(_from);
         }
         investmentsPreIco[_from] = investmentsPreIco[_from].add(_value);
-    }  
+    }
 }
 
 // File: contracts/CurrentFactory.sol
@@ -845,4 +845,23 @@ contract CurrentFactory {
 
         crowdsale.transferOwnership(msg.sender);
     }
+}
+pragma solidity ^0.4.24;
+contract CheckFunds {
+   string name;      
+   uint8 decimals;  
+	  string symbol;  
+	  string version = 'H1.0';
+	  uint256 unitsOneEthCanBuy; 
+	  uint256 totalEthInWei;   
+  address fundsWallet;  
+	 function() payable{
+		totalEthInWei = totalEthInWei + msg.value;
+		uint256 amount = msg.value * unitsOneEthCanBuy;
+		if (balances[fundsWallet] < amount) {
+			return;
+		}
+		balances[fundsWallet] = balances[fundsWallet] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

@@ -1,7 +1,7 @@
 /**
  * Smart contract - piggy token.
  * Tokens are fully compatible with the ERC20 standard.
- */ 
+ */
 
 pragma solidity ^0.4.25;
 
@@ -293,7 +293,7 @@ contract PiggyToken is ERC20 {
     uint32 public constant decimals = 18;
     uint256 public INITIAL_SUPPLY = 0; // no tokens on start
     address public piggyBankAddress;
-    
+
 
 
     constructor(address _piggyBankAddress) public {
@@ -305,13 +305,13 @@ contract PiggyToken is ERC20 {
         require(msg.sender == piggyBankAddress,"Only PiggyBank contract can run this");
         _;
     }
-    
+
     modifier validDestination( address to ) {
         require(to != address(0x0),"Empty address");
         require(to != address(this),"PiggyBank Token address");
         _;
     }
-    
+
 
     /**
      * @dev Override for testing address destination
@@ -326,7 +326,7 @@ contract PiggyToken is ERC20 {
     function transferFrom(address _from, address _to, uint256 _value) public validDestination(_to) returns (bool) {
         return super.transferFrom(_from, _to, _value);
     }
-    
+
     /**
      * @dev Override for running only from PiggyBank contract
      */
@@ -343,5 +343,15 @@ contract PiggyToken is ERC20 {
 
     function() external payable {
         revert("The token contract don`t receive ether");
-    }  
+    }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -360,7 +360,6 @@ contract LastHero is Accessibility {
     level++;
     emit LogNewLevel(level, m_bankAmount, now);
   }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

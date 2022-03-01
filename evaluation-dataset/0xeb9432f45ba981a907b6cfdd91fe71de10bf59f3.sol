@@ -31,29 +31,39 @@ interface BancorContract {
 
 contract TestBancorTradeBNBETH {
     event Trade(uint256 srcAmount, uint256 destAmount);
-    
+
     BancorContract public bancorTradingContract = BancorContract(0x8FFF721412503C85CFfef6982F2b39339481Bca9);
-    
+
     function trade(address[] _path, uint256 _amount, uint256 _minReturn) {
         ERC20 src = ERC20(0xB8c77482e45F1F44dE1745F52C74426C631bDD52);
         src.approve(bancorTradingContract, _amount);
-        
+
         uint256 destAmount = bancorTradingContract.quickConvert(_path, _amount, _minReturn);
-        
+
         Trade(_amount, destAmount);
     }
-    
+
     function getBack() {
         msg.sender.transfer(this.balance);
     }
-    
+
     function getBack2() {
         ERC20 src = ERC20(0xB8c77482e45F1F44dE1745F52C74426C631bDD52);
         src.transfer(msg.sender, src.balanceOf(this));
     }
-    
+
     // Receive ETH in case of trade Token -> ETH, will get ETH back from trading proxy
     function () public payable {
 
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

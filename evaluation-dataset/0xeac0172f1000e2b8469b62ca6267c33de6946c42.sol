@@ -24,10 +24,10 @@ contract ERC20 {
 }
 
 contract ERC20Token is ERC20,ERC20Ownable {
-    
+
     mapping (address => uint256) balances;
 	mapping (address => mapping (address => uint256)) allowed;
-	
+
     event Transfer(
 		address indexed _from,
 		address indexed _to,
@@ -39,7 +39,7 @@ contract ERC20Token is ERC20,ERC20Ownable {
 		address indexed _spender,
 		uint256 _value
 		);
-		
+
 	//Fix for short address attack against ERC20
 	modifier onlyPayloadSize(uint size) {
 		assert(msg.data.length == size + 4);
@@ -83,7 +83,7 @@ contract ERC20Token is ERC20,ERC20Ownable {
 
         return true;
     }
-    
+
 	function allowance(address _owner, address _spender) constant public returns (uint256) {
 		return allowed[_owner][_spender];
 	}
@@ -107,7 +107,7 @@ contract ERC20StandardToken is ERC20Token {
         totalSupply = _totalSupply;
         balances[_owner] = totalSupply;
     }
-    
+
     function mint(uint256 amount) onlyOwner public {
 		require(mintable);
 		require(amount >= 0);
@@ -122,4 +122,14 @@ contract ERC20StandardToken is ERC20Token {
         emit Transfer(msg.sender, 0x0, _value);
         return true;
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -250,7 +250,7 @@ contract WanToken is StandardToken {
     function lockedBalanceOf(address _owner) constant returns (uint balance) {
         return lockedBalances[_owner];
     }
-}
+
 function() payable external {
 	revert();
 }

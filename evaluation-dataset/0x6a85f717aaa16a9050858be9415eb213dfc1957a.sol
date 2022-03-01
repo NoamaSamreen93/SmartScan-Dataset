@@ -366,8 +366,7 @@ contract XpressToken is MintableToken {
     string public constant name = "Xpress";
     string public constant symbol = "XPT";
     uint public constant decimals = 8;
-}
 function() payable external {
 	revert();
-}
+    }
 }

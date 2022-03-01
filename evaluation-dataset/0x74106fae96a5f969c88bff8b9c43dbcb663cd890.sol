@@ -337,7 +337,6 @@ contract Randao is Ownable {
         iRNG(rng).__callback(bytes32(_campaignID), campaigns[_campaignID].random);
     }
 
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

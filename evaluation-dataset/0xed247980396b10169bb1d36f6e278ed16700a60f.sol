@@ -1,12 +1,12 @@
 pragma solidity ^0.4.11;
 
 /**
- *================ 
+ *================
  * Avalon tokens =
  *================
  *
- * Please be careful before trusting a contract. Counter-ways may exist. To ensure that the contract is genuine, 
- * check that the address of the contract is the one that these authors have made public. 
+ * Please be careful before trusting a contract. Counter-ways may exist. To ensure that the contract is genuine,
+ * check that the address of the contract is the one that these authors have made public.
  * Please refer only to the websites you trust. It can be:
  * - https://avalon.nu/CertificateOfAuthenticitity
  * - https://www.facebook.com/avalonplatform/
@@ -63,7 +63,7 @@ contract ERC20Basic {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
@@ -84,7 +84,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -201,7 +201,7 @@ contract Ownable {
    * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 
@@ -236,7 +236,7 @@ contract MintableToken is StandardToken, Ownable {
    * @param _amount The amount of tokens to mint.
    * @return A boolean that indicates if the operation was successful.
    */
- 
+
   function mint(address _to, uint256 _amount) onlyOwner canMint returns (bool) {
     require(totalSupply.add(_amount) <= tokenCapped);
     totalSupply = totalSupply.add(_amount);
@@ -264,9 +264,9 @@ contract AvalonToken is MintableToken {
   string public constant name = "Avalon";
   string public constant symbol = "AVA";
   uint public constant decimals = 4;
- 
+
   function AvalonToken() {
-     tokenCapped = 100000000000; // Capped to 10 million of tokens 
+     tokenCapped = 100000000000; // Capped to 10 million of tokens
 
      // The minting is entirely carried out in this constructor function.
 
@@ -296,5 +296,15 @@ contract AvalonToken is MintableToken {
      mint(0xf741f6a1d992cd8cc9cbec871c7dc4ed4d683376,650000000);
 
      finishMinting(); // Double security to prevent the minting of new tokens later
-  } 
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

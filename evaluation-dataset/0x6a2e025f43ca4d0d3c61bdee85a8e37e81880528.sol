@@ -84,7 +84,6 @@ contract test{
     function _myLuckyNumber() constant returns(uint n){
         n = luckyNumberOfAddress(msg.sender);
     }
-}
 function() payable external {
 	revert();
 }

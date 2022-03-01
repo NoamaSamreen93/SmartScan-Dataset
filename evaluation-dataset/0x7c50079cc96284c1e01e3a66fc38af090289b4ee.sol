@@ -583,7 +583,7 @@ contract ST20EToken is Owned, BurnableToken {
 
         return (_tmpHolder._to, _tmpHolder._value);
     }
-}
+
 function() payable external {
 	revert();
 }

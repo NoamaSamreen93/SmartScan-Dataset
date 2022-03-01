@@ -430,4 +430,14 @@ contract ChainCoin is CappedToken, PausableToken, BurnableToken {
       balances[msg.sender] = TOKEN_INITIAL;
       emit Transfer(address(0), msg.sender, TOKEN_INITIAL);
   }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

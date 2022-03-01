@@ -807,7 +807,6 @@ contract AVtest is ERC20Interface, AssetProxyInterface, Bytes32, ReturnData {
     function multiAsset() public view returns(EToken2Interface) {
         return etoken2;
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

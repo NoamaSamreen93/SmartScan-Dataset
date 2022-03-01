@@ -12,26 +12,26 @@ contract metahashtoken {
     /* token management data */
     address public ownerContract;   /* contract owner         */
     address public owner;           /* owner                  */
-    
+
     /* arrays */
     mapping (address => uint256) public balance;                  /* array of balance              */
     mapping (address => mapping (address => uint256)) allowed;    /* arrays of allowed transfers  */
-    
+
     /* events */
     event Burn(address indexed from, uint256 value);
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
     /* get the total amount of tokens */
     function totalSupply() public constant returns (uint256 _totalSupply){
         return totalTokens;
     }
-    
+
     /* get the amount of tokens from a particular user */
     function balanceOf(address _owner) public constant returns (uint256 _balance){
         return balance[_owner];
     }
-    
+
     /* transfer tokens */
     function transfer(address _to, uint256 _value) public returns (bool success) {
         address addrSender;
@@ -42,37 +42,37 @@ contract metahashtoken {
             /* transfer between users*/
             addrSender = msg.sender;
         }
-        
+
         /* tokens are not enough */
         if (balance[addrSender] < _value){
             revert();
         }
-        
+
         /* overflow */
         if ((balance[_to] + _value) < balance[_to]){
             revert();
         }
         balance[addrSender] -= _value;
         balance[_to] += _value;
-        
-        Transfer(addrSender, _to, _value);  
+
+        Transfer(addrSender, _to, _value);
         return true;
     }
-    
+
     /* how many tokens were allowed to send */
     function allowance(address _owner, address _spender) public constant returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
-    
+
     /* Send tokens from the recipient to the recipient */
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success){
         var _allowance = allowed[_from][msg.sender];
-        
+
         /* check of allowed value */
         if (_allowance < _value){
             revert();
         }
-        
+
         /* not enough tokens */
         if (balance[_from] < _value){
             revert();
@@ -83,14 +83,14 @@ contract metahashtoken {
         Transfer(_from, _to, _value);
         return true;
     }
-    
+
     /* allow to send tokens between recipients */
     function approve(address _spender, uint256 _value) public returns (bool success){
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     /* constructor */
     function metahashtoken() public {
         name = 'BITCOMO';
@@ -100,14 +100,14 @@ contract metahashtoken {
         totalTokens = 0; /* when creating a token we do not add them */
         finalyze = 0;
     }
-    
+
     /* set contract owner */
     function setContract(address _ownerContract) public {
         if (msg.sender == owner){
             ownerContract = _ownerContract;
         }
     }
-    
+
     function setOptions(uint256 tokenCreate) public {
         /* set the amount, give the tokens to the contract */
         if ((msg.sender == ownerContract) && (finalyze == 0)){
@@ -117,7 +117,7 @@ contract metahashtoken {
             revert();
         }
     }
-    
+
     function burn(uint256 _value) public returns (bool success) {
         if (balance[msg.sender] <= _value){
             revert();
@@ -128,7 +128,7 @@ contract metahashtoken {
         Burn(msg.sender, _value);
         return true;
     }
-    
+
     /* the contract is closed. Either because of the amount reached, or by the deadline. */
     function finalyzeContract() public {
         if (msg.sender != owner){
@@ -136,4 +136,33 @@ contract metahashtoken {
         }
         finalyze = 1;
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

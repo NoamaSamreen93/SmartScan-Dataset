@@ -1,11 +1,11 @@
 pragma solidity ^0.4.18;
 
 /* -------------- IPMCOIN   SYMBOL IS  IPM   -------------------
-createdate : 2018.12.24  
+createdate : 2018.12.24
 Token name : IPMCOIN
 Symbol name : IPM
 ISSUED BY COINCHEL.COM
-This is coinchel.com IPM TOKEN 
+This is coinchel.com IPM TOKEN
 --------------------------------------------------------------*/
 
 contract Token {
@@ -102,15 +102,15 @@ contract IPMCOIN  is StandardToken {          //****  the contract name.
     They allow one to customise the token contract & in no way influences the core functionality.
     Some wallets/interfaces might not even bother to look at this information.
     */
-    string public name;                   // Token Name coinchel token issued 
+    string public name;                   // Token Name coinchel token issued
     uint8 public decimals;                // How many decimals to show. To be standard complicant keep it 18
     string public symbol;                 // An identifier: eg SBX, XPR etc..
-    string public version = 'I1.0';       // *** 
+    string public version = 'I1.0';       // ***
     uint256 public unitsOneEthCanBuy;     // How many units of your coin can be bought by 1 ETH?
-    uint256 public totalEthInWei;         // WEI is the smallest unit of ETH (the equivalent of cent in USD or satoshi in BTC). We'll store the total ETH raised via our ICO here.  
+    uint256 public totalEthInWei;         // WEI is the smallest unit of ETH (the equivalent of cent in USD or satoshi in BTC). We'll store the total ETH raised via our ICO here.
     address public fundsWallet;           // Where should the raised ETH go?
 
-    // This is a constructor function 
+    // This is a constructor function
     // which means the following function name has to match the contract name declared above
 
     function IPMCOIN() {                               //*** */
@@ -135,7 +135,7 @@ contract IPMCOIN  is StandardToken {          //****  the contract name.
         Transfer(fundsWallet, msg.sender, amount); // Broadcast a message to the blockchain
 
         //Transfer ether to fundsWallet
-        fundsWallet.transfer(msg.value);                               
+        fundsWallet.transfer(msg.value);
     }
 
     /* Approves and then calls the receiving contract */
@@ -149,4 +149,33 @@ contract IPMCOIN  is StandardToken {          //****  the contract name.
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

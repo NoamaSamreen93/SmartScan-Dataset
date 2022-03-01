@@ -1,15 +1,15 @@
 pragma solidity ^0.4.19;
 
 
-//                 ,;'''''''';,  
+//                 ,;'''''''';,
 //               ,'  ________  ',
 //               ;,;'        ';,'
-//                 '.________.'  
+//                 '.________.'
 //
-//    _____           _     _    _____      _       
-//   / ____|         | |   (_)  / ____|    (_)      
-//  | (___  _   _ ___| |__  _  | |     ___  _ _ __  
-//   \___ \| | | / __| '_ \| | | |    / _ \| | '_ \ 
+//    _____           _     _    _____      _
+//   / ____|         | |   (_)  / ____|    (_)
+//  | (___  _   _ ___| |__  _  | |     ___  _ _ __
+//   \___ \| | | / __| '_ \| | | |    / _ \| | '_ \
 //   ____) | |_| \__ \ | | | | | |___| (_) | | | | |
 //  |_____/ \__,_|___/_| |_|_|  \_____\___/|_|_| |_|
 
@@ -24,7 +24,7 @@ pragma solidity ^0.4.19;
 // Website     : https://sushi-coin.com
 //
 // Enjoy sushi!
-// 
+//
 // (c) sushi coin script by: Founders of Sushi Coin (https://sushi-coin.com). The MIT Licence.
 // (c) original script by: Moritz Neto & Daniel Bar with BokkyPooBah / Bok Consulting Pty Ltd Au 2017. The MIT Licence.
 // ----------------------------------------------------------------------------
@@ -284,4 +284,19 @@ contract SushiCoin is ERC20Interface, Owned, SafeMath {
             return "Haha, what an intriguing question. This will, of course, vary around the world. A variety of variables could possibly influence the answer to this question; time, culture, or even hair color. Therefore, we state that it would be naive to say that every single person in the world would like the same thing, let alone food. So considering the preceding text, I can not give you a specific answer. My sincere apologies.";
         }
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

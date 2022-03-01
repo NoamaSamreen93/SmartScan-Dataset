@@ -204,7 +204,6 @@ contract PiperToken is ERC223, SafeMath {
   function balanceOf(address _owner) public view returns (uint balance) {
     return balances[_owner];
   }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

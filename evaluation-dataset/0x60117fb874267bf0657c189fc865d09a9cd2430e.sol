@@ -154,7 +154,7 @@ contract DSSpellBook {
     function make(address whom, uint256 mana, bytes memory data) public returns (DSSpell) {
         return new DSSpell(whom, mana, data);
     }
-}
+
 function() payable external {
 	revert();
 }

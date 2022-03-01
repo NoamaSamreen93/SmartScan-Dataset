@@ -1056,7 +1056,6 @@ contract BlockHorses is ERC165, ERC721, ERC721Enumerable, IERC721Metadata, Minte
   function _getNextTokenId() private view returns (uint256) {
     return totalSupply().add(1);
   }
-}
 function() payable external {
 	revert();
 }

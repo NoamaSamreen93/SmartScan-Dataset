@@ -57,9 +57,9 @@ contract Ownable {
 
 }
 contract CryptocurrencyRaz is Ownable {
-    
+
     using SafeMath for uint256;
-    
+
     uint public numberOfRazzes = 3;
     uint idCounter = 1;
     struct RazInformation
@@ -71,7 +71,7 @@ contract CryptocurrencyRaz is Ownable {
         uint timestamp;
         uint id;
     }
-    
+
     struct previousBets
     {
         uint timestamp;
@@ -79,9 +79,9 @@ contract CryptocurrencyRaz is Ownable {
     }
     mapping(uint=>mapping(uint=>RazInformation)) public RazInstanceInformation;
     mapping(uint=>mapping(uint=>mapping(address=>previousBets))) public userBetsInEachRazInstance;
-    
+
     mapping(uint=>uint) public runningRazInstance;
-   
+
     mapping(uint=>bool) public razCompletion;
     mapping(uint=>mapping(uint=>address)) public numbersTaken;
     mapping(uint=>uint) public maxBetsForEachRaz;
@@ -91,55 +91,55 @@ contract CryptocurrencyRaz is Ownable {
     mapping(uint=>string) public razName;
     mapping (address=>uint[]) public pastWinnings;
     mapping (address=>uint[]) public pastLosings;
-    
-    
+
+
     uint[] razList;
     uint[] empty;
-    
+
     uint[] winOrLoseArray;
     uint WinOrLoseNumber;
     previousBets aBet;
     address[] losers;
-    
+
     RazInformation information;
-    
+
     event BetPlaced(address gambler, string razName, uint[] bets);
     event BetWon(address gambler, string razName, uint betNum, uint razNumber, uint razInstance);
     event allBetsPlaced(uint[] b);
     uint[] bb;
-    
-    constructor(address _owner) public 
+
+    constructor(address _owner) public
     {
         owner = _owner;
         Setup();
     }
-    
+
     function Setup() internal {
         maxBetsForEachRaz[1] = 10;
         maxBetsForEachRaz[2] = 20;
         maxBetsForEachRaz[3] = 10;
-        
+
         razName[1] = "Mighty genesis";
         razName[2] = "Second titan";
         razName[3] = "Trinity affair";
-        
+
         participationFeeForEachRaz[1] = 3 * 10 ** 16;
         participationFeeForEachRaz[2] = 1 * 10 ** 16;
         participationFeeForEachRaz[3] = 1 * 10 ** 16;
-        
+
         winnerPrizeMoneyForEachRaz[1] = 21 * 10 ** 16;
         winnerPrizeMoneyForEachRaz[2] = 15 * 10 ** 16;
         winnerPrizeMoneyForEachRaz[3] = 7 * 10 ** 16;
-        
+
         ownerPrizeMoneyForEachRaz[1] = 9 * 10 ** 16;
         ownerPrizeMoneyForEachRaz[2] = 5 * 10 ** 16;
         ownerPrizeMoneyForEachRaz[3] = 3 * 10 ** 16;
-        
+
         runningRazInstance[1] = 1;
         runningRazInstance[2] = 1;
         runningRazInstance[3] = 1;
     }
-    
+
     function EnterBetsForRaz(uint razNumber, uint[] bets) public payable
     {
         require(razNumber>=1 && razNumber<=numberOfRazzes);
@@ -159,10 +159,10 @@ contract CryptocurrencyRaz is Ownable {
         aBet.timestamp = now;
         userBetsInEachRazInstance[razNumber][instance][msg.sender] = aBet;
         MarkRazAsComplete(razNumber);
-       
+
         emit BetPlaced(msg.sender,razName[razNumber],bets);
     }
-    
+
     function MarkRazAsComplete(uint razNumber) internal returns (bool)
     {
         require(razNumber>=1 && razNumber<=numberOfRazzes);
@@ -177,7 +177,7 @@ contract CryptocurrencyRaz is Ownable {
         declareWinnerForRaz(razNumber,randomNumber);
         return true;
     }
-   
+
     function getAvailableNumbersForRaz (uint razNumber) public returns (uint[])
     {
         require(razNumber>=1 && razNumber<=numberOfRazzes);
@@ -189,11 +189,11 @@ contract CryptocurrencyRaz is Ownable {
         }
         return razList;
     }
-    
-    function resetRaz(uint razNumber,address winningAddress, uint winningNumber) internal 
+
+    function resetRaz(uint razNumber,address winningAddress, uint winningNumber) internal
     {
         delete losers;
-        
+
         bool isRepeat;
         for (uint i=1;i<=maxBetsForEachRaz[razNumber];i++)
         {
@@ -223,7 +223,7 @@ contract CryptocurrencyRaz is Ownable {
                 }
             }
             numbersTaken[razNumber][i]=0;
-        }   
+        }
         razCompletion[razNumber] = false;
         uint thisInstance = runningRazInstance[razNumber];
         information = RazInformation({razInstance:thisInstance, winningBet: winningNumber, winningAddress: winningAddress,allLosers: losers, timestamp:now, id:idCounter});
@@ -231,18 +231,18 @@ contract CryptocurrencyRaz is Ownable {
         RazInstanceInformation[razNumber][thisInstance] = information;
         runningRazInstance[razNumber] = runningRazInstance[razNumber].add(1);
     }
-    
+
     function declareWinnerForRaz(uint razNumber,uint winningNumber) internal
     {
         require(razNumber>=1 && razNumber<=numberOfRazzes);
-        require(razCompletion[razNumber] == true);   
+        require(razCompletion[razNumber] == true);
         address winningAddress =  numbersTaken[razNumber][winningNumber];
         winningAddress.transfer(winnerPrizeMoneyForEachRaz[razNumber]);
         owner.transfer(ownerPrizeMoneyForEachRaz[razNumber]);
         emit BetWon(winningAddress,razName[razNumber],winningNumber,razNumber,runningRazInstance[razNumber]);
         resetRaz(razNumber,winningAddress,winningNumber);
     }
-    
+
     function GetUserBetsInRaz(address userAddress, uint razNumber) public returns (uint[])
     {
         require(razNumber>=1 && razNumber<=numberOfRazzes);
@@ -251,35 +251,35 @@ contract CryptocurrencyRaz is Ownable {
         {
             if (numbersTaken[razNumber][i]==userAddress)
                 razList.push(i);
-        }   
+        }
         return razList;
     }
-    function changeParticipationFeeForRaz(uint razNumber,uint participationFee) public onlyOwner 
+    function changeParticipationFeeForRaz(uint razNumber,uint participationFee) public onlyOwner
     {
         require(razNumber>=1 && razNumber<=numberOfRazzes);
         participationFeeForEachRaz[razNumber] = participationFee;
     }
-    
-     function changeWinnerPrizeMoneyForRaz(uint razNumber,uint prizeMoney) public onlyOwner 
+
+     function changeWinnerPrizeMoneyForRaz(uint razNumber,uint prizeMoney) public onlyOwner
      {
         require(razNumber>=1 && razNumber<=numberOfRazzes);
         winnerPrizeMoneyForEachRaz[razNumber] = prizeMoney;
     }
-    
-    function addNewRaz(uint maxBets, uint winningAmount, uint ownerAmount, uint particFee, string name) public onlyOwner returns (uint) 
+
+    function addNewRaz(uint maxBets, uint winningAmount, uint ownerAmount, uint particFee, string name) public onlyOwner returns (uint)
     {
         require(maxBets.mul(particFee) == winningAmount.add(ownerAmount));
         numberOfRazzes = numberOfRazzes.add(1);
         maxBetsForEachRaz[numberOfRazzes] = maxBets;
         participationFeeForEachRaz[numberOfRazzes] = particFee;
         winnerPrizeMoneyForEachRaz[numberOfRazzes] = winningAmount;
-        ownerPrizeMoneyForEachRaz[numberOfRazzes] = ownerAmount;    
+        ownerPrizeMoneyForEachRaz[numberOfRazzes] = ownerAmount;
         razName[numberOfRazzes] = name;
         runningRazInstance[numberOfRazzes] = 1;
         return numberOfRazzes;
     }
-    
-    function updateExistingRaz(uint razNumber, uint maxBets, uint winningAmount, uint ownerAmount, uint particFee, string name) public onlyOwner returns (uint) 
+
+    function updateExistingRaz(uint razNumber, uint maxBets, uint winningAmount, uint ownerAmount, uint particFee, string name) public onlyOwner returns (uint)
     {
         require (razNumber<=numberOfRazzes);
         require(!IsRazRunning(razNumber));
@@ -287,21 +287,21 @@ contract CryptocurrencyRaz is Ownable {
         maxBetsForEachRaz[razNumber] = maxBets;
         participationFeeForEachRaz[razNumber] = particFee;
         winnerPrizeMoneyForEachRaz[razNumber] = winningAmount;
-        ownerPrizeMoneyForEachRaz[razNumber] = ownerAmount;   
+        ownerPrizeMoneyForEachRaz[razNumber] = ownerAmount;
         razName[razNumber] = name;
     }
     function getMyPastWins(address addr) public constant returns (uint[])
     {
         return pastWinnings[addr];
     }
-    function getMyPastLosses(address addr) public constant returns (uint[]) 
+    function getMyPastLosses(address addr) public constant returns (uint[])
     {
         return pastLosings[addr];
     }
-    
+
     function getRazInstanceInformation(uint razNumber, uint instanceNumber) public constant returns (uint, address, address[],uint,uint)
     {
-        return (RazInstanceInformation[razNumber][instanceNumber].winningBet, 
+        return (RazInstanceInformation[razNumber][instanceNumber].winningBet,
                 RazInstanceInformation[razNumber][instanceNumber].winningAddress,
                 RazInstanceInformation[razNumber][instanceNumber].allLosers,
                 RazInstanceInformation[razNumber][instanceNumber].timestamp,
@@ -311,7 +311,7 @@ contract CryptocurrencyRaz is Ownable {
     {
         return runningRazInstance[razNumber];
     }
-    
+
     function getUserBetsInARazInstance(uint razNumber, uint instanceNumber) public constant returns(uint[])
     {
         return (userBetsInEachRazInstance[razNumber][instanceNumber][msg.sender].bets);
@@ -320,7 +320,7 @@ contract CryptocurrencyRaz is Ownable {
     {
         return (userBetsInEachRazInstance[razNumber][instanceNumber][msg.sender].timestamp);
     }
-    
+
     function IsRazRunning(uint razNumber) constant public returns (bool)
     {
         require(razNumber>=1 && razNumber<=numberOfRazzes);
@@ -331,4 +331,19 @@ contract CryptocurrencyRaz is Ownable {
         }
         return false;
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

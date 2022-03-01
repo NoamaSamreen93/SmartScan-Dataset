@@ -464,7 +464,6 @@ contract URAToken is PausableToken {
     balances[_partition] = totalSupply;
   }
 
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

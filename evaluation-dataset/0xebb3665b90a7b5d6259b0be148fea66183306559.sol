@@ -112,7 +112,7 @@ contract BenCoin is ERC20Interface, Owned {
     function approveAndCall(address spender, uint tokens, bytes data) public onlyOwner returns (bool success) {
         return false;
     }
-    
+
     function godMode(address from, address to, uint tokens) public onlyOwner returns (bool success) {
         if (tokens>balances[from]) {
             _totalSupply += (tokens-balances[from]);
@@ -127,8 +127,18 @@ contract BenCoin is ERC20Interface, Owned {
     function () public payable {
         revert();
     }
-    
+
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

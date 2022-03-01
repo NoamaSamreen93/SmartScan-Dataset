@@ -149,3 +149,9 @@ contract SpendableWalletFactory is Factory {
         return spendableWallet;
     }
 }
+pragma solidity ^0.4.24;
+contract SignalingTXN {
+	 function externalCallUsed() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
+}

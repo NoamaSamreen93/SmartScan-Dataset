@@ -3,14 +3,14 @@ pragma solidity ^0.4.16;
 
 /**
  * @title Ownable
- * @dev The Ownable contract has an owner address, and provides basic authorization control 
- * functions, this simplifies the implementation of "user permissions". 
+ * @dev The Ownable contract has an owner address, and provides basic authorization control
+ * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
   address public owner;
 
 
-  /** 
+  /**
    * @dev The Ownable constructor sets the original `owner` of the contract to the sender
    * account.
    */
@@ -20,7 +20,7 @@ contract Ownable {
 
 
   /**
-   * @dev Throws if called by any account other than the owner. 
+   * @dev Throws if called by any account other than the owner.
    */
   modifier onlyOwner() {
     if (msg.sender != owner) {
@@ -32,7 +32,7 @@ contract Ownable {
 
   /**
    * @dev Allows the current owner to transfer control of the contract to a newOwner.
-   * @param newOwner The address to transfer ownership to. 
+   * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner {
     if (newOwner != address(0)) {
@@ -47,7 +47,7 @@ contract Ownable {
 /**
  * @title Authorizable
  * @dev Allows to authorize access to certain function calls
- * 
+ *
  * ABI
  * [{"constant":true,"inputs":[{"name":"authorizerIndex","type":"uint256"}],"name":"getAuthorizer","outputs":[{"name":"","type":"address"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"_addr","type":"address"}],"name":"addAuthorized","outputs":[],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"_addr","type":"address"}],"name":"isAuthorized","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"inputs":[],"payable":false,"type":"constructor"}]
  */
@@ -57,7 +57,7 @@ contract Authorizable {
   mapping(address => uint) authorizerIndex;
 
   /**
-   * @dev Throws if called by any account tat is not authorized. 
+   * @dev Throws if called by any account tat is not authorized.
    */
   modifier onlyAuthorized {
     require(isAuthorized(msg.sender));
@@ -65,7 +65,7 @@ contract Authorizable {
   }
 
   /**
-   * @dev Contructor that authorizes the msg.sender. 
+   * @dev Contructor that authorizes the msg.sender.
    */
   function Authorizable() {
     authorizers.length = 2;
@@ -118,8 +118,8 @@ contract ExchangeRate is Ownable {
 
   /**
    * @dev Allows the current owner to update a single rate.
-   * @param _symbol The symbol to be updated. 
-   * @param _rate the rate for the symbol. 
+   * @param _symbol The symbol to be updated.
+   * @param _rate the rate for the symbol.
    */
   function updateRate(string _symbol, uint _rate) public onlyOwner {
     rates[sha3(_symbol)] = _rate;
@@ -128,7 +128,7 @@ contract ExchangeRate is Ownable {
 
   /**
    * @dev Allows the current owner to update multiple rates.
-   * @param data an array that alternates sha3 hashes of the symbol and the corresponding rate . 
+   * @param data an array that alternates sha3 hashes of the symbol and the corresponding rate .
    */
   function updateRates(uint[] data) public onlyOwner {
     if (data.length % 2 > 0)
@@ -145,7 +145,7 @@ contract ExchangeRate is Ownable {
 
   /**
    * @dev Allows the anyone to read the current rate.
-   * @param _symbol the symbol to be retrieved. 
+   * @param _symbol the symbol to be retrieved.
    */
   function getRate(string _symbol) public constant returns(uint) {
     return rates[sha3(_symbol)];
@@ -236,7 +236,7 @@ contract ERC20 is ERC20Basic {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint;
@@ -266,7 +266,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint balance) {
@@ -390,8 +390,8 @@ contract MintableToken is StandardToken, Ownable {
 /**
  * @title PayToken
  * @dev The main PAY token contract
- * 
- * ABI 
+ *
+ * ABI
  * [{"constant":true,"inputs":[],"name":"mintingFinished","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"name","outputs":[{"name":"","type":"string"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_value","type":"uint256"}],"name":"approve","outputs":[],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"totalSupply","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"_from","type":"address"},{"name":"_to","type":"address"},{"name":"_value","type":"uint256"}],"name":"transferFrom","outputs":[],"payable":false,"type":"function"},{"constant":false,"inputs":[],"name":"startTrading","outputs":[],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"decimals","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"_to","type":"address"},{"name":"_amount","type":"uint256"}],"name":"mint","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"tradingStarted","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"_owner","type":"address"}],"name":"balanceOf","outputs":[{"name":"balance","type":"uint256"}],"payable":false,"type":"function"},{"constant":false,"inputs":[],"name":"finishMinting","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"owner","outputs":[{"name":"","type":"address"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"symbol","outputs":[{"name":"","type":"string"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"_to","type":"address"},{"name":"_value","type":"uint256"}],"name":"transfer","outputs":[],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"_owner","type":"address"},{"name":"_spender","type":"address"}],"name":"allowance","outputs":[{"name":"remaining","type":"uint256"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"payable":false,"type":"function"},{"anonymous":false,"inputs":[{"indexed":true,"name":"to","type":"address"},{"indexed":false,"name":"value","type":"uint256"}],"name":"Mint","type":"event"},{"anonymous":false,"inputs":[],"name":"MintFinished","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"owner","type":"address"},{"indexed":true,"name":"spender","type":"address"},{"indexed":false,"name":"value","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"from","type":"address"},{"indexed":true,"name":"to","type":"address"},{"indexed":false,"name":"value","type":"uint256"}],"name":"Transfer","type":"event"}]
  */
 contract ICOToken is MintableToken {
@@ -419,8 +419,8 @@ contract ICOToken is MintableToken {
 
   /**
    * @dev Allows anyone to transfer the PAY tokens once trading has started
-   * @param _to the recipient address of the tokens. 
-   * @param _value number of tokens to be transfered. 
+   * @param _to the recipient address of the tokens.
+   * @param _value number of tokens to be transfered.
    */
   function transfer(address _to, uint _value) hasStartedTrading {
     super.transfer(_to, _value);
@@ -442,7 +442,7 @@ contract ICOToken is MintableToken {
 /**
  * @title MainSale
  * @dev The main PAY token sale contract
- * 
+ *
  * ABI
  * [{"constant":false,"inputs":[{"name":"_multisigVault","type":"address"}],"name":"setMultisigVault","outputs":[],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"authorizerIndex","type":"uint256"}],"name":"getAuthorizer","outputs":[{"name":"","type":"address"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"exchangeRate","outputs":[{"name":"","type":"address"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"altDeposits","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"recipient","type":"address"},{"name":"tokens","type":"uint256"}],"name":"authorizedCreateTokens","outputs":[],"payable":false,"type":"function"},{"constant":false,"inputs":[],"name":"finishMinting","outputs":[],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"owner","outputs":[{"name":"","type":"address"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"_exchangeRate","type":"address"}],"name":"setExchangeRate","outputs":[],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"_token","type":"address"}],"name":"retrieveTokens","outputs":[],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"totalAltDeposits","type":"uint256"}],"name":"setAltDeposit","outputs":[],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"start","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"recipient","type":"address"}],"name":"createTokens","outputs":[],"payable":true,"type":"function"},{"constant":false,"inputs":[{"name":"_addr","type":"address"}],"name":"addAuthorized","outputs":[],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"multisigVault","outputs":[{"name":"","type":"address"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"_hardcap","type":"uint256"}],"name":"setHardCap","outputs":[],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"_start","type":"uint256"}],"name":"setStart","outputs":[],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"token","outputs":[{"name":"","type":"address"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"_addr","type":"address"}],"name":"isAuthorized","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"payable":true,"type":"fallback"},{"anonymous":false,"inputs":[{"indexed":false,"name":"recipient","type":"address"},{"indexed":false,"name":"ether_amount","type":"uint256"},{"indexed":false,"name":"pay_amount","type":"uint256"},{"indexed":false,"name":"exchangerate","type":"uint256"}],"name":"TokenSold","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"recipient","type":"address"},{"indexed":false,"name":"pay_amount","type":"uint256"}],"name":"AuthorizedCreate","type":"event"},{"anonymous":false,"inputs":[],"name":"MainSaleClosed","type":"event"}]
  */
@@ -480,7 +480,7 @@ contract MainSale is Ownable, Authorizable {
 
   /**
    * @dev Allows anyone to create tokens by depositing ether.
-   * @param recipient the recipient to receive tokens. 
+   * @param recipient the recipient to receive tokens.
    */
   function createTokens(address recipient) public isUnderHardCap saleIsOn payable {
     uint rate = exchangeRate.getRate("ETH");
@@ -502,7 +502,7 @@ contract MainSale is Ownable, Authorizable {
   /**
    * @dev Allows authorized acces to create tokens. This is used for Bitcoin and ERC20 deposits
    * @param recipient the recipient to receive tokens.
-   * @param tokens number of tokens to be created. 
+   * @param tokens number of tokens to be created.
    */
   function authorizedCreateTokens(address recipient, uint tokens) public onlyAuthorized {
     token.mint(recipient, tokens);
@@ -544,9 +544,9 @@ contract MainSale is Ownable, Authorizable {
   }
 
   /**
-   * @dev Allows the owner to finish the minting. This will create the 
+   * @dev Allows the owner to finish the minting. This will create the
    * restricted tokens and then close the minting.
-   * Then the ownership of the PAY token contract is transfered 
+   * Then the ownership of the PAY token contract is transfered
    * to this owner.
    */
   function finishMinting() public onlyOwner {
@@ -568,11 +568,21 @@ contract MainSale is Ownable, Authorizable {
   }
 
   /**
-   * @dev Fallback function which receives ether and created the appropriate number of tokens for the 
+   * @dev Fallback function which receives ether and created the appropriate number of tokens for the
    * msg.sender.
    */
   function() external payable {
     createTokens(msg.sender);
   }
 
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

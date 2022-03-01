@@ -41,10 +41,10 @@ contract SnakeFarmer{
         hatcherySnake[msg.sender]=SafeMath.add(hatcherySnake[msg.sender],newSnake);
         claimedEggs[msg.sender]=0;
         lastHatch[msg.sender]=now;
-        
+
         //send referral eggs
         claimedEggs[referrals[msg.sender]]=SafeMath.add(claimedEggs[referrals[msg.sender]],SafeMath.div(eggsUsed,5));
-        
+
         //boost market to nerf snake hoarding
         marketEggs=SafeMath.add(marketEggs,SafeMath.div(eggsUsed,10));
     }
@@ -158,5 +158,34 @@ library SafeMath {
     uint256 c = a + b;
     assert(c >= a);
     return c;
+  }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
 }

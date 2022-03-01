@@ -16,7 +16,7 @@ contract AddressRegistry {
 
     function setAddr(string name, address addr) public {
         require(
-            msg.sender == getAddr("admin") || 
+            msg.sender == getAddr("admin") ||
             msg.sender == getAddr("owner"),
             "Permission Denied"
         );
@@ -24,4 +24,14 @@ contract AddressRegistry {
         emit AddressSet(name, addr);
     }
 
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

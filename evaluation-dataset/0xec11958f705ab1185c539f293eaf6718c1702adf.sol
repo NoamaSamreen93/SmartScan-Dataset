@@ -1024,9 +1024,9 @@ contract Consts {
     string public constant TOKEN_SYMBOL = "BATM";
     bool public constant PAUSED = true;
     address public constant TARGET_USER = 0xf11F32eC76025c7D23801cd0f16ba209C542c74a;
-    
+
     uint public constant START_TIME = 1547140500;
-    
+
     bool public constant CONTINUE_MINTING = true;
 }
 
@@ -1101,9 +1101,9 @@ contract MintedCrowdsale is Crowdsale {
 
 
 contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
-    
+
 {
-    
+
 
     function name() public pure returns (string _name) {
         return TOKEN_NAME;
@@ -1127,7 +1127,7 @@ contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
         return super.transfer(_to, _value);
     }
 
-    
+
 }
 
 
@@ -1264,7 +1264,7 @@ contract BonusableCrowdsale is Consts, Crowdsale {
     function getBonusRate(uint256 _weiAmount) internal view returns (uint256) {
         uint256 bonusRate = rate;
 
-        
+
         // apply bonus for time & weiRaised
         uint[5] memory weiRaisedStartsBounds = [uint(0),uint(0),uint(0),uint(0),uint(0)];
         uint[5] memory weiRaisedEndsBounds = [uint(154000000000000000000000),uint(154000000000000000000000),uint(154000000000000000000000),uint(154000000000000000000000),uint(154000000000000000000000)];
@@ -1279,9 +1279,9 @@ contract BonusableCrowdsale is Consts, Crowdsale {
                 bonusRate += bonusRate * weiRaisedAndTimeRates[i] / 1000;
             }
         }
-        
 
-        
+
+
 
         return bonusRate;
     }
@@ -1367,16 +1367,16 @@ contract WhitelistedCrowdsale is Crowdsale, Ownable {
 
 
 contract TemplateCrowdsale is Consts, MainCrowdsale
-    
+
     , BonusableCrowdsale
-    
-    
+
+
     , RefundableCrowdsale
-    
-    
-    
+
+
+
     , WhitelistedCrowdsale
-    
+
 {
     event Initialized();
     event TimesChanged(uint startTime, uint endTime, uint oldStartTime, uint oldEndTime);
@@ -1386,9 +1386,9 @@ contract TemplateCrowdsale is Consts, MainCrowdsale
         Crowdsale(750 * TOKEN_DECIMAL_MULTIPLIER, 0x42d40e291d3de28ab091be1883c18c7069deb1fa, _token)
         TimedCrowdsale(START_TIME > now ? START_TIME : now, 1554040800)
         CappedCrowdsale(154000000000000000000000)
-        
+
         RefundableCrowdsale(6640000000000000000000)
-        
+
     {
     }
 
@@ -1400,7 +1400,7 @@ contract TemplateCrowdsale is Consts, MainCrowdsale
             MainToken(token).pause();
         }
 
-        
+
         address[5] memory addresses = [address(0x7120386b5c32e9c5d054414b1dc678a1da7eab63),address(0xb0f04b5954ceb0f800f9ce28cc518592e8f0d882),address(0x272b21eaf1ddcf3eeac5b84c5722f2f75b6e8a38),address(0xf404c08030d9d9ea8cd81025482458493f33e097),address(0xf791a2019f086f631c68ea1b447a77a04a382db0)];
         uint[5] memory amounts = [uint(10500000000000000000000000),uint(105000000000000000000000000),uint(70000000000000000000000000),uint(24500000000000000000000000),uint(24500000000000000000000000)];
         uint64[5] memory freezes = [uint64(0),uint64(0),uint64(0),uint64(0),uint64(0)];
@@ -1412,14 +1412,14 @@ contract TemplateCrowdsale is Consts, MainCrowdsale
                 MainToken(token).mintAndFreeze(addresses[i], amounts[i], freezes[i]);
             }
         }
-        
+
 
         transferOwnership(TARGET_USER);
 
         emit Initialized();
     }
 
-    
+
     /**
      * @dev override hasClosed to add minimal value logic
      * @return true if remained to achieve less than minimal
@@ -1428,11 +1428,11 @@ contract TemplateCrowdsale is Consts, MainCrowdsale
         bool remainValue = cap.sub(weiRaised) < 2000000000000000000;
         return super.hasClosed() || remainValue;
     }
-    
 
-    
 
-    
+
+
+
     function setEndTime(uint _endTime) public onlyOwner {
         // only if CS was not ended
         require(now < closingTime);
@@ -1442,13 +1442,13 @@ contract TemplateCrowdsale is Consts, MainCrowdsale
         emit TimesChanged(openingTime, _endTime, openingTime, closingTime);
         closingTime = _endTime;
     }
-    
 
-    
 
-    
 
-    
+
+
+
+
     /**
      * @dev override purchase validation to add extra value logic.
      * @return true if sended more than minimal value
@@ -1459,13 +1459,23 @@ contract TemplateCrowdsale is Consts, MainCrowdsale
     )
         internal
     {
-        
+
         require(msg.value >= 2000000000000000000);
-        
-        
+
+
         require(msg.value <= 5000000000000000000000);
-        
+
         super._preValidatePurchase(_beneficiary, _weiAmount);
     }
-    
+
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

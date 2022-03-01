@@ -152,8 +152,8 @@ contract ELTWagerLedger is SafeMath {
   address public admin; //the admin address
 
   mapping (address => mapping (address => uint)) public tokens; //mapping of token addresses to mapping of account balances (token=0 means Ether)
-  
-  
+
+
   event Deposit(address token, address user, uint amount, uint balance);
   event Withdraw(address token, address user, uint amount, uint balance);
 
@@ -200,5 +200,15 @@ contract ELTWagerLedger is SafeMath {
 
   function balanceOf(address token, address user) constant returns (uint) {
     return tokens[token][user];
+  }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
 }

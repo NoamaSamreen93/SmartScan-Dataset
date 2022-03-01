@@ -60,7 +60,7 @@ contract Owned {
  */
 contract ArconexICO is ERC20Interface, Owned {
   using SafeMath for uint256;
-  string  public symbol; 
+  string  public symbol;
   string  public name;
   uint8   public decimals;
   uint256 public fundsRaised;
@@ -71,17 +71,17 @@ contract ArconexICO is ERC20Interface, Owned {
   uint internal _totalRemaining;
   address public wallet;
   bool internal distributionFinished;
-  
+
   mapping(address => uint) balances;
   mapping(address => mapping(address => uint)) allowed;
   mapping(address => bool) zeroInvestors;
   event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
-    
+
     modifier canDistribut {
         require(!distributionFinished);
         _;
     }
-  
+
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
@@ -95,7 +95,7 @@ contract ArconexICO is ERC20Interface, Owned {
         _allocateTokens();
         // send the reserve tokens to the creator of the contract
         balances[owner] = reserveTokens;
-        emit Transfer(address(0),owner, reserveTokens); 
+        emit Transfer(address(0),owner, reserveTokens);
         // make total remaining equal to saleTokens
         _totalRemaining = saleTokens;
         distributionFinished = false;
@@ -106,19 +106,19 @@ contract ArconexICO is ERC20Interface, Owned {
         saleTokens            = (_totalSupply.mul(95)).div(100) *10 **uint(decimals); // 95% of totalSupply
         TokenPrice            = "0.0000004 ETH";
     }
-    
+
     function () external payable {
         buyTokens(msg.sender);
     }
 
     function buyTokens(address _beneficiary) public payable canDistribut {
-    
+
         uint256 weiAmount = msg.value;
-    
+
         _preValidatePurchase(_beneficiary, weiAmount);
-        
+
         uint256 tokens = _getTokenAmount(_beneficiary, weiAmount);
-        
+
         fundsRaised = fundsRaised.add(weiAmount);
 
         _processPurchase(_beneficiary, tokens);
@@ -126,32 +126,32 @@ contract ArconexICO is ERC20Interface, Owned {
 
         _forwardFunds(msg.value);
     }
-    
+
     function _preValidatePurchase(address _beneficiary, uint256 _weiAmount) view internal{
         require(_beneficiary != address(0));
         if(_weiAmount == 0){
             require(!(zeroInvestors[_beneficiary]));
         }
     }
-  
+
     function _getTokenAmount(address _beneficiary, uint256 _weiAmount) internal returns (uint256) {
         if(_weiAmount == 0){
             zeroInvestors[_beneficiary] = true;
-            return 50e18; 
+            return 50e18;
         }
         else{
             uint256 rate = 2500000; //per wei
             return _weiAmount.mul(rate);
         }
     }
-    
+
     function _deliverTokens(address _beneficiary, uint256 _tokenAmount) internal {
         if(_totalRemaining != 0 && _totalRemaining >= _tokenAmount) {
             balances[_beneficiary] = balances[_beneficiary].add(_tokenAmount);
             emit Transfer(address(0),_beneficiary, _tokenAmount);
             _totalRemaining = _totalRemaining.sub(_tokenAmount);
         }
-        
+
         if(_totalRemaining <= 0) {
             distributionFinished = true;
         }
@@ -160,16 +160,16 @@ contract ArconexICO is ERC20Interface, Owned {
     function _processPurchase(address _beneficiary, uint256 _tokenAmount) internal {
         _deliverTokens(_beneficiary, _tokenAmount);
     }
-    
+
     function _forwardFunds(uint256 _amount) internal {
         wallet.transfer(_amount);
     }
-    
+
     /* ERC20Interface function's implementation */
     function totalSupply() public constant returns (uint){
        return _totalSupply* 10**uint(decimals);
     }
-    
+
     // ------------------------------------------------------------------------
     // Get the token balance for account `tokenOwner`
     // ------------------------------------------------------------------------
@@ -192,7 +192,7 @@ contract ArconexICO is ERC20Interface, Owned {
         emit Transfer(msg.sender,to,tokens);
         return true;
     }
-    
+
     // ------------------------------------------------------------------------
     // Token owner can approve for `spender` to transferFrom(...) `tokens`
     // from the token owner's account
@@ -205,7 +205,7 @@ contract ArconexICO is ERC20Interface, Owned {
 
     // ------------------------------------------------------------------------
     // Transfer `tokens` from the `from` account to the `to` account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the `from` account and
     // - From account must have sufficient balance to transfer
@@ -229,4 +229,33 @@ contract ArconexICO is ERC20Interface, Owned {
         return allowed[tokenOwner][spender];
     }
 
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

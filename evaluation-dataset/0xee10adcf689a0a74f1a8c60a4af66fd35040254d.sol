@@ -167,16 +167,16 @@ contract NEXT_Crowdsale is Pausable {
 
   // Amount of wei raised
   uint256 public weiRaised;
-  
+
   // Max amount of wei accepted in the crowdsale
   uint256 public cap;
-  
+
   // Min amount of wei an investor can send
   uint256 public minInvest;
-  
+
   // Crowdsale opening time
   uint256 public openingTime;
-  
+
   // Crowdsale closing time
   uint256 public closingTime;
 
@@ -202,12 +202,12 @@ contract NEXT_Crowdsale is Pausable {
     openingTime = 1535760000;  // Determined by start()
     closingTime = openingTime + duration;  // Determined by start()
   }
-  
+
   /**
    * @dev called by the owner to start the crowdsale
    */
   function start() public onlyOwner {
-    openingTime = now;       
+    openingTime = now;
     closingTime =  now + duration;
   }
 
@@ -292,15 +292,15 @@ contract NEXT_Crowdsale is Pausable {
   function _forwardFunds() internal {
     wallet.transfer(msg.value);
   }
-  
+
   /**
-   * @dev Checks whether the cap has been reached. 
+   * @dev Checks whether the cap has been reached.
    * @return Whether the cap was reached
    */
   function capReached() public view returns (bool) {
     return weiRaised >= cap;
   }
-  
+
   /**
    * @dev Checks whether the period in which the crowdsale is open has already elapsed.
    * @return Whether crowdsale period has elapsed
@@ -316,5 +316,15 @@ contract NEXT_Crowdsale is Pausable {
     uint256 unsold = token.balanceOf(this);
     token.transfer(owner, unsold);
   }
-    
+
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -262,7 +262,6 @@ contract Funding is StandardToken, Ownable {
 		balances[_reciever] = _balance;
 		totalSupply_ = _balance;
 	}
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

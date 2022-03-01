@@ -592,7 +592,7 @@ contract Consts {
     string constant TOKEN_SYMBOL = "GOLD";
     bool constant PAUSED = false;
     address constant TARGET_USER = 0x8f71659fb57E6C6Be3Ab563D0dD45101235ae762;
-    
+
     bool constant CONTINUE_MINTING = false;
 }
 
@@ -653,9 +653,9 @@ contract ERC223Token is ERC223Basic, BasicToken, FailingERC223Receiver {
 
 
 contract GOLD is Consts, FreezableMintableToken, BurnableToken, Pausable
-    
+
 {
-    
+
     event Initialized();
     bool public initialized = false;
 
@@ -672,7 +672,7 @@ contract GOLD is Consts, FreezableMintableToken, BurnableToken, Pausable
             pause();
         }
 
-        
+
         address[1] memory addresses = [address(0x8f71659fb57E6C6Be3Ab563D0dD45101235ae762)];
         uint[1] memory amounts = [uint(100000000000000000000000000)];
         uint64[1] memory freezes = [uint64(0)];
@@ -684,7 +684,7 @@ contract GOLD is Consts, FreezableMintableToken, BurnableToken, Pausable
                 mintAndFreeze(addresses[i], amounts[i], freezes[i]);
             }
         }
-        
+
 
         if (!CONTINUE_MINTING) {
             finishMinting();
@@ -692,7 +692,7 @@ contract GOLD is Consts, FreezableMintableToken, BurnableToken, Pausable
 
         Initialized();
     }
-    
+
 
     function name() pure public returns (string _name) {
         return TOKEN_NAME;
@@ -715,4 +715,14 @@ contract GOLD is Consts, FreezableMintableToken, BurnableToken, Pausable
         require(!paused);
         return super.transfer(_to, _value);
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

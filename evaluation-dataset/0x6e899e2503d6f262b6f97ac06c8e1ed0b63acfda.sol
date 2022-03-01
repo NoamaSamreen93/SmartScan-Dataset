@@ -180,7 +180,6 @@ contract TokenHolder is Ownable {
     function calculateVestedAmount() view internal returns (uint) {
         return now.sub(start).div(vestingInterval).mul(value);
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

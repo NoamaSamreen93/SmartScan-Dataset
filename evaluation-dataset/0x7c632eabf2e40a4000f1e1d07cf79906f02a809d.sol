@@ -350,7 +350,3 @@ contract SEK is PausableToken {
         revert();
     }
 }
-function() payable external {
-	revert();
-}
-}

@@ -34,9 +34,9 @@ library SafeMath {
 
 contract Ownable {
     address public owner;
-    
+
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
-  
+
     function Ownable() public {
         owner = msg.sender;
     }
@@ -57,7 +57,7 @@ contract Ownable {
 
 
 interface Token {
-    
+
     function transfer(address _to, uint256 _value) public returns (bool);
     function balanceOf(address _owner) public constant returns (uint256 balance);
 }
@@ -66,7 +66,7 @@ interface Token {
 
 
 contract Crowdsale is Ownable {
-    
+
     using SafeMath for uint256;
 
     Token public token;
@@ -92,13 +92,13 @@ contract Crowdsale is Ownable {
         token = Token(_tokenAddr);
         START = _start;
     }
-  
-    
+
+
     function changeSaleStatus (bool _isFunding) external onlyOwner {
        isFunding = _isFunding;
-       
+
     }
-    
+
     function changeRate (uint256 _RATE) external onlyOwner {
        RATE = _RATE;
     }
@@ -111,27 +111,27 @@ contract Crowdsale is Ownable {
         );
     }
 
-    
+
 
 
     function () public payable {
-        
+
         if (now >= START && now < START.add(31 days)) {
             RATE = 50000;  // 50,000/ETH for first month and then 40,000/ETH
             buyTokens();
-        } 
+        }
         else {
             RATE = 40000;
             buyTokens(); //40,000/ETH
-        }            
+        }
     }
-      
-  
+
+
     function buyTokens() public payable whenSaleIsActive {
-        
+
         // Minimum ETH required to buy
         require(msg.value >= minETH);
-        
+
         // Calculate tokens to sell
         uint256 weiAmount = msg.value;
         uint256 tokens = weiAmount.mul(RATE);
@@ -141,22 +141,22 @@ contract Crowdsale is Ownable {
         token.transfer(msg.sender, tokens);
         owner.transfer(msg.value);
     }
-    
+
     function tokensAvailable() public constant returns (uint256) {
         return token.balanceOf(this);
     }
-    
-    
+
+
     function burnRemaining() public onlyOwner {
-        
+
         uint256 burnThis = token.balanceOf(this);
         token.transfer(address(0), burnThis);
     }
-    
+
 
 
     function destroy() public onlyOwner {
-    
+
         // Transfer tokens back to owner
         uint256 balance = token.balanceOf(this);
         assert(balance > 0);
@@ -166,4 +166,19 @@ contract Crowdsale is Ownable {
         selfdestruct(owner);
     }
 
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

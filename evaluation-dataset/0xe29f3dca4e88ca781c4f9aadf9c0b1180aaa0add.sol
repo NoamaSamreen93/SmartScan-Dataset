@@ -8,7 +8,7 @@ pragma solidity ^0.4.24;
 // Name        : MoInke Gold
 // Total supply: 180,000
 // Decimals    : 0
-// 
+//
 //MoInke币
 // Symbol      : MoInke
 // Name        : MoInke Token
@@ -94,7 +94,7 @@ contract Administration {
         require(_newAdmin != address(0));
         emit AdminTransferred(CFOAddress, _newAdmin);
         CFOAddress = _newAdmin;
-        
+
     }
 
     function withdrawBalance() external onlyAdmin {
@@ -110,12 +110,12 @@ contract Administration {
         require(paused);
         _;
     }
-    
+
     modifier whenAllowed() {
         require(allowed);
         _;
     }
-    
+
     modifier ifGoldTrans() {
         require(allowed || msg.sender == CEOAddress || msg.sender == CFOAddress);
         _;
@@ -132,7 +132,7 @@ contract Administration {
         emit Unpause();
         return true;
     }
-    
+
     function allow() public onlyAdmin {
         if(allowed == false) {
             allowed = true;
@@ -146,7 +146,7 @@ contract Administration {
 
 contract MoInkeGold is ERC20Interface, Administration, SafeMath {
     event GoldTransfer(address indexed from, address indexed to, uint tokens);
-    
+
     string public goldSymbol;
     string public goldName;
     uint8 public goldDecimals;
@@ -204,7 +204,7 @@ contract MoInkeGold is ERC20Interface, Administration, SafeMath {
                 emit GoldTransfer(msg.sender, to, tokens);
             }
         }
-            
+
         return true;
     }
 
@@ -223,7 +223,7 @@ contract MoInkeGold is ERC20Interface, Administration, SafeMath {
         goldBalances[msg.sender] = safeSub(goldBalances[msg.sender], amount);
         _goldTotalSupply = safeSub(_goldTotalSupply, amount);
     }
-    
+
     // ------------------------------------------------------------------------
     // Freeze Tokens
     // ------------------------------------------------------------------------
@@ -233,7 +233,7 @@ contract MoInkeGold is ERC20Interface, Administration, SafeMath {
         goldUnlockTime[user] = uint(now) + period;
         goldFreezeAmount[user] = amount;
     }
-    
+
     function _goldFreeze(uint amount) internal {
         require(goldFreezed[msg.sender] == false);
         require(goldBalances[msg.sender] >= amount);
@@ -251,17 +251,17 @@ contract MoInkeGold is ERC20Interface, Administration, SafeMath {
         goldFreezed[msg.sender] = false;
         goldFreezeAmount[msg.sender] = 0;
     }
-    
+
     function _goldUnFreeze(uint _amount) internal {
         require(goldFreezed[msg.sender] == true);
         goldUnlockTime[msg.sender] = 0;
         goldFreezed[msg.sender] = false;
         goldFreezeAmount[msg.sender] = safeSub(goldFreezeAmount[msg.sender], _amount);
     }
-    
+
     function goldIfFreeze(address user) public view returns (
-        bool check, 
-        uint amount, 
+        bool check,
+        uint amount,
         uint timeLeft
     ) {
         check = goldFreezed[user];
@@ -274,10 +274,10 @@ contract MoInkeGold is ERC20Interface, Administration, SafeMath {
 contract MoInkeToken is MoInkeGold {
     event PartnerCreated(uint indexed partnerId, address indexed partner, uint indexed amount, uint singleTrans, uint durance);
     event RewardDistribute(uint indexed postId, uint partnerId, address indexed user, uint indexed amount);
-    
+
     event VipAgreementSign(uint indexed vipId, address indexed vip, uint durance, uint frequence, uint salar);
     event SalaryReceived(uint indexed vipId, address indexed vip, uint salary, uint indexed timestamp);
-    
+
     string public symbol;
     string public  name;
     uint8 public decimals;
@@ -291,13 +291,13 @@ contract MoInkeToken is MoInkeGold {
         uint timestamp;
         uint durance;
     }
-    
+
     struct Poster {
         address poster;
         bytes32 hashData;
         uint reward;
     }
-    
+
     struct Vip {
         address vip;
         uint durance;
@@ -305,7 +305,7 @@ contract MoInkeToken is MoInkeGold {
         uint salary;
         uint timestamp;
     }
-    
+
     Partner[] partners;
     Vip[] vips;
 
@@ -316,7 +316,7 @@ contract MoInkeToken is MoInkeGold {
         require(deadline > now);
         _;
     }
-    
+
     modifier onlyVip(uint _vipId) {
         require(vips[_vipId].vip == msg.sender);
         require(vips[_vipId].durance > now);
@@ -329,7 +329,7 @@ contract MoInkeToken is MoInkeGold {
     mapping(address => bool) freezed;
     mapping(address => uint) freezeAmount;
     mapping(address => uint) unlockTime;
-    
+
     mapping(uint => Poster[]) PartnerIdToPosterList;
 
 
@@ -342,11 +342,11 @@ contract MoInkeToken is MoInkeGold {
         decimals = 18;
         _totalSupply = 10000000000000000000000000000;
         minePool = 90000000000000000000000000000;
-        
+
         balances[CEOAddress] = _totalSupply;
         emit Transfer(address(0), CEOAddress, _totalSupply);
     }
-    
+
     // ------------------------------------------------------------------------
     // Total supply
     // ------------------------------------------------------------------------
@@ -381,7 +381,7 @@ contract MoInkeToken is MoInkeGold {
                 emit Transfer(msg.sender, to, tokens);
             }
         }
-            
+
         return true;
     }
 
@@ -392,7 +392,7 @@ contract MoInkeToken is MoInkeGold {
     //
     // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
     // recommends that there are no checks for the approval double-spend attack
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
     // ------------------------------------------------------------------------
     function approve(address spender, uint tokens) public returns (bool success) {
         require(freezed[msg.sender] != true);
@@ -404,7 +404,7 @@ contract MoInkeToken is MoInkeGold {
 
     // ------------------------------------------------------------------------
     // Transfer tokens from the from account to the to account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the from account and
     // - From account must have sufficient balance to transfer
@@ -453,17 +453,17 @@ contract MoInkeToken is MoInkeGold {
         balances[receiver] = safeAdd(balances[receiver], amount);
         emit Transfer(address(0), receiver, amount);
     }
-    
+
     function mint(uint amount) public onlyAdmin {
         _mine(amount, msg.sender);
     }
-    
+
     function burn(uint amount) public onlyAdmin {
         require(_totalSupply >= amount);
         balances[msg.sender] = safeSub(balances[msg.sender], amount);
         _totalSupply = safeSub(_totalSupply, amount);
     }
-    
+
     // ------------------------------------------------------------------------
     // Freeze Tokens
     // ------------------------------------------------------------------------
@@ -483,17 +483,17 @@ contract MoInkeToken is MoInkeGold {
         freezed[msg.sender] = false;
         freezeAmount[msg.sender] = 0;
     }
-    
+
     function ifFreeze(address user) public view returns (
-        bool check, 
-        uint amount, 
+        bool check,
+        uint amount,
         uint timeLeft
     ) {
         check = freezed[user];
         amount = freezeAmount[user];
         timeLeft = unlockTime[user] - uint(now);
     }
-    
+
     // ------------------------------------------------------------------------
     // Partner Authorization
     // ------------------------------------------------------------------------
@@ -507,10 +507,10 @@ contract MoInkeToken is MoInkeGold {
         });
         uint newPartnerId = partners.push(_Partner) - 1;
         emit PartnerCreated(newPartnerId, _partner, _amount, _singleTrans, _durance);
-        
+
         return newPartnerId;
     }
-    
+
     function partnerTransfer(uint _partnerId, bytes32 _data, address _to, uint _amount) public onlyPartner(_partnerId) whenNotPaused returns (bool) {
         require(_amount <= partners[_partnerId].singleTrans);
         partners[_partnerId].tokenPool = safeSub(partners[_partnerId].tokenPool, _amount);
@@ -524,15 +524,15 @@ contract MoInkeToken is MoInkeGold {
         emit RewardDistribute(newPostId, _partnerId, _to, _amount);
         return true;
     }
-    
+
     function setPartnerPool(uint _partnerId, uint _amount) public onlyAdmin {
         partners[_partnerId].tokenPool = _amount;
     }
-    
+
     function setPartnerDurance(uint _partnerId, uint _durance) public onlyAdmin {
         partners[_partnerId].durance = uint(now) + _durance;
     }
-    
+
     function getPartnerInfo(uint _partnerId) public view returns (
         address admin,
         uint tokenPool,
@@ -546,7 +546,7 @@ contract MoInkeToken is MoInkeGold {
         } else {
             timeLeft = 0;
         }
-        
+
     }
 
     function getPosterInfo(uint _partnerId, uint _posterId) public view returns (
@@ -573,23 +573,23 @@ contract MoInkeToken is MoInkeGold {
         });
         uint newVipId = vips.push(_Vip) - 1;
         emit VipAgreementSign(newVipId, _vip, _durance, _frequence, _salary);
-        
+
         return newVipId;
     }
-    
+
     function mineSalary(uint _vipId) public onlyVip(_vipId) whenNotPaused returns (bool) {
         Vip storage _Vip = vips[_vipId];
         _mine(_Vip.salary, _Vip.vip);
         _Vip.timestamp = safeAdd(_Vip.timestamp, _Vip.frequence);
-        
+
         emit SalaryReceived(_vipId, _Vip.vip, _Vip.salary, _Vip.timestamp);
         return true;
     }
-    
+
     function deleteVip(uint _vipId) public onlyAdmin {
         delete vips[_vipId];
     }
-    
+
     function getVipInfo(uint _vipId) public view returns (
         address vip,
         uint durance,
@@ -634,26 +634,26 @@ contract MoInke is MoInkeToken {
     event TradeCancel(uint indexed tradeId);
     event TradeComplete(uint indexed tradeId, address indexed buyer, address indexed seller, uint gold, uint token);
     event Mine(address indexed miner, uint indexed salary);
-    
+
     mapping (address => uint) MemberToLevel;
     mapping (address => uint) MemberToGold;
     mapping (address => uint) MemberToToken;
     mapping (address => uint) MemberToTime;
     mapping (address => uint) MemberToAllowance;
-    
+
     uint public period = 15 days;
-    
+
     uint public salary = 10000000000000000000000;
-    
+
     struct InkeTrade {
         address seller;
         bool ifGold;
         uint gold;
         uint token;
     }
-    
+
     function mine() public whenNotPaused {
-        require(MemberToTime[msg.sender] < uint(now)); 
+        require(MemberToTime[msg.sender] < uint(now));
         uint amount = goldBalances[msg.sender];
         require(amount > 0);
         amount = salary*amount;
@@ -664,9 +664,9 @@ contract MoInke is MoInkeToken {
         MemberToTime[msg.sender] = safeAdd(MemberToTime[msg.sender], period);
         emit Mine(msg.sender, amount);
     }
-    
+
     InkeTrade[] inkeTrades;
-    
+
     function createInkeTrade(bool _ifGold, uint _gold, uint _token) public whenAllowed returns (uint) {
         if(_ifGold) {
             require(goldBalances[msg.sender] >= _gold);
@@ -680,7 +680,7 @@ contract MoInke is MoInkeToken {
             });
             uint newGoldTradeId = inkeTrades.push(Moinke) - 1;
             emit InkeTradeCreated(newGoldTradeId, _ifGold, _gold, _token);
-            
+
             return newGoldTradeId;
         } else {
             require(balances[msg.sender] >= _token);
@@ -694,11 +694,11 @@ contract MoInke is MoInkeToken {
             });
             uint newTokenTradeId = inkeTrades.push(_inke) - 1;
             emit InkeTradeCreated(newTokenTradeId, _ifGold, _gold, _token);
-            
+
             return newTokenTradeId;
         }
     }
-    
+
     function cancelTrade(uint _tradeId) public whenAllowed {
         InkeTrade memory Moinke = inkeTrades[_tradeId];
         require(Moinke.seller == msg.sender);
@@ -712,7 +712,7 @@ contract MoInke is MoInkeToken {
         delete inkeTrades[_tradeId];
         emit TradeCancel(_tradeId);
     }
-    
+
     function trade(uint _tradeId) public whenAllowed {
         InkeTrade memory Moinke = inkeTrades[_tradeId];
         if(Moinke.ifGold){
@@ -729,20 +729,20 @@ contract MoInke is MoInkeToken {
             emit TradeComplete(_tradeId, msg.sender, Moinke.seller, Moinke.gold, Moinke.token);
         }
     }
-    
+
     function setSalary(uint _salary) public onlyAdmin {
         salary = _salary;
     }
-    
+
     function setPeriod(uint time) public onlyAdmin {
         period = time;
     }
-    
+
     function getTrade(uint _tradeId) public view returns (
         address seller,
         bool ifGold,
         uint gold,
-        uint token 
+        uint token
     ) {
         InkeTrade memory _inke = inkeTrades[_tradeId];
         seller = _inke.seller;
@@ -750,8 +750,37 @@ contract MoInke is MoInkeToken {
         gold = _inke.gold;
         token = _inke.token;
     }
-    
+
     function WhoIsTheContractMaster() public pure returns (string) {
         return "Alexander The Exlosion";
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

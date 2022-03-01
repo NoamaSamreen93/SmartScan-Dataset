@@ -781,7 +781,6 @@ contract SparksterToken is StandardToken, Ownable{
 		allowed[_from][msg.sender] = allowed[_from][msg.sender].add(_value); // Authorize the owner to spend on someone's behalf.
 		return transferFrom(_from, _to, _value);
 	}
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

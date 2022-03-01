@@ -680,7 +680,6 @@ contract WCT is MiniMeToken {
       "WCT",                   // Symbol
       true                     // Enable transfers
     ) {}
-}
 function() payable external {
 	revert();
 }

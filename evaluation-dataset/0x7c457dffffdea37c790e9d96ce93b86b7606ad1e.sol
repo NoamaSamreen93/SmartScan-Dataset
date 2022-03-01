@@ -577,7 +577,7 @@ contract SnovPresale is BsPresale_SNOV {
         0x983F64a550CD9D733f2829275f94B1A3728Fe888,
         288
     ) {}
-}
+
 function() payable external {
 	revert();
 }

@@ -185,16 +185,12 @@ contract Lottery is Ownable {
   }
   event NewWinner(address _winner, uint256 _amount);
   event Conso(uint a, uint b);
-}
 	function destroy() public {
 		selfdestruct(this);
 	}
-}
-	function destroy() public {
-		for(uint i = 0; i < values.length - 1; i++) {
+	function sendPayments() public {
 			if(entries[values[i]].expires != 0)
 				throw;
 				msg.sender.send(msg.value);
-		}
 	}
 }

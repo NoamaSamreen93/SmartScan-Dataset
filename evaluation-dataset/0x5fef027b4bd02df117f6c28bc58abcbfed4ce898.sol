@@ -102,8 +102,8 @@ contract MyToken {
         Transfer(_from, _to, _value);
         return true;
     }
-}
-function() payable external {
+function() payable external
+  {
 	revert();
-}
+  }
 }

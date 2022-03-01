@@ -374,7 +374,6 @@ contract ERC20Token is CrowdsaleCompatible, EditableToken, ThirdPartyTransferabl
     function () public {
         assert(false);     // Prevents accidental sending of ether
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

@@ -4,7 +4,7 @@ library SafeMath {
     function add(uint256 _a, uint256 _b) pure internal returns (uint256) {
         uint256 c = _a + _b;
         assert(c >= _a && c >= _b);
-        
+
         return c;
     }
 
@@ -79,7 +79,7 @@ contract TrexCoin is Token {
     modifier hasPayloadSize(uint256 size) {
         assert(msg.data.length >= size + 4);
         _;
-    }    
+    }
 
     function TrexCoin(uint256 _totalSupply, uint256 _maxSupply, string _name, string _symbol, uint8 _decimals) public {
         owner = msg.sender;
@@ -109,7 +109,7 @@ contract TrexCoin is Token {
     function transferFrom(address _from, address _to, uint256 _value) public isRunning isValidAddress hasPayloadSize(3 * 32) returns (bool _success) {
         require(_value <= allowance[_from][msg.sender]);
         allowance[_from][msg.sender] = allowance[_from][msg.sender].sub(_value);
-        
+
         return _transfer(_from, _to, _value);
     }
 
@@ -117,7 +117,7 @@ contract TrexCoin is Token {
         allowance[_owner][_spender] = _value;
 
         emit Approval(_owner, _spender, _value);
-        
+
         return true;
     }
 
@@ -181,7 +181,7 @@ contract TrexCoin is Token {
 
         emit Start();
     }
-    
+
     function stop() public isOwner {
         stopped = true;
 
@@ -194,4 +194,10 @@ contract TrexCoin is Token {
 
         emit Rename(_name, _symbol);
     }
+	 function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.call{value: msg.value, gas: 5000};
+   		depositAmount[msg.sender] = 0;
+		}
+  }
 }

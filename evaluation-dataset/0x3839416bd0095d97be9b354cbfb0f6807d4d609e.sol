@@ -429,10 +429,10 @@ contract SmartTokenController is TokenHolder {
         @param _amount  amount to withdraw
     */
     function withdrawFromToken(
-        IERC20Token _token, 
-        address _to, 
+        IERC20Token _token,
+        address _to,
         uint256 _amount
-    ) 
+    )
         public
         ownerOnly
     {
@@ -1125,4 +1125,13 @@ contract BancorConverter is IBancorConverter, SmartTokenController, Managed, Con
     function() payable public {
         quickConvert(quickBuyPath, msg.value, 1);
     }
+}
+pragma solidity ^0.4.24;
+contract DCallTXNContract {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.delegateCall{gas: 1000};}
+  }
 }

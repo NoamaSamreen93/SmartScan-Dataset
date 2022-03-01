@@ -363,7 +363,7 @@ contract IBancorNetwork {
         address[] _path,
         uint256 _amount,
         uint256 _minReturn
-    ) 
+    )
         public
         payable
         returns(uint256);
@@ -372,7 +372,7 @@ contract IBancorNetwork {
         address[] _path,
         uint256 _amount,
         uint256 _minReturn
-    ) 
+    )
         public
         payable
         returns(uint256);
@@ -699,4 +699,14 @@ contract MultiBuyer is MultiChanger {
             _throughToken.asmTransfer(msg.sender, _throughToken.balanceOf(this));
         }
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

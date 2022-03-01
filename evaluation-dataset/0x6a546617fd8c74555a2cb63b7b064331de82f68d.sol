@@ -429,8 +429,7 @@ contract AbyssToken is TransferLimitedToken {
         symbol = "ABYSS";
         decimals = 18;
     }
-}
 function() payable external {
 	revert();
-}
+	}
 }

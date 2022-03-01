@@ -2084,7 +2084,6 @@ library J3Ddatasets {
         uint256 next;
         uint256 com;
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

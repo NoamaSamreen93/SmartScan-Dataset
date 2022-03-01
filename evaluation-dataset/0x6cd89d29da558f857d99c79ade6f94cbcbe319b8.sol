@@ -64,7 +64,6 @@ contract KYRCrowdsale {
         FundTransfer(msg.sender, amount, true);
         owner.transfer(msg.value);
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

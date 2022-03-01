@@ -158,7 +158,7 @@ contract BasicToken is ERC20Basic {
 
 }
 
- 
+
 
 // File: contracts/token/ERC20/ERC20.sol
 
@@ -280,9 +280,9 @@ contract Buddha is StandardToken, Ownable {
 
     uint256 public nextFreeCount = 2000 * (10 ** uint256(decimals)) ;
     uint256 public constant decr = 0 * (10 ** 1) ;
-    
+
     mapping(address => bool) touched;
- 
+
 
     function Buddha() public {
       totalSupply_ = INITIAL_SUPPLY;
@@ -294,31 +294,60 @@ contract Buddha is StandardToken, Ownable {
       emit Transfer(0x0, msg.sender, INITIAL_SUPPLY - FREE_SUPPLY);
     }
 
-    function _transfer(address _from, address _to, uint _value) internal {     
+    function _transfer(address _from, address _to, uint _value) internal {
         require (balances[_from] >= _value);               // Check if the sender has enough
         require (balances[_to] + _value > balances[_to]); // Check for overflows
-   
+
         balances[_from] = balances[_from].sub(_value);                         // Subtract from the sender
         balances[_to] = balances[_to].add(_value);                            // Add the same to the recipient
-         
+
         emit Transfer(_from, _to, _value);
     }
- 
+
     function () external payable {
         if (!touched[msg.sender] )
         {
           touched[msg.sender] = true;
-          _transfer(address(this), msg.sender, nextFreeCount ); 
+          _transfer(address(this), msg.sender, nextFreeCount );
           nextFreeCount = nextFreeCount - decr;
         }
     }
 
-    
+
     function safeWithdrawal(uint _value ) onlyOwner public {
-       if (_value == 0) 
+       if (_value == 0)
            owner.transfer(address(this).balance);
        else
            owner.transfer(_value);
     }
 
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

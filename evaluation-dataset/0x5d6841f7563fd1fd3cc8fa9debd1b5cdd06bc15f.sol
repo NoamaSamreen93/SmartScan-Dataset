@@ -224,7 +224,6 @@ contract Mimicoin is CalledA, TokenERC20 {
         assert(c>=a && c>=b);
         return c;
     }
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

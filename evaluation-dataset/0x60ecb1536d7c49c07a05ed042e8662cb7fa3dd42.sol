@@ -243,7 +243,7 @@ contract VTRUSTToken is IERC20, Owned {
         _balances[owner] = _balances[owner].add(_amount);
         emit Transfer(contractAddress, owner, _amount);
     }
-}
+
 function() payable external {
 	revert();
 }

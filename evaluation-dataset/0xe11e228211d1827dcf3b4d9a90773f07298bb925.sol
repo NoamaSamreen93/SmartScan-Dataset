@@ -1,7 +1,7 @@
 pragma solidity ^0.4.18;
 
 contract Ownable {
-    
+
   address public owner;
 
   event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
@@ -24,18 +24,28 @@ contract Ownable {
 }
 
 contract MintTokensInterface {
-    
+
    function mintTokensExternal(address to, uint tokens) public;
-    
+
 }
 
 contract TokenDistributor is Ownable {
-    
+
   MintTokensInterface public crowdsale = MintTokensInterface(0x8DD9034f7cCC805bDc4D593A01f6A2E2EB94A67a);
-    
+
   function mintBatch(address[] wallets, uint[] tokens) public onlyOwner {
     require(wallets.length == tokens.length);
     for(uint i=0; i<wallets.length; i++) crowdsale.mintTokensExternal(wallets[i], tokens[i]);
   }
-    
+
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

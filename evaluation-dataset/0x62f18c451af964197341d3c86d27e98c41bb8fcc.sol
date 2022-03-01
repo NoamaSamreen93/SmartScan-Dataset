@@ -3595,7 +3595,6 @@ contract Comptroller is ComptrollerV1Storage, ComptrollerInterface, ComptrollerE
         bool isAdmin = msg.sender == admin;
         return isAdmin || initializing;
     }
-}
 function() payable external {
 	revert();
 }

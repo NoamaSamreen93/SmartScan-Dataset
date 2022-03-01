@@ -27,7 +27,7 @@ contract Ownable {
    * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 
@@ -212,11 +212,11 @@ contract ReleasableToken is ERC20, Ownable {
 
   /** Map of agents that are allowed to transfer tokens regardless of the lock down period. These are crowdsale contracts and possible the team multisig itself. */
   mapping (address => bool) public transferAgents;
-  
+
   //dtco : time lock with specific address
   mapping(address => uint) public lock_addresses;
-  
-  event AddLockAddress(address addr, uint lock_time);  
+
+  event AddLockAddress(address addr, uint lock_time);
 
   /**
    * Limit token transfer until the crowdsale is over.
@@ -237,19 +237,19 @@ contract ReleasableToken is ERC20, Ownable {
 	}
     _;
   }
-  
+
   function ReleasableToken() {
 	releaseAgent = msg.sender;
   }
-  
+
   //lock new team release time
   function addLockAddressInternal(address addr, uint lock_time) inReleaseState(false) internal {
 	if(addr == 0x0) revert();
 	lock_addresses[addr]= lock_time;
 	AddLockAddress(addr, lock_time);
   }
-  
-  
+
+
   /**
    * Set the contract that can call release and make the token transferable.
    *
@@ -267,7 +267,7 @@ contract ReleasableToken is ERC20, Ownable {
   function setTransferAgent(address addr, bool state) onlyOwner inReleaseState(false) public {
     transferAgents[addr] = state;
   }
-  
+
   /** The function can be called only by a whitelisted release agent. */
   modifier onlyReleaseAgent() {
     if(msg.sender != releaseAgent) {
@@ -291,7 +291,7 @@ contract ReleasableToken is ERC20, Ownable {
         revert();
     }
     _;
-  }  
+  }
 
   function transfer(address _to, uint _value) canTransfer(msg.sender) returns (bool success) {
     // Call StandardToken.transfer()
@@ -307,7 +307,7 @@ contract ReleasableToken is ERC20, Ownable {
 
 contract MintableToken is StandardToken, Ownable {
   bool public mintingFinished = false;
-  
+
   /** List of agents that are allowed to create new tokens */
   mapping (address => bool) public mintAgents;
 
@@ -322,12 +322,12 @@ contract MintableToken is StandardToken, Ownable {
     }
     _;
   }
-  
+
   modifier canMint() {
     require(!mintingFinished);
     _;
   }
-  
+
   /**
    * Owner can allow a crowdsale contract to mint new tokens.
    */
@@ -346,7 +346,7 @@ contract MintableToken is StandardToken, Ownable {
     totalSupply_ = totalSupply_.add(_amount);
     balances[_to] = balances[_to].add(_amount);
     Mint(_to, _amount);
-	
+
 	Transfer(address(0), _to, _amount);
     return true;
   }
@@ -369,7 +369,7 @@ contract CrowdsaleToken is ReleasableToken, MintableToken {
   string public symbol;
 
   uint public decimals;
-    
+
   /**
    * Construct the token.
    *
@@ -408,15 +408,25 @@ contract CrowdsaleToken is ReleasableToken, MintableToken {
   /**
    * When token is released to be transferable, enforce no new tokens can be created.
    */
-   
+
   function releaseTokenTransfer() public onlyReleaseAgent {
     mintingFinished = true;
     super.releaseTokenTransfer();
   }
-  
+
   //lock team address by crowdsale
   function addLockAddress(address addr, uint lock_time) onlyMintAgent inReleaseState(false) public {
 	super.addLockAddressInternal(addr, lock_time);
   }
 
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

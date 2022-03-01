@@ -671,4 +671,14 @@ contract BLPZ is NFTokenMetadata, NFTokenEnumerable {
   {
     super._setTokenUri(_tokenId, _uri, _chtype, _name, _honey, _spec);
   }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

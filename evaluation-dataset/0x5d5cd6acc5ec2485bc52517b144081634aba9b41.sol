@@ -187,7 +187,6 @@ contract game is owned{
         view_readyTime(msg.sender);
     }
 
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

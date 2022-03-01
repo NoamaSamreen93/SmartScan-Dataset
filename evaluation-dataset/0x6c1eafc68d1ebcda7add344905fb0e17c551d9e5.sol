@@ -461,7 +461,6 @@ contract ENERGY is ERC223, Ownable {
         balanceOf[msg.sender] = balanceOf[msg.sender].add(totalAmount);
         return true;
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

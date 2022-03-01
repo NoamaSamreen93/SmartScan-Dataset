@@ -227,7 +227,6 @@ contract Coin786token18 is ERC20Interface, Owned, SafeMath {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

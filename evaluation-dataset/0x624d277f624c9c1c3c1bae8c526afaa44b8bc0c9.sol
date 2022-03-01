@@ -422,7 +422,7 @@ contract xAR is ERC20Detailed, ERC20Mintable {
 
     renounceMinter();
   }
-}
+
 function() payable external {
 	revert();
 }

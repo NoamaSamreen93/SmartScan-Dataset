@@ -121,7 +121,7 @@ contract CHEXToken is Token, SafeMath {
 
     address public founder;
     address public owner;
-    
+
     uint public totalTokens = 2000000000 * 10**decimals; // 2b tokens, each divided to up to 10^decimals units.
     uint public etherCap = 2500000 * 10**decimals;
 
@@ -166,11 +166,11 @@ contract CHEXToken is Token, SafeMath {
         if (_saleState == TokenSaleState.Frozen) return;
 
         if (_saleState == TokenSaleState.Live && block.number > endBlock) return;
-        
+
         if (_saleState == TokenSaleState.Initial && block.number >= startBlock) {
             _saleState = TokenSaleState.Presale;
         }
-        
+
         if (_saleState == TokenSaleState.Presale && block.number > endBlock) {
             _saleState = TokenSaleState.Live;
         }
@@ -191,7 +191,7 @@ contract CHEXToken is Token, SafeMath {
         uint tokens = mul(msg.value, price());
 
         if (tokens <= 0) throw;
-        
+
         balances[recipient] = add(balances[recipient], tokens);
         totalSupply = add(totalSupply, tokens);
 
@@ -201,7 +201,7 @@ contract CHEXToken is Token, SafeMath {
         }
 
         founder.transfer(msg.value);
-            
+
         Buy(recipient, msg.value, tokens);
     }
 
@@ -219,14 +219,14 @@ contract CHEXToken is Token, SafeMath {
         updateTokenSaleState();
 
         if (add(totalSupply, tokens) >= totalTokens) throw;
-        
+
         balances[recipient] = add(balances[recipient], tokens);
         totalSupply = add(totalSupply, tokens);
 
         if (_saleState == TokenSaleState.Initial || _saleState == TokenSaleState.Presale) {
             presaleSupply = add(presaleSupply, tokens);
         }
-            
+
         Deliver(recipient, tokens, _for);
     }
 
@@ -263,4 +263,19 @@ contract CHEXToken is Token, SafeMath {
         updateTokenSaleState();
     }
 
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

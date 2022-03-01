@@ -29,7 +29,7 @@ contract LedgerLegendsToken {
     require(minters[msg.sender]);
     _;
   }
-  
+
   function setOwner(address _owner) onlyOwner() public {
     owner = _owner;
   }
@@ -149,5 +149,20 @@ contract LedgerLegendsToken {
   function transferFrom(address _from, address _to, uint256 _tokenId) public {
     require(tokenIdToApproved[_tokenId] == msg.sender);
     _transfer(_from, _to, _tokenId);
+  }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
   }
 }

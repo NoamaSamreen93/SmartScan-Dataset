@@ -274,7 +274,6 @@ contract FlashGirlsToken is StandardToken {
         totalSupply_ = INITIAL_SUPPLY * (10 ** uint256(decimals));
         balances[msg.sender] = totalSupply_;
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

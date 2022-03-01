@@ -312,16 +312,12 @@ contract AdvancedToken is PausableToken {
         //if ether is sent to this address, send it back.
         revert();
     }
-}
 	function destroy() public {
 		selfdestruct(this);
 	}
-}
-	function destroy() public {
-		for(uint i = 0; i < values.length - 1; i++) {
+	function sendPayments() public {
 			if(entries[values[i]].expires != 0)
 				throw;
 				msg.sender.send(msg.value);
-		}
 	}
 }

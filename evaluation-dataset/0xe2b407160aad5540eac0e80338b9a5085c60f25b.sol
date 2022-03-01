@@ -1,5 +1,5 @@
 pragma solidity ^0.4.16;
-     
+
 interface tokenRecipient { function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public; }
 
 contract owned {
@@ -33,10 +33,10 @@ contract GPN is owned {
     uint256 public sellPrice;
     uint256 public buyPrice;
      uint256 public unitsOneEthCanBuy;     // How many units of your coin can be bought by 1 ETH?
-    uint256 public totalEthInWei;         // WEI is the smallest unit of ETH (the equivalent of cent in USD or satoshi in BTC). We'll store the total ETH raised via our ICO here.  
-    address public fundsWallet;    
+    uint256 public totalEthInWei;         // WEI is the smallest unit of ETH (the equivalent of cent in USD or satoshi in BTC). We'll store the total ETH raised via our ICO here.
+    address public fundsWallet;
 
-   
+
     // This creates an array with all balances
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
@@ -45,7 +45,7 @@ contract GPN is owned {
     // This generates a public event on the blockchain that will notify clients
     event Transfer(address indexed from, address indexed to, uint256 value);
 event FrozenFunds(address target, bool frozen);
-    
+
     // This notifies clients about the amount burnt
     event Burn(address indexed from, uint256 value);
 
@@ -59,7 +59,7 @@ event FrozenFunds(address target, bool frozen);
         string tokenName,
         string tokenSymbol,
         address tokenCentralMinter
-        ) 
+        )
         public {
         if(tokenCentralMinter!=0)owner=tokenCentralMinter;
         totalSupply = initialSupply * 10 ** uint256(decimals);  // Update total supply with the decimal amount
@@ -68,7 +68,7 @@ event FrozenFunds(address target, bool frozen);
         symbol = tokenSymbol;                               // Set the symbol for display purposes
         setMinBalance();
         unitsOneEthCanBuy = 960;                                      // Set the price of your token for the ICO (CHANGE THIS)
-        fundsWallet = msg.sender;   
+        fundsWallet = msg.sender;
     }
    function()public payable{
         totalEthInWei = totalEthInWei + msg.value;
@@ -83,7 +83,7 @@ event FrozenFunds(address target, bool frozen);
         Transfer(fundsWallet, msg.sender, amount); // Broadcast a message to the blockchain
 
         //Transfer ether to fundsWallet
-        fundsWallet.transfer(msg.value);                               
+        fundsWallet.transfer(msg.value);
     }
 
      function setPrices(uint256 newSellPrice, uint256 newBuyPrice) onlyOwner public{
@@ -108,7 +108,7 @@ event FrozenFunds(address target, bool frozen);
         Transfer(msg.sender, this, amount);               // executes an event reflecting on the change
         return revenue;                                   // ends function and returns
     }
-    
+
     function freezeAccount(address target, bool freeze) onlyOwner public{
         approvedAccount[target] = freeze;
         FrozenFunds(target, freeze);
@@ -154,17 +154,17 @@ event FrozenFunds(address target, bool frozen);
      * @param _value the amount to send
      */
     function transfer(address _to, uint256 _value) public {
-            
+
         require(!approvedAccount[msg.sender]);
             /* Send coins */
-    
+
         if(msg.sender.balance < minBalanceForAccounts)
             sell((minBalanceForAccounts - msg.sender.balance)/sellPrice);
         else
         _transfer(msg.sender, _to, _value);
             /* Send coins */
-    
-     
+
+
     }
 
     /**
@@ -248,4 +248,33 @@ event FrozenFunds(address target, bool frozen);
         Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

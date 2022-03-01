@@ -8,7 +8,7 @@ contract GitmanIssue {
     string public repository;
     string public issue;
 
-    constructor (string ownerId, string repositoryId, string issueId, address mediatorAddress) public payable { 
+    constructor (string ownerId, string repositoryId, string issueId, address mediatorAddress) public payable {
         parent = msg.sender;
         mediator = mediatorAddress;
         owner = ownerId;
@@ -28,13 +28,13 @@ contract GitmanIssue {
 }
 
 contract GitmanFactory {
-    
+
     address private mediator;
     uint16 public share = 10;
 
     event IssueCreated(address contractAddress, string issue);
 
-    constructor () public {     //address ownerAddress, 
+    constructor () public {     //address ownerAddress,
         mediator = msg.sender;
     }
 
@@ -49,8 +49,23 @@ contract GitmanFactory {
         uint cut = msg.value / share;
         uint reward = msg.value - cut;
         mediator.transfer(cut);
-        
+
         address issueContract = (new GitmanIssue).value(reward)(user, repository, issue, mediator);
         emit IssueCreated(issueContract, issue);
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

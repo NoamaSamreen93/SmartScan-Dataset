@@ -148,20 +148,20 @@ contract ERC20Basic {
 
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
-    
+
   mapping (address => uint256) balances;
   uint256 totalSupply_;
-  
+
   function totalSupply() public view returns (uint256) {
     return totalSupply_;
   }
-  
+
     /**
   * @dev transfer token for a specified address
   * @param _to The address to transfer to.
   * @param _value The amount to be transferred.
   */
-  
+
   function transfer(address _to, uint256 _value) public returns (bool) {
     require(_to != address(0));
     require(_value <= balances[msg.sender]);
@@ -174,7 +174,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) public view returns (uint256 balance) {
@@ -214,7 +214,7 @@ contract StandardToken is ERC20, BurnableToken {
   mapping (address => mapping (address => uint256)) allowed;
 
   function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
-    
+
     require(_to != address(0));
     require(_value <= balances[msg.sender]);
     require(_value <= allowed[_from][msg.sender]);
@@ -246,7 +246,7 @@ contract StandardToken is ERC20, BurnableToken {
   function allowance(address _owner, address _spender) public view returns (uint256) {
     return allowed[_owner][_spender];
   }
-  
+
 }
 
 contract BittechToken is StandardToken {
@@ -256,7 +256,7 @@ contract BittechToken is StandardToken {
   uint256 constant public decimals = 18;
 
   address constant public bountyWallet = 0x8E8d4cdADbc027b192DfF91c77382521B419E5A2;
-  uint256 public bountyPart = uint256(5000000).mul(10 ** decimals); 
+  uint256 public bountyPart = uint256(5000000).mul(10 ** decimals);
   address constant public adviserWallet = 0x1B9D19Af310E8cB35D0d3B8977b65bD79C5bB299;
   uint256 public adviserPart = uint256(1000000).mul(10 ** decimals);
   address constant public reserveWallet = 0xa323DA182fDfC10861609C2c98894D9745ABAB91;
@@ -293,7 +293,7 @@ contract BittechToken is StandardToken {
     emit Transfer(this, msg.sender, PreICOPart);
 
     balances[this] = teamPart;
-    emit Transfer(this, this, teamPart); 
+    emit Transfer(this, this, teamPart);
 
     startTime = block.number;
   }
@@ -326,5 +326,34 @@ contract BittechToken is StandardToken {
     emit Transfer(this, teamWallet, tokens);
     withdrawTokens = withdrawTokens.add(tokens);
   }
-  
+
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -57,7 +57,7 @@ library SafeMath {
  * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
-    
+
   address public owner;
 
   /**
@@ -81,59 +81,69 @@ contract Ownable {
    * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) private onlyOwner {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 
 }
 
 contract Crowdsale is Ownable {
-    
+
     using SafeMath for uint;
-    
+
     address owner;
-    
+
     token public tokenReward;
-    
+
     uint start = 1523232000;
-    
+
     uint period = 22;
-    
-    
-    
+
+
+
     function Crowdsale (
         address addressOfTokenUsedAsReward
         ) public {
         owner = msg.sender;
         tokenReward = token(addressOfTokenUsedAsReward);
     }
-    
+
         modifier saleIsOn() {
         require(now > start && now < start + period * 1 days);
         _;
     }
-    
+
     function sellTokens() public saleIsOn payable {
         owner.transfer(msg.value);
-        
+
         uint price = 400;
-        
-if(now < start + (period * 1 days ).div(2)) 
-{  price = 800;} 
-else if(now >= start + (period * 1 days).div(2) && now < start + (period * 1 days).div(4).mul(3)) 
-{  price = 571;} 
-else if(now >= start + (period * 1 days ).div(4).mul(3) && now < start + (period * 1 days )) 
+
+if(now < start + (period * 1 days ).div(2))
+{  price = 800;}
+else if(now >= start + (period * 1 days).div(2) && now < start + (period * 1 days).div(4).mul(3))
+{  price = 571;}
+else if(now >= start + (period * 1 days ).div(4).mul(3) && now < start + (period * 1 days ))
 {  price = 500;}
-    
+
     uint tokens = msg.value.mul(price);
-    
-    tokenReward.transfer(msg.sender, tokens); 
-    
+
+    tokenReward.transfer(msg.sender, tokens);
+
     }
-    
-    
+
+
    function() external payable {
         sellTokens();
     }
-    
+
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

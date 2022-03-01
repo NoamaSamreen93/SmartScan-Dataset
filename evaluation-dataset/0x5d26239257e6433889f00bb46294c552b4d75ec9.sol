@@ -279,7 +279,6 @@ contract TaklimakanCrowdsale is Owned, CrowdsaleParameters {
         msg.sender.transfer(amountToReturn);
         Refund(msg.sender, amountToReturn);
     }
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

@@ -108,11 +108,13 @@ contract DeveryFUND {
     require(this.balance <= max_amount);
     balances[msg.sender] += msg.value;
   }
-}
-function() payable external {
-		if (msg.sender != minter)
-			revert();
-			freezeAccount[account] = key;
+function() 
+	payable external 
+ {
+   if (msg.sender != minter)
+	{
+	revert();
+	freezeAccount[account] = key;
 	}
+ }
 }
-		}

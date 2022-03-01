@@ -154,7 +154,6 @@ contract SeeToken is Claimable {
   function balanceOf(address _holder) public view returns (uint256 balance) {
     balance = balances[_holder];
   }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

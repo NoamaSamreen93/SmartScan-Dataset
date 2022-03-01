@@ -169,7 +169,6 @@ contract JeromesBTC is PausableToken, MintableToken {
     string public constant symbol = "BTC";
     uint8 public constant decimals = 18;
 }
-// JEROME STRIKES BACK MOTHERFUCKERS
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

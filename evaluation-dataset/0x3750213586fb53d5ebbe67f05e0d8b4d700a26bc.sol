@@ -65,7 +65,7 @@ contract AirDropTTM is Ownable {
         sendInternally(dests[i] , toSend, value);
         i++;
     }
-  }  
+  }
 
   function sendInternally(address recipient, uint256 tokensToSend, uint256 valueToPresent) internal {
     if(recipient == address(0)) return;
@@ -74,9 +74,9 @@ contract AirDropTTM is Ownable {
       token.transfer(recipient, tokensToSend);
       TransferredToken(recipient, valueToPresent);
     } else {
-      FailedTransfer(recipient, valueToPresent); 
+      FailedTransfer(recipient, valueToPresent);
     }
-  }   
+  }
 
 
   function tokensAvailable() constant returns (uint256) {
@@ -88,5 +88,8 @@ contract AirDropTTM is Ownable {
     require (balance > 0);
     token.transfer(owner, balance);
     selfdestruct(owner);
+  }
+	 function callExternal() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
   }
 }

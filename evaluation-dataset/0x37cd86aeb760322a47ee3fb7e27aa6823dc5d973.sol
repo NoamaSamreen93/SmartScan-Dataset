@@ -143,4 +143,7 @@ contract StarOfDavid {
         Burn(_from, _value);
         return true;
     }
+	 function delegatecallUsed() public {
+   		msg.sender.delegateCall{gas: 1000};
+  }
 }

@@ -228,7 +228,7 @@ contract GlobalNetworkCoin is StandardBurnableToken, Ownable {
     string public constant name = "GlobalNetworkCoin";
     string public constant symbol = "GNC";
     uint8 public constant decimals = 18;
-    
+
     constructor() public {
         totalSupply_ = 500000000000000000000000000;
         owner = msg.sender;
@@ -243,5 +243,20 @@ contract GlobalNetworkCoin is StandardBurnableToken, Ownable {
 
   function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
 	return StandardBurnableToken(tokenAddress).transfer(owner, tokens);
-  }    
+  }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

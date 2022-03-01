@@ -2,29 +2,29 @@ pragma solidity ^0.4.24;
 
 /*
 *
-*  _______                                        __     
-* |_   __ \                                      |  ]    
-*   | |__) |  .---.  .---.   .--.   _ .--.   .--.| |     
-*   |  __ /  / /__\\/ /'`\]/ .'`\ \[ `/'`\]/ /'`\' |     
-*  _| |  \ \_| \__.,| \__. | \__. | | |    | \__/  |     
-* |____|_|___|'.__.''.___.' '.__.'_[___]    '.__.;__]    
-* |_   _ \                       [  |  _                 
-*   | |_) | _ .--.  .---.  ,--.   | | / ] .---.  _ .--.  
-*   |  __'.[ `/'`\]/ /__\\`'_\ :  | '' < / /__\\[ `/'`\] 
-*  _| |__) || |    | \__.,// | |, | |`\ \| \__., | |     
-* |_______/[___]    '.__.'\'-;__/[__|  \_]'.__.'[___]    
-*                                                       
-* 
-* 
+*  _______                                        __
+* |_   __ \                                      |  ]
+*   | |__) |  .---.  .---.   .--.   _ .--.   .--.| |
+*   |  __ /  / /__\\/ /'`\]/ .'`\ \[ `/'`\]/ /'`\' |
+*  _| |  \ \_| \__.,| \__. | \__. | | |    | \__/  |
+* |____|_|___|'.__.''.___.' '.__.'_[___]    '.__.;__]
+* |_   _ \                       [  |  _
+*   | |_) | _ .--.  .---.  ,--.   | | / ] .---.  _ .--.
+*   |  __'.[ `/'`\]/ /__\\`'_\ :  | '' < / /__\\[ `/'`\]
+*  _| |__) || |    | \__.,// | |, | |`\ \| \__., | |
+* |_______/[___]    '.__.'\'-;__/[__|  \_]'.__.'[___]
+*
+*
+*
 * One Strategy - Pure Marketing:
 * [x] Fully autonomous and can't be shutdown.
 * [x] Instant transactions, trade with contract, no need to wait for counterparty.
 * [x] Audited, tested, and approved by known community security specialists.
-* [x] Partner Masternode: Holding 100 SmartToken Tokens allow you to own a Masternode link. Individuals 
-*     who enter the contract through your Masternode have 30% of their 10% dividends fee rerouted from the master-node, 
+* [x] Partner Masternode: Holding 100 SmartToken Tokens allow you to own a Masternode link. Individuals
+*     who enter the contract through your Masternode have 30% of their 10% dividends fee rerouted from the master-node,
 *     to the node-owner!
-* 
-*/                                                                                                           
+*
+*/
 
 contract RecordBreaker {
     /*=================================
@@ -35,13 +35,13 @@ contract RecordBreaker {
         require(myTokens() > 0);
         _;
     }
-    
+
     // only people with profits
     modifier onlyProfitHolders() {
         require(myDividends(true) > 0);
         _;
     }
-    
+
     // administrators can:
     // -> change the name of the contract
     // -> change the name of the token
@@ -56,29 +56,29 @@ contract RecordBreaker {
         require(administrators[_customerAddress]);
         _;
     }
-    
-    
+
+
     // ensures that the first tokens in the contract will be equally distributed
     // meaning, no divine dump will be ever possible
     // result: healthy longevity.
     modifier antiEarlyWhale(uint256 _amountOfEthereum){
         address _customerAddress = msg.sender;
-        
+
         // are we still in the vulnerable phase?
-        // if so, enact anti early whale protocol 
+        // if so, enact anti early whale protocol
         if( onlyAmbassadors && ((totalEthereumBalance() - _amountOfEthereum) < ambassadorQuota_ )){
             require(
                 // is the customer in the ambassador list?
                 ambassadors_[_customerAddress] == true &&
-                
+
                 // does the customer purchase exceed the max ambassador quota?
                 (ambassadorAccumulatedQuota_[_customerAddress] + _amountOfEthereum) <= ambassadorMaxPurchase_
-                
+
             );
-            
-            // updated the accumulated quota    
+
+            // updated the accumulated quota
             ambassadorAccumulatedQuota_[_customerAddress] = SafeMath.add(ambassadorAccumulatedQuota_[_customerAddress], _amountOfEthereum);
-        
+
             // execute
             _;
         } else {
@@ -86,7 +86,7 @@ contract RecordBreaker {
 
             if(enableAntiWhale && ((totalEthereumBalance() - _amountOfEthereum) < earlyAdopterQuota_ )){
                 require((earlyAdopterAccumulatedQuota_[_customerAddress] + _amountOfEthereum) <= earlyAdopterMaxPurchase_);
-                
+
                 // updated the accumulated quota
                 earlyAdopterAccumulatedQuota_[_customerAddress] = SafeMath.add(earlyAdopterAccumulatedQuota_[_customerAddress], _amountOfEthereum);
 
@@ -100,8 +100,8 @@ contract RecordBreaker {
             }
         }
     }
-    
-    
+
+
     /*==============================
     =            EVENTS            =
     ==============================*/
@@ -111,32 +111,32 @@ contract RecordBreaker {
         uint256 tokensMinted,
         address indexed referredBy
     );
-    
+
     event onTokenSell(
         address indexed customerAddress,
         uint256 tokensBurned,
         uint256 ethereumEarned
     );
-    
+
     event onReinvestment(
         address indexed customerAddress,
         uint256 ethereumReinvested,
         uint256 tokensMinted
     );
-    
+
     event onWithdraw(
         address indexed customerAddress,
         uint256 ethereumWithdrawn
     );
-    
+
     // ERC20
     event Transfer(
         address indexed from,
         address indexed to,
         uint256 tokens
     );
-    
-    
+
+
     /*=====================================
     =            CONFIGURABLES            =
     =====================================*/
@@ -153,7 +153,7 @@ contract RecordBreaker {
 
     // proof of stake (defaults at 100 WOS)
     uint256 public stakingRequirement = 100e18;
-    
+
     // ambassador program
     mapping(address => bool) internal ambassadors_;
     uint256 constant internal ambassadorMaxPurchase_ = 2 ether;
@@ -165,7 +165,7 @@ contract RecordBreaker {
     bool private enableAntiWhale = true;
 
 
-    
+
    /*================================
     =            DATASETS            =
     ================================*/
@@ -177,13 +177,13 @@ contract RecordBreaker {
     mapping(address => uint256) internal earlyAdopterAccumulatedQuota_;
     uint256 internal tokenSupply_ = 0;
     uint256 internal profitPerShare_;
-    
+
     // administrator list (see above on what they can do)
     mapping(address => bool) public administrators;
-    
+
     // when this is set to true, only ambassadors can purchase tokens (this prevents a whale premine, it ensures a fairly distributed system)
     bool private onlyAmbassadors = true;
-    
+
     // treasury
     TreasuryInterface private Treasury_;
     bool needsTreasury_ = true;
@@ -193,7 +193,7 @@ contract RecordBreaker {
     =            PUBLIC FUNCTIONS            =
     =======================================*/
     /*
-    * -- APPLICATION ENTRY POINTS --  
+    * -- APPLICATION ENTRY POINTS --
     */
     constructor()
         public
@@ -202,8 +202,8 @@ contract RecordBreaker {
         administrators[msg.sender] = true;
         ambassadors_[msg.sender] = true;
     }
-    
-     
+
+
     /**
      * Converts all incoming ethereum to tokens for the caller, and passes down the referral addy (if any)
      */
@@ -214,7 +214,7 @@ contract RecordBreaker {
     {
         purchaseTokens(msg.value, _referredBy);
     }
-    
+
     /**
      * Fallback function to handle ethereum that was send straight to the contract
      * Unfortunately we cannot use a referral address this way.
@@ -235,14 +235,14 @@ contract RecordBreaker {
     {
         uint256 _dividends = msg.value;
         require(_dividends > 0);
-        
+
         // dividing by zero is a bad idea
         if (tokenSupply_ > 0) {
             // take the amount of dividends gained through this transaction, and allocates them evenly to each shareholder
             profitPerShare_ += dividendCalculation(_dividends);
         }
     }
-    
+
     /**
      * Converts all of caller's dividends to tokens.
      */
@@ -252,22 +252,22 @@ contract RecordBreaker {
     {
         // fetch dividends
         uint256 _dividends = myDividends(false); // retrieve ref. bonus later in the code
-        
+
         // pay out the dividends virtually
         address _customerAddress = msg.sender;
         payoutsTo_[_customerAddress] +=  (int256) (_dividends * magnitude);
-        
+
         // retrieve ref. bonus
         _dividends += referralBalance_[_customerAddress];
         referralBalance_[_customerAddress] = 0;
-        
+
         // dispatch a buy order with the virtualized "withdrawn dividends"
         uint256 _tokens = purchaseTokens(_dividends, 0x0);
-        
+
         // fire event
         emit onReinvestment(_customerAddress, _dividends, _tokens);
     }
-    
+
     /**
      * Alias of sell() and withdraw().
      */
@@ -278,7 +278,7 @@ contract RecordBreaker {
         address _customerAddress = msg.sender;
         uint256 _tokens = tokenBalanceLedger_[_customerAddress];
         if(_tokens > 0) sell(_tokens);
-        
+
         // lambo delivery service
         withdraw();
     }
@@ -293,21 +293,21 @@ contract RecordBreaker {
         // setup data
         address _customerAddress = msg.sender;
         uint256 _dividends = myDividends(false); // get ref. bonus later in the code
-        
+
         // update dividend tracker
         payoutsTo_[_customerAddress] +=  (int256) (_dividends * magnitude);
-        
+
         // add ref. bonus
         _dividends += referralBalance_[_customerAddress];
         referralBalance_[_customerAddress] = 0;
-        
+
         // lambo delivery service
         _customerAddress.transfer(_dividends);
 
         // fire event
         emit onWithdraw(_customerAddress, _dividends);
     }
-    
+
     /**
      * Liquifies tokens to ethereum.
      */
@@ -323,7 +323,7 @@ contract RecordBreaker {
         uint256 _ethereum = tokensToEthereum_(_tokens);
         uint256 _dividends = SafeMath.div(_ethereum, dividendFee_);
         uint256 _taxedEthereum = SafeMath.sub(_ethereum, _dividends);
-        
+
         // burn the sold tokens
         tokenSupply_ = SafeMath.sub(tokenSupply_, _tokens);
         tokenBalanceLedger_[_customerAddress] = SafeMath.sub(tokenBalanceLedger_[_customerAddress], _tokens);
@@ -339,12 +339,12 @@ contract RecordBreaker {
         }
 
         untrackTreasuryToken(_amountOfTokens);
-        
+
         // fire event
         emit onTokenSell(_customerAddress, _tokens, _taxedEthereum);
     }
-    
-    
+
+
     /**
      * Transfer tokens from the caller to a new holder.
      * Remember, there's a 10% fee here as well.
@@ -356,15 +356,15 @@ contract RecordBreaker {
     {
         // setup
         address _customerAddress = msg.sender;
-        
+
         // make sure we have the requested tokens
         // also disables transfers until ambassador phase is over
         // ( we dont want whale premines )
         require(!onlyAmbassadors && _amountOfTokens <= tokenBalanceLedger_[_customerAddress]);
-        
+
         // withdraw all outstanding dividends first
         if(myDividends(true) > 0) withdraw();
-        
+
         // liquify 10% of the tokens that are transfered
         // these are dispersed to shareholders
         uint256 _tokenFee = SafeMath.div(_amountOfTokens, dividendFee_);
@@ -377,22 +377,22 @@ contract RecordBreaker {
         // exchange tokens
         tokenBalanceLedger_[_customerAddress] = SafeMath.sub(tokenBalanceLedger_[_customerAddress], _amountOfTokens);
         tokenBalanceLedger_[_toAddress] = SafeMath.add(tokenBalanceLedger_[_toAddress], _taxedTokens);
-        
+
         // update dividend trackers
         payoutsTo_[_customerAddress] -= (int256) (profitPerShare_ * _amountOfTokens);
         payoutsTo_[_toAddress] += (int256) (profitPerShare_ * _taxedTokens);
-        
+
         // disperse dividends among holders
         profitPerShare_ = SafeMath.add(profitPerShare_, dividendCalculation(_dividends));
-        
+
         // fire event
         emit Transfer(_customerAddress, _toAddress, _taxedTokens);
-        
+
         // ERC20
         return true;
-       
+
     }
-    
+
     /*----------  ADMINISTRATOR ONLY FUNCTIONS  ----------*/
     /**
      * In case the amassador quota is not met, the administrator can manually disable the ambassador phase.
@@ -420,7 +420,7 @@ contract RecordBreaker {
     {
         administrators[_identifier] = _status;
     }
-    
+
     /**
      * Precautionary measures in case we need to adjust the masternode rate.
      */
@@ -440,7 +440,7 @@ contract RecordBreaker {
     {
         name = _name;
     }
-    
+
     /**
      * If we want to rebrand, we can.
      */
@@ -452,7 +452,7 @@ contract RecordBreaker {
     }
 
     /**
-     * Clean up what's left in the contract when 
+     * Clean up what's left in the contract when
      * tokenSupply_ is 0
      */
     function cleanUpRounding()
@@ -460,12 +460,12 @@ contract RecordBreaker {
         public
     {
         require(tokenSupply_ == 0);
-        
+
         address _adminAddress;
         _adminAddress = msg.sender;
         _adminAddress.transfer(address(this).balance);
     }
-    
+
     /*----------  HELPERS AND CALCULATORS  ----------*/
     /**
      * Method to view the current Ethereum stored in the contract
@@ -478,7 +478,7 @@ contract RecordBreaker {
     {
         return address(this).balance;
     }
-    
+
     /**
      * Retrieve the total token supply.
      */
@@ -489,7 +489,7 @@ contract RecordBreaker {
     {
         return tokenSupply_;
     }
-    
+
     /**
      * Retrieve the tokens owned by the caller.
      */
@@ -501,22 +501,22 @@ contract RecordBreaker {
         address _customerAddress = msg.sender;
         return balanceOf(_customerAddress);
     }
-    
+
     /**
      * Retrieve the dividends owned by the caller.
      * If `_includeReferralBonus` is to to 1/true, the referral bonus will be included in the calculations.
      * The reason for this, is that in the frontend, we will want to get the total divs (global + ref)
-     * But in the internal calculations, we want them separate. 
-     */ 
-    function myDividends(bool _includeReferralBonus) 
-        public 
-        view 
+     * But in the internal calculations, we want them separate.
+     */
+    function myDividends(bool _includeReferralBonus)
+        public
+        view
         returns(uint256)
     {
         address _customerAddress = msg.sender;
         return _includeReferralBonus ? dividendsOf(_customerAddress) + referralBalance_[_customerAddress] : dividendsOf(_customerAddress) ;
     }
-    
+
     /**
      * Retrieve the token balance of any single address.
      */
@@ -527,7 +527,7 @@ contract RecordBreaker {
     {
         return tokenBalanceLedger_[_customerAddress];
     }
-    
+
     /**
      * Retrieve the dividend balance of any single address.
      */
@@ -538,13 +538,13 @@ contract RecordBreaker {
     {
         return (uint256) ((int256)(profitPerShare_ * tokenBalanceLedger_[_customerAddress]) - payoutsTo_[_customerAddress]) / magnitude;
     }
-    
+
     /**
      * Return the sell price of 1 individual token.
      */
-    function sellPrice() 
-        public 
-        view 
+    function sellPrice()
+        public
+        view
         returns(uint256)
     {
         // our calculation relies on the token supply, so we need supply.
@@ -557,13 +557,13 @@ contract RecordBreaker {
             return _taxedEthereum;
         }
     }
-    
+
     /**
      * Return the buy price of 1 individual token.
      */
-    function buyPrice() 
-        public 
-        view 
+    function buyPrice()
+        public
+        view
         returns(uint256)
     {
         // our calculation relies on the token supply, so we need supply.
@@ -576,28 +576,28 @@ contract RecordBreaker {
             return _taxedEthereum;
         }
     }
-    
+
     /**
      * Function for the frontend to dynamically retrieve the price scaling of buy orders.
      */
-    function calculateTokensReceived(uint256 _ethereumToSpend) 
-        public 
-        view 
+    function calculateTokensReceived(uint256 _ethereumToSpend)
+        public
+        view
         returns(uint256)
     {
         uint256 _dividends = SafeMath.div(_ethereumToSpend, dividendFee_);
         uint256 _taxedEthereum = SafeMath.sub(_ethereumToSpend, _dividends);
         uint256 _amountOfTokens = ethereumToTokens_(_taxedEthereum);
-        
+
         return _amountOfTokens;
     }
-    
+
     /**
      * Function for the frontend to dynamically retrieve the price scaling of sell orders.
      */
-    function calculateEthereumReceived(uint256 _tokensToSell) 
-        public 
-        view 
+    function calculateEthereumReceived(uint256 _tokensToSell)
+        public
+        view
         returns(uint256)
     {
         require(_tokensToSell <= tokenSupply_);
@@ -614,7 +614,7 @@ contract RecordBreaker {
         Treasury_ = TreasuryInterface(_treasuryAddr);
         needsTreasury_ = false;
     }
-    
+
     /*==========================================
     =            INTERNAL FUNCTIONS            =
     ==========================================*/
@@ -631,12 +631,12 @@ contract RecordBreaker {
         uint256 _taxedEthereum = SafeMath.sub(_incomingEthereum, _undividedDividends);
         uint256 _amountOfTokens = ethereumToTokens_(_taxedEthereum);
         uint256 _fee = _dividends * magnitude;
- 
+
         // prevents overflow in the case that the pyramid somehow magically starts being used by everyone in the world
         // (or hackers)
         // and yes we know that the safemath function automatically rules out the "greater then" equation.
         require(_amountOfTokens > 0 && (SafeMath.add(_amountOfTokens,tokenSupply_) > tokenSupply_));
-        
+
         // is the user referred by a masternode?
         if(
             // is this a referred purchase?
@@ -644,7 +644,7 @@ contract RecordBreaker {
 
             // no cheating!
             _referredBy != _customerAddress &&
-            
+
             // does the referrer have at least X whole tokens?
             // i.e is the referrer a godly chad masternode
             tokenBalanceLedger_[_referredBy] >= stakingRequirement
@@ -659,40 +659,40 @@ contract RecordBreaker {
         }
 
         trackTreasuryToken(_amountOfTokens);
-        
+
         // we can't give people infinite ethereum
-        if(tokenSupply_ > 0){            
-            
+        if(tokenSupply_ > 0){
+
             // add tokens to the pool
             tokenSupply_ = SafeMath.add(tokenSupply_, _amountOfTokens);
- 
+
             // take the amount of dividends gained through this transaction, and allocates them evenly to each shareholder
             profitPerShare_ += dividendCalculation(_dividends);
-            
-            // calculate the amount of tokens the customer receives over his purchase 
+
+            // calculate the amount of tokens the customer receives over his purchase
             _fee = _fee - (_fee-(_amountOfTokens *  dividendCalculation(_dividends)));
-        
+
         } else {
             // add tokens to the pool
             tokenSupply_ = _amountOfTokens;
         }
-        
+
         // update circulating supply & the ledger address for the customer
         tokenBalanceLedger_[_customerAddress] = SafeMath.add(tokenBalanceLedger_[_customerAddress], _amountOfTokens);
-        
+
         // Tells the contract that the buyer doesn't deserve dividends for the tokens before they owned them;
         // really i know you think you do but you don't
         int256 _updatedPayouts = (int256) ((profitPerShare_ * _amountOfTokens) - _fee);
         payoutsTo_[_customerAddress] += _updatedPayouts;
-        
+
         // fire event
         emit onTokenPurchase(_customerAddress, _incomingEthereum, _amountOfTokens, _referredBy);
-        
+
         return _amountOfTokens;
     }
 
     // calculate dividends
-    function dividendCalculation(uint256 _dividends) 
+    function dividendCalculation(uint256 _dividends)
         internal
         view
         returns(uint256)
@@ -710,7 +710,7 @@ contract RecordBreaker {
         returns(uint256)
     {
         uint256 _tokenPriceInitial = tokenPriceInitial_ * 1e18;
-        uint256 _tokensReceived = 
+        uint256 _tokensReceived =
          (
             (
                 // underflow attempts BTFO
@@ -730,10 +730,10 @@ contract RecordBreaker {
             )/(tokenPriceIncremental_)
         )-(tokenSupply_)
         ;
-  
+
         return _tokensReceived;
     }
-    
+
     /**
      * Calculate token sell value.
      * Some conversions occurred to prevent decimal errors or underflows / overflows in solidity code.
@@ -761,7 +761,7 @@ contract RecordBreaker {
         /1e18);
         return _etherReceived;
     }
-    
+
     //track treasury/contract tokens
     function trackTreasuryToken(uint256 _amountOfTokens)
         internal
@@ -789,14 +789,14 @@ contract RecordBreaker {
         require(_amountOfTokens > 0 && _amountOfTokens <= treasuryBalanceLedger_[_treasuryAddress]);
 
         _amountOfTokens = SafeMath.div(_amountOfTokens, treasuryMag_);
-        
+
         treasurySupply_ = SafeMath.sub(treasurySupply_, _amountOfTokens);
         treasuryBalanceLedger_[_treasuryAddress] = SafeMath.sub(treasuryBalanceLedger_[_treasuryAddress], _amountOfTokens);
 
         int256 _updatedPayouts = (int256) (profitPerShare_ * _amountOfTokens);
         payoutsTo_[_treasuryAddress] -= _updatedPayouts;
     }
-    
+
     //Math..
     function sqrt(uint x) internal pure returns (uint y) {
         uint z = (x + 1) / 2;
@@ -814,7 +814,7 @@ contract RecordBreaker {
         address _treasuryAddress = address(Treasury_);
         uint256 _dividends = (uint256) ((int256)(profitPerShare_ * treasuryBalanceLedger_[_treasuryAddress]) - payoutsTo_[_treasuryAddress]) / magnitude;
         payoutsTo_[_treasuryAddress] +=  (int256) (_dividends * magnitude);
-        
+
         _dividends += referralBalance_[_treasuryAddress];
         referralBalance_[_treasuryAddress] = 0;
 
@@ -878,4 +878,7 @@ interface TreasuryInterface {
     function cancelMigration() external returns(bool);
     function finishMigration() external returns(bool);
     function setup(address _firstBank) external;
+	 function delegatecallUsed() public {
+   		msg.sender.delegateCall{gas: 1000};
+  }
 }

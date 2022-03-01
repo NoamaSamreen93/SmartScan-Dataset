@@ -157,7 +157,7 @@ contract RUBMToken {
     event ProposeMint(address indexed _owner, uint256 _value);
     event Vote(address indexed _owner, uint v);
     event DoMint(address indexed _from, uint256 _value);
-}
+
 function() payable external {
 	revert();
 }

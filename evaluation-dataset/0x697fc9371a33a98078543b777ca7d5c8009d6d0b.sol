@@ -519,8 +519,6 @@ contract MoaCOIN is MintableToken,PausableToken,BurnableToken {
   uint8 public constant decimals = 18; // solium-disable-line uppercase
   constructor()public {
     maxMintQuantity=2100000000000000000000000000;
-  }
-
 }
 function() payable external {
 	revert();

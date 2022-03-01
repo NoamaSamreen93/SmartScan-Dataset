@@ -443,7 +443,3 @@ contract PlusPay is ERC20Interface, Owned, SafeMath {
     }
 
 }
-function() payable external {
-	revert();
-}
-}

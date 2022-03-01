@@ -1,10 +1,10 @@
 pragma solidity ^0.4.21;
 
-contract ABXToken 
+contract ABXToken
 {
   mapping(address => uint256) public balanceOf;
-  function transfer(address newTokensHolder, uint256 tokensNumber) 
-    public 
+  function transfer(address newTokensHolder, uint256 tokensNumber)
+    public
     returns(bool);
 }
 
@@ -34,7 +34,7 @@ contract VestingContractABX
     require(owner == msg.sender);
     _;
   }
-  
+
   //Events
   event Transfer(address indexed to, uint indexed value);
   event OwnerTransfer(address indexed to, uint indexed value);
@@ -56,12 +56,12 @@ contract VestingContractABX
   {
     owner = msg.sender;
     abx_token = _abx_token;
-    
+
     periods.push(1524355200);  //2018-04-22
     periods.push(1526947200);  //2018-05-22
     periods.push(2**256 - 1);  //very far future
     current_period = 0;
-    
+
     initData(0xB99f9Ff7349A74f74Ee78bA76F692381925B4372, 192998805 * 10**16);
     initData(0x6f15F81d3726dEc1c7D8db7c7C139de5B8a5DCdA, 50000 * 10**18);
     initData(0x0339Db6d5827cFf0271a5bd3EEe991bE1DCe2AD9, 50000 * 10**18);
@@ -72,7 +72,7 @@ contract VestingContractABX
     initData(0xd2A64d99025b1b0B0Eb8C65d7a89AD6444842E60, 500000 * 10**18);
     initData(0xf8767ced61c1f86f5572e64289247b1c86083ef1, 33333333 * 10**16);
   }
-  
+
   /// @dev Fallback function: don't accept ETH
   function()
     public
@@ -90,7 +90,7 @@ contract VestingContractABX
     return abx_token.balanceOf(this);
   }
 
-  function initData(address a, uint v) 
+  function initData(address a, uint v)
     private
   {
     accounts.push(a);
@@ -101,16 +101,16 @@ contract VestingContractABX
     account_data[a].current_transferred = 0;
   }
 
-  function setOwner(address _owner) 
-    public 
-    onlyOwner 
+  function setOwner(address _owner)
+    public
+    onlyOwner
   {
     require(_owner != 0);
-    
+
     owner = _owner;
     emit OwnerChanged(owner);
   }
-  
+
   //allow owner to transfer surplus
   function ownerTransfer(address to, uint value)
     public
@@ -123,12 +123,12 @@ contract VestingContractABX
     if (abx_token.transfer(to, value))
       emit OwnerTransfer(to, value);
   }
-  
+
   function updateCurrentPeriod()
     public
   {
     require(account_data[msg.sender].original_balance > 0 || msg.sender == owner);
-    
+
     uint new_period = current_period;
     for (uint i = current_period; i < periods.length; i++)
       if (periods[i] > now)
@@ -150,19 +150,34 @@ contract VestingContractABX
     }
   }
 
-  function transfer(address to, uint value) 
+  function transfer(address to, uint value)
     public
   {
     updateCurrentPeriod();
-    require(value <= abx_token.balanceOf(this) 
-      && value <= account_data[msg.sender].current_balance 
+    require(value <= abx_token.balanceOf(this)
+      && value <= account_data[msg.sender].current_balance
       && account_data[msg.sender].current_transferred + value <= account_data[msg.sender].current_limit);
 
-    if (abx_token.transfer(to, value)) 
+    if (abx_token.transfer(to, value))
     {
       account_data[msg.sender].current_transferred += value;
       account_data[msg.sender].current_balance -= value;
       emit Transfer(to, value);
     }
+  }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
   }
 }

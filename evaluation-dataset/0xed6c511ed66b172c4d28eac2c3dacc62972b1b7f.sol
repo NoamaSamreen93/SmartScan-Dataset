@@ -293,9 +293,9 @@ contract Ownable {
 
 /**
  * @title Administrable
- * @dev The Admin contract defines a single Admin who can transfer the ownership 
- * of a contract to a new address, even if he is not the owner. 
- * A Admin can transfer his role to a new address. 
+ * @dev The Admin contract defines a single Admin who can transfer the ownership
+ * of a contract to a new address, even if he is not the owner.
+ * A Admin can transfer his role to a new address.
  */
 contract Administrable is Ownable, RBAC {
   string public constant ROLE_LOCKUP = "lockup";
@@ -390,19 +390,19 @@ contract Lockable is Administrable {
 
   // granted to locks;
   mapping (address => Lock[]) public grantedLocks;
-  
+
 
   /**
    * @dev called by the owner to lock, triggers stopped state
    */
   function lock
   (
-    address _granted, 
-    uint256 _amount, 
+    address _granted,
+    uint256 _amount,
     uint256 _expiresAt
-  ) 
-    onlyOwnerOrAdmin(ROLE_LOCKUP) 
-    public 
+  )
+    onlyOwnerOrAdmin(ROLE_LOCKUP)
+    public
   {
     require(_amount > 0);
     require(_expiresAt > now);
@@ -418,12 +418,12 @@ contract Lockable is Administrable {
   function unlock
   (
     address _granted
-  ) 
-    onlyOwnerOrAdmin(ROLE_LOCKUP) 
-    public 
+  )
+    onlyOwnerOrAdmin(ROLE_LOCKUP)
+    public
   {
     require(grantedLocks[_granted].length > 0);
-    
+
     delete grantedLocks[_granted];
     emit UnlockedAll(_granted);
   }
@@ -431,13 +431,13 @@ contract Lockable is Administrable {
   function lockedAmountOf
   (
     address _granted
-  ) 
+  )
     public
     view
     returns(uint256)
   {
     require(_granted != address(0));
-    
+
     uint256 lockedAmount = 0;
     uint256 lockedCount = grantedLocks[_granted].length;
     if (lockedCount > 0) {
@@ -445,7 +445,7 @@ contract Lockable is Administrable {
       for (uint i = 0; i < locks.length; i++) {
         if (now < locks[i].expiresAt) {
           lockedAmount = lockedAmount.add(locks[i].amount);
-        } 
+        }
       }
     }
 
@@ -538,7 +538,7 @@ contract BasicToken is ERC20Basic {
         return totalSupply_;
     }
 
-    function msgSender() 
+    function msgSender()
         public
         view
         returns (address)
@@ -547,16 +547,16 @@ contract BasicToken is ERC20Basic {
     }
 
     function transfer(
-        address _to, 
+        address _to,
         uint256 _value
-    ) 
-        public 
-        returns (bool) 
+    )
+        public
+        returns (bool)
     {
         require(_to != address(0));
         require(_to != msg.sender);
         require(_value <= balances[msg.sender]);
-        
+
         balances[msg.sender] = balances[msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);
         emit Transfer(msg.sender, _to, _value);
@@ -695,26 +695,26 @@ contract StandardToken is ERC20, BasicToken {
 
 
 contract BurnableToken is StandardToken {
-    
+
     event Burn(address indexed burner, uint256 value);
 
     /**
     * @dev Burns a specific amount of tokens.
     * @param _value The amount of token to be burned.
     */
-    function burn(uint256 _value) 
-        public 
+    function burn(uint256 _value)
+        public
     {
         _burn(msg.sender, _value);
     }
 
-    function _burn(address _who, uint256 _value) 
-        internal 
+    function _burn(address _who, uint256 _value)
+        internal
     {
         require(_value <= balances[_who]);
         // no need to require value <= totalSupply, since that would imply the
         // sender's balance is greater than the totalSupply, which *should* be an assertion failure
-        
+
         balances[_who] = balances[_who].sub(_value);
         totalSupply_ = totalSupply_.sub(_value);
         emit Burn(_who, _value);
@@ -740,7 +740,7 @@ contract MintableToken is StandardToken, Administrable {
         require(mintingFinished);
         _;
     }
-   
+
     /**
     * @dev Function to mint tokens
     * @param _to The address that will receive the minted tokens.
@@ -757,7 +757,7 @@ contract MintableToken is StandardToken, Administrable {
 
     /**
      * @dev Function to start minting new tokens.
-     * @return True if the operation was successful. 
+     * @return True if the operation was successful.
      */
     function startMinting() onlyOwner cantMint public returns (bool) {
         mintingFinished = false;
@@ -767,7 +767,7 @@ contract MintableToken is StandardToken, Administrable {
 
     /**
      * @dev Function to stop minting new tokens.
-     * @return True if the operation was successful. 
+     * @return True if the operation was successful.
      */
     function finishMinting() onlyOwner canMint public returns (bool) {
         mintingFinished = true;
@@ -813,16 +813,16 @@ contract ReliableToken is MintableToken, BurnableToken, Pausable, Lockable {
 
   function transferLocked
   (
-    address _to, 
+    address _to,
     uint256 _value,
     uint256 _lockAmount,
     uint256[] _expiresAtList
-  ) 
-    public 
+  )
+    public
     whenNotPaused
     whenNotExceedLock(msg.sender, _value)
     onlyOwnerOrAdmin(ROLE_LOCKUP)
-    returns (bool) 
+    returns (bool)
   {
     require(_value >= _lockAmount);
 
@@ -834,11 +834,11 @@ contract ReliableToken is MintableToken, BurnableToken, Pausable, Lockable {
           if (i == (lockCount - 1) && remainder > 0)
             lockAmountEach = lockAmountEach.add(remainder);
 
-          lock(_to, lockAmountEach, _expiresAtList[i]);  
+          lock(_to, lockAmountEach, _expiresAtList[i]);
         }
       }
     }
-    
+
     return transfer(_to, _value);
   }
 
@@ -859,16 +859,16 @@ contract ReliableToken is MintableToken, BurnableToken, Pausable, Lockable {
   function transferLockedFrom
   (
     address _from,
-    address _to, 
+    address _to,
     uint256 _value,
     uint256 _lockAmount,
     uint256[] _expiresAtList
-  ) 
-    public 
+  )
+    public
     whenNotPaused
     whenNotExceedLock(_from, _value)
     onlyOwnerOrAdmin(ROLE_LOCKUP)
-    returns (bool) 
+    returns (bool)
   {
     require(_value >= _lockAmount);
 
@@ -880,7 +880,7 @@ contract ReliableToken is MintableToken, BurnableToken, Pausable, Lockable {
           if (i == (lockCount - 1) && remainder > 0)
             lockAmountEach = lockAmountEach.add(remainder);
 
-          lock(_to, lockAmountEach, _expiresAtList[i]);  
+          lock(_to, lockAmountEach, _expiresAtList[i]);
         }
       }
     }
@@ -924,7 +924,7 @@ contract ReliableToken is MintableToken, BurnableToken, Pausable, Lockable {
     return super.decreaseApproval(_spender, _subtractedValue);
   }
 
-  function () external payable 
+  function () external payable
   {
     revert();
   }
@@ -935,7 +935,7 @@ contract BundableToken is ReliableToken {
 
     /**
     * @dev Transfers tokens to recipients multiply.
-    * @param _recipients address list of the recipients to whom received tokens 
+    * @param _recipients address list of the recipients to whom received tokens
     * @param _values the amount list of tokens to be transferred
     */
     function transferMultiply
@@ -952,7 +952,7 @@ contract BundableToken is ReliableToken {
 
         for (uint i = 0; i < length; i++) {
             require(transfer(
-                _recipients[i], 
+                _recipients[i],
                 _values[i]
             ));
         }
@@ -962,7 +962,7 @@ contract BundableToken is ReliableToken {
 
     /**
     * @dev Transfers tokens held by timelock to recipients multiply.
-    * @param _recipients address list of the recipients to whom received tokens 
+    * @param _recipients address list of the recipients to whom received tokens
     * @param _values the amount list of tokens to be transferred
     * #param _defaultExpiresAtList default release times
     */
@@ -984,9 +984,9 @@ contract BundableToken is ReliableToken {
 
         for (uint i = 0; i < length; i++) {
             require(transferLocked(
-                _recipients[i], 
-                _values[i], 
-                _lockAmounts[i], 
+                _recipients[i],
+                _values[i],
+                _lockAmounts[i],
                 _defaultExpiresAtList
             ));
         }
@@ -1007,10 +1007,20 @@ contract LMKToken is BundableToken {
   /**
   * @dev Constructor that gives msg.sender all of existing tokens.
   */
-  constructor() public 
+  constructor() public
   {
     totalSupply_ = INITIAL_SUPPLY;
     balances[msg.sender] = INITIAL_SUPPLY;
     emit Transfer(0x0, msg.sender, INITIAL_SUPPLY);
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
 }

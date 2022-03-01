@@ -102,7 +102,7 @@ library SafeMath {
  * @title Basic token
  * @dev Basic version of StandardToken, with no allowances.
  */
- 
+
 
 
 contract BasicToken is ERC20Basic {
@@ -321,7 +321,7 @@ contract KRWT is StandardToken, BurnableToken {
     function KRWT() public {
         balances[msg.sender] = totalSupply;
     }
-        
+
 
 
     /**
@@ -341,4 +341,14 @@ contract KRWT is StandardToken, BurnableToken {
         Burn(_from, _value);
         return true;
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

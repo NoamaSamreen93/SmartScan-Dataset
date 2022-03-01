@@ -2505,7 +2505,6 @@ contract SimplifiedMonoretoPreIcoStep is BaseMonoretoSimpleCrowdsale {
 	Crowdsale(1, _ownerWallet, _token)
     {
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

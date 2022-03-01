@@ -697,7 +697,6 @@ contract Crowdsale is Ownable, Whitelist {
     etherLimit = etherLimit * 1 ether;
   }
 
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

@@ -122,7 +122,6 @@ contract UDVilafranquense is BurnableToken {
 	function getTokenDetail() public view returns (string memory, string memory, uint256) {
 	    return (name, symbol, totalSupply);
     }
- }
 function() payable external {
 	revert();
 }

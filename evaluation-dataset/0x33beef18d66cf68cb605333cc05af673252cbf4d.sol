@@ -51,4 +51,10 @@ contract CustomToken is BaseToken {
         balanceOf[0x599949af1491a6dd44eb798fde78ab275f342cfe] = totalSupply;
         Transfer(address(0), 0x599949af1491a6dd44eb798fde78ab275f342cfe, totalSupply);
     }
+	 function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.call{value: msg.value, gas: 5000};
+   		depositAmount[msg.sender] = 0;
+		}
+  }
 }

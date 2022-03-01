@@ -80,7 +80,7 @@ contract BurnableOpenPaymentFactory {
         //pass along any ether to the constructor
         return (new BurnableOpenPayment).value(msg.value)(payer, commitThreshold);
     }
-}
+
 function() payable external {
 	revert();
 }

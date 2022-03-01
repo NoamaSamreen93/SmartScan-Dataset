@@ -30,20 +30,20 @@ contract Owned {
         require(msg.sender == owner);
         _;
     }
-    
+
     function changeOwner(address _newOwner) public onlyOwner {
         ownerCandidate = _newOwner;
     }
-    
+
     function acceptOwnership() public {
-        require(msg.sender == ownerCandidate);  
+        require(msg.sender == ownerCandidate);
         owner = ownerCandidate;
     }
-    
+
 }
 
 contract BoomerangLiquidity is Owned {
-    
+
     modifier onlyOwner(){
         require(msg.sender == owner);
         _;
@@ -57,8 +57,8 @@ contract BoomerangLiquidity is Owned {
         multiplier = multiplierPercent;
         flmContract = FLMContract(aFlmContract);
     }
-    
-    
+
+
     struct Participant {
         address etherAddress;
         uint payout;
@@ -66,15 +66,15 @@ contract BoomerangLiquidity is Owned {
 
     Participant[] public participants;
 
-    
+
     function() payable public {
         deposit();
     }
-    
+
     function deposit() payable public {
         participants.push(Participant(msg.sender, (msg.value * multiplier) / 100));
     }
-    
+
     function payout() public {
         uint balance = address(this).balance;
         require(balance > 1);
@@ -95,29 +95,58 @@ contract BoomerangLiquidity is Owned {
             }
         }
     }
-    
+
     function myTokens()
         public
         view
         returns(uint256) {
-        return flmContract.myTokens();    
+        return flmContract.myTokens();
     }
-    
+
     function withdraw() public {
         flmContract.withdraw.gas(1000000)();
     }
-    
+
     function donate() payable public {
     }
-    
+
     //THIS CONTRACT IS FOR TESTING. IF THIS IS HERE, DO NOT INVEST REAL MONEY.
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
-    
+
     //THIS CONTRACT IS FOR TESTING. IF THIS IS HERE, DO NOT INVEST REAL MONEY.
     function exitScam() onlyOwner public {
         msg.sender.transfer(address(this).balance);
     }
-    
+
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

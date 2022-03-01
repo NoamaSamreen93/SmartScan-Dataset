@@ -261,9 +261,7 @@ contract Reward {
         return tokensale.closingTime();
     }
 
-
-}
 function() payable external {
 	revert();
-}
+    }
 }

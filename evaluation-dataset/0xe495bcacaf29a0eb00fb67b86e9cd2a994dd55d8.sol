@@ -56,9 +56,9 @@ contract ERC20Token is Token {
 
     function transfer(address _to, uint _value)
         public
-        returns (bool) 
+        returns (bool)
     {
-        require(balances[msg.sender] >= _value && balances[_to] + _value >= balances[_to]); 
+        require(balances[msg.sender] >= _value && balances[_to] + _value >= balances[_to]);
         balances[msg.sender] -= _value;
         balances[_to] += _value;
         Transfer(msg.sender, _to, _value);
@@ -66,10 +66,10 @@ contract ERC20Token is Token {
     }
 
     function transferFrom(address _from, address _to, uint _value)
-        public 
-        returns (bool) 
+        public
+        returns (bool)
     {
-        require(balances[_from] >= _value && allowed[_from][msg.sender] >= _value && balances[_to] + _value >= balances[_to]); 
+        require(balances[_from] >= _value && allowed[_from][msg.sender] >= _value && balances[_to] + _value >= balances[_to]);
         balances[_to] += _value;
         balances[_from] -= _value;
         allowed[_from][msg.sender] -= _value;
@@ -77,7 +77,7 @@ contract ERC20Token is Token {
         return true;
     }
 
-    function approve(address _spender, uint _value) 
+    function approve(address _spender, uint _value)
         public
         returns (bool)
     {
@@ -94,7 +94,7 @@ contract ERC20Token is Token {
         return balances[_owner];
     }
 
-    function allowance(address _owner, address _spender) 
+    function allowance(address _owner, address _spender)
         public
         view
         returns (uint)
@@ -117,11 +117,11 @@ contract UnlimitedAllowanceToken is ERC20Token {
     /// @param _value Amount to transfer.
     /// @return Success of transfer.
     function transferFrom(address _from, address _to, uint _value)
-        public 
-        returns (bool) 
+        public
+        returns (bool)
     {
         uint allowance = allowed[_from][msg.sender];
-        require(balances[_from] >= _value && allowance >= _value && balances[_to] + _value >= balances[_to]); 
+        require(balances[_from] >= _value && allowance >= _value && balances[_to] + _value >= balances[_to]);
         balances[_to] += _value;
         balances[_from] -= _value;
         if (allowance < MAX_UINT) {
@@ -239,4 +239,33 @@ contract EtherToken is UnlimitedAllowanceToken, SafeMath {
         require(msg.sender.send(_value));
         Transfer(msg.sender, address(0), _value);
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

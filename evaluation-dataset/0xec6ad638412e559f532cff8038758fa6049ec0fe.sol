@@ -326,7 +326,7 @@ contract usingOraclize {
     function __callback(bytes32 myid, string result) public {
         __callback(myid, result, new bytes(0));
     }
-    
+
     function __callback(bytes32 myid, string result, bytes proof) public {
       return;
       myid; result; proof; // Silence compiler warnings
@@ -1266,7 +1266,7 @@ contract BMRoll is usingOraclize {
     /*
      * checks player profit, bet size and player number is within range
     */
-    modifier betIsValid(uint _betSize, uint _playerNumber) {      
+    modifier betIsValid(uint _betSize, uint _playerNumber) {
         require(_betSize >= minBet && _playerNumber >= minNumber && _playerNumber <= maxNumber && (((((_betSize * (100-(_playerNumber.sub(1)))) / (_playerNumber.sub(1))+_betSize))*houseEdge/houseEdgeDivisor)-_betSize <= maxProfit));
 		_;
     }
@@ -1277,7 +1277,7 @@ contract BMRoll is usingOraclize {
     modifier gameIsActive {
         require(gamePaused == false);
 		_;
-    }    
+    }
 
     /*
      * checks payouts are currently active
@@ -1285,7 +1285,7 @@ contract BMRoll is usingOraclize {
     modifier payoutsAreActive {
         require(payoutsPaused == false);
 		_;
-    }    
+    }
 
     /*
      * checks only Oraclize address is calling
@@ -1309,32 +1309,32 @@ contract BMRoll is usingOraclize {
     modifier onlyTreasury {
          require (msg.sender == treasury);
          _;
-    }    
+    }
 
     /*
      * game vars
-    */ 
+    */
     uint constant public maxProfitDivisor = 1000000;
-    uint constant public houseEdgeDivisor = 1000;    
-    uint constant public maxNumber = 99; 
+    uint constant public houseEdgeDivisor = 1000;
+    uint constant public maxNumber = 99;
     uint constant public minNumber = 2;
 	bool public gamePaused;
     uint32 public gasForOraclize;
     address public owner;
-    bool public payoutsPaused; 
+    bool public payoutsPaused;
     address public treasury;
     uint public contractBalance;
-    uint public houseEdge;     
-    uint public maxProfit;   
-    uint public maxProfitAsPercentOfHouse;                    
-    uint public minBet; 
+    uint public houseEdge;
+    uint public maxProfit;
+    uint public maxProfitAsPercentOfHouse;
+    uint public minBet;
 
     uint public totalBets = 0;
     uint public totalWeiWon = 0;
-    uint public totalWeiWagered = 0; 
+    uint public totalWeiWagered = 0;
 
     uint public maxPendingPayouts;
-    
+
     /*
      * player vars
     */
@@ -1342,25 +1342,25 @@ contract BMRoll is usingOraclize {
     mapping (bytes32 => address) playerTempAddress;
     mapping (bytes32 => bytes32) playerBetId;
     mapping (bytes32 => uint) playerBetValue;
-    mapping (bytes32 => uint) playerTempBetValue;               
+    mapping (bytes32 => uint) playerTempBetValue;
     mapping (bytes32 => uint) playerDieResult;
     mapping (bytes32 => uint) playerNumber;
-    mapping (address => uint) playerPendingWithdrawals;      
+    mapping (address => uint) playerPendingWithdrawals;
     mapping (bytes32 => uint) playerProfit;
-    mapping (bytes32 => uint) playerTempReward;           
+    mapping (bytes32 => uint) playerTempReward;
 
     /*
      * events
     */
     /* log bets + output to web3 for precise 'payout on win' field in UI */
-    event LogBet(bytes32 indexed BetID, address indexed PlayerAddress, uint indexed RewardValue, uint ProfitValue, uint BetValue, uint PlayerNumber);      
+    event LogBet(bytes32 indexed BetID, address indexed PlayerAddress, uint indexed RewardValue, uint ProfitValue, uint BetValue, uint PlayerNumber);
     /* output to web3 UI on bet result*/
     /* Status: 0=lose, 1=win, 2=win + failed send, 3=refund, 4=refund + failed send*/
-	event LogResult(bytes32 indexed BetID, address indexed PlayerAddress, uint PlayerNumber, uint DiceResult, uint ProfitValue, uint BetValue, int Status, bytes Proof);   
+	event LogResult(bytes32 indexed BetID, address indexed PlayerAddress, uint PlayerNumber, uint DiceResult, uint ProfitValue, uint BetValue, int Status, bytes Proof);
     /* log manual refunds */
     event LogRefund(bytes32 indexed BetID, address indexed PlayerAddress, uint indexed RefundValue);
     /* log owner transfers */
-    event LogOwnerTransfer(address indexed SentToAddress, uint indexed AmountTransferred);               
+    event LogOwnerTransfer(address indexed SentToAddress, uint indexed AmountTransferred);
 
 
     /*
@@ -1370,7 +1370,7 @@ contract BMRoll is usingOraclize {
 
         owner = msg.sender;
         treasury = msg.sender;
-        oraclize_setNetwork(networkID_auto);        
+        oraclize_setNetwork(networkID_auto);
         /* sets the Ledger authenticity proof in the constructor */
         oraclize_setProof(proofType_Ledger);
         /* init 980 = 98% (2% houseEdge)*/
@@ -1378,24 +1378,24 @@ contract BMRoll is usingOraclize {
         /* init 50,000 = 5%  */
         ownerSetMaxProfitAsPercentOfHouse(50000);
         /* init min bet (0.1 ether) */
-        ownerSetMinBet(100000000000000000);        
-        /* init gas for oraclize */        
-        gasForOraclize = 235000;  
+        ownerSetMinBet(100000000000000000);
+        /* init gas for oraclize */
+        gasForOraclize = 235000;
         /* init gas price for callback (default 20 gwei)*/
-        oraclize_setCustomGasPrice(20000000000 wei);              
+        oraclize_setCustomGasPrice(20000000000 wei);
 
     }
 
     /*
      * public function
      * player submit bet
-     * only if game is active & bet is valid can query oraclize and set player vars     
+     * only if game is active & bet is valid can query oraclize and set player vars
     */
-    function playerRollDice(uint rollUnder) public 
+    function playerRollDice(uint rollUnder) public
         payable
         gameIsActive
         betIsValid(msg.value, rollUnder)
-	{       
+	{
 
         bytes32 rngId = oraclize_newRandomDSQuery(0, 1, gasForOraclize); // this function internally generates the correct oraclize_query and returns its queryId
 
@@ -1407,30 +1407,30 @@ contract BMRoll is usingOraclize {
         playerBetValue[rngId] = msg.value;
         /* map player address to this oraclize query */
         playerAddress[rngId] = msg.sender;
-        /* safely map player profit to this oraclize query */                     
-        playerProfit[rngId] = ((((msg.value * (100-(rollUnder.sub(1)))) / (rollUnder.sub(1))+msg.value))*houseEdge/houseEdgeDivisor)-msg.value;        
+        /* safely map player profit to this oraclize query */
+        playerProfit[rngId] = ((((msg.value * (100-(rollUnder.sub(1)))) / (rollUnder.sub(1))+msg.value))*houseEdge/houseEdgeDivisor)-msg.value;
         /* safely increase maxPendingPayouts liability - calc all pending payouts under assumption they win */
         maxPendingPayouts = maxPendingPayouts.add(playerProfit[rngId]);
         /* check contract can payout on win */
         if(maxPendingPayouts >= contractBalance) revert();
         /* provides accurate numbers for web3 and allows for manual refunds in case of no oraclize __callback */
-        emit LogBet(playerBetId[rngId], playerAddress[rngId], playerBetValue[rngId].add(playerProfit[rngId]), playerProfit[rngId], playerBetValue[rngId], playerNumber[rngId]);          
+        emit LogBet(playerBetId[rngId], playerAddress[rngId], playerBetValue[rngId].add(playerProfit[rngId]), playerProfit[rngId], playerBetValue[rngId], playerNumber[rngId]);
 
-    }   
-             
+    }
+
 
     /*
     * semi-public function - only oraclize can call
     */
-	function __callback(bytes32 myid, string result, bytes proof) public   
+	function __callback(bytes32 myid, string result, bytes proof) public
 		onlyOraclize
 		payoutsAreActive
-	{  
+	{
 
         /* player address mapped to query id does not exist */
         require(playerAddress[myid]!=0x0);
 
-            
+
         /* map random result to player */
         playerDieResult[myid] = uint(keccak256(abi.encodePacked(result))) % 100; // this is an efficient way to get the uint out in the [0, maxRange] range;
         /* get the playerAddress for this query id */
@@ -1441,21 +1441,21 @@ contract BMRoll is usingOraclize {
         /* map the playerProfit for this query id */
         playerTempReward[myid] = playerProfit[myid];
         /* set  playerProfit for this query id to 0 */
-        playerProfit[myid] = 0; 
+        playerProfit[myid] = 0;
 
         /* safely reduce maxPendingPayouts liability */
-        maxPendingPayouts = maxPendingPayouts.sub(playerTempReward[myid]);         
+        maxPendingPayouts = maxPendingPayouts.sub(playerTempReward[myid]);
 
         /* map the playerBetValue for this query id */
         playerTempBetValue[myid] = playerBetValue[myid];
         /* set  playerBetValue for this query id to 0 */
-        playerBetValue[myid] = 0; 
+        playerBetValue[myid] = 0;
 
         /* total number of bets */
         totalBets += 1;
 
         /* total wagered */
-        totalWeiWagered += playerTempBetValue[myid];    
+        totalWeiWagered += playerTempBetValue[myid];
 
         /*
         * refund
@@ -1463,7 +1463,7 @@ contract BMRoll is usingOraclize {
         * if refund fails save refund value to playerPendingWithdrawals
         */
         if (playerDieResult[myid] == 0 || bytes(result).length == 0 || bytes(proof).length == 0 || oraclize_randomDS_proofVerify__returnCode(myid, result, proof) != 0) {
-            emit LogResult(playerBetId[myid], playerTempAddress[myid], playerNumber[myid], playerDieResult[myid], 0, playerTempBetValue[myid], 3, proof);            
+            emit LogResult(playerBetId[myid], playerTempAddress[myid], playerNumber[myid], playerDieResult[myid], 0, playerTempBetValue[myid], 3, proof);
 
             /*
             * send refund - external call to an untrusted contract
@@ -1471,7 +1471,7 @@ contract BMRoll is usingOraclize {
             * for withdrawal later via playerWithdrawPendingTransactions
             */
             if(!playerTempAddress[myid].send(playerTempBetValue[myid])){
-                emit LogResult(playerBetId[myid], playerTempAddress[myid], playerNumber[myid], playerDieResult[myid], 0, playerTempBetValue[myid], 4, proof);              
+                emit LogResult(playerBetId[myid], playerTempAddress[myid], playerNumber[myid], playerDieResult[myid], 0, playerTempBetValue[myid], 4, proof);
                 /* if send failed let player withdraw via playerWithdrawPendingTransactions */
                 playerPendingWithdrawals[playerTempAddress[myid]] = playerPendingWithdrawals[playerTempAddress[myid]].add(playerTempBetValue[myid]);
             }
@@ -1483,33 +1483,33 @@ contract BMRoll is usingOraclize {
         * pay winner
         * update contract balance to calculate new max bet
         * send reward
-        * if send of reward fails save value to playerPendingWithdrawals        
+        * if send of reward fails save value to playerPendingWithdrawals
         */
-        if(playerDieResult[myid] < playerNumber[myid]){ 
+        if(playerDieResult[myid] < playerNumber[myid]){
 
             /* safely reduce contract balance by player profit */
-            contractBalance = contractBalance.sub(playerTempReward[myid]); 
+            contractBalance = contractBalance.sub(playerTempReward[myid]);
 
             /* update total wei won */
-            totalWeiWon = totalWeiWon.add(playerTempReward[myid]);              
+            totalWeiWon = totalWeiWon.add(playerTempReward[myid]);
 
             /* safely calculate payout via profit plus original wager */
-            playerTempReward[myid] = playerTempReward[myid].add(playerTempBetValue[myid]); 
+            playerTempReward[myid] = playerTempReward[myid].add(playerTempBetValue[myid]);
 
-            emit LogResult(playerBetId[myid], playerTempAddress[myid], playerNumber[myid], playerDieResult[myid], playerTempReward[myid], playerTempBetValue[myid],1, proof);                            
+            emit LogResult(playerBetId[myid], playerTempAddress[myid], playerNumber[myid], playerDieResult[myid], playerTempReward[myid], playerTempBetValue[myid],1, proof);
 
             /* update maximum profit */
             setMaxProfit();
-            
+
             /*
             * send win - external call to an untrusted contract
             * if send fails map reward value to playerPendingWithdrawals[address]
             * for withdrawal later via playerWithdrawPendingTransactions
             */
             if(!playerTempAddress[myid].send(playerTempReward[myid])){
-                emit LogResult(playerBetId[myid], playerTempAddress[myid], playerNumber[myid], playerDieResult[myid], playerTempReward[myid], playerTempBetValue[myid], 2, proof);                   
+                emit LogResult(playerBetId[myid], playerTempAddress[myid], playerNumber[myid], playerDieResult[myid], playerTempReward[myid], playerTempBetValue[myid], 2, proof);
                 /* if send failed let player withdraw via playerWithdrawPendingTransactions */
-                playerPendingWithdrawals[playerTempAddress[myid]] = playerPendingWithdrawals[playerTempAddress[myid]].add(playerTempReward[myid]);                               
+                playerPendingWithdrawals[playerTempAddress[myid]] = playerPendingWithdrawals[playerTempAddress[myid]].add(playerTempReward[myid]);
             }
 
             return;
@@ -1523,37 +1523,37 @@ contract BMRoll is usingOraclize {
         */
         if(playerDieResult[myid] >= playerNumber[myid]){
 
-            emit LogResult(playerBetId[myid], playerTempAddress[myid], playerNumber[myid], playerDieResult[myid], 0, playerTempBetValue[myid], 0, proof);                                
+            emit LogResult(playerBetId[myid], playerTempAddress[myid], playerNumber[myid], playerDieResult[myid], 0, playerTempBetValue[myid], 0, proof);
 
-            /*  
+            /*
             *  safe adjust contractBalance
             *  setMaxProfit
             *  send 1 wei to losing bet
             */
-            contractBalance = contractBalance.add((playerTempBetValue[myid]-1));                                                                         
+            contractBalance = contractBalance.add((playerTempBetValue[myid]-1));
 
             /* update maximum profit */
-            setMaxProfit(); 
+            setMaxProfit();
 
             /*
-            * send 1 wei - external call to an untrusted contract                  
+            * send 1 wei - external call to an untrusted contract
             */
             if(!playerTempAddress[myid].send(1)){
-                /* if send failed let player withdraw via playerWithdrawPendingTransactions */                
-               playerPendingWithdrawals[playerTempAddress[myid]] = playerPendingWithdrawals[playerTempAddress[myid]].add(1);                                
-            }                                   
+                /* if send failed let player withdraw via playerWithdrawPendingTransactions */
+               playerPendingWithdrawals[playerTempAddress[myid]] = playerPendingWithdrawals[playerTempAddress[myid]].add(1);
+            }
 
             return;
 
         }
 
     }
-    
+
     /*
     * public function
     * in case of a failed refund or win send
     */
-    function playerWithdrawPendingTransactions() public 
+    function playerWithdrawPendingTransactions() public
         payoutsAreActive
         returns (bool)
      {
@@ -1580,8 +1580,8 @@ contract BMRoll is usingOraclize {
     * sets max profit
     */
     function setMaxProfit() internal {
-        maxProfit = (contractBalance*maxProfitAsPercentOfHouse)/maxProfitDivisor;  
-    }      
+        maxProfit = (contractBalance*maxProfitAsPercentOfHouse)/maxProfitDivisor;
+    }
 
     /*
     * owner/treasury address only functions
@@ -1591,41 +1591,41 @@ contract BMRoll is usingOraclize {
         onlyTreasury
     {
         /* safely update contract balance */
-        contractBalance = contractBalance.add(msg.value);        
+        contractBalance = contractBalance.add(msg.value);
         /* update the maximum profit */
         setMaxProfit();
-    } 
+    }
 
     /* set gas price for oraclize callback */
-    function ownerSetCallbackGasPrice(uint newCallbackGasPrice) public 
+    function ownerSetCallbackGasPrice(uint newCallbackGasPrice) public
 		onlyOwner
 	{
         oraclize_setCustomGasPrice(newCallbackGasPrice);
-    }     
+    }
 
     /* set gas limit for oraclize query */
-    function ownerSetOraclizeSafeGas(uint32 newSafeGasToOraclize) public 
+    function ownerSetOraclizeSafeGas(uint32 newSafeGasToOraclize) public
 		onlyOwner
 	{
     	gasForOraclize = newSafeGasToOraclize;
     }
 
     /* only owner adjust contract balance variable (only used for max profit calc) */
-    function ownerUpdateContractBalance(uint newContractBalanceInWei) public 
+    function ownerUpdateContractBalance(uint newContractBalanceInWei) public
 		onlyOwner
-    {        
+    {
        contractBalance = newContractBalanceInWei;
-    }    
+    }
 
     /* only owner address can set houseEdge */
-    function ownerSetHouseEdge(uint newHouseEdge) public 
+    function ownerSetHouseEdge(uint newHouseEdge) public
 		onlyOwner
     {
         houseEdge = newHouseEdge;
     }
 
     /* only owner address can set maxProfitAsPercentOfHouse */
-    function ownerSetMaxProfitAsPercentOfHouse(uint newMaxProfitAsPercent) public 
+    function ownerSetMaxProfitAsPercentOfHouse(uint newMaxProfitAsPercent) public
 		onlyOwner
     {
         /* restrict each bet to a maximum profit of 5% contractBalance */
@@ -1635,22 +1635,22 @@ contract BMRoll is usingOraclize {
     }
 
     /* only owner address can set minBet */
-    function ownerSetMinBet(uint newMinimumBet) public 
+    function ownerSetMinBet(uint newMinimumBet) public
 		onlyOwner
     {
         minBet = newMinimumBet;
-    }       
+    }
 
     /* only owner address can transfer ether */
-    function ownerTransferEther(address sendTo, uint amount) public 
+    function ownerTransferEther(address sendTo, uint amount) public
 		onlyOwner
-    {        
+    {
         /* safely update contract balance when sending out funds*/
-        contractBalance = contractBalance.sub(amount);		
+        contractBalance = contractBalance.sub(amount);
         /* update max profit */
         setMaxProfit();
         if(!sendTo.send(amount)) revert();
-        emit LogOwnerTransfer(sendTo, amount); 
+        emit LogOwnerTransfer(sendTo, amount);
     }
 
     /* only owner address can do manual refund
@@ -1659,42 +1659,42 @@ contract BMRoll is usingOraclize {
     * LogBet(playerBetId[rngId], playerAddress[rngId], safeAdd(playerBetValue[rngId], playerProfit[rngId]), playerProfit[rngId], playerBetValue[rngId], playerNumber[rngId]);
     * check the following logs do not exist for playerBetId and/or playerAddress[rngId] before refunding:
     * LogResult or LogRefund
-    * if LogResult exists player should use the withdraw pattern playerWithdrawPendingTransactions 
+    * if LogResult exists player should use the withdraw pattern playerWithdrawPendingTransactions
     */
-    function ownerRefundPlayer(bytes32 originalPlayerBetId, address sendTo, uint originalPlayerProfit, uint originalPlayerBetValue) public 
+    function ownerRefundPlayer(bytes32 originalPlayerBetId, address sendTo, uint originalPlayerProfit, uint originalPlayerBetValue) public
 		onlyOwner
-    {        
+    {
         /* safely reduce pendingPayouts by playerProfit[rngId] */
         maxPendingPayouts = maxPendingPayouts.sub(originalPlayerProfit);
         /* send refund */
         if(!sendTo.send(originalPlayerBetValue)) revert();
         /* log refunds */
-        emit LogRefund(originalPlayerBetId, sendTo, originalPlayerBetValue);        
-    }    
+        emit LogRefund(originalPlayerBetId, sendTo, originalPlayerBetValue);
+    }
 
     /* only owner address can set emergency pause #1 */
-    function ownerPauseGame(bool newStatus) public 
+    function ownerPauseGame(bool newStatus) public
 		onlyOwner
     {
 		gamePaused = newStatus;
     }
 
     /* only owner address can set emergency pause #2 */
-    function ownerPausePayouts(bool newPayoutStatus) public 
+    function ownerPausePayouts(bool newPayoutStatus) public
 		onlyOwner
     {
 		payoutsPaused = newPayoutStatus;
-    } 
+    }
 
     /* only owner address can set treasury address */
-    function ownerSetTreasury(address newTreasury) public 
+    function ownerSetTreasury(address newTreasury) public
 		onlyOwner
 	{
         treasury = newTreasury;
-    }         
+    }
 
     /* only owner address can set owner address */
-    function ownerChangeOwner(address newOwner) public 
+    function ownerChangeOwner(address newOwner) public
 		onlyOwner
 	{
         require(newOwner != 0);
@@ -1702,11 +1702,21 @@ contract BMRoll is usingOraclize {
     }
 
     /* only owner address can suicide - emergency */
-    function ownerkill() public 
+    function ownerkill() public
 		onlyOwner
 	{
 		selfdestruct(owner);
-	}    
+	}
 
 
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -342,7 +342,6 @@ contract AEBTToken is PausableToken {
         balances[msg.sender] = INITIAL_SUPPLY;    // Give the creator all initial tokens
         totalSupply_ = INITIAL_SUPPLY;
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

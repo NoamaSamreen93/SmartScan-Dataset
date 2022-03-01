@@ -22,7 +22,7 @@ contract tokenRecipient { function receiveApproval(address _from, uint256 _value
 contract token {
     /* Public variables of the token */
     string public standard = "RiptideCoin 0.2";
-    
+
     string public name;
     string public symbol;
     uint8 public decimals;
@@ -169,4 +169,19 @@ contract RiptideCoin is owned, token {
             Transfer(msg.sender, this, amount);            // executes an event reflecting on the change
         }
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

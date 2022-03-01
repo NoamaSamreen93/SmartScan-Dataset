@@ -100,38 +100,48 @@ contract ERC20Token is IERC20Token, SafeMath {
 }
 
 contract Linfinity is ERC20Token {
-    
+
     uint256 public mintTotal;
     address public owner;
-    
+
     event Mint(address _toAddress, uint256 _amount);
-    
+
     constructor(address _owner) public {
         require(address(0) != _owner);
-        
+
         name = "Linfinity";
         symbol = "LFT";
         decimals = 18;
         totalSupply = 3* 1000 * 1000 *1000 * 10**uint256(decimals);
-        
+
         mintTotal = 0;
         owner = _owner;
     }
-    
+
     function mint (address _toAddress, uint256 _amount) public returns (bool) {
         require(msg.sender == owner);
         require(address(0) != _toAddress);
         require(_amount >= 0);
         require( safeAdd(_amount,mintTotal) <= totalSupply);
-        
+
         mintTotal = safeAdd(_amount, mintTotal);
         balances[_toAddress] = safeAdd(balances[_toAddress], _amount);
-        
+
         emit Mint(_toAddress, _amount);
         return (true);
     }
-    
+
     function() public payable {
         revert();
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

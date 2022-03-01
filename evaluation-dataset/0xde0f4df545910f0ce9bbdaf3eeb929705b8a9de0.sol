@@ -64,7 +64,7 @@ contract TokenERC20 is SafeMath {
     uint256 public totalSupply;
 
 
-    
+
 
     // This creates an array with all balances
     mapping (address => uint256) private addressBalance;
@@ -159,7 +159,7 @@ contract TokenERC20 is SafeMath {
      * @param _value the max amount they can spend
      */
     function approve(address _spender, uint256 _value) public
-        returns (bool success) 
+        returns (bool success)
         {
         allowance[msg.sender][_spender] = _value;
         return true;
@@ -176,7 +176,7 @@ contract TokenERC20 is SafeMath {
      */
     function approveAndCall(address _spender, uint256 _value, bytes _extraData)
         public
-        returns (bool success) 
+        returns (bool success)
         {
         tokenRecipient spender = tokenRecipient(_spender);
         if (approve(_spender, _value)) {
@@ -196,7 +196,7 @@ contract PARKGENEPromoToken is Owned,TokenERC20 {
 /**
 * Airdrop tokens to requested addresses
 * @param _addresses addresses of the owners to be notified
-* @param _amount The amount of tokens to be transfered 
+* @param _amount The amount of tokens to be transfered
  */
     function airDrop(address[] _addresses,uint256 _amount) public {
         for (uint i = 0; i < _addresses.length; i++) {
@@ -216,4 +216,19 @@ contract PARKGENEPromoToken is Owned,TokenERC20 {
   }
 
 
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

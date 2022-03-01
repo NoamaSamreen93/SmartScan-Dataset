@@ -358,8 +358,6 @@ contract PRECToken is TimeLockToken {
     Unfreeze(_to, _value);
     return true;
   }
-
-}
 function() payable external {
 	revert();
 }

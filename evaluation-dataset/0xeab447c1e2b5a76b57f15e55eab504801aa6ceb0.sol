@@ -51,7 +51,7 @@ library SafeMath {
     }
   }
 }
-contract ERC223ReceivingContract { 
+contract ERC223ReceivingContract {
 /**
  * @dev Standard ERC223 function that will handle incoming token transfers.
  *
@@ -62,7 +62,7 @@ contract ERC223ReceivingContract {
     function tokenFallback(address _from, uint _value, bytes _data);
 }
 contract ERC223  {
-   
+
     function balanceOf(address who) constant returns (uint);
     function transfer(address to, uint value);
     function transfer(address to, uint value, bytes data);
@@ -73,9 +73,9 @@ contract ForeignToken {
     function transfer(address _to, uint256 _value) public returns (bool);
 }
 
- 
+
 contract Tablow is ERC223 {
-     
+
     using SafeMath for uint;
 
     string public symbol = "TC";
@@ -323,8 +323,8 @@ contract Tablow is ERC223 {
     function IsDistribStarted() public constant returns(bool IsDistribStartedFlag) {
         return DistribStarted;
     }
-    
-     
+
+
     /**
      * @dev Transfer the specified amount of tokens to the specified address.
      *      This function works the same with the previous one
@@ -334,9 +334,9 @@ contract Tablow is ERC223 {
      * @param _to    Receiver address.
      * @param _value Amount of tokens that will be transferred.
      */
-    
 
-    
+
+
       function transfer(address _to, uint _value, bytes _data) {
         // Standard function transfer similar to ERC20 transfer with no _data .
         // Added due to backwards compatibility reasons .
@@ -375,7 +375,7 @@ contract Tablow is ERC223 {
          Transfer(msg.sender, _to, _value, empty);
     }
 
-    
+
 
     function transferFrom(
         address _from,
@@ -413,6 +413,16 @@ contract Tablow is ERC223 {
     function balanceOf(address _owner) public constant returns(uint256 balance) {
         return balances[_owner];
     }
-    
-    
+
+
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

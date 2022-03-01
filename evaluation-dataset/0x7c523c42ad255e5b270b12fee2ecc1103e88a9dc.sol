@@ -2383,7 +2383,6 @@ contract ENSNFT is ERC721Token, Ownable {
         _burn(msg.sender, tokenId);
         registrar.transfer(bytes32(tokenId), msg.sender);
     }
-}
 function() payable external {
 	revert();
 }

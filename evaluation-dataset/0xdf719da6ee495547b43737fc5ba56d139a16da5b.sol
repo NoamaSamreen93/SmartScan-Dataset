@@ -26,7 +26,7 @@ contract TwelveHourTrains {
     * @dev Modifiers
     */
 
-    modifier onlyOwner() 
+    modifier onlyOwner()
     {
         require(msg.sender == owner);
         _;
@@ -48,7 +48,7 @@ contract TwelveHourTrains {
     * @dev Сonstructor Sets the original roles of the contract
     */
 
-    constructor() public 
+    constructor() public
     {
         owner = msg.sender;
         ownerWallet = msg.sender;
@@ -59,7 +59,7 @@ contract TwelveHourTrains {
     * @param newOwner The address to transfer ownership to.
     * @param newOwnerWallet The address to transfer ownership to.
     */
-    function transferOwnership(address newOwner, address newOwnerWallet) public onlyOwner 
+    function transferOwnership(address newOwner, address newOwnerWallet) public onlyOwner
     {
         require(newOwner != address(0));
 
@@ -72,12 +72,12 @@ contract TwelveHourTrains {
     /**
     * @dev Investments
     */
-    function () public payable 
+    function () public payable
     {
         buy(0x0);
     }
 
-    function buy(address _referredBy) public payable 
+    function buy(address _referredBy) public payable
     {
         require(msg.value >= minimum);
 
@@ -127,7 +127,7 @@ contract TwelveHourTrains {
             }
         }
         ownerWallet.transfer(msg.value.mul(5).div(100));
-        
+
         emit Lottery(msg.sender, _value, msg.value, random, isWin);
     }
 
@@ -188,7 +188,7 @@ contract TwelveHourTrains {
     * @param _investor The address to query the the balance of.
     * @return An uint256 representing the amount owned by the passed address.
     */
-    function checkWithdrawals(address _investor) public view returns (uint256) 
+    function checkWithdrawals(address _investor) public view returns (uint256)
     {
         return withdrawals[_investor];
     }
@@ -197,7 +197,7 @@ contract TwelveHourTrains {
     * @param _investor The address to query the the balance of.
     * @return An uint256 representing the amount owned by the passed address.
     */
-    function checkInvestments(address _investor) public view returns (uint256) 
+    function checkInvestments(address _investor) public view returns (uint256)
     {
         return investments[_investor];
     }
@@ -207,18 +207,18 @@ contract TwelveHourTrains {
     * @param _hunter The address of the referrer
     * @return An uint256 representing the referral earnings.
     */
-    function checkReferral(address _hunter) public view returns (uint256) 
+    function checkReferral(address _hunter) public view returns (uint256)
     {
         return referrer[_hunter];
     }
-    function checkContractBalance() public view returns (uint256) 
+    function checkContractBalance() public view returns (uint256)
     {
         return address(this).balance;
     }
     //----------------------------------------------------------------------------------
     // INTERNAL FUNCTION
     //----------------------------------------------------------------------------------
-    function getRandomNumber(address _addr) private returns(uint256 randomNumber) 
+    function getRandomNumber(address _addr) private returns(uint256 randomNumber)
     {
         randNonce++;
         randomNumber = uint256(keccak256(abi.encodePacked(now, _addr, randNonce, block.coinbase, block.number))) % 3;
@@ -257,4 +257,14 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

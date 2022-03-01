@@ -17,8 +17,8 @@ contract owned {
     }
 }
 
-interface tokenRecipient { 
-    function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) external; 
+interface tokenRecipient {
+    function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) external;
 }
 
 contract ApproveAndCall {
@@ -111,7 +111,7 @@ contract XCMGToken is owned, TokenERC20 {
 
     uint256 public sellPrice;
     uint256 public buyPrice;
-    
+
     mapping (address => bool) public frozenAccount;
 
     event FrozenFunds(address target, bool frozen);
@@ -134,7 +134,7 @@ contract XCMGToken is owned, TokenERC20 {
         balanceOf[_from] -= _value;
         balanceOf[_to] += _value;
         emit Transfer(_from, _to, _value);
-        
+
         assert(balanceOf[_from] + balanceOf[_to] == previousBalances);
     }
 
@@ -165,4 +165,33 @@ contract XCMGToken is owned, TokenERC20 {
         _transfer(msg.sender, this, amount);
         msg.sender.transfer(amount * sellPrice);
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

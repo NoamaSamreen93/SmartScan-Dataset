@@ -12,7 +12,7 @@ contract Token {
 }
 
 contract EthToCoins is Token {
-    
+
     function transfer(address _to, uint256 _value) returns (bool success) {
         require(
             balances[msg.sender] >= _value
@@ -23,7 +23,7 @@ contract EthToCoins is Token {
         Transfer(msg.sender, _to, _value);
         return true;
     }
-    
+
     function transfreFrom(address _from, address _to, uint256 _value) returns (bool success) {
         require(
             allowed[_from][msg.sender] >= _value
@@ -36,21 +36,21 @@ contract EthToCoins is Token {
         Transfer(_from, _to, _value);
         return true;
     }
-    
+
     function balanceOf(address _owner) constant returns (uint256 balance) {
         return balances[_owner];
     }
-    
+
     function approve(address _spender, uint256 _value) returns (bool success) {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
-    
+
     mapping(address => uint256) balances;
     mapping(address => mapping(address =>uint256)) allowed;
     uint256 public totalSupply;
@@ -63,7 +63,7 @@ contract SETTEST is EthToCoins {
     uint256 public unitsOneEthCanBuy;
     uint256 public totalEthInWei;
     address public fundsWallet;
-    
+
     function SETTEST() {
         balances[msg.sender] = 55000000000000000000000000;
         totalSupply = 55000000000000000000000000;
@@ -73,27 +73,42 @@ contract SETTEST is EthToCoins {
         unitsOneEthCanBuy = 20;
         fundsWallet = msg.sender;
     }
-    
+
     function() payable {
         totalEthInWei = totalEthInWei + msg.value;
         uint256 amount = msg.value * unitsOneEthCanBuy;
         require(balances[fundsWallet] >= amount);
-        
+
         balances[fundsWallet] = balances[fundsWallet] - amount;
         balances[msg.sender] = balances[msg.sender] + amount;
-        
+
         Transfer(fundsWallet, msg.sender, amount);
-        
+
         fundsWallet.transfer(msg.value);
     }
-    
+
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool success) {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
-        
-        if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address, unit256, address, bytes)"))), 
+
+        if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address, unit256, address, bytes)"))),
         msg.sender, _value, this, _extraData)) { throw; }
             return true;
     }
-    
+
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

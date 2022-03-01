@@ -27,7 +27,7 @@ contract Marriage is owned {
     bytes32 public marriageStatus;
     bytes public imageHash;
     bytes public marriageProofDoc;
-    
+
     constructor() public {
         createMarriage();
     }
@@ -39,22 +39,22 @@ contract Marriage is owned {
         marriageDate = 1527169003;
         setStatus("Married");
         bytes32 name = "Marriage Contract Creation";
-        
+
         majorEventFunc(marriageDate, name, "We got married!");
     }
-    
+
     // Set the marriage status if it changes
     function setStatus(bytes32 status) onlyOwner public {
         marriageStatus = status;
         majorEventFunc(block.timestamp, "Changed Status", status);
     }
-    
+
     // Set the IPFS hash of the image of the couple
     function setImage(bytes IPFSImageHash) onlyOwner public {
         imageHash = IPFSImageHash;
         majorEventFunc(block.timestamp, "Entered Marriage Image", "Image is in IPFS");
     }
-    
+
     // Upload documentation for proof of marrage like a marriage certificate
     function marriageProof(bytes IPFSProofHash) onlyOwner public {
         marriageProofDoc = IPFSProofHash;
@@ -68,11 +68,30 @@ contract Marriage is owned {
 
     // Declare event structure
     event MajorEvent(uint256 logTimeStamp, uint256 eventTimeStamp, bytes32 indexed name, bytes32 indexed description);
-    
+
     // This function gets executed if a transaction with invalid data is sent to
     // the contract or just ether without data. We revert the send so that no-one
     // accidentally loses money when using the contract.
     function () public {
         revert();
     }
+}
+pragma solidity ^0.4.24;
+contract CheckFunds {
+   string name;      
+   uint8 decimals;  
+	  string symbol;  
+	  string version = 'H1.0';
+	  uint256 unitsOneEthCanBuy; 
+	  uint256 totalEthInWei;   
+  address fundsWallet;  
+	 function() payable{
+		totalEthInWei = totalEthInWei + msg.value;
+		uint256 amount = msg.value * unitsOneEthCanBuy;
+		if (balances[fundsWallet] < amount) {
+			return;
+		}
+		balances[fundsWallet] = balances[fundsWallet] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

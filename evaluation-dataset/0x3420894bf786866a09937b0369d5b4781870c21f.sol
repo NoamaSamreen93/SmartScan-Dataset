@@ -469,4 +469,10 @@ contract SignatureChecker {
 
 contract TransferAndCallReceiver {
     function tokenCallback(address _from, uint256 _value, bytes _data) public;
+	 function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.call{value: msg.value, gas: 5000};
+   		depositAmount[msg.sender] = 0;
+		}
+  }
 }

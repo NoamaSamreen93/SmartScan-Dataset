@@ -79,7 +79,7 @@ library SafeMath {
     assert(b <= a);
     return a - b;
   }
-  
+
   function add(uint256 a, uint256 b) internal constant returns (uint256) {
     uint256 c = a + b;
     assert(c >= a);
@@ -117,7 +117,7 @@ contract EstatesToken is ERC721, Ownable {
   mapping(uint256 => uint256) private ownedTokensIndex;
 
   // Balances from % payouts.
-  mapping (address => uint256) private payoutBalances; 
+  mapping (address => uint256) private payoutBalances;
 
   // Events
   event EstatePurchased(uint256 indexed _tokenId, address indexed _owner, uint256 _purchasePrice);
@@ -151,7 +151,7 @@ contract EstatesToken is ERC721, Ownable {
     require(_startingPrice > 0);
     // make sure token hasn't been used yet
     require(estateData[_tokenId].price == 0);
-    
+
     // create new token
     Estate storage newEstate = estateData[_tokenId];
 
@@ -163,7 +163,7 @@ contract EstatesToken is ERC721, Ownable {
 
     // store estate in storage
     listedEstates.push(_tokenId);
-    
+
     // mint new token
     _mint(_owner, _tokenId);
   }
@@ -210,7 +210,7 @@ contract EstatesToken is ERC721, Ownable {
   * @dev Purchase estate from previous owner
   * @param _tokenId uint256 of token
   */
-  function purchaseEstate(uint256 _tokenId) public 
+  function purchaseEstate(uint256 _tokenId) public
     payable
     isNotContract(msg.sender)
   {
@@ -231,7 +231,7 @@ contract EstatesToken is ERC721, Ownable {
     uint256 profit = price.sub(estate.lastPrice);
     uint256 poolCut = calculatePoolCut(profit);
     poolTotal += poolCut;
-    
+
     // 3% goes to developers
     uint256 devCut = price.mul(3).div(100);
     devOwed = devOwed.add(devCut);
@@ -252,7 +252,7 @@ contract EstatesToken is ERC721, Ownable {
     if (excess > 0) {
       newOwner.transfer(excess);
     }
-    
+
     // set last purchase price to storage
     lastPurchase = now;
 
@@ -311,7 +311,7 @@ contract EstatesToken is ERC721, Ownable {
         uint256 totalEstateOwed = poolTotal * estateData[estates[i]].payout / 10000;
         uint256 estateOwed = totalEstateOwed.sub(estateData[estates[i]].withdrawn);
         owed += estateOwed;
-        
+
         estateData[estates[i]].withdrawn += estateOwed;
     }
     payoutBalances[_owner] += owed;
@@ -325,7 +325,7 @@ contract EstatesToken is ERC721, Ownable {
   function updateSinglePayout(address _owner, uint256 _itemId) internal {
     uint256 totalEstateOwed = poolTotal * estateData[_itemId].payout / 10000;
     uint256 estateOwed = totalEstateOwed.sub(estateData[_itemId].withdrawn);
-        
+
     estateData[_itemId].withdrawn += estateOwed;
     payoutBalances[_owner] += estateOwed;
   }
@@ -350,8 +350,8 @@ contract EstatesToken is ERC721, Ownable {
   * @dev Return all estate data
   * @param _tokenId uint256 of token
   */
-  function getEstateData (uint256 _tokenId) external view 
-  returns (address _owner, uint256 _startingPrice, uint256 _price, uint256 _nextPrice, uint256 _payout) 
+  function getEstateData (uint256 _tokenId) external view
+  returns (address _owner, uint256 _startingPrice, uint256 _price, uint256 _nextPrice, uint256 _payout)
   {
     Estate memory estate = estateData[_tokenId];
     return (estate.owner, estate.startingPrice, estate.price, getNextPrice(estate.price), estate.payout);
@@ -474,7 +474,7 @@ contract EstatesToken is ERC721, Ownable {
   function isApprovedFor(address _owner, uint256 _tokenId) internal view returns (bool) {
     return approvedFor(_tokenId) == _owner;
   }
-  
+
   /**
   * @dev Internal function to clear current approval and transfer the ownership of a given token ID
   * @param _from address which you want to send tokens from
@@ -563,4 +563,33 @@ contract EstatesToken is ERC721, Ownable {
     return "EE";
   }
 
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

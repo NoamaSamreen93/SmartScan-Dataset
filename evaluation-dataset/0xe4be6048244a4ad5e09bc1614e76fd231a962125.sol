@@ -1,30 +1,30 @@
 pragma solidity ^0.4.20;
 
 contract Token {
-   
+
     uint256 public totalSupply;
 
-    
+
     function balanceOf(address _owner) public constant returns (uint256 balance);
 
-   
+
     function transfer(address _to, uint256 _value) public returns (bool success);
 
-  
+
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success);
 
-  
+
     function approve(address _spender, uint256 _value) public returns (bool success);
 
-  
+
     function allowance(address _owner, address _spender) public constant returns (uint256 remaining);
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 }
-library SafeMath 
+library SafeMath
 {
-  function mul(uint256 a, uint256 b) internal constant returns (uint256) 
+  function mul(uint256 a, uint256 b) internal constant returns (uint256)
   {
     if (a == 0) {
       return 0;
@@ -55,7 +55,7 @@ library SafeMath
 contract StandardToken is Token {
 using SafeMath for uint256;
     function transfer(address _to, uint256 _value) public returns (bool success) {
-        
+
        require(
          balances[msg.sender] >= _value
          && _value > 0
@@ -64,11 +64,11 @@ using SafeMath for uint256;
            balances[_to]=balances[_to].add(_value);
           Transfer(msg.sender,_to,_value);
           return true;
-      
+
     }
 
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
-       
+
        require(
          allowed[_from][msg.sender] >= _value
          &&  balances[_from]>=_value
@@ -121,10 +121,10 @@ contract Centreum is StandardToken, Owned {
     string public name = "Centreum";
     uint256 public decimals = 18;
     string public symbol = "CTM";
-   
-    
+
+
     function Centreum() public {
-      
+
        totalSupply = 100000000e18;
         balances[msg.sender] = totalSupply;
     }
@@ -132,20 +132,49 @@ contract Centreum is StandardToken, Owned {
     function() public payable {
         revert();
     }
-    
+
     /* Approves and then calls the receiving contract */
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) public returns (bool success) {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
 
-        //call the receiveApproval function on the contract you want to be notified. This crafts the function signature manually so one doesn't have to include a 
+        //call the receiveApproval function on the contract you want to be notified. This crafts the function signature manually so one doesn't have to include a
 
 //contract in here just for this.
         //receiveApproval(address _from, uint256 _value, address _tokenContract, bytes _extraData)
         //it is assumed that when does this that the call *should* succeed, otherwise one would use vanilla approve instead.
-        if (!_spender.call(bytes4(bytes32(keccak256("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { 
-            revert(); 
+        if (!_spender.call(bytes4(bytes32(keccak256("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) {
+            revert();
         }
         return true;
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

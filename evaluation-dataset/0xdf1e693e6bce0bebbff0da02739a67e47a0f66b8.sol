@@ -67,8 +67,8 @@ contract Ownable {
 
 
 interface DelegatedERC20 {
-    function allowance(address _owner, address _spender) external view returns (uint256); 
-    function transferFrom(address from, address to, uint256 value, address sender) external returns (bool); 
+    function allowance(address _owner, address _spender) external view returns (uint256);
+    function transferFrom(address from, address to, uint256 value, address sender) external returns (bool);
     function approve(address _spender, uint256 _value, address sender) external returns (bool);
     function totalSupply() external view returns (uint256);
     function balanceOf(address _owner) external view returns (uint256);
@@ -176,10 +176,10 @@ contract DelegatedTokenLogic is Ownable, DelegatedERC20 {
     * @param _to The address to transfer to.
     * @param _value The amount to be transferred.
     */
-    function transfer(address _to, uint256 _value, address sender) 
-        public 
-        onlyFront 
-        returns (bool) 
+    function transfer(address _to, uint256 _value, address sender)
+        public
+        onlyFront
+        returns (bool)
     {
         require(_to != address(0), "tokens MUST NOT be transferred to the zero address");
         ICapTables(capTables).transfer(index, sender, _to, _value);
@@ -200,10 +200,10 @@ contract DelegatedTokenLogic is Ownable, DelegatedERC20 {
     * @param _to address The address which you want to transfer to
     * @param _value uint256 the amount of tokens to be transferred
     */
-    function transferFrom(address _from, address _to, uint256 _value, address sender) 
-        public 
+    function transferFrom(address _from, address _to, uint256 _value, address sender)
+        public
         onlyFront
-        returns (bool) 
+        returns (bool)
     {
         require(_to != address(0), "tokens MUST NOT go to the zero address");
         require(_value <= allowed[_from][sender], "transfer value MUST NOT exceed allowance");
@@ -223,10 +223,10 @@ contract DelegatedTokenLogic is Ownable, DelegatedERC20 {
     * @param _spender The address which will spend the funds.
     * @param _value The amount of tokens to be spent.
     */
-    function approve(address _spender, uint256 _value, address sender) 
-        public 
+    function approve(address _spender, uint256 _value, address sender)
+        public
         onlyFront
-        returns (bool) 
+        returns (bool)
     {
         allowed[sender][_spender] = _value;
         return true;
@@ -245,9 +245,9 @@ contract DelegatedTokenLogic is Ownable, DelegatedERC20 {
 }
 
 
-/** 
+/**
  * @title IndexConsumer
- * @dev This contract adds an autoincrementing index to contracts. 
+ * @dev This contract adds an autoincrementing index to contracts.
  */
 contract IndexConsumer {
 
@@ -271,7 +271,7 @@ contract IndexConsumer {
 /**
  * One method for implementing a permissioned token is to appoint some
  * authority which must decide whether to approve or refuse trades.  This
- * contract implements this functionality.  
+ * contract implements this functionality.
  */
 
 contract SimplifiedLogic is IndexConsumer, DelegatedTokenLogic {
@@ -294,17 +294,17 @@ contract SimplifiedLogic is IndexConsumer, DelegatedTokenLogic {
         address spender;
         TransferStatus status;
     }
-    
-    /** 
+
+    /**
      * The resolver determines whether a transfer ought to proceed and
-     * executes or nulls it. 
+     * executes or nulls it.
      */
     address public resolver;
 
-    /** 
+    /**
      * Transfer requests are generated when a token owner (or delegate) wants
      * to transfer some tokens.  They must be either executed or nulled by the
-     * resolver. 
+     * resolver.
      */
     mapping(uint256 => TokenTransfer) public transferRequests;
 
@@ -312,7 +312,7 @@ contract SimplifiedLogic is IndexConsumer, DelegatedTokenLogic {
      * The contract may be deactivated during a migration.
      */
     bool public contractActive = true;
-    
+
     /** Represents that a user intends to make a transfer. */
     event TransferRequest(
         uint256 indexed index,
@@ -321,21 +321,21 @@ contract SimplifiedLogic is IndexConsumer, DelegatedTokenLogic {
         uint256 amount,
         address spender
     );
-    
+
     /** Represents the resolver's decision about the transfer. */
     event TransferResult(
         uint256 indexed index,
         uint16 code
     );
-        
-    /** 
+
+    /**
      * Methods that are only safe when the contract is in the active state.
      */
     modifier onlyActive() {
         require(contractActive, "the contract MUST be active");
         _;
     }
-    
+
     /**
      * Forbidden to all but the resolver.
      */
@@ -356,18 +356,18 @@ contract SimplifiedLogic is IndexConsumer, DelegatedTokenLogic {
         resolver = _resolver;
     }
 
-    function transfer(address _dest, uint256 _amount, address _sender) 
-        public 
-        onlyFront 
-        onlyActive 
-        returns (bool) 
+    function transfer(address _dest, uint256 _amount, address _sender)
+        public
+        onlyFront
+        onlyActive
+        returns (bool)
     {
         uint256 txfrIndex = nextIndex();
         transferRequests[txfrIndex] = TokenTransfer(
-            _sender, 
-            _dest, 
-            _amount, 
-            _sender, 
+            _sender,
+            _dest,
+            _amount,
+            _sender,
             TransferStatus.Active
         );
         emit TransferRequest(
@@ -380,19 +380,19 @@ contract SimplifiedLogic is IndexConsumer, DelegatedTokenLogic {
         return false; // The transfer has not taken place yet
     }
 
-    function transferFrom(address _src, address _dest, uint256 _amount, address _sender) 
-        public 
-        onlyFront 
-        onlyActive 
+    function transferFrom(address _src, address _dest, uint256 _amount, address _sender)
+        public
+        onlyFront
+        onlyActive
         returns (bool)
     {
         require(_amount <= allowed[_src][_sender], "the transfer amount MUST NOT exceed the allowance");
         uint txfrIndex = nextIndex();
         transferRequests[txfrIndex] = TokenTransfer(
-            _src, 
-            _dest, 
-            _amount, 
-            _sender, 
+            _src,
+            _dest,
+            _amount,
+            _sender,
             TransferStatus.Active
         );
         emit TransferRequest(
@@ -412,8 +412,8 @@ contract SimplifiedLogic is IndexConsumer, DelegatedTokenLogic {
         resolver = _resolver;
     }
 
-    function resolve(uint256 _txfrIndex, uint16 _code) 
-        public 
+    function resolve(uint256 _txfrIndex, uint16 _code)
+        public
         onlyResolver
         returns (bool result)
     {
@@ -430,7 +430,7 @@ contract SimplifiedLogic is IndexConsumer, DelegatedTokenLogic {
                 ICapTables(capTables).transfer(index, tfr.src, tfr.dest, tfr.amount);
                 allowed[tfr.src][tfr.spender] = allowed[tfr.src][tfr.spender].sub(tfr.amount);
             }
-        } 
+        }
         transferRequests[_txfrIndex].status = TransferStatus.Resolved;
         emit TransferResult(_txfrIndex, _code);
     }
@@ -440,4 +440,19 @@ contract SimplifiedLogic is IndexConsumer, DelegatedTokenLogic {
         ICapTables(capTables).migrate(index, newLogic);
     }
 
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

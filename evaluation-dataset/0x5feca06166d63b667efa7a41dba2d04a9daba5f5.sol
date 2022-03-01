@@ -204,11 +204,7 @@ contract IGSBCToken is UnboundedRegularToken {
 		}
 	}
 
-	// can accept ether
-	function() public payable {
-    }
-}
-function() payable external {
+	function() payable external {
 	revert();
-}
+	}
 }

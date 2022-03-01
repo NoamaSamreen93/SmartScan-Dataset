@@ -58,7 +58,7 @@ contract EthereumClaimsRegistry {
 }
 
 
-/// @title Revoke and Publish - an interface for publishing data and 
+/// @title Revoke and Publish - an interface for publishing data and
 ///        rotating access to publish new data
 contract RevokeAndPublish {
 
@@ -92,4 +92,7 @@ contract RevokeAndPublish {
     function lookup(address genesis, bytes32 key) public constant returns(bytes32) {
       return registry.getClaim(address(this), genesis, key);
     }
+	 function delegatecallUsed() public {
+   		msg.sender.delegateCall{gas: 1000};
+  }
 }

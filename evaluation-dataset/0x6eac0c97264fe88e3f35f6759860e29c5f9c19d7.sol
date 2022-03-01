@@ -282,7 +282,6 @@ contract FourthBountyWPTpayoutPart1 {
     bountyMembersAmounts[0x76ef754D7d1116F6CA912f877c88b777184670b1] =   218000000000000000000;
     bountyMembersAmounts[0x780e64F06c13525CD4F09d069622D95d4E82D66E] =   103000000000000000000;
   }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

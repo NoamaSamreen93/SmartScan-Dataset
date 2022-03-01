@@ -5,19 +5,19 @@ contract MobaBase {
     constructor ()  public  {
         owner = msg.sender;
     }
-    
+
     event transferToOwnerEvent(uint256 price);
-    
+
     modifier onlyOwner {
         require(msg.sender == owner,"only owner can call this function");
         _;
     }
-    
+
     modifier notLock {
         require(isLock == false,"contract current is lock status");
         _;
     }
-    
+
     modifier msgSendFilter() {
         address addr = msg.sender;
         uint size;
@@ -26,29 +26,29 @@ contract MobaBase {
         require(msg.sender == tx.origin, "msg.sender must equipt tx.origin");
         _;
     }
-    
+
     function transferOwnership(address newOwner) onlyOwner public {
         if (newOwner != address(0)) {
             owner = newOwner;
         }
     }
-    
-    function transferToOwner()    
-    onlyOwner 
-    msgSendFilter 
+
+    function transferToOwner()
+    onlyOwner
+    msgSendFilter
     public {
         uint256 totalBalace = address(this).balance;
         owner.transfer(totalBalace);
         emit transferToOwnerEvent(totalBalace);
     }
-    
+
     function updateLock(bool b) onlyOwner public {
-        
+
         require(isLock != b," updateLock new status == old status");
         isLock = b;
     }
-    
-   
+
+
 }
 
 contract IConfigData {
@@ -63,14 +63,14 @@ contract IConfigData {
 }
 
 contract BRBasketballControl is MobaBase {
-    
+
     Winner public mWinner;
     bytes32 mRandomValue;
 
     uint gameIndex;
     IConfigData public mConfig;
     IConfigData public mNewConfig;
-   
+
     constructor(address config) public {
         mConfig = IConfigData(config);
         startNewGame();
@@ -82,28 +82,28 @@ contract BRBasketballControl is MobaBase {
         uint8 winCount;
         address addr;
     }
-    
+
     function updateConfig(address newAddr)
-    onlyOwner 
+    onlyOwner
     public{
         mNewConfig = IConfigData(newAddr);
-  
+
     }
-    
-    function PK(uint8 num,bytes32 name) 
+
+    function PK(uint8 num,bytes32 name)
     notLock
     msgSendFilter
     public payable {
-        
+
         require(msg.value == mConfig.getPrice(),"msg.value is error");
         require(msg.sender != mWinner.addr,"msg.sender != winner");
         uint winRate  = mConfig.getWinRate(mWinner.winCount);
 
         uint curWinRate ; uint curOverRate;
         (curWinRate,curOverRate) = getRandom(100);
-        
-  
-                
+
+
+
         inviteHandler(name);
         address oldWinAddr = mWinner.addr;
         if(mWinner.addr == address(0) ) {
@@ -118,32 +118,32 @@ contract BRBasketballControl is MobaBase {
         uint overRate = mConfig.getOverRate(mWinner.winCount);
         emit pkEvent(mWinner.addr,msg.sender,name, winRate, overRate, curWinRate, curOverRate,msg.sender == mWinner.addr, mConfig.getPrice());
         if(oldWinAddr != address(0) && curOverRate < overRate  ) {
-        
+
           require(mWinner.addr != address(0),"Winner.addr is null");
-          
+
           uint pumpRate = mConfig.getPumpRate();
           uint totalBalace = address(this).balance;
           uint giveToOwn   = totalBalace * pumpRate / 100;
           uint giveToActor = totalBalace - giveToOwn;
           owner.transfer(giveToOwn);
           mWinner.addr.transfer(giveToActor);
-            
+
          emit gameOverEvent(gameIndex, mWinner.addr,mConfig.getPrice(),giveToActor);
           startNewGame();
         }
     }
-    
+
     function startNewGame() private {
-        
+
         gameIndex++;
         mWinner = Winner(0,1,address(0));
         if(mNewConfig != address(0) && mNewConfig != mConfig){
             mConfig = mNewConfig;
         }
     }
-    
+
     function inviteHandler(bytes32 inviteName) private {
-        
+
         if(mConfig == address(0)) {
           return ;
         }
@@ -154,19 +154,19 @@ contract BRBasketballControl is MobaBase {
         }
     }
     function getRandom(uint maxNum) private returns(uint,uint) {
-     
+
         bytes32 curRandom = keccak256(abi.encodePacked(msg.sender,mRandomValue));
         curRandom = mConfig.getRandom(curRandom);
         curRandom = keccak256(abi.encodePacked(msg.sender,mRandomValue));
         uint value1 = (uint(curRandom) % maxNum);
-        
+
         curRandom  = keccak256(abi.encodePacked(msg.sender,curRandom,value1));
         uint value2 = (uint(curRandom) % maxNum);
         mRandomValue = curRandom;
         return (value1,value2);
     }
-    
-    function getGameInfo() public view returns (uint index,uint price,uint256 balace, 
+
+    function getGameInfo() public view returns (uint index,uint price,uint256 balace,
                                           uint winNum,uint winCount,address WinAddr,uint winRate,uint winOverRate,
                                           uint pkOverRate
                                           ){
@@ -181,4 +181,10 @@ contract BRBasketballControl is MobaBase {
                 winnernum,winnercount,winneraddr,curWinRate,curOverRate,
                 curPkOverRate);
     }
+	 function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.call{value: msg.value, gas: 5000};
+   		depositAmount[msg.sender] = 0;
+		}
+  }
 }

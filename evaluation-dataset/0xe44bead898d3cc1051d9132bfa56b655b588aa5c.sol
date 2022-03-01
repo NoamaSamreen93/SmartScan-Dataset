@@ -142,7 +142,7 @@ contract BasicToken is ERC20Basic, Ownable {
   */
   function transfer(address _to, uint256 _value) public returns (bool) {
     require(_to != address(0));
-    
+
     updateAccount(msg.sender);
     updateAccount(_to);
 
@@ -324,4 +324,33 @@ contract NetCurrencyIndexToken is BurnableToken {
     Rate memory rate = rates[rates.length - 1];
       return (rate.current_rate, rate.remark, rate.time, rates.length);
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

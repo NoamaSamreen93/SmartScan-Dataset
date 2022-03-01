@@ -222,7 +222,7 @@ contract OrganicFreshCoin is MintableToken {
   uint256 public constant INITIAL_SUPPLY = 350000000 * (10 ** uint256(decimals));
 
   /**
-   * @dev Constructor that set name and symbol. 
+   * @dev Constructor that set name and symbol.
    */
   function OrganicFreshCoin() public {
 
@@ -262,5 +262,34 @@ library SafeMath {
     uint256 c = a + b;
     assert(c >= a);
     return c;
+  }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
 }

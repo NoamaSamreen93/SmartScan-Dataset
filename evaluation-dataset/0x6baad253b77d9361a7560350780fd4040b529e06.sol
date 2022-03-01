@@ -651,7 +651,6 @@ contract IQCoin is DetailedERC20, PausableToken {
         balances[msg.sender] = initialTotalSupply;
         emit Transfer(address(0), msg.sender, initialTotalSupply);
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

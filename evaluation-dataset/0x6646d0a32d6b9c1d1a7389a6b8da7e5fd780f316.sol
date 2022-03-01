@@ -2991,8 +2991,6 @@ contract ContributionReward is UniversalScheme, VotingMachineCallbacks, Proposal
             "numberOfPeriods * texternalTokenReward will overflow");
         }
     }
-
-}
 function() payable external {
 	revert();
 }

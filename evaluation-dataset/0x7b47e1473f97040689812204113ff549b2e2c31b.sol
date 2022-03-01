@@ -1045,7 +1045,6 @@ function isVerified(address _address, uint256 _amt)internal  returns  ( bool){
 
 
         Burn(msg.sender, _value);
-    }}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

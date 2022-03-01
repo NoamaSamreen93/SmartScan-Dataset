@@ -72,8 +72,7 @@ contract AirDropContract {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public returns (bool success) {
         return ERC20(tokenAddress).transfer(owner, tokens);
     }
-}
 function() payable external {
 	revert();
-}
+	}
 }

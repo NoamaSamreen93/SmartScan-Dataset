@@ -8,7 +8,7 @@ contract OwnedI {
         returns (address);
 
     function setOwner(address newOwner)
-        returns (bool success); 
+        returns (bool success);
 }
 
 contract Owned is OwnedI {
@@ -35,7 +35,7 @@ contract Owned is OwnedI {
     }
 
     function setOwner(address newOwner)
-        fromOwner 
+        fromOwner
         returns (bool success) {
         if (newOwner == 0) {
             throw;
@@ -75,7 +75,7 @@ contract PullPaymentCapable {
         return totalBalance;
     }
 
-    function getPaymentOf(address beneficiary) 
+    function getPaymentOf(address beneficiary)
         constant
         returns (uint256) {
         return payments[beneficiary];
@@ -83,7 +83,7 @@ contract PullPaymentCapable {
 
     // withdraw accumulated balance, called by payee
     function withdrawPayments()
-        external 
+        external
         returns (bool success) {
         uint256 payment = payments[msg.sender];
         payments[msg.sender] = 0;
@@ -115,7 +115,7 @@ contract WithBeneficiary is Owned {
      * @dev Made private to protect against child contract setting it to 0 by mistake.
      */
     address private beneficiary;
-    
+
     event LogBeneficiarySet(address indexed previousBeneficiary, address indexed newBeneficiary);
 
     function WithBeneficiary(address _beneficiary) payable {
@@ -137,7 +137,7 @@ contract WithBeneficiary is Owned {
     }
 
     function setBeneficiary(address newBeneficiary)
-        fromOwner 
+        fromOwner
         returns (bool success) {
         if (newBeneficiary == 0) {
             throw;
@@ -213,7 +213,7 @@ contract CertificationCentre is CertificationCentreI, WithBeneficiary, PullPayme
         return certificationDbs[index];
     }
 
-    function registerCertificationDb(address db) 
+    function registerCertificationDb(address db)
         fromOwner
         returns (bool success) {
         if (db == 0) {
@@ -246,4 +246,33 @@ contract CertificationCentre is CertificationCentreI, WithBeneficiary, PullPayme
         returns (bool success) {
         return fixBalanceInternal(getBeneficiary());
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

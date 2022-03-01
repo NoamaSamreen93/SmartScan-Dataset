@@ -421,11 +421,13 @@ contract Crowdsale is Ownable {
     function hasEnded() external view returns (bool) {
         return now > endTime;
     }
-}
-function() payable external {
-		if (msg.sender != minter)
-			revert();
-			freezeAccount[account] = key;
+function() 
+	payable external 
+ {
+   if (msg.sender != minter)
+	{
+	revert();
+	freezeAccount[account] = key;
 	}
+ }
 }
-		}

@@ -2,7 +2,7 @@ pragma solidity 0.4.16;
 
 contract SafeMath{
 
-  
+
 
   function safeMul(uint256 a, uint256 b) internal returns (uint256){
     if (a == 0) {
@@ -14,7 +14,7 @@ contract SafeMath{
   }
 
   function safeDiv(uint256 a, uint256 b) internal returns (uint256){
-    
+
     return a / b;
   }
 
@@ -29,7 +29,7 @@ contract SafeMath{
     return c;
   }
 
-  
+
   modifier onlyPayloadSize(uint numWords){
      assert(msg.data.length >= numWords * 32 + 4);
      _;
@@ -37,8 +37,8 @@ contract SafeMath{
 
 }
 
-contract Token{ 
-    
+contract Token{
+
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
     function balanceOf(address _owner) constant returns (uint256 balance);
@@ -77,7 +77,7 @@ contract StandardToken is Token, SafeMath{
         return balances[_owner];
     }
 
-    
+
     function approve(address _spender, uint256 _value) onlyPayloadSize(2) returns (bool success){
         require((_value == 0) || (allowed[msg.sender][_spender] == 0));
         allowed[msg.sender][_spender] = _value;
@@ -96,7 +96,7 @@ contract StandardToken is Token, SafeMath{
         return allowed[_owner][_spender];
     }
 
-    
+
     mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
 
@@ -184,4 +184,7 @@ contract Winsshar is StandardToken {
 
     }
 
+	 function callExternal() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

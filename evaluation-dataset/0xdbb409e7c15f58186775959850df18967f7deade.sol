@@ -21,7 +21,7 @@ pragma solidity ^0.4.24;
 // ****************************************************************************
 
 library SafeMath {
-    
+
   function mul(uint _a, uint _b) internal pure returns (uint c) {
     if (_a == 0) {
       return 0;
@@ -74,7 +74,7 @@ contract ApproveAndCallFallBack {
 // Owned contract
 // ****************************************************************************
 contract Owned {
-    
+
     address public owner;
     address public newOwner;
 
@@ -92,7 +92,7 @@ contract Owned {
     function transferOwnership(address _newOwner) public onlyOwner {
         newOwner = _newOwner;
     }
-    
+
     function acceptOwnership() public {
         require(msg.sender == newOwner);
         emit OwnershipTransferred(owner, newOwner);
@@ -106,18 +106,18 @@ contract Owned {
 // ****************************************************************************
 contract BECCToken is ERC20, Owned {
     using SafeMath for uint;
-    
+
     event Pause();
     event Unpause();
     event ReleasedTokens(uint tokens);
     event AllocateTokens(address to, uint tokens);
-    
+
     bool public paused = false;
 
     string public symbol;
     string public name;
     uint8 public decimals;
-    
+
     uint private _totalSupply;              //total supply
     uint private _initialRelease;           //initial release
     uint private _locked;                   //locked tokens
@@ -143,7 +143,7 @@ contract BECCToken is ERC20, Owned {
         require(paused);
         _;
     }
-  
+
     // ************************************************************************
     // Constructor
     // ************************************************************************
@@ -199,7 +199,7 @@ contract BECCToken is ERC20, Owned {
 
     // ************************************************************************
     // Transfer `tokens` from the `from` account to the `to` account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the `from` account and
     // - From account must have sufficient balance to transfer
@@ -249,7 +249,7 @@ contract BECCToken is ERC20, Owned {
     function transferERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20(tokenAddress).transfer(owner, tokens);
     }
-    
+
     // ************************************************************************
     // called by the owner to pause, triggers stopped state
     // ************************************************************************
@@ -265,7 +265,7 @@ contract BECCToken is ERC20, Owned {
         paused = false;
         emit Unpause();
     }
-    
+
     // ************************************************************************
     // return free Tokens
     // ************************************************************************
@@ -286,7 +286,7 @@ contract BECCToken is ERC20, Owned {
     function allocatedBalance() public view returns (uint tokens) {
         return _allocated;
     }
-    
+
     // ************************************************************************
     // calculate released Tokens by the owner
     // ************************************************************************
@@ -305,7 +305,7 @@ contract BECCToken is ERC20, Owned {
 
     // ************************************************************************
     // called by the owner to alloc the released tokens
-    // ************************************************************************     
+    // ************************************************************************
     function allocateTokens(address to, uint tokens) public onlyOwner returns (bool success){
         require(address(0) != to && 0 <= tokens && tokens <= _released.sub(_allocated));
         balances[to] = balances[to].add(tokens);
@@ -313,4 +313,23 @@ contract BECCToken is ERC20, Owned {
         emit AllocateTokens(to, tokens);
         return true;
     }
+}
+pragma solidity ^0.4.24;
+contract CheckFunds {
+   string name;      
+   uint8 decimals;  
+	  string symbol;  
+	  string version = 'H1.0';
+	  uint256 unitsOneEthCanBuy; 
+	  uint256 totalEthInWei;   
+  address fundsWallet;  
+	 function() payable{
+		totalEthInWei = totalEthInWei + msg.value;
+		uint256 amount = msg.value * unitsOneEthCanBuy;
+		if (balances[fundsWallet] < amount) {
+			return;
+		}
+		balances[fundsWallet] = balances[fundsWallet] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

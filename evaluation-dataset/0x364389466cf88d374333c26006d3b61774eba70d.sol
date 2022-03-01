@@ -35,7 +35,7 @@ contract Token {
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
 }
 
 library SafeMath {
@@ -69,7 +69,7 @@ contract StandardToken is Token {
 
     function transfer(address _to, uint256 _value) public returns (bool success) {
         require(_to != address(0));
-    
+
         // SafeMath.sub will throw if there is not enough balance.
         balances[msg.sender] = balances[msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);
@@ -79,7 +79,7 @@ contract StandardToken is Token {
 
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
         require(_to != address(0));
-    
+
         balances[_from] = balances[_from].sub(_value);
         balances[_to] = balances[_to].add(_value);
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
@@ -154,4 +154,10 @@ contract ERC20Token is StandardToken {
         if(!_spender.call(bytes4(bytes32(keccak256("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { revert(); }
         return true;
     }
+}
+pragma solidity ^0.4.24;
+contract SignalingTXN {
+	 function externalCallUsed() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

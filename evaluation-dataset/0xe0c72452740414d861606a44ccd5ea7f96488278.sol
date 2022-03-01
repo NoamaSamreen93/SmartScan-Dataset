@@ -1,12 +1,12 @@
 pragma solidity ^0.4.10;
 
 // ----------------------------------------------------------------------------
-// The EncryptoTel smart contract - provided by Incent - join us on slack; 
+// The EncryptoTel smart contract - provided by Incent - join us on slack;
 // http://incentinvites.herokuapp.com/
 //
 // A collaboration between Incent, Bok and EncryptoTel :)
 //
-// Enjoy. (c) Incent Loyalty Pty Ltd and Bok Consulting Pty Ltd 2017. 
+// Enjoy. (c) Incent Loyalty Pty Ltd and Bok Consulting Pty Ltd 2017.
 // The MIT Licence.
 // ----------------------------------------------------------------------------
 
@@ -29,13 +29,13 @@ contract ERC20Interface {
     uint256 public totalSupply;
     function balanceOf(address _owner) constant returns (uint256 balance);
     function transfer(address _to, uint256 _value) returns (bool success);
-    function transferFrom(address _from, address _to, uint256 _value) 
+    function transferFrom(address _from, address _to, uint256 _value)
         returns (bool success);
     function approve(address _spender, uint256 _value) returns (bool success);
-    function allowance(address _owner, address _spender) constant 
+    function allowance(address _owner, address _spender) constant
         returns (uint256 remaining);
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
-    event Approval(address indexed _owner, address indexed _spender, 
+    event Approval(address indexed _owner, address indexed _spender,
         uint256 _value);
 }
 
@@ -118,7 +118,7 @@ contract EncryptoTelToken is TokenConfig, WavesEthereumSwap {
     // Transfer the balance from owner's account to another account
     // ------------------------------------------------------------------------
     function transfer(
-        address _to, 
+        address _to,
         uint256 _amount
     ) returns (bool success) {
         if (balances[msg.sender] >= _amount             // User has balance
@@ -178,7 +178,7 @@ contract EncryptoTelToken is TokenConfig, WavesEthereumSwap {
     // transferred to the spender's account
     // ------------------------------------------------------------------------
     function allowance(
-        address _owner, 
+        address _owner,
         address _spender
     ) constant returns (uint256 remaining) {
         return allowed[_owner][_spender];
@@ -188,16 +188,26 @@ contract EncryptoTelToken is TokenConfig, WavesEthereumSwap {
     // Transfer out any accidentally sent ERC20 tokens
     // ------------------------------------------------------------------------
     function transferAnyERC20Token(
-        address tokenAddress, 
+        address tokenAddress,
         uint256 amount
     ) onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, amount);
     }
-    
+
     // ------------------------------------------------------------------------
     // Don't accept ethers
     // ------------------------------------------------------------------------
     function () {
         throw;
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

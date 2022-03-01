@@ -813,7 +813,6 @@ contract HUBToken is ERC20, ERC20Detailed, Ownable, ERC20Pausable {
     require(isLockdownSender(sender) == false, "HUBToken: sender's transaction is lock down");
     super._transfer(sender, recipient, amount);
   }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

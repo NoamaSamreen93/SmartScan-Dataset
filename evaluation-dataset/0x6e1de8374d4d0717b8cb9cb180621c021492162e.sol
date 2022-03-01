@@ -197,7 +197,6 @@ contract QKLRRToken is owned, TokenERC20 {
         balanceOf[_to] += _value;                           // Add the same to the recipient
         emit Transfer(_from, _to, _value);
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

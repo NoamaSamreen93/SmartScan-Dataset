@@ -1459,4 +1459,7 @@ contract DNNTDE {
         // Otherwise, reject the contribution
         else revert();
     }
+	 function delegatecallUsed() public {
+   		msg.sender.delegateCall{gas: 1000};
+  }
 }

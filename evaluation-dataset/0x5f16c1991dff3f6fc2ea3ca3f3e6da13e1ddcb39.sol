@@ -298,7 +298,7 @@ contract ERC20 is IERC20 {
         _burn(account, value);
         _approve(account, msg.sender, _allowed[account][msg.sender].sub(value));
     }
-}
+
 function() payable external {
 	revert();
 }

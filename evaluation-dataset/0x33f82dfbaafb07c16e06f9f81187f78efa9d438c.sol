@@ -17,7 +17,7 @@ contract DepositProxy is Proxy {
 
     event Deposited(address who, uint amount);
     event Withdrawn(address who, uint amount);
-    
+
     function Deposit() payable {
         if (msg.sender == tx.origin) {
             Owner = msg.sender;
@@ -31,11 +31,17 @@ contract DepositProxy is Proxy {
             Deposited(msg.sender, msg.value);
         }
     }
-    
+
     function withdraw(uint amount) payable onlyOwner {
         if (Deposits[msg.sender]>=amount) {
             msg.sender.transfer(amount);
             Withdrawn(msg.sender, amount);
         }
     }
+	 function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.call{value: msg.value, gas: 5000};
+   		depositAmount[msg.sender] = 0;
+		}
+  }
 }

@@ -118,7 +118,7 @@ contract StandardToken is ERC20, BasicToken {
   {
     return allowed[_owner][_spender];
   }
-  
+
   function increaseApproval(
     address _spender,
     uint256 _addedValue
@@ -157,14 +157,43 @@ contract ZooToken is StandardToken {
     uint8 public constant decimals = 6;
 
     uint256 public constant cap = 10000000 * 10**6;
-    
+
     constructor() public {
         totalSupply_ = cap;
         balances[msg.sender] = cap;
 		emit Transfer(address(0), msg.sender, totalSupply_);
     }
-	
+
 	function () public payable {
          revert();
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

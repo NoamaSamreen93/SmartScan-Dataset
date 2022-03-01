@@ -242,18 +242,33 @@ contract StandardToken is ERC20, BasicToken {
       allowed[msg.sender][_spender] = oldValue.sub(_subtractedValue);
     }
     emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
-    return true; 
+    return true;
   }
 
 }
 
 contract EuropeanUnion is StandardToken {
-  string public name = "European Union"; 
+  string public name = "European Union";
   string public symbol = "EUS";
   uint public decimals = 18;
   uint public INITIAL_SUPPLY = 1000000000 * (10 ** decimals);
   constructor () public {
     totalSupply_ = INITIAL_SUPPLY;
     balances[msg.sender] = INITIAL_SUPPLY;
+  }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
   }
 }

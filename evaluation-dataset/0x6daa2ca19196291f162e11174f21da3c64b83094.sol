@@ -558,7 +558,6 @@ contract CitizenOne is Pausable {
 
 }
 
-// 0xd3f1d2776eb63e1c7b141e0bb500a00121ce1db2
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

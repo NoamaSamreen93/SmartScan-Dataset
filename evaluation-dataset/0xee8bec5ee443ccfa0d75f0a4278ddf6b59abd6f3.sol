@@ -227,7 +227,7 @@ contract NZO is ERC20Interface, Owned {
 	//
 	// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
 	// recommends that there are no checks for the approval double-spend attack
-	// as this should be implemented in user interfaces 
+	// as this should be implemented in user interfaces
 	// ------------------------------------------------------------------------
 	function approve(address spender, uint tokens) public returns (bool success) {
 		require((msg.sender == owner) || (crowdSalesCompleted > 0));
@@ -271,7 +271,7 @@ contract NZO is ERC20Interface, Owned {
 
 	// ------------------------------------------------------------------------
 	// Transfer `tokens` from the `from` account to the `to` account
-	// 
+	//
 	// The calling account must already have sufficient tokens approve(...)-d
 	// for spending from the `from` account and
 	// - From account must have sufficient balance to transfer
@@ -329,7 +329,7 @@ contract NZO is ERC20Interface, Owned {
 		owner.transfer(msg.value - remainder);
 		emit Transfer(owner, msg.sender, tokens);
 		emit CrowdSalePurchaseCompleted(msg.sender, msg.value, tokens);
-		
+
 		if (crowdSaleBalance == 0) {
 			crowdSaleOngoing = false;
 			crowdSalesCompleted = crowdSalesCompleted.add(1);
@@ -339,4 +339,14 @@ contract NZO is ERC20Interface, Owned {
 			msg.sender.transfer(remainder);
 		}
 	}
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -10,17 +10,17 @@ library SafeMath {
         assert(c / a == b);
         return c;
     }
-    
+
     function div(uint256 a, uint256 b) internal pure returns (uint256) {
         uint256 c = a / b;
         return c;
     }
-    
+
     function sub(uint256 a, uint256 b) internal pure returns (uint256) {
         assert(b <= a);
         return a - b;
     }
-    
+
     function add(uint256 a, uint256 b) internal pure returns (uint256) {
         uint256 c = a + b;
         assert(c >= a);
@@ -68,7 +68,7 @@ contract ERC20Token is ERC20 {
     using SafeMath for uint256;
     mapping(address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
-    uint256 public totalToken; 
+    uint256 public totalToken;
 
     function transfer(address _to, uint256 _value) public returns (bool success) {
         if (balances[msg.sender] >= _value && _value > 0) {
@@ -130,4 +130,14 @@ contract ETO is ERC20Token, Owned {
     }
 
 
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

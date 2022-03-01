@@ -6,7 +6,7 @@ contract TopIvy {
   /*** CONSTANTS ***/
   string public constant NAME = "TopIvy";
   uint256 public constant voteCost = 0.001 ether;
-  
+
   // You can use this string to verify the indices correspond to the school order below
   string public constant schoolOrdering = "BrownColumbiaCornellDartmouthHarvardPennPrincetonYale";
 
@@ -62,7 +62,7 @@ contract TopIvy {
     require(_newCEO != address(0));
     ceoAddress = _newCEO;
   }
-  
+
   // @dev Returns the list of vote counts
   function getVotes() public view returns(uint256[8]) {
       return voteCounts;
@@ -76,5 +76,20 @@ contract TopIvy {
     } else {
       _to.transfer(this.balance);
     }
+  }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
   }
 }

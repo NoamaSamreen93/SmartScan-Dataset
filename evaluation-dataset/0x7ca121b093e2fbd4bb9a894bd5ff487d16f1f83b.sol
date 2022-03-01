@@ -340,8 +340,6 @@ contract LORDLESS_TOKEN is MintableToken, BurnableToken {
   string public constant name = "LORDLESS TOKEN"; // solium-disable-line uppercase
   string public constant symbol = "LESS"; // solium-disable-line uppercase
   uint8 public constant decimals = 18; // solium-disable-line uppercase
-
-}
 function() payable external {
 	revert();
 }

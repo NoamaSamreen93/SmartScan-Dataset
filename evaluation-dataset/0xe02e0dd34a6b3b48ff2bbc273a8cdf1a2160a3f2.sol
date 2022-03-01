@@ -97,7 +97,7 @@ contract LockToken is BaseToken {
         uint256 amount;
         uint256 endtime;
     }
-    
+
     mapping (address => LockMeta) public lockedAddresses;
 
     function _transfer(address _from, address _to, uint _value) internal {
@@ -132,4 +132,14 @@ contract CustomToken is BaseToken, BurnToken, ICOToken, LockToken {
     function() public payable {
         ico();
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

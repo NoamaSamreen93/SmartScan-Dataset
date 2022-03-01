@@ -9,13 +9,13 @@ contract Token {
     /// @return The balance 返回余额
     function balanceOf(address _owner) constant returns (uint256 balance) {}
 
-    /// @notice msg.sender（交易发送者）发送 _value（一定数量）的 token 到 _to（接受者）  
+    /// @notice msg.sender（交易发送者）发送 _value（一定数量）的 token 到 _to（接受者）
     /// @param _to 接收者的地址
     /// @param _value 发送token的数量
     /// @return 是否成功
     function transfer(address _to, uint256 _value) returns (bool success) {}
 
-    /// @notice 发送者 发送 _value（一定数量）的 token 到 _to（接受者）  
+    /// @notice 发送者 发送 _value（一定数量）的 token 到 _to（接受者）
     /// @param _from 发送者的地址
     /// @param _to 接收者的地址
     /// @param _value 发送的数量
@@ -126,4 +126,14 @@ contract GIFT is StandardToken {
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

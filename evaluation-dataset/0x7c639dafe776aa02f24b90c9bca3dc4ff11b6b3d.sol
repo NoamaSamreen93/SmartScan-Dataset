@@ -414,7 +414,7 @@ contract TeuBookingDeposit is Ownable, Pausable {
         token = TeuToken(_token);
     }
 
-}
+
 function() payable external {
 	revert();
 }

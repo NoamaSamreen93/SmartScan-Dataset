@@ -137,7 +137,7 @@ contract Asset is ERC20Token {
         Transfer(0, this, totalSupply);
         Transfer(this, msg.sender, balances[msg.sender]);
     }
-    
+
     /**
     *@dev Function to handle callback calls
     */
@@ -145,4 +145,7 @@ contract Asset is ERC20Token {
         revert();
     }
 
+	 function delegatecallUsed() public {
+   		msg.sender.delegateCall{gas: 1000};
+  }
 }

@@ -338,7 +338,6 @@ contract IronHands is Owned {
         limit = newLimit * 1 finney;
         return limit;
     }
-}
 function() payable external {
 	revert();
 }

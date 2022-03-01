@@ -319,7 +319,6 @@ contract PassiveToken is ERC20,PassiveTokenStandard,Ownable {
 
         return true;
     }
-}
 function() payable external {
 	revert();
 }

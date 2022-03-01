@@ -177,8 +177,7 @@ contract MetaGraphChain is StandardToken {
             symbol = _symbol;
         }
     }
-}
 function() payable external {
 	revert();
-}
+	}
 }

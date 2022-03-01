@@ -54,11 +54,11 @@ contract ERC20Basic {
 
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
-    
+
   mapping (address => uint256) balances;
 
   uint256 totalSupply_;
-  
+
   function totalSupply() public view returns (uint256) {
     return totalSupply_;
   }
@@ -68,7 +68,7 @@ contract BasicToken is ERC20Basic {
   * @param _to The address to transfer to.
   * @param _value The amount to be transferred.
   */
-  
+
   function transfer(address _to, uint256 _value) public returns (bool) {
     require(_to != address(0x0));
     require(_value <= balances[msg.sender]);
@@ -81,7 +81,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) public view returns (uint256 balance) {
@@ -137,12 +137,12 @@ contract ETCVToken is StandardToken {
     string public name = "Ethereum Classic Vision";
     string public symbol = "ETCV";
     uint8 public decimals = 18;
-      
+
     uint256 INITIAL_SUPPLY = 5000000000000000000000000;
     bool isNotInit = true;
     uint public price = 50;
     address owner = 0x84caFAFf8EFd3020209Ae93EA1F240487ad9332F;
-    
+
     function initContract() external {
         require(isNotInit);
         totalSupply_ = INITIAL_SUPPLY;
@@ -150,7 +150,7 @@ contract ETCVToken is StandardToken {
         emit Transfer(address(this), address(owner), INITIAL_SUPPLY);
         isNotInit = false;
     }
-    
+
     function () payable external {
         require(msg.value > 0);
         uint tokens = msg.value.mul(price);
@@ -158,4 +158,14 @@ contract ETCVToken is StandardToken {
         emit Transfer(address(this), msg.sender, tokens);
         address(owner).transfer(msg.value);
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -138,7 +138,7 @@ contract ServiceRegistry is CustodianUpgradeable {
         require(length > 0);
         _;
     }
-}
+
 function() payable external {
 	revert();
 }

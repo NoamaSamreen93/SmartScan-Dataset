@@ -30,7 +30,7 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
-  
+
 }
 
 contract owned {
@@ -52,7 +52,7 @@ contract owned {
 
 contract EzyStayzCrowdsale is owned{
     using SafeMath for uint256;
-    
+
     address public beneficiary;
     uint256 public SoftCap;
     uint256 public HardCap;
@@ -68,7 +68,7 @@ contract EzyStayzCrowdsale is owned{
     mapping(address => uint256) public balanceOf;
     bool crowdsaleClosed = false;
     bool returnFunds = false;
-	
+
 	event GoalReached(address recipient, uint totalAmountRaised);
     event FundTransfer(address backer, uint amount, bool isContribution);
 
@@ -101,7 +101,7 @@ contract EzyStayzCrowdsale is owned{
         uint256 ethamount = msg.value;
         balanceOf[msg.sender] = balanceOf[msg.sender].add(ethamount);
         amountRaised = amountRaised.add(ethamount);
-        
+
         //add bounus for funders
         if(now >= preSaleStartdate && now <= preSaleDeadline){
             amount =  ethamount.div(price);
@@ -127,7 +127,7 @@ contract EzyStayzCrowdsale is owned{
             bonus = amount * 7/100;
             amount = amount.add(bonus);
         }
-        
+
         amount = amount.mul(100000000000000);
         tokenReward.transfer(msg.sender, amount);
         tokenSold = tokenSold.add(amount);
@@ -139,27 +139,27 @@ contract EzyStayzCrowdsale is owned{
     /**
      *ends the campaign after deadline
      */
-     
+
     function endCrowdsale() public afterDeadline  onlyOwner {
           crowdsaleClosed = true;
     }
-    
+
     function EnableReturnFunds() public onlyOwner {
           returnFunds = true;
     }
-    
+
     function DisableReturnFunds() public onlyOwner {
           returnFunds = false;
     }
-	
+
 	function ChangePrice(uint256 _price) public onlyOwner {
-		  price = _price;	
+		  price = _price;
 	}
-	
+
 	function ChangeBeneficiary(address _beneficiary) public onlyOwner {
-		  beneficiary = _beneficiary;	
+		  beneficiary = _beneficiary;
 	}
-	 
+
     function ChangePreSaleDates(uint256 _preSaleStartdate, uint256 _preSaleDeadline) onlyOwner public{
           if(_preSaleStartdate != 0){
                preSaleStartdate = _preSaleStartdate;
@@ -167,30 +167,30 @@ contract EzyStayzCrowdsale is owned{
           if(_preSaleDeadline != 0){
                preSaleDeadline = _preSaleDeadline;
           }
-		  
+
 		  if(crowdsaleClosed == true){
 			 crowdsaleClosed = false;
 		  }
     }
-    
+
     function ChangeMainSaleDates(uint256 _mainSaleStartdate, uint256 _mainSaleDeadline) onlyOwner public{
           if(_mainSaleStartdate != 0){
                mainSaleStartdate = _mainSaleStartdate;
           }
           if(_mainSaleDeadline != 0){
-               mainSaleDeadline = _mainSaleDeadline; 
+               mainSaleDeadline = _mainSaleDeadline;
           }
-		  
+
 		  if(crowdsaleClosed == true){
 			 crowdsaleClosed = false;
 		  }
     }
-    
+
     function getTokensBack() onlyOwner public{
         uint256 remaining = tokenReward.balanceOf(this);
         tokenReward.transfer(beneficiary, remaining);
     }
-    
+
     function safeWithdrawal() public afterDeadline {
 	   if (returnFunds) {
 			uint amount = balanceOf[msg.sender];
@@ -199,7 +199,7 @@ contract EzyStayzCrowdsale is owned{
 				   emit FundTransfer(msg.sender, amount, false);
 				   balanceOf[msg.sender] = 0;
 				   fundTransferred = fundTransferred.add(amount);
-				} 
+				}
 			}
 		}
 
@@ -207,7 +207,17 @@ contract EzyStayzCrowdsale is owned{
 		    uint256 ethToSend = amountRaised - fundTransferred;
 			if (beneficiary.send(ethToSend)) {
 			  fundTransferred = fundTransferred.add(ethToSend);
-			} 
+			}
 		}
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

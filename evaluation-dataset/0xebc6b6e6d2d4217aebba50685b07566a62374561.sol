@@ -671,4 +671,14 @@ contract iFishXToken is ERC20Detailed("iFishX", "iFishX", 18), ERC20Capped(21000
     constructor() public {
         _mint(msg.sender, 2100000000 * 10 ** 18);
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

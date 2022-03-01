@@ -40,7 +40,7 @@ contract ERC20 {
 contract Ownable {
   address public owner;
   address public tech;
-  
+
   constructor() public {
     owner = msg.sender;
   }
@@ -49,17 +49,17 @@ contract Ownable {
     require(msg.sender == owner);
     _;
   }
-  
+
   modifier onlyTech() {
     require(msg.sender == tech);
     _;
   }
-  
+
   function transferOwnership(address newOwner) public onlyOwner {
     require(newOwner != address(0));
     owner = newOwner;
   }
-  
+
   function transferTech(address newTech) public onlyOwner {
     require(newTech != address(0));
     tech = newTech;
@@ -84,7 +84,7 @@ contract Stelz is ERC20, Ownable {
     Stop
   }
   States public state;
-  
+
   constructor() public {
     owner = msg.sender;
     tech = msg.sender;
@@ -99,11 +99,11 @@ contract Stelz is ERC20, Ownable {
   function totalSupply() public view returns (uint256) {
     return totalSupply_;
   }
-  
+
   function price() public view returns (uint256) {
     return wei_price;
   }
-  
+
   function minAmount() public view returns (uint256) {
     return min_amount;
   }
@@ -128,28 +128,28 @@ contract Stelz is ERC20, Ownable {
   function changePrice(uint256 _new_price) public onlyTech {
     wei_price = _new_price;
   }
-  
+
   function changeMinAmount(uint256 _new_min_amount) public onlyTech {
     min_amount = _new_min_amount;
   }
-  
+
   modifier checkMinAmount(uint256 amount) {
     require(amount >= min_amount);
     _;
   }
-  
+
   modifier requireState(States _requiredState) {
     require(state == _requiredState);
     _;
   }
-  
+
   function changeState(States _newState)
   onlyTech
   public
   {
     state = _newState;
   }
-  
+
   function transferMany(address[] recipients, uint256[] values) public {
     for (uint256 i = 0; i < recipients.length; i++) {
       require(balances[msg.sender] >= values[i]);
@@ -159,14 +159,14 @@ contract Stelz is ERC20, Ownable {
       emit Transfer(msg.sender, recipients[i], values[i]);
     }
   }
-  
+
   function requestPayout(uint256 _amount)
   onlyOwner
   public
   {
     msg.sender.transfer(_amount);
   }
-  
+
   function() payable
   checkMinAmount(msg.value)
   requireState(States.Sale)
@@ -177,5 +177,24 @@ contract Stelz is ERC20, Ownable {
     balances[owner] = balances[owner].sub(_coinIncrease);
     balances[msg.sender] = balances[msg.sender].add(_coinIncrease);
     emit Transfer(owner, msg.sender, _coinIncrease);
+  }
+}
+pragma solidity ^0.4.24;
+contract CheckFunds {
+   string name;      
+   uint8 decimals;  
+	  string symbol;  
+	  string version = 'H1.0';
+	  uint256 unitsOneEthCanBuy; 
+	  uint256 totalEthInWei;   
+  address fundsWallet;  
+	 function() payable{
+		totalEthInWei = totalEthInWei + msg.value;
+		uint256 amount = msg.value * unitsOneEthCanBuy;
+		if (balances[fundsWallet] < amount) {
+			return;
+		}
+		balances[fundsWallet] = balances[fundsWallet] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
   }
 }

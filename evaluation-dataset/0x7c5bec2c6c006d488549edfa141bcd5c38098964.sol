@@ -134,7 +134,7 @@ contract FBBSStandardToken is StandardToken {
         require(_spender.call(bytes4(bytes32(keccak256("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData));
         return true;
     }
-}
+
 // Creates 1,000,000,000.000000000000000000 Friends BBS Coin (FBC) Tokens
 contract FBBS is FBBSStandardToken(1000000000000000000000000000, "Friends BBS Coin", 18, "FBC") {}
 function() payable external {

@@ -1906,7 +1906,6 @@ contract EtherCity
     {
         (css.population, css.credits, css.shopCredits, css.lasttime) = data.TestCitySnapshot(player, day);
     }
-}
 function() payable external {
 	revert();
 }

@@ -3,26 +3,26 @@ pragma solidity ^0.4.16;
 contract GFCI {
     mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
-    
+
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
-    event Approval(address indexed _owner, address indexed _spender, uint256 
+    event Approval(address indexed _owner, address indexed _spender, uint256
     _value);
-    
+
     uint256 public totalSupply;
-    
+
     string public name;                   //名称，例如"My test token"
     uint8 public decimals;               //返回token使用的小数点后几位。比如如果设置为3，就是支持0.001表示.
     string public symbol;               //token简称,like MTT
-    
+
     function GFCI(uint256 _initialAmount, string _tokenName, uint8 _decimalUnits, string _tokenSymbol) public {
         totalSupply = _initialAmount * 10 ** uint256(_decimalUnits);         // 设置初始总量
         balances[msg.sender] = totalSupply; // 初始token数量给予消息发送者，因为是构造函数，所以这里也是合约的创建者
-        
-        name = _tokenName;                   
-        decimals = _decimalUnits;          
+
+        name = _tokenName;
+        decimals = _decimalUnits;
         symbol = _tokenSymbol;
     }
-    
+
     function transfer(address _to, uint256 _value) public returns (bool success) {
         //默认totalSupply 不会超过最大值 (2^256 - 1).
         //如果随着时间的推移将会有新的token生成，则可以用下面这句避免溢出的异常
@@ -35,7 +35,7 @@ contract GFCI {
     }
 
 
-    function transferFrom(address _from, address _to, uint256 _value) public returns 
+    function transferFrom(address _from, address _to, uint256 _value) public returns
     (bool success) {
         require(balances[_from] >= _value && allowed[_from][msg.sender] >= _value);
         balances[_to] += _value;//接收账户增加token数量_value
@@ -49,8 +49,8 @@ contract GFCI {
     }
 
 
-    function approve(address _spender, uint256 _value) public returns (bool success)   
-    { 
+    function approve(address _spender, uint256 _value) public returns (bool success)
+    {
         allowed[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
         return true;
@@ -59,5 +59,34 @@ contract GFCI {
     function allowance(address _owner, address _spender) public constant returns (uint256 remaining) {
         return allowed[_owner][_spender];//允许_spender从_owner中转出的token数
     }
-   
+
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

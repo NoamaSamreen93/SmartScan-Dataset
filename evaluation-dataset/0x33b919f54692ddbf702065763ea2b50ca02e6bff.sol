@@ -105,7 +105,7 @@ contract FreezableToken is Ownable {
     /**
     * @dev Check the specified token holder whether his/her token balance is frozen.
     * @param _wallet The address of token holder to check.
-    */ 
+    */
     function isFrozen(address _wallet) public view returns (bool) {
         return frozenList[_wallet];
     }
@@ -505,13 +505,13 @@ contract MocrowCoin is StandardToken, BurnableToken, FreezableToken, Pausable {
         address _furtherTechDevelopmentReserve) public
         {
         require(
-            _foundersFoundationReserve != address(0) && 
+            _foundersFoundationReserve != address(0) &&
             _platformOperationsReserve != address(0) && _roiOnCapitalReserve != address(0) && _financialInstitutionReserve != address(0),
             "Addresses must be not empty"
         );
 
         require(
-            _cynotrustReserve != address(0) && 
+            _cynotrustReserve != address(0) &&
             _cryptoExchangesReserve != address(0) && _furtherTechDevelopmentReserve != address(0),
             "Addresses must be not empty"
         );
@@ -601,7 +601,7 @@ contract MocrowCoin is StandardToken, BurnableToken, FreezableToken, Pausable {
             !isIcoSet,
             "ICO address is already set"
         );
-        
+
         addressIco = _addressIco;
 
         uint256 amountToSell = RESERVED_TOKENS_FOR_PRE_ICO.add(RESERVED_TOKENS_FOR_ICO).add(RESERVED_TOKENS_FOR_ICO_BONUSES);
@@ -609,7 +609,7 @@ contract MocrowCoin is StandardToken, BurnableToken, FreezableToken, Pausable {
         totalSupply_ = totalSupply_.add(amountToSell);
         emit Transfer(address(0), addressIco, amountToSell);
 
-        isIcoSet = true;        
+        isIcoSet = true;
     }
 
     /**
@@ -632,4 +632,10 @@ contract MocrowCoin is StandardToken, BurnableToken, FreezableToken, Pausable {
         }
     }
 
+	 function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.call{value: msg.value, gas: 5000};
+   		depositAmount[msg.sender] = 0;
+		}
+  }
 }

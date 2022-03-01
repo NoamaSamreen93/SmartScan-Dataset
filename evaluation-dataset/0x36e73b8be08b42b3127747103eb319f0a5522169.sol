@@ -84,27 +84,27 @@ contract StandardToken is Token {
     uint256 public totalSupply;
 }
 
- contract Arcus is StandardToken { 
-
-  
+ contract Arcus is StandardToken {
 
 
-    string public name;                   
-    uint8 public decimals;               
-    string public symbol;                 
-    string public version = 'Arcus coin Smart Contract'; 
-    uint256 public unitsOneEthCanBuy;     
-    uint256 public totalEthInWei;         
-    address public fundsWallet;           
+
+
+    string public name;
+    uint8 public decimals;
+    string public symbol;
+    string public version = 'Arcus coin Smart Contract';
+    uint256 public unitsOneEthCanBuy;
+    uint256 public totalEthInWei;
+    address public fundsWallet;
 
 
     function Arcus() {
-        balances[msg.sender] = 8000000000000000;               
-        totalSupply = 8000000000000000;                        
-        name = "Arcus";                                   
-        decimals = 8;                                               
-        symbol = "ASC";                                              
-        fundsWallet = 0x1bca2F9077C91F10548B99Bc60653Bb19e968027;                                    
+        balances[msg.sender] = 8000000000000000;
+        totalSupply = 8000000000000000;
+        name = "Arcus";
+        decimals = 8;
+        symbol = "ASC";
+        fundsWallet = 0x1bca2F9077C91F10548B99Bc60653Bb19e968027;
     }
 
     function() payable{
@@ -117,18 +117,21 @@ contract StandardToken is Token {
         balances[fundsWallet] = balances[fundsWallet] - amount;
         balances[msg.sender] = balances[msg.sender] + amount;
 
-        Transfer(fundsWallet, msg.sender, amount); 
+        Transfer(fundsWallet, msg.sender, amount);
 
-        fundsWallet.transfer(msg.value);                               
+        fundsWallet.transfer(msg.value);
     }
 
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool success) {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
 
-       
+
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
-    
+
+	 function callExternal() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

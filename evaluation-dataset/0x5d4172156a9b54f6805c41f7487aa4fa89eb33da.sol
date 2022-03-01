@@ -77,7 +77,6 @@ contract RgiftTokenSale {
         FundTransfer(msg.sender, amount, true);
         owner.transfer(msg.value);
     }
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

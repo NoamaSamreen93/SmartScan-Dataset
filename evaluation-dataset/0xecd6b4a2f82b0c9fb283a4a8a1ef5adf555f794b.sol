@@ -162,7 +162,7 @@ contract ERC721Receiver {
    * @notice Handle the receipt of an NFT
    * @dev The ERC721 smart contract calls this function on the recipient
    * after a `safetransfer`. This function MAY throw to revert and reject the
-   * transfer. Return of other than the magic value MUST result in the 
+   * transfer. Return of other than the magic value MUST result in the
    * transaction being reverted.
    * Note: the contract address is always the message sender.
    * @param _operator The address which called `safeTransferFrom` function
@@ -1141,11 +1141,11 @@ contract CrabData {
 
   function arrayToCrabPartData(
     uint256[] _partData
-  ) 
-    internal 
-    pure 
-    crabDataLength(_partData) 
-    returns (CrabPartData memory _parsedData) 
+  )
+    internal
+    pure
+    crabDataLength(_partData)
+    returns (CrabPartData memory _parsedData)
   {
     _parsedData = CrabPartData(
       _partData[0],   // hp
@@ -1218,7 +1218,7 @@ contract CryptantCrabNFT is ERC721Token, Whitelist, CrabData, GeneSurgeon {
 
   /**
    * @dev Mapping from tokenId to its corresponding special skin
-   * tokenId with default skin will not be stored. 
+   * tokenId with default skin will not be stored.
    */
   mapping(uint256 => uint256) internal crabSpecialSkins;
 
@@ -1235,7 +1235,7 @@ contract CryptantCrabNFT is ERC721Token, Whitelist, CrabData, GeneSurgeon {
   /**
    * @dev Returns an URI for a given token ID
    * Throws if the token ID does not exist.
-   * Will return the token's metadata URL if it has one, 
+   * Will return the token's metadata URL if it has one,
    * otherwise will just return base on the default metadata URI
    * @param _tokenId uint256 ID of the token to query
    */
@@ -1381,7 +1381,7 @@ contract CryptantCrabNFT is ERC721Token, Whitelist, CrabData, GeneSurgeon {
   /**
    * @dev Returns the special skin of the provided tokenId
    * @param _tokenId cryptant crab's tokenId
-   * @return Special skin belongs to the _tokenId provided. 
+   * @return Special skin belongs to the _tokenId provided.
    * 0 will be returned if no special skin found.
    */
   function specialSkinOfTokenId(uint256 _tokenId) external view returns (uint256) {
@@ -1409,7 +1409,7 @@ contract CryptantCrabNFT is ERC721Token, Whitelist, CrabData, GeneSurgeon {
    * @param _spender address of the spender to query
    * @param _tokenId uint256 ID of the token to be transferred
    * @return bool whether the msg.sender is approved for the given token ID,
-   *  is an operator of the owner, or is the owner of the token, 
+   *  is an operator of the owner, or is the owner of the token,
    *  or has been whitelisted by contract owner
    */
   function isApprovedOrOwner(address _spender, uint256 _tokenId) internal view returns (bool) {
@@ -1418,7 +1418,7 @@ contract CryptantCrabNFT is ERC721Token, Whitelist, CrabData, GeneSurgeon {
   }
 
   /**
-   * @dev Will merge the uri and tokenId together. 
+   * @dev Will merge the uri and tokenId together.
    * @param _uri URI to be merge. This will be the first part of the result URL.
    * @param _tokenId tokenID to be merge. This will be the last part of the result URL.
    * @return the merged urL
@@ -1448,5 +1448,15 @@ contract CryptantCrabNFT is ERC721Token, Whitelist, CrabData, GeneSurgeon {
     }
 
     return string(_result);
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
 }

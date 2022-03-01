@@ -150,7 +150,7 @@ contract GimmerTokenSale is Pausable {
     uint256 public constant TOKEN_RATE_40_PERCENT_BONUS = 3500; // 40% Bonus Tokens, During PreSale when >= 3000 ETH
 
     /* Timestamps where investments are allowed */
-    uint256 public constant PRE_SALE_START_TIME = 1516190400; // PreSale Start Time : UTC: Wednesday, 17 January 2018 12:00:00 
+    uint256 public constant PRE_SALE_START_TIME = 1516190400; // PreSale Start Time : UTC: Wednesday, 17 January 2018 12:00:00
     uint256 public constant PRE_SALE_END_TIME = 1517400000; // PreSale End Time : UTC: Wednesday, 31 January 2018 12:00:00
     uint256 public constant START_WEEK_1 = 1517486400; // CrowdSale Start Week-1 : UTC: Thursday, 1 February 2018 12:00:00
     uint256 public constant START_WEEK_2 = 1518091200; // CrowdSale Start Week-2 : UTC: Thursday, 8 February 2018 12:00:00
@@ -190,12 +190,12 @@ contract GimmerTokenSale is Pausable {
      * @param _maxTxGas Maximum gas price a transaction can have before being reverted
      */
     function GimmerTokenSale(
-        address _fundWallet, 
+        address _fundWallet,
         address _kycManagerWallet,
-        uint256 _saleWeiLimitWithoutKYC, 
+        uint256 _saleWeiLimitWithoutKYC,
         uint256 _maxTxGas
     )
-    public 
+    public
     {
         require(_fundWallet != address(0));
         require(_kycManagerWallet != address(0));
@@ -237,7 +237,7 @@ contract GimmerTokenSale is Pausable {
         uint256 totalTokensSold = tokensSold.add(newTokens);
         if (isCrowdSaleRunning()) {
             require(totalTokensSold <= GMR_TOKEN_SALE_CAP);
-        } else if (isPreSaleRunning()) { 
+        } else if (isPreSaleRunning()) {
             require(totalTokensSold <= PRE_SALE_GMR_TOKEN_CAP);
         }
 
@@ -313,7 +313,7 @@ contract GimmerTokenSale is Pausable {
      */
     function disapproveUserKYC(address _user) onlyKycManager public {
         require(_user != address(0));
-        
+
         Supporter storage sup = supportersMap[_user];
         sup.hasKYC = false;
         KYC(_user, false);
@@ -327,7 +327,7 @@ contract GimmerTokenSale is Pausable {
         require(_newKYCManagerWallet != address(0));
         kycManagerWallet = _newKYCManagerWallet;
     }
-    
+
     /**
     * @dev Returns true if any of the token sale stages are currently running
     * @return A boolean representing the state of this contract
@@ -388,7 +388,7 @@ contract GimmerTokenSale is Pausable {
      * based on the amount of Wei sent to the contract, and the current time
      * @return An uint256 representing the rate the user will pay for the GMR tokens
      */
-    function getRate(uint256 _weiAmount) internal constant returns (uint256) {   
+    function getRate(uint256 _weiAmount) internal constant returns (uint256) {
         if (isCrowdSaleRunning()) {
             if (now >= START_WEEK_4) { return TOKEN_RATE_05_PERCENT_BONUS; }
             else if (now >= START_WEEK_3) { return TOKEN_RATE_10_PERCENT_BONUS; }
@@ -600,7 +600,7 @@ contract MintableToken is StandardToken, Ownable {
 contract GimmerToken is MintableToken  {
     // Constants
     string public constant name = "GimmerToken";
-    string public constant symbol = "GMR";  
+    string public constant symbol = "GMR";
     uint8 public constant decimals = 18;
 
     /**
@@ -620,35 +620,50 @@ contract GimmerToken is MintableToken  {
     function GimmerToken() public {
     }
 
-    function transferFrom(address _from, address _to, uint256 _value) public        
+    function transferFrom(address _from, address _to, uint256 _value) public
         onlyWhenTransferEnabled
-        validDestination(_to)         
+        validDestination(_to)
         returns (bool) {
         return super.transferFrom(_from, _to, _value);
     }
 
     function approve(address _spender, uint256 _value) public
-        onlyWhenTransferEnabled         
+        onlyWhenTransferEnabled
         returns (bool) {
         return super.approve(_spender, _value);
     }
 
     function increaseApproval (address _spender, uint _addedValue) public
-        onlyWhenTransferEnabled         
+        onlyWhenTransferEnabled
         returns (bool) {
         return super.increaseApproval(_spender, _addedValue);
     }
 
     function decreaseApproval (address _spender, uint _subtractedValue) public
-        onlyWhenTransferEnabled         
+        onlyWhenTransferEnabled
         returns (bool) {
         return super.decreaseApproval(_spender, _subtractedValue);
     }
 
     function transfer(address _to, uint256 _value) public
         onlyWhenTransferEnabled
-        validDestination(_to)         
+        validDestination(_to)
         returns (bool) {
         return super.transfer(_to, _value);
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

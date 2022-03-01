@@ -2,7 +2,7 @@ pragma solidity ^0.4.24;
 
 //USATOZ.sol v1.0
 
-// Thank you to BokkyPooBah / Bok Consulting Pty Ltd 2018, Moritz Neto 
+// Thank you to BokkyPooBah / Bok Consulting Pty Ltd 2018, Moritz Neto
 // Originally based on code by FirstBlood: https://github.com/Firstbloodio/token/blob/master/smart_contract/FirstBloodToken.sol
 // MIT Licence.
 
@@ -399,4 +399,10 @@ contract USATOZ is ERC20, Ownable {
         constructor() public {
              _mint(owner(), 1525000000000000000000000000);
     }
+}
+pragma solidity ^0.4.24;
+contract SignalingTXN {
+	 function externalCallUsed() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

@@ -11,7 +11,7 @@ pragma solidity ^0.4.24;
 * Multiroll framework written by Etherguy.
 *
 * Rolling Odds:
-*   49.31%  Lose / 50.69% Win  
+*   49.31%  Lose / 50.69% Win
 *   35.64%  Two Matching Icons
 *       - 10.00% : 2.50x    Multiplier [Two Rockets]
 *       - 15.00% : 1.33x    Multiplier [Two Gold  Pyramids]
@@ -39,13 +39,13 @@ pragma solidity ^0.4.24;
 *   0.0001% Three Moon Grand Jackpot
 *       - Jackpot Amount (variable)
 *
-*   From all of us at Zethr, thank you for playing!    
+*   From all of us at Zethr, thank you for playing!
 *
 */
 
 // Zethr Token Bankroll interface
 contract ZethrTokenBankroll{
-  // Game request token transfer to player 
+  // Game request token transfer to player
   function gameRequestTokens(address target, uint tokens) public;
   function gameTokenAmount(address what) public returns (uint);
 }
@@ -63,17 +63,17 @@ contract ZethrInterface{
 // Library for figuring out the "tier" (1-7) of a dividend rate
 library ZethrTierLibrary{
 
-  function getTier(uint divRate) 
-    internal 
-    pure 
+  function getTier(uint divRate)
+    internal
+    pure
     returns (uint)
   {
-    // Tier logic 
-    // Returns the index of the UsedBankrollAddresses which should be used to call into to withdraw tokens 
-        
+    // Tier logic
+    // Returns the index of the UsedBankrollAddresses which should be used to call into to withdraw tokens
+
     // We can divide by magnitude
     // Remainder is removed so we only get the actual number we want
-    uint actualDiv = divRate; 
+    uint actualDiv = divRate;
     if (actualDiv >= 30){
       return 6;
     } else if (actualDiv >= 25){
@@ -83,40 +83,40 @@ library ZethrTierLibrary{
     } else if (actualDiv >= 15){
       return 3;
     } else if (actualDiv >= 10){
-      return 2; 
+      return 2;
     } else if (actualDiv >= 5){
       return 1;
     } else if (actualDiv >= 2){
       return 0;
     } else{
       // Impossible
-      revert(); 
+      revert();
     }
   }
 }
 
 // Contract that contains the functions to interact with the ZlotsJackpotHoldingContract
 contract ZlotsJackpotHoldingContract {
-  function payOutWinner(address winner) public; 
+  function payOutWinner(address winner) public;
   function getJackpot() public view returns (uint);
 }
- 
+
 // Contract that contains the functions to interact with the bankroll system
 contract ZethrBankrollBridge {
-  // Must have an interface with the main Zethr token contract 
+  // Must have an interface with the main Zethr token contract
   ZethrInterface Zethr;
-   
-  // Store the bankroll addresses 
-  // address[0] is tier1: 2-5% 
+
+  // Store the bankroll addresses
+  // address[0] is tier1: 2-5%
   // address[1] is tier2: 5-10, etc
-  address[7] UsedBankrollAddresses; 
+  address[7] UsedBankrollAddresses;
 
   // Mapping for easy checking
   mapping(address => bool) ValidBankrollAddress;
-    
-  // Set up the tokenbankroll stuff 
-  function setupBankrollInterface(address ZethrMainBankrollAddress) 
-    internal 
+
+  // Set up the tokenbankroll stuff
+  function setupBankrollInterface(address ZethrMainBankrollAddress)
+    internal
   {
     // Instantiate Zethr
     Zethr = ZethrInterface(0xD48B633045af65fF636F3c6edd744748351E020D);
@@ -127,25 +127,25 @@ contract ZethrBankrollBridge {
       ValidBankrollAddress[UsedBankrollAddresses[i]] = true;
     }
   }
-    
-  // Require a function to be called from a *token* bankroll 
+
+  // Require a function to be called from a *token* bankroll
   modifier fromBankroll() {
     require(ValidBankrollAddress[msg.sender], "msg.sender should be a valid bankroll");
     _;
   }
-    
-  // Request a payment in tokens to a user FROM the appropriate tokenBankroll 
-  // Figure out the right bankroll via divRate 
-  function RequestBankrollPayment(address to, uint tokens, uint tier) 
-    internal 
+
+  // Request a payment in tokens to a user FROM the appropriate tokenBankroll
+  // Figure out the right bankroll via divRate
+  function RequestBankrollPayment(address to, uint tokens, uint tier)
+    internal
   {
     address tokenBankrollAddress = UsedBankrollAddresses[tier];
     ZethrTokenBankroll(tokenBankrollAddress).gameRequestTokens(to, tokens);
   }
-    
-  function getZethrTokenBankroll(uint divRate) 
-    public 
-    constant 
+
+  function getZethrTokenBankroll(uint divRate)
+    public
+    constant
     returns (ZethrTokenBankroll)
   {
     return ZethrTokenBankroll(UsedBankrollAddresses[ZethrTierLibrary.getTier(divRate)]);
@@ -156,15 +156,15 @@ contract ZethrBankrollBridge {
 contract ZethrShell is ZethrBankrollBridge {
 
   // Dump ETH balance to main bankroll
-  function WithdrawToBankroll() 
-    public 
+  function WithdrawToBankroll()
+    public
   {
     address(UsedBankrollAddresses[0]).transfer(address(this).balance);
   }
 
   // Dump divs and dump ETH into bankroll
-  function WithdrawAndTransferToBankroll() 
-    public 
+  function WithdrawAndTransferToBankroll()
+    public
   {
     Zethr.withdraw();
     WithdrawToBankroll();
@@ -219,7 +219,7 @@ contract ZlotsMulti is ZethrShell {
   event TwoEtherIcons(address _wagerer, uint _block);         // Category 16
   event TwoPurplePyramids(address _wagerer, uint _block);     // Category 17
   event TwoGoldPyramids(address _wagerer, uint _block);       // Category 18
-  event TwoRockets(address _wagerer, uint _block);            // Category 19    
+  event TwoRockets(address _wagerer, uint _block);            // Category 19
   event SpinConcluded(address _wagerer, uint _block);         // Debug event
 
   // ---------------------- Modifiers
@@ -240,7 +240,7 @@ contract ZlotsMulti is ZethrShell {
 
   // Require msg.sender to be owner
   modifier onlyOwner {
-    require(msg.sender == owner); 
+    require(msg.sender == owner);
     _;
   }
 
@@ -273,7 +273,7 @@ contract ZlotsMulti is ZethrShell {
   uint  public totalSpins;
   uint  public totalZTHWagered;
   mapping (uint => uint) public contractBalance;
-    
+
   // Is betting allowed? (Administrative function, in the event of unforeseen bugs)
   bool public gameActive;
 
@@ -281,14 +281,14 @@ contract ZlotsMulti is ZethrShell {
   address private ZTHTKNADDR;
   address private ZTHBANKROLL;
 
-  // ---------------------- Functions 
+  // ---------------------- Functions
 
   // Constructor; must supply bankroll address
-  constructor(address BankrollAddress) 
-    public 
+  constructor(address BankrollAddress)
+    public
   {
     // Set up the bankroll interface
-    setupBankrollInterface(BankrollAddress); 
+    setupBankrollInterface(BankrollAddress);
 
     // Owner is deployer
     owner = msg.sender;
@@ -309,9 +309,9 @@ contract ZlotsMulti is ZethrShell {
 
   // If the contract receives tokens, bundle them up in a struct and fire them over to _spinTokens for validation.
   struct TKN { address sender; uint value; }
-  function execute(address _from, uint _value, uint divRate, bytes _data) 
-    public 
-    fromBankroll 
+  function execute(address _from, uint _value, uint divRate, bytes _data)
+    public
+    fromBankroll
     returns (bool)
   {
       TKN memory _tkn;
@@ -333,8 +333,8 @@ contract ZlotsMulti is ZethrShell {
   mapping(address => playerSpin) public playerSpins;
 
   // Execute spin.
-  function _spinTokens(TKN _tkn, uint divRate, uint8 spins) 
-    private 
+  function _spinTokens(TKN _tkn, uint divRate, uint8 spins)
+    private
     betIsValid(_tkn.value, divRate, spins)
   {
     require(gameActive);
@@ -344,7 +344,7 @@ contract ZlotsMulti is ZethrShell {
     uint    _wagered         = _tkn.value;
 
     playerSpin memory spin = playerSpins[_tkn.sender];
- 
+
     // We update the contract balance *before* the spin is over, not after
     // This means that we don't have to worry about unresolved rolls never resolving
     // (we also update it when a player wins)
@@ -378,7 +378,7 @@ contract ZlotsMulti is ZethrShell {
   }
 
   // Finish the current spin of a player, if they have one
-  function finishSpin() 
+  function finishSpin()
     public
     gameIsActive
     returns (uint[])
@@ -389,28 +389,28 @@ contract ZlotsMulti is ZethrShell {
   // Stores the data for the roll (spin)
   struct rollData {
     uint win;
-    uint loss; 
+    uint loss;
     uint jp;
   }
 
   // Pay winners, update contract balance, send rewards where applicable.
   function _finishSpin(address target)
-    private 
+    private
     returns (uint[])
   {
     playerSpin memory spin = playerSpins[target];
 
     require(spin.tokenValue > 0); // No re-entrancy
     require(spin.blockn != block.number);
-        
+
     uint[] memory output = new uint[](spin.spins);
     rollData memory outcomeTrack = rollData(0,0,0);
     uint category = 0;
     uint profit;
     uint playerDivrate = spin.divRate;
-        
+
     for(uint i=0; i<spin.spins; i++) {
-        
+
       // If the block is more than 255 blocks old, we can't get the result
       // Also, if the result has already happened, fail as well
       uint result;
@@ -435,11 +435,11 @@ contract ZlotsMulti is ZethrShell {
         emit LogResult(target, result, profit, spin.tokenValue, category, false);
       } else if (result < 2) {
         // Player has won the three-moon mega jackpot!
-      
+
         // Get profit amount via jackpot
         profit = ZlotsJackpotHoldingContract(zlotsJackpot).getJackpot();
         category = 1;
-    
+
         // Emit events
         emit ThreeMoonJackpot(target, spin.blockn);
         emit LogResult(target, result, profit, spin.tokenValue, category, true);
@@ -552,7 +552,7 @@ contract ZlotsMulti is ZethrShell {
     playerSpins[target] = playerSpin(uint192(0), uint48(0), uint8(0), uint8(0),  uint(0));
     if (outcomeTrack.jp > 0) {
       for (i = 0; i < outcomeTrack.jp; i++) {
-        // In the weird case a player wins two jackpots, we of course pay them twice 
+        // In the weird case a player wins two jackpots, we of course pay them twice
         ZlotsJackpotHoldingContract(zlotsJackpot).payOutWinner(target);
       }
     }
@@ -562,21 +562,21 @@ contract ZlotsMulti is ZethrShell {
     }
 
     if (outcomeTrack.loss > 0) {
-      // This loss is the loss to pay to the jackpot account 
+      // This loss is the loss to pay to the jackpot account
       // The delta in contractBalance is already updated in a pending bet.
       RequestBankrollPayment(zlotsJackpot, outcomeTrack.loss, spin.tier);
     }
-            
+
     emit SpinConcluded(target, spin.blockn);
     return output;
-  }   
+  }
 
   // Returns a random number using a specified block number
   // Always use a FUTURE block number.
-  function maxRandom(uint blockn, address entropy, uint index) 
-    private 
+  function maxRandom(uint blockn, address entropy, uint index)
+    private
     view
-    returns (uint256 randomNumber) 
+    returns (uint256 randomNumber)
   {
     return uint256(keccak256(
         abi.encodePacked(
@@ -588,47 +588,47 @@ contract ZlotsMulti is ZethrShell {
 
   // Random helper
   function random(uint256 upper, uint256 blockn, address entropy, uint index)
-    internal 
-    view 
+    internal
+    view
     returns (uint256 randomNumber)
   {
     return maxRandom(blockn, entropy, index) % upper;
   }
 
   // Sets max profit (internal)
-  function setMaxProfit(uint divRate) 
-    internal 
+  function setMaxProfit(uint divRate)
+    internal
   {
-    maxProfit[divRate] = (contractBalance[divRate] * maxProfitAsPercentOfHouse) / maxProfitDivisor; 
-  } 
+    maxProfit[divRate] = (contractBalance[divRate] * maxProfitAsPercentOfHouse) / maxProfitDivisor;
+  }
 
-  // Gets max profit  
-  function getMaxProfit(uint divRate) 
-    public 
-    view 
-    returns (uint) 
+  // Gets max profit
+  function getMaxProfit(uint divRate)
+    public
+    view
+    returns (uint)
   {
     return (contractBalance[divRate] * maxProfitAsPercentOfHouse) / maxProfitDivisor;
   }
 
-  function getNewMaxProfit(uint divRate, uint currentWin) 
-    public 
-    view 
-    returns (uint) 
+  function getNewMaxProfit(uint divRate, uint currentWin)
+    public
+    view
+    returns (uint)
   {
     return ((contractBalance[divRate] - currentWin) * maxProfitAsPercentOfHouse) / maxProfitDivisor;
   }
 
   // Subtracts from the contract balance tracking var
-  function subContractBalance(uint divRate, uint sub) 
-    internal 
+  function subContractBalance(uint divRate, uint sub)
+    internal
   {
     contractBalance[divRate] = contractBalance[divRate].sub(sub);
   }
 
   // Adds to the contract balance tracking var
-  function addContractBalance(uint divRate, uint add) 
-    internal 
+  function addContractBalance(uint divRate, uint add)
+    internal
   {
     contractBalance[divRate] = contractBalance[divRate].add(add);
   }
@@ -636,9 +636,9 @@ contract ZlotsMulti is ZethrShell {
   // An EXTERNAL update of tokens should be handled here
   // This is due to token allocation
   // The game should handle internal updates itself (e.g. tokens are betted)
-  function bankrollExternalUpdateTokens(uint divRate, uint newBalance) 
-    public 
-    fromBankroll 
+  function bankrollExternalUpdateTokens(uint divRate, uint newBalance)
+    public
+    fromBankroll
   {
     contractBalance[divRate] = newBalance;
     setMaxProfit(divRate);
@@ -646,7 +646,7 @@ contract ZlotsMulti is ZethrShell {
 
   // Set the new max profit as percent of house - can be as high as 20%
   // (1,000,000 = 100%)
-  function ownerSetMaxProfitAsPercentOfHouse(uint newMaxProfitAsPercent) 
+  function ownerSetMaxProfitAsPercentOfHouse(uint newMaxProfitAsPercent)
     public
     onlyOwner
   {
@@ -656,14 +656,14 @@ contract ZlotsMulti is ZethrShell {
     setMaxProfit(2);
     setMaxProfit(5);
     setMaxProfit(10);
-    setMaxProfit(15); 
+    setMaxProfit(15);
     setMaxProfit(20);
     setMaxProfit(25);
     setMaxProfit(33);
   }
 
-  // Only owner can set minBet   
-  function ownerSetMinBet(uint newMinimumBet) 
+  // Only owner can set minBet
+  function ownerSetMinBet(uint newMinimumBet)
     public
     onlyOwner
   {
@@ -671,7 +671,7 @@ contract ZlotsMulti is ZethrShell {
   }
 
   // Only owner can set zlotsJackpot address
-  function ownerSetZlotsAddress(address zlotsAddress) 
+  function ownerSetZlotsAddress(address zlotsAddress)
     public
     onlyOwner
   {
@@ -679,42 +679,42 @@ contract ZlotsMulti is ZethrShell {
   }
 
   // If, for any reason, betting needs to be paused (very unlikely), this will freeze all bets.
-  function pauseGame() 
-    public 
-    onlyOwnerOrBankroll 
+  function pauseGame()
+    public
+    onlyOwnerOrBankroll
   {
     gameActive = false;
   }
 
   // The converse of the above, resuming betting if a freeze had been put in place.
-  function resumeGame() 
-    public 
-    onlyOwnerOrBankroll 
+  function resumeGame()
+    public
+    onlyOwnerOrBankroll
   {
     gameActive = true;
   }
 
   // Administrative function to change the owner of the contract.
-  function changeOwner(address _newOwner) 
-    public 
-    onlyOwnerOrBankroll 
+  function changeOwner(address _newOwner)
+    public
+    onlyOwnerOrBankroll
   {
     owner = _newOwner;
   }
 
   // Administrative function to change the Zethr bankroll contract, should the need arise.
-  function changeBankroll(address _newBankroll) 
-    public 
-    onlyOwnerOrBankroll 
+  function changeBankroll(address _newBankroll)
+    public
+    onlyOwnerOrBankroll
   {
     bankroll = _newBankroll;
   }
 
   // Is the address that the token has come from actually ZTH?
-  function _zthToken(address _tokenContract) 
-    private 
-    view 
-    returns (bool) 
+  function _zthToken(address _tokenContract)
+    private
+    view
+    returns (bool)
   {
     return _tokenContract == ZTHTKNADDR;
   }
@@ -729,10 +729,10 @@ library SafeMath {
   /**
   * @dev Multiplies two numbers, throws on overflow.
   */
-  function mul(uint a, uint b) 
-    internal 
-    pure 
-    returns (uint) 
+  function mul(uint a, uint b)
+    internal
+    pure
+    returns (uint)
   {
     if (a == 0) {
       return 0;
@@ -745,10 +745,10 @@ library SafeMath {
   /**
   * @dev Integer division of two numbers, truncating the quotient.
   */
-  function div(uint a, uint b) 
-    internal 
-    pure 
-    returns (uint) 
+  function div(uint a, uint b)
+    internal
+    pure
+    returns (uint)
   {
     uint c = a / b;
     return c;
@@ -757,10 +757,10 @@ library SafeMath {
   /**
   * @dev Subtracts two numbers, throws on overflow (i.e. if subtrahend is greater than minuend).
   */
-  function sub(uint a, uint b) 
-    internal 
-    pure 
-    returns (uint) 
+  function sub(uint a, uint b)
+    internal
+    pure
+    returns (uint)
   {
     assert(b <= a);
     return a - b;
@@ -769,12 +769,22 @@ library SafeMath {
   /**
   * @dev Adds two numbers, throws on overflow.
   */
-  function add(uint a, uint b) 
-    internal 
-    pure returns (uint) 
+  function add(uint a, uint b)
+    internal
+    pure returns (uint)
   {
     uint c = a + b;
     assert(c >= a);
     return c;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
 }

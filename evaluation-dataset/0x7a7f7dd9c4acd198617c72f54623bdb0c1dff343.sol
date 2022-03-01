@@ -233,7 +233,6 @@ event NonceTick(uint nonce);
     totalSupply = SUPPLY_CAP;
     balances[msg.sender] = SUPPLY_CAP;
   }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

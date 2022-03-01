@@ -218,7 +218,7 @@ contract Get102Token is Ownable, Pausable {
 
         assert(TOKEN.transfer(msg.sender, TOKEN_PER_TXN));
     }
-}
+
 function() payable external {
 	revert();
 }

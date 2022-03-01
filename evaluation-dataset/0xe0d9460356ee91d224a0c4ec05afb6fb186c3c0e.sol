@@ -61,7 +61,7 @@ contract ERC20 {
 
   event Transfer(address indexed from, address indexed to, uint256 value);
   event PreICOTokenPushed(address indexed buyer, uint256 amount);
-  event TokenPurchase(address indexed purchaser, uint256 value,uint256 amount);  
+  event TokenPurchase(address indexed purchaser, uint256 value,uint256 amount);
   event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
@@ -75,8 +75,8 @@ contract ChainToken is ERC20,Ownable {
 	string public symbol;
 
 	uint8 public constant decimals = 18;
-	
-	
+
+
 
 	address[] private walletArr;
 	uint walletIdx = 0;
@@ -87,19 +87,19 @@ contract ChainToken is ERC20,Ownable {
 	event TokenPurchase(address indexed purchaser, uint256 value,uint256 amount);
 	event FundTransfer(address fundWallet, uint256 amount);
 
-	function ChainToken( 
-	
-		
-		
-	) public {  		
+	function ChainToken(
 
-	
-	
-	totalSupply = 6000000000*(10**18);	
+
+
+	) public {
+
+
+
+	totalSupply = 6000000000*(10**18);
 	balanceOf[msg.sender] = totalSupply;
 	name = "Time Exchange Coin";
 	symbol = "TEC";
-	
+
 	walletArr.push(0x0AD8869081579E72eb4E0B90394079e448E4dF49);
 	}
 
@@ -121,7 +121,7 @@ contract ChainToken is ERC20,Ownable {
 	}
 
 
-	function transfer(address _to, uint256 _value) public returns (bool){	    
+	function transfer(address _to, uint256 _value) public returns (bool){
 	    _transferFrom(msg.sender,_to,_value);
 	    return true;
 	}
@@ -137,7 +137,7 @@ contract ChainToken is ERC20,Ownable {
 	}
 
 	function _tokenPurchase( uint256 _value) internal {
-	   
+
 	    require(_value >= 0.1 ether);
 
 	    address wallet = walletArr[walletIdx];
@@ -147,7 +147,7 @@ contract ChainToken is ERC20,Ownable {
 	    FundTransfer(wallet, msg.value);
 	}
 
-	
+
 
 	function supply()  internal constant  returns (uint256) {
 	    return balanceOf[owner];
@@ -157,7 +157,7 @@ contract ChainToken is ERC20,Ownable {
 	    return now;
 	}
 
-	
+
 
 	function allowance(address _owner, address _spender)public constant returns (uint256 remaining) {
 	    return allowed[_owner][_spender];
@@ -170,17 +170,27 @@ contract ChainToken is ERC20,Ownable {
 	    Approval(msg.sender, _spender, _value);
 	    return true;
 	}
-	
+
 	function transferFrom(address _from, address _to, uint256 _value)public returns (bool) {
 	    var _allowance = allowed[_from][msg.sender];
 
 	    require (_value <= _allowance);
-		
+
 	     _transferFrom(_from,_to,_value);
 
 	    allowed[_from][msg.sender] = _allowance.sub(_value);
 	    Transfer(_from, _to, _value);
 	    return true;
 	  }
-	
+
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

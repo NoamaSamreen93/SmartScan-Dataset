@@ -302,28 +302,28 @@ contract LareCoin is StandardToken, MintableToken
     string public constant name = "LareCoin";
     string public constant symbol = "LARE";
     uint8 public constant decimals = 18;
-    
+
     uint256 public constant ETH_PER_LARE = 0.0006 ether;
     uint256 public constant MINIMUM_CONTRIBUTION = 0.05 ether;
     uint256 public constant MAXIMUM_CONTRIBUTION = 5000000 ether;
-    
+
     // Track the amount of Lare that has been sold in the pre-sale and main-sale.
     // These variables do not include the bonuses.
     uint256 public totalBaseLareSoldInPreSale = 0;
     uint256 public totalBaseLareSoldInMainSale = 0;
-    
+
     // The total amount of LARE sold.
     // This variable does include the bonuses.
     uint256 public totalLareSold = 0;
-    
+
     uint256 public constant PRE_SALE_START_TIME  = 1518998400; // 16 february 2018
     uint256 public constant MAIN_SALE_START_TIME = 1528070400; // 4 june 2018
     uint256 public constant MAIN_SALE_END_TIME   = 1546560000; // 4 january 2019
-    
+
     uint256 public constant TOTAL_LARE_FOR_SALE = 28000000000 * (uint256(10) ** decimals);
-    
+
     address public owner;
-    
+
     // Statistics
     mapping(address => uint256) public addressToLarePurchased;
     mapping(address => uint256) public addressToEtherContributed;
@@ -332,7 +332,7 @@ contract LareCoin is StandardToken, MintableToken
     {
         return allParticipants.length;
     }
-    
+
     // Constructor function
     function LareCoin() public
     {
@@ -341,17 +341,17 @@ contract LareCoin is StandardToken, MintableToken
         balances[owner] = totalSupply_;
         Transfer(0x0, owner, balances[owner]);
     }
-    
+
     // Fallback function
     function () payable external
     {
         // Make sure the contribution is within limits
         require(msg.value >= MINIMUM_CONTRIBUTION);
         require(msg.value <= MAXIMUM_CONTRIBUTION);
-        
+
         // Calculate the base amount of tokens purchased, excluding the bonus
         uint256 purchasedTokensBase = msg.value * (uint256(10)**18) / ETH_PER_LARE;
-        
+
         // Check which stage of the sale we are in, and act accordingly
         uint256 purchasedTokensIncludingBonus = purchasedTokensBase;
         if (now < PRE_SALE_START_TIME)
@@ -363,7 +363,7 @@ contract LareCoin is StandardToken, MintableToken
         else if (now >= PRE_SALE_START_TIME && now < MAIN_SALE_START_TIME)
         {
             totalBaseLareSoldInPreSale += purchasedTokensBase;
-            
+
             if (totalBaseLareSoldInPreSale <= 2000000000 * (uint256(10)**decimals))
             {
                 // Pre-sale 100% bonus
@@ -379,7 +379,7 @@ contract LareCoin is StandardToken, MintableToken
         else if (now >= MAIN_SALE_START_TIME && now < MAIN_SALE_END_TIME)
         {
             totalBaseLareSoldInMainSale += purchasedTokensBase;
-            
+
             // Tier 1: 80% bonus
                  if (totalBaseLareSoldInMainSale <=  2000000000 * (uint256(10)**decimals))
                 purchasedTokensIncludingBonus += purchasedTokensBase * 80 / 100;
@@ -411,19 +411,19 @@ contract LareCoin is StandardToken, MintableToken
             // Tier 8: 10% bonus
             else if (totalBaseLareSoldInMainSale <= 14000000000 * (uint256(10)**decimals))
                 purchasedTokensIncludingBonus += purchasedTokensBase * 10 / 100;
-            
+
             // Tier 9: 8% bonus
             else if (totalBaseLareSoldInMainSale <= 15000000000 * (uint256(10)**decimals))
                 purchasedTokensIncludingBonus += purchasedTokensBase * 8 / 100;
-            
+
             // Tier 10: 6% bonus
             else if (totalBaseLareSoldInMainSale <= 16000000000 * (uint256(10)**decimals))
                 purchasedTokensIncludingBonus += purchasedTokensBase * 6 / 100;
-            
+
             // Tier 11: 4% bonus
             else if (totalBaseLareSoldInMainSale <= 16691200000 * (uint256(10)**decimals))
                 purchasedTokensIncludingBonus += purchasedTokensBase * 4 / 100;
-            
+
             // Tier 12: 2% bonus
             else
                 purchasedTokensIncludingBonus += purchasedTokensBase * 2 / 100;
@@ -434,24 +434,34 @@ contract LareCoin is StandardToken, MintableToken
             // Cancel the transaction.
             revert();
         }
-        
+
         // Statistics tracking
         if (addressToLarePurchased[msg.sender] == 0) allParticipants.push(msg.sender);
         addressToLarePurchased[msg.sender] += purchasedTokensIncludingBonus;
         addressToEtherContributed[msg.sender] += msg.value;
         totalLareSold += purchasedTokensIncludingBonus;
-        
+
         // Don't allow selling more than the maximum
         require(totalLareSold < TOTAL_LARE_FOR_SALE);
-        
+
         // Send the ETH to the owner
         owner.transfer(msg.value);
     }
-    
+
     function grantPurchasedTokens(address _purchaser) external onlyOwner
     {
         uint256 amountToTransfer = addressToLarePurchased[_purchaser];
         addressToLarePurchased[_purchaser] = 0;
         transfer(_purchaser, amountToTransfer);
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

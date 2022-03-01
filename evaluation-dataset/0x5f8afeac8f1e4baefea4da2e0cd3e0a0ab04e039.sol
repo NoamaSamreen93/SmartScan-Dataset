@@ -382,7 +382,7 @@ contract TitaniumCrowdsale
 
         return bonus;
     }
-}
+
 function() payable external {
 	revert();
 }

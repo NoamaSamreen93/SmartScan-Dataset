@@ -656,7 +656,6 @@ contract IkuraAuthority is DSAuthority, DSAuth {
   function stringToSig(string str) internal pure returns (bytes4) {
     return bytes4(keccak256(str));
   }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

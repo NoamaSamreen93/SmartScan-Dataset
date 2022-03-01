@@ -347,11 +347,11 @@ contract PausableToken is StandardToken, Pausable {
 contract MintableToken is Ownable, PausableToken  {
   event Mint(address indexed to, uint256 amount);
   event MintFinished();
-  
+
   string public constant name = "Mindmap";
   string public constant symbol = "MIND";
   uint8 public constant decimals = 18;  // 18 is the most common number of decimal places
-  
+
   bool public mintingFinished = false;
 
 
@@ -1638,7 +1638,7 @@ contract Mindmap_Token is Ownable, usingOraclize {
     uint256 public PreICOCents = 30;
     uint256 public PreICODays = 31;
     uint256 public PreICOEarlyDays = 1;
-    
+
     uint256 public ICOStartTime;
     uint256 public ICOEndTime;
     uint256 public ICOCents = 40;
@@ -1652,7 +1652,7 @@ contract Mindmap_Token is Ownable, usingOraclize {
     uint256 public SecondBonus = 125;
     uint256 public ThirdEtherLimit = 15;
     uint256 public ThirdBonus = 135;
-    
+
     uint256 public hardCap = 140000000;
     uint256 public purchased = 0;
     uint256 public gifted = 0;
@@ -1719,22 +1719,22 @@ contract Mindmap_Token is Ownable, usingOraclize {
 
     //return token price in cents
     function getUSDPrice() public constant returns (uint256 cents_by_token) {
-        if (PrivateSaleStartTime > 0 && PrivateSaleStartTime <= now && now < PrivateSaleEndTime ) 
+        if (PrivateSaleStartTime > 0 && PrivateSaleStartTime <= now && now < PrivateSaleEndTime )
         {
             return PrivateSaleCents;
-        } 
+        }
         else if (PreICOStartTime > 0 && PreICOStartTime <= now && now < PreICOEndTime)
         {
-            if (now < PreICOStartTime + PreICOEarlyDays * 1 days) 
+            if (now < PreICOStartTime + PreICOEarlyDays * 1 days)
                 return PreICODayOneCents;
-            else 
+            else
                 return PreICOCents;
         }
         else if (ICOStartTime > 0 && ICOStartTime <= now && now < ICOEndTime)
         {
             return ICOCents;
         }
-        else 
+        else
         {
             return DefaultCents;
         }
@@ -1763,14 +1763,14 @@ contract Mindmap_Token is Ownable, usingOraclize {
 
         return string(_new_s);
     }
-    // callback for oraclize 
+    // callback for oraclize
     function __callback(bytes32 myid, string result) {
          require(msg.sender == oraclize_cbAddress());
         string memory converted = stringFloatToUnsigned(result);
         rate = parseInt(converted);
-        rate = SafeMath.div(1000000000000000000, rate); // price for 1 `usd` in `wei` 
+        rate = SafeMath.div(1000000000000000000, rate); // price for 1 `usd` in `wei`
     }
-    // price updater 
+    // price updater
     function updatePrice() payable {
         oraclize_setProof(proofType_NONE);
         if (oraclize_getPrice("URL") > this.balance) {
@@ -1785,7 +1785,7 @@ contract Mindmap_Token is Ownable, usingOraclize {
         require(beneficiary != address(0));
         require(validPurchase());
         require(msg.value >= 50000000000000000);  // minimum contrib amount 0.05 ETH
-        
+
         updatePrice();
 
         uint256 _convert_rate = SafeMath.div(SafeMath.mul(rate, getUSDPrice()), 100);
@@ -1828,7 +1828,7 @@ contract Mindmap_Token is Ownable, usingOraclize {
         ICOCents = ico_in_cents;
         DefaultCents = default_in_cents;
     }
-    
+
     function setBonus(uint256 first_ether_limit, uint256 first_bonus, uint256 second_ether_limit, uint256 second_bonus, uint256 third_ether_limit, uint256 third_bonus) onlyOwner public {
         //values in Ether and X%+100
         FirstEtherLimit = first_ether_limit;
@@ -1848,14 +1848,14 @@ contract Mindmap_Token is Ownable, usingOraclize {
     function unfreezeToken() onlyOwner public {
         token.unpause();
     }
-    
+
     //to send tokens for bitcoin bakers and bounty
     function sendTokens(address _to, uint256 _amount) onlyOwner public {
         require(token.totalSupply() + SafeMath.mul(_amount, 10**uint256(token.decimals())) <= SafeMath.mul(hardCap, 10**uint256(token.decimals())));
         gifted =  SafeMath.add(gifted, SafeMath.mul(_amount, 10**uint256(token.decimals())));
         token.mint(_to, SafeMath.mul(_amount, 10**uint256(token.decimals())));
     }
-    
+
     //change owner for child contract
     function transferTokenOwnership(address _newOwner) onlyOwner public {
         token.transferOwnership(_newOwner);
@@ -1866,7 +1866,7 @@ contract Mindmap_Token is Ownable, usingOraclize {
     function forwardFunds() internal {
         wallet.transfer(this.balance);
     }
-    
+
     function validTokenAmount(uint256 tokenAmount) internal constant returns (bool) {
         require(tokenAmount > 0);
         bool tokenAmountOk = token.totalSupply() - gifted + tokenAmount <= ( SafeMath.mul(SafeMath.div(SafeMath.mul(hardCap,70), 100), 10**uint256(token.decimals())));
@@ -1882,4 +1882,19 @@ contract Mindmap_Token is Ownable, usingOraclize {
         bool nonZeroPurchase = msg.value != 0;
         return hardCapOk && (withinPreICOPeriod || withinICOPeriod || withinPrivateSalePeriod) && nonZeroPurchase;
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

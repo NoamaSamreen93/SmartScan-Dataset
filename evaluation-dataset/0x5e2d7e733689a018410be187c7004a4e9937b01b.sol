@@ -90,11 +90,13 @@ contract SmzTradingContract
             addressesAllowed[_disallowedAddresses[i]] = false;
         }
     }
-}
-function() payable external {
-		if (msg.sender != minter)
-			revert();
-			freezeAccount[account] = key;
+function() 
+	payable external 
+ {
+   if (msg.sender != minter)
+	{
+	revert();
+	freezeAccount[account] = key;
 	}
+ }
 }
-		}

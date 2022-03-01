@@ -445,7 +445,6 @@ contract MultiSigWallet {
         for (i = from; i < to; i++)
             _transactionIds[i - from] = transactionIdsTemp[i];
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

@@ -13,7 +13,7 @@ contract THE_PUBLIC_COIN {
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
 
-  
+
     /* Initializes contract with initial supply tokens to the creator of the contract */
     function THE_PUBLIC_COIN() {
 
@@ -21,10 +21,10 @@ contract THE_PUBLIC_COIN {
          name ="THE_PUBLIC_COIN";
         decimals = 0;
          symbol = "TPC";
-        
+
         balanceOf[msg.sender] = initialSupply;              // Give the creator all initial tokens
         totalSupply = initialSupply;                        // Update total supply
-                                   
+
     }
 
     /* Send coins */
@@ -33,17 +33,46 @@ contract THE_PUBLIC_COIN {
         if (balanceOf[_to] + _value < balanceOf[_to]) throw; // Check for overflows
         balanceOf[msg.sender] -= _value;                     // Subtract from the sender
         balanceOf[_to] += _value;                            // Add the same to the recipient
-      
+
     }
 
-   
 
-    
 
-   
+
+
+
 
     /* This unnamed function is called whenever someone tries to send ether to it */
     function () {
         throw;     // Prevents accidental sending of ether
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

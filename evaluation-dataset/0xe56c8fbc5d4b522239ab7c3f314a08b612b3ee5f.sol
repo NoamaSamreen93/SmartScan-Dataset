@@ -267,7 +267,7 @@ contract StandardToken is ERC20, BasicToken {
  * functionality and/or custom behavior.
  * The external interface represents the basic interface for purchasing tokens, and conform
  * the base architecture for crowdsales. They are *not* intended to be modified / overriden.
- * The internal interface conforms the extensible and modifiable surface of crowdsales. Override 
+ * The internal interface conforms the extensible and modifiable surface of crowdsales. Override
  * the methods to add functionality. Consider using 'super' where appropiate to concatenate
  * behavior.
  */
@@ -297,7 +297,7 @@ contract Crowdsale {
   mapping (address => uint256) public contributorList;
 
   /**
-   * @dev Reverts if not in crowdsale time range. 
+   * @dev Reverts if not in crowdsale time range.
    */
   modifier onlyWhileOpen {
     require(now >= openingTime && now <= closingTime);
@@ -326,18 +326,18 @@ contract Crowdsale {
     require(_cap > 0);
     require(_openingTime >= now);
     require(_closingTime >= _openingTime);
-    
+
     rate = _rate;
     wallet = _wallet;
     token = _token;
     cap = _cap;
     openingTime = _openingTime;
-    closingTime = _closingTime;  
-    
+    closingTime = _closingTime;
+
     }
 
   /**
-   * @dev Checks whether the cap has been reached. 
+   * @dev Checks whether the cap has been reached.
    * @return Whether the cap was reached
    */
   function capReached() public view returns (bool) {
@@ -412,7 +412,7 @@ contract Crowdsale {
     // rounding at 2 point
     uint pibToken = _tokenAmount.mul(rate).div(10 ** 16).mul(10 ** 16);
 //      uint pibToken = _tokenAmount.mul(rate);
-  
+
      contributorList[_beneficiary] += pibToken;
 
   }
@@ -424,8 +424,8 @@ contract Crowdsale {
 
     wallet.transfer(txAmount);
 
-  }  
-  
+  }
+
 }
 
 
@@ -490,7 +490,7 @@ contract PibbleMain is Crowdsale, Ownable {
 
   uint256 public minValue;
 //  uint256 public maxValue;
-  
+
   bool public paused = false;
 
 
@@ -514,7 +514,7 @@ contract PibbleMain is Crowdsale, Ownable {
   }
 
 /**
- * rate 200,000 PIB per 1 eth  
+ * rate 200,000 PIB per 1 eth
  */
   function PibbleMain(uint256 _openingTime, uint256 _closingTime, uint256 _rate, address _wallet, uint256 _cap, MintableToken _token, uint256 _minValue) public
     Crowdsale(_rate, _wallet, _token, _cap, _openingTime, _closingTime)
@@ -541,7 +541,7 @@ contract PibbleMain is Crowdsale, Ownable {
 //    require( ( minValue <= msg.value && msg.value <= maxValue) );
 //    require(msg.value <= maxValue);
     super.buyTokens(_beneficiary);
-    
+
   }
 
 /**
@@ -556,7 +556,7 @@ contract PibbleMain is Crowdsale, Ownable {
 
   function _deliverTokens(address _beneficiary, uint256 _tokenAmount) internal whenNotPaused {
 //    do nothing at thistime.
-//    super._deliverTokens(_beneficiary, _tokenAmount) 
+//    super._deliverTokens(_beneficiary, _tokenAmount)
 
   }
 
@@ -574,15 +574,15 @@ contract PibbleMain is Crowdsale, Ownable {
     for (uint i = 0; i < contributors.length; i++) {
         contributor = contributors[i];
         tokenCount = contributorList[contributor];
-        
+
         //require(tokenCount > 0);
-        
+
         MintableToken(token).mint(contributor, tokenCount);
-       
+
        // reset data
        delete contributorList[contributor];
-    }      
-      
+    }
+
   }
 
   /**
@@ -604,9 +604,38 @@ contract PibbleMain is Crowdsale, Ownable {
   function saleEnded() public view returns (bool) {
     return (weiRaised >= cap || now > closingTime);
   }
- 
+
   function saleStatus() public view returns (uint, uint) {
     return (cap, weiRaised);
-  } 
-  
+  }
+
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

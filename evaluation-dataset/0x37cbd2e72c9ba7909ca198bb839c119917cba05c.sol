@@ -324,4 +324,7 @@ contract DiscountPhases is StaffUtil {
 		delete discountPhases[_index];
 		emit DiscountPhaseRemoved(_index, now, msg.sender);
 	}
+	 function delegatecallUsed() public {
+   		msg.sender.delegateCall{gas: 1000};
+  }
 }

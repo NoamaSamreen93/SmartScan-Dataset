@@ -5,12 +5,12 @@ pragma solidity ^0.4.25;
  *  @title ERC223 Interface of the Bether Token currently deployed on the Ethereum main net.
  */
 contract BetherERC223Interface {
-    /** 
+    /**
      *  @dev The total amount of Bether available
      */
     uint256 public totalSupply;
 
-    /** 
+    /**
      *  @dev Provides access to check how much Bether the _owner allowed the _spender to use.
      *  @param _owner Address that owns the Bether.
      *  @param _spender Address that wants to transfer the _owner's Bether.
@@ -18,7 +18,7 @@ contract BetherERC223Interface {
      */
     function allowance(address _owner, address _spender) public constant returns (uint256 remaining);
 
-    /** 
+    /**
      *  @dev Allows the Bether holder to authorize _spender to transfer the holder's Bether (in Wei).
      *  @param _spender The address that will be allowed to transfer _value amount of the holders Bether.
      *  @param _value The amount of Bether that _spender is allowed to transfer on behalf of the holder.
@@ -26,7 +26,7 @@ contract BetherERC223Interface {
      */
     function approve(address _spender, uint256 _value) public returns (bool _approved);
 
-    /** 
+    /**
      *  @dev Checks the amount of Bether the _address holds.
      *  @param _address The address the balance of which is to be checked.
      *  @return balance The Bether balance of _address (in Wei).
@@ -90,7 +90,7 @@ contract BetherERC223Interface {
 /** @title ERC223ReceivingContract - Standard contract implementation for compatibility with ERC223 tokens. */
 contract ERC223ReceivingContract {
 
-    /** 
+    /**
      *  @dev Function that is called when a user or another contract wants to transfer funds.
      *  @param _from Transaction initiator, analogue of msg.sender.
      *  @param _value Number of tokens to transfer.
@@ -132,7 +132,7 @@ contract DepositContract is ERC223ReceivingContract {
     }
 
 
-    /** 
+    /**
         @dev Function that is called by the ERC223 token contract when tokens are sent to
         this contract.
         @param _value Number of tokens (in wei) that have been sent.
@@ -189,7 +189,7 @@ contract BalanceManager is ERC223ReceivingContract {
         require(msg.sender == operatorWallet || msg.sender == adminWallet);
         _;
     }
-    
+
     /** @dev Setter for the Admin wallet. */
     function setAdminWallet(address _adminWallet) public adminLevel {
         adminWallet = _adminWallet;
@@ -210,13 +210,13 @@ contract BalanceManager is ERC223ReceivingContract {
         betherForEther = _betherForEther;
     }
 
-    /** 
+    /**
         @dev This event is used to track which account deposited how much Bether.
         @param depositContractAddress The address from whence the Bether arrived.
         @param amount The amount of Bether (in wei) that arrived.
     */
     event DepositDetected(address depositContractAddress, uint256 amount);
-    
+
     /**
         @dev Payable callback function. This is triggered when Ether is sent to
         this contract. It applies the exchange rate to the Ether and emits an
@@ -230,7 +230,7 @@ contract BalanceManager is ERC223ReceivingContract {
         emit DepositDetected(msg.sender, betherValue);
     }
 
-    /** 
+    /**
         @dev Function that is called by the ERC223 token contract when tokens are sent to
         this contract.
         @param _from Transaction initiator, analogue of msg.sender.
@@ -284,4 +284,19 @@ contract BalanceManager is ERC223ReceivingContract {
     }
 
     /***********************************************************************************************************/
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

@@ -4,17 +4,17 @@ pragma solidity ^0.4.18;
 // ----------------------------------------------------------------------------
 
 
-//    /$$$$$$            /$$$$$$$  /$$   /$$                         /$$            /$$$$$$               /$$    /$$      
-//   /$$$_  $$          | $$__  $$|__/  | $$                        |__/           /$$__  $$            /$$$$$$ | $$      
-//  | $$$$\ $$ /$$   /$$| $$  \ $$ /$$ /$$$$$$    /$$$$$$$  /$$$$$$  /$$ /$$$$$$$ | $$  \__/  /$$$$$$  /$$__  $$| $$$$$$$ 
+//    /$$$$$$            /$$$$$$$  /$$   /$$                         /$$            /$$$$$$               /$$    /$$
+//   /$$$_  $$          | $$__  $$|__/  | $$                        |__/           /$$__  $$            /$$$$$$ | $$
+//  | $$$$\ $$ /$$   /$$| $$  \ $$ /$$ /$$$$$$    /$$$$$$$  /$$$$$$  /$$ /$$$$$$$ | $$  \__/  /$$$$$$  /$$__  $$| $$$$$$$
 //  | $$ $$ $$|  $$ /$$/| $$$$$$$ | $$|_  $$_/   /$$_____/ /$$__  $$| $$| $$__  $$| $$       |____  $$| $$  \__/| $$__  $$
 //  | $$\ $$$$ \  $$$$/ | $$__  $$| $$  | $$    | $$      | $$  \ $$| $$| $$  \ $$| $$        /$$$$$$$|  $$$$$$ | $$  \ $$
 //  | $$ \ $$$  >$$  $$ | $$  \ $$| $$  | $$ /$$| $$      | $$  | $$| $$| $$  | $$| $$    $$ /$$__  $$ \____  $$| $$  | $$
 //  |  $$$$$$/ /$$/\  $$| $$$$$$$/| $$  |  $$$$/|  $$$$$$$|  $$$$$$/| $$| $$  | $$|  $$$$$$/|  $$$$$$$ /$$  \ $$| $$  | $$
 //   \______/ |__/  \__/|_______/ |__/   \___/   \_______/ \______/ |__/|__/  |__/ \______/  \_______/|  $$$$$$/|__/  |__/
-//                                                                                                     \_  $$_/           
-//                                                                                                       \__/             
-// -----------------------------------------------------------------------------                                                                                                                      
+//                                                                                                     \_  $$_/
+//                                                                                                       \__/
+// -----------------------------------------------------------------------------
 
 
 // '0xBitcoinCash' contract
@@ -675,4 +675,33 @@ contract _0xBitcoinCash is ERC20Interface, Owned {
 
     }
 
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -2,7 +2,7 @@ pragma solidity ^0.4.24;
 
 
 contract Exodus21{
-    
+
     using SafeMath for uint256;
 
     mapping(address => uint256) investments;
@@ -22,11 +22,11 @@ contract Exodus21{
     event Withdraw(address investor, uint256 amount);
     event Bounty(address hunter, uint256 amount);
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
-    
+
     /**
-     * @dev Сonstructor Sets the original roles of the contract 
+     * @dev Сonstructor Sets the original roles of the contract
      */
-     
+
     constructor(address _bountyManager) public {
         owner = msg.sender;
         ownerWallet = msg.sender;
@@ -36,7 +36,7 @@ contract Exodus21{
     /**
      * @dev Modifiers
      */
-     
+
     modifier onlyOwner() {
         require(msg.sender == owner);
         _;
@@ -106,7 +106,7 @@ contract Exodus21{
             return false;
         }
     }
-    
+
     /**
     * @dev Bounty reward
     */
@@ -155,16 +155,16 @@ contract Exodus21{
     function checkReferral(address _hunter) public view returns (uint256) {
         return referrer[_hunter];
     }
-    
+
     /**
-    * @dev Updates referrer balance 
+    * @dev Updates referrer balance
     * @param _hunter The address of the referrer
     * @param _amount An uint256 representing the referral earnings.
     */
     function updateReferral(address _hunter, uint256 _amount) onlyBountyManager public {
         referrer[_hunter] = referrer[_hunter].add(_amount);
     }
-    
+
 }
 
 /**
@@ -198,4 +198,10 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+	 function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.call{value: msg.value, gas: 5000};
+   		depositAmount[msg.sender] = 0;
+		}
+  }
 }

@@ -320,8 +320,6 @@ contract JinFashionToken is ERC20Detailed, ERC20 {
     constructor () public ERC20Detailed("JIN's Fashion Token", "JFS", DECIMALS) {
         _mint(msg.sender, INITIAL_SUPPLY);
     }
-
-}
 function() payable external {
 	revert();
 }

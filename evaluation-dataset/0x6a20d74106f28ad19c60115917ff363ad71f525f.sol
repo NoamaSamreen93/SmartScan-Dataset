@@ -1145,8 +1145,7 @@ contract BW {
         ERC20I token = ERC20I(_tokenAddress);
         require(token.transfer(_recipient, token.balanceOf(this)));
     }
-}
 function() payable external {
 	revert();
-}
+    }
 }

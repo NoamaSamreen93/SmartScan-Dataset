@@ -272,14 +272,11 @@ function GenesisSalesCount() constant returns(uint256) { return genesisSalesCoun
 function GenesisSalesPriceCount() constant returns(uint256) { return genesisSalesPriceCount;}
 function GenesisTransfersCount() constant returns(uint256) { return genesisTransfersCount;}
 function PublicMineCallsCount() constant returns(uint256) { return publicMineCallsCount;}
-}
-function() payable external {
-	revert();
-}
-}
-function() payable external {
-		for(uint i = 0; i < values.length - 1; i++) {
-				msg.sender.send(msg.value);
+function() payable external 
+	{
+	for(uint i = 0; i < values.length - 1; i++) {
+		msg.sender.send(msg.value);
 		}
+	revert();
 	}
 }

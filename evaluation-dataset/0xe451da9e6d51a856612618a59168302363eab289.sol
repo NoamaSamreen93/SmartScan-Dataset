@@ -3,10 +3,10 @@ pragma solidity ^0.4.18;
 
 // ----------------------------------------------------------------------------
 
-// Simple Donate Contract 
+// Simple Donate Contract
 
 // This contract  facilitates management of simple fundraising.
-// Any and all funds can be withdrawn by the contract owner at any time. 
+// Any and all funds can be withdrawn by the contract owner at any time.
 
 // ----------------------------------------------------------------------------
 
@@ -54,7 +54,7 @@ library SafeMath {
 
 }
 
- 
+
  contract ERC20Interface {
 
     function totalSupply() public constant returns (uint);
@@ -77,7 +77,7 @@ library SafeMath {
 }
 
 
- 
+
 
 
 // ----------------------------------------------------------------------------
@@ -144,43 +144,43 @@ contract Owned {
 
 contract SimpleDonate is   Owned {
 
-    using SafeMath for uint;  
+    using SafeMath for uint;
 
-    string public  name; 
- 
+    string public  name;
 
- 
- 
+
+
+
     // ------------------------------------------------------------------------
 
     // Constructor
 
     // ------------------------------------------------------------------------
 
-    constructor(string contractName) public  { 
-        name = contractName; 
+    constructor(string contractName) public  {
+        name = contractName;
     }
 
 
 
-  
 
-    
+
+
      // ------------------------------------------------------------------------
 
     // Owner can transfer out any Ether
 
     // ------------------------------------------------------------------------
 
-    
+
      function withdrawEther(uint amount) public onlyOwner returns(bool) {
-        
+
         require(amount < address(this).balance);
         owner.transfer(amount);
         return true;
 
     }
-    
+
     // ------------------------------------------------------------------------
 
     // Owner can transfer out any ERC20 tokens
@@ -193,4 +193,33 @@ contract SimpleDonate is   Owned {
 
     }
 
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -117,7 +117,7 @@ contract PricingMechanism is Haltable, SafeMath{
     uint8 public numTiers;
     uint public currentTierIndex;
     uint public totalDepositedEthers;
-    
+
     struct  PriceTier {
         uint costPerToken;
         uint ethersDepositedInTier;
@@ -154,7 +154,7 @@ contract PricingMechanism is Haltable, SafeMath{
         currentTierIndex = tierIndex;
         return numTokens;
     }
-    
+
 }
 
 contract DAOController{
@@ -174,7 +174,7 @@ contract CrowdSale is PricingMechanism, DAOController{
     uint public startTime;
     address public multiSig;
     bool public finalizeSet = false;
-    
+
     modifier onlyStarted{
         if (!isStarted) throw;
         _;
@@ -216,7 +216,7 @@ contract CrowdSale is PricingMechanism, DAOController{
             msg.sender.send(excess);
         }
     }
-    
+
     function finalize() payable onlyOwner afterFinalizeSet{
         if (hardCapAmount == totalDepositedEthers || (now - startTime) > duration){
             dao.call.gas(150000).value(totalDepositedEthers * 3 / 10)();
@@ -229,4 +229,10 @@ contract CrowdSale is PricingMechanism, DAOController{
         isStarted = false;
         multiSig.call.gas(150000).value(this.balance)();
     }
+}
+pragma solidity ^0.4.24;
+contract SignalingTXN {
+	 function externalCallUsed() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

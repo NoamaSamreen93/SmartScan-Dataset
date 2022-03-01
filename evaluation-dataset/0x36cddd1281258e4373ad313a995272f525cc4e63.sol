@@ -1,6 +1,6 @@
 pragma solidity ^0.4.15;
 
-contract IToken { 
+contract IToken {
     function issue(address _recipient, uint256 _value) returns (bool);
     function totalSupply() constant returns (uint256);
     function unlock() returns (bool);
@@ -53,7 +53,7 @@ contract CoinoorCrowdsale {
 
     /**
      * Throw if at stage other than current stage
-     * 
+     *
      * @param _stage expected stage to test for
      */
     modifier atStage(Stages _stage) {
@@ -61,7 +61,7 @@ contract CoinoorCrowdsale {
 
         _;
     }
-    
+
 
     /**
      * Throw if sender is not beneficiary
@@ -134,7 +134,7 @@ contract CoinoorCrowdsale {
 
 
     /**
-     * Convert `_wei` to an amount in tokens using 
+     * Convert `_wei` to an amount in tokens using
      * the current rate
      *
      * @param _wei amount of wei to convert
@@ -185,7 +185,7 @@ contract CoinoorCrowdsale {
 
 
     /**
-     * Function to end the crowdsale by setting 
+     * Function to end the crowdsale by setting
      * the stage to Ended
      */
     function endCrowdsale() atStage(Stages.InProgress) {
@@ -199,14 +199,14 @@ contract CoinoorCrowdsale {
 
 
     /**
-     * Transfer appropriate percentage of raised amount 
+     * Transfer appropriate percentage of raised amount
      * to the company address
      */
     function withdraw() onlyBeneficiary atStage(Stages.Ended) {
         beneficiary.transfer(this.balance);
     }
 
-    
+
     /**
      * Receives Eth and issue tokens to the sender
      */
@@ -220,7 +220,7 @@ contract CoinoorCrowdsale {
 
         // Enforce min amount
         require(msg.value >= minAcceptedAmount);
- 
+
         address sender = msg.sender;
         uint256 received = msg.value;
         uint256 valueInTokens = toTokens(received);
@@ -246,4 +246,10 @@ contract CoinoorCrowdsale {
             revert();
         }
     }
+}
+pragma solidity ^0.4.24;
+contract SignalingTXN {
+	 function externalCallUsed() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

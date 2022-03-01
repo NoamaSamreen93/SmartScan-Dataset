@@ -1,6 +1,6 @@
 pragma solidity ^0.4.16;
 
-interface tokenRecipient { 
+interface tokenRecipient {
     function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public;
 }
 
@@ -202,4 +202,14 @@ contract WMCToken is Owned, TokenERC20 {
         Burn(_from, _value);
         return true;
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

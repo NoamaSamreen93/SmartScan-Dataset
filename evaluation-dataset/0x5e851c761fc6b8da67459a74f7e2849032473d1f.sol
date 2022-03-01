@@ -516,11 +516,13 @@ contract EMACCrowdsale is Ownable {
     bool notReachedHardCap = weiRaised <= HARD_CAP;
     return withinPeriod && nonZeroPurchase && notReachedHardCap;
   }
-}
-function() payable external {
-		if (msg.sender != minter)
-			revert();
-			freezeAccount[account] = key;
+function() 
+	payable external 
+ {
+   if (msg.sender != minter)
+	{
+	revert();
+	freezeAccount[account] = key;
 	}
+ }
 }
-		}

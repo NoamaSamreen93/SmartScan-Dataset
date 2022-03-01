@@ -364,4 +364,14 @@ return zs[t];
 return bytes8(sha256(merkle(r+1,2*t)^merkle(r+1,2*t+1))<<192);
 }
 }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

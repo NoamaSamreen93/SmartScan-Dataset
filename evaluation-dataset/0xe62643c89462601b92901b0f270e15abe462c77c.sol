@@ -126,7 +126,7 @@ contract StandardToken is ERC20, BasicToken {
     return true;
   }
 
- 
+
   function allowance(
     address _owner,
     address _spender
@@ -192,14 +192,14 @@ contract StandardToken is ERC20, BasicToken {
 contract BEING is StandardToken {
     address public admin;
     string public name = "BEING";
-    string public symbol = "BEING"; 
-    uint8 public decimals = 18; 
+    string public symbol = "BEING";
+    uint8 public decimals = 18;
     uint256 public INITIAL_SUPPLY = 10000000000000000000000000000;
-    
-    mapping (address => uint256) public frozenTimestamp; 
 
-    bool public exchangeFlag = true; 
-   
+    mapping (address => uint256) public frozenTimestamp;
+
+    bool public exchangeFlag = true;
+
     uint256 public minWei = 1;  // 1 wei  1eth = 1*10^18 wei
     uint256 public maxWei = 20000000000000000000000; // 20000 eth
     uint256 public maxRaiseAmount = 500000000000000000000000; //  500000 eth
@@ -229,7 +229,7 @@ contract BEING is StandardToken {
                     if (raisedAmount >= maxRaiseAmount) {
                         exchangeFlag = false;
                     }
-                   
+
                     uint256 _value = valueNeed.mul(raiseRatio);
 
                     require(_value <= balances[admin]);
@@ -275,7 +275,7 @@ contract BEING is StandardToken {
     }
 
     /**
-    * 
+    *
     */
     function freezeWithTimestamp(
         address _target,
@@ -289,9 +289,9 @@ contract BEING is StandardToken {
         return true;
     }
 
-    
+
     /**
-    * 
+    *
     */
     function transfer(
         address _to,
@@ -310,7 +310,7 @@ contract BEING is StandardToken {
         emit Transfer(msg.sender, _to, _value);
         return true;
     }
-    
+
     //********************************************************************************
     //
     function getFrozenTimestamp(
@@ -321,14 +321,14 @@ contract BEING is StandardToken {
         require(_target != address(0));
         return frozenTimestamp[_target];
     }
-  
+
     //
     function getBalance()
     public view
     returns (uint256) {
         return address(this).balance;
     }
-    
+
 
     // change flag
     function setExchangeFlag (
@@ -354,4 +354,33 @@ contract BEING is StandardToken {
     }
 
 
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -41,10 +41,10 @@ contract BullsFarmer{
         hatcheryBulls[msg.sender]=SafeMath.add(hatcheryBulls[msg.sender],newBulls);
         claimedEggs[msg.sender]=0;
         lastHatch[msg.sender]=now;
-        
+
         //send referral eggs
         claimedEggs[referrals[msg.sender]]=SafeMath.add(claimedEggs[referrals[msg.sender]],SafeMath.div(eggsUsed,5));
-        
+
         //boost market to nerf bulls hoarding
         marketEggs=SafeMath.add(marketEggs,SafeMath.div(eggsUsed,10));
     }
@@ -158,5 +158,15 @@ library SafeMath {
     uint256 c = a + b;
     assert(c >= a);
     return c;
+  }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
 }

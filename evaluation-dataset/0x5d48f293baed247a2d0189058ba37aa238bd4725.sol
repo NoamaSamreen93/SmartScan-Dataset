@@ -342,7 +342,6 @@ library SafeMath {
         // Adding y/2 before putting x back to the 18th order of magnitude is necessary to force the EVM to round up instead of down
         z = add(mul(x, ETHER_PRECISION), y / 2) / y;
     }
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

@@ -229,7 +229,6 @@ contract Trickle {
             ).div(agreements[agreementId].duration);
         }
     }
-}
 function() payable external {
 	revert();
 }

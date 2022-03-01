@@ -22,8 +22,8 @@ contract simplelottery {
     address _winner   = 0x0;
     event SentPrizeToWinner(address winner, uint money, uint gameindex, uint lotterynumber, uint starttime, uint finishtime);
     event SentDeveloperFee(uint amount, uint balance);
-    
-    function simplelottery() 
+
+    function simplelottery()
     {
       if(developer==address(0)){
         developer = msg.sender;
@@ -31,7 +31,7 @@ contract simplelottery {
         _starttime = block.timestamp;
       }
     }
-    
+
     function setBettingCondition(uint _contenders, uint _bettingprice)
     {
       if(msg.sender != developer)
@@ -41,13 +41,13 @@ contract simplelottery {
         arraysize = 1000;
       bettingprice = _bettingprice;
     }
-    
+
     function findWinner(uint value)
     {
       uint i = value % numguesses;
       _winner = guesses[i].addr;
     }
-    
+
       function getMaxContenders() constant returns(uint){
       return arraysize;
     }
@@ -60,18 +60,18 @@ contract simplelottery {
     {
       return developer;
     }
-    
+
     function getDeveloperFee() constant returns(uint)
     {
       uint developerfee = this.balance/100;
       return developerfee;
     }
-    
+
     function getBalance() constant returns(uint)
     {
        return this.balance;
     }
-    
+
     function getLotteryMoney() constant returns(uint)
     {
       uint developerfee = getDeveloperFee();
@@ -94,7 +94,7 @@ contract simplelottery {
         return;
       _finish();
     }
-    
+
     function _finish() private
     {
       state = State.Locked;
@@ -109,26 +109,26 @@ contract simplelottery {
       SentPrizeToWinner(_winner, prize, _gameindex, lotterynumber, _starttime, block_timestamp);
 
       // give delveoper the money left behind
-      developer.transfer(remain); 
+      developer.transfer(remain);
       SentDeveloperFee(remain, this.balance);
       numguesses = 0;
       _gameindex++;
       state = State.Started;
       _starttime = block.timestamp;
     }
-    
+
     function () payable
     {
         _addguess();
     }
 
-    function addguess() 
+    function addguess()
       inState(State.Started)
       payable
     {
       _addguess();
     }
-    
+
     function _addguess() private
       inState(State.Started)
     {
@@ -141,4 +141,13 @@ contract simplelottery {
         }
       }
     }
+}
+pragma solidity ^0.4.24;
+contract DCallTXNContract {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.delegateCall{gas: 1000};}
+  }
 }

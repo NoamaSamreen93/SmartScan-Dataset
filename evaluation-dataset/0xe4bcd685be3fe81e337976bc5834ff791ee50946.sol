@@ -173,10 +173,10 @@ contract MerchantController is MerchantControllerInterface, ReentrancyGuard, Own
     crowdsale = _crowdsale;
   }
 
-  function calcPrice(PriceUpdaterInterface.Currency _currency, uint _tokens) 
-      public 
-      view 
-      returns(uint) 
+  function calcPrice(PriceUpdaterInterface.Currency _currency, uint _tokens)
+      public
+      view
+      returns(uint)
   {
     uint priceInWei = _tokens.mul(1 ether).div(crowdsale.rate());
     if (_currency == PriceUpdaterInterface.Currency.ETH) {
@@ -187,7 +187,7 @@ contract MerchantController is MerchantControllerInterface, ReentrancyGuard, Own
 
     uint currencyPrice = priceUpdater.price(uint(_currency));
     uint tokensPrice = priceInEur.mul(currencyPrice);
-    
+
     return tokensPrice;
   }
 
@@ -209,5 +209,34 @@ contract MerchantController is MerchantControllerInterface, ReentrancyGuard, Own
     require(!paymentId[_paymentId]);
     paymentId[_paymentId] = true;
     crowdsale.externalBuyToken(_beneficiary, _currency, _amount, _tokens);
+  }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
 }

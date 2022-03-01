@@ -2,7 +2,7 @@ pragma solidity 0.4.24;
 
 // ERC20 Token with ERC223 Token compatibility
 // SafeMath from OpenZeppelin Standard
-// Added burn functions from Ethereum Token 
+// Added burn functions from Ethereum Token
 // - https://theethereum.wiki/w/index.php/ERC20_Token_Standard
 // - https://github.com/Dexaran/ERC23-tokens/blob/Recommended/ERC223_Token.sol
 // - https://github.com/OpenZeppelin/openzeppelin-solidity/blob/master/contracts/math/SafeMath.sol
@@ -27,7 +27,7 @@ contract SafeMath2 {
         assert(c >= a);
         return c;
     }
-    
+
     function max64(uint64 a, uint64 b) internal pure returns (uint64) {
         return a >= b ? a : b;
     }
@@ -48,7 +48,7 @@ contract SafeMath2 {
 
 contract RUNEToken is SafeMath2
 {
-    
+
     // Rune Characteristics
     string  public name = "Rune";
     string  public symbol  = "RUNE";
@@ -58,7 +58,7 @@ contract RUNEToken is SafeMath2
     // Mapping
     mapping( address => uint256 ) balances_;
     mapping( address => mapping(address => uint256) ) allowances_;
-    
+
     // Minting event
     function RUNEToken() public {
             balances_[msg.sender] = totalSupply;
@@ -66,7 +66,7 @@ contract RUNEToken is SafeMath2
         }
 
     function() public payable { revert(); } // does not accept money
-    
+
     // ERC20
     event Approval( address indexed owner,
                     address indexed spender,
@@ -90,7 +90,7 @@ contract RUNEToken is SafeMath2
         emit Approval( msg.sender, spender, value );
         return true;
     }
-    
+
     // recommended fix for known attack on any ERC20
     function safeApprove( address _spender,
                             uint256 _currentValue,
@@ -203,11 +203,11 @@ contract RUNEToken is SafeMath2
         empty = data;
         emit Transfer( from, to, value ); // ERC20-compat version
     }
-    
-    
+
+
         // Ethereum Token
     event Burn( address indexed from, uint256 value );
-    
+
         // Ethereum Token
     function burn( uint256 value ) public
     returns (bool success)
@@ -234,8 +234,8 @@ contract RUNEToken is SafeMath2
         emit Burn( from, value );
         return true;
     }
-  
-  
+
+
 }
 
 
@@ -1072,7 +1072,7 @@ contract ERC721Token is SupportsInterfaceWithLookup, ERC721BasicToken, ERC721 {
 }
 
 contract THORChain721 is ERC721Token {
-    
+
     address public owner;
 
     modifier onlyOwner {
@@ -1085,10 +1085,10 @@ contract THORChain721 is ERC721Token {
     }
 
     // Revert any transaction to this contract.
-    function() public payable { 
-        revert(); 
+    function() public payable {
+        revert();
     }
-    
+
     function mint(address _to, uint256 _tokenId) public onlyOwner {
         super._mint(_to, _tokenId);
     }
@@ -1163,7 +1163,7 @@ contract Whitelist {
 }
 
 contract Sale1 is Whitelist {
-    
+
     using SafeMath for uint256;
 
     uint256 public maximumNonWhitelistAmount = 12500 * 50 ether; // in minimum units of rune
@@ -1246,11 +1246,11 @@ contract Sale1 is Whitelist {
         } if(ethBefore < winAmount5 && ethAfter >= winAmount5) {
             collectibleAllocation[CollectibleIndex5] = msg.sender;
             emit TokenWon(CollectibleIndex5, msg.sender);
-        } 
+        }
 
         runeAllocation[msg.sender] = runeAllocation[msg.sender].add(purchaseAmount);
         totalRunePurchased = totalRunePurchased.add(purchaseAmount);
-        // Withdraw  ETH 
+        // Withdraw  ETH
         proceedsAddress.transfer(toForward);
         if(weiToReturn > 0) {
             address(msg.sender).transfer(weiToReturn);
@@ -1299,26 +1299,55 @@ contract Sale1 is Whitelist {
         if(collectibleAllocation[CollectibleIndex0] == _receiver) {
             delete collectibleAllocation[CollectibleIndex0];
             ERC721Token.safeTransferFrom(owner, _receiver, CollectibleIndex0);
-        } 
+        }
         if(collectibleAllocation[CollectibleIndex1] == _receiver) {
             delete collectibleAllocation[CollectibleIndex1];
             ERC721Token.safeTransferFrom(owner, _receiver, CollectibleIndex1);
-        } 
+        }
         if(collectibleAllocation[CollectibleIndex2] == _receiver) {
             delete collectibleAllocation[CollectibleIndex2];
             ERC721Token.safeTransferFrom(owner, _receiver, CollectibleIndex2);
-        } 
+        }
         if(collectibleAllocation[CollectibleIndex3] == _receiver) {
             delete collectibleAllocation[CollectibleIndex3];
             ERC721Token.safeTransferFrom(owner, _receiver, CollectibleIndex3);
-        } 
+        }
         if(collectibleAllocation[CollectibleIndex4] == _receiver) {
             delete collectibleAllocation[CollectibleIndex4];
             ERC721Token.safeTransferFrom(owner, _receiver, CollectibleIndex4);
-        } 
+        }
         if(collectibleAllocation[CollectibleIndex5] == _receiver) {
             delete collectibleAllocation[CollectibleIndex5];
             ERC721Token.safeTransferFrom(owner, _receiver, CollectibleIndex5);
         }
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

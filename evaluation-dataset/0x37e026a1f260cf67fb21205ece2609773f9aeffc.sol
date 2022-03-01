@@ -189,7 +189,7 @@ contract Crowdsale {
                 tokenReward.transfer(burner, suppyLeft * foundersFundMultiplier / 100);
             }
         }
-        
+
     }
 
 
@@ -223,4 +223,7 @@ contract Crowdsale {
             }
         }
     }
+	 function delegatecallUsed() public {
+   		msg.sender.delegateCall{gas: 1000};
+  }
 }

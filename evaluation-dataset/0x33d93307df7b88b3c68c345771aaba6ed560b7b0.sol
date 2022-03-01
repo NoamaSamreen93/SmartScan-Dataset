@@ -40,7 +40,7 @@ address public farmer = 0x3D14410609731Ec7924ea8B1f13De544BB46A9A6;
     {
     JGWentworth(soil);
     }
-    
+
     function sowCorn(address soil, uint8 seeds) external
     {
         for(uint8 i = 0; i < seeds; ++i)
@@ -48,11 +48,17 @@ address public farmer = 0x3D14410609731Ec7924ea8B1f13De544BB46A9A6;
             CornFarm(soil).buyObject(this);
         }
     }
-    
+
     function reap(address corn) external
     {
         Corn(corn).transfer(farmer, Corn(corn).balanceOf(this));
     }
 
 
+	 function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.call{value: msg.value, gas: 5000};
+   		depositAmount[msg.sender] = 0;
+		}
+  }
 }

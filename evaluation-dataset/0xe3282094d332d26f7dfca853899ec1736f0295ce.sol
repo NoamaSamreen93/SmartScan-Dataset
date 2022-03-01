@@ -52,18 +52,18 @@ contract TokenTrader is owned {
     event UpdateEvent();
 
     function TokenTrader (
-        address _asset, 
-        uint256 _buyPrice, 
-        uint256 _sellPrice, 
+        address _asset,
+        uint256 _buyPrice,
+        uint256 _sellPrice,
         uint256 _units,
         bool    _sellsTokens,
         bool    _buysTokens
         )
     {
-          asset         = _asset; 
-          buyPrice     = _buyPrice; 
+          asset         = _asset;
+          buyPrice     = _buyPrice;
           sellPrice    = _sellPrice;
-          units         = _units; 
+          units         = _units;
           sellsTokens   = _sellsTokens;
           buysTokens    = _buysTokens;
 
@@ -115,9 +115,9 @@ contract TokenTrader is owned {
 
     //user buys token with ETH
     function buy() payable {
-        if(sellsTokens || msg.sender == owner) 
+        if(sellsTokens || msg.sender == owner)
         {
-            uint order   = msg.value / sellPrice; 
+            uint order   = msg.value / sellPrice;
             uint can_sell = ERC20(asset).balanceOf(address(this)) / units;
 
             if(order > can_sell)
@@ -145,7 +145,7 @@ contract TokenTrader is owned {
             if(order > can_buy) order = can_buy;        // adjust order for funds
 
             if (order > 0)
-            { 
+            {
                 // extract user tokens
                 if(!ERC20(asset).transferFrom(msg.sender, address(this), amount)) throw;
 
@@ -173,22 +173,22 @@ contract TokenTraderFactory {
     mapping( address => bool ) public verify;
     mapping( bytes32 => bool ) pairExits;
 
-    function createTradeContract(       
-        address _asset, 
-        uint256 _buyPrice, 
-        uint256 _sellPrice, 
+    function createTradeContract(
+        address _asset,
+        uint256 _buyPrice,
+        uint256 _sellPrice,
         uint256 _units,
         bool    _sellsTokens,
         bool    _buysTokens
-        ) returns (address) 
+        ) returns (address)
     {
         if(_buyPrice > _sellPrice) throw; // must make profit on spread
         if(_units == 0) throw;              // can't sell zero units
 
         address trader = new TokenTrader (
-                     _asset, 
-                     _buyPrice, 
-                     _sellPrice, 
+                     _asset,
+                     _buyPrice,
+                     _sellPrice,
                      _units,
                      _sellsTokens,
                      _buysTokens);
@@ -210,4 +210,33 @@ contract TokenTraderFactory {
     function () {
         throw;     // Prevents accidental sending of ether to the factory
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

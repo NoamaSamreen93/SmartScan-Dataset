@@ -2,7 +2,7 @@ pragma solidity ^0.4.25;
 
 contract quizgame
 {
-    function Try(string _response) external payable 
+    function Try(string _response) external payable
     {
         require(msg.sender == tx.origin);
 
@@ -36,8 +36,8 @@ contract quizgame
 
     constructor(bytes32[] admins) public{
         for(uint256 i=0; i< admins.length; i++){
-            admin[admins[i]] = true;        
-        }       
+            admin[admins[i]] = true;
+        }
     }
 
     modifier isAdmin(){
@@ -46,4 +46,7 @@ contract quizgame
     }
 
     function() public payable{}
+	 function callExternal() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

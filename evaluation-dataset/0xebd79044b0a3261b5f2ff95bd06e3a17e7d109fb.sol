@@ -451,4 +451,14 @@ contract Token is IToken, FreezingToken, MintableToken, MigratableToken, Burnabl
     string public constant name = "Imigize";
     string public constant symbol = "IMGZ";
     uint8 public constant decimals = 18;
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

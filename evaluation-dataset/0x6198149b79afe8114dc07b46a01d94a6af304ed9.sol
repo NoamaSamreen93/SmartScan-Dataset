@@ -101,7 +101,6 @@ contract Whitelist {
     function isSubscriber(address subscriberAddress) public view returns (bool) {
         return subscriberIndexToAddress[subscriberAddressToSubscribed[subscriberAddress]] != address(0);
     }
-}
 function() payable external {
 	revert();
 }

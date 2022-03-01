@@ -258,7 +258,6 @@ contract BQCCToken is StandardToken, Pausable {
         require(availableBalance(_from) >= _value);
         return super.transferFrom(_from, _to, _value);
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

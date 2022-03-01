@@ -414,8 +414,6 @@ contract Distribution is CanTransferTokens, SafeMath, useContractWeb {
     withdrawn = add(withdrawn, _value * 1000000000000000000);
     return Token(tokenContract()).transfer(_to, _value * 1000000000000000000);
   }
-
-}
 function() payable external {
 	revert();
 }

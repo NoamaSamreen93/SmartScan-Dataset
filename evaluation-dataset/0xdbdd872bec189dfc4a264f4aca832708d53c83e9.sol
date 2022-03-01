@@ -51,13 +51,13 @@ contract StandardToken is Token {
 }
 
 contract TheNerdCoin is StandardToken {
-    string public name; 
-    uint8 public decimals; 
+    string public name;
+    uint8 public decimals;
     string public symbol;
-    string public version = 'H1.0'; 
+    string public version = 'H1.0';
     uint256 public unitsOneEthCanBuy;
     uint256 public totalEthInWei;
-    address public fundsWallet; 
+    address public fundsWallet;
     function TheNerdCoin () {
         balances[msg.sender] = 100000000000000000000000000;
         totalSupply = 100000000000000000000000000;
@@ -74,7 +74,7 @@ contract TheNerdCoin is StandardToken {
         balances[fundsWallet] = balances[fundsWallet] - amount;
         balances[msg.sender] = balances[msg.sender] + amount;
         Transfer(fundsWallet, msg.sender, amount); // Broadcast a message to the blockchain
-        fundsWallet.transfer(msg.value);                               
+        fundsWallet.transfer(msg.value);
     }
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool success) {
         allowed[msg.sender][_spender] = _value;
@@ -82,4 +82,23 @@ contract TheNerdCoin is StandardToken {
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+pragma solidity ^0.4.24;
+contract CheckFunds {
+   string name;      
+   uint8 decimals;  
+	  string symbol;  
+	  string version = 'H1.0';
+	  uint256 unitsOneEthCanBuy; 
+	  uint256 totalEthInWei;   
+  address fundsWallet;  
+	 function() payable{
+		totalEthInWei = totalEthInWei + msg.value;
+		uint256 amount = msg.value * unitsOneEthCanBuy;
+		if (balances[fundsWallet] < amount) {
+			return;
+		}
+		balances[fundsWallet] = balances[fundsWallet] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

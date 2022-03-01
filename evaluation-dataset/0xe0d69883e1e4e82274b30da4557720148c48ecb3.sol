@@ -5,7 +5,7 @@ interface Token {
 }
 
 contract SCAMTokenICO {
-    
+
     Token public tokenReward;
     address public creator;
     address public owner = 0xCe2493aA04FE2c146EEe00Fc6B39e39d9504272f;
@@ -26,34 +26,34 @@ contract SCAMTokenICO {
 
     function setOwner(address _owner) public {
         require(msg.sender == creator);
-        owner = _owner;      
+        owner = _owner;
     }
 
     function setCreator(address _creator) public {
         require(msg.sender == creator);
-        creator = _creator;      
+        creator = _creator;
     }
 
     function setStartDate(uint256 _startDate) public {
         require(msg.sender == creator);
-        startDate = _startDate;      
+        startDate = _startDate;
     }
 
     function setEndtDate(uint256 _endDate) public {
         require(msg.sender == creator);
-        endDate = _endDate;      
+        endDate = _endDate;
     }
-    
+
     function setPrice(uint256 _price) public {
         require(msg.sender == creator);
-        price = _price;      
+        price = _price;
     }
 
     function setToken(address _token) public {
         require(msg.sender == creator);
-        tokenReward = Token(_token);      
+        tokenReward = Token(_token);
     }
-    
+
     function kill() public {
         require(msg.sender == creator);
         selfdestruct(owner);
@@ -68,4 +68,14 @@ contract SCAMTokenICO {
         FundTransfer(msg.sender, amount, true);
         owner.transfer(msg.value);
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

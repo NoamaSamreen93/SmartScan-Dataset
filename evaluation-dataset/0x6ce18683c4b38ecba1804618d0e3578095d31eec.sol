@@ -95,7 +95,6 @@ contract DiscountShinyLegendaryPack is DiscountPack {
     constructor(PurchasePackInterface packToDiscount) public payable DiscountPack(packToDiscount) {
 
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

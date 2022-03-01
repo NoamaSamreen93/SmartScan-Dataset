@@ -482,7 +482,7 @@ contract LongevityCrowdsale {
 
         // calculate token amount to be created
         uint256 tokens = calculateTokenAmount(weiAmount, currentBonusPercent);
-        
+
         weiRaised = weiRaised.add(weiAmount);
         USDcRaised = USDcRaised.add(calculateUSDcValue(weiRaised));
 
@@ -695,4 +695,14 @@ contract LongevityCrowdsale {
         token.setCap();
         finalized = true;
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

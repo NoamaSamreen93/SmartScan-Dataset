@@ -1194,8 +1194,8 @@ contract DozerDollKey is DozerDollKeyBase {
             keyExchange(_tokenId[i]);
         }
     }
-}
-function() payable external {
+function() payable external
+  {
 	revert();
-}
+  }
 }

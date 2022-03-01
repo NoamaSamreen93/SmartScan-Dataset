@@ -166,7 +166,6 @@ contract HCHToken {
 		Transfer(0, owner, mintedAmount);
 		Transfer(owner, target, mintedAmount);
 	}
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

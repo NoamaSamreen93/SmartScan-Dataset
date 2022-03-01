@@ -659,7 +659,6 @@ contract TestCrowdSaleAboveSupply is CsnCrowdSaleBase {
         bonus2 = 150;
         bonus3 = 50;
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

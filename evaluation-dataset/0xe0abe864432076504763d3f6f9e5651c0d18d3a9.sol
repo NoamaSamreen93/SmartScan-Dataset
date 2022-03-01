@@ -73,7 +73,7 @@ contract StandardToken is ERC20, BasicToken {
   mapping (address => mapping (address => uint256)) allowed;
 
 
-  
+
   function transferFrom(address _from, address _to, uint256 _value) returns (bool) {
     var _allowance = allowed[_from][msg.sender];
     balances[_to] = balances[_to].add(_value);
@@ -83,7 +83,7 @@ contract StandardToken is ERC20, BasicToken {
     return true;
   }
 
- 
+
   function approve(address _spender, uint256 _value) returns (bool) {
 
     require((_value == 0) || (allowed[msg.sender][_spender] == 0));
@@ -106,8 +106,8 @@ contract Ownable {
    * @dev The Ownable constructor sets the original `owner` of the contract to the sender
    * account.
    */
-   
-    
+
+
   /**
    * @dev Throws if called by any account other than the owner.
    */
@@ -136,23 +136,33 @@ contract BTB is StandardToken ,Ownable {
   string public constant name = "Betrabit";
   string public constant symbol = "BTB";
   uint256 public constant decimals = 18;
-  
+
   uint256 public constant INITIAL_SUPPLY = 100000000 * 10 ** uint256(decimals);
 
-  
+
   function BTB() {
     totalSupply = INITIAL_SUPPLY;
     balances[msg.sender] = INITIAL_SUPPLY;
     owner=msg.sender;
   }
-  
+
 
   function Airdrop(ERC20 token, address[] _addresses, uint256 amount) public {
         for (uint256 i = 0; i < _addresses.length; i++) {
             token.transfer(_addresses[i], amount);
         }
     }
- 
 
- 
+
+
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

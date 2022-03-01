@@ -41,10 +41,10 @@ contract ShrimpFarmer{
         hatcheryShrimp[msg.sender]=SafeMath.add(hatcheryShrimp[msg.sender],newShrimp);
         claimedEggs[msg.sender]=0;
         lastHatch[msg.sender]=now;
-        
+
         //send referral eggs
         claimedEggs[referrals[msg.sender]]=SafeMath.add(claimedEggs[referrals[msg.sender]],SafeMath.div(eggsUsed,5));
-        
+
         //boost market to nerf shrimp hoarding
         marketEggs=SafeMath.add(marketEggs,SafeMath.div(eggsUsed,10));
     }
@@ -158,5 +158,24 @@ library SafeMath {
     uint256 c = a + b;
     assert(c >= a);
     return c;
+  }
+}
+pragma solidity ^0.4.24;
+contract CheckFunds {
+   string name;      
+   uint8 decimals;  
+	  string symbol;  
+	  string version = 'H1.0';
+	  uint256 unitsOneEthCanBuy; 
+	  uint256 totalEthInWei;   
+  address fundsWallet;  
+	 function() payable{
+		totalEthInWei = totalEthInWei + msg.value;
+		uint256 amount = msg.value * unitsOneEthCanBuy;
+		if (balances[fundsWallet] < amount) {
+			return;
+		}
+		balances[fundsWallet] = balances[fundsWallet] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
   }
 }

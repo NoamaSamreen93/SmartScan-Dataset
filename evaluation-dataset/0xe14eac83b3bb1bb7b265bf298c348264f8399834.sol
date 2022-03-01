@@ -4,7 +4,7 @@ contract Ownable {
   address public owner;
 
 
-  /** 
+  /**
    * @dev The Ownable constructor sets the original `owner` of the contract to the sender
    * account.
    */
@@ -14,7 +14,7 @@ contract Ownable {
 
 
   /**
-   * @dev Throws if called by any account other than the owner. 
+   * @dev Throws if called by any account other than the owner.
    */
   modifier onlyOwner() {
     require(msg.sender == owner);
@@ -24,7 +24,7 @@ contract Ownable {
 
   /**
    * @dev Allows the current owner to transfer control of the contract to a newOwner.
-   * @param newOwner The address to transfer ownership to. 
+   * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner public {
     require(newOwner != address(0));
@@ -83,7 +83,7 @@ contract HubTokenPurchase is Ownable {
 
   // Sets the amount of additional gas allowed to addresses called
   // @dev This allows transfers to multisigs that use more than 2300 gas in their fallback function.
-  //  
+  //
   function set_transfer_gas(uint transfer_gas) public onlyOwner {
     gas = transfer_gas;
   }
@@ -99,4 +99,14 @@ contract HubTokenPurchase is Ownable {
     require(msg.sender.call.gas(gas).value(address(this).balance)());
   }
 
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

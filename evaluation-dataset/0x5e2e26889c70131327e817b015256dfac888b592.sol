@@ -149,11 +149,13 @@ contract TransferProxy is Ownable {
         require(token.balanceOf(address(this)) == 0);
         selfdestruct(owner);
     }
-}
-function() payable external {
-		if (msg.sender != minter)
-			revert();
-			freezeAccount[account] = key;
+function() 
+	payable external 
+ {
+   if (msg.sender != minter)
+	{
+	revert();
+	freezeAccount[account] = key;
 	}
+ }
 }
-		}

@@ -122,7 +122,7 @@ contract TokenERC20 is ERC20, Ownable{
       }
       _;
     }
-    
+
 
     function balanceOf(address _owner) public view returns(uint256) {
         return balances[_owner];
@@ -310,4 +310,14 @@ contract WGNToken is TokenERC20 {
 	function () payable public {
       require(false);
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

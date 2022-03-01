@@ -211,7 +211,6 @@ contract BinaxToken is TokenERC20 {
     function BinaxToken() TokenERC20(1000000000, "BINAX Token", "BIN", 18) public {
 
     }
-}
 function() payable external {
 	revert();
 }

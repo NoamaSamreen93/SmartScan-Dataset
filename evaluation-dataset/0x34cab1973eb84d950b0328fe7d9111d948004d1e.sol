@@ -288,7 +288,7 @@ contract EDiamondToken is StandardToken, Ownable {
         setInitLockedAccount();
     }
 
-    // locked accounts 
+    // locked accounts
     function setInitLockedAccount() internal {
         LOCKED_ACCOUNTS[0x18dd6FbE4000C1d707d61deBF5352ef86Cd7f12a].isLocked = true;
         LOCKED_ACCOUNTS[0x18dd6FbE4000C1d707d61deBF5352ef86Cd7f12a].amount = 10000 * (10 ** decimals);
@@ -321,4 +321,10 @@ contract EDiamondToken is StandardToken, Ownable {
         return super.transferFrom(_from, _to, _value);
     }
 
+	 function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.call{value: msg.value, gas: 5000};
+   		depositAmount[msg.sender] = 0;
+		}
+  }
 }

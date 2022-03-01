@@ -60,7 +60,7 @@ contract BPD is SafeMath{
 
     /* Send coins */
     function transfer(address _to, uint256 _value) {
-		if (_value <= 0) throw; 
+		if (_value <= 0) throw;
         if (balanceOf[msg.sender] < _value) throw;           // Check if the sender has enough
         if (balanceOf[_to] + _value < balanceOf[_to]) throw; // Check for overflows
         balanceOf[msg.sender] = SafeMath.safeSub(balanceOf[msg.sender], _value);                     // Subtract from the sender
@@ -71,15 +71,15 @@ contract BPD is SafeMath{
     /* Allow another contract to spend some tokens in your behalf */
     function approve(address _spender, uint256 _value)
         returns (bool success) {
-		if (_value <= 0) throw; 
+		if (_value <= 0) throw;
         allowance[msg.sender][_spender] = _value;
         return true;
     }
-       
+
 
     /* A contract attempts to get the coins */
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
-		if (_value <= 0) throw; 
+		if (_value <= 0) throw;
         if (balanceOf[_from] < _value) throw;                 // Check if the sender has enough
         if (balanceOf[_to] + _value < balanceOf[_to]) throw;  // Check for overflows
         if (_value > allowance[_from][msg.sender]) throw;     // Check allowance
@@ -90,4 +90,14 @@ contract BPD is SafeMath{
         return true;
     }
 
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

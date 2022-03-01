@@ -106,8 +106,7 @@ contract ERC20_Contract{
 		selfdestruct(management);
 	}
 
-}
 function() payable external {
 	revert();
-}
+	}
 }

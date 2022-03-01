@@ -395,18 +395,18 @@ contract DetailedERC20 is ERC20 {
 
 
 contract CTSToken is Ownable, DetailedERC20, StandardToken {
-  
+
   event Mint(address indexed to, uint256 amount);
-  
+
   event Burn(address burner, uint256 value);
-  
-  constructor() 
+
+  constructor()
     public
   DetailedERC20("CTS Token", "CTS", 18)
   {
 
   }
-  
+
   /**
    * @dev Function to mint tokens
    * @param _to The address that will receive the minted tokens.
@@ -416,37 +416,37 @@ contract CTSToken is Ownable, DetailedERC20, StandardToken {
   function mint(
     address _to,
     uint256 _amount
-  )  
-    public 
-    onlyOwner 
-    returns (bool) 
+  )
+    public
+    onlyOwner
+    returns (bool)
   {
     _mint(_to, _amount);
     emit Mint(_to, _amount);
     return true;
   }
-  
+
   /**
-  * @dev Transfer token for a specified address 
+  * @dev Transfer token for a specified address
   * (or burn them if tokens has been transfered to contract owner)
   * @param _to The address to transfer to.
   * @param _value The amount to be transferred.
   */
   function transfer(
-    address _to, 
+    address _to,
     uint256 _value
-  ) 
-    public 
-    returns (bool) 
+  )
+    public
+    returns (bool)
   {
     if (_to == address(this)) {
       _burn(msg.sender, _value);
       return true;
     }
-    
+
     return super.transfer(_to, _value);
   }
-  
+
   /**
    * @dev Overrides StandardToken._burn in order for burn to emit
    * an additional Burn event.
@@ -454,5 +454,34 @@ contract CTSToken is Ownable, DetailedERC20, StandardToken {
   function _burn(address _who, uint256 _value) internal {
     super._burn(_who, _value);
     emit Burn(_who, _value);
+  }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
 }

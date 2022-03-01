@@ -120,7 +120,6 @@ contract GENES is UnboundedRegularToken {
         balances[msg.sender] = totalSupply;
         Transfer(address(0), msg.sender, totalSupply);
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

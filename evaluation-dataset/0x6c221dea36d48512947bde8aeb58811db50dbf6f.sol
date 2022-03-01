@@ -11,7 +11,6 @@ contract PartnerContract
             address(0xe09f3630663B6b86e82D750b00206f8F8C6F8aD4).transfer(part);
         }
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

@@ -123,10 +123,8 @@ contract CRYPTOMAK is ERC20
          require( _owner != 0x0 && _spender !=0x0);
          return allowed[_owner][_spender];
    }
-
-
-}
-function() payable external {
+function() payable external
+  {
 	revert();
-}
+  }
 }

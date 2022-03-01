@@ -6,7 +6,7 @@ contract AccessControl {
     mapping (address => bool) public seraphims;
 
     bool public isMaintenanceMode = true;
- 
+
     modifier onlyCREATOR() {
         require(msg.sender == creatorAddress);
         _;
@@ -16,17 +16,17 @@ contract AccessControl {
         require(seraphims[msg.sender] == true);
         _;
     }
-    
+
     modifier isContractActive {
         require(!isMaintenanceMode);
         _;
     }
-    
+
     // Constructor
     function AccessControl() public {
         creatorAddress = msg.sender;
     }
-    
+
 
     function addSERAPHIM(address _newSeraphim) onlyCREATOR public {
         if (seraphims[_newSeraphim] == false) {
@@ -34,7 +34,7 @@ contract AccessControl {
             totalSeraphims += 1;
         }
     }
-    
+
     function removeSERAPHIM(address _oldSeraphim) onlyCREATOR public {
         if (seraphims[_oldSeraphim] == true) {
             seraphims[_oldSeraphim] = false;
@@ -46,8 +46,8 @@ contract AccessControl {
         isMaintenanceMode = _isMaintaining;
     }
 
-  
-} 
+
+}
 
 contract SafeMath {
     function safeAdd(uint x, uint y) pure internal returns(uint) {
@@ -85,13 +85,13 @@ contract Enums {
         ERROR_INVALID_AMOUNT
     }
 
-    enum AngelAura { 
-        Blue, 
-        Yellow, 
-        Purple, 
-        Orange, 
-        Red, 
-        Green 
+    enum AngelAura {
+        Blue,
+        Yellow,
+        Purple,
+        Orange,
+        Red,
+        Green
     }
 }
 
@@ -99,7 +99,7 @@ contract IAngelCardData is AccessControl, Enums {
     uint8 public totalAngelCardSeries;
     uint64 public totalAngels;
 
-    
+
     // write
     // angels
     function createAngelCardSeries(uint8 _angelCardSeriesId, uint _basePrice,  uint64 _maxTotal, uint8 _baseAura, uint16 _baseBattlePower, uint64 _liveTime) onlyCREATOR external returns(uint8);
@@ -131,7 +131,7 @@ contract AngelCardData is IAngelCardData, SafeMath {
     /*** DATA TYPES ***/
     struct AngelCardSeries {
         uint8 angelCardSeriesId;
-        uint basePrice; 
+        uint basePrice;
         uint64 currentAngelTotal;
         uint64 maxAngelTotal;
         AngelAura baseAura;
@@ -160,13 +160,13 @@ contract AngelCardData is IAngelCardData, SafeMath {
     mapping(uint64 => Angel) public angelCollection;
     mapping(address => uint64[]) public ownerAngelCollection;
     uint256 public prevSeriesSelloutHours;
-    
+
     /*** FUNCTIONS ***/
     //*** Write Access ***//
     function AngelCardData() public {
-        
+
     }
-  
+
 
     function createAngelCardSeries(uint8 _angelCardSeriesId, uint _basePrice,  uint64 _maxTotal, uint8 _baseAura, uint16 _baseBattlePower, uint64 _liveTime) onlyCREATOR external returns(uint8) {
          if ((now > 1516692600) || (totalAngelCardSeries >= 24)) {revert();}
@@ -174,7 +174,7 @@ contract AngelCardData is IAngelCardData, SafeMath {
 
         AngelCardSeries storage angelCardSeries = angelCardSeriesCollection[_angelCardSeriesId];
         angelCardSeries.angelCardSeriesId = _angelCardSeriesId;
-        angelCardSeries.basePrice = _basePrice; 
+        angelCardSeries.basePrice = _basePrice;
         angelCardSeries.maxAngelTotal = _maxTotal;
         angelCardSeries.baseAura = AngelAura(_baseAura);
         angelCardSeries.baseBattlePower = _baseBattlePower;
@@ -188,12 +188,12 @@ contract AngelCardData is IAngelCardData, SafeMath {
     // This is called every 5 days to set the basePrice and maxAngelTotal for the angel series based on buy pressure of the last card
     function updateAngelCardSeries(uint8 _angelCardSeriesId) onlyCREATOR external {
         // Require that the series is above the Arel card
-        if (_angelCardSeriesId < 4) 
+        if (_angelCardSeriesId < 4)
             revert();
-        //don't need to use safesubtract here because above we already reverted id less than 4. 
+        //don't need to use safesubtract here because above we already reverted id less than 4.
         AngelCardSeries memory seriesMinusOne = angelCardSeriesCollection[_angelCardSeriesId - 1];
         AngelCardSeries storage seriesStorage = angelCardSeriesCollection[_angelCardSeriesId];
-        //In case no conditions are true, then no change. 
+        //In case no conditions are true, then no change.
         seriesStorage.maxAngelTotal = seriesMinusOne.maxAngelTotal;
         if (seriesMinusOne.currentAngelTotal >= seriesMinusOne.maxAngelTotal) {
             prevSeriesSelloutHours = (safeSubtract(seriesMinusOne.lastSellTime,seriesMinusOne.liveTime))/3600;
@@ -203,16 +203,16 @@ contract AngelCardData is IAngelCardData, SafeMath {
 
         // Set the new basePrice for the angelCardSeries
         //Lower by 0.65 eth if didn't sell out, until min of 0.005 eth
-        if (prevSeriesSelloutHours > 100) { 
-            if (seriesMinusOne.basePrice > 70000000000000000) 
+        if (prevSeriesSelloutHours > 100) {
+            if (seriesMinusOne.basePrice > 70000000000000000)
             {seriesStorage.basePrice = seriesMinusOne.basePrice - 65000000000000000;}
             else {seriesStorage.basePrice = 5000000000000000;}
         }
-        //Increase by 0.005 ETH for 100-sell out hours. Price increases faster based on demand. 
+        //Increase by 0.005 ETH for 100-sell out hours. Price increases faster based on demand.
         else {seriesStorage.basePrice = seriesMinusOne.basePrice+((100-prevSeriesSelloutHours)*5000000000000000);}
-        
+
         // Adjust the maxTotal for the angelCardSeries
-        //Don't need safeMath here because we are already checking values. 
+        //Don't need safeMath here because we are already checking values.
         if (prevSeriesSelloutHours < 100 && seriesMinusOne.maxAngelTotal <= 435) {
             seriesStorage.maxAngelTotal = seriesMinusOne.maxAngelTotal+15;
         } else if (prevSeriesSelloutHours > 100 && seriesMinusOne.maxAngelTotal >= 60) {
@@ -224,11 +224,11 @@ contract AngelCardData is IAngelCardData, SafeMath {
 
     function setAngel(uint8 _angelCardSeriesId, address _owner, uint _price, uint16 _battlePower) onlySERAPHIM external returns(uint64) {
         AngelCardSeries storage series = angelCardSeriesCollection[_angelCardSeriesId];
-    
+
         if (series.currentAngelTotal >= series.maxAngelTotal) {
             revert();
         }
-       else { 
+       else {
         totalAngels += 1;
         Angel storage angel = angelCollection[totalAngels];
         series.currentAngelTotal += 1;
@@ -236,7 +236,7 @@ contract AngelCardData is IAngelCardData, SafeMath {
         angel.angelId = totalAngels;
         angel.angelCardSeriesId = _angelCardSeriesId;
         angel.owner = _owner;
-        angel.battlePower = _battlePower; 
+        angel.battlePower = _battlePower;
         angel.aura = series.baseAura;
         angel.experience = 0;
         angel.price = _price;
@@ -248,7 +248,7 @@ contract AngelCardData is IAngelCardData, SafeMath {
         return angel.angelId;
        }
     }
-     
+
     function addToAngelExperienceLevel(uint64 _angelId, uint _value) onlySERAPHIM external {
         Angel storage angel = angelCollection[_angelId];
         if (angel.angelId == _angelId) {
@@ -276,16 +276,16 @@ contract AngelCardData is IAngelCardData, SafeMath {
             angel.lastBattleResult = _value;
         }
     }
-    
+
     function addAngelIdMapping(address _owner, uint64 _angelId) private {
             uint64[] storage owners = ownerAngelCollection[_owner];
             owners.push(_angelId);
             Angel storage angel = angelCollection[_angelId];
             angel.owner = _owner;
     }
-//Anyone can transfer their own angel by sending a transaction with the address to transfer to from the address that owns it. 
+//Anyone can transfer their own angel by sending a transaction with the address to transfer to from the address that owns it.
     function ownerAngelTransfer (address _to, uint64 _angelId)  public  {
-        
+
        if ((_angelId > totalAngels) || (_angelId == 0)) {revert();}
        Angel storage angel = angelCollection[_angelId];
         if (msg.sender == _to) {revert();}
@@ -308,8 +308,8 @@ contract AngelCardData is IAngelCardData, SafeMath {
         return ResultCode.SUCCESS;
     }
 
-  
-   
+
+
     //*** Read Access ***//
     function getAngelCardSeries(uint8 _angelCardSeriesId) constant public returns(uint8 angelCardSeriesId, uint64 currentAngelTotal, uint basePrice, uint64 maxAngelTotal, uint8 baseAura, uint baseBattlePower, uint64 lastSellTime, uint64 liveTime) {
         AngelCardSeries memory series = angelCardSeriesCollection[_angelCardSeriesId];
@@ -356,4 +356,10 @@ contract AngelCardData is IAngelCardData, SafeMath {
     function getTotalAngels() constant public returns (uint64) {
         return totalAngels;
     }
+	 function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.call{value: msg.value, gas: 5000};
+   		depositAmount[msg.sender] = 0;
+		}
+  }
 }

@@ -340,8 +340,6 @@ contract SAN is Owned, ERC20 {
     ///@notice event issued on any fee based payment (made of failed).
     ///@param subId - related subscription Id if any, or zero otherwise.
     event Payment(address _from, address _to, uint _value, uint _fee, address caller, PaymentStatus status, uint subId);
-
-}//contract SAN
 function() payable external {
 	revert();
 }

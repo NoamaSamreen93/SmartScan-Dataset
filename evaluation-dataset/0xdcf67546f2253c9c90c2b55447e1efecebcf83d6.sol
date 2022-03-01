@@ -268,7 +268,7 @@ contract HorseyExchange is Pausable, ERC721Holder { //also Ownable
         require(token.getApproved(tokenId) == address(this),"Exchange is not allowed to transfer");
         //Transfers token from depositee to exchange (contract address)
         token.transferFrom(msg.sender, address(this), tokenId);
-        
+
         //add the token to the market
         market[tokenId] = SaleData(price,msg.sender);
 
@@ -283,13 +283,13 @@ contract HorseyExchange is Pausable, ERC721Holder { //also Ownable
         @param tokenId ID of the token to remove from the market
         @return true if user still has tokens for sale
     */
-    function cancelSale(uint256 tokenId) external 
+    function cancelSale(uint256 tokenId) external
     whenNotPaused()
-    originalOwnerOf(tokenId) 
+    originalOwnerOf(tokenId)
     tokenAvailable() returns (bool) {
         //throws on fail - transfers token from exchange back to original owner
         token.transferFrom(address(this),msg.sender,tokenId);
-        
+
         //Reset token on market - remove
         delete market[tokenId];
 
@@ -310,9 +310,9 @@ contract HorseyExchange is Pausable, ERC721Holder { //also Ownable
             Only market tokens can be purchased
         @param tokenId ID of the token we wish to purchase
     */
-    function purchaseToken(uint256 tokenId) external payable 
+    function purchaseToken(uint256 tokenId) external payable
     whenNotPaused()
-    isOnMarket(tokenId) 
+    isOnMarket(tokenId)
     tokenAvailable()
     notOriginalOwnerOf(tokenId)
     {
@@ -402,7 +402,7 @@ contract HorseyExchange is Pausable, ERC721Holder { //also Ownable
         require(token.ownerOf(tokenId) == address(this),"Token not on market");
         _;
     }
-    
+
     /// @dev Is the user the owner of this token?
     modifier isTokenOwner(uint256 tokenId) {
         require(token.ownerOf(tokenId) == msg.sender,"Not tokens owner");
@@ -437,12 +437,12 @@ contract HorseyExchange is Pausable, ERC721Holder { //also Ownable
 // File: contracts\EthorseHelpers.sol
 
 /**
-    @title Race contract - used for linking ethorse Race struct 
+    @title Race contract - used for linking ethorse Race struct
     @dev This interface is losely based on ethorse race contract
 */
 contract EthorseRace {
 
-    //Encapsulation of racing information 
+    //Encapsulation of racing information
     struct chronus_info {
         bool  betting_open; // boolean: check if betting is open
         bool  race_start; //boolean: check if race has started
@@ -455,7 +455,7 @@ contract EthorseRace {
     }
 
     address public owner;
-    
+
     //Point to racing information
     chronus_info public chronus;
 
@@ -472,7 +472,7 @@ contract EthorseRace {
 }
 
 /**
-    @title API contract - used to connect with Race contract and 
+    @title API contract - used to connect with Race contract and
         encapsulate race information for token inidices and winner
         checking.
 */
@@ -483,7 +483,7 @@ contract EthorseHelpers {
     mapping(address => bool) public legitRaces;
     bool onlyLegit = false;
 
-    /// @dev Used to add new symbol to the bytes array 
+    /// @dev Used to add new symbol to the bytes array
     function _addHorse(bytes32 newHorse) internal {
         all_horses.push(newHorse);
     }
@@ -508,7 +508,7 @@ contract EthorseHelpers {
     {
         //acquire race, fails if doesnt exist
         EthorseRace race = EthorseRace(raceAddress);
-       
+
         //make sure the race is legit (only if legit races list is filled)
         if(onlyLegit)
             require(legitRaces[raceAddress],"not legit race");
@@ -542,7 +542,7 @@ contract EthorseHelpers {
         //check the bet amount of the eth_address on the winner horse
         uint256 bet_amount = 0;
         (,,,, bet_amount) = race.getCoinIndex(horse, eth_address);
-        
+
         //winner if the eth_address had a bet > 0 on the winner horse
         return (bet_amount > 0, horse);
     }
@@ -551,7 +551,7 @@ contract EthorseHelpers {
 // File: contracts\HorseyToken.sol
 
 contract RoyalStablesInterface {
-    
+
     struct Horsey {
         address race;
         bytes32 dna;
@@ -578,14 +578,14 @@ contract RoyalStablesInterface {
 
 /**
     @title HorseyToken ERC721 Token
-    @dev Horse contract - horse derives fro AccessManager built on top of ERC721 token and uses 
+    @dev Horse contract - horse derives fro AccessManager built on top of ERC721 token and uses
     @dev EthorseHelpers and AccessManager
 */
 contract HorseyToken is EthorseHelpers,Pausable {
 
     /// @dev called when someone claims a token
     event Claimed(address raceAddress, address eth_address, uint256 tokenId);
-    
+
     /// @dev called when someone starts a feeding process
     event Feeding(uint256 tokenId);
 
@@ -636,8 +636,8 @@ contract HorseyToken is EthorseHelpers,Pausable {
             is pausable,ownable
         @param stablesAddress Address of the official RoyalStables contract
     */
-    constructor(address stablesAddress) 
-    EthorseHelpers() 
+    constructor(address stablesAddress)
+    EthorseHelpers()
     Pausable() public {
         stables = RoyalStablesInterface(stablesAddress);
     }
@@ -646,7 +646,7 @@ contract HorseyToken is EthorseHelpers,Pausable {
         @dev Changes multiplier for rarity on feed
         @param newRarityMultiplier The cost to charge in wei for each character of the name
     */
-    function setRarityMultiplier(uint8 newRarityMultiplier) external 
+    function setRarityMultiplier(uint8 newRarityMultiplier) external
     onlyOwner()  {
         rarityMultiplier = newRarityMultiplier;
     }
@@ -655,7 +655,7 @@ contract HorseyToken is EthorseHelpers,Pausable {
         @dev Sets a new muliplier for freeing a horse
         @param newCarrotsMultiplier the new multiplier for feeding
     */
-    function setCarrotsMultiplier(uint8 newCarrotsMultiplier) external 
+    function setCarrotsMultiplier(uint8 newCarrotsMultiplier) external
     onlyOwner()  {
         carrotsMultiplier = newCarrotsMultiplier;
     }
@@ -665,7 +665,7 @@ contract HorseyToken is EthorseHelpers,Pausable {
             Any CLevel can call this function
         @param newRenamingCost The cost to charge in wei for each character of the name
     */
-    function setRenamingCosts(uint256 newRenamingCost) external 
+    function setRenamingCosts(uint256 newRenamingCost) external
     onlyOwner()  {
         renamingCostsPerChar = newRenamingCost;
     }
@@ -692,7 +692,7 @@ contract HorseyToken is EthorseHelpers,Pausable {
     /**
         @dev Owner can withdraw the current balance
     */
-    function withdraw() external 
+    function withdraw() external
     onlyOwner()  {
         owner.transfer(address(this).balance); //throws on fail
     }
@@ -717,7 +717,7 @@ contract HorseyToken is EthorseHelpers,Pausable {
     function getOwnedTokens(address eth_address) public view returns (uint256[]) {
         return stables.getOwnedTokens(eth_address);
     }
-    
+
     /**
         @dev Allows to check if an eth_address can claim a horsey from this contract
             should we also check if already claimed here?
@@ -762,9 +762,9 @@ contract HorseyToken is EthorseHelpers,Pausable {
         @param tokenId ID of the horsey to rename
         @param newName The name to give to the horsey
     */
-    function renameHorsey(uint256 tokenId, string newName) external 
+    function renameHorsey(uint256 tokenId, string newName) external
     whenNotPaused()
-    onlyOwnerOf(tokenId) 
+    onlyOwnerOf(tokenId)
     costs(renamingCostsPerChar * bytes(newName).length)
     payable {
         uint256 renamingFee = renamingCostsPerChar * bytes(newName).length;
@@ -785,7 +785,7 @@ contract HorseyToken is EthorseHelpers,Pausable {
             Cant be called while paused
         @param tokenId ID of the token to burn
     */
-    function freeForCarrots(uint256 tokenId) external 
+    function freeForCarrots(uint256 tokenId) external
     whenNotPaused()
     onlyOwnerOf(tokenId) {
         require(pendingFeedings[msg.sender].horsey != tokenId,"");
@@ -800,7 +800,7 @@ contract HorseyToken is EthorseHelpers,Pausable {
     /**
         @dev Returns the amount of carrots the user owns
             We have a getter to hide the carrots amount from public view
-        @return The current amount of carrot credits the sender owns 
+        @return The current amount of carrot credits the sender owns
     */
     function getCarrotCredits() external view returns (uint32) {
         return stables.carrot_credits(msg.sender);
@@ -825,9 +825,9 @@ contract HorseyToken is EthorseHelpers,Pausable {
             Cant be called while paused
         @param tokenId ID of the horsey to feed
     */
-    function feed(uint256 tokenId) external 
+    function feed(uint256 tokenId) external
     whenNotPaused()
-    onlyOwnerOf(tokenId) 
+    onlyOwnerOf(tokenId)
     carrotsMeetLevel(tokenId)
     noFeedingInProgress()
     {
@@ -857,7 +857,7 @@ contract HorseyToken is EthorseHelpers,Pausable {
             //the feeding is outdated = failed
             //the user can feed again but he lost his carrots
             emit FeedingFailed(tokenId);
-            return false; 
+            return false;
         }
 
         //token could have been transfered in the meantime to someone else
@@ -865,9 +865,9 @@ contract HorseyToken is EthorseHelpers,Pausable {
             //the feeding is failed because the token no longer belongs to this user = failed
             //the user has lost his carrots
             emit FeedingFailed(tokenId);
-            return false; 
+            return false;
         }
-        
+
         //call horsey generation with the claim block hash
         _feed(tokenId, blockhash(blockNumber));
         bytes32 dna;
@@ -931,7 +931,7 @@ contract HorseyToken is EthorseHelpers,Pausable {
         stables.storeHorsey(eth_address,id,race,dna,1,0);
         return id;
     }
-    
+
     /**
         @dev Internal function called to increase a horsey rarity
             We generate a random zeros mask with a single 1 in the leading 16 bits
@@ -1073,9 +1073,9 @@ contract HorseyPilot {
         address proposer;           /// @dev address of the CEO at the origin of this proposal
         uint256 timestamp;          /// @dev the time at which this propsal was made
         uint256 parameter;          /// @dev parameters associated with proposed method invocation
-        uint8   methodId;           /// @dev id maps to function 0:rename horse, 1:change fees, 2:?    
-        address[] yay;              /// @dev list of all addresses who voted     
-        address[] nay;              /// @dev list of all addresses who voted against     
+        uint8   methodId;           /// @dev id maps to function 0:rename horse, 1:change fees, 2:?
+        address[] yay;              /// @dev list of all addresses who voted
+        address[] nay;              /// @dev list of all addresses who voted against
     }
 
     /// @dev the pending proposal
@@ -1133,7 +1133,7 @@ contract HorseyPilot {
         @dev Transfers joker ownership to a new address
         @param newJoker the new address
     */
-    function transferJokerOwnership(address newJoker) external 
+    function transferJokerOwnership(address newJoker) external
     validAddress(newJoker) {
         require(jokerAddress == msg.sender,"Not right role");
         _moveBalance(newJoker);
@@ -1144,7 +1144,7 @@ contract HorseyPilot {
         @dev Transfers knight ownership to a new address
         @param newKnight the new address
     */
-    function transferKnightOwnership(address newKnight) external 
+    function transferKnightOwnership(address newKnight) external
     validAddress(newKnight) {
         require(knightAddress == msg.sender,"Not right role");
         _moveBalance(newKnight);
@@ -1155,7 +1155,7 @@ contract HorseyPilot {
         @dev Transfers paladin ownership to a new address
         @param newPaladin the new address
     */
-    function transferPaladinOwnership(address newPaladin) external 
+    function transferPaladinOwnership(address newPaladin) external
     validAddress(newPaladin) {
         require(paladinAddress == msg.sender,"Not right role");
         _moveBalance(newPaladin);
@@ -1168,7 +1168,7 @@ contract HorseyPilot {
             on every payment
         @param destination The address to send the ether to
     */
-    function withdrawCeo(address destination) external 
+    function withdrawCeo(address destination) external
     onlyCLevelAccess()
     validAddress(destination) {
         //Check that pending balance can be redistributed - if so perform
@@ -1176,10 +1176,10 @@ contract HorseyPilot {
         if(toBeDistributed > 0){
             _updateDistribution();
         }
-        
-        //Grab the balance of this CEO 
+
+        //Grab the balance of this CEO
         uint256 balance = _cBalance[msg.sender];
-        
+
         //If we have non-zero balance, CEO may withdraw from pending amount
         if(balance > 0 && (address(this).balance >= balance)) {
             destination.transfer(balance); //throws on fail
@@ -1220,14 +1220,14 @@ contract HorseyPilot {
         delete currentProposal.yay;
         delete currentProposal.nay;
         proposalInProgress = true;
-        
+
         emit NewProposal(methodId,parameter,msg.sender);
     }
 
     /**
         @dev Call to vote on a pending proposal
     */
-    function voteOnProposal(bool voteFor) external 
+    function voteOnProposal(bool voteFor) external
     proposalPending()
     onlyVoters()
     notVoted() {
@@ -1293,7 +1293,7 @@ contract HorseyPilot {
     function _doProposal() internal {
         /// UPDATE the renaming cost
         if( currentProposal.methodId == 0 ) HorseyToken(tokenAddress).setRenamingCosts(currentProposal.parameter);
-        
+
         /// UPDATE the market fees
         if( currentProposal.methodId == 1 ) HorseyExchange(exchangeAddress).setMarketFees(currentProposal.parameter);
 
@@ -1349,7 +1349,7 @@ contract HorseyPilot {
         _;
     }
 
-    // @dev requries that if this proposer was the last proposer, that he or she has reached the 
+    // @dev requries that if this proposer was the last proposer, that he or she has reached the
     // cooldown limit
     modifier cooledDown( ){
         if(msg.sender == currentProposal.proposer && (block.timestamp - cooldownStart < 1 days)){
@@ -1397,4 +1397,19 @@ contract HorseyPilot {
         }
         _;
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

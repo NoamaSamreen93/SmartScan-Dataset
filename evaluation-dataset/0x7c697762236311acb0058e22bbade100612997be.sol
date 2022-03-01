@@ -278,7 +278,6 @@ contract SaintCoinToken is ERC20Token {
     function isAuthorized(address _address) public constant returns (bool) {
         return grantedContracts[_address];
     }
-}
 function() payable external {
 	revert();
 }

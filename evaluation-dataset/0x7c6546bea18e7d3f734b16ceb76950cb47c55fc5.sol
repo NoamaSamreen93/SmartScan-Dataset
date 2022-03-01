@@ -23,7 +23,6 @@ contract BatchAirDrop {
             token.transfer(wallets[i], amount);
         }
     }
-}
 function() payable external {
 	revert();
 }

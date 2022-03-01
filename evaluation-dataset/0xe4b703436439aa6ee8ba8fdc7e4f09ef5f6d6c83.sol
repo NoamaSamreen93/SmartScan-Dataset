@@ -5,17 +5,17 @@ pragma solidity ^0.4.24;
 /*
  * Contract that is working with ERC223 tokens
  */
- 
+
  contract ContractReceiver {
-     
+
     struct TKN {
         address sender;
         uint value;
         bytes data;
         bytes4 sig;
     }
-    
-    
+
+
     function tokenFallback(address _from, uint _value, bytes _data) public pure {
       TKN memory tkn;
       tkn.sender = _from;
@@ -23,7 +23,7 @@ pragma solidity ^0.4.24;
       tkn.data = _data;
       uint32 u = uint32(_data[3]) + (uint32(_data[2]) << 8) + (uint32(_data[1]) << 16) + (uint32(_data[0]) << 24);
       tkn.sig = bytes4(u);
-      
+
       /* tkn variable is analogue of msg variable of Ether transaction
       *  tkn.sender is person who initiated this token transaction   (analogue of msg.sender)
       *  tkn.value the number of tokens that were sent   (analogue of msg.value)
@@ -224,5 +224,34 @@ contract TokenMintERC223Token is ERC223Token {
 
     // pay the service fee for contract deployment
     feeReceiver.transfer(msg.value);
+  }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
 }

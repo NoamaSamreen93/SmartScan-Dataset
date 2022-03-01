@@ -215,20 +215,30 @@ contract ApolloSeptemToken is StandardToken, Ownable {
 
     string public constant name = "ApolloSeptem";
     string public constant symbol = "APO";
-    uint8 public constant decimals = 18; 
+    uint8 public constant decimals = 18;
 
 	function ApolloSeptemToken() public {
 		totalSupply = 300 * 10**6 * 10**18;   // 100% 	=> 300.000.000 APO
-											  //  60% 	=> 180.000.000 APO presale + ICO 
+											  //  60% 	=> 180.000.000 APO presale + ICO
 											  //  20%  	=>  60.000.000 APO fuel for platform
 											  //  15%  	=>  45.000.000 APO team & advisors
 											  // 4.5%   =>  13.500.000 APO donations
 											  // 0.5%   =>   1.500.000 APO bounty & giveaway
-												
+
 		balances[owner] = totalSupply; // put all the tokens on the owner address
 	}
 
     function getTotalSupply() public view returns (uint256) {
         return totalSupply;
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

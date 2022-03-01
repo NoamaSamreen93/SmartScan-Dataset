@@ -246,7 +246,6 @@ contract CoinvaToken is ERC20Interface, MultiOwned {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwners returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(msg.sender, tokens);
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

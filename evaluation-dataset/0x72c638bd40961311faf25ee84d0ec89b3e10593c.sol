@@ -696,7 +696,6 @@ contract ERC20Chocolate is ERC20Pistachio, ERC20Burnable, ERC20Mintable, Pausabl
         return super.decreaseAllowance(spender, subtractedValue);
     }
 
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

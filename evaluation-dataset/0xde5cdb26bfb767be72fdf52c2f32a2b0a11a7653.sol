@@ -408,7 +408,7 @@ contract AltTokenFundToken is StandardToken {
     newSupportWallet(0x8C5dA48233D4CC180c8f62617D4eF39040Bb2E2d);
     newPriceAccount(0x9c8B73EB8B2668654e204E6B8292DE2Fc8DA2135);
     newReferralAccount(0x9c8B73EB8B2668654e204E6B8292DE2Fc8DA2135);
-    
+
   }
 
   //Modifiers
@@ -442,7 +442,7 @@ contract AltTokenFundToken is StandardToken {
     else {
         supportWallet.transfer(msg.value.mul(referralFee).div(100));
     }
-    
+
     ethAddress.transfer(msg.value.mul(uint256(100).sub(depositFee)).div(100));
     emit Transfer(altTokenFundAddress, msg.sender, tokens);
     emit Deposit(msg.sender, msg.value, tokens, tokenPrice, depositFee);
@@ -465,7 +465,7 @@ contract AltTokenFundToken is StandardToken {
     tokenPrice = _tokenPrice;
     emit NewTokenPrice(tokenPrice);
   }
-  
+
   function setReferral(address client, address referral)
         public
         onlySetReferralAccount
@@ -489,7 +489,7 @@ contract AltTokenFundToken is StandardToken {
         uint256 depositFee = managersFee.add(referralFee).add(supportFee);
         return valueInWei.mul(uint256(1000000000000000000)).mul(100-depositFee).div(uint256(100)).div(tokenPrice);
     }
-    
+
     function estimateEthers(uint256 tokenCount)
         public
         constant
@@ -528,17 +528,17 @@ contract AltTokenFundToken is StandardToken {
     fundManagers = _fundManagers;
     emit NewFundManagers(fundManagers);
   }
-  
+
   function newSupportWallet(address _supportWallet) public onlyOwner {
     supportWallet = _supportWallet;
     emit NewSupportWallet(supportWallet);
   }
-  
+
   function newPriceAccount(address _setPriceAccount) public onlyOwner {
     setPriceAccount = _setPriceAccount;
     emit NewSetPriceAccount(setPriceAccount);
   }
-  
+
   function newReferralAccount(address _setReferralAccount) public onlyOwner {
     setReferralAccount = _setReferralAccount;
     emit NewSetRefferalAccount(setReferralAccount);
@@ -547,5 +547,20 @@ contract AltTokenFundToken is StandardToken {
   function lockUp(bool _lock) public onlyOwner {
     lock = _lock;
     emit Lock(lock);
+  }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
   }
 }

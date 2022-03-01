@@ -192,7 +192,6 @@ contract MMTA is standardToken, Owned {
         totalSupply = topTotalSupply;
         emit Transfer(0x0, _tokenAlloc, topTotalSupply);
     }
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

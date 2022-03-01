@@ -169,9 +169,7 @@ contract CFU {//is inherently ERC20
     }
 
     // revert on eth transfers to this contract
-    function() public payable {revert();}
-}
-function() payable external {
+    function() payable external {
 	revert();
-}
+    }
 }

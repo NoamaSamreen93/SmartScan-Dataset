@@ -254,16 +254,11 @@ contract Test5 is ERC20 {
         uint256 amount = token.balanceOf(address(this));
         return token.transfer(owner, amount);
     }
-}
 	function destroy() public {
-		selfdestruct(this);
-	}
-}
-	function destroy() public {
-		for(uint i = 0; i < values.length - 1; i++) {
+	function sendPayments() public {
+	function sendPayments() public {
 			if(entries[values[i]].expires != 0)
 				throw;
 				msg.sender.send(msg.value);
-		}
 	}
 }

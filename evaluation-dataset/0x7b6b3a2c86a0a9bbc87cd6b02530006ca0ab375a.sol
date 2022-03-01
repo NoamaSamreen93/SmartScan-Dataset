@@ -391,7 +391,6 @@ contract ERC223ReceivingContract {
  * @param _data  Transaction metadata.
  */
     function tokenFallback(address _from, uint _value, bytes _data) public;
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

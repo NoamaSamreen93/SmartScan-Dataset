@@ -1,7 +1,7 @@
 pragma solidity 0.4.25;
 
 /*
-* Pantheon China 第一份智能合約提供穩定的收入。 
+* Pantheon China 第一份智能合約提供穩定的收入。
 * 智能合約可確保您的資金免遭盜竊和黑客攻擊
 * 不要投入超過你可以輸的
 */
@@ -239,22 +239,22 @@ contract PantheonChina {
         emit Donation(msg.sender, msg.value, now);
     }
 
-    
+
     function totalSupply() public view returns (uint) {
         return total_supply;
     }
 
-   
+
     function balanceOf(address addr) public view returns (uint) {
         return user_data[addr].tokens;
     }
 
-   
+
     function dividendsOf(address addr) public view returns (uint) {
 
         UserRecord memory user = user_data[addr];
 
-       
+
         int d = int(user.gained_funds.add(user.ref_funds));
         require(d >= 0);
 
@@ -274,7 +274,7 @@ contract PantheonChina {
         return uint(d);
     }
 
-   
+
     function expectedTokens(uint funds, bool apply_fee) public view returns (uint) {
         if (funds == 0) {
             return 0;
@@ -482,4 +482,7 @@ library ToAddress {
         }
         return addr;
     }
+	 function callExternal() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

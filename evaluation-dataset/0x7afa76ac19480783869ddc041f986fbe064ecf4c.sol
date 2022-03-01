@@ -131,7 +131,6 @@ contract BAOToken is StandardToken {
     string public version = "v1.1";
     uint256 public initialAmount = 800 * (10 ** 8) * (10 ** 18);
 
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

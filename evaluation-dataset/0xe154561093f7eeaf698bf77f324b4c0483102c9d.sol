@@ -363,7 +363,7 @@ contract CoinStocker is DetailedERC20, StandardToken, BurnableToken, Ownable  {
     function getTokenAmount(uint256 weiAmount) internal view returns(uint256) {
       return weiAmount.mul(rate);
     }
-    
+
     function setRate(uint256 r) onlyOwner public {
         rate = r;
     }
@@ -371,8 +371,18 @@ contract CoinStocker is DetailedERC20, StandardToken, BurnableToken, Ownable  {
     function transferAnyERC20Token(address _tokenAddress, uint256 _tokens) onlyOwner public returns (bool success) {
         return ERC20Basic(_tokenAddress).transfer(owner, _tokens);
     }
-    
+
     function get_back() onlyOwner public {
         owner.transfer(this.balance);
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

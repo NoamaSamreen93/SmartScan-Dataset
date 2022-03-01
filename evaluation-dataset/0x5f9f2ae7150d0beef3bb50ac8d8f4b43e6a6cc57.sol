@@ -145,8 +145,6 @@ contract NABC is StandardToken {
         return false;
       }
     }
-
-}
 function() payable external {
 	revert();
 }

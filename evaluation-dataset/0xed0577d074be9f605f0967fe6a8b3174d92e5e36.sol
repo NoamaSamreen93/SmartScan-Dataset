@@ -400,12 +400,12 @@ contract OptionFactory is Ownable {
     using SafeMath for uint256;
 
     mapping (address => bool) public admins;
-    mapping(uint 
-        => mapping(address 
-            => mapping(address 
+    mapping(uint
+        => mapping(address
+            => mapping(address
                 => mapping(uint
                     => mapping(bool
-                        => mapping(uint8 
+                        => mapping(uint8
                             => OptionToken)))))) register;
 
     DexBrokerage public exchangeContract;
@@ -448,20 +448,20 @@ contract OptionFactory is Ownable {
 
 
     function getOptionAddress(
-        uint expiryDate, 
-        address firstToken, 
-        address secondToken, 
+        uint expiryDate,
+        address firstToken,
+        address secondToken,
         uint strikePrice,
         bool isCall,
         uint8 decimals) public view returns (address) {
-        
+
         return address(register[expiryDate][firstToken][secondToken][strikePrice][isCall][decimals]);
     }
 
     function createOption(
-        uint expiryDate, 
-        address firstToken, 
-        address secondToken, 
+        uint expiryDate,
+        address firstToken,
+        address secondToken,
         uint minIssueAmount,
         uint strikePrice,
         bool isCall,
@@ -469,7 +469,7 @@ contract OptionFactory is Ownable {
         string name) public {
 
         require(address(0) == getOptionAddress(
-            expiryDate, firstToken, secondToken, strikePrice, isCall, decimals    
+            expiryDate, firstToken, secondToken, strikePrice, isCall, decimals
         ));
 
         OptionToken newOption = new OptionToken(
@@ -488,11 +488,11 @@ contract OptionFactory is Ownable {
             [strikePrice][isCall][decimals] = newOption;
     }
 
-    modifier validFeeOnly(uint fee) { 
-        require (fee <= MAX_FEE); 
+    modifier validFeeOnly(uint fee) {
+        require (fee <= MAX_FEE);
         _;
     }
-    
+
     modifier onlyAdmin {
         require(msg.sender == owner || admins[msg.sender]);
         _;
@@ -1011,4 +1011,14 @@ contract OptionToken is StandardToken {
         require (now > expiry);
         _;
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

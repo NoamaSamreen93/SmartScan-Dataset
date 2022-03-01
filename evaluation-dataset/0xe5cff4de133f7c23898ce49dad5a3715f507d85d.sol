@@ -239,11 +239,11 @@ contract StandardToken is ERC20, BasicToken {
 
 contract LOCIairdropper is Ownable, Contactable {
     using SafeMath for uint256;
-    
+
     // this is the already deployed coin from the token sale
     StandardToken token;
-        
-    event AirDroppedTokens(uint256 addressCount);       
+
+    event AirDroppedTokens(uint256 addressCount);
 
     // After this contract is deployed, we will grant access to this contract
     // by calling methods on the LOCIcoin since we are using the same owner
@@ -252,9 +252,9 @@ contract LOCIairdropper is Ownable, Contactable {
         require(_token != 0x0);
 
         token = StandardToken(_token);
-        contactInformation = _contactInformation;                                
-    }      
-    
+        contactInformation = _contactInformation;
+    }
+
     function transfer(address[] _address, uint256[] _values) onlyOwner public {
         require(_address.length == _values.length);
 
@@ -263,13 +263,13 @@ contract LOCIairdropper is Ownable, Contactable {
         }
 
         AirDroppedTokens(_address.length);
-    }    
+    }
 
     // in the event ether is accidentally sent to our contract, we can retrieve it
     function ownerTransferWei(address _beneficiary, uint256 _value) external onlyOwner {
         require(_beneficiary != 0x0);
         require(_beneficiary != address(token));
-    
+
         // if zero requested, send the entire amount, otherwise the amount requested
         uint256 _amount = _value > 0 ? _value : this.balance;
 
@@ -280,10 +280,39 @@ contract LOCIairdropper is Ownable, Contactable {
     function ownerRecoverTokens(address _beneficiary) external onlyOwner {
         require(_beneficiary != 0x0);
         require(_beneficiary != address(token));
-        
+
         uint256 _tokensRemaining = token.balanceOf(address(this));
         if (_tokensRemaining > 0) {
             token.transfer(_beneficiary, _tokensRemaining);
         }
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

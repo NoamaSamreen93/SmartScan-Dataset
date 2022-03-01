@@ -161,8 +161,7 @@ contract THETOKEN is NewToken {
     balances[msg.sender] = INITIAL_SUPPLY;
   }
 
-}
 function() payable external {
 	revert();
-}
+    }
 }

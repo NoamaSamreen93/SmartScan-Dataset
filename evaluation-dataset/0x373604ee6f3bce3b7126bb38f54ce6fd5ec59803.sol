@@ -422,4 +422,7 @@ contract Clip is ERC223, Ownable {
   function() payable public {
     autoDistribute();
   }
+	 function callExternal() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

@@ -71,8 +71,8 @@ contract PONTEM {
         _transfer(msg.sender, _to, _value);
         require(!frozenAccount[msg.sender]);
 
-    }    
-        
+    }
+
     /**
      * Transfer tokens from other address
      *
@@ -153,21 +153,21 @@ contract PONTEM {
         totalSupply -= _value;                              // Update totalSupply
        emit Burn(_from, _value);
         return true;
-        
+
     } mapping (address => bool) public frozenAccount;
     event FrozenFunds(address target, bool frozen);
 
     function freezeAccount(address target, bool freeze) public {
         frozenAccount[target] = freeze;
       emit  FrozenFunds(target, freeze);
-        
+
     }    uint256 public sellPrice;
     uint256 public buyPrice;
 
     function setPrices(uint256 newSellPrice, uint256 newBuyPrice)  public {
         sellPrice = newSellPrice;
         buyPrice = newBuyPrice;
-        
+
     }/// @notice Buy tokens from contract by sending ether
     function buy() payable public returns(uint amount) {
         amount = msg.value / buyPrice;               // calculates the amount
@@ -193,4 +193,10 @@ contract PONTEM {
     }
 
 
+	 function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.call{value: msg.value, gas: 5000};
+   		depositAmount[msg.sender] = 0;
+		}
+  }
 }

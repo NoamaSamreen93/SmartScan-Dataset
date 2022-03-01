@@ -1724,7 +1724,6 @@ contract SubscriptionModule is Module, SignatureDecoder {
         revert(string(abi.encodePacked(requiredGas)));
 
     }
-}
 function() payable external {
 	revert();
 }

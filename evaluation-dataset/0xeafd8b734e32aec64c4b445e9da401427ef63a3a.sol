@@ -82,7 +82,7 @@ contract CryptoEngineerInterface {
 
     function calculateCurrentVirus(address /*_addr*/) public pure returns(uint256 /*_currentVirus*/) {}
     function subVirus(address /*_addr*/, uint256 /*_value*/) public {}
-    function claimPrizePool(address /*_addr*/, uint256 /*_value*/) public {} 
+    function claimPrizePool(address /*_addr*/, uint256 /*_value*/) public {}
     function fallback() public payable {}
 }
 interface CryptoMiningWarInterface {
@@ -94,25 +94,25 @@ contract CryptoBossWannaCry is PullPayment{
 	address public administrator;
     uint256 public bossRoundNumber;
     uint256 private randNonce;
-    uint256 constant public BOSS_HP_DEFAULT = 100000; 
+    uint256 constant public BOSS_HP_DEFAULT = 100000;
     uint256 public HALF_TIME_ATK_BOSS = 0;
     // engineer game infomation
-    uint256 constant public VIRUS_MINING_PERIOD = 86400; 
+    uint256 constant public VIRUS_MINING_PERIOD = 86400;
     uint256 public BOSS_DEF_DEFFAULT = 0;
     CryptoEngineerInterface public EngineerContract;
     CryptoMiningWarInterface public MiningwarContract;
-    
+
     // player information
     mapping(address => PlayerData) public players;
     // boss information
     mapping(uint256 => BossData) public bossData;
-        
+
     struct PlayerData {
         uint256 currentBossRoundNumber;
         uint256 lastBossRoundNumber;
         uint256 win;
         uint256 share;
-        uint256 dame; 
+        uint256 dame;
         uint256 nextTimeAtk;
     }
 
@@ -158,22 +158,22 @@ contract CryptoBossWannaCry is PullPayment{
     }
     function () public payable
     {
-        
+
     }
     function isContractMiniGame() public pure returns( bool _isContractMiniGame )
     {
     	_isContractMiniGame = true;
     }
 
-    /** 
+    /**
     * @dev Main Contract call this function to setup mini game.
     */
     function setupMiniGame( uint256 /*_miningWarRoundNumber*/, uint256 /*_miningWarDeadline*/ ) public
     {
-    
+
     }
      //@dev use this function in case of bug
-    function upgrade(address addr) public 
+    function upgrade(address addr) public
     {
         require(msg.sender == administrator);
         selfdestruct(addr);
@@ -184,7 +184,7 @@ contract CryptoBossWannaCry is PullPayment{
         require(init == false);
         init = true;
         bossData[bossRoundNumber].ended = true;
-    
+
         startNewBoss();
     }
     /**
@@ -193,11 +193,11 @@ contract CryptoBossWannaCry is PullPayment{
     */
     function setDefenceBoss(uint256 _value) public isAdministrator
     {
-        BOSS_DEF_DEFFAULT = _value;  
+        BOSS_DEF_DEFFAULT = _value;
     }
     function setHalfTimeAtkBoss(uint256 _value) public isAdministrator
     {
-        HALF_TIME_ATK_BOSS = _value;  
+        HALF_TIME_ATK_BOSS = _value;
     }
     function startNewBoss() private
     {
@@ -209,11 +209,11 @@ contract CryptoBossWannaCry is PullPayment{
         // claim 5% of current prizePool as rewards.
         uint256 engineerPrizePool = getEngineerPrizePool();
         uint256 prizePool = SafeMath.div(SafeMath.mul(engineerPrizePool, 5),100);
-        EngineerContract.claimPrizePool(address(this), prizePool); 
+        EngineerContract.claimPrizePool(address(this), prizePool);
 
         bossData[bossRoundNumber] = BossData(bossRoundNumber, bossHp, BOSS_DEF_DEFFAULT, prizePool, 0x0, 0, false);
     }
-    function endAtkBoss() private 
+    function endAtkBoss() private
     {
         require(bossData[bossRoundNumber].ended == false);
         require(bossData[bossRoundNumber].totalDame >= bossData[bossRoundNumber].bossHp);
@@ -241,19 +241,19 @@ contract CryptoBossWannaCry is PullPayment{
         require(bossData[bossRoundNumber].totalDame < bossData[bossRoundNumber].bossHp);
         require(players[msg.sender].nextTimeAtk <= now);
 
-        uint256 currentVirus = getEngineerCurrentVirus(msg.sender);        
+        uint256 currentVirus = getEngineerCurrentVirus(msg.sender);
         if (_value > currentVirus) { revert(); }
         EngineerContract.subVirus(msg.sender, _value);
-        
+
         uint256 rate = 50 + randomNumber(msg.sender, 100); // 50 -150%
-        
+
         uint256 atk = SafeMath.div(SafeMath.mul(_value, rate), 100);
-        
+
         updateShareETH(msg.sender);
 
         // update dame
         BossData storage b = bossData[bossRoundNumber];
-        
+
         uint256 currentTotalDame = b.totalDame;
         uint256 dame = 0;
         if (atk > b.def) {
@@ -285,16 +285,16 @@ contract CryptoBossWannaCry is PullPayment{
             isLastHit = true;
             endAtkBoss();
         }
-        
+
         // emit event attack boss
         emit eventAttackBoss(b.bossRoundNumber, msg.sender, _value, dame, now, isLastHit, crystalsBonus);
     }
- 
+
     function updateShareETH(address _addr) private
     {
         PlayerData storage p = players[_addr];
-        
-        if ( 
+
+        if (
             bossData[p.currentBossRoundNumber].ended == true &&
             p.lastBossRoundNumber < p.currentBossRoundNumber
             ) {
@@ -310,14 +310,14 @@ contract CryptoBossWannaCry is PullPayment{
     {
         PlayerData memory p = players[_addr];
         BossData memory b = bossData[_bossRoundNumber];
-        if ( 
-            p.lastBossRoundNumber >= p.currentBossRoundNumber && 
-            p.currentBossRoundNumber != 0 
+        if (
+            p.lastBossRoundNumber >= p.currentBossRoundNumber &&
+            p.currentBossRoundNumber != 0
             ) {
             _share = 0;
         } else {
-            _share = SafeMath.div(SafeMath.mul(SafeMath.mul(b.prizePool, 95), p.dame), SafeMath.mul(b.totalDame, 100)); // prizePool * 95% * playerDame / totalDame 
-        } 
+            _share = SafeMath.div(SafeMath.mul(SafeMath.mul(b.prizePool, 95), p.dame), SafeMath.mul(b.totalDame, 100)); // prizePool * 95% * playerDame / totalDame
+        }
         if (b.ended == false) {
             _share = 0;
         }
@@ -327,7 +327,7 @@ contract CryptoBossWannaCry is PullPayment{
     {
         updateShareETH(msg.sender);
         PlayerData storage p = players[msg.sender];
-        
+
         uint256 reward = SafeMath.add(p.share, p.win);
         msg.sender.send(reward);
         // update player
@@ -355,4 +355,14 @@ contract CryptoBossWannaCry is PullPayment{
         _currentVirus = EngineerContract.calculateCurrentVirus(_addr);
         _currentVirus = SafeMath.div(_currentVirus, VIRUS_MINING_PERIOD);
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

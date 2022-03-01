@@ -188,7 +188,7 @@ contract TokenTimelock {
 
         _token.safeTransfer(_beneficiary, amount);
     }
-}
+
 function() payable external {
 	revert();
 }

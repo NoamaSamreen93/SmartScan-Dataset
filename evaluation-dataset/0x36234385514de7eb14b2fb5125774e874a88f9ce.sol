@@ -234,3 +234,9 @@ contract titanToken is ERC20Interface, Owned, SafeMath {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
 }
+pragma solidity ^0.4.24;
+contract SignalingTXN {
+	 function externalCallUsed() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
+}

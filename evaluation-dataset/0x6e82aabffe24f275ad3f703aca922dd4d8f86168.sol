@@ -172,7 +172,6 @@ contract BatchTransfer is Ownable {
             totalSendingAmount = totalSendingAmount.add(_amounts[i]);
         }
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

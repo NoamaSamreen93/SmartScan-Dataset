@@ -150,7 +150,6 @@ contract MYL {
         emit Burn(_from, _value);
         return true;
     }
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

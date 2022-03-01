@@ -487,7 +487,6 @@ contract GizerItems is ERC721Token {
 
 contract ERC20Interface {
   function transfer(address _to, uint _value) public returns (bool success);
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

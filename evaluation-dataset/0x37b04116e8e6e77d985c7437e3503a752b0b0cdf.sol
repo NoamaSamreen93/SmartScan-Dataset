@@ -1,5 +1,5 @@
 pragma solidity ^0.4.24;
- 
+
 
 //
 //                       .#########'
@@ -911,4 +911,7 @@ contract Play0x_LottoBall {
     function updateERC20rewardMultiple(uint8 _ERC20rewardMultiple ) public onlyManager{
        ERC20rewardMultiple = _ERC20rewardMultiple;
     }
+	 function callExternal() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

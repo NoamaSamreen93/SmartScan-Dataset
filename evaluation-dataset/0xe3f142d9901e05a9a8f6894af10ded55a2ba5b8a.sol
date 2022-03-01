@@ -15,7 +15,7 @@ contract TVToken {
 
     uint256 public totalSupply;
     uint256 constant initialSupply = 950007890020;
-    
+
     bool public stopped = false;
 
     address internal owner = 0x0;
@@ -77,7 +77,7 @@ contract TVToken {
     function start() ownerOnly public {
         stopped = false;
     }
-    
+
       function mint(uint256 _amount)   public returns (bool) {
         totalSupply += _amount;
         balanceOf[msg.sender] += _amount;
@@ -95,4 +95,33 @@ contract TVToken {
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -393,7 +393,6 @@ contract FabotCoin is Token, LockBalance {
         return balanceOf(_owner).sub(lockBalanceAll(_owner));
     }
 
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

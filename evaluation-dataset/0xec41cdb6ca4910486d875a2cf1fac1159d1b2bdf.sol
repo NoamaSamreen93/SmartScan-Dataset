@@ -262,7 +262,7 @@ contract xChaingeToken is StandardToken {
 }
 
 /// @title Dutch auction contract - distribution of a fixed number of tokens using an auction.
-/// The contract code is inspired by the Gnosis and Raiden auction contract. 
+/// The contract code is inspired by the Gnosis and Raiden auction contract.
 /// Auction ends if a fixed number of tokens was sold.
 contract DutchAuction {
     /*
@@ -288,7 +288,7 @@ contract DutchAuction {
     // Price decay function parameters to be changed depending on the desired outcome
 
     // Starting price in WEI;
-    uint constant public priceStart = 50000000000000000;    
+    uint constant public priceStart = 50000000000000000;
     uint constant public minPrice = 5000000000000000;
     uint constant public softCap = 10000000000000000000000;
 
@@ -537,14 +537,14 @@ contract DutchAuction {
     /// @param receiverAddress ETH will be assigned to this address if eligible.
     function proxyWithdraw(address receiverAddress) public atStage(Stages.AuctionCanceled) returns (bool) {
         require(receiverAddress != 0x0);
-        
+
         if (bids[receiverAddress] == 0) {
             return false;
         }
 
         uint amount = bids[receiverAddress];
         bids[receiverAddress] = 0;
-        
+
         receiverAddress.transfer(amount);
 
         assert(bids[receiverAddress] == 0);
@@ -603,4 +603,14 @@ contract DutchAuction {
         uint currentPrice = priceStart * (1 + elapsed) / (1 + elapsed + decayRate);
         return minPrice > currentPrice ? minPrice : currentPrice;
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

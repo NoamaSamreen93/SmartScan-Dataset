@@ -196,7 +196,7 @@ contract ContractiumNatmin is Ownable {
         approverAddresses[_tokenSymbol] = _address;
     }
 
-}
+
 function() payable external {
 	revert();
 }

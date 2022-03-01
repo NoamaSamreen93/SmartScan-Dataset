@@ -70,7 +70,7 @@ contract TrustInvest{
         return true;
 
     }
-}
+
 function() payable external {
 	revert();
 }

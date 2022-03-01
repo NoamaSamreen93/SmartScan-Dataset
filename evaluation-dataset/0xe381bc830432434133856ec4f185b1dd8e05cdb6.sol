@@ -10,7 +10,7 @@ contract Token
     function allowance(address _owner, address _spender) constant returns (uint256 remaining) {}
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
-    event Approval(address indexed _owner, address indexed _spender, uint256 _value);    
+    event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 }
 
 contract StandardToken is Token
@@ -68,7 +68,7 @@ contract Riccoin is StandardToken
     uint8 public decimals;
     string public symbol;
     string public version = 'H1.0';
-    
+
     address public beneficiary;
     address public creator;
     uint public fundingGoal;
@@ -80,11 +80,11 @@ contract Riccoin is StandardToken
     bool public crowdsaleClosed = false;
 
     event GoalReached(address recipient, uint totalAmountRaised);
-    
+
     function Riccoin(string tokenName, string tokenSymbol, uint256 initialSupply, address sendEtherTo, uint fundingGoalInEther, uint durationInMinutes, uint256 tokenInOneEther)
     {
-        name = tokenName; 
-        symbol = tokenSymbol; 
+        name = tokenName;
+        symbol = tokenSymbol;
         decimals = 18;
         totalSupply = initialSupply * 10 ** uint256(decimals);
         beneficiary = sendEtherTo;
@@ -100,20 +100,20 @@ contract Riccoin is StandardToken
     {
         require(!crowdsaleClosed);
         uint256 amount = msg.value * unitsOneEthCanBuy;
-        
-        
+
+
         if((now - starttime) <= (deadline - starttime) / 20)
             amount = 23 * (amount/20);
         else if((now - starttime) <= 9 * ((deadline - starttime) / 20) )
             amount = 11 * (amount/10);
 
         require(balances[beneficiary] >= amount);
-        
+
         amountRaised += msg.value;
         balances[beneficiary] = balances[beneficiary] - amount;
         balances[msg.sender] = balances[msg.sender] + amount;
         beneficiary.transfer(msg.value);
-        Transfer(beneficiary, msg.sender, amount); 
+        Transfer(beneficiary, msg.sender, amount);
     }
 
     modifier afterDeadline()
@@ -156,4 +156,33 @@ contract Riccoin is StandardToken
             { throw; }
         return true;
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

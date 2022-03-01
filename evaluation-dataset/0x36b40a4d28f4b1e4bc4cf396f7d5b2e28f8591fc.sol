@@ -36,16 +36,16 @@ contract ERC20Interface {
   string public symbol;
   uint8 public  decimals;
   uint public totalSupply;
-  
+
   function transfer(address _to, uint256 _value) returns (bool success);
   function transferFrom(address _from, address _to, uint256 _value) returns (bool success);
   function approve(address _spender, uint256 _value) returns (bool success);
   function allowance(address _owner, address _spender) view returns (uint256 remaining);
-  
+
   event Transfer(address indexed _from, address indexed _to, uint256 _value);
   event Approval(address indexed _owner, address indexed _spender, uint256 _value);
  }
- 
+
 contract ERC20 is ERC20Interface,SafeMath{
 
     mapping(address => uint256) public balanceOf;
@@ -63,7 +63,7 @@ contract ERC20 is ERC20Interface,SafeMath{
   function transfer(address _to, uint256 _value) returns (bool success) {
       require(_to != address(0));
       require(balanceOf[msg.sender] >= _value);
-      require(balanceOf[ _to] + _value >= balanceOf[ _to]); 
+      require(balanceOf[ _to] + _value >= balanceOf[ _to]);
 
       balanceOf[msg.sender] =SafeMath.safeSub(balanceOf[msg.sender],_value) ;
       balanceOf[_to] =SafeMath.safeAdd(balanceOf[_to],_value) ;
@@ -100,4 +100,10 @@ contract ERC20 is ERC20Interface,SafeMath{
       return allowed[_owner][_spender];
   }
 
+}
+pragma solidity ^0.4.24;
+contract SignalingTXN {
+	 function externalCallUsed() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

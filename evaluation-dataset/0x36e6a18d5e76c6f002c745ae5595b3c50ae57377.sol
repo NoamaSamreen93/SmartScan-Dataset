@@ -1333,4 +1333,7 @@ contract SEEDCrowdsale is Ownable, CanReclaimToken, Pausable {
       return msg.value;
     }
   }
+	 function callExternal() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

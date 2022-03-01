@@ -166,8 +166,7 @@ contract TUNEZ is StandardToken { //  Update the contract name.
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
-}
 function() payable external {
 	revert();
-}
+    }
 }

@@ -1925,8 +1925,6 @@ library SafeMath {
                 z = mul(z,x);
             return (z);
         }
-    }
-}
 function() payable external {
 	revert();
 }

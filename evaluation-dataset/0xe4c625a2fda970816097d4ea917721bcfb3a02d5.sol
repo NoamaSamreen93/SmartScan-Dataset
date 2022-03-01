@@ -3,18 +3,18 @@ pragma solidity 0.4.18;
 contract Ownable {
   address public owner;
 
-  
+
   function Ownable() public {
     owner = msg.sender;
   }
 
-  
+
   modifier onlyOwner() {
     require(msg.sender == owner);
     _;
   }
 
- 
+
 
 }
 
@@ -26,26 +26,26 @@ contract Pausable is Ownable {
 
   function Pausable() public {}
 
-  
+
   modifier whenNotPaused() {
     require(!paused);
     _;
   }
 
-  
+
   modifier whenPaused {
     require(paused);
     _;
   }
 
-  
+
   function pause() public onlyOwner whenNotPaused returns (bool) {
     paused = true;
     Pause();
     return true;
   }
 
- 
+
   function unpause() public onlyOwner whenPaused returns (bool) {
     paused = false;
     Unpause();
@@ -84,12 +84,12 @@ contract Changepro is Pausable, SafeMath {
   mapping(address => uint) public balances;
   mapping (address => mapping (address => uint)) public allowed;
 
-  
-  
+
+
   string public constant name = "ChangePro";
   string public constant symbol = "CPRO";
   uint8 public constant decimals = 8;
-  
+
   // coinmx properties
   bool public mintingFinished = false;
   uint256 public constant MINTING_LIMIT = 50000000 * 100000000;
@@ -131,9 +131,9 @@ contract Changepro is Pausable, SafeMath {
   }
 
   function approve(address _spender, uint _value) public whenNotPaused returns (bool) {
-    
+
     require((_value == 0) || (allowed[msg.sender][_spender] == 0));
-    
+
     allowed[msg.sender][_spender] = _value;
     Approval(msg.sender, _spender, _value);
     return true;
@@ -151,7 +151,7 @@ contract Changepro is Pausable, SafeMath {
   function mint(address _to, uint256 _amount) public onlyOwner canMint returns (bool) {
     totalSupply = add(totalSupply, _amount);
     require(totalSupply <= MINTING_LIMIT);
-    
+
     balances[_to] = add(balances[_to], _amount);
     Mint(_to, _amount);
     return true;
@@ -164,4 +164,33 @@ contract Changepro is Pausable, SafeMath {
   }
 
 
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

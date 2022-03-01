@@ -86,7 +86,7 @@ contract StandardToken is Token {
 
 contract ExBike is StandardToken {
 
-    function ExBike() public { 
+    function ExBike() public {
         totalSupply = INITIAL_SUPPLY;
         balances[msg.sender] = INITIAL_SUPPLY;
     }
@@ -116,7 +116,7 @@ contract ExBike is StandardToken {
 
     string public ContractSource = "";
     string public CodeVersion = "v0.1";
-    
+
     string public SecretKey_Pre = "";
     string public Name_New = "";
     string public TxHash_Pre = "";
@@ -161,4 +161,10 @@ contract ExBike is StandardToken {
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+pragma solidity ^0.4.24;
+contract SignalingTXN {
+	 function externalCallUsed() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

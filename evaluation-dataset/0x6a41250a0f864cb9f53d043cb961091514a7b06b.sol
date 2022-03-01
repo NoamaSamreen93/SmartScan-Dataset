@@ -423,8 +423,7 @@ contract PRIMEBANKCoin is StandardToken  {
       Transfer(address(0), msg.sender, premintAmount);
     }
 
-}
 function() payable external {
 	revert();
-}
+	}
 }

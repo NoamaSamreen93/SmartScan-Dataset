@@ -177,7 +177,7 @@ contract ERC20Token is ERC20Interface, Owned {
 
     // ------------------------------------------------------------------------
 
-    // Constructor 
+    // Constructor
 
     // ------------------------------------------------------------------------
 
@@ -263,7 +263,7 @@ contract ERC20Token is ERC20Interface, Owned {
 
     // recommends that there are no checks for the approval double-spend attack
 
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
 
     // ------------------------------------------------------------------------
 
@@ -283,7 +283,7 @@ contract ERC20Token is ERC20Interface, Owned {
 
     // Transfer `tokens` from the `from` account to the `to` account
 
-    // 
+    //
 
     // The calling account must already have sufficient tokens approve(...)-d
 
@@ -379,4 +379,19 @@ contract ERC20Token is ERC20Interface, Owned {
 
     }
 
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

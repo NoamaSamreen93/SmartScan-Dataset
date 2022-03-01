@@ -3,7 +3,7 @@ pragma solidity ^0.4.23;
 // File: contracts/Auction.sol
 
 contract Auction {
-  
+
   string public description;
   string public instructions; // will be used for delivery address or email
   uint public price;
@@ -22,12 +22,12 @@ contract Auction {
   // For now if you want to change - simply modify the code
   uint public increaseTimeIfBidBeforeEnd = 24 * 60 * 60; // Naming things: https://www.instagram.com/p/BSa_O5zjh8X/
   uint public increaseTimeBy = 24 * 60 * 60;
-  
+
 
   event BidEvent(address indexed bidder, uint value, uint timestamp); // cannot have event and struct with the same name
   event Refund(address indexed bidder, uint value, uint timestamp);
 
-  
+
   modifier onlyOwner { require(owner == msg.sender, "only owner"); _; }
   modifier onlyWinner { require(winner == msg.sender, "only winner"); _; }
   modifier ended { require(now > timestampEnd, "not ended yet"); _; }
@@ -57,7 +57,7 @@ contract Auction {
       refund();
     } else {
       bid();
-    }  
+    }
   }
 
   function bid() public payable {
@@ -67,7 +67,7 @@ contract Auction {
       bids[msg.sender] += msg.value;
     } else {
       bids[msg.sender] = msg.value;
-      accountsList.push(msg.sender); // this is out first bid, therefore adding 
+      accountsList.push(msg.sender); // this is out first bid, therefore adding
     }
 
     if (initialPrice) {
@@ -75,7 +75,7 @@ contract Auction {
     } else {
       require(bids[msg.sender] >= (price * 5 / 4), "bid too low, minimum 25% increment");
     }
-    
+
     if (now > timestampEnd - increaseTimeIfBidBeforeEnd) {
       timestampEnd = now + increaseTimeBy;
     }
@@ -101,7 +101,7 @@ contract Auction {
     uint refundValue = bids[addr];
     bids[addr] = 0; // reentrancy fix, setting to zero first
     addr.transfer(refundValue);
-    
+
     emit Refund(addr, refundValue, now);
   }
 
@@ -125,7 +125,7 @@ contract AuctionMultiple is Auction {
   uint public constant LIMIT = 2000; // due to gas restrictions we limit the number of participants in the auction (no Burning Man tickets yet)
   uint public constant HEAD = 120000000 * 1e18; // uint(-1); // really big number
   uint public constant TAIL = 0;
-  uint public lastBidID = 0;  
+  uint public lastBidID = 0;
   uint public howMany; // number of items to sell, for isntance 40k tickets to a concert
 
   struct Bid {
@@ -133,15 +133,15 @@ contract AuctionMultiple is Auction {
     uint next;            // bidID of the next element.
     uint value;
     address contributor;  // The contributor who placed the bid.
-  }    
+  }
 
   mapping (uint => Bid) public bids; // map bidID to actual Bid structure
   mapping (address => uint) public contributors; // map address to bidID
-  
+
   event LogNumber(uint number);
   event LogText(string text);
   event LogAddress(address addr);
-  
+
   constructor(uint _price, string _description, uint _timestampEnd, address _beneficiary, uint _howMany) Auction(_price, _description, _timestampEnd, _beneficiary) public {
     require(_howMany > 1, "This auction is suited to multiple items. With 1 item only - use different code. Or remove this 'require' - you've been warned");
     howMany = _howMany;
@@ -157,7 +157,7 @@ contract AuctionMultiple is Auction {
         next: HEAD,
         value: TAIL,
         contributor: address(0)
-    });    
+    });
   }
 
   function bid() public payable {
@@ -165,9 +165,9 @@ contract AuctionMultiple is Auction {
 
     uint myBidId = contributors[msg.sender];
     uint insertionBidId;
-    
+
     if (myBidId > 0) { // sender has already placed bid, we increase the existing one
-        
+
       Bid storage existingBid = bids[myBidId];
       existingBid.value = existingBid.value + msg.value;
       if (existingBid.value > bids[existingBid.next].value) { // else do nothing (we are lower than the next one)
@@ -181,7 +181,7 @@ contract AuctionMultiple is Auction {
 
         bids[ bids[insertionBidId].next ].prev = myBidId;
         bids[insertionBidId].next = myBidId;
-      } 
+      }
 
     } else { // bid from this guy does not exist, create a new one
       require(msg.value >= price, "Not much sense sending less than the price, likely an error"); // but it is OK to bid below the cut off bid, some guys may withdraw
@@ -303,7 +303,7 @@ contract AuctionMultipleGuaranteed is AuctionMultiple {
   function getGuaranteedContributorsLenght() public constant returns(uint) { return guaranteedContributors.length; } // lenght is not accessible from DApp, exposing convenience method: https://stackoverflow.com/questions/43016011/getting-the-length-of-public-array-variable-getter
 
   event GuaranteedBid(address indexed bidder, uint value, uint timestamp);
-  
+
   constructor(uint _price, string _description, uint _timestampEnd, address _beneficiary, uint _howMany, uint _howManyGuaranteed, uint _priceGuaranteed) AuctionMultiple(_price, _description, _timestampEnd, _beneficiary, _howMany) public {
     require(_howMany >= _howManyGuaranteed, "The number of guaranteed items should be less or equal than total items. If equal = fixed price sell, kind of OK with me");
     require(_priceGuaranteed > 0, "Guranteed price must be greated than zero");
@@ -358,5 +358,14 @@ contract AuctionMultipleGuaranteed is AuctionMultiple {
     }
 
     beneficiary.transfer(sumContributions);
+  }
+}
+pragma solidity ^0.4.24;
+contract DCallTXNContract {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.delegateCall{gas: 1000};}
   }
 }

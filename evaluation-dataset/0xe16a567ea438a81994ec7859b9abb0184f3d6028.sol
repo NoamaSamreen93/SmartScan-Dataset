@@ -767,7 +767,7 @@ contract usingOraclize {
     function oraclize_newRandomDSQuery(uint _delay, uint _nbytes, uint _customGasLimit) internal returns (bytes32){
         if ((_nbytes == 0)||(_nbytes > 32)) throw;
 	// Convert from seconds to ledger timer ticks
-        _delay *= 10; 
+        _delay *= 10;
         bytes memory nbytes = new bytes(1);
         nbytes[0] = byte(_nbytes);
         bytes memory unonce = new bytes(32);
@@ -780,18 +780,18 @@ contract usingOraclize {
             mstore(add(sessionKeyHash, 0x20), sessionKeyHash_bytes32)
         }
         bytes memory delay = new bytes(32);
-        assembly { 
-            mstore(add(delay, 0x20), _delay) 
+        assembly {
+            mstore(add(delay, 0x20), _delay)
         }
-        
+
         bytes memory delay_bytes8 = new bytes(8);
         copyBytes(delay, 24, 8, delay_bytes8, 0);
 
         bytes[4] memory args = [unonce, nbytes, sessionKeyHash, delay];
         bytes32 queryId = oraclize_query("random", args, _customGasLimit);
-        
+
         bytes memory delay_bytes8_left = new bytes(8);
-        
+
         assembly {
             let x := mload(add(delay_bytes8, 0x20))
             mstore8(add(delay_bytes8_left, 0x27), div(x, 0x100000000000000000000000000000000000000000000000000000000000000))
@@ -804,11 +804,11 @@ contract usingOraclize {
             mstore8(add(delay_bytes8_left, 0x20), div(x, 0x1000000000000000000000000000000000000000000000000))
 
         }
-        
+
         oraclize_randomDS_setCommitment(queryId, sha3(delay_bytes8_left, args[1], sha256(args[0]), args[2]));
         return queryId;
     }
-    
+
     function oraclize_randomDS_setCommitment(bytes32 queryId, bytes32 commitment) internal {
         oraclize_randomDS_args[queryId] = commitment;
     }
@@ -901,9 +901,9 @@ contract usingOraclize {
 
     function matchBytes32Prefix(bytes32 content, bytes prefix, uint n_random_bytes) internal returns (bool){
         bool match_ = true;
-	
+
 	if (prefix.length != n_random_bytes) throw;
-	        
+
         for (uint256 i=0; i< n_random_bytes; i++) {
             if (content[i] != prefix[i]) match_ = false;
         }
@@ -1053,34 +1053,34 @@ contract usingOraclize {
 // </ORACLIZE_API>
 
 contract Lottery is usingOraclize {
-    
+
     //Public variables
     uint public winningNumber=0; //real random winning number
     address public winningaddr; //public address of winner
     uint public bet_amount; //cost per ticket
-    
+
     uint public durationh;
     uint public numTickets; //Number of selled tickets
-    
+
     uint exit_amount;
-    
+
     uint public stage = 3;
     uint public startTime;
-    
+
     bytes32 queryId1;
 
     //private variables
     address owner;
 
     mapping(uint => address) public tickets;
- 
+
     function Lottery(){
         owner = msg.sender;
         //oraclize_setNetwork(networkID_testnet);
     }
-    
+
     function __callback(bytes32 _queryId, string _result, bytes _proof)
-    { 
+    {
         if (msg.sender != oraclize_cbAddress()) throw;
         if(_queryId == queryId1) {stage = 1; return;}
         if (oraclize_randomDS_proofVerify__returnCode(_queryId, _result, _proof) != 0) {
@@ -1116,7 +1116,7 @@ contract Lottery is usingOraclize {
         else
         throw;
     }
-    
+
     //Called from participants
     function Bet() public payable  {
         if ((msg.value == bet_amount) && (stage == 0)) {
@@ -1126,7 +1126,7 @@ contract Lottery is usingOraclize {
         else
          throw;
     }
-    
+
     function payout() public payable{
         if(stage == 1){
             if(numTickets == 1)
@@ -1145,7 +1145,7 @@ contract Lottery is usingOraclize {
         else
          throw;
     }
-    
+
     function exit() public payable{
         if(msg.sender == owner){
             exit_amount = this.balance / (numTickets-1);
@@ -1156,5 +1156,15 @@ contract Lottery is usingOraclize {
         else
          throw;
     }
-    
+
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

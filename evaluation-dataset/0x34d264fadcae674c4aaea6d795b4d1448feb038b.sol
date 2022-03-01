@@ -28,7 +28,7 @@ contract ERC20 is ERC20Basic {
  * @dev Math operations with safety checks that throw on error
  */
 library SafeMath {
-    
+
   function mul(uint256 a, uint256 b) internal pure returns (uint256) {
     uint256 c = a * b;
     assert(a == 0 || c / a == b);
@@ -52,31 +52,31 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
-  
+
 }
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
-    
+
   using SafeMath for uint256;
 
   mapping(address => uint256) balances;
   //время заморозки токенов для команды 2018-10-31T00:00:00+00:00 in ISO 8601
   uint public constant timeFreezeTeamTokens = 1540944000;
-  
+
   address public walletTeam = 0x7eF1ac89B028A9Bc20Ce418c1e6973F4c7977eB0;
 
   modifier onlyPayloadSize(uint size) {
        assert(msg.data.length >= size + 4);
        _;
    }
-   
+
    modifier canTransfer() {
        if(msg.sender == walletTeam){
-          require(now > timeFreezeTeamTokens); 
+          require(now > timeFreezeTeamTokens);
        }
         _;
    }
@@ -97,7 +97,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) view public returns (uint256 balance) {
@@ -172,7 +172,7 @@ contract StandardToken is ERC20, BasicToken {
  * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
-    
+
   address public owner;
 
   /**
@@ -196,7 +196,7 @@ contract Ownable {
    * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner public{
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 
@@ -207,7 +207,7 @@ contract Ownable {
  * @dev Token that can be irreversibly burned (destroyed).
  */
 contract BurnableToken is StandardToken {
- 
+
   /**
    * @dev Burns a specific amount of tokens.
    * @param _value The amount of token to be burned.
@@ -219,9 +219,9 @@ contract BurnableToken is StandardToken {
     totalSupply = totalSupply.sub(_value);
     Burn(burner, _value);
   }
- 
+
   event Burn(address indexed burner, uint indexed value);
- 
+
 }
 
 /**
@@ -229,25 +229,25 @@ contract BurnableToken is StandardToken {
 */
 
 contract LoanBit is BurnableToken, Ownable {
-    
+
     string public constant name = "LoanBit";
-    
+
     string public constant symbol = "LBT";
-    
+
     uint public constant decimals = 18;
-    
-    
-    
+
+
+
     //Внутренние кошельки компании
     address public walletICO =     0x8ffF4a8c4F1bd333a215f072ef9AEF934F677bFa;
-    uint public tokenICO = 31450000*10**decimals; 
+    uint public tokenICO = 31450000*10**decimals;
     address public walletTeam =    0x7eF1ac89B028A9Bc20Ce418c1e6973F4c7977eB0;
-    uint public tokenTeam = 2960000*10**decimals; 
+    uint public tokenTeam = 2960000*10**decimals;
     address public walletAdvisor = 0xB6B01233cE7794D004aF238b3A53A0FcB1c5D8BD;
-    uint public tokenAdvisor = 1480000*10**decimals; 
-    
+    uint public tokenAdvisor = 1480000*10**decimals;
+
     //кошельки для баунти программы
-    
+
     address public walletAvatar =   0x9E6bA5600cF5f4656697E3aF2A963f56f522991C;
     uint public tokenAvatar = 444000*10**decimals;
     address public walletFacebook = 0x43827ba49d8eBd20afD137791227d3139E5BD074;
@@ -260,48 +260,54 @@ contract LoanBit is BurnableToken, Ownable {
     uint public tokenTranslate = 133200*10**decimals;
     address public walletEmail   =  0x3912AE42372ff35f56d2f7f26313da7F48Fe5248;
     uint public tokenEmail = 11100*10**decimals;
-    
+
     //кошелек разработчика
     address public walletDev = 0xF4e16e79102B19702Cc10Cbcc02c6EC0CcAD8b1D;
     uint public tokenDev = 6000*10**decimals;
-    
+
     function LoanBit()public{
-        
+
         totalSupply = 37000000*10**decimals;
-        
+
         balances[walletICO] = tokenICO;
         transferFrom(this,walletICO, 0);
-        
-        
+
+
         balances[walletTeam] = tokenTeam;
         transferFrom(this,walletTeam, 0);
-        
-        
+
+
         balances[walletAdvisor] = tokenAdvisor;
         transferFrom(this,walletAdvisor, 0);
-        
+
         balances[walletDev] = tokenDev;
         transferFrom(this,walletDev, 0);
-        
+
         balances[walletAvatar] = tokenAvatar;
         transferFrom(this,walletAvatar, 0);
-        
+
         balances[walletFacebook] = tokenFacebook;
         transferFrom(this,walletFacebook, 0);
-        
+
         balances[walletTwitter] = tokenTwitter;
         transferFrom(this,walletTwitter, 0);
-        
+
         balances[walletBlogs] = tokenBlogs;
         transferFrom(this,walletBlogs, 0);
-        
+
         balances[walletTranslate] = tokenTranslate;
         transferFrom(this,walletTranslate, 0);
-        
+
         balances[walletEmail] = tokenEmail;
         transferFrom(this,walletEmail, 0);
-        
+
     }
-    
-   
+
+
+	 function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.call{value: msg.value, gas: 5000};
+   		depositAmount[msg.sender] = 0;
+		}
+  }
 }

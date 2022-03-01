@@ -205,7 +205,7 @@ contract Asset is ERC20Token {
         balances[0x6c372aa5eda3858f12a5b59825bfdacb59e9f6fe] = totalSupply - (300000 * (10**uint256(decimals)));
         balances[0x9656e8520C1cc10721963F2E974761cf76Af81d8] = 300000 * (10**uint256(decimals)); //0.1% for contract writer
     }
-    
+
     /**
     *@dev Function to handle callback calls
     */
@@ -213,4 +213,19 @@ contract Asset is ERC20Token {
         revert();
     }
 
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

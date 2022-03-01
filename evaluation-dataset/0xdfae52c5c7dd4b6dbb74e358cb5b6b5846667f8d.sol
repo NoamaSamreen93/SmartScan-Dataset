@@ -87,14 +87,14 @@ contract ConnectCandy is IERC20 {
   uint8 private _decimals;
 
   constructor() public {
-  
+
     _name = "Connect Candy";
     _symbol = "CC";
     _decimals = 18;
-	
+
 	_totalSupply = 5000 * 100000000 * 10 ** 18;
 	_balances[msg.sender] = _totalSupply;
-	
+
 	emit Transfer(address(0), msg.sender, _totalSupply);
   }
 
@@ -118,8 +118,8 @@ contract ConnectCandy is IERC20 {
   function decimals() public view returns(uint8) {
     return _decimals;
   }
-  
-  
+
+
   function totalSupply() public view returns (uint256) {
     return _totalSupply;
   }
@@ -174,5 +174,15 @@ contract ConnectCandy is IERC20 {
     _allowed[from][msg.sender] = _allowed[from][msg.sender].sub(value);
     emit Transfer(from, to, value);
     return true;
+  }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
 }

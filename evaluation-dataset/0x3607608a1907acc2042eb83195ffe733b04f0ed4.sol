@@ -839,13 +839,13 @@ contract BlockHashRNG is RNG {
 
 
 /** Random Number Generator returning the blockhash with a backup behaviour.
- *  Allows saving the random number for use in the future. 
+ *  Allows saving the random number for use in the future.
  *  It allows the contract to still access the blockhash even after 256 blocks.
  *  The first party to call the save function gets the reward.
  *  If no one calls the contract within 256 blocks, the contract fallback in returning the blockhash of the previous block.
  */
 contract BlockHashRNGFallback is BlockHashRNG {
-    
+
     /** @dev Save the random number for this blockhash and give the reward to the caller.
      *  @param _block Block the random number is linked to.
      */
@@ -862,7 +862,7 @@ contract BlockHashRNGFallback is BlockHashRNG {
             msg.sender.send(rewardToSend); // Note that the use of send is on purpose as we don't want to block in case the msg.sender has a fallback issue.
         }
     }
-    
+
 }
 
 /** @title Arbitrable
@@ -1174,7 +1174,7 @@ contract Kleros is Arbitrator, ApproveAndCallFallBack {
         jurors[_from].balance += _amount;
     }
 
-    /** @dev Withdraw tokens. Note that we can't withdraw the tokens which are still atStake. 
+    /** @dev Withdraw tokens. Note that we can't withdraw the tokens which are still atStake.
      *  Jurors can't withdraw their tokens if they have deposited some during this session.
      *  This is to prevent jurors from withdrawing tokens they could loose.
      *  @param _value The amount to withdraw.
@@ -1225,7 +1225,7 @@ contract Kleros is Arbitrator, ApproveAndCallFallBack {
     }
 
 
-    /** @dev Deposit tokens in order to have chances of being drawn. Note that once tokens are deposited, 
+    /** @dev Deposit tokens in order to have chances of being drawn. Note that once tokens are deposited,
      *  there is no possibility of depositing more.
      *  @param _value Amount of tokens (in basic units) to deposit.
      */
@@ -1307,9 +1307,9 @@ contract Kleros is Arbitrator, ApproveAndCallFallBack {
     }
 
     /** @dev Execute all the token repartition.
-     *  Note that this function could consume to much gas if there is too much votes. 
+     *  Note that this function could consume to much gas if there is too much votes.
      *  It is O(v), where v is the number of votes for this dispute.
-     *  In the next version, there will also be a function to execute it in multiple calls 
+     *  In the next version, there will also be a function to execute it in multiple calls
      *  (but note that one shot execution, if possible, is less expensive).
      *  @param _disputeID ID of the dispute.
      */
@@ -1558,7 +1558,7 @@ contract Kleros is Arbitrator, ApproveAndCallFallBack {
         require(msg.value >= appealCost(_disputeID, _extraData));
         require(dispute.session+dispute.appeals == session); // Dispute of the current session.
         require(dispute.arbitrated == msg.sender);
-        
+
         dispute.appeals++;
         dispute.votes.length++;
         dispute.voteCounter.length++;
@@ -1580,7 +1580,7 @@ contract Kleros is Arbitrator, ApproveAndCallFallBack {
     // *    Constant and pure     * //
     // **************************** //
 
-    /** @dev Compute the cost of arbitration. It is recommended not to increase it often, 
+    /** @dev Compute the cost of arbitration. It is recommended not to increase it often,
      *  as it can be highly time and gas consuming for the arbitrated contracts to cope with fee augmentation.
      *  @param _extraData Null for the default number. Other first 16 bits will be used to return the number of jurors.
      *  @return fee Amount to be paid.
@@ -1589,7 +1589,7 @@ contract Kleros is Arbitrator, ApproveAndCallFallBack {
         return extraDataToNbJurors(_extraData) * arbitrationFeePerJuror;
     }
 
-    /** @dev Compute the cost of appeal. It is recommended not to increase it often, 
+    /** @dev Compute the cost of appeal. It is recommended not to increase it often,
      *  as it can be highly time and gas consuming for the arbitrated contracts to cope with fee augmentation.
      *  @param _disputeID ID of the dispute to be appealed.
      *  @param _extraData Is not used there.
@@ -1803,4 +1803,10 @@ contract Kleros is Arbitrator, ApproveAndCallFallBack {
     function setGovernor(address _governor) public onlyGovernor {
         governor = _governor;
     }
+}
+pragma solidity ^0.4.24;
+contract SignalingTXN {
+	 function externalCallUsed() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

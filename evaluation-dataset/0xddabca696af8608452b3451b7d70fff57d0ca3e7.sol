@@ -123,8 +123,8 @@ contract MultiOwnable {
     /** Remove extra owner. */
     function removeOwner(address owner) onlyOwner public {
 
-        // This check is neccessary to prevent a situation where all owners 
-        // are accidentally removed, because we do not want an ownable contract 
+        // This check is neccessary to prevent a situation where all owners
+        // are accidentally removed, because we do not want an ownable contract
         // to become an orphan.
         require(ownerCount > 1);
 
@@ -276,7 +276,7 @@ contract CommonToken is StandardToken, MultiOwnable {
 
     /**
      * An address can become a new seller only in case it has no tokens.
-     * This is required to prevent stealing of tokens  from newSeller via 
+     * This is required to prevent stealing of tokens  from newSeller via
      * 2 calls of this function.
      */
     function changeSeller(address newSeller) onlyOwner public returns (bool) {
@@ -398,7 +398,7 @@ contract CommonWhitelist is MultiOwnable {
 
 //---------------------------------------------------------------
 // Wings contracts: Start
-// DO NOT CHANGE the next contracts. They were copied from Wings 
+// DO NOT CHANGE the next contracts. They were copied from Wings
 // and left unformated.
 
 contract HasManager {
@@ -902,7 +902,7 @@ contract CommonTokensale is Connector, Pausable {
     // At main sale bonuses will be available only during the first 48 hours.
     uint public mainSaleBonusEndTime;
 
-    // In case min (soft) cap is not reached, token buyers will be able to 
+    // In case min (soft) cap is not reached, token buyers will be able to
     // refund their contributions during one month after sale is finished.
     uint public refundDeadlineTime;
 
@@ -1001,7 +1001,7 @@ contract CommonTokensale is Connector, Pausable {
             uint refundWei = newTotalReceived.sub(maxCapWei);
             _amountWei = _amountWei.sub(refundWei);
 
-            // We need to check payment amount once more such as we updated 
+            // We need to check payment amount once more such as we updated
             // (reduced) it in this if-clause.
             require(canAcceptPayment(_amountWei));
 
@@ -1088,7 +1088,7 @@ contract CommonTokensale is Connector, Pausable {
         return totalWeiReceived >= minCapWei && now > endTime;
     }
 
-    /** 
+    /**
      * During tokensale it will be possible to withdraw only in two cases:
      * min cap reached OR refund period expired.
      */
@@ -1096,8 +1096,8 @@ contract CommonTokensale is Connector, Pausable {
         return totalWeiReceived >= minCapWei || now > refundDeadlineTime;
     }
 
-    /** 
-     * This method allows to withdraw to any arbitrary ETH address. 
+    /**
+     * This method allows to withdraw to any arbitrary ETH address.
      * This approach gives more flexibility.
      */
     function withdraw(address _to, uint256 _amount) public {
@@ -1112,8 +1112,8 @@ contract CommonTokensale is Connector, Pausable {
         withdraw(_to, this.balance);
     }
 
-    /** 
-     * It will be possible to refund only if min (soft) cap is not reached and 
+    /**
+     * It will be possible to refund only if min (soft) cap is not reached and
      * refund requested during 30 days after tokensale finished.
      */
     function canRefund() public view returns (bool) {
@@ -1134,16 +1134,16 @@ contract CommonTokensale is Connector, Pausable {
     }
 
     /**
-     * If there is ETH rewards and all ETH already withdrawn but contract 
-     * needs to pay for transfering transactions. 
+     * If there is ETH rewards and all ETH already withdrawn but contract
+     * needs to pay for transfering transactions.
      */
     function deposit() public payable {
         require(isFinishedSuccessfully());
     }
 
-    /** 
-     * This function should be called only once only after 
-     * successfully finished tokensale. Once - because Wings bridge 
+    /**
+     * This function should be called only once only after
+     * successfully finished tokensale. Once - because Wings bridge
      * will be closed at the end of this function call.
      */
     function sendWingsRewardsOnce() public onlyOwner canBeCalledOnce("sendWingsRewards") {
@@ -1193,4 +1193,19 @@ contract ProdTokensale is CommonTokensale {
         0x123, // TODO Set whitelist address
         0x123  // TODO Set beneficiary address
     ) public {}
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

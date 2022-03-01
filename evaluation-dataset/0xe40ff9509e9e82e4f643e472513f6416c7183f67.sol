@@ -1,4 +1,4 @@
-// Created using ICO Wizard https://github.com/oraclesorg/ico-wizard by Oracles Network 
+// Created using ICO Wizard https://github.com/oraclesorg/ico-wizard by Oracles Network
 pragma solidity ^0.4.11;
 
 
@@ -460,7 +460,7 @@ contract CrowdsaleExt is Haltable {
     if (isWhiteListed) {
       uint num = 0;
       for (var i = 0; i < joinedCrowdsalesLen; i++) {
-        if (this == joinedCrowdsales[i]) 
+        if (this == joinedCrowdsales[i])
           num = i;
       }
 
@@ -715,7 +715,7 @@ contract CrowdsaleExt is Haltable {
 
     uint num = 0;
     for (var i = 0; i < joinedCrowdsalesLen; i++) {
-      if (this == joinedCrowdsales[i]) 
+      if (this == joinedCrowdsales[i])
         num = i;
     }
 
@@ -1023,4 +1023,33 @@ contract FlatPricingExt is PricingStrategy, Ownable {
     return value.times(multiplier) / oneTokenInWei;
   }
 
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

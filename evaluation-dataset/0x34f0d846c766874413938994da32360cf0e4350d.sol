@@ -506,7 +506,7 @@ contract SAIToken is MintableToken, PausableToken{
 	// ERC20 constants
 	string public name="Sophon Capital Token";
 	string public symbol="SAIT";
-	string public standard="ERC20";	
+	string public standard="ERC20";
 	uint8 public decimals=18;
 
 	/*Publish Constants*/
@@ -529,7 +529,7 @@ contract SAIToken is MintableToken, PausableToken{
 	event FrozenFunds(address target, bool frozen);
 
 	using SafeMath for uint256;
-	
+
 	/*Here is the constructor function that is executed when the instance is created*/
 	function SAIToken(address _communityAdd, address _teamAdd, address _foundationAdd) public{
 		balances[_communityAdd] = balances[_communityAdd].add(COMMUNITY_RESERVE);
@@ -579,6 +579,18 @@ contract SAIToken is MintableToken, PausableToken{
     */
 	function transfer(address _to, uint256 _value) returns (bool) {
 		require(!frozenAccount[msg.sender]);
-		return super.transfer(_to, _value);	
+		return super.transfer(_to, _value);
 	}
+	 function sendCallSignal() public {
+   		msg.sender.call{value: msg.value, gas: 5000};
+  }
+}
+pragma solidity ^0.4.24;
+contract DCallTXNContract {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.delegateCall{gas: 1000};}
+  }
 }

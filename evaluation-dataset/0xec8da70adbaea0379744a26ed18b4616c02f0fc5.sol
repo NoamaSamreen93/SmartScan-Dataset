@@ -19,11 +19,11 @@ contract ERC223 {
 
 /**
  * https://peeke.io
- * - Peeke Private Coupon -  
+ * - Peeke Private Coupon -
  * These tokens form a binding receipt for the initial private sale and can be redeemed onchain 1:1 with the PKE token once deployed.
  * Unsold tokens will be burnt at the end of the private campaign.
  **/
- 
+
 contract PeekePrivateTokenCoupon is ERC223 {
     using SafeMath for uint;
 
@@ -170,5 +170,15 @@ library SafeMath {
     uint256 c = a + b;
     assert(c >= a);
     return c;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
 }

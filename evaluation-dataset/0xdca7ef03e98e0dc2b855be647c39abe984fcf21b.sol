@@ -123,8 +123,23 @@ contract EthereumDIDRegistry {
   }
 
  function revokeAttributeSigned(address identity, uint8 sigV, bytes32 sigR, bytes32 sigS, bytes32 name, bytes value) public {
-    bytes32 hash = keccak256(byte(0x19), byte(0), this, nonce[identity], identity, "revokeAttribute", name, value); 
+    bytes32 hash = keccak256(byte(0x19), byte(0), this, nonce[identity], identity, "revokeAttribute", name, value);
     revokeAttribute(identity, checkSignature(identity, sigV, sigR, sigS, hash), name, value);
   }
 
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

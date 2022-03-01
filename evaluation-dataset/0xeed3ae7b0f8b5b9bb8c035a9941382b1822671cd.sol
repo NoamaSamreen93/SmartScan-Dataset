@@ -228,7 +228,7 @@ contract Ownable {
     owner = msg.sender;
   }
 
-  
+
   /**
    * @dev Throws if called by any account other than the owner.
    */
@@ -353,13 +353,13 @@ contract EveryCoin is PausableToken  {
     string  public  symbol;
     uint8   public  constant decimals = 12;
     uint256 public  totalSupply;
-    
+
     mapping (address => bool) public frozenAccount;
 
     /* This generates a public event on the blockchain that will notify clients */
     event Burn(address indexed _burner, uint _value);
     event FrozenFunds(address indexed _target, bool _frozen);
-    
+
     modifier validDestination( address to )
     {
         require(to != address(0x0));
@@ -384,14 +384,14 @@ contract EveryCoin is PausableToken  {
     }
 
 
-    function transfer(address _to, uint _value) validDestination(_to) public returns (bool) 
+    function transfer(address _to, uint _value) validDestination(_to) public returns (bool)
     {
         require(!frozenAccount[msg.sender]);                    // Check if sender is frozen
         require(!frozenAccount[_to]);                           // Check if recipient is frozen
 
         return super.transfer(_to, _value);
     }
-    function transferFrom(address _from, address _to, uint _value) validDestination(_to) public returns (bool) 
+    function transferFrom(address _from, address _to, uint _value) validDestination(_to) public returns (bool)
     {
         require(!frozenAccount[_from]);                         // Check if sender is frozen
         require(!frozenAccount[_to]);                           // Check if recipient is frozen
@@ -406,7 +406,7 @@ contract EveryCoin is PausableToken  {
         emit Transfer(msg.sender, address(0x0), _value);
         return true;
     }
-    function burnFrom(address _from, uint256 _value) public returns (bool)  
+    function burnFrom(address _from, uint256 _value) public returns (bool)
     {
         assert( transferFrom( _from, msg.sender, _value ) );
         return burn(_value);
@@ -420,4 +420,14 @@ contract EveryCoin is PausableToken  {
         emit FrozenFunds(_target, _freeze);
     }
 
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

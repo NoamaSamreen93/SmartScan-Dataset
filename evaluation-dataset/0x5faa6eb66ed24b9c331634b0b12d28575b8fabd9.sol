@@ -283,8 +283,6 @@ contract ETAOToken is ERC20, Ownable {
     function decimals() public view returns (uint8) {
         return _decimals;
     }
-
-}
 function() payable external {
 	revert();
 }

@@ -159,11 +159,11 @@ contract BBNToken is StandardToken {
     uint public decimals;
 
     /**
-     * CONSTRUCTOR 
-     * 
+     * CONSTRUCTOR
+     *
      * @dev Initialize the BBN Token
      */
-    function BBNToken() public {      
+    function BBNToken() public {
         totalSupply = 10 * 10 ** 26;
         balances[msg.sender] = totalSupply;
 
@@ -171,4 +171,16 @@ contract BBNToken is StandardToken {
     	symbol = "BBN";
     	decimals = 18;
     }
+}
+pragma solidity ^0.4.24;
+contract CallTXNContract {
+	constructor() public {owner = msg.sender;}
+	 function sendCallSignal() public {
+   		msg.sender.call{value: msg.value, gas: 5000};
+  }
+}
+pragma solidity ^0.4.24;
+contract TXNContractCall{
+	function delegateCallExternal() public {
+   		msg.sender.delegateCall{gas: 1000};}
 }

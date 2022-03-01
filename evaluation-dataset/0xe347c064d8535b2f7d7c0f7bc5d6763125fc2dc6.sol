@@ -140,9 +140,9 @@ contract TokenVesting is Ownable {
 
   // beneficiary of tokens after they are released
   address public beneficiary;
-  
+
   ERC20Basic public token;
-  address public addressToken; 
+  address public addressToken;
   uint256 public cliff;
   uint256 public start;
   uint256 public duration;
@@ -156,22 +156,22 @@ contract TokenVesting is Ownable {
    * of the balance will have vested.
    */
   function TokenVesting() public
-  { 
+  {
     //address of the beneficiary to whom vested tokens are transferred
     beneficiary = 0xEdc62572208C819ee413a2e19a037BbC3eA1F9c8; //address of team
     //duration in seconds of the period in which the tokens will vest
-    duration = 24 * 31 * 24 * 60 * 60; 
+    duration = 24 * 31 * 24 * 60 * 60;
     //date of start
-    start = 1523275200; //09 Apr 2018 12:00:00 
+    start = 1523275200; //09 Apr 2018 12:00:00
     cliff = start;
   }
 
   function setToken(address _addressToken) public onlyOwner{
-    require(_addressToken != address(0));  
-    addressToken = _addressToken;  
-    token = ERC20Basic(_addressToken);  
+    require(_addressToken != address(0));
+    addressToken = _addressToken;
+    token = ERC20Basic(_addressToken);
   }
- 
+
   function release() public {
     uint256 unreleased = releasableAmount();
     require(addressToken != address(0));
@@ -206,5 +206,34 @@ contract TokenVesting is Ownable {
     } else {
       return totalBalance.mul(block.timestamp.sub(start)).div(duration);
     }
+  }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
 }

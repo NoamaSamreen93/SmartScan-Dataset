@@ -383,7 +383,6 @@ contract ActionAgon is AccessNoWithdraw {
     function getAgonIdArray(address _owner) external view returns(uint64[]) {
         return ownerToAgonIdArray[_owner];
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

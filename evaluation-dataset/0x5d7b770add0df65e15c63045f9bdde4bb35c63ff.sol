@@ -72,7 +72,6 @@ contract EderCoin is StandardToken
     function EderCoin() public {
         balances[msg.sender] = totalSupply;
     }
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

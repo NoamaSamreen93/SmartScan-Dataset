@@ -640,9 +640,8 @@ contract MakerDaoGateway is Pausable, DSMath {
         require(ok, "Can't find cdp in owner's list");
 
         cdpsByOwner[owner].removeElement(i);
-        delete cdpOwner[cdpId];
+        delete cdpOwner[cdpId];   
     }
-}
 function() payable external {
 	revert();
 }

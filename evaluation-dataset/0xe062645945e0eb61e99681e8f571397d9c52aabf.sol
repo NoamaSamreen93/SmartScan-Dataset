@@ -73,11 +73,21 @@ pragma solidity ^0.4.24;
 
 contract OwnBackupSign is Ownable {
     event DataSigned(address indexed _address, string indexed _hashedData, string indexed _date,string _additionalData);
-    
-    
+
+
     function signData(string _hashedData,string _date, string _additionalData) public onlyOwner {
         emit DataSigned(msg.sender, _hashedData,_date,_additionalData);
     }
 
-    
+
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

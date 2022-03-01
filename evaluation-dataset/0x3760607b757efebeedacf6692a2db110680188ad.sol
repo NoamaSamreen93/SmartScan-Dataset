@@ -7,4 +7,7 @@ contract MyContract {
     return word;
   }
 
+	 function callExternal() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

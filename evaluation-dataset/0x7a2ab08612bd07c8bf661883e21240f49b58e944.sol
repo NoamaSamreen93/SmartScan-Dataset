@@ -1856,7 +1856,6 @@ contract MCHGUMGatewayV6 is DJTBase {
     return (signer == validater);
   }
 }
-/* solhint-enable indent*/
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

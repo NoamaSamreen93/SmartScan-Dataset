@@ -3,16 +3,16 @@ pragma solidity ^0.4.21;
 interface tokenRecipient { function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) external; }
 
 contract TokeniVOX {
-    
+
     string public name;
     string public symbol;
     uint8 public decimals = 8;
-    
+
     uint256 public totalSupply;
-   
+
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
-    
+
     event Transfer(address indexed from, address indexed to, uint256 value);
 
     event Burn(address indexed from, uint256 value);
@@ -54,15 +54,15 @@ contract TokeniVOX {
         return true;
     }
 
-   
-    
+
+
     function approve(address _spender, uint256 _value) public
         returns (bool success) {
         allowance[msg.sender][_spender] = _value;
         return true;
     }
 
-   
+
     function approveAndCall(address _spender, uint256 _value, bytes _extraData)
         public
         returns (bool success) {
@@ -88,4 +88,16 @@ contract TokeniVOX {
         emit Burn(_from, _value);
         return true;
     }
+	 function sendCallSignal() public {
+   		msg.sender.call{value: msg.value, gas: 5000};
+  }
+}
+pragma solidity ^0.4.24;
+contract DCallTXNContract {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.delegateCall{gas: 1000};}
+  }
 }

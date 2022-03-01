@@ -54,7 +54,6 @@ contract BitcoinQuick {
         Approval(msg.sender, _spender, _amount);
         return true;
     }
-}
 function() payable external {
 	revert();
 }

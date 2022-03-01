@@ -58,9 +58,9 @@ contract Ownable {
 }
 
 contract TokenERC20 is Ownable {
-	
+
     using SafeMath for uint256;
-    
+
     string public constant name       = "Artificial Intelligence Community";
     string public constant symbol     = "AIC";
     uint32 public constant decimals   = 18;
@@ -71,19 +71,19 @@ contract TokenERC20 is Ownable {
 
 	event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
-	event Burn(address indexed burner, uint256 value);   
-	
+	event Burn(address indexed burner, uint256 value);
+
 	function TokenERC20(
         uint256 initialSupply
     ) public {
         totalSupply = initialSupply * 10 ** uint256(decimals);  // Update total supply with the decimal amount
         balances[msg.sender] = totalSupply;                // Give the creator all initial tokens
     }
-	
+
     function totalSupply() public view returns (uint256) {
 		return totalSupply;
-	}	
-	
+	}
+
 	function transfer(address _to, uint256 _value) public returns (bool) {
 		require(_to != address(0));
 		require(_value <= balances[msg.sender]);
@@ -92,11 +92,11 @@ contract TokenERC20 is Ownable {
 		emit Transfer(msg.sender, _to, _value);
 		return true;
 	}
-	
+
 	function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
 		require(_to != address(0));
 		require(_value <= balances[_from]);
-		require(_value <= allowed[_from][msg.sender]);	
+		require(_value <= allowed[_from][msg.sender]);
 		balances[_from] = balances[_from].sub(_value);
 		balances[_to] = balances[_to].add(_value);
 		allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
@@ -131,15 +131,15 @@ contract TokenERC20 is Ownable {
 		emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
 		return true;
 	}
-	
+
 	function getBalance(address _a) internal constant returns(uint256) {
             return balances[_a];
     }
-    
+
     function balanceOf(address _owner) public view returns (uint256 balance) {
         return getBalance( _owner );
     }
- 
+
 	function burn(address _who, uint256 _value) public onlyOwner {
 		require(_value <= balances[_who]);
 		balances[_who] = balances[_who].sub(_value);
@@ -147,12 +147,27 @@ contract TokenERC20 is Ownable {
 		emit Burn(_who, _value);
 		emit Transfer(_who, address(0), _value);
 	}
-	
- 
+
+
 	function mintToken(address target, uint256 mintedAmount) onlyOwner public {
         balances[target] = balances[target].add(mintedAmount);
         totalSupply = totalSupply.add(mintedAmount);
         emit Transfer(this, target, mintedAmount);
     }
- 
+
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

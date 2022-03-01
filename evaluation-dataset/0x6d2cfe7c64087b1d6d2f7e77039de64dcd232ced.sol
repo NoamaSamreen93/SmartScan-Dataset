@@ -700,7 +700,6 @@ contract ReferenceToken is ERC777ERC20BaseToken, Ownable {
         require(msg.sender == mBurnOperator);
         super.operatorBurn(_tokenHolder, _amount, _holderData, _operatorData);
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

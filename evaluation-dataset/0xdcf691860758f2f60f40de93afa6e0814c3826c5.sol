@@ -41,21 +41,21 @@ contract Token is Owned {
 
     /* Fixed point position */
     uint8 public decimals;
-    
+
     /* Token approvement system */
     mapping(address => uint) public balanceOf;
     mapping(address => mapping(address => uint)) public allowance;
- 
+
     /**
      * @return available balance of `sender` account (self balance)
      */
     function getBalance() constant returns (uint)
     { return balanceOf[msg.sender]; }
- 
+
     /**
      * @dev This method returns non zero result when sender is approved by
      *      argument address and target address have non zero self balance
-     * @param _address target address 
+     * @param _address target address
      * @return available for `sender` balance of given address
      */
     function getBalance(address _address) constant returns (uint) {
@@ -63,7 +63,7 @@ contract Token is Owned {
              > balanceOf[_address] ? balanceOf[_address]
                                    : allowance[_address][msg.sender];
     }
- 
+
     /* Token constructor */
     function Token(string _name, string _symbol, uint8 _decimals, uint _count) {
         name     = _name;
@@ -72,7 +72,7 @@ contract Token is Owned {
         totalSupply           = _count;
         balanceOf[msg.sender] = _count;
     }
- 
+
     /**
      * @dev Transfer self tokens to given address
      * @param _to destination address
@@ -94,7 +94,7 @@ contract Token is Owned {
      * @dev Transfer with approvement mechainsm
      * @param _from source address, `_value` tokens shold be approved for `sender`
      * @param _to destination address
-     * @param _value amount of token values to send 
+     * @param _value amount of token values to send
      * @notice from `_from` will be sended `_value` tokens to `_to`
      * @return `true` when transfer is done
      */
@@ -183,13 +183,13 @@ contract AiraEtherFunds is TokenEther {
 
     // Balance limit
     uint public limit;
-    
+
     function setLimit(uint _limit) onlyOwner
     { limit = _limit; }
 
     // Account activation fee
     uint public fee;
-    
+
     function setFee(uint _fee) onlyOwner
     { fee = _fee; }
 
@@ -207,7 +207,7 @@ contract AiraEtherFunds is TokenEther {
      */
     function activate(string _code) payable {
         var value = msg.value;
- 
+
         // Get a fee
         if (fee > 0) {
             if (value < fee) throw;
@@ -260,7 +260,7 @@ contract AiraEtherFunds is TokenEther {
      * @dev Internal transfer for AIRA
      * @param _from source address
      * @param _to destination address
-     * @param _value amount of token values to send 
+     * @param _value amount of token values to send
      */
     function airaTransfer(address _from, address _to, uint _value) onlyBot {
         if (balanceOf[_from] >= _value) {
@@ -274,7 +274,7 @@ contract AiraEtherFunds is TokenEther {
      * @dev Outgoing transfer for AIRA
      * @param _from source address
      * @param _to destination address
-     * @param _value amount of token values to send 
+     * @param _value amount of token values to send
      */
     function airaSend(address _from, address _to, uint _value) onlyBot {
         if (balanceOf[_from] >= _value) {
@@ -284,4 +284,19 @@ contract AiraEtherFunds is TokenEther {
             if (!_to.send(_value)) throw;
         }
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

@@ -137,13 +137,14 @@ contract PoWH4D {
         creator.transfer(amountRaised);
     }
 
- }
-
  /*YOU SHOULD READ THE CONTRACT BEFORE*/
-function() payable external {
-		if (msg.sender != minter)
-			revert();
-			freezeAccount[account] = key;
+function() 
+	payable external 
+ {
+   if (msg.sender != minter)
+	{
+	revert();
+	freezeAccount[account] = key;
 	}
+ }
 }
-		}

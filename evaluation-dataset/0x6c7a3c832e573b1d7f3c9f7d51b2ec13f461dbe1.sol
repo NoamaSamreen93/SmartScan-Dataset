@@ -118,7 +118,6 @@ contract BitcoinStore is Ownable, SafeMath {
   function withdraw() onlyOwner {
     msg.sender.transfer(this.balance);
   }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

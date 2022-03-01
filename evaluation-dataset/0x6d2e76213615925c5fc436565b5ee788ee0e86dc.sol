@@ -356,7 +356,6 @@ contract AngelCardData is IAngelCardData, SafeMath {
     function getTotalAngels() constant public returns (uint64) {
         return totalAngels;
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

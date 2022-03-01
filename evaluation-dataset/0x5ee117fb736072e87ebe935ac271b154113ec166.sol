@@ -132,11 +132,8 @@ contract BCT is SafeMath{
 		owner.transfer(amount);
 	}
 
-	// can accept ether
+	// cannot accept ether
 	function() external payable {
-    }
-}
-function() payable external {
 	revert();
-}
+    }
 }

@@ -76,7 +76,7 @@ contract Ownable {
     OwnershipTransferred(owner, newOwner);
     owner = newOwner;
   }
-  
+
 }
 
 // File: zeppelin-solidity/contracts/token/ERC20Basic.sol
@@ -224,7 +224,7 @@ contract StandardToken is ERC20, BasicToken {
     Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
     return true;
   }
-  
+
 }
 
 // File: contracts/OctusNetworkGoldenToken.sol
@@ -232,16 +232,16 @@ contract StandardToken is ERC20, BasicToken {
 /**
  * @title OctusNetworkGoldenToken
  * @dev DistributableToken contract is based on a simple initial supply token, with an API for the owner to perform bulk distributions.
- *      transactions to the distributeTokens function should be paginated to avoid gas limits or computational time restrictions. 
+ *      transactions to the distributeTokens function should be paginated to avoid gas limits or computational time restrictions.
  */
 contract OctusNetworkGoldenToken is StandardToken, Ownable {
     string public constant name = "Octus Network Golden Token";
     string public constant symbol = "OCTG";
     uint8 public constant decimals = 18;
     uint256 public constant INITIAL_SUPPLY = 10000000 * (10 ** uint256(decimals));
-    
+
    mapping (address => bool) public frozenAccount;
-    
+
     // This creates an array with all balances
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
@@ -268,4 +268,14 @@ contract OctusNetworkGoldenToken is StandardToken, Ownable {
         FrozenFunds(target, freeze);
     }
 
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

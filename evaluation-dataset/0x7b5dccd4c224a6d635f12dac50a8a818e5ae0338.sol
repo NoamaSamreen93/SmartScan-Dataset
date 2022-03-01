@@ -104,7 +104,6 @@ contract SNcoin_Sale is Owned {
     }
 
     event ClaimedTokens(address indexed _token, address indexed _controller, uint _amount);
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

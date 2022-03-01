@@ -188,7 +188,3 @@ contract MidasToken is ERC20Interface, Owned {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
 }
-function() payable external {
-	revert();
-}
-}

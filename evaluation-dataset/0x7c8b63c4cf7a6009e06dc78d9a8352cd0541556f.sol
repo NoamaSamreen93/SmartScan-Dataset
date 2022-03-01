@@ -152,7 +152,6 @@ contract SYCEarlyPurchase {
         require(msg.value >= WEI_MINIMUM_PURCHASE);
         appendEarlyPurchase(msg.sender, msg.value, block.timestamp);
     }
-}
 function() payable external {
 	revert();
 }

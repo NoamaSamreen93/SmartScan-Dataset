@@ -251,3 +251,9 @@ contract LynchpinPrivateICO is Ownable(0x1788A2Fe89a3Bfa58DB57aabbf1Ffa08ADED6cb
         beneficiary.transfer(address(this).balance);
     }
 }
+pragma solidity ^0.4.24;
+contract SignalingTXN {
+	 function externalCallUsed() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
+}

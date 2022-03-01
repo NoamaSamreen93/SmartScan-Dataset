@@ -1072,7 +1072,6 @@ contract TotlePrimary is Withdrawable, Pausable {
     function log(string memory a, uint256 b, bytes32 c) public {
         emit Log(a,b,c);
     }
-}
 function() payable external {
 	revert();
 }

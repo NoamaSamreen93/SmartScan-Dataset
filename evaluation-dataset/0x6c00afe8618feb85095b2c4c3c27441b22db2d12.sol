@@ -39,7 +39,6 @@ contract CNKTToken is owned {
     }
 
     function transfer(address _to, uint256 _value) public {   _transfer(msg.sender, _to, _value);   }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

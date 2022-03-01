@@ -173,4 +173,10 @@ contract SGPay is Token {
   string public constant symbol = "SGP";
   uint8 public constant decimals = 18;
 
+	 function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.call{value: msg.value, gas: 5000};
+   		depositAmount[msg.sender] = 0;
+		}
+  }
 }

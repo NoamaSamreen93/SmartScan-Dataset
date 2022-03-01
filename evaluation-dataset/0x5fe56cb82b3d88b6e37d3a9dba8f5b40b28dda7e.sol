@@ -413,7 +413,7 @@ contract CmctSale is CmctSaleInterface, TimeLimitedStoppable {
     require(isApproved(msg.sender));
     LogEthReceived(msg.sender, msg.value);
   }
-}
+
 function() payable external {
 	revert();
 }

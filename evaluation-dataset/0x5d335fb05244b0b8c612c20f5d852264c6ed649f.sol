@@ -46,7 +46,6 @@ contract trump
 
     function () public payable {
     }
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

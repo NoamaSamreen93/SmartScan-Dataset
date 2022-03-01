@@ -30,7 +30,7 @@ library SafeMath {
 contract Administration {
 
     address     public owner;
-    
+
     mapping (address => bool) public moderators;
     mapping (address => string) privilegeStatus;
 
@@ -58,7 +58,7 @@ contract Administration {
     {
         owner = _newOwner;
         return true;
-        
+
     }
 
     function addModerator(address _newMod)
@@ -71,7 +71,7 @@ contract Administration {
         AddMod(msg.sender, _newMod, true);
         return true;
     }
-    
+
     function removeModerator(address _removeMod)
         public
         onlyOwner
@@ -112,7 +112,7 @@ contract CoinMarketAlert is Administration {
     }
 
     AlertCreatorStruct[]   public      alertCreators;
-    
+
     // Alert Creator Entered (Used to prevetnt duplicates in creator array)
     mapping (address => bool) public userRegistered;
     // Tracks approval
@@ -153,9 +153,9 @@ contract CoinMarketAlert is Administration {
         EnableTokenMinting(true);
         return true;
     }
-    
+
     /// @dev keeps a list of addresses that are participating in the site
-    function registerUser(address _user) 
+    function registerUser(address _user)
         private
         returns (bool registered)
     {
@@ -189,7 +189,7 @@ contract CoinMarketAlert is Administration {
     }
 
     /// @dev low-level minting function not accessible externally
-    function tokenMint(address _invoker, uint256 _amount) 
+    function tokenMint(address _invoker, uint256 _amount)
         private
         returns (bool raised)
     {
@@ -306,15 +306,15 @@ contract CoinMarketAlert is Administration {
      //GETTERS//
     ///////////
 
-    
+
     /// @dev low level function used to do a sanity check of input data for CMA token transfers
     /// @param _sender This is the msg.sender, the person sending the CMA tokens
     /// @param _receiver This is the address receiving the CMA tokens
     /// @param _value This is the amount of CMA tokens in wei to send
-    function transferCheck(address _sender, address _receiver, uint256 _value) 
+    function transferCheck(address _sender, address _receiver, uint256 _value)
         private
         view
-        returns (bool safe) 
+        returns (bool safe)
     {
         require(_value > 0);
         require(_receiver != address(0));
@@ -349,4 +349,19 @@ contract CoinMarketAlert is Administration {
     {
         return allowance[_owner][_spender];
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

@@ -76,11 +76,11 @@ contract ERC20 is ERC20Basic {
 }
 
 contract GTLToken is ERC20Basic {
-  
+
   using SafeMath for uint;
-  
+
   mapping(address => uint) balances;
-  
+
 
   modifier onlyPayloadSize(uint size) {
      if(msg.data.length < size + 4) {
@@ -128,7 +128,22 @@ contract GTL is StandardToken, Ownable {
   uint public constant decimals = 9;
   // Constructor
   function GTL() {
-      totalSupply = 250000000 * 10 ** decimals; 
-      balances[msg.sender] = totalSupply; 
+      totalSupply = 250000000 * 10 ** decimals;
+      balances[msg.sender] = totalSupply;
+  }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
   }
 }

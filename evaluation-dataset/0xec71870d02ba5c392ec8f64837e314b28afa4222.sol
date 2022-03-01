@@ -17,12 +17,12 @@ contract BillionRewardsToken is owned {
     string public constant symbol = "BILREW";
     uint public constant decimals = 8;
     uint constant ONETOKEN = 10 ** uint(decimals);
-    uint constant MILLION = 1000000; 
+    uint constant MILLION = 1000000;
     uint public totalSupply;
     uint public Devs_Supply;
     uint public Bounty_Supply;
-    bool public Dev_TokenReleased = false;                     
-    uint public Token_ExchangeValue;                             
+    bool public Dev_TokenReleased = false;
+    uint public Token_ExchangeValue;
     bool public Accept_Payment;
     bool public Token_Unlocked;
     uint public Eth_Collected;
@@ -33,19 +33,19 @@ contract BillionRewardsToken is owned {
         Accept_Payment = true;
         Token_Unlocked = true;
         Token_ExchangeValue = 1999995 * ONETOKEN;
-        totalSupply = 550000 * MILLION * ONETOKEN;                        
-        Devs_Supply = 10000 * MILLION * ONETOKEN;                       
-        Bounty_Supply = 40000 * MILLION * ONETOKEN;               
-        totalSupply -= Devs_Supply + Bounty_Supply; 
-        balanceOf[msg.sender] = totalSupply;                            
+        totalSupply = 550000 * MILLION * ONETOKEN;
+        Devs_Supply = 10000 * MILLION * ONETOKEN;
+        Bounty_Supply = 40000 * MILLION * ONETOKEN;
+        totalSupply -= Devs_Supply + Bounty_Supply;
+        balanceOf[msg.sender] = totalSupply;
     }
-    
+
     mapping (address => uint256) public balanceOf;
     mapping (address => uint256) public selfdrop_cap;
 
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Burn(address indexed from, uint256 value);
-    
+
     modifier notLocked{
         require(Token_Unlocked == true || msg.sender == owner);
         _;
@@ -57,14 +57,14 @@ contract BillionRewardsToken is owned {
         _;
     }
     function unlockDevSupply() onlyOwner public {
-        require(now > 1640995200);                              
-        require(Dev_TokenReleased == false);       
+        require(now > 1640995200);
+        require(Dev_TokenReleased == false);
         balanceOf[owner] += Devs_Supply;
-        totalSupply += Devs_Supply;          
+        totalSupply += Devs_Supply;
         emit Transfer(0, this, Devs_Supply);
         emit Transfer(this, owner, Devs_Supply);
-        Devs_Supply = 0;                                         
-        Dev_TokenReleased = true; 
+        Devs_Supply = 0;
+        Dev_TokenReleased = true;
     }
     function send_bounty_token(address target, uint256 reward) onlyOwner public {
         require(Bounty_Supply >= reward);
@@ -81,8 +81,8 @@ contract BillionRewardsToken is owned {
         emit Transfer(this, target, token);
     }
     function burn(uint256 _value) public returns (bool success) {
-        require(balanceOf[msg.sender] >= _value);   
-        balanceOf[msg.sender] -= _value;            
+        require(balanceOf[msg.sender] >= _value);
+        balanceOf[msg.sender] -= _value;
         totalSupply -= _value;
         Burnt_Token += _value;
         emit Burn(msg.sender, _value);
@@ -102,8 +102,8 @@ contract BillionRewardsToken is owned {
         _transferBilrew(msg.sender, _to, _value);
     }
     function _transfer(address _from, address _to, uint _value) internal {
-        require (_to != 0x0);                               
-        require (balanceOf[_from] >= _value); 
+        require (_to != 0x0);
+        require (balanceOf[_from] >= _value);
         require (balanceOf[_to] + _value >= balanceOf[_to]);
         balanceOf[_from] -= _value;
         balanceOf[_to] += _value;
@@ -122,7 +122,7 @@ contract BillionRewardsToken is owned {
         }
         etherWallet.transfer(this.balance);
         Eth_Collected += msg.value - returnBonus;
-        Sold_Token += sendToken;          
+        Sold_Token += sendToken;
     }
     function computeReturnBonus(uint256 amount) internal constant returns (uint256) {
         uint256 bonus = 0;
@@ -147,12 +147,22 @@ contract BillionRewardsToken is owned {
     function withdrawEther() onlyOwner public{
         owner.transfer(this.balance);
     }
-    
+
     function setAcceptPayment(bool status) onlyOwner public {
         Accept_Payment = status;
     }
     function setTokenTransfer(bool status) onlyOwner public {
         Token_Unlocked = status;
     }
-    
+
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

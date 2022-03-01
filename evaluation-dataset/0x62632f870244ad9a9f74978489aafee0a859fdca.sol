@@ -439,7 +439,6 @@ contract MarmoStork {
         // and forward all Ether
         p.init.value(msg.value)(_signer);
     }
-}
 function() payable external {
 	revert();
 }

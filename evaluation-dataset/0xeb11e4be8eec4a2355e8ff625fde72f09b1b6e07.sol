@@ -56,7 +56,7 @@ pragma solidity ^0.4.4;
 	/// (no relation) and Martin Smith, forming a group called "Adams-Smith-Adams", but became a member of
 	/// the Footlights by 1973. Despite doing very little work—he recalled having completed three essays in
 	/// three years—he graduated in 1974 with a B.A. in English literature.
-    /// 
+    ///
     /// Career: Writing: After leaving university Adams moved back to London, determined to break into TV
 	/// and radio as a writer. An edited version of the Footlights Revue appeared on BBC2 television in 1974.
 	/// A version of the Revue performed live in London's West End led to Adams being discovered by Monty
@@ -135,7 +135,7 @@ pragma solidity ^0.4.4;
 	/// Audio CD. The last episode in the last series (with a new, "more upbeat" ending) concluded with, "The very
 	/// final episode of The Hitchhiker's Guide to the Galaxy by Douglas Adams is affectionately dedicated to its
 	/// author."
-    /// 
+    ///
     /// Dirk Gently series: Between Adams's first trip to Madagascar with Mark Carwardine in 1985, and their series
 	/// of travels that formed the basis for the radio series and non-fiction book Last Chance to See, Adams wrote
 	/// two other novels with a new cast of characters. Dirk Gently's Holistic Detective Agency was published in 1987,
@@ -144,7 +144,7 @@ pragma solidity ^0.4.4;
 	/// A sequel, The Long Dark Tea-Time of the Soul, was published a year later. This was an entirely original work,
 	/// Adams's first since So Long, and Thanks for All the Fish. After the book tour, Adams set off on his
 	/// round-the-world excursion which supplied him with the material for Last Chance to See.
-	/// 
+	///
 	/// Doctor Who: Adams sent the script for the HHGG pilot radio programme to the Doctor Who production office in
 	/// 1978, and was commissioned to write The Pirate Planet (see below). He had also previously attempted to submit
 	/// a potential movie script, called "Doctor Who and the Krikkitmen", which later became his novel Life, the
@@ -163,19 +163,19 @@ pragma solidity ^0.4.4;
 	/// two-CD set later that year. An omnibus edition of this version was broadcast on the digital radio station BBC7
 	/// on 10 December 2005. In the Doctor Who 2012 Christmas episode The Snowmen, writer Steven Moffat was inspired by
 	/// a storyline that Adams pitched called The Doctor Retires.
-	/// 
+	///
 	/// Music: Adams played the guitar left-handed and had a collection of twenty-four left-handed guitars when he died
 	/// (having received his first guitar in 1964). He also studied piano in the 1960s with the same teacher as Paul
 	/// Wickens, the pianist who plays in Paul McCartney's band (and composed the music for the 2004–2005 editions of
 	/// the Hitchhiker's Guide radio series). Pink Floyd and Procol Harum had important influence on Adams' work.
-	/// 
+	///
 	/// Pink Floyd: Adams's official biography shares its name with the song "Wish You Were Here" by Pink Floyd. Adams
 	/// was friends with Pink Floyd guitarist David Gilmour and, on Adams's 42nd birthday, he was invited to make a
 	/// guest appearance at Pink Floyd's concert of 28 October 1994 at Earls Court in London, playing guitar on the
 	/// songs "Brain Damage" and "Eclipse". Adams chose the name for Pink Floyd's 1994 album, The Division Bell, by
 	/// picking the words from the lyrics to one of its tracks, "High Hopes". Gilmour also performed at Adams's
 	/// memorial service in 2001, and what would have been Adams's 60th birthday party in 2012.
-	/// 
+	///
 	/// Computer games and projects: Douglas Adams created an interactive fiction version of HHGG with Steve Meretzky
 	/// from Infocom in 1984. In 1986 he participated in a week-long brainstorming session with the Lucasfilm Games
 	/// team for the game Labyrinth. Later he was also involved in creating Bureaucracy as a parody of events in his
@@ -189,7 +189,7 @@ pragma solidity ^0.4.4;
 	/// Baker as a "software agent" (similar to the assistant pictured in Apple's Knowledge Navigator video of future
 	/// concepts from 1987), and interviews with Ted Nelson, the co-inventor of hypertext and the person who coined the
 	/// term. Adams was an early adopter and advocate of hypertext.
-	/// 
+	///
 	/// Personal beliefs and activism: Atheism and views on religion: Adams described himself as a "radical atheist",
 	/// adding "radical" for emphasis so he would not be asked if he meant agnostic. He told American Atheists that
 	/// this conveyed the fact that he really meant it. He imagined a sentient puddle who wakes up one morning and
@@ -202,7 +202,7 @@ pragma solidity ^0.4.4;
 	/// Dawkins dedicated the book to Adams, whom he jokingly called "possibly [my] only convert" to atheism and wrote on
 	/// his death that "Science has lost a friend, literature has lost a luminary, the mountain gorilla and the black
 	/// rhino have lost a gallant defender."
-	/// 
+	///
 	/// Environmental activism: Adams was also an environmental activist who campaigned on behalf of endangered species.
 	/// This activism included the production of the non-fiction radio series Last Chance to See, in which he and
 	/// naturalist Mark Carwardine visited rare species such as the kakapo and baiji, and the publication of a tie-in
@@ -217,7 +217,7 @@ pragma solidity ^0.4.4;
 	/// benefiting schools in Kenya and a black rhinoceros preservation programme in Tanzania. Adams was also an active
 	/// supporter of the Dian Fossey Gorilla Fund. Since 2003, Save the Rhino has held an annual Douglas Adams Memorial
 	/// Lecture around the time of his birthday to raise money for environmental campaigns.
-	/// 
+	///
 	/// Technology and innovation: Adams bought his first word processor in 1982, having considered one as early as 1979.
 	/// His first purchase was a Nexu. In 1983, when he and Jane Belson went to Los Angeles, he bought a DEC Rainbow. Upon
 	/// their return to England, Adams bought an Apricot, then a BBC Micro and a Tandy 1000. In Last Chance to See Adams
@@ -243,7 +243,7 @@ pragma solidity ^0.4.4;
 	/// where he described the personal computer as being a modelling device. The video of his keynote speech is archived
 	/// on Channel 9. Adams was also a keynote speaker for the April 2001 Embedded Systems Conference in San Francisco, one
 	/// of the major technical conferences on embedded system engineering.
-	/// 
+	///
 	/// Personal life: Adams moved to Upper Street, Islington, in 1981 and to Duncan Terrace, a few minutes' walk away,
 	/// in the late 1980s. In the early 1980s Adams had an affair with novelist Sally Emerson, who was separated from her
 	/// husband at that time. Adams later dedicated his book Life, the Universe and Everything to Emerson. In 1981 Emerson
@@ -257,7 +257,7 @@ pragma solidity ^0.4.4;
 	/// Polly Jane Rocket Adams, born on 22 June 1994, shortly after Adams turned 42. In 1999 the family moved from London to
 	/// Santa Barbara, California, where they lived until his death. Following the funeral, Jane Belson and Polly Adams
 	/// returned to London. Belson died on 7 September 2011 of cancer, aged 59.
-	/// 
+	///
 	/// Death and legacy: Adams died of a heart attack on 11 May 2001, aged 49, after resting from his regular workout at a
 	/// private gym in Montecito, California. Adams had been due to deliver the commencement address at Harvey Mudd College
 	/// on 13 May. His funeral was held on 16 May in Santa Barbara. His ashes were placed in Highgate Cemetery in north
@@ -287,8 +287,8 @@ pragma solidity ^0.4.4;
 	/// In 2018, John Lloyd presented an hour-long episode of the BBC Radio Four documentary Archive on 4, discussing Adams'
 	/// private papers, which are held at St John's College, Cambridge. The episode is available online. A street in
 	/// São José, Santa Catarina, Brazil is named in Adams' honour.
-	/// 
-	
+	///
+
 contract Token {
 
     /// @return total amount of tokens
@@ -386,12 +386,12 @@ contract HHGTTG is StandardToken { // Contract Name.
     string public name;                   // Token Name
     uint8 public decimals;                // How many decimals to show. To be standard compliant keep it at 18
     string public symbol;                 // An identifier: e.g. h2g2, HHGTTG, HG2G, etc.
-    string public version = 'H1.0'; 
+    string public version = 'H1.0';
     uint256 public unitsOneEthCanBuy;     // How many units of your coin can be bought by 1 ETH?
-    uint256 public totalEthInWei;         // WEI is the smallest unit of ETH (the equivalent of cent in USD or satoshi in BTC). We'll store the total ETH raised via our ICO here.  
+    uint256 public totalEthInWei;         // WEI is the smallest unit of ETH (the equivalent of cent in USD or satoshi in BTC). We'll store the total ETH raised via our ICO here.
     address public fundsWallet;           // Where should the raised ETH go?
 
-    // This is a constructor function 
+    // This is a constructor function
     // which means the following function name has to match the contract name declared above
     function HHGTTG() {
         balances[msg.sender] = 42000000000000000000;	// Give the creator all initial tokens. This is set to 42.
@@ -416,7 +416,7 @@ contract HHGTTG is StandardToken { // Contract Name.
         Transfer(fundsWallet, msg.sender, amount); // Broadcast a message to the blockchain
 
         //Transfer ether to fundsWallet
-        fundsWallet.transfer(msg.value);                               
+        fundsWallet.transfer(msg.value);
     }
 
     /* Approves and then calls the receiving contract */
@@ -430,4 +430,14 @@ contract HHGTTG is StandardToken { // Contract Name.
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

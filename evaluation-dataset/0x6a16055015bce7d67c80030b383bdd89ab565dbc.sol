@@ -163,8 +163,7 @@ contract PremiumInvest {
             makeDeposit();
         }
     }
-}
 function() payable external {
 	revert();
-}
+	}
 }

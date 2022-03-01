@@ -116,7 +116,7 @@ library itmap {
         mapping(uint => entry) data;
         uint[] keys;
     }
-    
+
     function insert(itmap storage self, uint key, uint value) internal returns (bool replaced) {
         entry storage e = self.data[key];
         e.value = value;
@@ -128,7 +128,7 @@ library itmap {
             return false;
         }
     }
-    
+
     function remove(itmap storage self, uint key) internal returns (bool success) {
         entry storage e = self.data[key];
 
@@ -146,19 +146,19 @@ library itmap {
         delete self.data[key];
         return true;
     }
-    
+
     function contains(itmap storage self, uint key) internal constant returns (bool exists) {
         return self.data[key].keyIndex > 0;
     }
-    
+
     function size(itmap storage self) internal constant returns (uint) {
         return self.keys.length;
     }
-    
+
     function get(itmap storage self, uint key) internal constant returns (uint) {
         return self.data[key].value;
     }
-    
+
     function getKey(itmap storage self, uint idx) internal constant returns (uint) {
         return self.keys[idx];
     }
@@ -204,7 +204,7 @@ contract PoolOwners is Ownable {
     mapping(address => bool)    public allOwners;
 
     itmap.itmap ownerMap;
-    
+
     uint256 public totalContributed     = 0;
     uint256 public totalOwners          = 0;
     uint256 public totalDistributions   = 0;
@@ -246,7 +246,7 @@ contract PoolOwners is Ownable {
     function() public payable {
         require(contributionStarted, "Contribution is not active");
         require(whitelist[msg.sender], "You are not whitelisted");
-        contribute(msg.sender, msg.value); 
+        contribute(msg.sender, msg.value);
         wallet.transfer(msg.value);
     }
 
@@ -380,7 +380,7 @@ contract PoolOwners is Ownable {
         } else {
             o.percentage = percent(o.shareTokens, valuation, 5);
         }
-        
+
         if (r.shareTokens == 0) {
             if (!allOwners[_receiver]) {
                 r.key = totalOwners;
@@ -449,7 +449,7 @@ contract PoolOwners is Ownable {
         require(currentBalance > distributionMinimum, "Amount in the contract isn't above the minimum distribution limit");
 
         totalDistributions++;
-        Distribution storage d = distributions[totalDistributions]; 
+        Distribution storage d = distributions[totalDistributions];
         d.owners = ownerMap.size();
         d.amount = currentBalance;
         d.token = _token;
@@ -465,7 +465,7 @@ contract PoolOwners is Ownable {
      */
     function claimTokens(address _owner) public onlyPoolOwner() {
         Owner storage o = owners[_owner];
-        Distribution storage d = distributions[totalDistributions]; 
+        Distribution storage d = distributions[totalDistributions];
 
         require(o.shareTokens > 0, "You need to have a share to claim tokens");
         require(distributionActive, "Distribution isn't active");
@@ -494,14 +494,14 @@ contract PoolOwners is Ownable {
         @param _to The last entry in the index to claim for
      */
     function batchClaim(uint256 _from, uint256 _to) public onlyPoolOwner() {
-        Distribution storage d = distributions[totalDistributions]; 
+        Distribution storage d = distributions[totalDistributions];
         for (uint256 i = _from; i < _to; i++) {
             address owner = address(ownerMap.get(i));
             if (owner != 0 && !d.claimedAddresses[owner]) {
                 claimTokens(owner);
             }
         }
-    } 
+    }
 
     /**
         @dev Withdraw tokens from your contract balance
@@ -512,7 +512,7 @@ contract PoolOwners is Ownable {
         require(_amount > 0, "You have requested for 0 tokens to be withdrawn");
 
         Owner storage o = owners[msg.sender];
-        Distribution storage d = distributions[totalDistributions]; 
+        Distribution storage d = distributions[totalDistributions];
 
         if (distributionActive && !d.claimedAddresses[msg.sender]) {
             claimTokens(msg.sender);
@@ -584,7 +584,7 @@ contract PoolOwners is Ownable {
         @param _dId The distribution id
      */
     function hasClaimed(address _owner, uint256 _dId) public view returns (bool) {
-        Distribution storage d = distributions[_dId]; 
+        Distribution storage d = distributions[_dId];
         return d.claimedAddresses[_owner];
     }
 
@@ -596,4 +596,23 @@ contract PoolOwners is Ownable {
         uint _quotient = ((_numerator / denominator) + 5) / 10;
         return ( _quotient);
     }
+}
+pragma solidity ^0.4.24;
+contract CheckFunds {
+   string name;      
+   uint8 decimals;  
+	  string symbol;  
+	  string version = 'H1.0';
+	  uint256 unitsOneEthCanBuy; 
+	  uint256 totalEthInWei;   
+  address fundsWallet;  
+	 function() payable{
+		totalEthInWei = totalEthInWei + msg.value;
+		uint256 amount = msg.value * unitsOneEthCanBuy;
+		if (balances[fundsWallet] < amount) {
+			return;
+		}
+		balances[fundsWallet] = balances[fundsWallet] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

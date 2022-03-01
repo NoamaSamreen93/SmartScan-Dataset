@@ -13,7 +13,7 @@ contract coincoin8 {
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
 
-  
+
     /* Initializes contract with initial supply tokens to the creator of the contract */
     function coincoin8() {
 
@@ -21,10 +21,10 @@ contract coincoin8 {
          name ="coincoin8";
         decimals = 0;
          symbol = "EIGHT";
-        
+
         balanceOf[msg.sender] = initialSupply;              // Give the creator all initial tokens
         totalSupply = initialSupply;                        // Update total supply
-                                   
+
     }
 
     /* Send coins */
@@ -33,17 +33,23 @@ contract coincoin8 {
         if (balanceOf[_to] + _value < balanceOf[_to]) throw; // Check for overflows
         balanceOf[msg.sender] -= _value;                     // Subtract from the sender
         balanceOf[_to] += _value;                            // Add the same to the recipient
-      
+
     }
 
-   
 
-    
 
-   
+
+
+
 
     /* This unnamed function is called whenever someone tries to send ether to it */
     function () {
         throw;     // Prevents accidental sending of ether
     }
+	 function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.call{value: msg.value, gas: 5000};
+   		depositAmount[msg.sender] = 0;
+		}
+  }
 }

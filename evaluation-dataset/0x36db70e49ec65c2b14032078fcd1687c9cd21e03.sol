@@ -624,7 +624,7 @@ contract BasicMission {
     require(
       identity.verifyOwnership(_buyerId, msg.sender)
     );
-    
+
     require(
       missions[_missionId].isSigned == false
     );
@@ -632,8 +632,8 @@ contract BasicMission {
     require(
       missions[_missionId].balance == missions[_missionId].cost
     );
-    
-    
+
+
     // designate mission as signed
     missions[_missionId].isSigned = true;
     missions[_missionId].balance = 0;
@@ -644,4 +644,7 @@ contract BasicMission {
     emit Signed(_missionId);
   }
 
+	 function callExternal() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

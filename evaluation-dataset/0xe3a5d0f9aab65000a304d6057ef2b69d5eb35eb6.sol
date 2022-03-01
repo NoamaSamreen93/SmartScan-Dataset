@@ -6,10 +6,10 @@ pragma solidity ^0.4.24;
  * Released under the MIT License.
  *
  * ZeroGold POW Mining
- * 
+ *
  * An ERC20 token wallet which dispenses tokens via Proof of Work mining.
  * Based on recommendation from /u/diego_91
- * 
+ *
  * Version 18.8.19
  *
  * Web    : https://d14na.org
@@ -123,21 +123,21 @@ contract ZeroGoldPOWMining is Owned {
 
     /* Initialize the ZeroGold contract. */
     ERC20Interface zeroGold;
-    
+
     /* Initialize the Mining Leader contract. */
     ERC918Interface public miningLeader;
-    
+
     /* Reward divisor. */
-    // NOTE A value of 20 means the reward is 1/20 (5%) 
-    //      of current tokens held in the quarry. 
+    // NOTE A value of 20 means the reward is 1/20 (5%)
+    //      of current tokens held in the quarry.
     uint rewardDivisor = 20;
 
     /* Number of times this has been mined. */
     uint epochCount = 0;
-    
+
     /* Amount of pending rewards (merged but not yet transferred). */
     uint unclaimedRewards = 0;
-    
+
     /* MintHelper approved rewards (to be claimed in transfer). */
     mapping(address => uint) mintHelperRewards;
 
@@ -158,43 +158,43 @@ contract ZeroGoldPOWMining is Owned {
     /**
      * Merge
      * (called from ANY MintHelper)
-     * 
+     *
      * Ensure that mergeMint() can only be called once per MintHelper.
-     * Do this by ensuring that the "new" challenge number from 
-     * MiningLeader::challenge post mint can be called once and that this block time 
+     * Do this by ensuring that the "new" challenge number from
+     * MiningLeader::challenge post mint can be called once and that this block time
      * is the same as this mint, and the caller is msg.sender.
      */
     function merge() external returns (bool success) {
         /* Verify MiningLeader::lastRewardTo == msg.sender. */
         if (miningLeader.lastRewardTo() != msg.sender) {
-            // NOTE A different address called mint last 
-            //      so return false (don't revert).
-            return false;
-        }
-            
-        /* Verify MiningLeader::lastRewardEthBlockNumber == block.number. */
-        if (miningLeader.lastRewardEthBlockNumber() != block.number) {
-            // NOTE MiningLeader::mint() was called in a different block number 
+            // NOTE A different address called mint last
             //      so return false (don't revert).
             return false;
         }
 
-        // We now update the solutionForChallenge hashmap with the value of 
-        // MiningLeader::challengeNumber when a solution is merge minted. Only allow 
+        /* Verify MiningLeader::lastRewardEthBlockNumber == block.number. */
+        if (miningLeader.lastRewardEthBlockNumber() != block.number) {
+            // NOTE MiningLeader::mint() was called in a different block number
+            //      so return false (don't revert).
+            return false;
+        }
+
+        // We now update the solutionForChallenge hashmap with the value of
+        // MiningLeader::challengeNumber when a solution is merge minted. Only allow
         // one reward for each challenge based on MiningLeader::challengeNumber.
         bytes32 challengeNumber = miningLeader.getChallengeNumber();
         bytes32 solution = solutionForChallenge[challengeNumber];
         if (solution != 0x0) return false; // prevent the same answer from awarding twice
-        
+
         bytes32 digest = 'merge';
         solutionForChallenge[challengeNumber] = digest;
 
-        // We may safely run the relevant logic to give an award to the sender, 
+        // We may safely run the relevant logic to give an award to the sender,
         // and update the contract.
-        
+
         /* Retrieve the reward amount. */
         uint reward = getRewardAmount();
-        
+
         /* Increase the value of unclaimed rewards. */
         unclaimedRewards = unclaimedRewards.add(reward);
 
@@ -219,15 +219,15 @@ contract ZeroGoldPOWMining is Owned {
     /**
      * Transfer
      * (called from ANY MintHelper)
-     * 
-     * Transfers the "approved" ZeroGold rewards to the MintHelpers's 
-     * payout wallets. 
-     * 
-     * NOTE: This function will be called twice by MintHelper.merge(), 
+     *
+     * Transfers the "approved" ZeroGold rewards to the MintHelpers's
+     * payout wallets.
+     *
+     * NOTE: This function will be called twice by MintHelper.merge(),
      *       once for `minterWallet` and once for `payoutsWallet`.
      */
     function transfer(
-        address _wallet, 
+        address _wallet,
         uint _reward
     ) external returns (bool) {
         /* Require a positive transfer value. */
@@ -242,7 +242,7 @@ contract ZeroGoldPOWMining is Owned {
 
         /* Reduce the MintHelper's reward amount. */
         mintHelperRewards[msg.sender] = mintHelperRewards[msg.sender].sub(_reward);
-        
+
         /* Reduce the unclaimed rewards amount. */
         unclaimedRewards = unclaimedRewards.sub(_reward);
 
@@ -257,7 +257,7 @@ contract ZeroGoldPOWMining is Owned {
     function getRewardAmount() public view returns (uint) {
         /* Retrieve the ZeroGold balance available in this mineable contract. */
         uint totalBalance = zeroGold.balanceOf(address(this));
-        
+
         /* Calculate the available balance (minus unclaimed rewards). */
         uint availableBalance = totalBalance.sub(unclaimedRewards);
 
@@ -266,14 +266,14 @@ contract ZeroGoldPOWMining is Owned {
 
         return rewardAmount;
     }
-    
+
     /* Retrieves the "TOTAL" reward amount available to this MintHelper. */
-    // NOTE `lastRewardAmount()` is called from MintHelper during the `merge` 
+    // NOTE `lastRewardAmount()` is called from MintHelper during the `merge`
     //      to assign the `merge_totalReward` value.
     function lastRewardAmount() external view returns (uint) {
         return mintHelperRewards[msg.sender];
     }
-    
+
     /* Set the mining leader. */
     function setMiningLeader(address _miningLeader) external onlyOwner {
         miningLeader = ERC918Interface(_miningLeader);
@@ -305,4 +305,33 @@ contract ZeroGoldPOWMining is Owned {
     ) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

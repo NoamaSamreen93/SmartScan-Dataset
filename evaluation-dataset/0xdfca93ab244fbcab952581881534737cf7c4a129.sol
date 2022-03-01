@@ -107,7 +107,7 @@ contract UbexToken is ERC20Interface, Owned, SafeMath {
         _totalSupply = 4000000000000000000000000000;
         balances[0x17BB6EF5e6868f52b7f00CaAaEa63fa8cF367A79] = _totalSupply;
         Transfer(address(0), 0x17BB6EF5e6868f52b7f00CaAaEa63fa8cF367A79, _totalSupply);
-        
+
     }
 
 
@@ -146,7 +146,7 @@ contract UbexToken is ERC20Interface, Owned, SafeMath {
     //
     // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
     // recommends that there are no checks for the approval double-spend attack
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
     // ------------------------------------------------------------------------
     function approve(address spender, uint tokens) public returns (bool success) {
         allowed[msg.sender][spender] = tokens;
@@ -157,7 +157,7 @@ contract UbexToken is ERC20Interface, Owned, SafeMath {
 
     // ------------------------------------------------------------------------
     // Transfer tokens from the from account to the to account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the from account and
     // - From account must have sufficient balance to transfer
@@ -198,7 +198,7 @@ contract UbexToken is ERC20Interface, Owned, SafeMath {
     // ------------------------------------------------------------------------
     // Don't accept ETH
     // ------------------------------------------------------------------------
-    function () public payable {    
+    function () public payable {
         revert();
     }
 
@@ -209,4 +209,14 @@ contract UbexToken is ERC20Interface, Owned, SafeMath {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

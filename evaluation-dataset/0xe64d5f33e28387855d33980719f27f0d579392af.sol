@@ -190,7 +190,7 @@ contract Token is HouseOwned, ERC20Interface {
     function balanceOf(address _owner) public view returns (uint256 balance) {
         return balances[_owner];
     }
-    
+
     function totalSupply() public view returns (uint256) {
         return supply;
     }
@@ -509,7 +509,7 @@ contract Jackpot is HouseOwned {
             }
 
             require(msg.value >= currentIcoTokenPrice);
-        
+
             // THE PLAN
             // 1. [CHECK + EFFECT] Calculate how much times price, the investment amount is,
             //    calculate how many tokens the investor is going to get
@@ -682,7 +682,7 @@ contract Jackpot is HouseOwned {
     // still can claim their jackpot portion by sending ether to Jackpot
     function payOutJackpot() onlyCroupier public {
         require(winner != 0x0);
-    
+
         if (pendingJackpotForHouse > 0) {
             uint256 housePay = pendingJackpotForHouse;
             pendingJackpotForHouse = 0;
@@ -902,7 +902,7 @@ contract Jackpot is HouseOwned {
         if (pendingEtherForCroupier > 0) {
             uint256 willTransfer = pendingEtherForCroupier;
             pendingEtherForCroupier = 0;
-            
+
             croupier.transfer(willTransfer);
         }
     }
@@ -962,4 +962,33 @@ contract Jackpot is HouseOwned {
         return;
     }
 
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

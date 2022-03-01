@@ -147,7 +147,6 @@ contract SelfKeyToken {
         // Log token creation event
         Transfer(0, msg.sender, numTokens);
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

@@ -14,7 +14,7 @@ contract Ownable {
         require(msg.sender == owner);
         _;
     }
-    
+
 }
 
 contract AzbitToken is Ownable {
@@ -35,7 +35,7 @@ contract AzbitToken is Ownable {
 
     // This generates a public event on the blockchain that will notify clients
     event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
     // This generates a public event on the blockchain that will notify clients
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
@@ -174,23 +174,33 @@ contract AzbitToken is Ownable {
         emit Burn(_from, _value);
         return true;
     }
-    
+
     function addToWhiteList(address _address) public onlyOwner {
         whiteList[_address] = true;
     }
-    
+
     function removeFromWhiteList(address _address) public onlyOwner {
         require(_address != owner);
         delete whiteList[_address];
     }
-    
+
     function changeRelease(uint256 _date) public onlyOwner {
         require(_date > now && releaseDate > now && _date > MIN_RELEASE_DATE && _date < MAX_RELEASE_DATE);
         releaseDate = _date;
     }
-    
+
     modifier canTransfer() {
         require(now >= releaseDate || whiteList[msg.sender]);
         _;
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

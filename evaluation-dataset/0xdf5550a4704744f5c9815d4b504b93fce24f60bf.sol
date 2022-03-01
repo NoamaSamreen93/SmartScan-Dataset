@@ -671,7 +671,7 @@ contract ERC20Capped is ERC20Mintable {
     * @return the total minted
     */
     function minted() public view returns(uint256) {
-        return _totalMinted;    
+        return _totalMinted;
     }
 
     /**
@@ -695,10 +695,10 @@ contract ERC20Capped is ERC20Mintable {
 }
 
 contract Movecoin is ERC20, ERC20Detailed, ERC20Pausable, ERC20Burnable, ERC20Capped {
-    
+
     // Token cap in Wei
     uint256 public constant TOKEN_CAP = 1000000000000000000000000000;
-    
+
     constructor(
         string name,
         string symbol,
@@ -725,4 +725,14 @@ contract Movecoin is ERC20, ERC20Detailed, ERC20Pausable, ERC20Burnable, ERC20Ca
 
         return super.transferFrom(from, to, value);
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

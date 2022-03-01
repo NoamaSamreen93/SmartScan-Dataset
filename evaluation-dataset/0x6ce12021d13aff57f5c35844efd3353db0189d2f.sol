@@ -20,7 +20,6 @@ contract GetSaiTapValues {
         bid = saiTap.bid(_wad);
         ask = saiTap.ask(_wad);
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

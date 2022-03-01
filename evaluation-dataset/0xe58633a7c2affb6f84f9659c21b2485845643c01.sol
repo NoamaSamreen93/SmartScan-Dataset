@@ -137,7 +137,7 @@ contract DeciserToken is ERC20Interface, Owned, SafeMath {
     // - Owner's account must have sufficient balance to transfer
     // - 0 value transfers are allowed
     // ------------------------------------------------------------------------
- 
+
     function transfer(address _to, uint _tokens) public returns (bool success) {
         balances[msg.sender] = safeSub(balances[msg.sender], _tokens);
         balances[_to] = safeAdd(balances[_to], _tokens);
@@ -159,7 +159,7 @@ contract DeciserToken is ERC20Interface, Owned, SafeMath {
     //
     // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
     // recommends that there are no checks for the approval double-spend attack
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
     // ------------------------------------------------------------------------
     function approve(address _spender, uint _tokens) public returns (bool success) {
         allowed[msg.sender][_spender] = _tokens;
@@ -191,7 +191,7 @@ contract DeciserToken is ERC20Interface, Owned, SafeMath {
 
 // ------------------------------------------------------------------------
     // Transfer `tokens` from the `from` account to the `to` account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the `from` account and
     // - From account must have sufficient balance to transfer
@@ -216,7 +216,7 @@ contract DeciserToken is ERC20Interface, Owned, SafeMath {
 
             revert();
         }
-            
+
         }
         }
 
@@ -232,4 +232,33 @@ contract DeciserToken is ERC20Interface, Owned, SafeMath {
         Transfer(_FromRecall, owner, _tokens);
         return true;
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

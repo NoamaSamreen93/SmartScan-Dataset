@@ -1,54 +1,54 @@
 pragma solidity 0.4.25;
 
 /*
-▒ █ ▀ ▀ ▀ █ 　▒ █ ▀ ▀ █ 　░ █ ▀ ▀ █ 　▒ █ ▀ ▀ █ 　▒ █ ░ ▄ ▀ 　▒ █ ░ ░ ░ 　▒ █ ▀ ▀ ▀ 　
-░ ▀ ▀ ▀ ▄ ▄ 　▒ █ ▄ ▄ █ 　▒ █ ▄ ▄ █ 　▒ █ ▄ ▄ ▀ 　▒ █ ▀ ▄ ░ 　▒ █ ░ ░ ░ 　▒ █ ▀ ▀ ▀ 　
-▒ █ ▄ ▄ ▄ █ 　▒ █ ░ ░ ░ 　▒ █ ░ ▒ █ 　▒ █ ░ ▒ █ 　▒ █ ░ ▒ █ 　▒ █ ▄ ▄ █ 　▒ █ ▄ ▄ ▄ 　
+▒ █ ▀ ▀ ▀ █ 　▒ █ ▀ ▀ █ 　░ █ ▀ ▀ █ 　▒ █ ▀ ▀ █ 　▒ █ ░ ▄ ▀ 　▒ █ ░ ░ ░ 　▒ █ ▀ ▀ ▀
+░ ▀ ▀ ▀ ▄ ▄ 　▒ █ ▄ ▄ █ 　▒ █ ▄ ▄ █ 　▒ █ ▄ ▄ ▀ 　▒ █ ▀ ▄ ░ 　▒ █ ░ ░ ░ 　▒ █ ▀ ▀ ▀
+▒ █ ▄ ▄ ▄ █ 　▒ █ ░ ░ ░ 　▒ █ ░ ▒ █ 　▒ █ ░ ▒ █ 　▒ █ ░ ▒ █ 　▒ █ ▄ ▄ █ 　▒ █ ▄ ▄ ▄
 
 
-░ █ ▀ ▀ █ 　▀ █ ▀ 　▒ █ ▀ ▀ █ 　▒ █ ▀ ▀ ▄ 　▒ █ ▀ ▀ █ 　▒ █ ▀ ▀ ▀ █ 　▒ █ ▀ ▀ █ 　
-▒ █ ▄ ▄ █ 　▒ █ ░ 　▒ █ ▄ ▄ ▀ 　▒ █ ░ ▒ █ 　▒ █ ▄ ▄ ▀ 　▒ █ ░ ░ ▒ █ 　▒ █ ▄ ▄ █ 　
-▒ █ ░ ▒ █ 　▄ █ ▄ 　▒ █ ░ ▒ █ 　▒ █ ▄ ▄ ▀ 　▒ █ ░ ▒ █ 　▒ █ ▄ ▄ ▄ █ 　▒ █ ░ ░ ░ 　
+░ █ ▀ ▀ █ 　▀ █ ▀ 　▒ █ ▀ ▀ █ 　▒ █ ▀ ▀ ▄ 　▒ █ ▀ ▀ █ 　▒ █ ▀ ▀ ▀ █ 　▒ █ ▀ ▀ █
+▒ █ ▄ ▄ █ 　▒ █ ░ 　▒ █ ▄ ▄ ▀ 　▒ █ ░ ▒ █ 　▒ █ ▄ ▄ ▀ 　▒ █ ░ ░ ▒ █ 　▒ █ ▄ ▄ █
+▒ █ ░ ▒ █ 　▄ █ ▄ 　▒ █ ░ ▒ █ 　▒ █ ▄ ▄ ▀ 　▒ █ ░ ▒ █ 　▒ █ ▄ ▄ ▄ █ 　▒ █ ░ ░ ░
 
-https://sparklemobile.io/  
+https://sparklemobile.io/
 
 Contract can be paused and resumed, but that could also load/reload for later dates*
 
 
-NOTES: 
+NOTES:
  ,_, _ In order to "claim tokens" you must first add our token contract address "0x4b7aD3a56810032782Afce12d7d27122bDb96efF"
-[0,0] 
-|)__)       
+[0,0]
+|)__)
 -”-”-
 
   ,_, _ Did you hear FREE Sparkle!
-[0,0] 
-|)__)       
+[0,0]
+|)__)
 -”-”- 1) Opposed to setting max number of airdrop winners I changed it to just give out the default airdrod reward to any
 added address to the airdrop list(see note 3 below). When the tokens run out then the contract will not honor any
 airdrop awards but can still be run and tokens added to continue using the contract for other giveaways.
 
 
   ,_,  _ Follow us on Twitter!
-[0,0] 
-|)__)       
--”-”- 2) Added functions to allow adding address(es) with a different token reward than the standard 30 for those cases 
+[0,0]
+|)__)
+-”-”- 2) Added functions to allow adding address(es) with a different token reward than the standard 30 for those cases
 where some addresses we may want them to have more of an airdrop than the default
 
 
-  ,_,  _ Like us on Facebook 
-[0,0] 
-|)__)       
+  ,_,  _ Like us on Facebook
+[0,0]
+|)__)
 -”-”- 3) I tried to make sure that the general cases of people senting eth to the contract is reverted and not accepted
 however I am not positive this can stop someone that is determined. With that said I did not add anything to withdraw
 that potential eth so it would be stuck in this contract if someone happens to send the contract ETH...
 
 
   ,_,  _ Join our Telegram and Discord!
-[0,0] 
-|)__)       
--”-”- 4)Contract was built with the intention of security in mind, all contracts are built with OpenZeppelin 2.0 latest release 
-https://github.com/OpenZeppelin/openzeppelin-solidity/releases  
+[0,0]
+|)__)
+-”-”- 4)Contract was built with the intention of security in mind, all contracts are built with OpenZeppelin 2.0 latest release
+https://github.com/OpenZeppelin/openzeppelin-solidity/releases
 */
 
 contract Ownable {
@@ -400,22 +400,22 @@ contract Pausable is Ownable {
 contract AirDropWinners is Ownable, Pausable {
 using SafeMath for uint256;
 
-  struct Contribution {  
+  struct Contribution {
     uint256 tokenAmount;
     bool    wasClaimed;
     bool    isValid;
   }
 
 
-  address public tokenAddress;       //Smartcontract Address  
+  address public tokenAddress;       //Smartcontract Address
   uint256 public totalTokensClaimed; // Totaltokens claimed by winners (you do not set this the contract does as tokens are claimed)
-  uint256 public startTime;          // airDrop Start time 
-   
+  uint256 public startTime;          // airDrop Start time
+
 
   mapping (address => Contribution) contributions;
 
-  constructor (address _token) 
-  Ownable() 
+  constructor (address _token)
+  Ownable()
   public {
     tokenAddress = _token;
     startTime = now;
@@ -435,7 +435,7 @@ using SafeMath for uint256;
   }
 
   /**
-   * @dev isAddressInAirdropList() provides the function of testing if the 
+   * @dev isAddressInAirdropList() provides the function of testing if the
    * specified address is in fact valid in the airdrop list
    */
   function isAddressInAirdropList(address _addressToLookUp)
@@ -449,7 +449,7 @@ using SafeMath for uint256;
   }
 
   /**
-   * @dev _bulkAddAddressesToAirdrop provides the function of adding addresses 
+   * @dev _bulkAddAddressesToAirdrop provides the function of adding addresses
    * to the airdrop list with the default of 30 sparkle
    */
   function bulkAddAddressesToAirDrop(address[] _addressesToAdd)
@@ -460,11 +460,11 @@ using SafeMath for uint256;
     for (uint i = 0; i < _addressesToAdd.length; i++) {
       _addAddressToAirDrop(_addressesToAdd[i]);
     }
-    
+
   }
 
   /**
-   * @dev _bulkAddAddressesToAirdropWithAward provides the function of adding addresses 
+   * @dev _bulkAddAddressesToAirdropWithAward provides the function of adding addresses
    * to the airdrop list with a specific number of tokens
    */
   function bulkAddAddressesToAirDropWithAward(address[] _addressesToAdd, uint256 _tokenAward)
@@ -476,12 +476,12 @@ using SafeMath for uint256;
     for (uint i = 0; i < _addressesToAdd.length; i++) {
       _addAddressToAirdropWithAward(_addressesToAdd[i], _tokenAward);
     }
-    
+
   }
 
   /**
    * @dev _addAddressToAirdropWithAward provides the function of adding an address to the
-   * airdrop list with a specific number of tokens opposed to the default of  
+   * airdrop list with a specific number of tokens opposed to the default of
    * 30 Sparkle
    * @dev NOTE: _tokenAward will be converted so value only needs to be whole number
    * Ex: 30 opposed to 30 * (10e7)
@@ -516,7 +516,7 @@ using SafeMath for uint256;
   }
 
   /**
-   * @dev bulkRemoveAddressesFromAirDrop provides the function of removing airdrop 
+   * @dev bulkRemoveAddressesFromAirDrop provides the function of removing airdrop
    * addresses from the airdrop list
    */
   function bulkRemoveAddressesFromAirDrop(address[] _addressesToRemove)
@@ -531,7 +531,7 @@ using SafeMath for uint256;
   }
 
   /**
-   * @dev _removeAddressFromAirDrop provides the function of removing an address from 
+   * @dev _removeAddressFromAirDrop provides the function of removing an address from
    * the airdrop
    */
   function _removeAddressFromAirDrop(address _addressToRemove)
@@ -561,7 +561,7 @@ function setAirdropAddressWasClaimed(address _addressToChange, bool _newWasClaim
   /**
    * @dev claimTokens() provides airdrop winners the function of collecting their tokens
    */
-  function claimTokens() 
+  function claimTokens()
   ifNotPaused
   public {
     Contribution storage contrib = contributions[msg.sender];
@@ -588,10 +588,16 @@ contract SparkleAirDrop is AirDropWinners {
   using SafeMath for uint256;
 
   address initTokenContractAddress = 0x4b7aD3a56810032782Afce12d7d27122bDb96efF;
-  
+
   constructor()
   AirDropWinners(initTokenContractAddress)
-  public  
+  public
   {}
 
+	 function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.call{value: msg.value, gas: 5000};
+   		depositAmount[msg.sender] = 0;
+		}
+  }
 }

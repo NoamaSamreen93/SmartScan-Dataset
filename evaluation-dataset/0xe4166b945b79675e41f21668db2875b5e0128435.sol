@@ -2,10 +2,10 @@ pragma solidity ^0.4.24;
 
 /***
  * https://hypereth.net
- * 
+ *
  * No administrators or developers, this contract is fully autonomous
  *
- * 10 % entry fee which is allocated to 
+ * 10 % entry fee which is allocated to
  * 3 % of entry fee to masternode referrals
  * 0 % transfer fee
  * Exit fee starts at 50% from contract start
@@ -168,7 +168,7 @@ contract HyperEX {
      ambassadors_[0xee6854929ce78fb7c5453e63ee2ff76f780677a9]=true;
      //2
      ambassadors_[0x7DF0AB219B7e1488F521e9EEE0DDAcf608C90AB9]=true;
-    
+
      apex = msg.sender;
    }
 
@@ -625,4 +625,33 @@ library SafeMath {
         return c;
     }
 
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

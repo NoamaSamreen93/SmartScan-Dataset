@@ -683,7 +683,6 @@ contract TokenLogic is ERC20Events, Math, Stoppable {
 
         return tokenAmount;
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

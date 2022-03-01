@@ -95,8 +95,7 @@ contract BDKT is owned{
          return true;
      }
 
-}
 function() payable external {
 	revert();
-}
+	}
 }

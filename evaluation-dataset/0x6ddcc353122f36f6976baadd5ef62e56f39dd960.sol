@@ -56,7 +56,6 @@ contract PODSSale {
         uint256 amount = tokenf.balanceOf(address(this));
         return tokenf.transfer(beneficiary, amount);
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

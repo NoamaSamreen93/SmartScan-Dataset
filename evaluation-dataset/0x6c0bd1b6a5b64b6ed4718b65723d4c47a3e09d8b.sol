@@ -227,7 +227,6 @@ else if(!owner.send(this.balance)) throw;//if there is no lucky voter, give rema
 function getTotalVotes() constant returns(uint){
 return voters.length;
 }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

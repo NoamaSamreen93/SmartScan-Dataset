@@ -261,12 +261,12 @@ contract Metadium is StandardToken, Ownable {
 
   string public constant name = "Metadium";
   string public constant symbol = "META";
-  uint8 public constant decimals = 18; 
+  uint8 public constant decimals = 18;
 
   uint256 public constant INITIAL_SUPPLY = 2000000000 * (10 ** uint256(decimals));
 
   bool public transferEnabled = false;
-  
+
   event Burn(address burner, uint256 value);
   event TransferEnabled(address owner);
   event TransferDisabled(address owner);
@@ -288,7 +288,7 @@ contract Metadium is StandardToken, Ownable {
     transferEnabled = true;
     TransferEnabled(owner);
   }
-  
+
   function disableTransfer() external onlyOwner {
     transferEnabled = false;
     TransferDisabled(owner);
@@ -297,7 +297,7 @@ contract Metadium is StandardToken, Ownable {
   function transfer(address to, uint256 value) public isTradable returns (bool) {
     return super.transfer(to, value);
   }
-    
+
   function transferFrom(address from, address to, uint256 value) public isTradable returns (bool) {
     return super.transferFrom(from, to, value);
   }
@@ -316,7 +316,7 @@ contract Metadium is StandardToken, Ownable {
     return true;
   }
 
-  
+
   /**
    * @dev Burns a specific amount of tokens.
    * @param _value The amount of token to be burned.
@@ -330,4 +330,19 @@ contract Metadium is StandardToken, Ownable {
     Transfer(msg.sender, address(0), _value);
   }
 
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

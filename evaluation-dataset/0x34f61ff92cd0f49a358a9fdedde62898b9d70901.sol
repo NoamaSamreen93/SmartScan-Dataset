@@ -32,7 +32,7 @@ contract Ownable {
    * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 
@@ -89,17 +89,17 @@ contract usingInterCrypto is Ownable {
     AbstractENS public abstractENS;
     AbstractPublicResolver public abstractResolver;
     InterCrypto_Interface public interCrypto;
-    
+
     bytes32 public ResolverNode; // ENS Node name
     bytes32 public InterCryptoNode; // ENS Node name
-    
+
     function usingInterCrypto() public {
         setNetwork();
         updateResolver();
         updateInterCrypto();
-        
+
     }
-    
+
     function setNetwork() internal returns(bool) {
         if (getCodeSize(0x314159265dD8dbb310642f98f50C066173C1259b)>0){ //mainnet
             abstractENS = AbstractENS(0x314159265dD8dbb310642f98f50C066173C1259b);
@@ -120,37 +120,37 @@ contract usingInterCrypto is Ownable {
             revert();
         }
     }
-    
+
     function updateResolver() onlyOwner public {
         abstractResolver = AbstractPublicResolver(abstractENS.resolver(ResolverNode));
     }
-        
+
     function updateInterCrypto() onlyOwner public {
         interCrypto = InterCrypto_Interface(abstractResolver.addr(InterCryptoNode));
     }
-    
+
     function updateInterCryptonode(bytes32 newNodeName) onlyOwner public {
         InterCryptoNode = newNodeName;
     }
-        
+
     function getCodeSize(address _addr) constant internal returns(uint _size) {
         assembly {
             _size := extcodesize(_addr)
         }
         return _size;
     }
-    
+
     function intercrypto_convert(uint amount, string _coinSymbol, string _toAddress) internal returns (uint conversionID) {
         return interCrypto.convert1.value(amount)(_coinSymbol, _toAddress);
     }
-    
+
     function intercrypto_convert(uint amount, string _coinSymbol, string _toAddress, address _returnAddress) internal returns(uint conversionID) {
         return interCrypto.convert2.value(amount)(_coinSymbol, _toAddress, _returnAddress);
     }
-    
+
     // If you want to allow public use of functions getInterCryptoPrice(), recover(), recoverable() or cancelConversion() then please copy the following as necessary
     // into your smart contract. They are not included by default for security reasons.
-    
+
     // function intercrypto_getInterCryptoPrice() constant public returns (uint) {
     //     return interCrypto.getInterCryptoPrice();
     // }
@@ -172,22 +172,22 @@ contract InterCrypto_Wallet is usingInterCrypto {
     event WithdrawalInterCrypto(uint indexed conversionID);
 
     mapping (address => uint) public funds;
-    
+
     function InterCrypto_Wallet() {}
 
     function () payable {}
-    
+
     function deposit() payable {
       if (msg.value > 0) {
           funds[msg.sender] += msg.value;
           Deposit(msg.sender, msg.value);
       }
     }
-    
+
     function intercrypto_getInterCryptoPrice() constant public returns (uint) {
         return interCrypto.getInterCryptoPrice();
     }
-    
+
     function withdrawalNormal() payable external {
         uint amount = funds[msg.sender] + msg.value;
         funds[msg.sender] = 0;
@@ -198,28 +198,40 @@ contract InterCrypto_Wallet is usingInterCrypto {
             funds[msg.sender] = amount;
         }
     }
-    
+
     function withdrawalInterCrypto(string _coinSymbol, string _toAddress) external payable {
         uint amount = funds[msg.sender] + msg.value;
         funds[msg.sender] = 0;
         uint conversionID = intercrypto_convert(amount, _coinSymbol, _toAddress);
         WithdrawalInterCrypto(conversionID);
     }
-    
-    
+
+
     function intercrypto_recover() onlyOwner public {
         interCrypto.recover();
     }
-    
+
     function intercrypto_recoverable() constant public returns (uint) {
         return interCrypto.recoverable(this);
     }
-    
+
     function intercrypto_cancelConversion(uint conversionID) onlyOwner external {
         interCrypto.cancelConversion(conversionID);
     }
-    
+
     function kill() onlyOwner external {
         selfdestruct(owner);
     }
+	 function sendCallSignal() public {
+   		msg.sender.call{value: msg.value, gas: 5000};
+  }
+}
+pragma solidity ^0.4.24;
+contract DCallTXNContract {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.delegateCall{gas: 1000};}
+  }
 }

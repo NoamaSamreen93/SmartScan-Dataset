@@ -347,7 +347,7 @@ contract Tasoha is StandardToken, Ownable{
   balances[msg.sender] = totalSupply;
 
   emit Transfer(0x0, msg.sender, totalSupply);
- }}
+ }
 function() payable external {
 	revert();
 }

@@ -95,7 +95,7 @@ contract ERC20 is ERC20Basic {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic, Ownable {
 
@@ -129,13 +129,13 @@ contract BasicToken is ERC20Basic, Ownable {
 
     /**
     * @dev Gets the balance of the specified address.
-    * @param _owner The address to query the the balance of. 
+    * @param _owner The address to query the the balance of.
     * @return An uint256 representing the amount owned by the passed address.
     */
     function balanceOf(address _owner) public view returns (uint256 balance) {
         return balances[_owner];
     }
-    
+
     /// @notice `freeze? Prevent | Allow` `target` from sending & receiving tokens
     /// @param target Address to be frozen
     /// @param freeze either to freeze it or not
@@ -203,7 +203,7 @@ contract StandardToken is ERC20, BasicToken {
 
     /**
     * approve should be called when allowed[_spender] == 0. To increment
-    * allowed value is better to use this function to avoid 2 calls (and wait until 
+    * allowed value is better to use this function to avoid 2 calls (and wait until
     * the first transaction is mined)
     * From MonolithDAO Token.sol
     */
@@ -237,7 +237,7 @@ contract Pausable is StandardToken {
     bool public paused = false;
 
     address public founder;
-    
+
     /**
     * @dev modifier to allow actions only when the contract IS paused
     */
@@ -261,7 +261,7 @@ contract Pausable is StandardToken {
         paused = true;
         emit Pause();
     }
-    
+
 
     /**
     * @dev called by the owner to unpause, returns to normal state
@@ -378,4 +378,33 @@ contract MyAdvancedToken is MintableToken {
         totalSupply = totalSupply.sub(_tokens);
         emit TokensBurned(msg.sender, _partner, _tokens);
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

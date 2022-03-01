@@ -9,16 +9,16 @@ contract CryptoLandmarks {
 
     // Event fired whenever landmark is sold
     event LandmarkSold(uint256 tokenId, uint256 price, uint256 nextPrice, address prevOwner, address owner);
-    
+
     // Event fired when price of landmark changes
     event PriceChanged(uint256 tokenId, uint256 price);
 
     // Event fired for every new landmark created
     event LandmarkCreated(uint256 tokenId, uint256 groupId, uint256 price, address owner);
 
-   
-    string public constant NAME = "CryptoLandmarks.co Landmarks"; 
-    string public constant SYMBOL = "LANDMARK"; 
+
+    string public constant NAME = "CryptoLandmarks.co Landmarks";
+    string public constant SYMBOL = "LANDMARK";
 
     // Initial price of new Landmark
     uint256 private startingPrice = 0.03 ether;
@@ -33,19 +33,19 @@ contract CryptoLandmarks {
     address public coo;
 
     uint256[] private landmarks;
-    
+
     // landmark to prices
     mapping (uint256 => uint256) landmarkToMaxPrice;
     mapping (uint256 => uint256) landmarkToPrice;
-    
+
     // landmark to owner
     mapping (uint256 => address) landmarkToOwner;
-    
+
     // landmark to ambassador id
     // ambassador is also landmark token
     // every ambassador belongs to self
     mapping (uint256 => uint256) landmarkToAmbassador;
-    
+
     // ambassadors's landmarks count
     mapping (uint256 => uint256) groupLandmarksCount;
 
@@ -81,7 +81,7 @@ contract CryptoLandmarks {
             return 3; // 3%
         else
             return 2; // 2%
-    }   
+    }
 
     /*
         Buy Landmark or Ambassador from contract for calculated price that ensures that:
@@ -115,7 +115,7 @@ contract CryptoLandmarks {
 
         // for previous owner
         uint256 payment;
-        
+
         if (_tokenId < 1000) {
             // Buying Ambassador
             payment = sellingPrice.mul(SafeMath.sub(95, devCut)).div(100);
@@ -145,7 +145,7 @@ contract CryptoLandmarks {
                 landmarkToOwner[id].transfer(feeGroupMember);
             }
         }
-        
+
         uint256 nextPrice = calculateNextPrice(sellingPrice);
 
         // Set new price
@@ -180,7 +180,7 @@ contract CryptoLandmarks {
 
         // set new price
         landmarkToPrice[_tokenId] = _price;
-        
+
         // emit event
         PriceChanged(_tokenId, _price);
     }
@@ -268,7 +268,7 @@ contract CryptoLandmarks {
     function withdrawBalance() external notCLevel {
         // only person owning more than 3 tokens can whitdraw
         require(landmarkOwnershipCount[msg.sender] >= 3);
-        
+
         // player can withdraw only week after his previous withdrawal
         require(withdrawCooldown[msg.sender] <= now);
 
@@ -281,14 +281,14 @@ contract CryptoLandmarks {
         require(balance >= 0.3 ether);
 
         uint256 senderCut = balance.mul(3).div(1000).mul(landmarkOwnershipCount[msg.sender]);
-        
+
         // transfer 0.3% per Landmark or Ambassador to sender
         msg.sender.transfer(senderCut);
 
         // set sender withdraw cooldown
         withdrawCooldown[msg.sender] = now + 1 weeks;
 
-        // transfer rest to CEO 
+        // transfer rest to CEO
         ceo.transfer(balance.sub(senderCut));
 
         // set transactions counter to 0
@@ -426,5 +426,15 @@ library SafeMath {
     uint256 c = a + b;
     assert(c >= a);
     return c;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
 }

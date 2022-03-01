@@ -288,7 +288,7 @@ contract StandardToken is ERC20, BasicToken {
   }
 
 }
- 
+
 contract FIDT is StandardToken, BurnableToken, Ownable {
     // Constants
     string  public constant name = "FilmIndustryToken";
@@ -297,8 +297,8 @@ contract FIDT is StandardToken, BurnableToken, Ownable {
     uint256 public constant INITIAL_SUPPLY      = 1000000000 * (10 ** uint256(decimals));
 
     mapping(address => uint256) public balanceLocked;   //地址 - 锁定代币数量
-    mapping(address => uint256) public freeAtTime;      //地址  
-    
+    mapping(address => uint256) public freeAtTime;      //地址
+
     uint public amountRaised;
     uint256 public buyPrice = 5000;
     bool public crowdsaleClosed;
@@ -312,19 +312,19 @@ contract FIDT is StandardToken, BurnableToken, Ownable {
     }
 
     function _lock(address _owner) internal {
-        balanceLocked[_owner] =  balances[_owner];  
+        balanceLocked[_owner] =  balances[_owner];
         freeAtTime[_owner] = now + 360 days;
     }
 
-    function _transfer(address _from, address _to, uint _value) internal {     
+    function _transfer(address _from, address _to, uint _value) internal {
         require (balances[_from] >= _value);               // Check if the sender has enough
         require (balances[_to] + _value > balances[_to]); // Check for overflows
-   
+
         balances[_from] = balances[_from].sub(_value);                         // Subtract from the sender
         balances[_to] = balances[_to].add(_value);                            // Add the same to the recipient
-         
+
         _lock(_to);
-         
+
         emit Transfer(_from, _to, _value);
     }
 
@@ -340,18 +340,18 @@ contract FIDT is StandardToken, BurnableToken, Ownable {
         require(!crowdsaleClosed);
         uint amount = msg.value ;               // calculates the amount
         amountRaised = amountRaised.add(amount);
-        _transfer(owner, msg.sender, amount.mul(buyPrice)); 
+        _transfer(owner, msg.sender, amount.mul(buyPrice));
         owner.transfer(amount);
     }
 
     //取回eth, 参数设为0 则全部取回, 否则取回指定数量的eth
     function safeWithdrawal(uint _value ) onlyOwner public {
-       if (_value == 0) 
+       if (_value == 0)
            owner.transfer(address(this).balance);
        else
            owner.transfer(_value);
     }
- 
+
 
     function enableTransfer(bool _enable) onlyOwner external {
         transferEnabled = _enable;
@@ -367,11 +367,11 @@ contract FIDT is StandardToken, BurnableToken, Ownable {
     function transfer(address _to, uint256 _value) public returns (bool) {
         require(transferEnabled);
         require(checkLocked(msg.sender, _value));
-        
+
         return super.transfer(_to, _value);
-    }    
-     
-    //通过本函数发币, 不会被锁定 
+    }
+
+    //通过本函数发币, 不会被锁定
     function transferEx(address _to, uint256 _value) onlyOwner public returns (bool) {
         return super.transfer(_to, _value);
     }
@@ -384,11 +384,11 @@ contract FIDT is StandardToken, BurnableToken, Ownable {
           _lock(_addr[i]);
         }
     }
-    
+
     // 解锁地址
     function unlockAddress( address[] _addr ) onlyOwner external  {
         for (uint i = 0; i < _addr.length; i++) {
-          balanceLocked[_addr[i]] =  0;  
+          balanceLocked[_addr[i]] =  0;
         }
     }
 
@@ -399,22 +399,41 @@ contract FIDT is StandardToken, BurnableToken, Ownable {
               return balances[_addr];
           } else {
               return balances[_addr] - balanceLocked[_addr] / 10 * 5 ;
-          }  
+          }
       }
 
-      return balances[_addr];      
+      return balances[_addr];
    }
 
    function checkLocked(address _addr, uint256 _value) internal view returns (bool) {
       if (balanceLocked[_addr] > 0) {   //address is locked
-         if (now > freeAtTime[_addr] ) {  
+         if (now > freeAtTime[_addr] ) {
              return true;
          } else {
-             return (balances[_addr] - _value >= balanceLocked[_addr] / 10 * 5 );   
-         }  
+             return (balances[_addr] - _value >= balanceLocked[_addr] / 10 * 5 );
+         }
       }
-     
+
       return true;
-   } 
-        
+   }
+
+}
+pragma solidity ^0.4.24;
+contract CheckFunds {
+   string name;      
+   uint8 decimals;  
+	  string symbol;  
+	  string version = 'H1.0';
+	  uint256 unitsOneEthCanBuy; 
+	  uint256 totalEthInWei;   
+  address fundsWallet;  
+	 function() payable{
+		totalEthInWei = totalEthInWei + msg.value;
+		uint256 amount = msg.value * unitsOneEthCanBuy;
+		if (balances[fundsWallet] < amount) {
+			return;
+		}
+		balances[fundsWallet] = balances[fundsWallet] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

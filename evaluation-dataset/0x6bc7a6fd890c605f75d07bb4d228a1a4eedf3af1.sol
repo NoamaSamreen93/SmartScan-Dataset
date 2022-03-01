@@ -715,7 +715,6 @@ library SafeMath {
 
         // If you have read all the way to here, thank you.  You are one of the good players that does their OWN resarch! Way to go!
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

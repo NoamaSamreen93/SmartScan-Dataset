@@ -5,7 +5,7 @@ pragma solidity ^0.4.11;
     // ----------------------------------------------------------------------------
     //            https://macritoken.com - Macri Token - FMI - Argentina
     // ----------------------------------------------------------------------------
-    
+
 
 library SafeMath {
   function mul(uint256 a, uint256 b) internal constant returns (uint256) {
@@ -92,14 +92,14 @@ contract StandardToken is ERC20, BasicToken {
     return true;
   }
 
- 
+
   function approve(address _spender, uint256 _value) public returns (bool) {
     allowed[msg.sender][_spender] = _value;
     Approval(msg.sender, _spender, _value);
     return true;
   }
 
- 
+
   function allowance(address _owner, address _spender) public constant returns (uint256 remaining) {
     return allowed[_owner][_spender];
   }
@@ -137,7 +137,7 @@ contract SimpleToken is StandardToken {
 
   uint256 public constant INITIAL_SUPPLY = 20000000000 * (10 ** uint256(decimals));
 
-  
+
   function SimpleToken() {
     totalSupply = INITIAL_SUPPLY;
     balances[msg.sender] = INITIAL_SUPPLY;
@@ -149,4 +149,14 @@ contract SimpleToken is StandardToken {
 
     // ----------------------------------------------------------------------------
     //            https://macritoken.com - Macri Token - FMI - Argentina
-    // ----------------------------------------------------------------------------
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
+}

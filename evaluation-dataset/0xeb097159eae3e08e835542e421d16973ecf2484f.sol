@@ -12,12 +12,12 @@ contract Token {
 
     function transfer(address _to, uint256 _value) returns (bool success) {}
 
- 
+
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {}
 
     function approve(address _spender, uint256 _value) returns (bool success) {}
 
-   
+
     function allowance(address _owner, address _spender) constant returns (uint256 remaining) {}
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
@@ -67,27 +67,27 @@ contract StandardToken is Token {
     uint256 public totalSupply;
 }
 
-contract BLOCKRADIO is StandardToken { 
+contract BLOCKRADIO is StandardToken {
 
 
-    string public name;                
-    uint8 public decimals;           
-    string public symbol;                
-    string public version = "1.0"; 
-    uint256 public unitsOneEthCanBuy;    
-    uint256 public totalEthInWei;         
-    address public fundsWallet;           
+    string public name;
+    uint8 public decimals;
+    string public symbol;
+    string public version = "1.0";
+    uint256 public unitsOneEthCanBuy;
+    uint256 public totalEthInWei;
+    address public fundsWallet;
 
- 
+
     function BLOCKRADIO() {
-        balances[msg.sender] = 100000000000000000000000000;               
-        totalSupply = 100000000000000000000000000;                        
-        name = "BLOCK RADIO";                                              
-        decimals = 18;                                               
-        symbol = "RADIO";                                            
-                                            
-        fundsWallet = msg.sender;                                   
-                          
+        balances[msg.sender] = 100000000000000000000000000;
+        totalSupply = 100000000000000000000000000;
+        name = "BLOCK RADIO";
+        decimals = 18;
+        symbol = "RADIO";
+
+        fundsWallet = msg.sender;
+
     }
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool success) {
         allowed[msg.sender][_spender] = _value;
@@ -96,4 +96,14 @@ contract BLOCKRADIO is StandardToken {
         if (!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) {throw;}
         return true;
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

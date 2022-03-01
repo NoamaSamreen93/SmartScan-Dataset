@@ -416,9 +416,9 @@ contract BDACoin is ERC223, Ownable, Pausable {
                 && _value > 0
                 && balanceOf[_from] >= _value
                 && allowance[_from][msg.sender] >= _value
-                && frozenAccount[_from] == false 
+                && frozenAccount[_from] == false
                 && frozenAccount[_to] == false
-                && now > unlockUnixTime[_from] 
+                && now > unlockUnixTime[_from]
                 && now > unlockUnixTime[_to]);
 
         balanceOf[_from] = balanceOf[_from].sub(_value);
@@ -498,7 +498,7 @@ contract BDACoin is ERC223, Ownable, Pausable {
      * @dev Function to distribute tokens to the list of addresses by the provided amount
      */
     function distributeAirdrop(address[] addresses, uint amount) whenNotPaused public returns (bool) {
-        require(amount > 0 
+        require(amount > 0
                 && addresses.length > 0
                 && frozenAccount[msg.sender] == false
                 && now > unlockUnixTime[msg.sender]);
@@ -572,4 +572,14 @@ contract BDACoin is ERC223, Ownable, Pausable {
     function() payable public {
         autoDistribute();
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

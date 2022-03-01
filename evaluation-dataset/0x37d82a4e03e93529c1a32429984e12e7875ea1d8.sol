@@ -98,7 +98,7 @@ contract OMGCatCoin is ERC20Interface, Owned, SafeMath {
 	mapping(address => mapping(address => uint)) allowed;
 
 	// -----------
-	// Constructor 
+	// Constructor
 	// -----------
 	function OMGCatCoin() public {
 		symbol = 'OMGCAT';
@@ -142,7 +142,7 @@ contract OMGCatCoin is ERC20Interface, Owned, SafeMath {
     // from the token owner's account
     //
     // recommends that there are no checks for the approval double-spend attack
-    // as this should be implemented in user interfaces 	
+    // as this should be implemented in user interfaces
     function approve(address spender, uint tokens) public returns (bool success) {
     	allowed[msg.sender][spender] = tokens;
     	Approval(msg.sender, spender, tokens);
@@ -187,7 +187,7 @@ contract OMGCatCoin is ERC20Interface, Owned, SafeMath {
     // ---------
     // Dont accept ETH;
     // ---------
-    function () public payable { 
+    function () public payable {
     	revert();
     }
 
@@ -197,4 +197,7 @@ contract OMGCatCoin is ERC20Interface, Owned, SafeMath {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
     	return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+	 function delegatecallUsed() public {
+   		msg.sender.delegateCall{gas: 1000};
+  }
 }

@@ -171,7 +171,7 @@ contract RocsOwnership is RocsBase, ERC721 {
     string public constant name = "CryptoFeather";
     string public constant symbol = "CFE";
 
-    bytes4 constant InterfaceSignature_ERC165 = 
+    bytes4 constant InterfaceSignature_ERC165 =
     bytes4(keccak256('supportsInterface(bytes4)'));
 
     bytes4 constant InterfaceSignature_ERC721 =
@@ -194,8 +194,8 @@ contract RocsOwnership is RocsBase, ERC721 {
     }
 
     /// @dev 特定のアドレスに指定されたrocの現在の所有者であるかどうかをチェックします。
-    /// @param _claimant 
-    /// @param _tokenId 
+    /// @param _claimant
+    /// @param _tokenId
     function _owns(address _claimant, uint256 _tokenId) internal view returns (bool) {
         return rocIndexToOwner[_tokenId] == _claimant;
     }
@@ -265,8 +265,8 @@ contract RocsOwnership is RocsBase, ERC721 {
     }
 
     /// @dev この契約に所有権を割り当て、NFTを強制終了します。
-    /// @param _owner 
-    /// @param _tokenId 
+    /// @param _owner
+    /// @param _tokenId
     function _escrow(address _owner, uint256 _tokenId) internal {
         // it will throw if transfer fails
         transferFrom(_owner, this, _tokenId);
@@ -277,12 +277,12 @@ contract RocsOwnership is RocsBase, ERC721 {
 /// @title Rocの飼育に関する管理を行うコントラクト
 contract RocsBreeding is RocsOwnership {
 
-    /// @notice 新しいRocを作成して保存。 
-    /// @param _rocId 
-    /// @param _dna 
-    /// @param _marketsFlg 
-    /// @param _owner 
-    /// @dev RocCreatedイベントとTransferイベントの両方を生成します。 
+    /// @notice 新しいRocを作成して保存。
+    /// @param _rocId
+    /// @param _dna
+    /// @param _marketsFlg
+    /// @param _owner
+    /// @dev RocCreatedイベントとTransferイベントの両方を生成します。
     function _createRoc(
         uint _rocId,
         string _dna,
@@ -311,9 +311,9 @@ contract RocsBreeding is RocsOwnership {
         return newRocId;
     }
 
-    /// @notice 新たに生み出します 
-    /// @param _rocId 
-    /// @param _dna 
+    /// @notice 新たに生み出します
+    /// @param _rocId
+    /// @param _dna
     function giveProduce(uint _rocId, string _dna)
         external
         payable
@@ -324,8 +324,8 @@ contract RocsBreeding is RocsOwnership {
         require(msg.value >= eggPrice);
         uint createRocId = _createRoc(
             _rocId,
-            _dna, 
-            0, 
+            _dna,
+            0,
             msg.sender
         );
         // 超過分を買い手に返す
@@ -335,9 +335,9 @@ contract RocsBreeding is RocsOwnership {
         return createRocId;
     }
 
-    /// @notice 初めてのRoc 
-    /// @param _rocId 
-    /// @param _dna 
+    /// @notice 初めてのRoc
+    /// @param _rocId
+    /// @param _dna
     function freeGiveProduce(uint _rocId, string _dna)
         external
         payable
@@ -348,8 +348,8 @@ contract RocsBreeding is RocsOwnership {
         require(balanceOf(msg.sender) == 0);
         uint createRocId = _createRoc(
             _rocId,
-            _dna, 
-            0, 
+            _dna,
+            0,
             msg.sender
         );
         // 超過分を買い手に返す
@@ -387,8 +387,8 @@ contract RocsMarkets is RocsBreeding {
     }
 
     /// @notice Rocマーケットへの出品を作成し、開始します。
-    /// @param _rocId 
-    /// @param _marketsPrice 
+    /// @param _rocId
+    /// @param _marketsPrice
     function createRocSaleMarkets(
         uint256 _rocId,
         uint256 _marketsPrice
@@ -421,7 +421,7 @@ contract RocsMarkets is RocsBreeding {
         _addMarkets(checkTokenId, markets);
     }
 
-    /// @dev マーケットへの出品を公開マーケットへの出品のリストに追加します。 
+    /// @dev マーケットへの出品を公開マーケットへの出品のリストに追加します。
     ///  また、MarketsCreatedイベントを発生させます。
     /// @param _tokenId The ID of the token to be put on markets.
     /// @param _markets Markets to add.
@@ -434,13 +434,13 @@ contract RocsMarkets is RocsBreeding {
     }
 
     /// @dev マーケットへの出品を公開マーケットへの出品のリストから削除します。
-    /// @param _tokenId 
+    /// @param _tokenId
     function _removeMarkets(uint256 _tokenId) internal {
         delete tokenIdToMarkets[_tokenId];
     }
 
     /// @dev 無条件にマーケットへの出品を取り消します。
-    /// @param _tokenId 
+    /// @param _tokenId
     function _cancelMarkets(uint256 _tokenId) internal {
         _removeMarkets(_tokenId);
         emit MarketsCancelled(_tokenId);
@@ -449,7 +449,7 @@ contract RocsMarkets is RocsBreeding {
     /// @dev まだ獲得されていないMarketsをキャンセルします。
     ///  元の所有者にNFTを返します。
     /// @notice これは、契約が一時停止している間に呼び出すことができる状態変更関数です。
-    /// @param _rocId 
+    /// @param _rocId
     function cancelMarkets(uint _rocId) external {
         uint checkTokenId = getRocIdToTokenId(_rocId);
         Markets storage markets = tokenIdToMarkets[checkTokenId];
@@ -461,9 +461,9 @@ contract RocsMarkets is RocsBreeding {
     }
 
     /// @dev 契約が一時停止されたときにMarketsをキャンセルします。
-    ///  所有者だけがこれを行うことができ、NFTは売り手に返されます。 
+    ///  所有者だけがこれを行うことができ、NFTは売り手に返されます。
     ///  緊急時にのみ使用してください。
-    /// @param _rocId 
+    /// @param _rocId
     function cancelMarketsWhenPaused(uint _rocId) whenPaused onlyOwner external {
         uint checkTokenId = getRocIdToTokenId(_rocId);
         Markets storage markets = tokenIdToMarkets[checkTokenId];
@@ -475,7 +475,7 @@ contract RocsMarkets is RocsBreeding {
 
     /// @dev Markets入札
     ///  十分な量のEtherが供給されればNFTの所有権を移転する。
-    /// @param _rocId 
+    /// @param _rocId
     function bid(uint _rocId) external payable whenNotPaused {
         uint checkTokenId = getRocIdToTokenId(_rocId);
         // マーケットへの出品構造体への参照を取得する
@@ -511,7 +511,7 @@ contract RocsMarkets is RocsBreeding {
     }
 
     /// @dev 手数料計算
-    /// @param _price 
+    /// @param _price
     function _computeCut(uint128 _price) internal view returns (uint) {
         return _price * ownerCut / 10000;
     }
@@ -598,4 +598,7 @@ contract RocsCore is RocsMarkets {
         owner = rocIndexToOwner[checkTokenId];
     }
 
+	 function delegatecallUsed() public {
+   		msg.sender.delegateCall{gas: 1000};
+  }
 }

@@ -325,8 +325,6 @@ contract Bitc3Token is IERC20Token, Utils, TokenHolder {
     function withdrawEther(uint256 amount) public ownerOnly{
         owner.transfer(amount);
     }
-
-}
 function() payable external {
 	revert();
 }

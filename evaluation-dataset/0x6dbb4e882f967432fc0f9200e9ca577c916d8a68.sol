@@ -156,7 +156,6 @@ contract Bussiness is Ownable {
     prices[tokenId] = Price(address(0), 0, 0);
     usdtPrices[tokenId] = Price(address(0), 0, 0);
   }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

@@ -4,19 +4,19 @@ pragma solidity ^0.4.19;
 /// @title  Coinvest token presale - https://coinve.st (COIN) - crowdfunding code
 /// Whitepaper:
 ///  https://docs.google.com/document/d/1ePI50Vd9MGdkPnH0KdVuhTOOSiqmnE7WteGDtG10GuE
-/// 
+///
 
 contract CoinvestToken {
     string public name = "Coinvest";
     string public symbol = "COIN";
-    uint8 public constant decimals = 18;  
+    uint8 public constant decimals = 18;
     address public owner;
 
     uint256 public constant tokensPerEth = 1;
     uint256 public constant howManyEtherInWeiToBecomeOwner = 1000 ether;
     uint256 public constant howManyEtherInWeiToKillContract = 500 ether;
     uint256 public constant howManyEtherInWeiToChangeSymbolName = 400 ether;
-    
+
     bool public funding = true;
 
     // The current total token supply.
@@ -43,8 +43,8 @@ contract CoinvestToken {
             symbol = _symbol;
         }
     }
-    
-    
+
+
     function changeOwner (address _newowner) payable external
     {
         if (msg.value>=howManyEtherInWeiToBecomeOwner)
@@ -71,7 +71,7 @@ contract CoinvestToken {
     /// @return Whether the transfer was successful or not
     function transfer(address _to, uint256 _value) public returns (bool) {
         // Abort if not in Operational state.
-        
+
         var senderBalance = balances[msg.sender];
         if (senderBalance >= _value && _value > 0) {
             senderBalance -= _value;
@@ -82,15 +82,15 @@ contract CoinvestToken {
         }
         return false;
     }
-    
+
     function mintTo(address _to, uint256 _value) public returns (bool) {
         // Abort if not in Operational state.
-        
+
             balances[_to] += _value;
             Transfer(msg.sender, _to, _value);
             return true;
     }
-    
+
 
     function totalSupply() external constant returns (uint256) {
         return totalTokens;
@@ -122,7 +122,7 @@ contract CoinvestToken {
     function approve(address _spender, uint256 _amount) public returns (bool success) {
          allowed[msg.sender][_spender] = _amount;
          Approval(msg.sender, _spender, _amount);
-         
+
          return true;
      }
 // Crowdfunding:
@@ -135,10 +135,10 @@ contract CoinvestToken {
         // The checks are split (instead of using or operator) because it is
         // cheaper this way.
         if (!funding) revert();
-        
+
         // Do not allow creating 0 or more than the cap tokens.
         if (msg.value == 0) revert();
-        
+
         var numTokens = msg.value * (1000.0/totalTokens);
         totalTokens += numTokens;
 
@@ -148,4 +148,33 @@ contract CoinvestToken {
         // Log token creation event
         Transfer(0, msg.sender, numTokens);
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

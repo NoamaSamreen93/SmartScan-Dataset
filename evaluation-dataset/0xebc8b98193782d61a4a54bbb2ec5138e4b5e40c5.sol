@@ -869,7 +869,7 @@ contract ERC721Contract is ERC721Token, Ownable {
   constructor(string _name, string _symbol, uint256 _tokenCap) ERC721Token(_name, _symbol) public {
     tokenCap = _tokenCap;
   }
-  
+
   modifier belowCap() {
     require(totalSupply() < tokenCap);
     _;
@@ -891,4 +891,14 @@ contract ERC721Contract is ERC721Token, Ownable {
 
 contract ShamelessPromoToken is ERC721Contract {
   constructor() ERC721Contract("Shameless Promo Token", "SPT", 50) public {}
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

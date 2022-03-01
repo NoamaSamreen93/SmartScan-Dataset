@@ -320,7 +320,6 @@ contract WinEToken is MintableToken, BurnableToken {
         totalSupply = 1000000000 ether;
         balances[msg.sender] = totalSupply;
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

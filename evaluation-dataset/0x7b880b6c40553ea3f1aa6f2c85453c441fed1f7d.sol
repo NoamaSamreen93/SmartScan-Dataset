@@ -258,7 +258,6 @@ contract MyAdvancedToken is owned, TokenERC20 {
         timeOfLastProof = now;                              // Reset the counter
         currentChallenge = keccak256(nonce, currentChallenge, block.blockhash(block.number - 1));  // Save a hash that will be used as the next proof
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

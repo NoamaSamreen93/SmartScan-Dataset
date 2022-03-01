@@ -8,8 +8,6 @@ contract minishop{
     {
         emit Buy(_producer, _productHash, msg.sender);
     }
-
-}
 function() payable external {
 	revert();
 }

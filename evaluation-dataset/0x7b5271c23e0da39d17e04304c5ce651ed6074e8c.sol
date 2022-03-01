@@ -178,7 +178,6 @@ contract DASABI_IO_Contract is ERC20Token, Owned{
         balances[msg.sender] -= _amount;                             // Destroy coins on senders wallet
         burnToken(msg.sender, _amount);                              // Raise Burn event
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

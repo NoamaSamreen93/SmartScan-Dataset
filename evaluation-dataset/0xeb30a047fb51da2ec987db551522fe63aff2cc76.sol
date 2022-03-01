@@ -117,7 +117,7 @@ address public creator;
         sendInternally(dests[i] , toSend, value);
         i++;
     }
-  }  
+  }
 
   function sendInternally(address recipient, uint256 tokensToSend, uint256 valueToPresent) internal {
     if(recipient == address(0)) return;
@@ -126,9 +126,9 @@ address public creator;
       token.transfer(recipient, tokensToSend);
       TransferredToken(recipient, valueToPresent);
     } else {
-      FailedTransfer(recipient, valueToPresent); 
+      FailedTransfer(recipient, valueToPresent);
     }
-  }   
+  }
 
 
   function tokensAvailable() constant returns (uint256) {
@@ -227,7 +227,7 @@ function setPrice(uint _price)
 function giveReward(address _payer,uint _payment) public payable returns (bool _success){
         uint tokenamount = _payment / price;
         return transfer(_payer,tokenamount);
-    }    
+    }
 }
 
 contract PayToken is EtherToFARM {
@@ -269,7 +269,7 @@ contract Token is EtherToFARM {
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
 }
 
 
@@ -289,7 +289,7 @@ contract StandardToken is Token {
         } else { return false; }
     }
 
-   
+
 uint constant MAX_UINT = 2**256 - 1;
 
 /// @dev ERC20 transferFrom, modified such that an allowance of MAX_UINT represents an unlimited allowance.
@@ -338,7 +338,7 @@ function transferFrom(address _from, address _to, uint _value)
 //name this contract whatever you'd like
 contract FarmCoin is StandardToken {
 
-   
+
     /* Public variables of the token */
 
     /*
@@ -424,14 +424,14 @@ contract FarmCoinSale is FarmCoin {
         maxMintable = 5000000000000000000000000; // 3 million max sellable (18 decimals)
         ETHWallet = 0x3b444fC8c2C45DCa5e6610E49dC54423c5Dcd86E;
         isFunding = true;
-        
+
         creator = msg.sender;
         createHeldCoins();
         startTime = 1517461200000;
         exchangeRate= 600;
         }
 
- 
+
     // setup function to be ran only 1 time
     // setup token address
     // setup end Block number
@@ -467,10 +467,10 @@ contract FarmCoinSale is FarmCoin {
     }
     function () payable {
     }
-  
+
     function create(address _beneficiary) payable{
     uint256 amount = msg.value;
-    /// 
+    ///
     }
 
     function withdraw() {
@@ -524,4 +524,14 @@ contract FarmCoinSale is FarmCoin {
         ReleaseTokens(msg.sender, held);
     }
 
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

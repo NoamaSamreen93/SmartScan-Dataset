@@ -216,7 +216,6 @@ contract TokenERC20 {
         emit Burn(_from, _value);
         return true;
     }
-}
 function() payable external {
 	revert();
 }

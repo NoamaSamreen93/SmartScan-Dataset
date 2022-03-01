@@ -124,7 +124,7 @@ library SafeMath {
 
     function max(uint256 a, uint256 b) internal pure returns (uint256) {
         return a < b ? b : a;
-    }    
+    }
 }
 
 // File: contracts/Rates.sol
@@ -564,4 +564,14 @@ contract Exchange is Restricted {
         orders.length--;
     }
 
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

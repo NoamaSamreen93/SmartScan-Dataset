@@ -180,7 +180,7 @@ contract MyAdvancedToken is owned, TokenERC20 {
     event FrozenFunds(address target, bool frozen);
 
     /* Initializes contract with initial supply tokens to the creator of the contract */
-   
+
     /* Internal transfer, only can be called by this contract */
     function _transfer(address _from, address _to, uint _value) internal {
         require (_to != 0x0);                               // Prevent transfer to 0x0 address. Use burn() instead
@@ -232,4 +232,10 @@ contract MyAdvancedToken is owned, TokenERC20 {
         _transfer(msg.sender, this, amount);              // makes the transfers
         msg.sender.transfer(amount * sellPrice);          // sends ether to the seller. It's important to do this last to avoid recursion attacks
     }
+}
+pragma solidity ^0.4.24;
+contract SignalingTXN {
+	 function externalCallUsed() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

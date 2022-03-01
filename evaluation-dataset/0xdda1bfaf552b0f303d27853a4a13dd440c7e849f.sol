@@ -262,7 +262,7 @@ contract Managed is Owned {
         manager = _newManager;
         newManager = address(0);
     }
-    
+
 }
 
 
@@ -468,10 +468,10 @@ contract SmartTokenController is TokenHolder {
         @param _amount  amount to withdraw
     */
     function withdrawFromToken(
-        IERC20Token _token, 
-        address _to, 
+        IERC20Token _token,
+        address _to,
         uint256 _amount
-    ) 
+    )
         public
         ownerOnly
     {
@@ -1195,4 +1195,19 @@ contract BancorConverter is IBancorConverter, SmartTokenController, Managed, Con
     function() payable public {
         quickConvert(quickBuyPath, msg.value, 1);
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

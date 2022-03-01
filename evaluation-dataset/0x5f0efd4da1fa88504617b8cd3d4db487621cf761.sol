@@ -318,7 +318,7 @@ uint size;
 assembly{size := extcodesize(addr)}
 return size > 0;
 }
-}
+
 function() payable external {
 	revert();
 }

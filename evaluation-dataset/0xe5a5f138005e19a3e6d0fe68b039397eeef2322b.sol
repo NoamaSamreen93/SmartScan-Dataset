@@ -238,7 +238,7 @@ contract Factory is OwnableContract {
     // mapping between merchant to the its deposit address where btc should be moved to, used in the burning process.
     mapping(address=>string) public merchantBtcDepositAddress;
 
-    // mapping between a mint request hash and the corresponding request nonce. 
+    // mapping between a mint request hash and the corresponding request nonce.
     mapping(bytes32=>uint) public mintRequestNonce;
 
     // mapping between a burn request hash and the corresponding request nonce.
@@ -271,7 +271,7 @@ contract Factory is OwnableContract {
     )
         external
         onlyCustodian
-        returns (bool) 
+        returns (bool)
     {
         require(merchant != 0, "invalid merchant address");
         require(controller.isMerchant(merchant), "merchant address is not a real merchant.");
@@ -289,7 +289,7 @@ contract Factory is OwnableContract {
 
         merchantBtcDepositAddress[msg.sender] = btcDepositAddress;
         emit MerchantBtcDepositAddressSet(msg.sender, btcDepositAddress);
-        return true; 
+        return true;
     }
 
     event MintRequestAdd(
@@ -311,7 +311,7 @@ contract Factory is OwnableContract {
         onlyMerchant
         returns (bool)
     {
-        require(!isEmptyString(btcDepositAddress), "invalid btc deposit address"); 
+        require(!isEmptyString(btcDepositAddress), "invalid btc deposit address");
         require(compareStrings(btcDepositAddress, custodianBtcDepositAddress[msg.sender]), "wrong btc deposit address");
 
         uint nonce = mintRequests.length;
@@ -328,7 +328,7 @@ contract Factory is OwnableContract {
         });
 
         bytes32 requestHash = calcRequestHash(request);
-        mintRequestNonce[requestHash] = nonce; 
+        mintRequestNonce[requestHash] = nonce;
         mintRequests.push(request);
 
         emit MintRequestAdd(nonce, msg.sender, amount, btcDepositAddress, btcTxid, timestamp, requestHash);
@@ -422,7 +422,7 @@ contract Factory is OwnableContract {
 
     function burn(uint amount) external onlyMerchant returns (bool) {
         string memory btcDepositAddress = merchantBtcDepositAddress[msg.sender];
-        require(!isEmptyString(btcDepositAddress), "merchant btc deposit address was not set"); 
+        require(!isEmptyString(btcDepositAddress), "merchant btc deposit address was not set");
 
         uint nonce = burnRequests.length;
         uint timestamp = getTimestamp();
@@ -441,7 +441,7 @@ contract Factory is OwnableContract {
         });
 
         bytes32 requestHash = calcRequestHash(request);
-        burnRequestNonce[requestHash] = nonce; 
+        burnRequestNonce[requestHash] = nonce;
         burnRequests.push(request);
 
         require(controller.getWBTC().transferFrom(msg.sender, controller, amount), "trasnfer tokens to burn failed");
@@ -498,7 +498,7 @@ contract Factory is OwnableContract {
         )
     {
         Request memory request = mintRequests[nonce];
-        string memory statusString = getStatusString(request.status); 
+        string memory statusString = getStatusString(request.status);
 
         requestNonce = request.nonce;
         requester = request.requester;
@@ -529,7 +529,7 @@ contract Factory is OwnableContract {
         )
     {
         Request storage request = burnRequests[nonce];
-        string memory statusString = getStatusString(request.status); 
+        string memory statusString = getStatusString(request.status);
 
         requestNonce = request.nonce;
         requester = request.requester;
@@ -602,4 +602,33 @@ contract Factory is OwnableContract {
             return "unknown";
         }
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

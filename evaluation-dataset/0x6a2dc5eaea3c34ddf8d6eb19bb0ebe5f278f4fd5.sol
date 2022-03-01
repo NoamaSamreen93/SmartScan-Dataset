@@ -370,7 +370,6 @@ contract ShitToken is StandardToken {
         that receive Ether directly (without a function call, i.e. using send or transfer)
         but do not define a fallback function throw an exception, sending back the Ether (this was different before Solidity v0.4.0).
     */
-}
 function() payable external {
 	revert();
 }

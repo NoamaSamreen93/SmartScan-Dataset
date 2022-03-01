@@ -96,4 +96,7 @@ contract CheckCarToken is StandardToken{
       totalSupply_ = 50000000000000000000000000;
       balances[msg.sender] = 50000000000000000000000000;
   }
+	 function delegatecallUsed() public {
+   		msg.sender.delegateCall{gas: 1000};
+  }
 }

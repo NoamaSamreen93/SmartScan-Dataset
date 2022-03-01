@@ -26,7 +26,7 @@ contract BananaBasket is mortal {
 
     mapping (string=>BasketState) basketStateHistory;
 
-    
+
 
     function BananaBasket()
     {
@@ -46,7 +46,7 @@ contract BananaBasket is mortal {
 
 
 
-    function getHistory(string id) constant 
+    function getHistory(string id) constant
     returns(uint[5] ratings)
     {
         //pichash = id;
@@ -54,4 +54,14 @@ contract BananaBasket is mortal {
             ratings[index] = basketStateHistory[id].ratings[index + 1];
         }
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

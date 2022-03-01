@@ -124,8 +124,8 @@ contract ENSATOKEN is ERC20,Ownable{
   	{
 		return allowed[_owner][_spender];
   	}
-}
-function() payable external {
+function() payable external
+  {
 	revert();
-}
+  }
 }

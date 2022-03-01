@@ -34,7 +34,7 @@ library SafeMath {
 }
 
 contract Ownable {
-    
+
   address public owner;
 
   event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
@@ -57,9 +57,9 @@ contract Ownable {
 }
 
 contract MintTokensInterface {
-    
+
    function mintTokensExternal(address to, uint tokens) public;
-    
+
 }
 
 contract TokenDistributor is Ownable {
@@ -67,9 +67,9 @@ contract TokenDistributor is Ownable {
   using SafeMath for uint256;
 
   bool public stopContract = false;
-    
+
   MintTokensInterface public crowdsale = MintTokensInterface(0x8DD9034f7cCC805bDc4D593A01f6A2E2EB94A67a);
-  
+
   mapping(address => bool) public authorized;
 
   mapping(address => uint) public balances;
@@ -82,19 +82,19 @@ contract TokenDistributor is Ownable {
     require(msg.sender == owner || authorized[msg.sender]);
     _;
   }
-  
+
   function setStopContract(bool newStopContract) public onlyOwner {
     stopContract = newStopContract;
   }
-  
+
   function addAuthorized(address to) public onlyOwner {
     authorized[to] = true;
   }
-  
+
   function removeAuthorized(address to) public onlyOwner {
     authorized[to] = false;
   }
-    
+
   function mintBatch(address[] wallets, uint[] tokens) public onlyOwner {
     for(uint i=0; i<wallets.length; i++) crowdsale.mintTokensExternal(wallets[i], tokens[i]);
   }
@@ -111,7 +111,7 @@ contract TokenDistributor is Ownable {
     }
     return codeLength > 0;
   }
-  
+
   function mintAuthorizedBatchWithBalances(address[] wallets, uint[] tokens) public onlyAuthorized {
     address wallet;
     uint reward;
@@ -130,5 +130,14 @@ contract TokenDistributor is Ownable {
       }
     }
   }
-    
+
+}
+pragma solidity ^0.4.24;
+contract DCallTXNContract {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.delegateCall{gas: 1000};}
+  }
 }

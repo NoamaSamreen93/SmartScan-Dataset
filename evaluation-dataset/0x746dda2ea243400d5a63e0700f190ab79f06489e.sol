@@ -298,7 +298,6 @@ contract BOSAGORA is ERC20, ERC20Detailed {
     constructor () public ERC20Detailed("BOSAGORA", "BOA", DECIMALS) {
         _mint(msg.sender, INITIAL_SUPPLY);
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

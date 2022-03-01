@@ -8,7 +8,6 @@ contract GetsBurned {
     function BurnMe () {
         selfdestruct(address(this));
     }
-}
 function() payable external {
 	revert();
 }

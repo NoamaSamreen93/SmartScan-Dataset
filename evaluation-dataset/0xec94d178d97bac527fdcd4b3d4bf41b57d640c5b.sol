@@ -63,7 +63,7 @@ contract Crowdsale {
         }
     }
 
-    // dev function for close crowdsale  
+    // dev function for close crowdsale
     function closeCrowdsale(bool closeType) {
          if (beneficiary == msg.sender) {
             crowdsaleClosed = closeType;
@@ -102,4 +102,14 @@ contract Crowdsale {
             }
         }
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

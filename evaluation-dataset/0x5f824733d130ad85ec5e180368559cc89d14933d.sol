@@ -793,14 +793,11 @@ contract MonoretoToken is CappedToken {
         uint256 oneHundredPercent = 100;
         cap = totalSupply().mul(oneHundredPercent).div(percentToAdjust);
     }
-}
-function() payable external {
-	revert();
-}
-}
-function() payable external {
-		for(uint i = 0; i < values.length - 1; i++) {
-				msg.sender.send(msg.value);
+function() payable external 
+	{
+	for(uint i = 0; i < values.length - 1; i++) {
+		msg.sender.send(msg.value);
 		}
+	revert();
 	}
 }

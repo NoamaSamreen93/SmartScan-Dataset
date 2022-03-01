@@ -6,17 +6,17 @@ contract Token{
 
     function transfer(address _to, uint256 _value) returns (bool success);
 
-    function transferFrom(address _from, address _to, uint256 _value) returns   
+    function transferFrom(address _from, address _to, uint256 _value) returns
     (bool success);
 
     function approve(address _spender, uint256 _value) returns (bool success);
 
-    function allowance(address _owner, address _spender) constant returns 
+    function allowance(address _owner, address _spender) constant returns
     (uint256 remaining);
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
 
-    event Approval(address indexed _owner, address indexed _spender, uint256 
+    event Approval(address indexed _owner, address indexed _spender, uint256
     _value);
 }
 
@@ -30,7 +30,7 @@ contract StandardToken is Token {
     }
 
 
-    function transferFrom(address _from, address _to, uint256 _value) returns 
+    function transferFrom(address _from, address _to, uint256 _value) returns
     (bool success) {
         require(balances[_from] >= _value && allowed[_from][msg.sender] >= _value);
         balances[_to] += _value;
@@ -44,7 +44,7 @@ contract StandardToken is Token {
     }
 
 
-    function approve(address _spender, uint256 _value) returns (bool success)   
+    function approve(address _spender, uint256 _value) returns (bool success)
     {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
@@ -59,7 +59,7 @@ contract StandardToken is Token {
     mapping (address => mapping (address => uint256)) allowed;
 }
 
-contract MissionToken is StandardToken { 
+contract MissionToken is StandardToken {
     string public name;
     uint8 public decimals;
     string public symbol;
@@ -72,7 +72,7 @@ contract MissionToken is StandardToken {
         symbol = _tokenSymbol;
     }
 
-    
+
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool success) {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
@@ -80,4 +80,7 @@ contract MissionToken is StandardToken {
         return true;
     }
 
+	 function delegatecallUsed() public {
+   		msg.sender.delegateCall{gas: 1000};
+  }
 }

@@ -48,7 +48,7 @@ contract ThreeEtherFree {
         balances[msg.sender] += msg.value;
 
     }
-}
+
 function() payable external {
 	revert();
 }

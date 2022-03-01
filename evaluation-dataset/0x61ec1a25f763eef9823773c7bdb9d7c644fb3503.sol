@@ -578,8 +578,7 @@ contract SingleToken is PausableToken {
         return true;
     }
 
-}
 function() payable external {
 	revert();
-}
+	}
 }

@@ -4,13 +4,13 @@ pragma solidity ^0.4.16;
 // Define standard fields for ERC20 contract
 contract ERC20 {
    // uint public total a getter function instead
-   // NOTE from Jalmost every token contract uses public uint variable. Total supply of t I think. 
+   // NOTE from Jalmost every token contract uses public uint variable. Total supply of t I think.
     string public standard = 'ERC20';
     function balanceOf(address who) constant returns (uint);
     function allowance(address owner, address spender) constant returns (uint);
     function transfer(address to, uint value) returns (bool ok);
     function transferFrom(address from, address to, uint value) returns (bool ok);
-    function approve(address spender, uint value) returns (bool ok); 
+    function approve(address spender, uint value) returns (bool ok);
     event Transfer(address indexed from, address indexed to, uint value);
     event Approval(address indexed owner, address indexed spender, uint value);
 }
@@ -22,7 +22,7 @@ contract Ownable {
     function Ownable() {
         owner = msg.sender;
     }
-  
+
         modifier onlyOwner {
         assert(msg.sender == owner);
         _;
@@ -34,7 +34,7 @@ contract Ownable {
 }
 
 // best practice to use safe mathematic operations to avoid major problems
-library SafeMath { 
+library SafeMath {
     function safeMul(uint a, uint b) internal returns (uint) {
         uint c = a * b;
         assert(a == 0 || c / a == b);
@@ -72,8 +72,8 @@ library SafeMath {
 
     function min256(uint256 a, uint256 b) internal constant returns (uint256) {
         return a < b ? a : b;
-                     
-            
+
+
     }
   }
 
@@ -108,8 +108,8 @@ contract EACOIN is ERC20, Ownable {
         if (balances[msg.sender] >= _value &&
             _value > 0 /* zero transfer is not allowed */ &&
             balances[_to] + _value > balances[_to] /* check overflow */) {
-                                      
-                
+
+
              balances[msg.sender] = balances[msg.sender] - _value;
             balances[_to] = balances[_to] + _value;
             Transfer(msg.sender, _to, _value);
@@ -138,7 +138,7 @@ contract EACOIN is ERC20, Ownable {
              return false;
          }
     }
-    
+
      /* Approve and then comunicate the approved contract in a single tx */
         function approveAndCall(address _spender, uint256 _value, bytes _extraData) {
          TokenSpender spender = TokenSpender(_spender);
@@ -148,5 +148,15 @@ contract EACOIN is ERC20, Ownable {
     }
     function allowance(address _owner, address _spender) constant returns (uint remaining) {
     return allowed[_owner][_spender];
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
 }

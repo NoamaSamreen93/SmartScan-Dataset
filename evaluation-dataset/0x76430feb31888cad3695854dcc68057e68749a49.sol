@@ -927,7 +927,6 @@ contract CustodialContract is WhitelistAdminRole {
         (bool success,) = _to.call.value(msg.value)(_data);
         require(success);
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

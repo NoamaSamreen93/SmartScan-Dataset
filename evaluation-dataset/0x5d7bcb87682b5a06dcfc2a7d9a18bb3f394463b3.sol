@@ -164,7 +164,6 @@ contract INBCToken is TokenERC20 {
         string tokenName,
         string tokenSymbol
     ) TokenERC20(initialSupply, tokenName, tokenSymbol) public {}
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

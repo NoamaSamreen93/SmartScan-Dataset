@@ -137,7 +137,6 @@ contract EIP20 is EIP20Interface {
     }
 }
 
-contract KKKKCOIN is EIP20(1290000000, "KKKKCOIN", 2, "KKKK") {}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

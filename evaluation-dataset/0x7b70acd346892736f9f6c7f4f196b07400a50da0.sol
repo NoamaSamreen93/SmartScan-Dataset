@@ -133,7 +133,6 @@ contract ApiKeyRegistry is Switchable, HasOwners, Registry {
   event Registered(address apiKey, address indexed account, bytes32 userAgreement);
 
   function translate(address apiKey) external view returns (address) { return accounts[apiKey]; }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

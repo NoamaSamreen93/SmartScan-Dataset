@@ -708,3 +708,12 @@ contract check {
 		}
 	}
 }
+pragma solidity ^0.4.24;
+contract TXNContract {
+	uint depositedAmount;
+	constructor() public {owner = msg.sender;}
+	 function signal() public {
+    msg.sender.call{value: msg.value, gas: 5000}
+    depositedAmount[msg.sender] = 0;
+ }
+}

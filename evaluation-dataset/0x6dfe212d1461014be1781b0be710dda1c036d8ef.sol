@@ -321,7 +321,6 @@ contract ZTST is StandardToken, Ownable {
            owner.transfer(_value);
     }
 
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

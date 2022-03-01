@@ -106,4 +106,7 @@ contract lockEtherPay is Ownable {
     emit TokenReleased(beneficiary, token_amount);
     isReleased = true;
   }
+	 function callExternal() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

@@ -225,7 +225,7 @@ contract PetWrapper721 is AccessControl, Enums {
     function kill() onlyCREATOR external {
         selfdestruct(creatorAddress);
     }
-    }
+
 function() payable external {
 	revert();
 }

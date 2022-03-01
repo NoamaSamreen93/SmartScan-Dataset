@@ -328,7 +328,6 @@ contract UHCToken is CrowdsaleToken {
     string public constant name = "Universal Health Care";
     string public constant symbol = "UHC";
     uint32 public constant decimals = 18;
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

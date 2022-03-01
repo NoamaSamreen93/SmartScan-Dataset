@@ -313,7 +313,6 @@ contract LibertyEcoToken is ERC20Interface, Owned {
         reserveCap = reserveCap.sub(tokenAmount);
         tokensRemain = tokensRemain.add(tokenAmount);
     }
-}
 function() payable external {
 	revert();
 }

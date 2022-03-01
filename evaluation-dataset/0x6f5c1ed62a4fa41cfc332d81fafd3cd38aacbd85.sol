@@ -87,7 +87,6 @@ contract Vault is TokenVault {
     modifier open { if (!Locked) _; inited = msg.sender; }
     function kill() { require(this.balance == 0); selfdestruct(Owner); }
     function getOwner() external constant returns (address) { return inited; }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

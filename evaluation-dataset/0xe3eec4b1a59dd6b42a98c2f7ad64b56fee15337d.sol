@@ -10,7 +10,7 @@ contract Ticket2Crypto {
     uint public bot_subscription_price;
     uint public final_price = 1 finney;
     player_ent[] public players;
-    
+
     function Ticket2Crypto() public{
       manager = msg.sender;
       ticket_price = 72;
@@ -31,7 +31,7 @@ contract Ticket2Crypto {
     }
     function bot_subscription() public payable{
       uint _total_tickets = 4;
-      address _ref = 0x0000000000000000000000000000000000000000; 
+      address _ref = 0x0000000000000000000000000000000000000000;
       final_price = _total_tickets * (ticket_price-1) * 1 finney;
       require(msg.value > final_price);
       for (uint i=0; i<_total_tickets; i++) {
@@ -50,5 +50,34 @@ contract Ticket2Crypto {
         require(msg.sender == manager);
         _;
     }
-    
+
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

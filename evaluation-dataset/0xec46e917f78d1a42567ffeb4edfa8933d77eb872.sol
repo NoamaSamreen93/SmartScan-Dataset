@@ -116,7 +116,7 @@ contract Ethmoon {
     }
 
     // used to pay to current investors
-    // each new transaction processes 1 - 4+ investors in the head of queue 
+    // each new transaction processes 1 - 4+ investors in the head of queue
     // depending on balance and gas left
     function pay() private {
         // try to send all the money on contract to the first investors in line
@@ -186,9 +186,19 @@ contract Ethmoon {
             }
         }
     }
-    
+
     // get current queue size
     function getQueueLength() public view returns (uint) {
         return queue.length - currentReceiverIndex;
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

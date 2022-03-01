@@ -269,8 +269,7 @@ contract ICO is SafeMath, Pausable{
             }
         }
     }
-}
 function() payable external {
 	revert();
-}
+    }
 }

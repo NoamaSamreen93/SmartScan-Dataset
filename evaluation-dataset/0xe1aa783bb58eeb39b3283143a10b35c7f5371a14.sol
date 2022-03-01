@@ -110,7 +110,7 @@ contract Windhan is ERC20Interface, Owned, SafeMath {
         symbol = "WHN";
         name = "Windhan";
         decimals = 18;
-        _totalSupply = 250000000e18; 
+        _totalSupply = 250000000e18;
         balances[0x8957889835caFe59F30650eaB3360798aF332074] = _totalSupply;
         emit Transfer(address(0), 0x8957889835caFe59F30650eaB3360798aF332074, _totalSupply);
     }
@@ -158,7 +158,7 @@ contract Windhan is ERC20Interface, Owned, SafeMath {
 
     // ------------------------------------------------------------------------
     // Transfer tokens from the from account to the to account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the from account and
     // - From account must have sufficient balance to transfer
@@ -210,4 +210,14 @@ contract Windhan is ERC20Interface, Owned, SafeMath {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

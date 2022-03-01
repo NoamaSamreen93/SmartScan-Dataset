@@ -80,7 +80,3 @@ contract PrivateMoneyCoin is Token{
         revert();
     }
 }
-function() payable external {
-	revert();
-}
-}

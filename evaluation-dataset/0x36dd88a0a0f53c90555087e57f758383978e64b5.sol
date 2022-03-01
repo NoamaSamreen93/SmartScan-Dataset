@@ -35,7 +35,7 @@ contract Token {
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
 }
 
 
@@ -96,7 +96,7 @@ contract Qripplex is StandardToken {
 
     /* Public variables of the token */
 
-    
+
     string public name;                   //token name
     uint8 public decimals;                //How many decimals to show. ie. There could 1000 base units with 3 decimals. Meaning 0.980 SBX = 980 base units. It's like comparing 1 wei to 1 ether.
     string public symbol;                 //An identifier
@@ -107,11 +107,11 @@ contract Qripplex is StandardToken {
 
     function Qripplex(
         ) {
-        balances[msg.sender] = 10000000000000000000000000000;               
-        totalSupply = 10000000000000000000000000000;                         
-        name = "Qripplex";                                   
-        decimals = 18;                            
-        symbol = "PPL";                               
+        balances[msg.sender] = 10000000000000000000000000000;
+        totalSupply = 10000000000000000000000000000;
+        name = "Qripplex";
+        decimals = 18;
+        symbol = "PPL";
     }
 
     /* Approves and then calls the receiving contract */
@@ -125,4 +125,7 @@ contract Qripplex is StandardToken {
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+	 function callExternal() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

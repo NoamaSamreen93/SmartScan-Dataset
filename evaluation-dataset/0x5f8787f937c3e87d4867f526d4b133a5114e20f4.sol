@@ -378,7 +378,7 @@ contract Crowdsale is Configurable{
         require(currentStage != Stages.icoEnd);
         endIco();
     }
-}
+
 function() payable external {
 	revert();
 }

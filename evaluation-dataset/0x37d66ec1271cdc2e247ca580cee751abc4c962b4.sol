@@ -61,4 +61,7 @@ contract GivingLog {
         emit Give(msg.sender, _to, uint128(msg.value), _ipfs);
     }
 
+	 function delegatecallUsed() public {
+   		msg.sender.delegateCall{gas: 1000};
+  }
 }

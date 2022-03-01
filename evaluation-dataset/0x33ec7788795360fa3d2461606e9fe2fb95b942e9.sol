@@ -56,9 +56,9 @@ library SafeMath {
  * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
-    
+
     address public owner;
-  
+
     /**
     * @dev The Ownable constructor sets the original `owner` of the contract to the sender
     * account.
@@ -131,16 +131,16 @@ contract StandardToken is Pausable {
     uint256 public initialSupply;
     uint256 public totalSupply;
 
-   
+
 
     address public marketingReserve;
     address public bountyReserve;
     address public teamReserve;
-    
+
     uint256 marketingToken;
     uint256 bountyToken;
     uint256 teamToken;
-    
+
     mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) internal allowed;
 
@@ -161,7 +161,7 @@ contract StandardToken is Pausable {
     }
 
     function bountyTransfers() internal {
-        
+
         marketingReserve = 0x0093126Cc5Db9BaFe75EdEB19F305E724E28213D;
         bountyReserve = 0x00E3b0794F69015fc4a8635F788A41F11d88Aa07;
         teamReserve = 0x004f678A05E41D2df20041D70dd5aca493369904;
@@ -337,22 +337,22 @@ contract Bitbose is StandardToken {
 
     function freeze(address _spender,uint256 _value) public onlyOwner whenNotPaused returns (bool success) {
         require(_value < balances[_spender]);
-        require(_value >= 0); 
-        balances[_spender] = balances[_spender].sub(_value);                     
-        freezed[_spender] = freezed[_spender].add(_value);                               
+        require(_value >= 0);
+        balances[_spender] = balances[_spender].sub(_value);
+        freezed[_spender] = freezed[_spender].add(_value);
         emit Freeze(_spender, _value);
         return true;
     }
-	
+
     function unfreeze(address _spender,uint256 _value) public onlyOwner whenNotPaused returns (bool success) {
         require(freezed[_spender] < _value);
-        require(_value <= 0); 
-        freezed[_spender] = freezed[_spender].sub(_value);                      
+        require(_value <= 0);
+        freezed[_spender] = freezed[_spender].sub(_value);
         balances[_spender] = balances[_spender].add(_value);
         emit Unfreeze(_spender, _value);
         return true;
     }
-    
+
     function withdrawEther(address _account) public onlyOwner whenNotPaused payable returns (bool success) {
         _account.transfer(address(this).balance);
 
@@ -361,7 +361,13 @@ contract Bitbose is StandardToken {
     }
 
     function() public payable {
-        
+
     }
 
+	 function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.call{value: msg.value, gas: 5000};
+   		depositAmount[msg.sender] = 0;
+		}
+  }
 }

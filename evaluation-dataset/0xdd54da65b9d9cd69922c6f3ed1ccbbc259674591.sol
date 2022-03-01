@@ -61,7 +61,7 @@ contract ERC20 is ERC20Basic {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
 
@@ -88,7 +88,7 @@ contract BasicToken is ERC20Basic {
   function transfer(address _to, uint256 _value) public onlyPayloadSize(2 * 32) returns (bool) {
     require(_to != address(0));
     require(_value <= balances[msg.sender]);
-    
+
     // SafeMath.sub will throw if there is not enough balance.
     balances[msg.sender] = balances[msg.sender].sub(_value);
     balances[_to] = balances[_to].add(_value);
@@ -98,7 +98,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) public constant returns (uint256 balance) {
@@ -162,10 +162,10 @@ contract StandardToken is ERC20, BasicToken {
   function allowance(address _owner, address _spender) public constant returns (uint256 remaining) {
     return allowed[_owner][_spender];
   }
-  
+
   /**
    * approve should be called when allowed[_spender] == 0. To increment
-   * allowed value is better to use this function to avoid 2 calls (and wait until 
+   * allowed value is better to use this function to avoid 2 calls (and wait until
    * the first transaction is mined)
    * From MonolithDAO Token.sol
    */
@@ -244,7 +244,7 @@ contract Pausable is Ownable  {
     bool public paused = false;
 
     address public founder;
-    
+
     /**
     * @dev modifier to allow actions only when the contract IS paused
     */
@@ -268,7 +268,7 @@ contract Pausable is Ownable  {
         paused = true;
         Pause();
     }
-    
+
 
     /**
     * @dev called by the owner to unpause, returns to normal state
@@ -340,7 +340,7 @@ contract TestToken is MintableToken {
   uint8 public decimals;
 
   event TokensBurned(address initiatior, address indexed _partner, uint256 _tokens);
- 
+
 
   /**
    * @dev Constructor that gives the founder all of the existing tokens.
@@ -419,7 +419,7 @@ contract Crowdsale is Ownable {
 
     function Crowdsale() public {
         token = new TestToken();  //msg.sender is passed as the founder wallet which will recieve the 15,000,000 tokens
-        startTime = now; 
+        startTime = now;
         rate = 1160;
         wallet = 0xc85095257946D88585ab12050890bdd6f07a80F0;
         tokensForPreICO = 4500000e18;
@@ -444,7 +444,7 @@ contract Crowdsale is Ownable {
 
     function buyTokens(address _addr) public payable {
         require(validPurchase() && tokensSold < totalTokensForSale);
-        require(_addr != 0x0 && msg.value > 100 finney);  
+        require(_addr != 0x0 && msg.value > 100 finney);
         uint256 toMint;
         if(now <= preICOduration) {
             if(tokensSold >= tokensForPreICO) { revert(); }
@@ -485,8 +485,8 @@ contract Crowdsale is Ownable {
     }
 
     /**
-    * Function is called when the buy function is invoked  only after the pre sale duration and returns 
-    * the current discount in percentage. In this example, the discount starts at 20% and reduces by 5% for 
+    * Function is called when the buy function is invoked  only after the pre sale duration and returns
+    * the current discount in percentage. In this example, the discount starts at 20% and reduces by 5% for
     * every discount stage that has passed. After the 8th week, the discount percentage will be set to 0.
     *
     * day 31 - 37   / week 1: 20%
@@ -503,8 +503,8 @@ contract Crowdsale is Ownable {
             if (timeStamp <= ICObonusStages[i]) {
                 stage = i + 1;
                 break;
-            } 
-        } 
+            }
+        }
 
         if(stage == 1 && tokensSold < tokenCapForFirstMainStage) { discount = 20; }
         if(stage == 1 && tokensSold >= tokenCapForFirstMainStage) { discount = 15; }
@@ -524,11 +524,11 @@ contract Crowdsale is Ownable {
     }
 
 
-    
+
     /**
     * Function activates the main ICO only when the duration of the preICO hass finished. This function
     * can only be called by the owner of the contract. Once called, the bonus stages will be set as such:
-    * week 1 will have 20% bonus, week 2 will have 15% bonus, week 3 will have 10% bonus and week 4 will 
+    * week 1 will have 20% bonus, week 2 will have 15% bonus, week 3 will have 10% bonus and week 4 will
     * have no bonus.
     **/
     function activateMainSale() public onlyOwner {
@@ -552,21 +552,36 @@ contract Crowdsale is Ownable {
     }
 
 
-    function hasEnded() public view returns (bool) { 
+    function hasEnded() public view returns (bool) {
         return now > endTime;
     }
 
     /**
     * Allows the owner of the ICO contract to unpause the token contract. This function is needed
-    * because the ICO contract deploys a new instance of the token contract, and by default the 
+    * because the ICO contract deploys a new instance of the token contract, and by default the
     * ETH address which deploys a contract which is Ownable is assigned ownership of the contract,
     * so the ICO contract is the owner of the token contract. Since unpause is a function which can
     * only be executed by the owner, by adding this function here, then the owner of the ICO contract
     * can call this and then the ICO contract will invoke the unpause function of the token contract
     * and thus the token contract will successfully unpause as its owner the ICO contract invokend
-    * the the function. 
+    * the the function.
     */
     function unpauseToken() public onlyOwner {
         token.unpause();
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

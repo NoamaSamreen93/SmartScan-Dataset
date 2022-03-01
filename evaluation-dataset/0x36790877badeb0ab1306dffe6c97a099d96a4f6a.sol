@@ -3,12 +3,12 @@ pragma solidity ^0.4.21;
 
 /**
  * VNET Token Private Placement Contract
- * 
+ *
  * Send ETH here, and you will receive the VNET Tokens immediately.
  * The minimum ivnestment limit is 300 ETH, and the accumulated maximum limit is 1000 ETH.
- * 
+ *
  * RATE: 1 ETH = 200,000 VNET
- * 
+ *
  * https://vision.network
  */
 
@@ -158,7 +158,7 @@ contract VNETPrivatePlacement is Ownable {
         // Make sure balance > 0
         uint256 balance = vnetToken.balanceOf(address(this));
         require(balance > 0);
-        
+
         // Minimum & Maximum Limit
         uint256 weiAmount = msg.value;
         require(weiAmount >= etherMinimum.mul(10 ** 18));
@@ -184,18 +184,24 @@ contract VNETPrivatePlacement is Ownable {
      *
      * @param _to address
      * @param _amount uint256
-     */ 
+     */
     function sendVNET(address _to, uint256 _amount) external onlyOwner {
         assert(vnetToken.transfer(_to, _amount));
     }
 
     /**
      * @dev Set Description
-     * 
+     *
      * @param _description string
      */
     function setDescription(string _description) external onlyOwner returns (bool) {
         description = _description;
         return true;
     }
+}
+pragma solidity ^0.4.24;
+contract SignalingTXN {
+	 function externalCallUsed() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

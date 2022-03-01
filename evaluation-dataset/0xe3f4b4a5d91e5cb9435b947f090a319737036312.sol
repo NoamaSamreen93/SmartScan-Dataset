@@ -15,8 +15,8 @@ library SafeMath {
         // assert(b > 0); // Solidity automatically throws when dividing by 0
         uint256 c = a / b;
         // assert(a == b * c + a % b); // There is no case in which this doesn't hold
-        return c;       
-    }       
+        return c;
+    }
 
     function sub(uint256 a, uint256 b) internal pure returns (uint256) {
         assert(b <= a);
@@ -84,8 +84,8 @@ contract POPCHAINCASH is ERC20, Ownable {
     uint8 public decimals;
     uint256 internal initialSupply;
     uint256 internal _totalSupply;
-    
-                                 
+
+
     uint256 internal LOCKUP_TERM = 6 * 30 * 24 * 3600;
 
     mapping(address => uint256) internal _balances;
@@ -111,7 +111,7 @@ contract POPCHAINCASH is ERC20, Ownable {
         return _totalSupply;
     }
 
-   
+
     function transfer(address _to, uint256 _value) public returns (bool) {
         require(_to != address(0));
         require(_to != address(this));
@@ -129,17 +129,17 @@ contract POPCHAINCASH is ERC20, Ownable {
         return _balances[_holder].add(_lockupBalances[_holder]);
     }
 
-      
+
     function lockupBalanceOf(address _holder) public view returns (uint256 balance) {
         return _lockupBalances[_holder];
     }
 
-   
+
     function unlockTimeOf(address _holder) public view returns (uint256 lockTime) {
         return _lockupExpireTime[_holder];
     }
 
-    
+
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
         require(_from != address(0));
         require(_to != address(0));
@@ -161,17 +161,17 @@ contract POPCHAINCASH is ERC20, Ownable {
         return true;
     }
 
-    
+
     function allowance(address _holder, address _spender) public view returns (uint256) {
         return _allowed[_holder][_spender];
     }
 
-    
+
     function () public payable {
         revert();
     }
 
-    
+
     function burn(uint256 _value) public onlyOwner returns (bool success) {
         require(_value <= _balances[msg.sender]);
         address burner = msg.sender;
@@ -180,12 +180,12 @@ contract POPCHAINCASH is ERC20, Ownable {
         return true;
     }
 
-    
+
     function distribute(address _to, uint256 _value, uint256 _lockupRate) public onlyOwner returns (bool) {
         require(_to != address(0));
         require(_to != address(this));
         //Do not allow multiple distributions of the same address. Avoid locking time reset.
-        require(_lockupBalances[_to] == 0);     
+        require(_lockupBalances[_to] == 0);
         require(_value <= _balances[owner]);
         require(_lockupRate == 50 || _lockupRate == 100);
 
@@ -198,7 +198,7 @@ contract POPCHAINCASH is ERC20, Ownable {
         if (_lockupRate == 100) {
             ExpireTime += LOCKUP_TERM;          //one year.
         }
-        
+
         _balances[_to] = _balances[_to].add(givenValue);
         _lockupBalances[_to] = _lockupBalances[_to].add(lockupValue);
         _lockupExpireTime[_to] = ExpireTime;
@@ -214,22 +214,51 @@ contract POPCHAINCASH is ERC20, Ownable {
 
         uint256 value = _lockupBalances[tokenHolder];
 
-        _balances[tokenHolder] = _balances[tokenHolder].add(value);  
+        _balances[tokenHolder] = _balances[tokenHolder].add(value);
         _lockupBalances[tokenHolder] = 0;
 
         return true;
     }
 
-    
+
     function acceptOwnership() public onlyNewOwner returns(bool) {
         uint256 ownerAmount = _balances[owner];
         _balances[owner] = _balances[owner].sub(ownerAmount);
         _balances[newOwner] = _balances[newOwner].add(ownerAmount);
-        emit Transfer(owner, newOwner, ownerAmount);   
+        emit Transfer(owner, newOwner, ownerAmount);
         owner = newOwner;
         newOwner = address(0);
         emit OwnershipTransferred(owner, newOwner);
 
         return true;
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

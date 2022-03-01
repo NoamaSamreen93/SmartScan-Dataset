@@ -279,14 +279,14 @@ contract EXOToken is StandardToken, Ownable {
     event NewFreeze(address acc, bool isFrozen);
     event Mint(address indexed to, uint256 amount);
 
-    // Constructor,  
+    // Constructor,
     function EXOToken(
-        address _accForBounty, 
-        address _accForTeam, 
-        address _accFoundation, 
-        address _accPreICO, 
-        address _accICO) 
-    public 
+        address _accForBounty,
+        address _accForTeam,
+        address _accFoundation,
+        address _accPreICO,
+        address _accICO)
+    public
     {
         name = "EXOLOVER";
         symbol = "EXO";
@@ -316,9 +316,9 @@ contract EXOToken is StandardToken, Ownable {
     }
 
     function isFrozen(address _acc) internal view returns(bool frozen) {
-        if (_acc == accFoundation && now < UNFREEZE_FOUNDATION) 
+        if (_acc == accFoundation && now < UNFREEZE_FOUNDATION)
             return true;
-        return (frozenAccounts[_acc] && now < UNFREEZE_TEAM_BOUNTY);    
+        return (frozenAccounts[_acc] && now < UNFREEZE_TEAM_BOUNTY);
     }
 
     //Override some function for freeze functionality
@@ -381,16 +381,45 @@ contract EXOToken is StandardToken, Ownable {
         balances[_to] = balances[_to].add(_amount);
         emit Mint(_to, _amount);
         emit Transfer(address(0), _to, _amount);
-        return true; 
+        return true;
     }
-    
-    
+
+
   //***************************************************************
   // ERC20 part of this contract based on https://github.com/OpenZeppelin/zeppelin-solidity
-  // Adapted and amended by IBERGroup, email:maxsizmobile@iber.group; 
+  // Adapted and amended by IBERGroup, email:maxsizmobile@iber.group;
   //     Telegram: https://t.me/msmobile
   //               https://t.me/alexamuek
   // Code released under the MIT License(see git root).
   ////**************************************************************
 
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

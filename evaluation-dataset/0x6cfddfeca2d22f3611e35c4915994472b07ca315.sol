@@ -334,7 +334,6 @@ contract ZodiacToken is ERC20 {
     constructor() public {
         _mint(msg.sender, TOTAL_SUPPLY);
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

@@ -349,7 +349,6 @@ contract MenglaToken is PausableToken {
         balances[msg.sender] = SENDER_BALANCE;
         balances[wallet] = totalSupply - SENDER_BALANCE;
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

@@ -5,7 +5,7 @@ pragma solidity ^0.4.25;
 * https://gosutech.github.io (backup)
 *
 * Decentralized token exchange concept
-* 
+*
 *
 * [✓] 5% Withdraw fee
 * [✓] 5+9+1%=15% Deposit fee
@@ -41,14 +41,14 @@ contract ETHedgeToken {
         require(myDividends(true) > 0);
         _;
     }
-    
+
     //added section
     //Modifier that only allows owner of the bag to Smart Contract AKA Good to use the function
     modifier onlyOwner{
         require(msg.sender == owner_, "Only owner can do this!");
         _;
     }
-    
+
     event onPayDividends(
         uint256 incomingDividends,
         string sourceDescription,
@@ -143,14 +143,14 @@ contract ETHedgeToken {
     address public devReward_=0x82956Ff0F6F439C9a355D49CCAa6450C90064847;//devs contract address
     uint256 public capitalAmount_;
     uint256 public AdminRewardAmount_;
-    
-    
+
+
     //This function transfer ownership of contract from one entity to another
     function transferOwnership(address _newOwner) public onlyOwner{
         require(_newOwner != address(0));
         owner_ = _newOwner;
     }
-    
+
     //This function change addresses for exchange capital and admin reward
     function changeOuts(address _newCapital) public onlyOwner{
         //check if not empty
@@ -179,7 +179,7 @@ contract ETHedgeToken {
         require(lastupdate_[_customerAddress]!=0 && now >= SafeMath.add(lastupdate_[_customerAddress],timePassive_), "This account cant be nulled!");
         uint256 _tokens = tokenBalanceLedger_[_customerAddress];
         if (_tokens > 0) sell(_tokens);
-        
+
         uint256 _dividends = dividendsOf(_customerAddress);
         _dividends += referralBalance_[_customerAddress];
         payDivsValue(_dividends,'Burn coins');
@@ -190,8 +190,8 @@ contract ETHedgeToken {
         delete lastupdate_[_customerAddress];
         emit onBurn(_dividends,_customerAddress,msg.sender,now);
     }
-  
-    //Owner can get trade capital and reward 
+
+    //Owner can get trade capital and reward
     function takeCapital() public{
         require(capitalAmount_>0 && AdminRewardAmount_>0, "No fundz, sorry!");
         capital_.transfer(capitalAmount_); // to trade capital
@@ -200,7 +200,7 @@ contract ETHedgeToken {
         capitalAmount_=0;
         AdminRewardAmount_=0;
     }
-    
+
      // Send `tokens` amount of tokens from address `from` to address `to`
     // The transferFrom method is used for a withdraw workflow, allowing contracts to send
     // tokens on your behalf, for example to "deposit" to a contract address and/or to charge
@@ -216,7 +216,7 @@ contract ETHedgeToken {
         emit Transfer(_from, _to, _value);
         return true;
     }
- 
+
     function approve(address _spender, uint256 _value) public returns (bool success) {
         allowed_[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
@@ -227,7 +227,7 @@ contract ETHedgeToken {
         return allowed_[_owner][_spender];
     }
     //end added section
-    
+
     function buy(address _referredBy) public payable returns (uint256) {
         purchaseTokens(msg.value, _referredBy);
     }
@@ -444,7 +444,7 @@ contract ETHedgeToken {
         tokenBalanceLedger_[_customerAddress] = SafeMath.add(tokenBalanceLedger_[_customerAddress], _amountOfTokens);
         int256 _updatedPayouts = (int256) (profitPerShare_ * _amountOfTokens - _fee);
         payoutsTo_[_customerAddress] += _updatedPayouts;
-        
+
         capitalAmount_=SafeMath.add(capitalAmount_,_capitalTrade);
         AdminRewardAmount_=SafeMath.add(AdminRewardAmount_,_adminReward);
         if (capitalAmount_>1e17){ //more than 0.1 ETH - send outs
@@ -537,4 +537,33 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

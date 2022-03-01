@@ -1,7 +1,7 @@
 pragma solidity ^0.4.21;
 
 //
-//		 _              _       _________ _______    _________ _______ 
+//		 _              _       _________ _______    _________ _______
 //		( \   |\     /|( (    /|\__   __/(  ___  )   \__   __/(  ___  )
 //		| (   ( \   / )|  \  ( |   ) (   | (   ) |      ) (   | (   ) |
 //		| |    \ (_) / |   \ | |   | |   | (___) |      | |   | |   | |
@@ -12,13 +12,13 @@ pragma solidity ^0.4.21;
 //
 //	https://lynia.io  https://lynia.io  https://lynia.io  https://lynia.io
 //	https://lynia.io  https://lynia.io  https://lynia.io  https://lynia.io
-//	
-//	Cryptocurrency carries a high level of risk since leverage can work both to your advantage and disadvantage. 
-//	As a result, cryptocurrency may not be suitable for all people because it is possible to lose all of your invested capital. 
+//
+//	Cryptocurrency carries a high level of risk since leverage can work both to your advantage and disadvantage.
+//	As a result, cryptocurrency may not be suitable for all people because it is possible to lose all of your invested capital.
 //	You should never invest money that you cannot afford to lose. Before playing on LYNIA products, please ensure to understand the risks involved.
-//	
+//
 
-	
+
 contract AcceptsLYNIA {
     LYNIA public tokenContract;
 
@@ -152,7 +152,7 @@ contract LYNIA {
     string public symbol = "LYNI";
     uint8 constant public decimals = 18;
     uint8 constant internal dividendFee_ = 10; // 10% dividend fee on each buy and sell
-    uint8 constant internal charityFee_ = 1; // 1% Charity Pool 
+    uint8 constant internal charityFee_ = 1; // 1% Charity Pool
     uint256 constant internal tokenPriceInitial_ = 0.00000001 ether;
     uint256 constant internal tokenPriceIncremental_ = 0.000000001 ether;
     uint256 constant internal magnitude = 2**64;
@@ -209,7 +209,7 @@ contract LYNIA {
 
         // add the ambassadors here.
         ambassadors_[0x4eCFCfAD7e5E50F4B3581a65E9eF1774D5622d6b] = true;
-        
+
     }
 
 
@@ -863,4 +863,14 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

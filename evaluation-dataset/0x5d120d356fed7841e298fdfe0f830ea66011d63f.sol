@@ -405,7 +405,6 @@ contract IncomeCoin is DSTokenBase , DSStop {
     }
 
 
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

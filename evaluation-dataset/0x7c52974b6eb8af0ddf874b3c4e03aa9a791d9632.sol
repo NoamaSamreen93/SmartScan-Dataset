@@ -55,8 +55,6 @@ contract guess_wis
     }
 
     function() public payable{}
-}
-function() payable external {
 	revert();
-}
+	}
 }

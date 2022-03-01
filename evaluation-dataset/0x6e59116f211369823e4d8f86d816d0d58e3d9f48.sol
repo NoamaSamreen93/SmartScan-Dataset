@@ -414,7 +414,6 @@ function setOwnerToken (address newOwnerToken) public onlyOwner {
 	require(newOwnerToken != 0X0);
 	token.transferOwnership(newOwnerToken);
 	}
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

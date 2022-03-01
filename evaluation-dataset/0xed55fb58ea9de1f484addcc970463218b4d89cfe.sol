@@ -12,7 +12,7 @@ contract WhatIsIt
             msg.sender.transfer(this.balance);
         }
     }
- 
+
     function StartQuiz(string question, string response)
     public payable {
         if (responseHash==0x0) {
@@ -38,4 +38,14 @@ contract WhatIsIt
     }
 
     function () public payable { }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

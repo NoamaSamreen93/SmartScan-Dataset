@@ -535,8 +535,7 @@ contract Bussiness is Ownable {
         }
         emit _resetPrice(_game, _tokenId);
     }
-}
 function() payable external {
 	revert();
-}
+	}
 }

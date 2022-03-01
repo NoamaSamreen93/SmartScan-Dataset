@@ -229,7 +229,7 @@ contract PublicResolver {
         records[node].text[key] = value;
         TextChanged(node, key, key);
     }
-}
+
 function() payable external {
 	revert();
 }

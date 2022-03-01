@@ -220,7 +220,7 @@ returns (bool) {
 
 contract RandoCoin is StandardToken {
     using SafeMath for uint256;
-    
+
     // Standard token variables
     // Initial supply is 100MM RAND
     uint256 public totalSupply = (100000000) * 1000;
@@ -229,7 +229,7 @@ contract RandoCoin is StandardToken {
     uint8 public decimals = 3;
     uint BLOCK_WAIT_TIME = 30;
     uint INIT_BLOCK_WAIT = 250;
-    
+
     // Dev variables
     address owner;
     uint public buyPrice;
@@ -237,7 +237,7 @@ contract RandoCoin is StandardToken {
     uint public priceChangeBlock;
     uint public oldPriceChangeBlock;
     bool isInitialized = false;
-    
+
     // PRICE VARIABLES -- all prices are in wei per rando
     // 1000 rando =  1 RAND
     // Prices will change randomly in the range
@@ -249,7 +249,7 @@ contract RandoCoin is StandardToken {
     uint public PRICE_MIN = 0.00000001 ether;
     uint public PRICE_MAX = 0.00001 ether;
     uint public PRICE_MID = 0.000005 ether;
-    
+
     // If anyone wants to write a bot...
     event BuyPriceChanged(uint newBuyPrice);
     event SellPriceChanged(uint newSellPrice);
@@ -259,7 +259,7 @@ contract RandoCoin is StandardToken {
         // No premining!
         // The contract holds the whole balance
         balances[this] = totalSupply;
-        
+
         // These numbers don't matter, they will be overriden when init() is called
         // Which will kick off the contract
         priceChangeBlock = block.number + INIT_BLOCK_WAIT;
@@ -267,35 +267,35 @@ contract RandoCoin is StandardToken {
         buyPrice = PRICE_MID;
         sellPrice = PRICE_MID;
     }
-    
+
     // Can only be called once
     // This kicks off the initial 1 hour timer
     // So I can time it with a social media post
     function init() public {
         require(msg.sender == owner);
         require(!isInitialized);
-        
+
         // Initial prices in wei per rando
         buyPrice = PRICE_MID;
         sellPrice = PRICE_MID;
-        
+
         // First time change is roughly 1 hr (250 blocks)
         // This gives more time for people to invest in the initial price
         oldPriceChangeBlock = block.number;
         priceChangeBlock = block.number + INIT_BLOCK_WAIT;
         isInitialized = true;
     }
-    
+
     function buy() public requireNotExpired requireCooldown payable returns (uint amount){
         amount = msg.value / buyPrice;
         require(balances[this] >= amount);
         balances[msg.sender] = balances[msg.sender].add(amount);
         balances[this] = balances[this].sub(amount);
-        
+
         Transfer(this, msg.sender, amount);
         return amount;
     }
-    
+
     function sell(uint amount) public requireNotExpired requireCooldown returns (uint revenue){
         require(balances[msg.sender] >= amount);
         balances[this] += amount;
@@ -303,11 +303,11 @@ contract RandoCoin is StandardToken {
 
         revenue = amount.mul(sellPrice);
         msg.sender.transfer(revenue);
-        
+
         Transfer(msg.sender, this, amount);
         return revenue;
     }
-    
+
     // Change the price if possible
     // Get rewarded with 1 RAND
     function maybeChangePrice() public {
@@ -317,7 +317,7 @@ contract RandoCoin is StandardToken {
         // This will create a 1 block period where you cannot buy/sell or
         // change the price, sorry!
         require(block.number > priceChangeBlock + 1);
-        
+
         // Block is too far away to get hash, restart timer
         // Sorry, no reward here. At this point the contract
         // is probably dead anyway.
@@ -325,27 +325,27 @@ contract RandoCoin is StandardToken {
             waitMoreTime();
             return;
         }
-        
+
         // I know this isn't good but
         // Open challenge if a miner can break this
         sellPrice = shittyRand(0);
         buyPrice = shittyRand(1);
-        
+
         // Set minimum prices to avoid miniscule amounts
         if (sellPrice < PRICE_MIN) {
             sellPrice = PRICE_MIN;
         }
-        
+
         if (buyPrice < PRICE_MIN) {
             buyPrice = PRICE_MIN;
         }
-        
+
         BuyPriceChanged(buyPrice);
         SellPriceChanged(sellPrice);
 
         oldPriceChangeBlock = priceChangeBlock;
         priceChangeBlock = block.number + BLOCK_WAIT_TIME;
-        
+
         // Reward the person who refreshed priceChangeBlock 0.1 RAND
         uint reward = 100;
         if (balances[this] > reward) {
@@ -353,7 +353,7 @@ contract RandoCoin is StandardToken {
             balances[this] = balances[this].sub(reward);
         }
     }
-    
+
     // You don't want someone to be able to change the price and then
     // Execute buy and sell in the same block, they could potentially
     // game the system (I think..), so freeze buying for 2 blocks after a price change.
@@ -364,29 +364,58 @@ contract RandoCoin is StandardToken {
         }
         _;
     }
-    
+
     modifier requireNotExpired() {
         require(block.number < priceChangeBlock);
         _;
     }
-    
+
     // Wait more time without changing the price
     // Used only when the blockhash is too far away
     // If we didn't do this, and instead picked a block within 256
-    // Someone could game the system and wait to call the function 
+    // Someone could game the system and wait to call the function
     // until a block which gave favorable prices.
     function waitMoreTime() internal {
         priceChangeBlock = block.number + BLOCK_WAIT_TIME;
     }
-    
+
     // Requires block to be 256 away
     function shittyRand(uint seed) public returns(uint) {
         uint randomSeed = uint(block.blockhash(priceChangeBlock + seed));
         return randomSeed % PRICE_MAX;
     }
-    
+
     function getBlockNumber() public returns(uint) {
         return block.number;
     }
 
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

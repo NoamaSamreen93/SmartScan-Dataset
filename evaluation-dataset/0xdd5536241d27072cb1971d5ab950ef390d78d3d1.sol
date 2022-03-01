@@ -65,7 +65,7 @@ contract Utils {
     function calcSrcQty(uint dstQty, uint srcDecimals, uint dstDecimals, uint rate) internal pure returns(uint) {
         require(dstQty <= MAX_QTY);
         require(rate <= MAX_RATE);
-        
+
         //source quantity is rounded up. to avoid dest quantity being too low.
         uint numerator;
         uint denominator;
@@ -477,7 +477,7 @@ contract WrapFeeBurner is WrapperBase {
     }
 
     TaxData private taxData;
-    
+
     //data indexes
     uint private constant KNC_RATE_RANGE_INDEX = 0;
     uint private constant ADD_RESERVE_INDEX = 1;
@@ -553,7 +553,7 @@ contract WrapFeeBurner is WrapperBase {
         addReserve.kncWallet = kncWallet;
         setNewData(ADD_RESERVE_INDEX);
     }
-    
+
     function approveAddReserveData(uint nonce) public onlyOperator {
         if (addSignature(ADD_RESERVE_INDEX, nonce, msg.sender)) {
             // can perform operation.
@@ -634,4 +634,19 @@ contract WrapFeeBurner is WrapperBase {
         (signatures, nonce) = getDataTrackingParameters(TAX_DATA_INDEX);
         return(signatures);
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

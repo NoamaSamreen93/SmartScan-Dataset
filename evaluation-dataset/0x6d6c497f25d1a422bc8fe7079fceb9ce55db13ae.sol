@@ -421,7 +421,6 @@ contract SRATOKEN is ERC223Interface, Pausable {
         balances[msg.sender] = balances[msg.sender].add(totalAmount);
         return true;
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

@@ -33,7 +33,7 @@ library SafeMath {
 // _newOwner is address of new owner
 // ----------------------------------------------------------------------------
 contract Owned {
-    
+
     address public owner;
 
     event OwnershipTransferred(address indexed _from, address indexed _to);
@@ -53,7 +53,7 @@ contract Owned {
         emit OwnershipTransferred(owner,_newOwner);
         owner = _newOwner;
     }
-    
+
 }
 
 
@@ -61,10 +61,10 @@ contract Owned {
 // CesaireToken interface
 // ----------------------------------------------------------------------------
 contract CesaireToken {
-    
+
     function balanceOf(address _owner) public constant returns (uint256 balance);
     function transfer(address _to, uint256 _value) public returns (bool success);
-    
+
 }
 
 
@@ -74,7 +74,7 @@ contract CesaireToken {
 contract CesaireICO is Owned {
 
     using SafeMath for uint256;
-    
+
     enum State {
         PrivatePreSale,
         PreICO,
@@ -85,13 +85,13 @@ contract CesaireICO is Owned {
         ICORound5,
         Successful
     }
-    
+
     //public variables
     State public state; //Set initial stage
     uint256 public totalRaised; //eth in wei
     uint256 public totalDistributed; //tokens distributed
     CesaireToken public CSE; // CSE token address
-    
+
     mapping(address => bool) whitelist; // whitelisting for KYC verified users
 
     // events for log
@@ -102,21 +102,21 @@ contract CesaireICO is Owned {
     event LogFundingSuccessful(uint _totalRaised);
     event LogFunderInitialized(address _creator);
     event LogContributorsPayout(address _addr, uint _amount);
-    
+
     // To determine whether the ICO is running or stopped
     modifier onlyIfNotFinished {
         require(state != State.Successful);
         _;
     }
-    
-    // To determine whether the user is whitelisted 
+
+    // To determine whether the user is whitelisted
     modifier onlyIfWhiteListedOnPreSale {
         if(state == State.PrivatePreSale) {
           require(whitelist[msg.sender]);
-        } 
+        }
         _;
     }
-    
+
     // ----------------------------------------------------------------------------
     // CesaireICO constructor
     // _addressOfToken is the token totalDistributed
@@ -127,8 +127,8 @@ contract CesaireICO is Owned {
         state = State.PrivatePreSale;
         emit LogFunderInitialized(owner);
     }
-    
-    
+
+
     // ----------------------------------------------------------------------------
     // Function to handle eth transfers
     // It invokes when someone sends ETH to this contract address.
@@ -147,99 +147,99 @@ contract CesaireICO is Owned {
     // Acceptes ETH and send equivalent CSE with bonus if any.
     // NOTE: Add user to whitelist by invoking addToWhiteList() function.
     // Only whitelisted users can buy tokens.
-    // For Non-whitelisted/Blacklisted users transaction will be reverted. 
+    // For Non-whitelisted/Blacklisted users transaction will be reverted.
     // ----------------------------------------------------------------------------
     function contribute() onlyIfNotFinished onlyIfWhiteListedOnPreSale public payable {
-        
+
         uint256 tokenBought; // Variable to store amount of tokens bought
         uint256 bonus; // Variable to store bonus if any
         uint256 tokenPrice;
-        
+
         //Token allocation calculation
         if (state == State.PrivatePreSale){
             require(msg.value >= 2 ether); // min 2 ETH investment
             tokenPrice = 160000;
             tokenBought = msg.value.mul(tokenPrice);
             bonus = tokenBought; // 100 % bonus
-        } 
+        }
         else if (state == State.PreICO){
             require(msg.value >= 1 ether); // min 1 ETH investment
             tokenPrice = 160000;
             tokenBought = msg.value.mul(tokenPrice);
             bonus = tokenBought.mul(50).div(100); // 50 % bonus
-        } 
+        }
         else if (state == State.ICORound1){
             require(msg.value >= 0.7 ether); // min 0.7 ETH investment
             tokenPrice = 140000;
             tokenBought = msg.value.mul(tokenPrice);
             bonus = tokenBought.mul(40).div(100); // 40 % bonus
-        } 
+        }
         else if (state == State.ICORound2){
             require(msg.value >= 0.5 ether); // min 0.5 ETH investment
             tokenPrice = 120000;
             tokenBought = msg.value.mul(tokenPrice);
             bonus = tokenBought.mul(30).div(100); // 30 % bonus
-        } 
+        }
         else if (state == State.ICORound3){
             require(msg.value >= 0.3 ether); // min 0.3 ETH investment
             tokenPrice = 100000;
             tokenBought = msg.value.mul(tokenPrice);
             bonus = tokenBought.mul(20).div(100); // 20 % bonus
-        } 
+        }
         else if (state == State.ICORound4){
             require(msg.value >= 0.2 ether); // min 0.2 ETH investment
             tokenPrice = 80000;
             tokenBought = msg.value.mul(tokenPrice);
             bonus = tokenBought.mul(10).div(100); // 10 % bonus
-        } 
+        }
         else if (state == State.ICORound5){
             require(msg.value >= 0.1 ether); // min 0.1 ETH investment
             tokenPrice = 60000;
             tokenBought = msg.value.mul(tokenPrice);
             bonus = 0; // 0 % bonus
-        } 
+        }
 
         tokenBought = tokenBought.add(bonus); // add bonus to the tokenBought
-        
+
         // this smart contract should have enough tokens to distribute
         require(CSE.balanceOf(this) >= tokenBought);
-        
+
         totalRaised = totalRaised.add(msg.value); // Save the total eth totalRaised (in wei)
         totalDistributed = totalDistributed.add(tokenBought); //Save to total tokens distributed
-        
+
         CSE.transfer(msg.sender,tokenBought); //Send Tokens to user
         owner.transfer(msg.value); // Send ETH to owner
-        
+
         //LOGS
         emit LogContributorsPayout(msg.sender,tokenBought); // Log investor paid event
         emit LogBeneficiaryPaid(owner); // Log owner paid event
         emit LogFundingReceived(msg.sender, msg.value, totalRaised); // Log funding event
     }
-    
-    
-    function finished() onlyOwner public { 
-        
+
+
+    function finished() onlyOwner public {
+
         uint256 remainder = CSE.balanceOf(this); //Remaining tokens on contract
-        
+
         //Funds send to creator if any
         if(address(this).balance > 0) {
             owner.transfer(address(this).balance);
             emit LogBeneficiaryPaid(owner);
         }
- 
+
         CSE.transfer(owner,remainder); //remainder tokens send to creator
         emit LogContributorsPayout(owner, remainder);
-        
+
         state = State.Successful; // updating the state
     }
-    
-    
+
+
     function nextState() onlyOwner public {
         require(state != State.ICORound5);
         state = State(uint(state) + 1);
     }
-    
-    
+
+
     function previousState() onlyOwner public {
         require(state != State.PrivatePreSale);
         state = State(uint(state) - 1);
@@ -261,8 +261,8 @@ contract CesaireICO is Owned {
             return false;
         }
     }
-    
-    
+
+
     // ----------------------------------------------------------------------------
     // function to remove user from whitelist
     // ----------------------------------------------------------------------------
@@ -270,23 +270,23 @@ contract CesaireICO is Owned {
         require(_userAddress != address(0)); // user address must be valid
         // if in the whitelist
         if(whitelist[_userAddress]) {
-           whitelist[_userAddress] = false; 
+           whitelist[_userAddress] = false;
            emit LogBlackListed(_userAddress); // Log blacklist event
            return true;
         } else {
             return false;
         }
-        
+
     }
-    
-    
+
+
     // ----------------------------------------------------------------------------
     // function to check if user is whitelisted
     // ----------------------------------------------------------------------------
     function checkIfWhiteListed(address _userAddress) view public returns(bool) {
         return whitelist[_userAddress];
     }
-    
+
 
     // ----------------------------------------------------------------------------
     // Function to claim any token stuck on contract
@@ -295,5 +295,34 @@ contract CesaireICO is Owned {
         uint256 remainder = CSE.balanceOf(this); //Check remainder tokens
         CSE.transfer(owner,remainder); //Transfer tokens to owner
     }
-    
+
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

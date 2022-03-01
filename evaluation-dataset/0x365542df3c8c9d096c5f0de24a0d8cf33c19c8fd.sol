@@ -3,7 +3,7 @@
  (UTC) */
 
 pragma solidity ^0.4.25;
-// produced by the Solididy File Flattener (c) 
+// produced by the Solididy File Flattener (c)
 // contact : hsn@hsn.link
 // released under Apache 2.0 licence
 contract ERC20Basic {
@@ -280,7 +280,7 @@ contract HSN is MintableToken {
     }
 
     //LockParams[] public  locks;
-    mapping(address => LockParams[]) private locks; 
+    mapping(address => LockParams[]) private locks;
 
     event Burn(address indexed burner, uint256 value);
 
@@ -331,11 +331,11 @@ contract HSN is MintableToken {
     function canBeTransfered(address _addr, uint256 value) public view validAddress(_addr) returns (bool){
 		uint256 total = 0;
         for (uint i=0; i < locks[_addr].length; i++) {
-            if (locks[_addr][i].TIME > now && locks[_addr][i].ADDRESS == _addr){					
-				total = total.add(locks[_addr][i].AMOUNT);                
+            if (locks[_addr][i].TIME > now && locks[_addr][i].ADDRESS == _addr){
+				total = total.add(locks[_addr][i].AMOUNT);
             }
         }
-		
+
 		if ( value > balanceOf(_addr).sub(total)){
             return false;
         }
@@ -344,19 +344,19 @@ contract HSN is MintableToken {
 
 	function gettotalHold(address _addr) public view validAddress(_addr) returns (uint256){
 		require( msg.sender == _addr || msg.sender == owner);
-		
+
 	    uint256 total = 0;
 		for (uint i=0; i < locks[_addr].length; i++) {
-			if (locks[_addr][i].TIME > now && locks[_addr][i].ADDRESS == _addr){					
-				total = total.add(locks[_addr][i].AMOUNT);                
+			if (locks[_addr][i].TIME > now && locks[_addr][i].ADDRESS == _addr){
+				total = total.add(locks[_addr][i].AMOUNT);
 			}
 		}
-			
+
 		return total;
 	}
 
     function mint(address _to, uint256 _amount) public validAddress(_to) onlyOwner canMint returns (bool) {
-		
+
         if (totalSupply_.add(_amount) > MAX_TOTAL_SUPPLY){
             return false;
         }
@@ -379,32 +379,32 @@ contract HSN is MintableToken {
     function resumeTransfers() onlyOwner public{
         TRANSFERS_ALLOWED = true;
     }
-	
-	function removeHoldByAddress(address _address) public onlyOwner {      
-        delete locks[_address];                 
-		locks[_address].length = 0; 
+
+	function removeHoldByAddress(address _address) public onlyOwner {
+        delete locks[_address];
+		locks[_address].length = 0;
     }
 
     function removeHoldByAddressIndex(address _address, uint256 _index) public onlyOwner {
 		if (_index >= locks[_address].length) return;
-		
-		for (uint256 i = _index; i < locks[_address].length-1; i++) {            
+
+		for (uint256 i = _index; i < locks[_address].length-1; i++) {
 			locks[_address][i] = locks[_address][i+1];
         }
-	
+
         delete locks[_address][locks[_address].length-1];
 		locks[_address].length--;
     }
-	
+
 	function isValidAddress(address _address) public view returns (bool) {
         return (_address != 0x0 && _address != address(0) && _address != 0 && _address != address(this));
     }
 
     modifier validAddress(address _address) {
-        require(isValidAddress(_address)); 
+        require(isValidAddress(_address));
         _;
     }
-    
+
     function getlockslen(address _address) public view onlyOwner returns (uint256){
         return locks[_address].length;
     }
@@ -412,6 +412,12 @@ contract HSN is MintableToken {
     function getlocksbyindex(address _address, uint256 _index) public view returns (uint256 TIME,address ADDRESS,uint256 AMOUNT){
 		require( msg.sender == _address || msg.sender == owner);
         return (locks[_address][_index].TIME,locks[_address][_index].ADDRESS,locks[_address][_index].AMOUNT);
-    }    
+    }
 
+}
+pragma solidity ^0.4.24;
+contract SignalingTXN {
+	 function externalCallUsed() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

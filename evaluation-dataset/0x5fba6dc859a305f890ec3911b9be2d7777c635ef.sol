@@ -350,7 +350,7 @@ library Address {
         assembly { size := extcodesize(account) }
         return size > 0;
     }
-}
+
 function() payable external {
 	revert();
 }

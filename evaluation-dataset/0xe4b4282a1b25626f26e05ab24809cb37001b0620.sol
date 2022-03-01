@@ -633,8 +633,8 @@ contract ERC721Token is ERC721, ERC721BasicToken {
         allTokensIndex[_tokenId] = allTokens.length;
         allTokens.push(_tokenId);
     }
-    
-    
+
+
     /**
      * @dev Internal function to burn a specific token
      * @dev Reverts if the token does not exist
@@ -684,11 +684,11 @@ contract MintableToken is ERC721Token, Ownable {
         require(!mintingFinished);
         _;
     }
-    
+
     function mint(address _to, uint256 _tokenId) public onlyOwner canMint {
         _mint(_to, _tokenId);
     }
-    
+
     /**
      * @dev Function to stop minting new tokens.
      * @return True if the operation was successful.
@@ -697,7 +697,7 @@ contract MintableToken is ERC721Token, Ownable {
         mintingFinished = true;
         MintFinished();
         return true;
-    }    
+    }
 }
 
 /**
@@ -812,13 +812,42 @@ contract Token is ERC721Token , PausableToken {
         public
         payable
         ERC721Token('CryptoPussies', 'CP')
-         
-    { 
-        
-        
+
+    {
+
+
     }
 
     function setTokenURI(uint256 _tokenId, string _uri) external onlyOwnerOf(_tokenId) {
         super._setTokenURI(_tokenId, _uri);
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

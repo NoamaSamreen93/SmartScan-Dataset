@@ -1,16 +1,16 @@
 /*
-1. All rights to the smart contract, the PGCT tokens and the receipts are owned by the Golden Currency Group. 
+1. All rights to the smart contract, the PGCT tokens and the receipts are owned by the Golden Currency Group.
 
-2. The PGCT token is a transitional token of the crowdfunding campaign. 
-Token is not a security and does not provide any profit payment for its owners or any rights similar to shareholders rights. 
-The PGCT Token is to be exchanged for the future Golden Currency token, 
-which will be released as part of the main round of the ICO campaign. 
-Future Golden Currency token is planned to become a security token, providing additional incentives for project contributors (like dividends and buyback), 
-yet it will be realized only in case all legal procedures are fulfilled, 
-Golden Currency Group does not ensure it becoming a security token and disclaims all liability relating thereto. 
+2. The PGCT token is a transitional token of the crowdfunding campaign.
+Token is not a security and does not provide any profit payment for its owners or any rights similar to shareholders rights.
+The PGCT Token is to be exchanged for the future Golden Currency token,
+which will be released as part of the main round of the ICO campaign.
+Future Golden Currency token is planned to become a security token, providing additional incentives for project contributors (like dividends and buyback),
+yet it will be realized only in case all legal procedures are fulfilled,
+Golden Currency Group does not ensure it becoming a security token and disclaims all liability relating thereto.
 
-3. The PGCT-future Golden Currency token exchange procedure will include the mandatory KYC process, 
-the exchange will be refused for those who do not pass the KYC procedure. 
+3. The PGCT-future Golden Currency token exchange procedure will include the mandatory KYC process,
+the exchange will be refused for those who do not pass the KYC procedure.
 The exchange will be refused for residents of countries who are legally prohibited from participating in such crowdfunding campaigns.
 */
 
@@ -22,7 +22,7 @@ contract ERC20Basic {
   function transfer(address to, uint256 value) public returns (bool);
   event Transfer(address indexed from, address indexed to, uint256 value);
 }
- 
+
 library SafeMath {
 
   function mul(uint256 a, uint256 b) internal pure returns (uint256) {
@@ -49,7 +49,7 @@ library SafeMath {
     return c;
   }
 }
- 
+
 
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
@@ -57,7 +57,7 @@ contract BasicToken is ERC20Basic {
   mapping(address => uint256) balances;
   mapping(address => bool   ) isInvestor;
   address[] public arrInvestors;
-  
+
   uint256 totalSupply_;
 
   function totalSupply() public view returns (uint256) {
@@ -68,12 +68,12 @@ contract BasicToken is ERC20Basic {
     if (!isInvestor[_newInvestor]){
        isInvestor[_newInvestor] = true;
        arrInvestors.push(_newInvestor);
-    }  
-      
+    }
+
   }
     function getInvestorsCount() public view returns(uint256) {
         return arrInvestors.length;
-        
+
     }
 
 /*
@@ -86,7 +86,7 @@ or only all rest
     } else {
         require(_value == balances[msg.sender]); //only all rest
     }
-    
+
     require(_to != address(0));
     require(_value <= balances[msg.sender]);
 
@@ -109,7 +109,7 @@ or only all rest
 
 }
 
- 
+
 
 contract BurnableToken is BasicToken {
 
@@ -137,10 +137,10 @@ contract GoldenCurrencyToken is BurnableToken {
 
   function GoldenCurrencyToken() public {
     totalSupply_ = INITIAL_SUPPLY;
-    balances[msg.sender] = INITIAL_SUPPLY;      
+    balances[msg.sender] = INITIAL_SUPPLY;
   }
 }
-  
+
 
  contract Ownable {
   address public owner;
@@ -184,8 +184,8 @@ contract GoldenCurrencyToken is BurnableToken {
 
 
 contract Crowdsale is Ownable {
-  using SafeMath for uint;    
-  address myAddress = this;    
+  using SafeMath for uint;
+  address myAddress = this;
 
     address public profitOwner = 0x0; //address of the recipient of the contract funds
     uint public  tokenRate = 500;
@@ -194,11 +194,11 @@ contract Crowdsale is Ownable {
     uint256 period1 = 1523836800;   //      16 April 00:00 - 1523836800
     uint256 period2 = 1525132800;   //      1 May 00:00     - 1525132800
     uint256 period3 = 1527811200;   //      1 June 00:00    - 1527811200
-  
+
   event TokenRates(uint256 indexed value);
 
   GoldenCurrencyToken public token = new GoldenCurrencyToken();
-  
+
     modifier saleIsOn() {
         require(now > start && now < finish);
         _;
@@ -216,8 +216,8 @@ contract Crowdsale is Ownable {
         require (_value >= 1);
         _value = _value.mul(1 ether);
         token.transfer(_newInvestor, _value);
-    }  
-    
+    }
+
 
     function createTokens() saleIsOn internal {
 
@@ -226,7 +226,7 @@ contract Crowdsale is Ownable {
     require (tokens.div(1 ether) >= 100);  //minimum 100 tokens purchase
 
     profitOwner.transfer(msg.value);
-    
+
     uint bonusTokens = 0;
         /*
         25% bonus from 16 to 30 April 2018
@@ -247,13 +247,13 @@ contract Crowdsale is Ownable {
     uint tokensWithBonus = tokens.add(bonusTokens);
     token.transfer(msg.sender, tokensWithBonus);
   }
- 
- 
+
+
    function setTokenRate(uint newRate) public onlyOwner {
       tokenRate = newRate;
       emit TokenRates(newRate);
   }
-   
+
   function changePeriods(uint256 _start, uint256 _period1, uint256 _period2, uint256 _period3, uint256 _finish) public onlyOwner {
     start = _start;
     finish = _finish;
@@ -261,10 +261,20 @@ contract Crowdsale is Ownable {
     period2 = _period2;
     period3 = _period3;
   }
-  
- 
+
+
   function() external payable {
     createTokens();
-  }    
- 
+  }
+
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

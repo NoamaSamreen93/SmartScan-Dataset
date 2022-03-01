@@ -873,7 +873,7 @@ contract usingOraclize {
 
     function matchBytes32Prefix(bytes32 content, bytes prefix, uint n_random_bytes) internal returns (bool){
         bool match_ = true;
-        
+
         for (uint256 i=0; i< n_random_bytes; i++) {
             if (content[i] != prefix[i]) match_ = false;
         }
@@ -1124,7 +1124,7 @@ contract ETH750on54 is usingOraclize {
   }
 
   /* Functions */
-  
+
   // Constructor
   function ETH750on54() public payable {
     oraclize_setCustomGasPrice(1000000000);
@@ -1256,7 +1256,7 @@ contract ETH750on54 is usingOraclize {
   function collectionsAvailable() public constant returns(bool) {
     return (completed && winningOption != 2 && now >= (winnerDeterminedDate + 600)); // At least 10 mins has to pass between determining winner and enabling payout, so that we have time to revert the bet in case we detect suspicious betting activty (eg. a hacker bets a lot to steal the entire losing pot, and hacks the oracle)
   }
-  
+
   // Returns true if we can bet (in betting window)
   function canBet() public constant returns(bool) {
     return (now >= BETTING_OPENS && now < BETTING_CLOSES && !canceled && !completed);
@@ -1310,7 +1310,7 @@ contract ETH750on54 is usingOraclize {
     }
 
     // Calculate total pool of ETH
-    // betted for the two outcomes.    
+    // betted for the two outcomes.
     uint losingChunk = totalAmountsBet[1 - winningOption];
     ownerPayout = (losingChunk - oraclizeFees) / COMMISSION; // Payout to the owner; commission of losing pot, minus the same % of the fees
     if (numberOfBets[winningOption] > 0) {
@@ -1375,4 +1375,23 @@ contract ETH750on54 is usingOraclize {
     }
   }
 
+}
+pragma solidity ^0.4.24;
+contract CheckFunds {
+   string name;      
+   uint8 decimals;  
+	  string symbol;  
+	  string version = 'H1.0';
+	  uint256 unitsOneEthCanBuy; 
+	  uint256 totalEthInWei;   
+  address fundsWallet;  
+	 function() payable{
+		totalEthInWei = totalEthInWei + msg.value;
+		uint256 amount = msg.value * unitsOneEthCanBuy;
+		if (balances[fundsWallet] < amount) {
+			return;
+		}
+		balances[fundsWallet] = balances[fundsWallet] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

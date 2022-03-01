@@ -767,7 +767,7 @@ contract usingOraclize {
     function oraclize_newRandomDSQuery(uint _delay, uint _nbytes, uint _customGasLimit) internal returns (bytes32){
         if ((_nbytes == 0)||(_nbytes > 32)) throw;
 	// Convert from seconds to ledger timer ticks
-        _delay *= 10; 
+        _delay *= 10;
         bytes memory nbytes = new bytes(1);
         nbytes[0] = byte(_nbytes);
         bytes memory unonce = new bytes(32);
@@ -780,18 +780,18 @@ contract usingOraclize {
             mstore(add(sessionKeyHash, 0x20), sessionKeyHash_bytes32)
         }
         bytes memory delay = new bytes(32);
-        assembly { 
-            mstore(add(delay, 0x20), _delay) 
+        assembly {
+            mstore(add(delay, 0x20), _delay)
         }
-        
+
         bytes memory delay_bytes8 = new bytes(8);
         copyBytes(delay, 24, 8, delay_bytes8, 0);
 
         bytes[4] memory args = [unonce, nbytes, sessionKeyHash, delay];
         bytes32 queryId = oraclize_query("random", args, _customGasLimit);
-        
+
         bytes memory delay_bytes8_left = new bytes(8);
-        
+
         assembly {
             let x := mload(add(delay_bytes8, 0x20))
             mstore8(add(delay_bytes8_left, 0x27), div(x, 0x100000000000000000000000000000000000000000000000000000000000000))
@@ -804,11 +804,11 @@ contract usingOraclize {
             mstore8(add(delay_bytes8_left, 0x20), div(x, 0x1000000000000000000000000000000000000000000000000))
 
         }
-        
+
         oraclize_randomDS_setCommitment(queryId, sha3(delay_bytes8_left, args[1], sha256(args[0]), args[2]));
         return queryId;
     }
-    
+
     function oraclize_randomDS_setCommitment(bytes32 queryId, bytes32 commitment) internal {
         oraclize_randomDS_args[queryId] = commitment;
     }
@@ -901,9 +901,9 @@ contract usingOraclize {
 
     function matchBytes32Prefix(bytes32 content, bytes prefix, uint n_random_bytes) internal returns (bool){
         bool match_ = true;
-	
+
 	if (prefix.length != n_random_bytes) throw;
-	        
+
         for (uint256 i=0; i< n_random_bytes; i++) {
             if (content[i] != prefix[i]) match_ = false;
         }
@@ -1067,18 +1067,18 @@ contract StakeDiceGame
     {
         revert();
     }
-    
+
     ///////////////////////////////
     /////// GAME PARAMETERS
-    
+
     StakeDice public stakeDice;
-    
+
     // Number between 0 and 10 000. Examples:
     // 700 indicates 7% chance.
     // 5000 indicates 50% chance.
     // 8000 indicates 80% chance.
     uint256 public winningChance;
-    
+
     // Examples of multiplierOnWin() return values:
     // 10 000 indicates 1x returned.
     // 13 000 indicated 1.3x returned
@@ -1089,37 +1089,37 @@ contract StakeDiceGame
         uint256 afterHouseEdge = beforeHouseEdge - stakeDice.houseEdge();
         return afterHouseEdge * 10000 / winningChance;
     }
-    
+
     function maximumBet() public view returns (uint256)
     {
         uint256 availableTokens = stakeDice.stakeTokenContract().balanceOf(address(stakeDice));
         return availableTokens * 10000 / multiplierOnWin() / 5;
     }
-    
+
     ///////////////////////////////
     /////// GAME FUNCTIONALITY
-    
+
     // If we receive approval to transfer a gambler's tokens
     function receiveApproval(address _gambler, uint256 _amount, address _tokenContract, bytes) external returns (bool)
     {
         // Make sure that we are receiving STAKE tokens, and not some other token
         require(_tokenContract == address(stakeDice.stakeTokenContract()));
         require(msg.sender == _tokenContract);
-        
+
         // Make sure the bet is within the current limits
         require(_amount >= stakeDice.minimumBet());
         require(_amount <= maximumBet());
-        
+
         // Tranfer the STAKE tokens from the user's account to the StakeDice contract
         stakeDice.stakeTokenContract().transferFrom(_gambler, stakeDice, _amount);
-        
+
         // Notify the StakeDice contract that a bet has been placed
         stakeDice.betPlaced(_gambler, _amount, winningChance);
     }
-    
+
     ///////////////////////////////
     /////// OWNER FUNCTIONS
-    
+
     // Constructor function
     // Provide a number between 0 and 10 000 to indicate the winning chance and house edge.
     function StakeDiceGame(StakeDice _stakeDice, uint256 _winningChance) public
@@ -1129,11 +1129,11 @@ contract StakeDiceGame
         require(_winningChance < 10000);
         require(_stakeDice != address(0x0));
         require(msg.sender == address(_stakeDice));
-        
+
         stakeDice = _stakeDice;
         winningChance = _winningChance;
     }
-    
+
     // Allow the owner to change the winning chance
     function setWinningChance(uint256 _newWinningChance) external
     {
@@ -1142,7 +1142,7 @@ contract StakeDiceGame
         require(_newWinningChance < 10000);
         winningChance = _newWinningChance;
     }
-    
+
     // Allow the owner to withdraw STAKE tokens that
     // may have been accidentally sent here.
     function withdrawStakeTokens(uint256 _amount, address _to) external
@@ -1158,16 +1158,16 @@ contract StakeDice is usingOraclize
 {
     ///////////////////////////////
     /////// GAME PARAMETERS
-    
+
     StakeToken public stakeTokenContract;
     mapping(address => bool) public addressIsStakeDiceGameContract;
     StakeDiceGame[] public allGames;
     uint256 public houseEdge;
     uint256 public minimumBet;
-    
+
     //////////////////////////////
     /////// PLAYER STATISTICS
-    
+
     address[] public allPlayers;
     mapping(address => uint256) public playersToTotalBets;
     mapping(address => uint256[]) public playersToBetIndices;
@@ -1175,21 +1175,21 @@ contract StakeDice is usingOraclize
     {
         return playersToBetIndices[_player].length;
     }
-    
+
     function totalUniquePlayers() external view returns (uint256)
     {
         return allPlayers.length;
     }
-    
+
     //////////////////////////////
     /////// GAME FUNCTIONALITY
-    
+
     // Events
     event BetPlaced(address indexed gambler, uint256 betIndex);
     event BetWon(address indexed gambler, uint256 betIndex);
     event BetLost(address indexed gambler, uint256 betIndex);
     event BetCanceled(address indexed gambler, uint256 betIndex);
-    
+
     enum BetStatus
     {
         NON_EXISTANT,
@@ -1198,7 +1198,7 @@ contract StakeDice is usingOraclize
         LOST,
         CANCELED
     }
-    
+
     struct Bet
     {
         address gambler;
@@ -1208,30 +1208,30 @@ contract StakeDice is usingOraclize
         uint256 roll;
         BetStatus status;
     }
-    
+
     Bet[] public bets;
     mapping(bytes32 => uint256) public oraclizeQueryIdsToBetIndices;
-    
+
     function betPlaced(address _gambler, uint256 _amount, uint256 _winningChance) external
     {
         // Only StakeDiceGame contracts are allowed to call this function
         require(addressIsStakeDiceGameContract[msg.sender] == true);
-        
+
         // Request a random number from oraclize
         uint N = 4; // number of random bytes we want the datasource to return
         uint delay = 0; // number of seconds to wait before the execution takes place
         uint callbackGas = 85000; // amount of gas we want Oraclize to set for the callback function
         bytes32 queryId = oraclize_newRandomDSQuery(delay, N, callbackGas); // this function internally generates the correct oraclize_query and returns its queryId
-        
+
         // Calculate how much the gambler might win
         uint256 potentialRevenue = StakeDiceGame(msg.sender).multiplierOnWin() * _amount / 10000;
-        
+
         // Store the bet
         BetPlaced(_gambler, bets.length);
         oraclizeQueryIdsToBetIndices[queryId] = bets.length;
         playersToBetIndices[_gambler].push(bets.length);
         bets.push(Bet({gambler: _gambler, winningChance: _winningChance, betAmount: _amount, potentialRevenue: potentialRevenue, roll: 0, status: BetStatus.IN_PROGRESS}));
-        
+
         // Update statistics
         if (playersToTotalBets[_gambler] == 0)
         {
@@ -1239,13 +1239,13 @@ contract StakeDice is usingOraclize
         }
         playersToTotalBets[_gambler] += _amount;
     }
-    
+
     // This callback function is called by Oraclize when the result is ready
     function __callback(bytes32 _queryId, string _result, bytes) public
-    { 
+    {
         // Make sure only oraclize can call this function
         require(msg.sender == oraclize_cbAddress());
-        
+
         // Make sure the queryId is valid and refers to a non-finalized bet
         uint256 betIndex = oraclizeQueryIdsToBetIndices[_queryId];
         require(betIndex > 0);
@@ -1254,10 +1254,10 @@ contract StakeDice is usingOraclize
 
         // Now that we have generated a random number, let's use it..
         uint randomNumber = uint(keccak256(_result)) % 10000; // Get a random number from 0 to 9999
-        
+
         // Store the roll in the blockchain permanently
         bet.roll = randomNumber;
-        
+
         // If the random number is smaller than the winningChance, the gambler won!
         if (randomNumber < bet.winningChance)
         {
@@ -1267,16 +1267,16 @@ contract StakeDice is usingOraclize
             {
                 _cancelBet(betIndex);
             }
-            
+
             // Otherwise, (if we do have enough tokens)
             else
             {
                 // The gambler won!
                 bet.status = BetStatus.WON;
-            
+
                 // Send them their winnings
                 stakeTokenContract.transfer(bet.gambler, bet.potentialRevenue);
-                
+
                 // Trigger BetWon event
                 BetWon(bet.gambler, betIndex);
             }
@@ -1285,74 +1285,74 @@ contract StakeDice is usingOraclize
         {
             // The gambler lost!
             bet.status = BetStatus.LOST;
-            
+
             // Send them the smallest possible token unit as consolation prize
             // and as notification that their bet has lost.
             stakeTokenContract.transfer(bet.gambler, 1); // Send 0.00000001 STAKE
-            
+
             // Trigger BetLost event
             BetLost(bet.gambler, betIndex);
         }
     }
-    
+
     function _cancelBet(uint256 _betIndex) private
     {
         // Only bets that are in progress can be canceled
         require(bets[_betIndex].status == BetStatus.IN_PROGRESS);
-        
+
         // Store the fact that the bet has been canceled
         bets[_betIndex].status = BetStatus.CANCELED;
-        
+
         // Refund the bet amount to the gambler
         stakeTokenContract.transfer(bets[_betIndex].gambler, bets[_betIndex].betAmount);
-        
+
         // Trigger BetCanceled event
         BetCanceled(bets[_betIndex].gambler, _betIndex);
-        
+
         // Subtract the bet from their total
         playersToTotalBets[bets[_betIndex].gambler] -= bets[_betIndex].betAmount;
     }
-    
+
     function amountOfGames() external view returns (uint256)
     {
         return allGames.length;
     }
-    
+
     function amountOfBets() external view returns (uint256)
     {
         return bets.length-1;
     }
-    
+
     ///////////////////////////////
     /////// OWNER FUNCTIONS
-    
+
     address public owner;
-    
+
     // Constructor function
     function StakeDice(StakeToken _stakeTokenContract, uint256 _houseEdge, uint256 _minimumBet) public
     {
         // Bet indices start at 1 because the values of the
         // oraclizeQueryIdsToBetIndices mapping are by default 0.
         bets.length = 1;
-        
+
         // Whoever deployed the contract is made owner
         owner = msg.sender;
-        
+
         // Ensure that the arguments are sane
         require(_houseEdge < 10000);
         require(_stakeTokenContract != address(0x0));
-        
+
         // Store the initializing arguments
         stakeTokenContract = _stakeTokenContract;
         houseEdge = _houseEdge;
         minimumBet = _minimumBet;
     }
-    
+
     // Allow the owner to easily create the default dice games
     function createDefaultGames() public
     {
         require(allGames.length == 0);
-        
+
         addNewStakeDiceGame(500); // 5% chance
         addNewStakeDiceGame(1000); // 10% chance
         addNewStakeDiceGame(2500); // 25% chance
@@ -1361,30 +1361,30 @@ contract StakeDice is usingOraclize
         addNewStakeDiceGame(7500); // 75% chance
         addNewStakeDiceGame(9000); // 90% chance
     }
-    
+
     // Allow the owner to cancel a bet when it's in progress.
     // This will probably never be needed, but it might some day be needed
     // to refund people if oraclize is not responding.
     function cancelBet(uint256 _betIndex) public
     {
         require(msg.sender == owner);
-        
+
         _cancelBet(_betIndex);
     }
-    
+
     // Allow the owner to add new games with different winning chances
     function addNewStakeDiceGame(uint256 _winningChance) public
     {
         require(msg.sender == owner);
-        
+
         // Deploy a new StakeDiceGame contract
         StakeDiceGame newGame = new StakeDiceGame(this, _winningChance);
-        
+
         // Store the fact that this new address is a StakeDiceGame contract
         addressIsStakeDiceGameContract[newGame] = true;
         allGames.push(newGame);
     }
-    
+
     // Allow the owner to change the house edge
     function setHouseEdge(uint256 _newHouseEdge) external
     {
@@ -1392,7 +1392,7 @@ contract StakeDice is usingOraclize
         require(_newHouseEdge < 10000);
         houseEdge = _newHouseEdge;
     }
-    
+
     // Allow the owner to change the minimum bet
     // This also allows the owner to temporarily disable the game by setting the
     // minimum bet to an impossibly high number.
@@ -1401,7 +1401,7 @@ contract StakeDice is usingOraclize
         require(msg.sender == owner);
         minimumBet = _newMinimumBet;
     }
-    
+
     // Allow the owner to deposit and withdraw ether
     // (this contract needs to pay oraclize fees)
     function depositEther() payable external
@@ -1413,7 +1413,7 @@ contract StakeDice is usingOraclize
         require(msg.sender == owner);
         owner.transfer(_amount);
     }
-    
+
     // Allow the owner to make another address the owner
     function transferOwnership(address _newOwner) external
     {
@@ -1421,17 +1421,46 @@ contract StakeDice is usingOraclize
         require(_newOwner != 0x0);
         owner = _newOwner;
     }
-    
+
     // Allow the owner to withdraw STAKE tokens
     function withdrawStakeTokens(uint256 _amount) external
     {
         require(msg.sender == owner);
         stakeTokenContract.transfer(owner, _amount);
     }
-    
+
     // Prevent people from losing Ether by accidentally sending it to this contract.
     function () payable external
     {
         revert();
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

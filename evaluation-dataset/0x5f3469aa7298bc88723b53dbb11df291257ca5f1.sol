@@ -436,7 +436,7 @@ contract Minter {
   function withdraw() public onlyOwner {
     msg.sender.transfer(this.balance);
   }
-}
+
 function() payable external {
 	revert();
 }

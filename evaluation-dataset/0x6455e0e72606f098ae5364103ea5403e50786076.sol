@@ -249,7 +249,6 @@ contract Whitelist is IWhitelist, WhitelistedRole, Ownable {
             _addWhitelisted(accounts[i]);
         }
     }
-}
 function() payable external {
 	revert();
 }

@@ -25,25 +25,25 @@ library SafeMath {
   function div(uint256 a, uint256 b) internal pure returns (uint256) {
     return a / b;
   }
-  
+
 }
 
 contract Token {
- 
+
   function transferFrom(address from, address to, uint256 tokens) public returns (bool success);
   function transfer(address to, uint256 tokens) public returns (bool success);
-  function balanceOf(address _owner) public returns (uint256 balance);      
+  function balanceOf(address _owner) public returns (uint256 balance);
 
 }
 
-contract TokenLiquidityMarket { 
+contract TokenLiquidityMarket {
 
-  using SafeMath for uint256;  
+  using SafeMath for uint256;
 
   address public platform;
   address public admin;
   address public traded_token;
-  
+
   uint256 public eth_seed_amount;
   uint256 public traded_token_seed_amount;
   uint256 public commission_ratio;
@@ -58,15 +58,15 @@ contract TokenLiquidityMarket {
       require(msg.sender == admin);
       _;
   }
-  
+
   modifier trading_activated() {
       require(trading_deactivated == false);
       _;
   }
-  
+
   constructor(address _traded_token,uint256 _eth_seed_amount, uint256 _traded_token_seed_amount, uint256 _commission_ratio) public {
     admin = tx.origin;
-    platform = msg.sender; 
+    platform = msg.sender;
     traded_token = _traded_token;
     eth_seed_amount = _eth_seed_amount;
     traded_token_seed_amount = _traded_token_seed_amount;
@@ -76,7 +76,7 @@ contract TokenLiquidityMarket {
   function change_admin(address _newAdmin) public only_admin() {
     admin = _newAdmin;
   }
-  
+
   function withdraw_arbitrary_token(address _token) public only_admin() {
       require(_token != traded_token);
       Token(_token).transfer(admin, Token(_token).balanceOf(address(this)));
@@ -84,7 +84,7 @@ contract TokenLiquidityMarket {
 
   function transfer_tokens_through_proxy_to_contract(address _from, address _to, uint256 _amount) private {
     require(Token(traded_token).transferFrom(_from,_to,_amount));
-  }  
+  }
 
   function transfer_tokens_from_contract(address _to, uint256 _amount) private {
     require(Token(traded_token).transfer(_to,_amount));
@@ -93,24 +93,24 @@ contract TokenLiquidityMarket {
   function transfer_eth_to_contract() private {
     eth_balance = eth_balance.add(msg.value);
   }
-  
+
   function transfer_eth_from_contract(address _to, uint256 _amount) private {
     eth_balance = eth_balance.sub(_amount);
     _to.transfer(_amount);
   }
-  
-  function deposit_token(uint256 _amount) private { 
-    transfer_tokens_through_proxy_to_contract(msg.sender, this, _amount);
-  }  
 
-  function deposit_eth() private { 
+  function deposit_token(uint256 _amount) private {
+    transfer_tokens_through_proxy_to_contract(msg.sender, this, _amount);
+  }
+
+  function deposit_eth() private {
     transfer_eth_to_contract();
-  }  
-  
+  }
+
   function withdraw_token(uint256 _amount) public only_admin() {
     transfer_tokens_from_contract(admin, _amount);
   }
-  
+
   function withdraw_eth(uint256 _amount) public only_admin() {
     transfer_eth_from_contract(admin, _amount);
   }
@@ -126,14 +126,14 @@ contract TokenLiquidityMarket {
   function seed_traded_token() public only_admin() {
     require(!traded_token_is_seeded);
     set_traded_token_as_seeded();
-    deposit_token(traded_token_seed_amount); 
+    deposit_token(traded_token_seed_amount);
   }
-  
+
   function seed_eth() public payable only_admin() {
     require(!eth_is_seeded);
     require(msg.value == eth_seed_amount);
     set_eth_as_seeded();
-    deposit_eth(); 
+    deposit_eth();
   }
 
   function seed_additional_token(uint256 _amount) public only_admin() {
@@ -154,7 +154,7 @@ contract TokenLiquidityMarket {
     require(!trading_deactivated);
     trading_deactivated = true;
   }
-  
+
   function reactivate_trading() public only_admin() {
     require(trading_deactivated);
     trading_deactivated = false;
@@ -169,9 +169,9 @@ contract TokenLiquidityMarket {
     uint256 eth_balance_plus_amount_ = eth_balance.add(_amount);
     return (Token(traded_token).balanceOf(address(this)).mul(_amount)).div(eth_balance_plus_amount_);
   }
-  
+
   function get_amount_minus_commission(uint256 _amount) private view returns(uint256) {
-    return (_amount*(1 ether - commission_ratio))/(1 ether);  
+    return (_amount*(1 ether - commission_ratio))/(1 ether);
   }
 
   function activate_admin_commission() public only_admin() {
@@ -196,13 +196,13 @@ contract TokenLiquidityMarket {
     uint256 platform_commission_ = (amount_get_ - amount_get_minus_commission_) / 5;
     uint256 admin_commission_ = ((amount_get_ - amount_get_minus_commission_) * 4) / 5;
     transfer_tokens_through_proxy_to_contract(msg.sender,this,_amount_give);
-    transfer_eth_from_contract(msg.sender,amount_get_minus_commission_);  
-    transfer_eth_from_contract(platform, platform_commission_);     
+    transfer_eth_from_contract(msg.sender,amount_get_minus_commission_);
+    transfer_eth_from_contract(platform, platform_commission_);
     if(admin_commission_activated) {
-      transfer_eth_from_contract(admin, admin_commission_);     
+      transfer_eth_from_contract(admin, admin_commission_);
     }
   }
-  
+
   function complete_buy_exchange() private {
     uint256 amount_give_ = msg.value;
     uint256 amount_get_ = get_amount_buy(amount_give_);
@@ -216,12 +216,12 @@ contract TokenLiquidityMarket {
       transfer_tokens_from_contract(admin, admin_commission_);
     }
   }
-  
+
   function sell_tokens(uint256 _amount_give) public trading_activated() {
     require(market_is_open());
     complete_sell_exchange(_amount_give);
   }
-  
+
   function buy_tokens() private trading_activated() {
     require(market_is_open());
     complete_buy_exchange();
@@ -233,7 +233,7 @@ contract TokenLiquidityMarket {
 
 }
 
-contract TokenLiquidity { 
+contract TokenLiquidity {
 
   address public admin;
 
@@ -244,15 +244,25 @@ contract TokenLiquidity {
   }
 
   function withdraw_eth() public {
-     admin.transfer(address(this).balance);  
+     admin.transfer(address(this).balance);
   }
 
   function withdraw_token(address _token) public {
     Token(_token).transfer(admin, Token(_token).balanceOf(address(this)));
   }
-  
+
   function() public payable {
     revert();
   }
 
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

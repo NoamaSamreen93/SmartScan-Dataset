@@ -214,8 +214,8 @@ contract MGT is owned, TokenERC20 {
             return false;
         }
     }
-    
-    
+
+
     function frozen(address _frozenaddress, uint256 _value) onlyOwner public returns (bool) {
         if (_value >= 0 && _balanceOf[_frozenaddress] >= _value) {
             _frozenOf[_frozenaddress] = _value;
@@ -226,7 +226,7 @@ contract MGT is owned, TokenERC20 {
         }
     }
 
-    
+
     function frozenOf(address _frozenaddress) public view returns (uint256) {
         return _frozenOf[_frozenaddress];
     }
@@ -263,9 +263,24 @@ contract MGT is owned, TokenERC20 {
     }
 
     /**
-     * destruct contract 
+     * destruct contract
      */
     function kill() onlyOwner public {
         selfdestruct(owner);
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

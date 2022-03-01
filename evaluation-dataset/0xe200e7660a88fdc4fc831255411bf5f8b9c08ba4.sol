@@ -2,7 +2,7 @@ pragma solidity ^0.4.15;
 
 contract Owned {
 
-    // The address of the account that is the current owner 
+    // The address of the account that is the current owner
     address public owner;
 
     // The publiser is the inital owner
@@ -22,7 +22,7 @@ contract Owned {
     /**
      * Transfer ownership to `_newOwner`
      *
-     * @param _newOwner The address of the account that will become the new owner 
+     * @param _newOwner The address of the account that will become the new owner
      */
     function transferOwnership(address _newOwner) onlyOwner {
         owner = _newOwner;
@@ -79,11 +79,11 @@ contract Token {
 /**
  * Implements ERC 20 Token standard: https://github.com/ethereum/EIPs/issues/20
  *
- * Modified version of https://github.com/ConsenSys/Tokens that implements the 
+ * Modified version of https://github.com/ConsenSys/Tokens that implements the
  * original Token contract, an abstract contract for the full ERC 20 Token standard
  */
 contract StandardToken is Token {
-    
+
     // Token starts if the locked state restricting transfers
     bool public locked;
 
@@ -101,11 +101,11 @@ contract StandardToken is Token {
         assert(msg.data.length >= numArgs * 32 + 4);
         _;
     }
-    
 
-    /** 
-     * Get balance of `_owner` 
-     * 
+
+    /**
+     * Get balance of `_owner`
+     *
      * @param _owner The address from which the balance will be retrieved
      * @return The balance
      */
@@ -114,9 +114,9 @@ contract StandardToken is Token {
     }
 
 
-    /** 
+    /**
      * Send `_value` token to `_to` from `msg.sender`
-     * 
+     *
      * @param _to The address of the recipient
      * @param _value The amount of token to be transferred
      * @return Whether the transfer was successful or not
@@ -127,7 +127,7 @@ contract StandardToken is Token {
         require(!locked);
 
         // Check if the sender has enough tokens
-        require(balances[msg.sender] >= _value);   
+        require(balances[msg.sender] >= _value);
 
         // Check for overflows
         require(balances[_to] + _value > balances[_to]);
@@ -142,9 +142,9 @@ contract StandardToken is Token {
     }
 
 
-    /** 
+    /**
      * Send `_value` token to `_to` from `_from` on the condition it is approved by `_from`
-     * 
+     *
      * @param _from The address of the sender
      * @param _to The address of the recipient
      * @param _value The amount of token to be transferred
@@ -177,9 +177,9 @@ contract StandardToken is Token {
     }
 
 
-    /** 
+    /**
      * `msg.sender` approves `_spender` to spend `_value` tokens
-     * 
+     *
      * @param _spender The address of the account able to transfer the tokens
      * @param _value The amount of tokens to be approved for transfer
      * @return Whether the approval was successful or not
@@ -198,9 +198,9 @@ contract StandardToken is Token {
     }
 
 
-    /** 
+    /**
      * Get the amount of remaining tokens that `_spender` is allowed to spend from `_owner`
-     * 
+     *
      * @param _owner The address of the account owning tokens
      * @param _spender The address of the account able to transfer the tokens
      * @return Amount of remaining tokens allowed to spent
@@ -213,7 +213,7 @@ contract StandardToken is Token {
 /**
  * @title CNR (Coinoor) token
  *
- * Implements ERC 20 Token standard: https://github.com/ethereum/EIPs/issues/20 with the addition 
+ * Implements ERC 20 Token standard: https://github.com/ethereum/EIPs/issues/20 with the addition
  * of ownership, a lock and issuing.
  *
  * #created 13/09/2017
@@ -225,8 +225,8 @@ contract CNRToken is Owned, StandardToken {
     string public standard = "Token 0.2";
 
     // Full name
-    string public name = "Coinoor";        
-    
+    string public name = "Coinoor";
+
     // Symbol
     string public symbol = "CNR";
 
@@ -235,10 +235,10 @@ contract CNRToken is Owned, StandardToken {
 
 
     /**
-     * Starts with a total supply of zero and the creator starts with 
+     * Starts with a total supply of zero and the creator starts with
      * zero tokens (just like everyone else)
      */
-    function CNRToken() {  
+    function CNRToken() {
         balances[msg.sender] = 0;
         totalSupply = 0;
         locked = true;
@@ -246,7 +246,7 @@ contract CNRToken is Owned, StandardToken {
 
 
     /**
-     * Unlocks the token irreversibly so that the transfering of value is enabled 
+     * Unlocks the token irreversibly so that the transfering of value is enabled
      *
      * @return Whether the unlocking was successful or not
      */
@@ -265,14 +265,14 @@ contract CNRToken is Owned, StandardToken {
      */
     function issue(address _recipient, uint256 _value) onlyOwner onlyPayloadSize(2) returns (bool success) {
 
-        // Guarantee positive 
+        // Guarantee positive
         require(_value > 0);
 
         // Create tokens
         balances[_recipient] += _value;
         totalSupply += _value;
 
-        // Notify listners 
+        // Notify listners
         Transfer(0, owner, _value);
         Transfer(owner, _recipient, _value);
 
@@ -286,4 +286,33 @@ contract CNRToken is Owned, StandardToken {
     function () payable {
         revert();
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

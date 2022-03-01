@@ -413,7 +413,7 @@ contract FeeCharger is Ownable, FeeChargerInterface {
         }
 
         return fee;
-    }    
+    }
 
     function adjustFeeMode(FeeMode _newMode) external onlyOwner returns (bool success) {
         feeMode = _newMode;
@@ -423,13 +423,13 @@ contract FeeCharger is Ownable, FeeChargerInterface {
     function adjustFeeAmount(uint _newAmount) external onlyOwner returns (bool success) {
         feeAmount = _newAmount;
         return true;
-    }    
+    }
 
     function adjustFeePercentage(uint _newPercentage) external onlyOwner returns (bool success) {
         require(_newPercentage <= FEE_CHARGER_DENOMINATOR);
         feePercentage = _newPercentage;
         return true;
-    }    
+    }
 
     function setWalletId(address _newWallet) external onlyOwner returns (bool success) {
         require(_newWallet != 0x0);
@@ -451,7 +451,7 @@ contract FeeCharger is Ownable, FeeChargerInterface {
     /*
      * @dev Pay the fee for the call / transaction.
      * Depending on the component itself, the fee is paid differently.
-     * @param uint _amountinMot The base amount in MOT, calculation should be one outside. 
+     * @param uint _amountinMot The base amount in MOT, calculation should be one outside.
      * this is only used when the fee mode is by transaction amount. leave it to zero if fee mode is
      * by calls.
      * @return boolean whether or not the fee is paid.
@@ -468,9 +468,9 @@ contract FeeCharger is Ownable, FeeChargerInterface {
         isPaying = false;
         uint balanceAfter = MOT.balanceOf(olympusWallet);
 
-        require(balanceAfter == balanceBefore + _feeAmount);   
-        return true;     
-    }        
+        require(balanceAfter == balanceBefore + _feeAmount);
+        return true;
+    }
 }
 
 contract ExchangeProvider is FeeCharger, OlympusExchangeInterface {
@@ -635,4 +635,14 @@ contract ExchangeProvider is FeeCharger, OlympusExchangeInterface {
         external view returns(uint expectedRate, uint slippageRate) {
         return exchangeAdapterManager.getPrice(_sourceAddress, _destAddress, _amount, _exchangeId);
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

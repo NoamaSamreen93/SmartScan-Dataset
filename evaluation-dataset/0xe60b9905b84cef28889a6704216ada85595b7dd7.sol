@@ -1,13 +1,13 @@
 /**
 
-  ___             _    _ _             _                    _ _             
- / _ \           | |  | (_)           | |                  | (_)            
-/ /_\ \ ___ ___  | |  | |_ _ __  ___  | |     ___ _ __   __| |_ _ __   __ _ 
+  ___             _    _ _             _                    _ _
+ / _ \           | |  | (_)           | |                  | (_)
+/ /_\ \ ___ ___  | |  | |_ _ __  ___  | |     ___ _ __   __| |_ _ __   __ _
 |  _  |/ __/ _ \ | |/\| | | '_ \/ __| | |    / _ \ '_ \ / _` | | '_ \ / _` |
 | | | | (_|  __/ \  /\  / | | | \__ \ | |___|  __/ | | | (_| | | | | | (_| |
 \_| |_/\___\___|  \/  \/|_|_| |_|___/ \_____/\___|_| |_|\__,_|_|_| |_|\__, |
                                                                        __/ |
-                                                                      |___/ 
+                                                                      |___/
 
  * Allows (ACE) token holders to lend the Ace Wins Casino tokens for the bankroll.
  * Depositors earn 21% per month on lending amount to the bankroll.
@@ -95,7 +95,7 @@ contract AceWinsLending is Owned, SafeMath {
   address cards;
   uint public minStakingAmount;
   /** The maximum number of addresses to process in one batch of stake updates **/
-  uint public maxUpdates; 
+  uint public maxUpdates;
   /** The maximum number of addresses that can be assigned in one batch **/
   uint public maxBatchAssignment;
   /** remembers the last index updated per cycle **/
@@ -118,7 +118,7 @@ contract AceWinsLending is Owned, SafeMath {
   }
 
 function ()
-  public 
+  public
   payable
   {
 
@@ -155,7 +155,7 @@ function ()
   function setUpdateGasCost(uint gasCost) public onlyAuthorized {
     updateGasCost = gasCost;
   }
-  
+
   /**
    * Sets the maximum number of user stakes to update at once
    * @param newMax the new maximum
@@ -163,7 +163,7 @@ function ()
   function setMaxUpdates(uint newMax) public onlyAuthorized{
     maxUpdates = newMax;
   }
-  
+
   /**
    * Sets the minimum amount of user stakes
    * @param amount the new minimum
@@ -171,7 +171,7 @@ function ()
   function setMinStakingAmount(uint amount) public onlyAuthorized {
     minStakingAmount = amount;
   }
-  
+
   /**
    * Sets the maximum number of addresses that can be assigned at once
    * @param newMax the new maximum
@@ -179,7 +179,7 @@ function ()
   function setMaxBatchAssignment(uint newMax) public onlyAuthorized {
     maxBatchAssignment = newMax;
   }
-  
+
   /**
    * Allows the user to deposit funds, where the sender address and max allowed value have to be signed together with the cycle
    * number by the casino. The method verifies the signature and makes sure, the deposit was made in time, before updating
@@ -217,7 +217,7 @@ function ()
     assert(newTotalStakes < tokenBalance());
     totalStakes = newTotalStakes;
   }
-  
+
   /**
    * updates the stake of an address.
    * @param to the address
@@ -314,7 +314,7 @@ function ()
 
    * */
 
-  function withdraw(uint amt) 
+  function withdraw(uint amt)
   public {
     require(msg.sender == cards);
     require(amt <= address(this).balance);
@@ -331,7 +331,7 @@ function ()
    *        v, r, s the signature of the stakeholder
    * */
 
-  
+
   /**
    * internal method for processing the withdrawal.
    * @param from the stakeholder
@@ -375,7 +375,7 @@ function ()
     else
       stakeholders.push(holder);
   }
-  
+
   /**
   * Removes a stakeholder from the list.
   * @param holder the address of the stakeholder
@@ -421,7 +421,7 @@ function ()
     }
     return StatePhases.withdraw;
   }
-  
+
   //check if the sender is an authorized casino wallet
   modifier onlyAuthorized {
     require(casino.authorized(msg.sender));
@@ -452,4 +452,33 @@ function ()
     _;
   }
 
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

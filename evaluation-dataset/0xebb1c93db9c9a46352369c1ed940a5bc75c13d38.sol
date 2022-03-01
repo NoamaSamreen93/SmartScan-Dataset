@@ -1,4 +1,4 @@
-// Created using ICO Wizard https://github.com/oraclesorg/ico-wizard by Oracles Network 
+// Created using ICO Wizard https://github.com/oraclesorg/ico-wizard by Oracles Network
 // Temporarily have SafeMath here until all contracts have been migrated to SafeMathLib version from OpenZeppelin
 pragma solidity ^0.4.8;
 /**
@@ -454,7 +454,7 @@ contract CrowdsaleExt is Haltable {
     if (isWhiteListed) {
       uint num = 0;
       for (var i = 0; i < joinedCrowdsalesLen; i++) {
-        if (this == joinedCrowdsales[i]) 
+        if (this == joinedCrowdsales[i])
           num = i;
       }
       if (num + 1 < joinedCrowdsalesLen) {
@@ -668,7 +668,7 @@ contract CrowdsaleExt is Haltable {
     if (lastCrowdsaleCntrct.finalized()) throw;
     uint num = 0;
     for (var i = 0; i < joinedCrowdsalesLen; i++) {
-      if (this == joinedCrowdsales[i]) 
+      if (this == joinedCrowdsales[i])
         num = i;
     }
     if (num + 1 < joinedCrowdsalesLen) {
@@ -977,5 +977,15 @@ contract MintedTokenCappedCrowdsaleExt is CrowdsaleExt {
     if (lastCrowdsaleCntrct.finalized()) throw;
     maximumSellableTokens = tokens;
     MaximumSellableTokensChanged(maximumSellableTokens);
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
 }

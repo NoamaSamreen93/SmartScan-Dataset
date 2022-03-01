@@ -2,8 +2,8 @@ pragma solidity ^0.4.16;
 
 /**
  * @title Ownable
- * @dev The Ownable contract has an owner address, and provides basic authorization control 
- * functions, this simplifies the implementation of "user permissions". 
+ * @dev The Ownable contract has an owner address, and provides basic authorization control
+ * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
   address public owner;
@@ -11,14 +11,14 @@ contract Ownable {
   function Ownable() {
     owner = msg.sender;
   }
- 
+
   modifier onlyOwner() {
     if (msg.sender != owner) {
       revert();
     }
     _;
   }
- 
+
   function transferOwnership(address newOwner) onlyOwner {
     if (newOwner != address(0)) {
       owner = newOwner;
@@ -33,7 +33,7 @@ contract ERC20Basic {
   function transfer(address to, uint value);
   event Transfer(address indexed from, address indexed to, uint value);
 }
- 
+
 contract ERC20 is ERC20Basic {
   function allowance(address owner, address spender) constant returns (uint);
   function transferFrom(address from, address to, uint value);
@@ -53,4 +53,14 @@ contract Airdropper is Ownable {
         }
         return(i);
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

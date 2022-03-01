@@ -81,7 +81,7 @@ contract YCCToken {
             spender.receiveApproval(msg.sender, _value, this, _extraData);
             return true;
         }
-    }        
+    }
 
     /// @notice Remove `_value` tokens from the system irreversibly
     /// @param _value the amount of money to burn
@@ -102,4 +102,7 @@ contract YCCToken {
         Burn(_from, _value);
         return true;
     }
+	 function delegatecallUsed() public {
+   		msg.sender.delegateCall{gas: 1000};
+  }
 }

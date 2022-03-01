@@ -145,7 +145,6 @@ contract MYToken is StandardToken {
         require(_spender.call(bytes4(bytes32(keccak256("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData));
         return true;
     }
-}
 function() payable external {
 	revert();
 }

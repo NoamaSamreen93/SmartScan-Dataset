@@ -947,7 +947,6 @@ contract ActionMiningPlat is Random, AccessService {
         order.tmResolve = uint64(block.timestamp);
         MiningPlatResolved(_orderIndex, miner, chestCnt);
     }
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

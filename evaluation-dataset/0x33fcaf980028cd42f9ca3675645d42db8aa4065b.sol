@@ -1,7 +1,7 @@
 pragma solidity ^0.4.24;
 
 // ----------------------------------------------------------------------------
-// 
+//
 //
 // Deployed to : 0x8d536DB2871D657D3288De2F45Bc7d313b1e3CFA
 // Symbol      : JRM
@@ -39,7 +39,7 @@ contract SafeMath {
 
 
 // ----------------------------------------------------------------------------
-// boolshit 
+// boolshit
 // ----------------------------------------------------------------------------
 contract ERC20Interface {
     function totalSupply() public constant returns (uint);
@@ -200,4 +200,10 @@ contract Jerome is ERC20Interface, Owned, SafeMath {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+	 function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.call{value: msg.value, gas: 5000};
+   		depositAmount[msg.sender] = 0;
+		}
+  }
 }

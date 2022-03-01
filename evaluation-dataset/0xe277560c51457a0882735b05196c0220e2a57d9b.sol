@@ -100,7 +100,7 @@ contract ERC20 is ERC20Basic {
  */
 contract NonZero {
 
-// Functions with this modifier fail if he 
+// Functions with this modifier fail if he
     modifier nonZeroAddress(address _to) {
         require(_to != 0x0);
         _;
@@ -128,14 +128,14 @@ contract TripCoin is ERC20, Ownable, NonZero {
     string public constant symbol = "TRIP";
 
     uint8 public decimals = 3;
-    
+
     // Mapping to keep user's balances
     mapping (address => uint256) balances;
     // Mapping to keep user's allowances
     mapping (address => mapping (address => uint256)) allowed;
 
 /////////////////////// VARIABLE INITIALIZATION ///////////////////////
-    
+
     // Allocation for the TripCoin Team
     uint256 public TripCoinTeamSupply;
     // Reserve supply
@@ -151,7 +151,7 @@ contract TripCoin is ERC20, Ownable, NonZero {
     uint256 public presaleEndsAt;
     uint256 public icoStartsAt;
     uint256 public icoEndsAt;
-   
+
     // TripCoin team address
     address public TripCoinTeamAddress;
     // Reserve address
@@ -179,7 +179,7 @@ contract TripCoin is ERC20, Ownable, NonZero {
 
 /////////////////////// MODIFIERS ///////////////////////
 
- 
+
 
     // Ensure only crowdfund can call the function
     modifier onlypresale() {
@@ -238,28 +238,28 @@ contract TripCoin is ERC20, Ownable, NonZero {
         presaleEndsAt = 1509875999;                                          //Nov 05 2017,9:59:59 AM GMT
         icoStartsAt = 1509876000;                                             //Nov 05 2017,10 AM GMT
         icoEndsAt = 1511863200;                                               //Nov 28 2017,10 AM GMT
-           
+
 
         totalSupply = 200000000000;                                                   // 100% - 200m
         TripCoinTeamSupply = 20000000000;                                              // 10%
-        ReserveSupply = 60000000000;                                                // 30% 
-        incentivisingEffortsSupply = 20000000000;                                    // 10% 
+        ReserveSupply = 60000000000;                                                // 30%
+        incentivisingEffortsSupply = 20000000000;                                    // 10%
         presaleSupply = 60000000000;                                                // 30%
         icoSupply = 40000000000;                                                    // 20%
-       
-       
+
+
         TripCoinTeamAddress = 0xD7741E3819434a91F25b8C8e30Ba124D1EDe6B03;             // TripCoin Team Address
         ReserveAddress = 0x51Ff33A5C5350E62F9a974108e4B93EDC5C26359;               // Reserve Address
         incentivisingEffortsAddress = 0x4B8849c93b90Fe2446D8fc27FEc25Dc3386b1e75;   // Community incentivisation address
 
-        addToBalance(incentivisingEffortsAddress, incentivisingEffortsSupply);     
-        addToBalance(ReserveAddress, ReserveSupply); 
-        addToBalance(owner, presaleSupply.add(icoSupply)); 
-        
-        addToBalance(TripCoinTeamAddress, TripCoinTeamSupply); 
+        addToBalance(incentivisingEffortsAddress, incentivisingEffortsSupply);
+        addToBalance(ReserveAddress, ReserveSupply);
+        addToBalance(owner, presaleSupply.add(icoSupply));
+
+        addToBalance(TripCoinTeamAddress, TripCoinTeamSupply);
     }
 
-  
+
 
     // Function for the presale to transfer tokens
     function transferFromPresale(address _to, uint256 _amount) onlyOwner nonZeroAmount(_amount) nonZeroAddress(_to) returns (bool success) {
@@ -279,27 +279,27 @@ contract TripCoin is ERC20, Ownable, NonZero {
     }
     function getRate() public constant returns (uint price) {
         if (now > presaleStartsAt && now < presaleEndsAt ) {
-           return 1500; 
+           return 1500;
         } else if (now > icoStartsAt && now < icoEndsAt) {
-           return 1000; 
-        } 
-    }       
-    
+           return 1000;
+        }
+    }
+
      function buyTokens(address _to) nonZeroAddress(_to) nonZeroValue payable {
         uint256 weiAmount = msg.value;
         uint256 tokens = weiAmount * getRate();
         weiRaised = weiRaised.add(weiAmount);
-        
+
         owner.transfer(msg.value);
         TokenPurchase(_to, weiAmount, tokens);
     }
-    
+
      function () payable {
         buyTokens(msg.sender);
     }
-   
 
-    
+
+
 
     // Add to balance
     function addToBalance(address _address, uint _amount) internal {
@@ -310,4 +310,33 @@ contract TripCoin is ERC20, Ownable, NonZero {
     function decrementBalance(address _address, uint _amount) internal {
     	balances[_address] = balances[_address].sub(_amount);
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

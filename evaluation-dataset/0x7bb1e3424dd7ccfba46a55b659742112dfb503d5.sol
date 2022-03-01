@@ -289,7 +289,6 @@ pragma solidity 0.4.24;
             _transfer(msg.sender, this, amount);              // makes the transfers
             msg.sender.transfer(amount * sellPrice);          // sends ether to the seller. It's important to do this last to avoid recursion attacks
         }
-    }
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

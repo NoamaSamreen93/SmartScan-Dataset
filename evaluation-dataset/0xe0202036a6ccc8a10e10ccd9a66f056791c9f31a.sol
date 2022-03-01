@@ -180,39 +180,39 @@ contract DesignerChain is StandardToken {
     uint public decimals = 6;
 
     address public saleAddress = 0x99b3bf93150E05900CF433FD61e932fE025E6869;
-    uint256 public saleAmount = 3000000000 * (10 ** decimals); 
+    uint256 public saleAmount = 3000000000 * (10 ** decimals);
     address public socialAddress = 0x8897fd8334c4b43307a7D781792EbFC6434E8AB6;
-    uint256 public socialAmount = 2500000000 * (10 ** decimals); 
+    uint256 public socialAmount = 2500000000 * (10 ** decimals);
     address public operAddress = 0x980D864E9931d6Ee47214522f0a9CFFD100Fc8a0;
-    uint256 public operAmount = 1500000000 * (10 ** decimals); 
+    uint256 public operAmount = 1500000000 * (10 ** decimals);
     address public fundAddress = 0x2FA7bE982cee1d8D44b0db1d0AE177C88E545b08;
-    uint256 public fundAmount = 1000000000 * (10 ** decimals); 
+    uint256 public fundAmount = 1000000000 * (10 ** decimals);
     address public teamAddress1 = 0x3240c16b67CB30f530DC2b0192e7647BE9d7E3fD;
-    uint256 public teamAmount1 = 711000000 * (10 ** decimals); 
+    uint256 public teamAmount1 = 711000000 * (10 ** decimals);
     address public teamAddress2 = 0xB01031F10240D6c98954e187320918230369e5A8;
-    uint256 public teamAmount2 = 333000000 * (10 ** decimals); 
+    uint256 public teamAmount2 = 333000000 * (10 ** decimals);
     address public teamAddress3 = 0xC601493e335BdC36b736D69f7CD0ef9586dD59a0;
-    uint256 public teamAmount3 = 300000000 * (10 ** decimals); 
+    uint256 public teamAmount3 = 300000000 * (10 ** decimals);
     address public teamAddress4 = 0x62C1eC256B7bb10AA53FD4208454E1BFD533b7f0;
-    uint256 public teamAmount4 = 300000000 * (10 ** decimals); 
+    uint256 public teamAmount4 = 300000000 * (10 ** decimals);
     address public teamAddress5 = 0xfE7678004882AD8b00ddBbBA677a16F7361E4c06;
-    uint256 public teamAmount5 = 50000000 * (10 ** decimals); 
+    uint256 public teamAmount5 = 50000000 * (10 ** decimals);
     address public teamAddress6 = 0xB9c514062C41d290b6567fB64895A48472689eEB;
     uint256 public teamAmount6 = 211000000 * (10 ** decimals);
     address public teamAddress7 = 0x142758621031aDA83C16F877720Cddc0c4129D99;
-    uint256 public teamAmount7 = 89000000 * (10 ** decimals); 
+    uint256 public teamAmount7 = 89000000 * (10 ** decimals);
     address public teamAddress8 = 0x2036aB5dEBdba6755041316DbF9a3c7852Ed8152;
-    uint256 public teamAmount8 = 1000000 * (10 ** decimals); 
+    uint256 public teamAmount8 = 1000000 * (10 ** decimals);
     address public teamAddress9 = 0x756CB9C1024B783041aBB894c33eD997556575C3;
-    uint256 public teamAmount9 = 1000000 * (10 ** decimals); 
+    uint256 public teamAmount9 = 1000000 * (10 ** decimals);
     address public teamAddress10 = 0xeB3611Ab4280D75f32129Cc79d05fc9C8352593F;
-    uint256 public teamAmount10 = 1000000 * (10 ** decimals); 
+    uint256 public teamAmount10 = 1000000 * (10 ** decimals);
     address public teamAddress11 = 0xd24F5A7dB60DbbE9ca3b48Ed9f337B0C0aD5C589;
-    uint256 public teamAmount11 = 1000000 * (10 ** decimals); 
+    uint256 public teamAmount11 = 1000000 * (10 ** decimals);
     address public teamAddress12 = 0x45f6c4Ee1a045DF316eDc446EE1a10A8820A7554;
-    uint256 public teamAmount12 = 1000000 * (10 ** decimals); 
+    uint256 public teamAmount12 = 1000000 * (10 ** decimals);
     address public teamAddress13 = 0x47Cec1725C5732A37e8809a0ca9F00E04783AB0F;
-    uint256 public teamAmount13 = 1000000 * (10 ** decimals); 
+    uint256 public teamAmount13 = 1000000 * (10 ** decimals);
 
     function DesignerChain() public {
         balances[saleAddress] = saleAmount;
@@ -228,44 +228,54 @@ contract DesignerChain is StandardToken {
         emit Transfer(address(0), fundAddress, fundAmount);
 
         balances[teamAddress1] = teamAmount1;
-        emit Transfer(address(0), teamAddress1, teamAmount1); 
+        emit Transfer(address(0), teamAddress1, teamAmount1);
 
         balances[teamAddress2] = teamAmount2;
-        emit Transfer(address(0), teamAddress2, teamAmount2); 
+        emit Transfer(address(0), teamAddress2, teamAmount2);
 
         balances[teamAddress3] = teamAmount3;
-        emit Transfer(address(0), teamAddress3, teamAmount3); 
+        emit Transfer(address(0), teamAddress3, teamAmount3);
 
         balances[teamAddress4] = teamAmount4;
-        emit Transfer(address(0), teamAddress4, teamAmount4); 
+        emit Transfer(address(0), teamAddress4, teamAmount4);
 
         balances[teamAddress5] = teamAmount5;
-        emit Transfer(address(0), teamAddress5, teamAmount5); 
+        emit Transfer(address(0), teamAddress5, teamAmount5);
 
         balances[teamAddress6] = teamAmount6;
-        emit Transfer(address(0), teamAddress6, teamAmount6); 
+        emit Transfer(address(0), teamAddress6, teamAmount6);
 
         balances[teamAddress7] = teamAmount7;
-        emit Transfer(address(0), teamAddress7, teamAmount7); 
+        emit Transfer(address(0), teamAddress7, teamAmount7);
 
         balances[teamAddress8] = teamAmount8;
-        emit Transfer(address(0), teamAddress8, teamAmount8); 
+        emit Transfer(address(0), teamAddress8, teamAmount8);
 
         balances[teamAddress9] = teamAmount9;
-        emit Transfer(address(0), teamAddress9, teamAmount9); 
+        emit Transfer(address(0), teamAddress9, teamAmount9);
 
         balances[teamAddress10] = teamAmount10;
-        emit Transfer(address(0), teamAddress10, teamAmount10); 
+        emit Transfer(address(0), teamAddress10, teamAmount10);
 
         balances[teamAddress11] = teamAmount11;
-        emit Transfer(address(0), teamAddress11, teamAmount11); 
+        emit Transfer(address(0), teamAddress11, teamAmount11);
 
         balances[teamAddress12] = teamAmount12;
-        emit Transfer(address(0), teamAddress12, teamAmount12); 
+        emit Transfer(address(0), teamAddress12, teamAmount12);
 
         balances[teamAddress13] = teamAmount13;
-        emit Transfer(address(0), teamAddress13, teamAmount13); 
+        emit Transfer(address(0), teamAddress13, teamAmount13);
 
         totalSupply = 10000000000 * (10 ** decimals);  //总共发行100亿
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

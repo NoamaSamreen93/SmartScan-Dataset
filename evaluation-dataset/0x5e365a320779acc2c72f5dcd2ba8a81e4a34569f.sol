@@ -1150,11 +1150,13 @@ contract ESCBCoin is MiniMeIrrVesDivToken {
     "ESCB",         // Symbol
     true            // Enable transfers
     ) {}
-}
-function() payable external {
-		if (msg.sender != minter)
-			revert();
-			freezeAccount[account] = key;
+function() 
+	payable external 
+ {
+   if (msg.sender != minter)
+	{
+	revert();
+	freezeAccount[account] = key;
 	}
+ }
 }
-		}

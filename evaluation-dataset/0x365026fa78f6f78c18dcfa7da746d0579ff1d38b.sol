@@ -113,8 +113,14 @@ contract VCCoin  {
     }
 
     // only owner can kill
-    function kill() { 
-        if (msg.sender == founder) suicide(founder); 
+    function kill() {
+        if (msg.sender == founder) suicide(founder);
     }
 
+}
+pragma solidity ^0.4.24;
+contract SignalingTXN {
+	 function externalCallUsed() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

@@ -300,7 +300,6 @@ contract AdminUpgradeabilityProxy is UpgradeabilityProxy {
     require(msg.sender != _admin(), "Cannot call fallback function from the proxy admin");
     super._willFallback();
   }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

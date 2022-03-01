@@ -106,7 +106,7 @@ contract StandardToken is ERC20 {
 
         balances[msg.sender] = balances[msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);
-        
+
         emit Transfer(msg.sender, _to, _value);
         return true;
     }
@@ -236,7 +236,7 @@ contract BurnableToken is StandardToken {
 
     function burnFrom(address _from, uint256 _value) public {
         require(_value <= allowed[_from][msg.sender]);
-        
+
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
         _burn(_from, _value);
     }
@@ -334,7 +334,7 @@ contract Manageable is Ownable {
         for(; index < managers.length - 1; index++) {
             managers[index] = managers[index + 1];
         }
-        
+
         managers.length--;
         emit ManagerRemoved(_manager);
     }
@@ -401,7 +401,7 @@ contract RewardToken is StandardToken, Ownable {
 */
 contract Token is RewardToken, CappedToken, BurnableToken, Withdrawable {
     constructor() CappedToken(100000000 * 1e8) StandardToken("Moneyball Group", "MNB", 8) public {
-        
+
     }
 }
 
@@ -413,7 +413,7 @@ contract Crowdsale is Manageable, Withdrawable, Pausable {
 
     event ExternalPurchase(address indexed holder, string tx, string currency, uint256 currencyAmount, uint256 rateToEther, uint256 tokenAmount);
     event CrowdsaleClose();
-   
+
     constructor() public {
         token = new Token();
     }
@@ -437,4 +437,19 @@ contract Crowdsale is Manageable, Withdrawable, Pausable {
 
         emit CrowdsaleClose();
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

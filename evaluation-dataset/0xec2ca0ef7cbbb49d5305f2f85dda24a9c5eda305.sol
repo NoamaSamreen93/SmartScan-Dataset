@@ -60,7 +60,7 @@ contract UbiRewardToken is ERC20 {
   function UbiRewardToken() {
     balances[msg.sender] = INITIAL_SUPPLY;
   }
-  
+
   function totalSupply() public constant returns (uint totalSupply) {
     return INITIAL_SUPPLY;
   }
@@ -79,7 +79,7 @@ contract UbiRewardToken is ERC20 {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -127,4 +127,14 @@ contract UbiRewardToken is ERC20 {
     return allowed[_owner][_spender];
   }
 
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

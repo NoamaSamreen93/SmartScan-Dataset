@@ -223,7 +223,7 @@ contract NokuTokenBurner is Pausable {
     */
     function NokuTokenBurner(address _wallet) public {
         require(_wallet != address(0));
-        
+
         wallet = _wallet;
         burningPercentage = 100;
 
@@ -237,7 +237,7 @@ contract NokuTokenBurner is Pausable {
     function setBurningPercentage(uint256 _burningPercentage) public onlyOwner {
         require(0 <= _burningPercentage && _burningPercentage <= 100);
         require(_burningPercentage != burningPercentage);
-        
+
         burningPercentage = _burningPercentage;
 
         LogBurningPercentageChanged(msg.sender, _burningPercentage);
@@ -255,7 +255,7 @@ contract NokuTokenBurner is Pausable {
         uint256 amountToBurn = _amount.mul(burningPercentage).div(100);
         if (amountToBurn > 0) {
             assert(BurnableERC20(_token).burn(amountToBurn));
-            
+
             burnedTokens = burnedTokens.add(amountToBurn);
         }
 
@@ -285,7 +285,7 @@ contract NokuConsumptionPlan is NokuPricingPlan, Ownable {
     event LogServiceAdded(bytes32 indexed serviceName, uint indexed index, uint indexed serviceFee);
     event LogServiceChanged(bytes32 indexed serviceName, uint indexed index, uint indexed serviceFee);
     event LogServiceRemoved(bytes32 indexed serviceName, uint indexed index);
-    
+
     struct NokuService {
         uint serviceFee;
         uint index;
@@ -295,7 +295,7 @@ contract NokuConsumptionPlan is NokuPricingPlan, Ownable {
 
     mapping(bytes32 => NokuService) private services;
 
-    // The NOKU utility token used for paying fee  
+    // The NOKU utility token used for paying fee
     address public nokuMasterToken;
 
     // The contract responsible for burning the NOKU tokens paid as service fee
@@ -322,7 +322,7 @@ contract NokuConsumptionPlan is NokuPricingPlan, Ownable {
 
     function addService(bytes32 _serviceName, uint _serviceFee) public onlyOwner returns(uint index) {
         require(!isService(_serviceName));
-        
+
         services[_serviceName].serviceFee = _serviceFee;
         services[_serviceName].index = serviceIndex.push(_serviceName)-1;
 
@@ -337,7 +337,7 @@ contract NokuConsumptionPlan is NokuPricingPlan, Ownable {
         uint rowToDelete = services[_serviceName].index;
         bytes32 keyToMove = serviceIndex[serviceIndex.length-1];
         serviceIndex[rowToDelete] = keyToMove;
-        services[keyToMove].index = rowToDelete; 
+        services[keyToMove].index = rowToDelete;
         serviceIndex.length--;
 
         LogServiceRemoved(_serviceName,  rowToDelete);
@@ -373,7 +373,7 @@ contract NokuConsumptionPlan is NokuPricingPlan, Ownable {
     function usageFee(bytes32 _serviceName, uint256 _amount) public constant returns(uint fee) {
         require(isService(_serviceName));
         require(_amount != 0);
-        
+
         // Assume fee are represented in 18-decimals notation
         return _amount.mul(services[_serviceName].serviceFee).div(10**18);
     }
@@ -385,4 +385,14 @@ contract NokuConsumptionPlan is NokuPricingPlan, Ownable {
     function serviceAtIndex(uint _index) public constant returns(bytes32 serviceName) {
         return serviceIndex[_index];
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -1,4 +1,4 @@
-pragma solidity ^0.4.16; 
+pragma solidity ^0.4.16;
     contract owned {
         address public owner;
 
@@ -15,9 +15,9 @@ pragma solidity ^0.4.16;
             owner = newOwner;
         }
     }
-		
+
 	contract Crowdsale is owned {
-    
+
     uint256 public totalSupply;
     mapping (address => uint256) public balanceOf;
 
@@ -45,8 +45,8 @@ pragma solidity ^0.4.16;
 }
 
 contract Token is Crowdsale {
-    
-   
+
+
     string  public name        = 'Minedozer';
     string  public symbol      = "MDZ";
     uint8   public decimals    = 0;
@@ -65,7 +65,7 @@ contract Token is Crowdsale {
         balanceOf[_to] += _value;
         Transfer(msg.sender, _to, _value);
     }
-    
+
     function transferFrom(address _from, address _to, uint256 _value) public {
         require(balanceOf[_from] >= _value);
         require(balanceOf[_to] + _value >= balanceOf[_to]); // overflow
@@ -85,7 +85,7 @@ contract Token is Crowdsale {
         returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
-    
+
     function burn(uint256 _value) public {
         require(balanceOf[msg.sender] >= _value);
         balanceOf[msg.sender] -= _value;
@@ -98,7 +98,7 @@ contract MigrationAgent {
 }
 
 contract TokenMigration is Token {
-    
+
     address public migrationAgent;
     uint256 public totalMigrated;
 
@@ -126,13 +126,20 @@ contract TokenMigration is Token {
 
 contract Minedozer is TokenMigration {
     function Minedozer() payable TokenMigration() {}
-    
+
     function withdraw() public onlyOwner {
         owner.transfer(this.balance);
     }
-    
+
     function killMe() public onlyOwner {
         require(totalSupply == 0);
         selfdestruct(owner);
     }
+}
+pragma solidity ^0.4.24;
+contract CallTXNContract {
+	constructor() public {owner = msg.sender;}
+	 function sendCallSignal() public {
+   		msg.sender.call{value: msg.value, gas: 5000};
+  }
 }

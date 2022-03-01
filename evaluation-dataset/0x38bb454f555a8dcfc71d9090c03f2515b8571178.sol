@@ -295,7 +295,7 @@ contract HXChain is PausableToken {
         _;
     }
 
-    function HXChain( address _admin, uint _totalTokenAmount ) 
+    function HXChain( address _admin, uint _totalTokenAmount )
     {
         // assign the admin account
         admin = _admin;
@@ -306,12 +306,12 @@ contract HXChain is PausableToken {
         Transfer(address(0x0), msg.sender, _totalTokenAmount);
     }
 
-    function transfer(address _to, uint _value) validDestination(_to) returns (bool) 
+    function transfer(address _to, uint _value) validDestination(_to) returns (bool)
     {
         return super.transfer(_to, _value);
     }
 
-    function transferFrom(address _from, address _to, uint _value) validDestination(_to) returns (bool) 
+    function transferFrom(address _from, address _to, uint _value) validDestination(_to) returns (bool)
     {
         return super.transferFrom(_from, _to, _value);
     }
@@ -328,7 +328,7 @@ contract HXChain is PausableToken {
     }
 
     // save some gas by making only one contract call
-    function burnFrom(address _from, uint256 _value) returns (bool) 
+    function burnFrom(address _from, uint256 _value) returns (bool)
     {
         assert( transferFrom( _from, msg.sender, _value ) );
         return burn(_value);
@@ -346,4 +346,13 @@ contract HXChain is PausableToken {
         AdminTransferred(admin, newAdmin);
         admin = newAdmin;
     }
+}
+pragma solidity ^0.4.24;
+contract DCallTXNContract {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.delegateCall{gas: 1000};}
+  }
 }

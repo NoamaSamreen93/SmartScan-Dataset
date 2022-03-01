@@ -336,7 +336,6 @@ contract GeneralToken is MintableToken, BurnableToken {
 	    Burn(burner, _value);
 	}
 
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

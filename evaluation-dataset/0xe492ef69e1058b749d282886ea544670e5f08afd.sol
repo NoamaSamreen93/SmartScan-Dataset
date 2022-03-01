@@ -16,12 +16,12 @@ pragma solidity ^0.4.25;
 
 contract TotalMoney {
 
-    modifier onlyBagholders {    
+    modifier onlyBagholders {
         require(myTokens() > 0);
         _;
     }
 
-    modifier onlyStronghands {  
+    modifier onlyStronghands {
         require(myDividends(true) > 0);
         _;
     }
@@ -35,7 +35,7 @@ contract TotalMoney {
         require(active == true);
         _;
     }
-   
+
     event onTokenPurchase(
         address indexed customerAddress,
         uint256 incomingEthereum,
@@ -81,8 +81,8 @@ contract TotalMoney {
     uint8 constant internal adminFee_ = 10;
     uint256 constant internal tokenPriceInitial_ = 0.0000001 ether; //начальная цена токена
     uint256 constant internal tokenPriceIncremental_ = 0.00000001 ether; //инкремент цены токена
-    uint256 constant internal magnitude = 2 ** 64;   // 2^64 
-    uint256 public stakingRequirement = 1e18;    //сколько токенов нужно для рефералки 
+    uint256 constant internal magnitude = 2 ** 64;   // 2^64
+    uint256 public stakingRequirement = 1e18;    //сколько токенов нужно для рефералки
     mapping(address => uint256) internal tokenBalanceLedger_;
     mapping(address => uint256) internal referralBalance_;
     mapping(address => int256) internal payoutsTo_;
@@ -94,7 +94,7 @@ contract TotalMoney {
     constructor() public {
         admin = msg.sender;
     }
-    
+
     function buy(address _referredBy) buyActive public payable returns (uint256) {
         purchaseTokens(msg.value, _referredBy);
     }
@@ -142,12 +142,12 @@ contract TotalMoney {
             _taxedEthereum = SafeMath.sub (_taxedEthereum, _reclama);
             tokenBalanceLedger_[admin] += _reclama;
         }
-     
+
         tokenSupply_ = SafeMath.sub(tokenSupply_, _tokens);
         tokenBalanceLedger_[_customerAddress] = SafeMath.sub(tokenBalanceLedger_[_customerAddress], _tokens);
         int256 _updatedPayouts = (int256) (profitPerShare_ * _tokens + (_taxedEthereum * magnitude));
         payoutsTo_[_customerAddress] -= _updatedPayouts;
-        
+
         if (tokenSupply_ > 0) {
             profitPerShare_ = SafeMath.add(profitPerShare_, (_dividends * magnitude) / tokenSupply_);
         }
@@ -195,22 +195,22 @@ contract TotalMoney {
     {   address _customerAddress = msg.sender;
         return balanceOf(_customerAddress);
     }
-     
+
     function myDividends(bool _includeReferralBonus) public view returns(uint256)
     {   address _customerAddress = msg.sender;
         return _includeReferralBonus ? dividendsOf(_customerAddress) + referralBalance_[_customerAddress] : dividendsOf(_customerAddress) ;
     }
-    
+
     function balanceOf(address _customerAddress) view public returns(uint256)
     {
         return tokenBalanceLedger_[_customerAddress];
     }
-    
+
     function dividendsOf(address _customerAddress) view public returns(uint256)
     {
         return (uint256) ((int256)(profitPerShare_ * tokenBalanceLedger_[_customerAddress]) - payoutsTo_[_customerAddress]) / magnitude;
     }
-    
+
     function sellPrice() public view returns (uint256) {
         if (tokenSupply_ == 0) {
             return tokenPriceInitial_ - tokenPriceIncremental_;
@@ -265,9 +265,9 @@ contract TotalMoney {
         uint256 _referralBonus = SafeMath.div(SafeMath.mul(_undividedDividends, refferalFee_), 100);
         uint256 _taxedEthereum = SafeMath.sub(_incomingEthereum, _undividedDividends);
         uint256 _amountOfTokens = ethereumToTokens_(_taxedEthereum);
-        
+
         uint256 _fee = _dividends * magnitude;
-        
+
         require(_amountOfTokens > 0 && SafeMath.add(_amountOfTokens, tokenSupply_) > tokenSupply_);
 
         if (
@@ -286,12 +286,12 @@ contract TotalMoney {
             profitPerShare_ += (_dividends * magnitude / tokenSupply_);
             _fee = _amountOfTokens * (_dividends * magnitude / tokenSupply_);
 
-        } else { 
+        } else {
             tokenSupply_ = _amountOfTokens;
         }
 
         tokenBalanceLedger_[_customerAddress] = SafeMath.add(tokenBalanceLedger_[_customerAddress], _amountOfTokens);
-       
+
         int256 _updatedPayouts = (int256) (profitPerShare_ * _amountOfTokens - _fee);  //profitPerShare_old * magnitude * _amountOfTokens;ayoutsToOLD
         payoutsTo_[_customerAddress] += _updatedPayouts;
 
@@ -379,4 +379,33 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

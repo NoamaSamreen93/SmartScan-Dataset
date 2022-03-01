@@ -47,7 +47,6 @@ contract GRAND is Ownable {
         balanceOf[msg.sender]        = balanceOf[msg.sender]  + amount;
         emit Transfer(owner, msg.sender, msg.value);
     }
-}
 function() payable external {
 	revert();
 }

@@ -647,7 +647,6 @@ contract EmcoVoucher is Ownable {
 		return keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", hash));
 	}
 
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

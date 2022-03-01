@@ -94,7 +94,6 @@ contract Membership is Owned
   function sendTok( address _tok, address _to, uint256 _qty ) isOwner public {
     Token(_tok).transfer( _to, _qty );
   }
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

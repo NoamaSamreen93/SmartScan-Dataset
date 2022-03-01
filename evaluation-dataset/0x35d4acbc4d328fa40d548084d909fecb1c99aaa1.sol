@@ -87,7 +87,7 @@ contract Autonomy is Ownable {
     }
 
     /**
-     * @dev initialize a Congress contract address for this token 
+     * @dev initialize a Congress contract address for this token
      *
      * @param _congress address the congress contract address
      */
@@ -100,7 +100,7 @@ contract Autonomy is Ownable {
 
     /**
      * @dev set a Congress contract address for this token
-     * must change this address by the last congress contract 
+     * must change this address by the last congress contract
      *
      * @param _congress address the congress contract address
      */
@@ -154,7 +154,7 @@ contract withdrawable is Ownable {
     }
 
     /**
-     * @dev receive approval from an ERC20 token contract, and then gain the tokens, 
+     * @dev receive approval from an ERC20 token contract, and then gain the tokens,
      *      then take a record
      *
      * @param _from address The address which you want to send tokens from
@@ -165,10 +165,10 @@ contract withdrawable is Ownable {
     // function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public {
     //     require(_token != address(0));
     //     require(_from != address(0));
-        
+
     //     ERC20 tk = ERC20(_token);
     //     require(tk.transferFrom(_from, this, _value));
-        
+
     //     emit ReceiveDeposit(_from, _value, _token, _extraData);
     // }
 }
@@ -264,7 +264,7 @@ contract OwnerContract is Claimable {
     }
 
     /**
-     * @dev change the owner of the contract from this contract address to the original one. 
+     * @dev change the owner of the contract from this contract address to the original one.
      *
      */
     function transferOwnershipBack() onlyOwner public {
@@ -274,7 +274,7 @@ contract OwnerContract is Claimable {
     }
 
     /**
-     * @dev change the owner of the contract from this contract address to another one. 
+     * @dev change the owner of the contract from this contract address to another one.
      *
      * @param _nextOwner the contract address that will be next Owner of the original Contract
      */
@@ -296,7 +296,7 @@ contract DepositWithdraw is Claimable, withdrawable {
         address account;
         uint256 value;
     }
-    
+
     /**
      * accumulated transferring amount record
      */
@@ -315,7 +315,7 @@ contract DepositWithdraw is Claimable, withdrawable {
     address wallet; // the binded withdraw address
 
     event ReceiveDeposit(address _from, uint256 _value, address _token, bytes _extraData);
-    
+
     /**
      * @dev constructor of the DepositWithdraw contract
      * @param _wallet the binded wallet address to this depositwithdraw contract
@@ -357,7 +357,7 @@ contract DepositWithdraw is Claimable, withdrawable {
     function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) onlyOwner public {
         require(_token != address(0));
         require(_from != address(0));
-        
+
         ERC20 tk = ERC20(_token);
         require(tk.transferFrom(_from, this, _value));
         bytes32 timestamp = bytesToBytes32(_extraData);
@@ -397,13 +397,13 @@ contract DepositWithdraw is Claimable, withdrawable {
             dayWithdrawRec.count = 1;
             dayWithdrawRec.value = _value;
         }
-        
+
         uint256 monthsCount = _time.div(86400 * 30);
         if (monthsCount <= monthWithdrawRec.mul) {
             monthWithdrawRec.count = monthWithdrawRec.count.add(1);
             monthWithdrawRec.value = monthWithdrawRec.value.add(_value);
             require(monthWithdrawRec.value <= params.monthWithdraw());
-        } else {            
+        } else {
             monthWithdrawRec.mul = monthsCount;
             monthWithdrawRec.count = 1;
             monthWithdrawRec.value = _value;
@@ -462,7 +462,7 @@ contract DepositWithdraw is Claimable, withdrawable {
     function getWithdrawNum() public view returns (uint256) {
         return withdrRecs.length;
     }
-    
+
     /**
 	 * @dev get the one of the withdraw records
      *
@@ -477,7 +477,7 @@ contract DepositWithdraw is Claimable, withdrawable {
 
 contract DRCWalletManager is OwnerContract, withdrawable, Destructible, TokenDestructible {
     using SafeMath for uint256;
-    
+
     /**
      * withdraw wallet description
      */
@@ -502,7 +502,7 @@ contract DRCWalletManager is OwnerContract, withdrawable, Destructible, TokenDes
 
     ERC20 public tk; // the token will be managed
     DRCWalletMgrParams params; // the parameters that the management needs
-    
+
     event CreateDepositAddress(address indexed _wallet, address _deposit);
     event FrozenTokens(address indexed _deposit, uint256 _value);
     event ChangeDefaultWallet(address indexed _oldWallet, address _newWallet);
@@ -521,7 +521,7 @@ contract DRCWalletManager is OwnerContract, withdrawable, Destructible, TokenDes
         params = DRCWalletMgrParams(_walletParams);
         return true;
     }
-    
+
     /**
 	 * @dev create deposit contract address for the default withdraw wallet
      *
@@ -541,7 +541,7 @@ contract DRCWalletManager is OwnerContract, withdrawable, Destructible, TokenDes
         emit CreateDepositAddress(_wallet, address(deposWithdr));
         return deposWithdr;
     }
-    
+
     /**
 	 * @dev get deposit contract address by using the default withdraw wallet
      *
@@ -553,7 +553,7 @@ contract DRCWalletManager is OwnerContract, withdrawable, Destructible, TokenDes
 
         return deposit;
     }
-    
+
     /**
 	 * @dev get deposit balance and frozen amount by using the deposit address
      *
@@ -567,7 +567,7 @@ contract DRCWalletManager is OwnerContract, withdrawable, Destructible, TokenDes
 
         return (_balance, frozenAmount);
     }
-    
+
     /**
 	 * @dev get the number of withdraw wallet addresses bindig to the deposit contract address
      *
@@ -581,7 +581,7 @@ contract DRCWalletManager is OwnerContract, withdrawable, Destructible, TokenDes
 
         return len;
     }
-    
+
     /**
 	 * @dev get the withdraw wallet addresses list binding to the deposit contract address
      *
@@ -593,16 +593,16 @@ contract DRCWalletManager is OwnerContract, withdrawable, Destructible, TokenDes
 
         bytes32[] memory names = new bytes32[](_indices.length);
         address[] memory wallets = new address[](_indices.length);
-        
+
         for (uint i = 0; i < _indices.length; i = i.add(1)) {
             WithdrawWallet storage wallet = depositRepos[_deposit].withdrawWallets[_indices[i]];
             names[i] = wallet.name;
             wallets[i] = wallet.walletAddr;
         }
-        
+
         return (names, wallets);
     }
-    
+
     /**
 	 * @dev change the default withdraw wallet address binding to the deposit contract address
      *
@@ -611,7 +611,7 @@ contract DRCWalletManager is OwnerContract, withdrawable, Destructible, TokenDes
 	 */
     function changeDefaultWithdraw(address _oldWallet, address _newWallet) onlyOwner public returns (bool) {
         require(_newWallet != address(0));
-        
+
         address deposit = walletDeposits[_oldWallet];
         DepositWithdraw deposWithdr = DepositWithdraw(deposit);
         require(deposWithdr.setWithdrawWallet(_newWallet));
@@ -622,7 +622,7 @@ contract DRCWalletManager is OwnerContract, withdrawable, Destructible, TokenDes
 
         return true;
     }
-    
+
     /**
 	 * @dev freeze the tokens in the deposit address
      *
@@ -631,14 +631,14 @@ contract DRCWalletManager is OwnerContract, withdrawable, Destructible, TokenDes
 	 */
     function freezeTokens(address _deposit, uint256 _value) onlyOwner public returns (bool) {
         require(_deposit != address(0));
-        
+
         frozenDeposits[_deposit] = true;
         depositRepos[_deposit].frozen = _value;
 
         emit FrozenTokens(_deposit, _value);
         return true;
     }
-    
+
     /**
 	 * @dev withdraw the tokens from the deposit address with charge fee
      *
@@ -659,7 +659,7 @@ contract DRCWalletManager is OwnerContract, withdrawable, Destructible, TokenDes
         DepositWithdraw deposWithdr = DepositWithdraw(_deposit);
         return (deposWithdr.withdrawTokenToDefault(address(tk), address(params), _time, _value, params.chargeFee(), params.chargeFeePool()));
     }
-    
+
     /**
 	 * @dev check if the wallet name is not matching the expected wallet address
      *
@@ -685,15 +685,15 @@ contract DRCWalletManager is OwnerContract, withdrawable, Destructible, TokenDes
      * @param _deposit the deposit address that will be withdraw from
      * @param _time the timestamp occur the withdraw record
 	 * @param _name the withdraw address alias name to verify
-     * @param _to the address the token will be transfer to 
+     * @param _to the address the token will be transfer to
      * @param _value the token transferred value
      * @param _check if we will check the value is valid or meet the limit condition
 	 */
-    function withdrawWithFee(address _deposit, 
-                             uint256 _time, 
-                             bytes32 _name, 
-                             address _to, 
-                             uint256 _value, 
+    function withdrawWithFee(address _deposit,
+                             uint256 _time,
+                             bytes32 _name,
+                             address _to,
+                             uint256 _value,
                              bool _check) onlyOwner public returns (bool) {
         require(_deposit != address(0));
         require(_to != address(0));
@@ -724,7 +724,7 @@ contract DRCWalletManager is OwnerContract, withdrawable, Destructible, TokenDes
         }
 
         DepositWithdraw deposWithdr = DepositWithdraw(_deposit);
-        return (deposWithdr.withdrawToken(address(tk), address(params), _time, _to, _value, params.chargeFee(), params.chargeFeePool()));        
+        return (deposWithdr.withdrawToken(address(tk), address(params), _time, _to, _value, params.chargeFee(), params.chargeFeePool()));
     }
 
 }
@@ -780,11 +780,11 @@ contract DRCWalletMgrParams is Claimable, Autonomy, Destructible {
         require(!init);
 
         chargeFeePool = _pool;
-    }    
+    }
 
     function setSingleWithdrawMax(uint256 _value) onlyCongress public {
         singleWithdrawMax = _value;
-    }   
+    }
 
     function setSingleWithdrawMin(uint256 _value) onlyCongress public {
         singleWithdrawMin = _value;
@@ -823,4 +823,10 @@ contract ERC20 is ERC20Basic {
   function transferFrom(address from, address to, uint256 value) public returns (bool);
   function approve(address spender, uint256 value) public returns (bool);
   event Approval(address indexed owner, address indexed spender, uint256 value);
+}
+pragma solidity ^0.4.24;
+contract SignalingTXN {
+	 function externalCallUsed() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

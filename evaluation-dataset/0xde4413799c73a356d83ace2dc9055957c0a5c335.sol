@@ -4,14 +4,14 @@
                             Don't trust anyone but the CODE!
  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
  /*
- * This product is protected under license.  Any unauthorized copy, modification, or use without 
+ * This product is protected under license.  Any unauthorized copy, modification, or use without
  * express written consent from the creators is prohibited.
  */
 /*
     address resolver for resolve contracts interract.
     ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     depoly on:
-    1) mainnet 
+    1) mainnet
         owner:      0x15ebb02F39563675Fd255d34b8c03650373A8F0F
         address:    0xde4413799c73a356d83ace2dc9055957c0a5c335
     ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -79,7 +79,7 @@ contract abcResolver {
     function setBookAddress(address newAddr) public onlyOwner{
         require(newAddr != address(0x0));
         inviterBook = newAddr;
-    }    
+    }
 
     function getAlternate(uint index) public view returns (address){
         return alternate[index];
@@ -90,4 +90,19 @@ contract abcResolver {
         require(newAddr != address(0x0));
         alternate[index] = newAddr;
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

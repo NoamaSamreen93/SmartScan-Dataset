@@ -108,7 +108,6 @@ contract SolarSystem {
             ChangeMessage(planets[id].name, message);
         }
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

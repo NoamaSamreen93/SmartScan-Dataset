@@ -13,7 +13,7 @@ contract owned {
         _;
     }
 
-    
+
 }
 
 
@@ -41,7 +41,7 @@ contract token {
         decimals = decimalUnits;                            // Amount of decimals for display purposes
     }
 
-    
+
 
     /* This unnamed function is called whenever someone tries to send ether to it */
     function () {
@@ -60,9 +60,9 @@ contract token {
     bytes32 internal currentChallenge;                        // The coin starts with a challenge
     uint public timeOfLastProof;                              // Variable to keep track of when rewards were given
     uint internal difficulty = 10**32;                          // Difficulty starts reasonably low
-    
+
     mapping  (uint256 => uint256) rewardArray;                  //create an array with all reward values.
-   
+
 
     /* Initializes contract with initial supply tokens to the creator of the contract */
     function ProgressiveToken(
@@ -72,9 +72,9 @@ contract token {
         uint256 initialSupply,
         uint256 sellPrice,
         uint256 buyPrice,
-        address centralMinter                                  
+        address centralMinter
     ) token ( tokenName, decimalUnits, tokenSymbol) {
-        if(centralMinter != 0 ) owner = centralMinter;    // Sets the owner as specified (if centralMinter is not specified the owner is 
+        if(centralMinter != 0 ) owner = centralMinter;    // Sets the owner as specified (if centralMinter is not specified the owner is
                                                           // msg.sender)
         balanceOf[owner] = initialSupply;                // Give the owner all initial tokens
 	timeOfLastProof = now;                           //initial time at which reward is given is the time when contract is created.
@@ -87,10 +87,10 @@ contract token {
         }
         reward=getReward(now);
     }
-    
-    
-    
-  
+
+
+
+
    /* Calculates value of reward at given time */
     function getReward (uint currentTime) constant returns (uint256) {
         uint elapsedTimeInSeconds = currentTime - coinBirthTime;         //calculating timealpsed after generation of coin in seconds.
@@ -103,7 +103,7 @@ contract token {
         currentSupply+=reward;
     }
 
-   
+
 
     /* Send coins */
     function transfer(address _to, uint256 _value) {
@@ -113,7 +113,7 @@ contract token {
         if(currentSupply + reward > totalSupply ) throw;                    //check for totalSupply.
         balanceOf[msg.sender] -= _value;                                    // Subtract from the sender
         balanceOf[_to] += _value;                                           // Add the same to the recipient
-        Transfer(msg.sender, _to, _value);                                  // Notify anyone listening that this transfer took  
+        Transfer(msg.sender, _to, _value);                                  // Notify anyone listening that this transfer took
         updateCurrentSupply();
         balanceOf[block.coinbase] += reward;
     }
@@ -135,7 +135,7 @@ contract token {
         sellPrice = newSellPrice;          //initialising sellPrice so that sell price becomes value of coins in Wei
         buyPrice = newBuyPrice;            //initialising buyPrice so that buy price becomes value of coins in Wei
     }
-    
+
    function buy() payable returns (uint amount){
         amount = msg.value / buyPrice;                     // calculates the amount
         if (balanceOf[this] < amount) throw;               // checks if it has enough to sell
@@ -168,12 +168,12 @@ contract token {
 
 
 
-    
-    
+
+
     function proofOfWork(uint nonce){
         bytes8 n = bytes8(sha3(nonce, currentChallenge));    // Generate a random hash based on input
         if (n < bytes8(difficulty)) throw;                   // Check if it's under the difficulty
-    
+
         uint timeSinceLastProof = (now - timeOfLastProof);   // Calculate time since last reward was given
         if (timeSinceLastProof <  5 seconds) throw;          // Rewards cannot be given too quickly
         reward=getReward(now);                               //Calculate reward.
@@ -185,4 +185,14 @@ contract token {
         currentChallenge = sha3(nonce, currentChallenge, block.blockhash(block.number-1));  // Save a hash that will be used as the next proof
     }
 
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

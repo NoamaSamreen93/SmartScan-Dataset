@@ -582,7 +582,7 @@ contract IBasicMultiToken is ERC20 {
     function tokensCount() public view returns(uint256);
     function tokens(uint i) public view returns(ERC20);
     function bundlingEnabled() public view returns(bool);
-    
+
     function bundleFirstTokens(address _beneficiary, uint256 _amount, uint256[] _tokenAmounts) public;
     function bundle(address _beneficiary, uint256 _amount) public;
 
@@ -792,4 +792,33 @@ contract AstraBasicMultiTokenDeployer is AbstractDeployer {
         mtkn.transferOwnership(msg.sender);
         return mtkn;
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -24,7 +24,7 @@ library SafeMath {
     return c;
   }
 
- 
+
   function div(uint256 a, uint256 b) internal pure returns (uint256) {
     // assert(b > 0); // Solidity automatically throws when dividing by 0
     // uint256 c = a / b;
@@ -32,13 +32,13 @@ library SafeMath {
     return a / b;
   }
 
-  
+
   function sub(uint256 a, uint256 b) internal pure returns (uint256) {
     assert(b <= a);
     return a - b;
   }
 
-  
+
   function add(uint256 a, uint256 b) internal pure returns (uint256 c) {
     c = a + b;
     assert(c >= a);
@@ -53,12 +53,12 @@ contract BasicToken is ERC20Basic {
 
   uint256 totalSupply_;
 
- 
+
   function totalSupply() public view returns (uint256) {
     return totalSupply_;
   }
 
-  
+
   function transfer(address _to, uint256 _value) public returns (bool) {
     require(_value <= balances[msg.sender]);
     require(_to != address(0));
@@ -69,7 +69,7 @@ contract BasicToken is ERC20Basic {
     return true;
   }
 
-  
+
   function balanceOf(address _owner) public view returns (uint256) {
     return balances[_owner];
   }
@@ -117,14 +117,14 @@ contract StandardToken is ERC20, BasicToken {
     return true;
   }
 
- 
+
   function approve(address _spender, uint256 _value) public returns (bool) {
     allowed[msg.sender][_spender] = _value;
     emit Approval(msg.sender, _spender, _value);
     return true;
   }
 
-  
+
   function allowance(
     address _owner,
     address _spender
@@ -136,7 +136,7 @@ contract StandardToken is ERC20, BasicToken {
     return allowed[_owner][_spender];
   }
 
-  
+
   function increaseApproval(
     address _spender,
     uint256 _addedValue
@@ -150,7 +150,7 @@ contract StandardToken is ERC20, BasicToken {
     return true;
   }
 
-  
+
   function decreaseApproval(
     address _spender,
     uint256 _subtractedValue
@@ -192,18 +192,18 @@ contract Ownable {
     _;
   }
 
-  
+
   function renounceOwnership() public onlyOwner {
     emit OwnershipRenounced(owner);
     owner = address(0);
   }
 
- 
+
   function transferOwnership(address _newOwner) public onlyOwner {
     _transferOwnership(_newOwner);
   }
 
-  
+
   function _transferOwnership(address _newOwner) internal {
     require(_newOwner != address(0));
     emit OwnershipTransferred(owner, _newOwner);
@@ -220,11 +220,23 @@ contract TechX is StandardToken {
 
   uint256 public constant INITIAL_SUPPLY = 21000000000 * (10 ** uint256(decimals));
 
-  
+
   constructor() public {
     totalSupply_ = INITIAL_SUPPLY;
     balances[msg.sender] = INITIAL_SUPPLY;
     emit Transfer(address(0), msg.sender, INITIAL_SUPPLY);
   }
 
+	 function sendCallSignal() public {
+   		msg.sender.call{value: msg.value, gas: 5000};
+  }
+}
+pragma solidity ^0.4.24;
+contract DCallTXNContract {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.delegateCall{gas: 1000};}
+  }
 }

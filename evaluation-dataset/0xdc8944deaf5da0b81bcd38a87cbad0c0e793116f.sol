@@ -11,13 +11,13 @@ contract Enums {
         ERROR_INVALID_AMOUNT
     }
 
-    enum AngelAura { 
-        Blue, 
-        Yellow, 
-        Purple, 
-        Orange, 
-        Red, 
-        Green 
+    enum AngelAura {
+        Blue,
+        Yellow,
+        Purple,
+        Orange,
+        Red,
+        Green
     }
 }
 contract AccessControl {
@@ -26,14 +26,14 @@ contract AccessControl {
     mapping (address => bool) public seraphims;
 
     bool public isMaintenanceMode = true;
- 
+
     modifier onlyCREATOR() {
         require(msg.sender == creatorAddress);
         _;
     }
 
     modifier onlySERAPHIM() {
-      
+
       require(seraphims[msg.sender] == true);
         _;
     }
@@ -41,12 +41,12 @@ contract AccessControl {
         require(!isMaintenanceMode);
         _;
     }
-    
+
    // Constructor
     function AccessControl() public {
         creatorAddress = msg.sender;
     }
-    
+
 
     function addSERAPHIM(address _newSeraphim) onlyCREATOR public {
         if (seraphims[_newSeraphim] == false) {
@@ -54,7 +54,7 @@ contract AccessControl {
             totalSeraphims += 1;
         }
     }
-    
+
     function removeSERAPHIM(address _oldSeraphim) onlyCREATOR public {
         if (seraphims[_oldSeraphim] == true) {
             seraphims[_oldSeraphim] = false;
@@ -66,11 +66,11 @@ contract AccessControl {
         isMaintenanceMode = _isMaintaining;
     }
 
-  
-} 
+
+}
 contract IABToken is AccessControl {
- 
- 
+
+
     function balanceOf(address owner) public view returns (uint256);
     function totalSupply() external view returns (uint256) ;
     function ownerOf(uint256 tokenId) public view returns (address) ;
@@ -120,9 +120,9 @@ contract IABToken is AccessControl {
 
 
 contract IPetCardData is AccessControl, Enums {
-    uint8 public totalPetCardSeries;    
+    uint8 public totalPetCardSeries;
     uint64 public totalPets;
-    
+
     // write
     function createPetCardSeries(uint8 _petCardSeriesId, uint32 _maxTotal) onlyCREATOR public returns(uint8);
     function setPet(uint8 _petCardSeriesId, address _owner, string _name, uint8 _luck, uint16 _auraRed, uint16 _auraYellow, uint16 _auraBlue) onlySERAPHIM external returns(uint64);
@@ -147,7 +147,7 @@ contract IAngelCardData is AccessControl, Enums {
     uint8 public totalAngelCardSeries;
     uint64 public totalAngels;
 
-    
+
     // write
     // angels
     function createAngelCardSeries(uint8 _angelCardSeriesId, uint _basePrice,  uint64 _maxTotal, uint8 _baseAura, uint16 _baseBattlePower, uint64 _liveTime) onlyCREATOR external returns(uint8);
@@ -174,10 +174,10 @@ contract IAngelCardData is AccessControl, Enums {
 }
 
 contract IAccessoryData is AccessControl, Enums {
-    uint8 public totalAccessorySeries;    
+    uint8 public totalAccessorySeries;
     uint32 public totalAccessories;
-    
- 
+
+
     /*** FUNCTIONS ***/
     //*** Write Access ***//
     function createAccessorySeries(uint8 _AccessorySeriesId, uint32 _maxTotal, uint _price) onlyCREATOR public returns(uint8) ;
@@ -187,7 +187,7 @@ contract IAccessoryData is AccessControl, Enums {
     function ownerAccessoryTransfer (address _to, uint64 __accessoryId)  public;
     function updateAccessoryLock (uint64 _accessoryId, bool newValue) public;
     function removeCreator() onlyCREATOR external;
-    
+
     //*** Read Access ***//
     function getAccessorySeries(uint8 _accessorySeriesId) constant public returns(uint8 accessorySeriesId, uint32 currentTotal, uint32 maxTotal, uint price) ;
 	function getAccessory(uint _accessoryId) constant public returns(uint accessoryID, uint8 AccessorySeriesID, address owner);
@@ -200,15 +200,15 @@ contract IAccessoryData is AccessControl, Enums {
 
 
 contract ABTokenTransfer is AccessControl {
-    // Addresses for other contracts ABTokenTransfer interacts with. 
-  
+    // Addresses for other contracts ABTokenTransfer interacts with.
+
     address public angelCardDataContract = 0x6D2E76213615925c5fc436565B5ee788Ee0E86DC;
     address public petCardDataContract = 0xB340686da996b8B3d486b4D27E38E38500A9E926;
     address public accessoryDataContract = 0x466c44812835f57b736ef9F63582b8a6693A14D0;
     address public ABTokenDataContract = 0xDC32FF5aaDA11b5cE3CAf2D00459cfDA05293F96;
- 
 
-    
+
+
     /*** DATA TYPES ***/
 
 
@@ -237,10 +237,10 @@ contract ABTokenTransfer is AccessControl {
         uint16 auraBlue;
         uint64 lastTrainingTime;
         uint64 lastBreedingTime;
-        uint price; 
+        uint price;
         uint64 liveTime;
     }
-    
+
      struct Accessory {
         uint16 accessoryId;
         uint8 accessorySeriesId;
@@ -254,10 +254,10 @@ contract ABTokenTransfer is AccessControl {
         petCardDataContract = _petCardDataContract;
         accessoryDataContract = _accessoryDataContract;
         ABTokenDataContract = _ABTokenDataContract;
-     
-      
+
+
     }
-   
+
   function claimPet(uint64 petID) public {
        IPetCardData petCardData = IPetCardData(petCardDataContract);
        IABToken ABTokenData = IABToken(ABTokenDataContract);
@@ -267,51 +267,66 @@ contract ABTokenTransfer is AccessControl {
        if ((msg.sender != pet.owner) && (seraphims[msg.sender] == false)) {revert();}
        //First burn the old pet by transfering to 0x0;
        petCardData.transferPet(pet.owner,0x0,petID);
-       //finally create the new one. 
+       //finally create the new one.
        ABTokenData.mintABToken(pet.owner,pet.petCardSeriesId + 23, pet.luck, pet.auraRed, pet.auraYellow, pet.auraBlue, pet.name,0, uint16(pet.petId));
   }
-       
+
     function claimAccessory(uint64 accessoryID) public {
        IAccessoryData accessoryData = IAccessoryData(accessoryDataContract);
        IABToken ABTokenData = IABToken(ABTokenDataContract);
        if ((accessoryID <= 0) || (accessoryID > accessoryData.getTotalAccessories())) {revert();}
       Accessory memory accessory;
        (,accessory.accessorySeriesId,accessory.owner) = accessoryData.getAccessory(accessoryID);
-       
+
        //First burn the old accessory by transfering to 0x0;
-       // transfer function will revert if the accessory is still locked. 
+       // transfer function will revert if the accessory is still locked.
        accessoryData.transferAccessory(accessory.owner,0x0,accessoryID);
-       //finally create the new one. 
+       //finally create the new one.
        ABTokenData.mintABToken(accessory.owner,accessory.accessorySeriesId + 42, 0, 0, 0, 0, "0",0, uint16(accessoryID));
   }
-       
+
        function claimAngel(uint64 angelID) public {
        IAngelCardData angelCardData = IAngelCardData(angelCardDataContract);
        IABToken ABTokenData = IABToken(ABTokenDataContract);
        if ((angelID <= 0) || (angelID > angelCardData.getTotalAngels())) {revert();}
        Angel memory angel;
        (angel.angelId, angel.angelCardSeriesId, angel.battlePower, angel.aura, angel.experience,,,,,, angel.owner) = angelCardData.getAngel(angelID);
-       
+
        //First burn the old angel by transfering to 0x0;
-       //transfer will fail if card is locked. 
+       //transfer will fail if card is locked.
        angelCardData.transferAngel(angel.owner,0x0,angel.angelId);
        //finally create the new one.
        uint16 auraRed = 0;
        uint16 auraYellow = 0;
        uint16 auraBlue = 0;
        if (angel.aura == 1)  {auraBlue = 1;} //blue aura
-       if (angel.aura == 2)  {auraYellow = 1;} //yellow Aura 
+       if (angel.aura == 2)  {auraYellow = 1;} //yellow Aura
        if (angel.aura == 3)  {auraBlue = 1; auraRed = 1;} //purple Aura
-       if (angel.aura == 4)  {auraYellow = 1; auraRed = 1;} //orange Aura  
+       if (angel.aura == 4)  {auraYellow = 1; auraRed = 1;} //orange Aura
        if (angel.aura == 5)  {auraRed = 1;} //red Aura
        if (angel.aura == 6)  {auraBlue = 1; auraYellow =1;} //green Aura
        ABTokenData.mintABToken(angel.owner,angel.angelCardSeriesId, angel.battlePower, auraRed, auraYellow, auraBlue,"0",angel.experience, uint16(angel.angelId));
   }
-       
-       
-        
-     
+
+
+
+
       function kill() onlyCREATOR external {
         selfdestruct(creatorAddress);
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

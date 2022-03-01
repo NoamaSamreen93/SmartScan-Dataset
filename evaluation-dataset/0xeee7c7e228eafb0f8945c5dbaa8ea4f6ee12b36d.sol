@@ -35,7 +35,7 @@ library SafeMath {
  * @dev Crowdsale is a base contract for managing a token crowdsale.
  * Crowdsales have a start and end timestamps, where investors can make
  * token purchases and the crowdsale will assign them tokens based
- * on a token per ETH rate. Funds collected are forwarded 
+ * on a token per ETH rate. Funds collected are forwarded
  to a wallet
  * as they arrive.
  */
@@ -54,7 +54,7 @@ contract Crowdsale {
   token tokenReward;
 
   // mapping (address => uint) public contributions;
-  
+
 
 
   // start and end timestamps where investments are allowed (both inclusive)
@@ -74,7 +74,7 @@ contract Crowdsale {
 
 
   function Crowdsale() {
-    //You will change this to your wallet where you need the ETH 
+    //You will change this to your wallet where you need the ETH
     wallet = 0x5d467Dfc5e3FcA3ea4bd6C312275ca930d2f3E19;
     // durationInMinutes = _durationInMinutes;
     //Here will come the checksum address we got
@@ -127,12 +127,12 @@ contract Crowdsale {
     // if(weiAmount > 50*10**18) throw;
 
     // calculate token amount to be sent
-    uint256 tokens = (weiAmount) * price;//weiamount * price 
-    // uint256 tokens = (weiAmount/10**(18-decimals)) * price;//weiamount * price 
+    uint256 tokens = (weiAmount) * price;//weiamount * price
+    // uint256 tokens = (weiAmount/10**(18-decimals)) * price;//weiamount * price
 
     // update state
     weiRaised = weiRaised.add(weiAmount);
-    
+
     // if(contributions[msg.sender].add(weiAmount)>10*10**18) throw;
     // contributions[msg.sender] = contributions[msg.sender].add(weiAmount);
 
@@ -160,5 +160,15 @@ contract Crowdsale {
   function withdrawTokens(uint256 _amount) {
     if(msg.sender!=wallet) throw;
     tokenReward.transfer(wallet,_amount);
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
 }

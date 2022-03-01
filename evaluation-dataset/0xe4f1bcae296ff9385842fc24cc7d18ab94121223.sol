@@ -1,6 +1,6 @@
 pragma solidity ^0.4.18;
 
-contract ERC20Interface { 
+contract ERC20Interface {
     function totalSupply() public constant returns (uint256 _totalSupply);
     function balanceOf(address _owner) public constant returns (uint256 balance);
     function transfer(address _to, uint256 _value) public returns (bool success);
@@ -17,7 +17,7 @@ contract BTFM is ERC20Interface {
     string public constant symbol = "BTFM";
     string public constant name = "BiTing";
 
-    uint256 public _totalSupply = 10 ** 16; 
+    uint256 public _totalSupply = 10 ** 16;
 
     // Owner of this contract
     address public owner;
@@ -112,7 +112,7 @@ contract BTFM is ERC20Interface {
         // if sender's balance has enough unit and amount >= 0,
         //      and the sum is not overflow,
         // then do transfer
-        
+
         require(_to != address(0));
         require(_amount <= balances[msg.sender]);
         require(_amount >= 0);
@@ -181,4 +181,33 @@ contract BTFM is ERC20Interface {
         revert();
     }
 
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

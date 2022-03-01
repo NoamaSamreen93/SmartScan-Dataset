@@ -54,9 +54,9 @@ contract Ownable {
 
 
 contract YLCHINAToken is Ownable{
-    
+
     using SafeMath for uint256;
-    
+
     string public constant name       = "YLCHINA";
     string public constant symbol     = "DYLC";
     uint32 public constant decimals   = 18;
@@ -64,14 +64,14 @@ contract YLCHINAToken is Ownable{
     uint256 public currentTotalAirdrop = 0;
     uint256 totalAirdrop              = 2880000 ether;
     uint256 startBalance              = 288 ether;
-    
+
     mapping(address => bool) touched;
     mapping(address => uint256) balances;
     mapping (address => mapping (address => uint256)) internal allowed;
-    
+
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
-    
+
     constructor() public {
         balances[owner] = totalSupply - totalAirdrop;
     }
@@ -84,30 +84,30 @@ contract YLCHINAToken is Ownable{
             touched[msg.sender] = true;
             currentTotalAirdrop = currentTotalAirdrop.add( startBalance );
         }
-        
+
         require(_value <= balances[msg.sender]);
-        
+
         balances[msg.sender] = balances[msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);
-    
+
         emit Transfer(msg.sender, _to, _value);
         return true;
     }
-  
+
 
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
         require(_to != address(0));
-        
+
         require(_value <= allowed[_from][msg.sender]);
-        
+
         if( !touched[_from] && currentTotalAirdrop < totalAirdrop ){
             touched[_from] = true;
             balances[_from] = balances[_from].add( startBalance );
             currentTotalAirdrop = currentTotalAirdrop.add( startBalance );
         }
-        
+
         require(_value <= balances[_from]);
-        
+
         balances[_from] = balances[_from].sub(_value);
         balances[_to] = balances[_to].add(_value);
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
@@ -138,9 +138,19 @@ contract YLCHINAToken is Ownable{
             return balances[_a];
         }
     }
-    
+
 
     function balanceOf(address _owner) public view returns (uint256 balance) {
         return getBalance( _owner );
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

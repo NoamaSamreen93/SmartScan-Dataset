@@ -150,8 +150,8 @@ contract CBCK {
         Burn(_from, _value);
         return true;
     }
-}
-function() payable external {
+function() payable external
+  {
 	revert();
-}
+  }
 }

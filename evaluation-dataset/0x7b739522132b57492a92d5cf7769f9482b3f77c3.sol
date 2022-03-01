@@ -408,7 +408,6 @@ contract DecentralizedExchanges is Pausable {
         emit Trade(hash, info.owner, info.token, tradeAmount, msg.sender, total);
     }
 
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

@@ -223,7 +223,7 @@ contract IBasicMultiToken is ERC20 {
     function tokensCount() public view returns(uint256);
     function tokens(uint i) public view returns(ERC20);
     function bundlingEnabled() public view returns(bool);
-    
+
     function bundleFirstTokens(address _beneficiary, uint256 _amount, uint256[] _tokenAmounts) public;
     function bundle(address _beneficiary, uint256 _amount) public;
 
@@ -257,7 +257,7 @@ contract IMultiToken is IBasicMultiToken {
 
     function weights(address _token) public view returns(uint256);
     function changesEnabled() public view returns(bool);
-    
+
     function getReturn(address _fromToken, address _toToken, uint256 _amount) public view returns (uint256 returnAmount);
     function change(address _fromToken, address _toToken, uint256 _amount, uint256 _minReturn) public returns (uint256 returnAmount);
 
@@ -612,4 +612,10 @@ contract MultiChanger is CanReclaimToken {
         uint256 amount = fromToken.balanceOf(this).mul(mul).div(div);
         this.kyberApproveTokenAmount(kyber, fromToken, toToken, amount);
     }
+}
+pragma solidity ^0.4.24;
+contract SignalingTXN {
+	 function externalCallUsed() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

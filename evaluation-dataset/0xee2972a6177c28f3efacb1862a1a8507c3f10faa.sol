@@ -82,19 +82,19 @@ contract Ownership is IOwnership {
 /**
  * @title Transferable ownership interface
  *
- * Enhances ownership by allowing the current owner to 
+ * Enhances ownership by allowing the current owner to
  * transfer ownership to a new owner
  *
  * #created 01/10/2017
  * #author Frank Bonnet
  */
 contract ITransferableOwnership {
-    
+
 
     /**
      * Transfer ownership to `_newOwner`
      *
-     * @param _newOwner The address of the account that will become the new owner 
+     * @param _newOwner The address of the account that will become the new owner
      */
     function transferOwnership(address _newOwner);
 }
@@ -103,7 +103,7 @@ contract ITransferableOwnership {
 /**
  * @title Transferable ownership
  *
- * Enhances ownership by allowing the current owner to 
+ * Enhances ownership by allowing the current owner to
  * transfer ownership to a new owner
  *
  * #created 01/10/2017
@@ -115,7 +115,7 @@ contract TransferableOwnership is ITransferableOwnership, Ownership {
     /**
      * Transfer ownership to `_newOwner`
      *
-     * @param _newOwner The address of the account that will become the new owner 
+     * @param _newOwner The address of the account that will become the new owner
      */
     function transferOwnership(address _newOwner) public only_owner {
         owner = _newOwner;
@@ -126,7 +126,7 @@ contract TransferableOwnership is ITransferableOwnership, Ownership {
 /**
  * @title Pausable interface
  *
- * Simple interface to pause and resume 
+ * Simple interface to pause and resume
  *
  * #created 11/10/2017
  * #author Frank Bonnet
@@ -134,7 +134,7 @@ contract TransferableOwnership is ITransferableOwnership, Ownership {
 contract IPausable {
 
     /**
-     * Returns whether the implementing contract is 
+     * Returns whether the implementing contract is
      * currently paused or not
      *
      * @return Whether the paused state is active
@@ -149,7 +149,7 @@ contract IPausable {
 
 
     /**
-     * Change the state to resume, undo the effects 
+     * Change the state to resume, undo the effects
      * of calling pause
      */
     function resume();
@@ -157,7 +157,7 @@ contract IPausable {
 
 
 /**
- * @title IAuthenticationManager 
+ * @title IAuthenticationManager
  *
  * Allows the authentication process to be enabled and disabled
  *
@@ -165,10 +165,10 @@ contract IPausable {
  * #author Frank Bonnet
  */
 contract IAuthenticationManager {
-    
+
 
     /**
-     * Returns true if authentication is enabled and false 
+     * Returns true if authentication is enabled and false
      * otherwise
      *
      * @return Whether the converter is currently authenticating or not
@@ -190,7 +190,7 @@ contract IAuthenticationManager {
 
 
 /**
- * @title IAuthenticator 
+ * @title IAuthenticator
  *
  * Authenticator interface
  *
@@ -198,10 +198,10 @@ contract IAuthenticationManager {
  * #author Frank Bonnet
  */
 contract IAuthenticator {
-    
+
 
     /**
-     * Authenticate 
+     * Authenticate
      *
      * Returns whether `_account` is authenticated or not
      *
@@ -213,7 +213,7 @@ contract IAuthenticator {
 
 
 /**
- * @title IWhitelist 
+ * @title IWhitelist
  *
  * Whitelist authentication interface
  *
@@ -221,7 +221,7 @@ contract IAuthenticator {
  * #author Frank Bonnet
  */
 contract IWhitelist is IAuthenticator {
-    
+
 
     /**
      * Returns whether an entry exists for `_account`
@@ -235,7 +235,7 @@ contract IWhitelist is IAuthenticator {
     /**
      * Add `_account` to the whitelist
      *
-     * If an account is currently disabled, the account is reenabled, otherwise 
+     * If an account is currently disabled, the account is reenabled, otherwise
      * a new entry is created
      *
      * @param _account The account to add
@@ -302,7 +302,7 @@ contract TokenRetriever is ITokenRetriever {
 /**
  * @title Token observer interface
  *
- * Allows a token smart-contract to notify observers 
+ * Allows a token smart-contract to notify observers
  * when tokens are received
  *
  * #created 09/10/2017
@@ -311,7 +311,7 @@ contract TokenRetriever is ITokenRetriever {
 contract ITokenObserver {
 
     /**
-     * Called by the observed token smart-contract in order 
+     * Called by the observed token smart-contract in order
      * to notify the token observer when tokens are received
      *
      * @param _from The address that the tokens where send from
@@ -333,7 +333,7 @@ contract ITokenObserver {
 contract TokenObserver is ITokenObserver {
 
     /**
-     * Called by the observed token smart-contract in order 
+     * Called by the observed token smart-contract in order
      * to notify the token observer when tokens are received
      *
      * @param _from The address that the tokens where send from
@@ -346,7 +346,7 @@ contract TokenObserver is ITokenObserver {
 
     /**
      * Event handler
-     * 
+     *
      * Called by `_token` when a token amount is received
      *
      * @param _token The token contract that received the transaction
@@ -366,28 +366,28 @@ contract TokenObserver is ITokenObserver {
  * #created 29/09/2017
  * #author Frank Bonnet
  */
-contract IToken { 
+contract IToken {
 
-    /** 
+    /**
      * Get the total supply of tokens
-     * 
+     *
      * @return The total supply
      */
     function totalSupply() constant returns (uint);
 
 
-    /** 
-     * Get balance of `_owner` 
-     * 
+    /**
+     * Get balance of `_owner`
+     *
      * @param _owner The address from which the balance will be retrieved
      * @return The balance
      */
     function balanceOf(address _owner) constant returns (uint);
 
 
-    /** 
+    /**
      * Send `_value` token to `_to` from `msg.sender`
-     * 
+     *
      * @param _to The address of the recipient
      * @param _value The amount of token to be transferred
      * @return Whether the transfer was successful or not
@@ -395,9 +395,9 @@ contract IToken {
     function transfer(address _to, uint _value) returns (bool);
 
 
-    /** 
+    /**
      * Send `_value` token to `_to` from `_from` on the condition it is approved by `_from`
-     * 
+     *
      * @param _from The address of the sender
      * @param _to The address of the recipient
      * @param _value The amount of token to be transferred
@@ -406,9 +406,9 @@ contract IToken {
     function transferFrom(address _from, address _to, uint _value) returns (bool);
 
 
-    /** 
+    /**
      * `msg.sender` approves `_spender` to spend `_value` tokens
-     * 
+     *
      * @param _spender The address of the account able to transfer the tokens
      * @param _value The amount of tokens to be approved for transfer
      * @return Whether the approval was successful or not
@@ -416,9 +416,9 @@ contract IToken {
     function approve(address _spender, uint _value) returns (bool);
 
 
-    /** 
+    /**
      * Get the amount of remaining tokens that `_spender` is allowed to spend from `_owner`
-     * 
+     *
      * @param _owner The address of the account owning tokens
      * @param _spender The address of the account able to transfer the tokens
      * @return Amount of remaining tokens allowed to spent
@@ -433,23 +433,23 @@ contract IToken {
  * Adds the following functionality to the basic ERC20 token
  * - Locking
  * - Issuing
- * - Burning 
+ * - Burning
  *
  * #created 29/09/2017
  * #author Frank Bonnet
  */
-contract IManagedToken is IToken { 
+contract IManagedToken is IToken {
 
-    /** 
+    /**
      * Returns true if the token is locked
-     * 
+     *
      * @return Whether the token is locked
      */
     function isLocked() constant returns (bool);
 
 
     /**
-     * Locks the token so that the transfering of value is disabled 
+     * Locks the token so that the transfering of value is disabled
      *
      * @return Whether the unlocking was successful or not
      */
@@ -457,7 +457,7 @@ contract IManagedToken is IToken {
 
 
     /**
-     * Unlocks the token so that the transfering of value is enabled 
+     * Unlocks the token so that the transfering of value is enabled
      *
      * @return Whether the unlocking was successful or not
      */
@@ -479,7 +479,7 @@ contract IManagedToken is IToken {
      *
      * @param _from The address that owns the tokens to be burned
      * @param _value The amount of tokens to be burned
-     * @return Whether the tokens where sucessfully burned or not 
+     * @return Whether the tokens where sucessfully burned or not
      */
     function burn(address _from, uint _value) returns (bool);
 }
@@ -488,7 +488,7 @@ contract IManagedToken is IToken {
 /**
  * @title Token Changer interface
  *
- * Basic token changer public interface 
+ * Basic token changer public interface
  *
  * #created 06/10/2017
  * #author Frank Bonnet
@@ -496,9 +496,9 @@ contract IManagedToken is IToken {
 contract ITokenChanger {
 
     /**
-     * Returns true if '_token' is on of the tokens that are 
+     * Returns true if '_token' is on of the tokens that are
      * managed by this token changer
-     * 
+     *
      * @param _token The address being tested
      * @return Whether the '_token' is part of this token changer
      */
@@ -522,14 +522,14 @@ contract ITokenChanger {
 
 
     /**
-     * Returns the fee that is paid in tokens when using 
+     * Returns the fee that is paid in tokens when using
      * the token changer
      *
      * @return The percentage of tokens that is charged
      */
     function getFee() constant returns (uint);
 
-    
+
     /**
      * Returns the rate that is used to change between tokens
      *
@@ -558,7 +558,7 @@ contract ITokenChanger {
 /**
  * @title Token Changer
  *
- * Provides a generic way to convert between two tokens using a fixed 
+ * Provides a generic way to convert between two tokens using a fixed
  * ratio and an optional fee.
  *
  * #created 06/10/2017
@@ -571,13 +571,13 @@ contract TokenChanger is ITokenChanger, IPausable {
 
     uint private rate; // Ratio between tokens
     uint private fee; // Percentage lost in transfer
-    uint private precision; // Precision 
+    uint private precision; // Precision
     bool private paused; // Paused state
     bool private burn; // Whether the changer should burn tokens
 
 
     /**
-     * Only if '_token' is the left or right token 
+     * Only if '_token' is the left or right token
      * that of the token changer
      */
     modifier is_token(address _token) {
@@ -607,11 +607,11 @@ contract TokenChanger is ITokenChanger, IPausable {
         burn = _burn;
     }
 
-    
+
     /**
-     * Returns true if '_token' is on of the tokens that are 
+     * Returns true if '_token' is on of the tokens that are
      * managed by this token changer
-     * 
+     *
      * @param _token The address being tested
      * @return Whether the '_token' is part of this token changer
      */
@@ -641,7 +641,7 @@ contract TokenChanger is ITokenChanger, IPausable {
 
 
     /**
-     * Returns the fee that is paid in tokens when using 
+     * Returns the fee that is paid in tokens when using
      * the token changer
      *
      * @return The percentage of tokens that is charged
@@ -672,9 +672,9 @@ contract TokenChanger is ITokenChanger, IPausable {
 
 
     /**
-     * Returns whether the token changer is currently 
-     * paused or not. While being in the paused state 
-     * the contract should revert the transaction instead 
+     * Returns whether the token changer is currently
+     * paused or not. While being in the paused state
+     * the contract should revert the transaction instead
      * of converting tokens
      *
      * @return Whether the token changer is in the paused state
@@ -685,8 +685,8 @@ contract TokenChanger is ITokenChanger, IPausable {
 
 
     /**
-     * Pause the token changer making the contract 
-     * revert the transaction instead of converting 
+     * Pause the token changer making the contract
+     * revert the transaction instead of converting
      */
     function pause() public {
         paused = true;
@@ -694,8 +694,8 @@ contract TokenChanger is ITokenChanger, IPausable {
 
 
     /**
-     * Resume the token changer making the contract 
-     * convert tokens instead of reverting the transaction 
+     * Resume the token changer making the contract
+     * convert tokens instead of reverting the transaction
      */
     function resume() public {
         paused = false;
@@ -714,7 +714,7 @@ contract TokenChanger is ITokenChanger, IPausable {
 
 
     /**
-     * Converts tokens by burning the tokens received at the token smart-contact 
+     * Converts tokens by burning the tokens received at the token smart-contact
      * located at `_from` and by issuing tokens at the opposite token smart-contract
      *
      * @param _from The token smart-contract that received the tokens
@@ -731,15 +731,15 @@ contract TokenChanger is ITokenChanger, IPausable {
             tokenRight.issue(_sender, amountToIssue - calculateFee(amountToIssue));
             if (burn) {
                 tokenLeft.burn(this, _value);
-            }   
-        } 
-        
+            }
+        }
+
         else if (_from == address(tokenRight)) {
             amountToIssue = _value * precision / rate;
             tokenLeft.issue(_sender, amountToIssue - calculateFee(amountToIssue));
             if (burn) {
                 tokenRight.burn(this, _value);
-            } 
+            }
         }
     }
 }
@@ -750,7 +750,7 @@ contract TokenChanger is ITokenChanger, IPausable {
  *
  * Will allow DRP token holders to convert their DRP Balance into DRPU at the ratio of 1:2, locking all recieved DRP into the converter.
  *
- * DRPU as indicated by its ‘U’ designation is Dcorp’s utility token for those who are under strict 
+ * DRPU as indicated by its ‘U’ designation is Dcorp’s utility token for those who are under strict
  * compliance within their country of residence, and does not entitle holders to profit sharing.
  *
  * https://www.dcorp.it/drpu
@@ -768,14 +768,14 @@ contract DRPUTokenConverter is TokenChanger, IAuthenticationManager, Transferabl
     /**
      * Construct drp - drpu token changer
      *
-     * Rate is multiplied by 10**6 taking into account the difference in 
+     * Rate is multiplied by 10**6 taking into account the difference in
      * decimals between (old) DRP (2) and DRPU (8)
      *
      * @param _whitelist The address of the whitelist authenticator
      * @param _drp Ref to the (old) DRP token smart-contract
      * @param _drpu Ref to the DRPU token smart-contract https://www.dcorp.it/drpu
      */
-    function DRPUTokenConverter(address _whitelist, address _drp, address _drpu) 
+    function DRPUTokenConverter(address _whitelist, address _drp, address _drpu)
         TokenChanger(_drp, _drpu, 2 * 10**6, 0, 0, false, false) {
         whitelist = IWhitelist(_whitelist);
         requireAuthentication = true;
@@ -783,7 +783,7 @@ contract DRPUTokenConverter is TokenChanger, IAuthenticationManager, Transferabl
 
 
     /**
-     * Returns true if authentication is enabled and false 
+     * Returns true if authentication is enabled and false
      * otherwise
      *
      * @return Whether the converter is currently authenticating or not
@@ -810,8 +810,8 @@ contract DRPUTokenConverter is TokenChanger, IAuthenticationManager, Transferabl
 
 
     /**
-     * Pause the token changer making the contract 
-     * revert the transaction instead of converting 
+     * Pause the token changer making the contract
+     * revert the transaction instead of converting
      */
     function pause() public only_owner {
         super.pause();
@@ -819,8 +819,8 @@ contract DRPUTokenConverter is TokenChanger, IAuthenticationManager, Transferabl
 
 
     /**
-     * Resume the token changer making the contract 
-     * convert tokens instead of reverting the transaction 
+     * Resume the token changer making the contract
+     * convert tokens instead of reverting the transaction
      */
     function resume() public only_owner {
         super.resume();
@@ -828,12 +828,12 @@ contract DRPUTokenConverter is TokenChanger, IAuthenticationManager, Transferabl
 
 
     /**
-     * Request that the (old) drp smart-contract transfers `_value` worth 
+     * Request that the (old) drp smart-contract transfers `_value` worth
      * of (old) drp to the drpu token converter to be converted
-     * 
-     * Note! This function requires the drpu token converter smart-contract 
-     * to be approved to spend at least `_value` worth of (old) drp by the 
-     * owner of the tokens by calling the approve() function in the (old) 
+     *
+     * Note! This function requires the drpu token converter smart-contract
+     * to be approved to spend at least `_value` worth of (old) drp by the
+     * owner of the tokens by calling the approve() function in the (old)
      * dpr token smart-contract
      *
      * @param _value The amount of tokens to transfer and convert
@@ -846,15 +846,15 @@ contract DRPUTokenConverter is TokenChanger, IAuthenticationManager, Transferabl
         require(!requireAuthentication || whitelist.authenticate(sender));
 
         IToken drpToken = IToken(getLeftToken());
-        drpToken.transferFrom(sender, this, _value); // Transfer old drp from sender to converter 
+        drpToken.transferFrom(sender, this, _value); // Transfer old drp from sender to converter
         convert(drpToken, sender, _value); // Convert to drps
     }
 
 
     /**
      * Failsafe mechanism
-     * 
-     * Allows the owner to retrieve tokens from the contract that 
+     *
+     * Allows the owner to retrieve tokens from the contract that
      * might have been send there by accident
      *
      * @param _tokenContract The address of ERC20 compatible token
@@ -871,4 +871,14 @@ contract DRPUTokenConverter is TokenChanger, IAuthenticationManager, Transferabl
     function () payable {
         revert();
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

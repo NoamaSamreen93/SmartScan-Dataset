@@ -2,9 +2,9 @@ pragma solidity ^0.4.23;
 
 
 /*
- *             ╔═╗┌─┐┌─┐┬┌─┐┬┌─┐┬   ┌─────────────────────────┐ ╦ ╦┌─┐┌┐ ╔═╗┬┌┬┐┌─┐ 
- *             ║ ║├┤ ├┤ ││  │├─┤│   │          MSCE.vip       │ ║║║├┤ ├┴┐╚═╗│ │ ├┤  
- *             ╚═╝└  └  ┴└─┘┴┴ ┴┴─┘ └─┬─────────────────────┬─┘ ╚╩╝└─┘└─┘╚═╝┴ ┴ └─┘ 
+ *             ╔═╗┌─┐┌─┐┬┌─┐┬┌─┐┬   ┌─────────────────────────┐ ╦ ╦┌─┐┌┐ ╔═╗┬┌┬┐┌─┐
+ *             ║ ║├┤ ├┤ ││  │├─┤│   │          MSCE.vip       │ ║║║├┤ ├┴┐╚═╗│ │ ├┤
+ *             ╚═╝└  └  ┴└─┘┴┴ ┴┴─┘ └─┬─────────────────────┬─┘ ╚╩╝└─┘└─┘╚═╝┴ ┴ └─┘
  *   ┌────────────────────────────────┘                     └──────────────────────────────┐
  *   │    ┌─────────────────────────────────────────────────────────────────────────────┐  │
  *   └────┤ Dev:John ├──────────────────────┤ Boss:Jack ├──────────────────┤ Sup:Kilmas ├──┘
@@ -322,15 +322,15 @@ contract MSCE is Ownable, StandardToken, BurnableToken{
 
     uint8 public constant TOKEN_DECIMALS = 18;
 
-    string public name = "Mobile Ecosystem"; 
+    string public name = "Mobile Ecosystem";
     string public symbol = "MSCE";
     uint8 public decimals = TOKEN_DECIMALS;
 
 
-    uint256 public totalSupply = 500000000 *(10**uint256(TOKEN_DECIMALS)); 
-    uint256 public soldSupply = 0; 
-    uint256 public sellSupply = 0; 
-    uint256 public buySupply = 0; 
+    uint256 public totalSupply = 500000000 *(10**uint256(TOKEN_DECIMALS));
+    uint256 public soldSupply = 0;
+    uint256 public sellSupply = 0;
+    uint256 public buySupply = 0;
     bool public stopSell = true;
     bool public stopBuy = false;
 
@@ -340,18 +340,18 @@ contract MSCE is Ownable, StandardToken, BurnableToken{
     uint256 public crowdsaleTotal = 2000*40000*(10**18);
 
 
-    uint256 public buyExchangeRate = 40000;   
-    uint256 public sellExchangeRate = 100000;  
-    address public ethFundDeposit;  
+    uint256 public buyExchangeRate = 40000;
+    uint256 public sellExchangeRate = 100000;
+    address public ethFundDeposit;
 
 
-    bool public allowTransfers = true; 
+    bool public allowTransfers = true;
 
 
     mapping (address => bool) public frozenAccount;
 
     bool public enableInternalLock = true;
-    uint256 unitCount = 100; 
+    uint256 unitCount = 100;
     uint256 unitTime = 1 days;
     uint256 lockTime = unitCount * unitTime;
 
@@ -368,7 +368,7 @@ contract MSCE is Ownable, StandardToken, BurnableToken{
 
     function MSCE() public {
         balances[msg.sender] = totalSupply;
-        ethFundDeposit = msg.sender;                      
+        ethFundDeposit = msg.sender;
         allowTransfers = true;
     }
 
@@ -430,9 +430,9 @@ contract MSCE is Ownable, StandardToken, BurnableToken{
     }
     function getAccountLockState(address _target) public view returns(bool) {
         if(enableInternalLock && internalLockAccount[_target]){
-            if((releaseLockAccount[_target] > 0)&&(releaseLockAccount[_target]<block.timestamp)){       
+            if((releaseLockAccount[_target] > 0)&&(releaseLockAccount[_target]<block.timestamp)){
                 return false;
-            }          
+            }
             return true;
         }
         return false;
@@ -442,7 +442,7 @@ contract MSCE is Ownable, StandardToken, BurnableToken{
     function setUnitTime(uint256 unit) external onlyOwner{
         unitTime = unit;
     }
-    
+
     function isOwner() internal view returns(bool success) {
         if (msg.sender == owner) return true;
         return false;
@@ -454,8 +454,8 @@ contract MSCE is Ownable, StandardToken, BurnableToken{
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
         if (!isOwner()) {
             require (allowTransfers);
-            require(!frozenAccount[_from]);                                         
-            require(!frozenAccount[_to]);                                        
+            require(!frozenAccount[_from]);
+            require(!frozenAccount[_to]);
             require(!_isUserInternalLock());
         }
         return super.transferFrom(_from, _to, _value);
@@ -464,8 +464,8 @@ contract MSCE is Ownable, StandardToken, BurnableToken{
     function transfer(address _to, uint256 _value) public returns (bool) {
         if (!isOwner()) {
             require (allowTransfers);
-            require(!frozenAccount[msg.sender]);                                       
-            require(!frozenAccount[_to]);                                             
+            require(!frozenAccount[msg.sender]);
+            require(!frozenAccount[_to]);
             require(!_isUserInternalLock());
             require(_value <= balances[msg.sender] - lockAmount[msg.sender] + releasedAmount(msg.sender));
         }
@@ -474,15 +474,15 @@ contract MSCE is Ownable, StandardToken, BurnableToken{
         }else{
             lockAmount[msg.sender] = lockAmount[msg.sender].sub(_value);
         }
-        
+
         return super.transfer(_to, _value);
     }
 
     function approve(address _spender, uint256 _value) public returns (bool) {
         if (!isOwner()) {
             require (allowTransfers);
-            require(!frozenAccount[msg.sender]);                                         
-            require(!frozenAccount[_spender]);                                        
+            require(!frozenAccount[msg.sender]);
+            require(!frozenAccount[_spender]);
             require(!_isUserInternalLock());
             require(_value <= balances[msg.sender] - lockAmount[msg.sender] + releasedAmount(msg.sender));
         }
@@ -537,13 +537,13 @@ contract MSCE is Ownable, StandardToken, BurnableToken{
     function sell(uint256 amount) public {
         uint256 ethAmount = amount.div(sellExchangeRate);
         require(!stopSell);
-        require(this.balance >= ethAmount);      
-        require(ethAmount >= 1);      
+        require(this.balance >= ethAmount);
+        require(ethAmount >= 1);
 
-        require(balances[msg.sender] >= amount);                 
-        require(balances[owner] + amount > balances[owner]);       
-        require(!frozenAccount[msg.sender]);                       
-        require(!_isUserInternalLock());                                          
+        require(balances[msg.sender] >= amount);
+        require(balances[owner] + amount > balances[owner]);
+        require(!frozenAccount[msg.sender]);
+        require(!_isUserInternalLock());
 
         balances[owner] = balances[owner].add(amount);
         balances[msg.sender] = balances[msg.sender].sub(amount);
@@ -553,7 +553,7 @@ contract MSCE is Ownable, StandardToken, BurnableToken{
 
         Transfer(msg.sender, owner, amount);
 
-        msg.sender.transfer(ethAmount); 
+        msg.sender.transfer(ethAmount);
     }
 
     function setCrowdsaleStartTime(uint256 _crowdsaleStartTime) onlyOwner public {
@@ -563,7 +563,7 @@ contract MSCE is Ownable, StandardToken, BurnableToken{
     function setCrowdsaleEndTime(uint256 _crowdsaleEndTime) onlyOwner public {
         crowdsaleEndTime = _crowdsaleEndTime;
     }
-   
+
 
     function setCrowdsaleTotal(uint256 _crowdsaleTotal) onlyOwner public {
         crowdsaleTotal = _crowdsaleTotal;
@@ -596,7 +596,7 @@ contract MSCE is Ownable, StandardToken, BurnableToken{
             return (now - lockStartTime[_target]).div(unitTime).mul(lockAmount[_target]).div(100);
         }
     }
-    
+
 }
 
 
@@ -604,8 +604,8 @@ contract MSCEVote is MSCE {
     //Vote Setting
     uint256 votingRight = 10000;
     uint256 dealTime = 3 days;
-    
-     
+
+
     struct Vote{
         bool isActivated;
         bytes32 name;
@@ -621,7 +621,7 @@ contract MSCEVote is MSCE {
         uint256 endTime;
         uint256 releaseTime;
     }
- 
+
     Vote[] public votes;
 
     mapping (uint256 => address) public voteToOwner;
@@ -637,7 +637,7 @@ contract MSCEVote is MSCE {
     modifier onlyVotingRight() {
         require(balances[msg.sender] >= votingRight*(10**18), "You haven't voting right.");
         _;
-    }    
+    }
 
     function createVote(bytes32 _name, address _target, address _spender,uint256 _targetAmount, bool _freeze, string _newName, string _newSymbol, uint256 _releaseTime) onlySuperNode public {
         uint256 id = votes.push(Vote(true, _name,  _target, _spender,_targetAmount, _freeze, _newName, _newSymbol, 0, 0, uint256(now), uint256(now + dealTime), _releaseTime)) - 1;
@@ -664,7 +664,7 @@ contract MSCEVote is MSCE {
 
     function setName(string _name) onlySuperNode public {
         createVote("CHANGENAME", msg.sender, msg.sender, 0, false, _name, "", 0);
-        
+
     }
 
     function setSymbol(string _symbol) onlySuperNode public {
@@ -681,9 +681,9 @@ contract MSCEVote is MSCE {
     /***************************************************/
     /*              Vote Functions                     */
     /***************************************************/
-    function getVote(uint _id) 
-        public 
-        view 
+    function getVote(uint _id)
+        public
+        view
         returns (bool, bytes32, address, address, uint256, bool, string, string, uint256, uint256, uint256, uint256){
         Vote storage _vote = votes[_id];
         return(
@@ -769,5 +769,15 @@ contract MSCEVote is MSCE {
         votes[_id] = vote;
     }
 
-    
+
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

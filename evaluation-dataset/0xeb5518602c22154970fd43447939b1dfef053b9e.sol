@@ -641,4 +641,14 @@ contract JobeumPresale is CommonBsPresale {
         0x08d069ae12b1fe5f651ab56adae0f6c99cb7a15f, // address _token
         0x76CA9140540988d36f7be7A8b1172E09E6d8A26c  // address _beneficiary
     ) {}
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

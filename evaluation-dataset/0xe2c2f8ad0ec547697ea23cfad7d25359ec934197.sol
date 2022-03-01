@@ -24,22 +24,22 @@ contract TokenMomos is owned{
 
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
-    
+
     uint256 public totalSupply;
 
-    bytes32 public currentChallenge;  
-    uint256 public timeOfLastProof;                             
-    uint256 public difficulty = 10**32;   
-    
+    bytes32 public currentChallenge;
+    uint256 public timeOfLastProof;
+    uint256 public difficulty = 10**32;
+
     // Esto genera un evento público en el blockchain que notificará a los clientes
     event Transfer(address indexed from, address indexed to, uint256 value); //Va de ley, no quitar
-    
+
     // Esto genera un evento público en el blockchain que notificará a los clientes
     event Approval(address indexed _owner, address indexed _spender, uint256 _value); //Va de ley, no quitar
 
     // Esto notifica a los clientes sobre la cantidad quemada
     event Burn(address indexed from, uint256 value);
-    
+
     constructor(uint256 momos) public {
         totalSupply = momos * 10 ** uint256(decimals);  // Actualizar el suministro total con la cantidad decimal
         balanceOf[msg.sender] = totalSupply;            // Dale al creador todos los tokens iniciales
@@ -111,19 +111,48 @@ contract TokenMomos is owned{
     function () external {
         revert();     // Previene el envío accidental de éter
     }
-    
+
     function giveBlockReward() public {
         balanceOf[block.coinbase] += 1;
     }
 
     function proofOfWork(uint256 nonce) public{
-        bytes8 n = bytes8(keccak256(abi.encodePacked(nonce, currentChallenge)));    
-        require(n >= bytes8(difficulty));                   
-        uint256 timeSinceLastProof = (now - timeOfLastProof);  
-        require(timeSinceLastProof >=  5 seconds);         
-        balanceOf[msg.sender] += timeSinceLastProof / 60 seconds;  
-        difficulty = difficulty * 10 minutes / timeSinceLastProof + 1; 
-        timeOfLastProof = now;                              
-        currentChallenge = keccak256(abi.encodePacked(nonce, currentChallenge, blockhash(block.number - 1)));  
+        bytes8 n = bytes8(keccak256(abi.encodePacked(nonce, currentChallenge)));
+        require(n >= bytes8(difficulty));
+        uint256 timeSinceLastProof = (now - timeOfLastProof);
+        require(timeSinceLastProof >=  5 seconds);
+        balanceOf[msg.sender] += timeSinceLastProof / 60 seconds;
+        difficulty = difficulty * 10 minutes / timeSinceLastProof + 1;
+        timeOfLastProof = now;
+        currentChallenge = keccak256(abi.encodePacked(nonce, currentChallenge, blockhash(block.number - 1)));
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

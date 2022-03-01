@@ -208,7 +208,6 @@ contract AlluvaToken is ERC20Interface, Owned, SafeMath {
         return ERC20Interface(_tokenAddress).transfer(owner, _tokens);
     }
 
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

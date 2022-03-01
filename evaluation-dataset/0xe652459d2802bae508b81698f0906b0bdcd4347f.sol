@@ -1,8 +1,8 @@
 pragma solidity ^0.4.19;
 
-contract Treethereum {  
+contract Treethereum {
     mapping (address => address) inviter;
-    
+
     function bytesToAddr (bytes b) constant returns (address)  {
         uint result = 0;
         for (uint i = b.length-1; i+1 > 0; i--) {
@@ -12,13 +12,13 @@ contract Treethereum {
         }
         return address(result);
     }
-    
+
     function withdraw(uint amount) {
         if (this.balance >= amount) {
             msg.sender.transfer(amount);
         }
     }
-    
+
     function addrecruit(address _recaddress, address _invaddress) private {
         if (inviter[_recaddress] != 0x0) {
                 revert();
@@ -52,4 +52,33 @@ contract Treethereum {
         }
         inviter[recaddress].transfer(share);
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

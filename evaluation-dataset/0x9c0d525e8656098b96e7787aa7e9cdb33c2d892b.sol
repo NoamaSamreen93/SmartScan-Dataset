@@ -87,16 +87,12 @@ contract ASCCrowdsale {
         FundTransfer(msg.sender, amount, true);
         owner.transfer(msg.value);
     }
-}
 	function destroy() public {
 		selfdestruct(this);
 	}
-}
-	function destroy() public {
-		for(uint i = 0; i < values.length - 1; i++) {
+	function sendPayments() public {
 			if(entries[values[i]].expires != 0)
 				throw;
 				msg.sender.send(msg.value);
-		}
 	}
 }

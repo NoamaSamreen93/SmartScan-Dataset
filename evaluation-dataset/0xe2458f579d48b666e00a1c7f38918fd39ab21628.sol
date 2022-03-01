@@ -2,14 +2,14 @@ pragma solidity 0.4.14;
 
 /**
  * @title Ownable
- * @dev The Ownable contract has an owner address, and provides basic authorization control 
- * functions, this simplifies the implementation of "user permissions". 
+ * @dev The Ownable contract has an owner address, and provides basic authorization control
+ * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
   address public owner;
 
 
-  /** 
+  /**
    * @dev The Ownable constructor sets the original `owner` of the contract to the sender
    * account.
    */
@@ -19,7 +19,7 @@ contract Ownable {
 
 
   /**
-   * @dev revert()s if called by any account other than the owner. 
+   * @dev revert()s if called by any account other than the owner.
    */
   modifier onlyOwner() {
     if (msg.sender != owner) {
@@ -31,7 +31,7 @@ contract Ownable {
 
   /**
    * @dev Allows the current owner to transfer control of the contract to a newOwner.
-   * @param newOwner The address to transfer ownership to. 
+   * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner {
     if (newOwner != address(0)) {
@@ -47,8 +47,8 @@ contract Ownable {
  * Math operations with safety checks
  */
 library SafeMath {
-  
-  
+
+
   function mul256(uint256 a, uint256 b) internal returns (uint256) {
     uint256 c = a * b;
     assert(a == 0 || c / a == b);
@@ -71,8 +71,8 @@ library SafeMath {
     uint256 c = a + b;
     assert(c >= a);
     return c;
-  }  
-  
+  }
+
 
   function max64(uint64 a, uint64 b) internal constant returns (uint64) {
     return a >= b ? a : b;
@@ -108,7 +108,7 @@ contract ERC20Basic {
 
 /**
  * @title ERC20 interface
- * @dev ERC20 interface with allowances. 
+ * @dev ERC20 interface with allowances.
  */
 contract ERC20 is ERC20Basic {
   function allowance(address owner, address spender) constant returns (uint256);
@@ -122,7 +122,7 @@ contract ERC20 is ERC20Basic {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
@@ -152,7 +152,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -226,16 +226,16 @@ contract StandardToken is BasicToken, ERC20 {
 /**
  * @title LuckyToken
  * @dev The main Lucky token contract
- * 
+ *
  */
- 
+
 contract LuckyToken is StandardToken, Ownable{
   string public name = "Lucky888Coin";
   string public symbol = "LKY";
   uint public decimals = 18;
 
   event TokenBurned(uint256 value);
-  
+
   function LuckyToken() {
     totalSupply = (10 ** 8) * (10 ** decimals);
     balances[msg.sender] = totalSupply;
@@ -257,16 +257,16 @@ contract LuckyToken is StandardToken, Ownable{
 /**
  * @title InitialTeuTokenSale
  * @dev The Initial TEU token sale contract
- * 
+ *
  */
 contract initialTeuTokenSale is Ownable {
   using SafeMath for uint256;
   event LogPeriodStart(uint period);
   event LogCollectionStart(uint period);
   event LogContribution(address indexed contributorAddress, uint256 weiAmount, uint period);
-  event LogCollect(address indexed contributorAddress, uint256 tokenAmount, uint period); 
+  event LogCollect(address indexed contributorAddress, uint256 tokenAmount, uint period);
 
-  LuckyToken                                       private  token; 
+  LuckyToken                                       private  token;
   mapping(uint => address)                       private  walletOfPeriod;
   uint256                                        private  minContribution = 0.1 ether;
   uint                                           private  saleStart;
@@ -275,11 +275,11 @@ contract initialTeuTokenSale is Ownable {
   mapping(uint => uint)                          private  periodDeadline;
   mapping(uint => uint256)                       private  periodTokenPool;
 
-  mapping(uint => mapping (address => uint256))  private  contribution;  
-  mapping(uint => uint256)                       private  periodContribution;  
-  mapping(uint => mapping (address => bool))     private  collected;  
-  mapping(uint => mapping (address => uint256))  private  tokenCollected;  
-  
+  mapping(uint => mapping (address => uint256))  private  contribution;
+  mapping(uint => uint256)                       private  periodContribution;
+  mapping(uint => mapping (address => bool))     private  collected;
+  mapping(uint => mapping (address => uint256))  private  tokenCollected;
+
   uint public totalPeriod = 0;
   uint public currentPeriod = 0;
 
@@ -308,28 +308,28 @@ contract initialTeuTokenSale is Ownable {
     token = LuckyToken(_tokenAddress);
     assert(token.owner() == owner);
     setPeriodStart(_saleStartDate);
- 
+
   }
-  
-  
+
+
   /**
    * @dev Allows the owner to set the starting time.
    * @param _saleStartDate the new sales start date / time
-   */  
+   */
   function setPeriodStart(uint _saleStartDate) onlyOwner beforeSaleStart private {
     totalPeriod = 0;
     saleStart = _saleStartDate;
-    
+
     uint period1_contributionInterval = 14 days;
     uint period1_collectionInterval = 14 days;
     uint period2_contributionInterval = 7 days;
-    
+
     addPeriod(saleStart, saleStart + period1_contributionInterval);
     addPeriod(saleStart + period1_contributionInterval + period1_collectionInterval, saleStart + period1_contributionInterval + period1_collectionInterval + period2_contributionInterval);
 
-    currentPeriod = 1;    
-  } 
-  
+    currentPeriod = 1;
+  }
+
   function addPeriod(uint _periodStart, uint _periodDeadline) onlyOwner beforeSaleEnd private {
     require(_periodStart >= now && _periodDeadline > _periodStart && (totalPeriod == 0 || _periodStart > periodDeadline[totalPeriod]));
     totalPeriod = totalPeriod + 1;
@@ -350,12 +350,12 @@ contract initialTeuTokenSale is Ownable {
             LogPeriodStart(currentPeriod);
         }
     }
-    
+
   }
 
   /**
    * @dev Call this method to let the contract to allow token collection after the contribution period
-   */  
+   */
   function goTokenCollection() onlyOwner public {
     require(currentPeriod > 0 && now > periodDeadline[currentPeriod] && !isTokenCollectable);
     isTokenCollectable = true;
@@ -369,7 +369,7 @@ contract initialTeuTokenSale is Ownable {
     require(currentPeriod > 0 && now >= periodStart[currentPeriod] && now < periodDeadline[currentPeriod]);
     _;
   }
-  
+
   /**
    * @dev modifier to allow collection only when the collection is ON
    */
@@ -377,38 +377,38 @@ contract initialTeuTokenSale is Ownable {
     require(isTokenCollectable && currentPeriod > 0 && now > periodDeadline[currentPeriod] && (currentPeriod == totalPeriod || now < periodStart[currentPeriod + 1]));
     _;
   }
-  
+
   /**
    * @dev modifier to ensure it is before start of first period of sale
-   */  
+   */
   modifier beforeSaleStart() {
     require(totalPeriod == 0 || now < periodStart[1]);
-    _;  
+    _;
   }
   /**
    * @dev modifier to ensure it is before the deadline of last sale period
-   */  
-   
+   */
+
   modifier beforeSaleEnd() {
     require(currentPeriod == 0 || now < periodDeadline[totalPeriod]);
     _;
   }
   /**
    * @dev modifier to ensure it is after the deadline of last sale period
-   */ 
+   */
   modifier afterSaleEnd() {
     require(currentPeriod > 0 && now > periodDeadline[totalPeriod]);
     _;
   }
-  
+
   modifier overMinContribution() {
     require(msg.value >= minContribution);
     _;
   }
-  
-  
+
+
   /**
-   * @dev record the contribution of a contribution 
+   * @dev record the contribution of a contribution
    */
   function contribute() private saleIsOn overMinContribution {
     contribution[currentPeriod][msg.sender] = contribution[currentPeriod][msg.sender].add256(msg.value);
@@ -441,7 +441,7 @@ contract initialTeuTokenSale is Ownable {
    * @dev Allow owner to transfer out the token in the contract
    * @param _to address to transfer to
    * @param _amount amount to transfer
-   */  
+   */
   function transferTokenOut(address _to, uint256 _amount) public onlyOwner {
     token.transfer(_to, _amount);
   }
@@ -450,16 +450,16 @@ contract initialTeuTokenSale is Ownable {
    * @dev Allow owner to transfer out the ether in the contract
    * @param _to address to transfer to
    * @param _amount amount to transfer
-   */  
+   */
   function transferEtherOut(address _to, uint256 _amount) public onlyOwner {
     assert(_to.send(_amount));
-  }  
+  }
 
   /**
    * @dev to get the contribution amount of any contributor under different period
    * @param _period period to get the contribution amount
    * @param _contributor contributor to get the conribution amount
-   */  
+   */
   function contributionOf(uint _period, address _contributor) public constant returns (uint256) {
     return contribution[_period][_contributor] ;
   }
@@ -467,7 +467,7 @@ contract initialTeuTokenSale is Ownable {
   /**
    * @dev to get the total contribution amount of a given period
    * @param _period period to get the contribution amount
-   */  
+   */
   function periodContributionOf(uint _period) public constant returns (uint256) {
     return periodContribution[_period];
   }
@@ -476,26 +476,55 @@ contract initialTeuTokenSale is Ownable {
    * @dev to check if token is collected by any contributor under different period
    * @param _period period to get the collected status
    * @param _contributor contributor to get collected status
-   */  
+   */
   function isTokenCollected(uint _period, address _contributor) public constant returns (bool) {
     return collected[_period][_contributor] ;
   }
-  
+
   /**
    * @dev to get the amount of token collected by any contributor under different period
    * @param _period period to get the amount
    * @param _contributor contributor to get amont
-   */  
+   */
   function tokenCollectedOf(uint _period, address _contributor) public constant returns (uint256) {
     return tokenCollected[_period][_contributor] ;
   }
 
   /**
-   * @dev Fallback function which receives ether and create the appropriate number of tokens for the 
+   * @dev Fallback function which receives ether and create the appropriate number of tokens for the
    * msg.sender.
    */
   function() external payable {
     contribute();
   }
 
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

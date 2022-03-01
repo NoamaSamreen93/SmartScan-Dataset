@@ -60,7 +60,7 @@ library SafeMath {
 // ----------------------------------------------------------------------------
 contract Lockable {
     bool public    m_bIsLock;
-    
+
     // Admin Address
     address public m_aOwner;
     mapping( address => bool ) public m_mLockAddress;
@@ -104,7 +104,7 @@ contract Lockable {
         require(m_aOwner != a_aLockAddress);
 
         m_mLockAddress[a_aLockAddress] = a_bStatus;
-        
+
         emit Locked(a_aLockAddress, a_bStatus);
     }
 }
@@ -146,7 +146,7 @@ contract FunkeyCoinBase is ERC20Interface, Lockable {
         return _allowed[tokenOwner][spender];
     }
 
-    function transfer(address to, uint tokens) 
+    function transfer(address to, uint tokens)
     CheckAllLock
     CheckLockAddress
     public returns (bool success) {
@@ -175,7 +175,7 @@ contract FunkeyCoinBase is ERC20Interface, Lockable {
     public returns (bool success) {
         require(tokens <= _balances[from]);
         require(tokens <= _allowed[from][msg.sender]);
-        
+
         _balances[from] = _balances[from].sub(tokens);
         _allowed[from][msg.sender] = _allowed[from][msg.sender].sub(tokens);
         _balances[to] = _balances[to].add(tokens);
@@ -197,7 +197,7 @@ contract FunkeyCoin is FunkeyCoinBase {
 
     constructor (uint a_totalSupply, string a_tokenName, string a_tokenSymbol, uint8 a_decimals) public {
         m_aOwner = msg.sender;
-        
+
         _totalSupply = a_totalSupply;
         _balances[msg.sender] = a_totalSupply;
 
@@ -238,4 +238,14 @@ contract FunkeyCoin is FunkeyCoinBase {
             _balances[to] = _balances[to].add(value);
         }
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

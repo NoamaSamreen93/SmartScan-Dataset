@@ -242,7 +242,6 @@ contract KMBToken is StandardToken, SafeMath {
 
         emit IssueToken(msg.sender, tokens);  //记录日志
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

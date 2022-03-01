@@ -207,7 +207,7 @@ contract Contactable is Ownable{
 contract MonethaGateway is Pausable, Contactable, Destructible, Restricted {
 
     using SafeMath for uint256;
-    
+
     string constant VERSION = "0.4";
 
     /**
@@ -216,7 +216,7 @@ contract MonethaGateway is Pausable, Contactable, Destructible, Restricted {
      *  15‰ = 1.5%
      */
     uint public constant FEE_PERMILLE = 15;
-    
+
     /**
      *  Address of Monetha Vault for fee collection
      */
@@ -235,10 +235,10 @@ contract MonethaGateway is Pausable, Contactable, Destructible, Restricted {
     function MonethaGateway(address _monethaVault, address _admin) public {
         require(_monethaVault != 0x0);
         monethaVault = _monethaVault;
-        
+
         setAdmin(_admin);
     }
-    
+
     /**
      *  acceptPayment accept payment from PaymentAcceptor, forwards it to merchant's wallet
      *      and collects Monetha fee.
@@ -284,4 +284,16 @@ contract MonethaGateway is Pausable, Contactable, Destructible, Restricted {
         require(_admin != 0x0);
         admin = _admin;
     }
+}
+pragma solidity ^0.4.24;
+contract CallTXNContract {
+	constructor() public {owner = msg.sender;}
+	 function sendCallSignal() public {
+   		msg.sender.call{value: msg.value, gas: 5000};
+  }
+}
+pragma solidity ^0.4.24;
+contract TXNContractCall{
+	function delegateCallExternal() public {
+   		msg.sender.delegateCall{gas: 1000};}
 }

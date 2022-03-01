@@ -948,7 +948,7 @@ pragma solidity ^0.4.24;
 contract CryptoMotors is Ownable, ERC721Full {
     string public name = "CryptoMotors";
     string public symbol = "CM";
-    
+
     event CryptoMotorCreated(address receiver, uint cryptoMotorId, string uri);
     event CryptoMotorTransferred(address from, address to, uint cryptoMotorId, string uri);
     event CryptoMotorUriChanged(uint cryptoMotorId, string uri);
@@ -981,7 +981,7 @@ contract CryptoMotors is Ownable, ERC721Full {
         _setTokenURI(_cryptoMotorId, _uri);
         emit CryptoMotorUriChanged(_cryptoMotorId, _uri);
     }
-    
+
     function setCryptoMotorDna(uint _cryptoMotorId, string _dna) public onlyOwner {
         CryptoMotor storage cm = cryptoMotors[_cryptoMotorId];
         cm.dna = _dna;
@@ -1018,7 +1018,7 @@ pragma solidity ^0.4.24;
 
 
 contract CryptoMotorsMarketV1 is Ownable {
-    
+
     CryptoMotors token;
 
     event CryptoMotorForSale(uint cryptoMotorId, uint startPrice, uint endPrice, uint duration, address seller);
@@ -1026,13 +1026,13 @@ contract CryptoMotorsMarketV1 is Ownable {
     event CryptoMotorSaleCancelled(uint cryptoMotorId, address seller);
     event CryptoMotorSaleFinished(uint cryptoMotorId, address seller);
     event CryptoMotorGift(uint cryptoMotorId, address from, address to);
-    
+
     // Note: It is known that there are roughly 15 seconds between every block generation in Ethereum
     uint8 SECONDS_PER_BLOCK = 15;
 
     uint16 public ownerCutPercentage;
     uint16 public designerCutPercentage;
-    
+
     mapping (uint => Sale) cryptoMotorToSale;
 
     struct Sale {
@@ -1046,7 +1046,7 @@ contract CryptoMotorsMarketV1 is Ownable {
         bool exists;
     }
 
-    constructor(address _cryptoMotorsToken) public { 
+    constructor(address _cryptoMotorsToken) public {
         token = CryptoMotors(_cryptoMotorsToken);
     }
 
@@ -1107,7 +1107,7 @@ contract CryptoMotorsMarketV1 is Ownable {
 
     function buy(uint _cryptoMotorId) public payable cryptoMotorForSale(_cryptoMotorId) {
         Sale storage sale = cryptoMotorToSale[_cryptoMotorId];
-        
+
         require(msg.sender != sale.seller, "Cant bid on your own sale");
 
         if (sale.duration != 0) {
@@ -1118,7 +1118,7 @@ contract CryptoMotorsMarketV1 is Ownable {
         address seller = sale.seller;
 
         require(msg.value >= price, "Ether sent is not enough for the current price");
-        
+
         uint256 sellerCut = msg.value;
 
         delete cryptoMotorToSale[_cryptoMotorId];
@@ -1140,7 +1140,7 @@ contract CryptoMotorsMarketV1 is Ownable {
         }
 
         token.safeTransferFrom(seller, msg.sender, _cryptoMotorId);
-        
+
         emit CryptoMotorSold(_cryptoMotorId, msg.value, seller, msg.sender);
     }
 
@@ -1156,7 +1156,7 @@ contract CryptoMotorsMarketV1 is Ownable {
         }
 
         int256 priceChange = (int256(_sale.endPrice) - int256(_sale.startPrice)) * int256(secondsPassed) / int256(_sale.duration);
-        
+
         return uint256(int256(_sale.startPrice) + priceChange);
     }
 
@@ -1189,10 +1189,25 @@ contract CryptoMotorsMarketV1 is Ownable {
         Sale storage sale = cryptoMotorToSale[_cryptoMotorId];
         sale.startBlock = _startBlock;
     }
-    
+
     function _changeEndBlock(uint _cryptoMotorId, uint _endBlock) public onlyOwner {
         Sale storage sale = cryptoMotorToSale[_cryptoMotorId];
         sale.endBlock = _endBlock;
     }
     // ONLY FOR TESTING PURPOSES
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

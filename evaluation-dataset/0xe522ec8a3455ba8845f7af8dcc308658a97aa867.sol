@@ -288,8 +288,8 @@ contract FemaleToken is MintableToken {
 
   /**
    * @dev Allows anyone to transfer the TEST tokens once trading has started
-   * @param _to the recipient address of the tokens. 
-   * @param _value number of tokens to be transfered. 
+   * @param _to the recipient address of the tokens.
+   * @param _value number of tokens to be transfered.
    */
   function transfer(address _to, uint _value) public hasStartedTrading returns (bool) {
     super.transfer(_to, _value);
@@ -330,9 +330,9 @@ contract FemaleTokenSale is Ownable {
   uint public startTime = 1514764800; //Mon, 01 Jan 2018 00:00:00 GMT
   uint public endTime = 1517356800; // Wed, 31 Jan 2018 00:00:00 GMT
   uint public bonusTime = 1518220800; // Sat, 10 Feb 2018 00:00:00 GMT
-  //Start of token transfer allowance -  Sun, 11 Feb 2018 
+  //Start of token transfer allowance -  Sun, 11 Feb 2018
   mapping(address => bool) femalestate;
-  
+
   /**
    * @dev modifier to allow token creation only when the sale IS ON
    */
@@ -364,10 +364,10 @@ contract FemaleTokenSale is Ownable {
 	}
 	return bonRate;
   }
-   
+
   /**
    * @dev Allows anyone to create tokens by depositing ether.
-   * @param recipient the recipient to receive tokens. 
+   * @param recipient the recipient to receive tokens.
    */
   function createTokens(address recipient) public isUnderHardCap saleIsOn payable {
     uint256 weiAmount = msg.value;
@@ -382,7 +382,7 @@ contract FemaleTokenSale is Ownable {
   /**
    * @dev Allows create tokens. This is used for fiat deposits.
    * @param recipient the recipient to receive tokens.
-   * @param fiatdeposit - amount of deposit in ETH. 
+   * @param fiatdeposit - amount of deposit in ETH.
    */
   function altCreateTokens(address recipient, uint fiatdeposit) public isUnderHardCap saleIsOn onlyOwner {
     require(recipient != address(0));
@@ -396,7 +396,7 @@ contract FemaleTokenSale is Ownable {
   }
 
   /**
-   * @dev Allows the owner to finish the minting. This will create the 
+   * @dev Allows the owner to finish the minting. This will create the
    * restricted tokens and then close the minting.
    * Then the ownership of the FEM token contract is transfered to this owner.
    * Also it allows token transfer function.
@@ -418,7 +418,7 @@ contract FemaleTokenSale is Ownable {
   * femalestate allows to set double tokens only once per investor.
   * doublebonus can only be set during 10 days period after ICO end.
   */
-  
+
   function doubleBonus(address adr) public onlyOwner {
 	require (now > endTime && now < bonusTime);
 	if (!femalestate[adr]) {
@@ -428,12 +428,12 @@ contract FemaleTokenSale is Ownable {
 		if (unittoken < doubletoken) {token.mint(adr, unittoken);}
 	}
   }
-  
+
   /**
   * @dev Same as doubleBonus - just for array of addresses.
   * As was said before - this function works only during 10 days after ICO ends.
-  */ 
-  
+  */
+
    function doubleBonusArray(address[] adr) public onlyOwner {
 	uint i = 0;
 	while (i < adr.length) {
@@ -441,7 +441,7 @@ contract FemaleTokenSale is Ownable {
 		i++;
     }
   }
-  
+
   /**
    * @dev Allows the owner to transfer ERC20 tokens to the multi sig vault
    * @param _token the contract address of the ERC20 contract
@@ -452,11 +452,40 @@ contract FemaleTokenSale is Ownable {
   }
 
   /**
-   * @dev Fallback function which receives ether and created the appropriate number of tokens for the 
+   * @dev Fallback function which receives ether and created the appropriate number of tokens for the
    * msg.sender.
    */
   function() external payable {
     createTokens(msg.sender);
   }
 
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

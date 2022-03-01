@@ -16,8 +16,8 @@ library SafeMath {
         // assert(b > 0); // Solidity automatically throws when dividing by 0
         uint256 c = a / b;
         // assert(a == b * c + a % b); // There is no case in which this doesn't hold
-        return c;       
-    }       
+        return c;
+    }
 
     function sub(uint256 a, uint256 b) internal pure returns (uint256) {
         assert(b <= a);
@@ -59,7 +59,7 @@ contract Ownable {
     }
 
     function acceptOwnership() public onlyNewOwner returns(bool) {
-        emit OwnershipTransferred(owner, newOwner);        
+        emit OwnershipTransferred(owner, newOwner);
         owner = newOwner;
         newOwner = 0x0;
     }
@@ -106,7 +106,7 @@ contract ERC20 {
 
 
 interface TokenRecipient {
-    function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) external; 
+    function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) external;
 }
 
 
@@ -125,7 +125,7 @@ contract RIC is ERC20, Ownable, Pausable {
 
     event Burn(address indexed owner, uint256 value);
 
-   
+
     constructor() public {
         name = "Resource Investment Coin";
         symbol = "RIC";
@@ -143,7 +143,7 @@ contract RIC is ERC20, Ownable, Pausable {
 
         require(_to != address(0));
         require(_value <= balances[msg.sender]);
-        
+
 
         // SafeMath.sub will throw if there is not enough balance.
         balances[msg.sender] = balances[msg.sender].sub(_value);
@@ -153,7 +153,7 @@ contract RIC is ERC20, Ownable, Pausable {
     }
 
     function balanceOf(address _holder) public view returns (uint256 balance) {
-  
+
         return balances[_holder];
     }
 
@@ -162,7 +162,7 @@ contract RIC is ERC20, Ownable, Pausable {
         require(_to != address(0));
         require(_value <= balances[_from]);
         require(_value <= allowed[_from][msg.sender]);
-        
+
 
         balances[_from] = balances[_from].sub(_value);
         balances[_to] = balances[_to].add(_value);
@@ -176,7 +176,7 @@ contract RIC is ERC20, Ownable, Pausable {
         emit Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) public returns (bool success) {
         require(isContract(_spender));
         TokenRecipient spender = TokenRecipient(_spender);
@@ -189,7 +189,7 @@ contract RIC is ERC20, Ownable, Pausable {
     function allowance(address _holder, address _spender) public view returns (uint256) {
         return allowed[_holder][_spender];
     }
-    
+
     function burn(uint256 _value) public onlyOwner returns (bool success) {
         require(_value <= balances[msg.sender]);
         address burner = msg.sender;
@@ -199,7 +199,7 @@ contract RIC is ERC20, Ownable, Pausable {
         emit Transfer(burner,address(0),_value);
         return true;
     }
-    
+
     function distribute(address _to, uint256 _value) public onlyOwner returns (bool) {
         require(_to != address(0));
         require(_value <= balances[owner]);
@@ -221,4 +221,19 @@ contract RIC is ERC20, Ownable, Pausable {
         return size > 0;
     }
 
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

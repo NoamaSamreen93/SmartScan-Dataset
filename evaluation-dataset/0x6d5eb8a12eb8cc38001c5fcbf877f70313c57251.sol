@@ -173,7 +173,6 @@ contract Token is StandardToken, Owned, Destroyable {
     _destroy(msg.sender, _amount);
     emit Burn(msg.sender, _amount);
   }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

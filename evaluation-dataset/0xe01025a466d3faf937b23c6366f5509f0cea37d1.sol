@@ -728,4 +728,14 @@ contract OwnedUpgradeabilityProxy is UpgradeabilityProxy {
         upgradeTo(implementation);
         require(address(this).call.value(msg.value)(data), "data is invalid");
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

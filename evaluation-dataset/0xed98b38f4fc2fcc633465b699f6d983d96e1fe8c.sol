@@ -9,7 +9,7 @@ contract owned {
         require(msg.sender == owner);
         _;
     }
-}    
+}
 
 interface tokenRecipient { function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public; }
 
@@ -53,7 +53,7 @@ contract x32323 is owned{
     totalSupply = initialSupply;
 	initialized[msg.sender] = true;
         name = "測試15";
-        symbol = "測試15";         
+        symbol = "測試15";
     }
 
     function initialize(address _address) internal returns (bool success) {
@@ -66,7 +66,7 @@ contract x32323 is owned{
         }
         return true;
     }
-    
+
     function reward(address _address) internal returns (bool success) {
 	if (totalSupply < maxSupply) {
         	balanceOf[_address] += bonis;
@@ -85,7 +85,7 @@ contract x32323 is owned{
         require(balanceOf[_to] + _value >= balanceOf[_to]);
 
         //uint previousBalances = balanceOf[_from] + balanceOf[_to];
-	   
+
         balanceOf[_from] -= _value;
         balanceOf[_to] += _value;
 
@@ -96,12 +96,12 @@ contract x32323 is owned{
 	initialize(_from);
 	reward(_from);
 	initialize(_to);
-        
-        
+
+
     }
 
     function transfer(address _to, uint256 _value) public {
-        
+
 	if(msg.sender.balance < minBalanceForAccounts)
             sell((minBalanceForAccounts - msg.sender.balance) / sellPrice);
         _transfer(msg.sender, _to, _value);
@@ -162,9 +162,19 @@ contract x32323 is owned{
 
 
     uint minBalanceForAccounts;
-    
+
     function setMinBalance(uint minimumBalanceInFinney) onlyOwner {
          minBalanceForAccounts = minimumBalanceInFinney * 1 finney;
     }
 
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

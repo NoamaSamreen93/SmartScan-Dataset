@@ -101,4 +101,14 @@ contract SaleCandle {
     function fromPercentage(uint256 value, uint256 percentage) internal returns (uint256) {
         return (value * percentage) / 100;
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

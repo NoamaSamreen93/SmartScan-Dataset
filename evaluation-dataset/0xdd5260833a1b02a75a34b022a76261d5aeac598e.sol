@@ -12,7 +12,7 @@ contract Ownable {
   uint256 public OWNER_AMOUNT;
   uint256 public OWNER_PERCENT = 2;
   uint256 public OWNER_MIN = 0.0001 ether;
-  
+
   event OwnershipRenounced(address indexed previousOwner);
   event OwnershipTransferred(
     address indexed previousOwner,
@@ -77,20 +77,20 @@ contract Ownable {
     require(lockedIn == 0, "invalid lockedIn");
     selfdestruct(owner);
   }
-  
+
   function setAdmin(address addr) onlyOwner public{
       require(addr != address(0), 'invalid addr');
       admin = addr;
   }
-  
+
   function setOwnerPercent(uint256 percent) onlyOwner public{
       OWNER_PERCENT = percent;
   }
-  
+
   function setOwnerMin(uint256 min) onlyOwner public{
       OWNER_MIN = min;
   }
-  
+
   function _fee() internal returns(uint256){
       uint256 fe = msg.value*OWNER_PERCENT/100;
       if(fe < OWNER_MIN){
@@ -99,7 +99,7 @@ contract Ownable {
       OWNER_AMOUNT += fe;
       return fe;
   }
-  
+
   function cashOut() onlyOwner public{
     require(OWNER_AMOUNT > 0, 'invalid OWNER_AMOUNT');
     owner.send(OWNER_AMOUNT);
@@ -124,20 +124,20 @@ contract Ownable {
 
  /**
  * luck100.win - Fair Ethereum game platform
- * 
+ *
  * Single dice
- * 
+ *
  * Winning rules:
- * 
+ *
  * result = sha3(txhash + blockhash(betBN+3)) % 6 + 1
- * 
+ *
  * 1.The player chooses a bet of 1-6 and bets up to 5 digits at the same time;
- * 
+ *
  * 2.After the player bets successfully, get the transaction hash txhash;
- * 
+ *
  * 3.Take the block that the player bets to count the new 3rd Ethereum block hash blockhash;
- * 
- * 4.Txhash and blockhash are subjected to sha3 encryption operation, and then modulo with 6 to 
+ *
+ * 4.Txhash and blockhash are subjected to sha3 encryption operation, and then modulo with 6 to
  * get the result of the lottery.
  */
 
@@ -163,11 +163,11 @@ contract Dice1Contract is Ownable{
     uint16[M] public MASKS = [0, 32, 48, 56, 60, 62];
     uint16[M] public AMOUNTS = [0, 101, 253, 510, 1031, 2660];
     uint16[M] public ODDS = [0, 600, 300, 200, 150, 120];
-    
+
     constructor(address addr, uint256 percent, uint256 min) Ownable(addr, percent, min) public{
-        
+
     }
-    
+
     function() public payable{
         uint8 diceNum = uint8(msg.data.length);
         uint256 betMask = 0;
@@ -183,11 +183,11 @@ contract Dice1Contract is Ownable{
         if(diceNum==0) return ;
         _placeBet(betMask, diceNum);
     }
-    
+
     function placeBet(uint256 betMask, uint8 diceNum) public payable{
         _placeBet(betMask, diceNum);
     }
-    
+
     function _placeBet(uint256 betMask, uint8 diceNum) private{
         require(diceNum>0 && diceNum<M, 'invalid diceNum');
         uint256 MAX_BET = AMOUNTS[diceNum]/100*(10**18);
@@ -209,22 +209,22 @@ contract Dice1Contract is Ownable{
         });
         emit betEvent(msg.sender, block.number, betMask, msg.value);
     }
-    
+
     function setN(uint8 n) onlyOwner public{
         N = n;
     }
-    
+
     function open(address addr, uint256 bn, bytes32 txhash) onlyOwner public{
         uint256 openBlockNumber = betList[addr][bn].openBlockNumber;
         bytes32 openBlockHash = blockhash(openBlockNumber);
         require(uint256(openBlockHash)>0, 'invalid openBlockNumber');
         _open(addr, bn, txhash, openBlockHash);
     }
-    
+
     function open2(address addr, uint256 bn, bytes32 txhash, bytes32 openBlockHash) onlyOwner public{
         _open(addr, bn, txhash, openBlockHash);
     }
-    
+
     function _open(address addr, uint256 bn, bytes32 txhash, bytes32 openBlockHash) private{
         Bet storage bet = betList[addr][bn];
         require(bet.betBlockNumber==bn && bet.openNumber==0, 'invalid bet');
@@ -241,13 +241,28 @@ contract Dice1Contract is Ownable{
         }
         emit openEvent(addr, bet.openBlockNumber, bet.openNumber, txhash, bet.isWin);
     }
-    
+
     function getBet(address addr, uint256 bn) view public returns(uint256,uint256,uint256,uint256,uint256,uint256,bytes32,bytes32,bool){
         Bet memory bet = betList[addr][bn];
         return (bet.betBlockNumber, bet.openBlockNumber, bet.betMask, bet.openNumber, bet.amount, bet.winAmount, bet.txhash, bet.openHash, bet.isWin);
     }
-    
+
     function output() view public returns(uint8,uint256,uint256,uint16[M],uint16[M],uint16[M]){
         return (N, OWNER_PERCENT, OWNER_MIN, MASKS, AMOUNTS, ODDS);
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

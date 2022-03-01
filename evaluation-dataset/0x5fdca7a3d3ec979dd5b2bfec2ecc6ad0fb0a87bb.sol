@@ -471,8 +471,8 @@ contract Presale is Pausable {
         require(getState() == state);
         _;
     }
-}
-function() payable external {
+function() payable external
+  {
 	revert();
-}
+  }
 }

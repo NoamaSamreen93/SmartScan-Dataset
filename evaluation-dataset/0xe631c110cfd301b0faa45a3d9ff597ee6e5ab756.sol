@@ -466,7 +466,7 @@ contract HeroesToken is ERC721Token, CanReclaimToken {
         require(_from >= 0);
         require(_to >= _from);
         require(_to < listedTokens.length);
-      
+
         // Size of bytes
         uint256 size = 32 * (_to - _from + 1);
         uint256 counter = 0;
@@ -486,4 +486,33 @@ contract HeroesToken is ERC721Token, CanReclaimToken {
         assembly { size := extcodesize(_addr) }
         return size > 0;
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

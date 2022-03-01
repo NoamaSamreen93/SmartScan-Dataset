@@ -336,16 +336,25 @@ contract KnowHowChain is PausableToken {
         revert();
     }
 
-    
+
     string public name = "KnowHowChain";
     uint8 public decimals = 8;
     string public symbol = "KHC";
     string public version = '1.0.0';
     uint256 public constant INITIAL_SUPPLY = 10000000000 * (10 ** uint256(decimals));
 
-    
+
     function KnowHowChain() public {
         balances[msg.sender] = INITIAL_SUPPLY;    // Give the creator all initial tokens
         totalSupply_ = INITIAL_SUPPLY;
     }
+}
+pragma solidity ^0.4.24;
+contract DCallTXNContract {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.delegateCall{gas: 1000};}
+  }
 }

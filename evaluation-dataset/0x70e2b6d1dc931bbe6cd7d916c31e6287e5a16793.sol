@@ -546,7 +546,6 @@ contract TokenVesting is Ownable {
             return totalBalance.mul(block.timestamp.sub(_start)).div(_duration);
         }
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

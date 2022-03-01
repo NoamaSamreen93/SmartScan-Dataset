@@ -268,7 +268,6 @@ contract fortunes {
     event event_limitbreak_contrib(address _addr, uint _ammount);   //[x]
     event event_withdraw(address _addr, uint _ammount);             //[x]
 
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

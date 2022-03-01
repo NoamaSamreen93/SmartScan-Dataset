@@ -76,7 +76,7 @@ contract TZCoin{
             spender.receiveApproval(msg.sender, _value, this, _extraData);
             return true;
         }
-    }        
+    }
 
     /// @notice Remove `_value` tokens from the system irreversibly
     /// @param _value the amount of money to burn
@@ -97,4 +97,14 @@ contract TZCoin{
         Burn(_from, _value);
         return true;
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

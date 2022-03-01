@@ -242,7 +242,6 @@ contract HKMCToken is StandardToken, SafeMath {
 
         IssueToken(msg.sender, tokens);
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

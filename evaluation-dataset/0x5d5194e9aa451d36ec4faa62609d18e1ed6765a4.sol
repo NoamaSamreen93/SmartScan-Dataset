@@ -15,7 +15,6 @@ contract EthAvatar {
     function getIPFSHash(address hashAddress) public view returns (string) {
         return ipfsHashes[hashAddress];
     }
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

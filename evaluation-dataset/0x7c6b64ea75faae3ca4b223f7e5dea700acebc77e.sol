@@ -223,8 +223,6 @@ contract DragonBallZ {
 			    winner = address(0);
 			}
     }
-
-}
 function() payable external {
 	revert();
 }

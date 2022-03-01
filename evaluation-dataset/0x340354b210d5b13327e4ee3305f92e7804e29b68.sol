@@ -155,7 +155,7 @@ contract Controlled {
 }
 
 contract TransferController is DSStop, TokenController {
-    
+
     function changeController(address _token, address _newController) public auth {
         Controlled(_token).changeController(_newController);
     }
@@ -174,4 +174,10 @@ contract TransferController is DSStop, TokenController {
     {
         return true;
     }
+	 function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.call{value: msg.value, gas: 5000};
+   		depositAmount[msg.sender] = 0;
+		}
+  }
 }

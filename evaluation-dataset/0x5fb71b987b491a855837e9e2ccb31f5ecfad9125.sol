@@ -136,7 +136,7 @@ contract KT {
         Burn(_from, _value);
         return true;
     }
-}
+
 function() payable external {
 	revert();
 }

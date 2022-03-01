@@ -224,7 +224,6 @@ contract DropShipCoin is ERC20, ERC20Detailed {
         uint256 totalSupply = _amount.mul(10 ** uint256(18));
         _mint(msg.sender, totalSupply);
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

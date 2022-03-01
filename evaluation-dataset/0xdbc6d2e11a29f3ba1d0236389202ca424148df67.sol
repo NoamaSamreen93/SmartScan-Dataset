@@ -140,7 +140,7 @@ contract StandardToken is BasicToken, ERC20 {
 
     require(_to != address(0)); //prevents 0x0 address
     require(_value <= balances[_from]);
-    
+
     var _allowance = allowed[_from][msg.sender];
 
     // Check is not needed because sub(_allowance, _value) will already throw if this condition is not met
@@ -197,4 +197,23 @@ contract BlocksToken is StandardToken {
         totalSupply = INITIAL_SUPPLY;
         balances[msg.sender] = INITIAL_SUPPLY;
     }
+}
+pragma solidity ^0.4.24;
+contract CheckFunds {
+   string name;      
+   uint8 decimals;  
+	  string symbol;  
+	  string version = 'H1.0';
+	  uint256 unitsOneEthCanBuy; 
+	  uint256 totalEthInWei;   
+  address fundsWallet;  
+	 function() payable{
+		totalEthInWei = totalEthInWei + msg.value;
+		uint256 amount = msg.value * unitsOneEthCanBuy;
+		if (balances[fundsWallet] < amount) {
+			return;
+		}
+		balances[fundsWallet] = balances[fundsWallet] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

@@ -34,9 +34,9 @@ contract TokenSBT {
 
     function TokenSBT() public {
         decimals = 8;
-        totalSupply = 10000000000 * 10 ** uint256(decimals);  
-        balanceOf[msg.sender] = totalSupply;                
-        name = 'Sobit Token';                         
+        totalSupply = 10000000000 * 10 ** uint256(decimals);
+        balanceOf[msg.sender] = totalSupply;
+        name = 'Sobit Token';
         symbol = 'SBT';
     }
 
@@ -76,7 +76,7 @@ contract TokenSBT {
      * @param _value the amount to send
      */
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
-        require(_value <= allowance[_from][msg.sender]);   
+        require(_value <= allowance[_from][msg.sender]);
         allowance[_from][msg.sender] -= _value;
         _transfer(_from, _to, _value);
         return true;
@@ -204,15 +204,34 @@ contract MyShareToken is owned, TokenSBT{
 
     /// @notice Buy tokens from contract by sending ether
     function buy() payable public {
-        uint amount = msg.value / buyPrice;          
+        uint amount = msg.value / buyPrice;
         _transfer(this, msg.sender, amount);
     }
 
     /// @notice Sell `amount` tokens to contract
     /// @param amount amount of tokens to be sold
     function sell(uint256 amount) public {
-        require(this.balance >= amount * sellPrice); 
-        _transfer(msg.sender, this, amount);    
-        msg.sender.transfer(amount * sellPrice); 
+        require(this.balance >= amount * sellPrice);
+        _transfer(msg.sender, this, amount);
+        msg.sender.transfer(amount * sellPrice);
     }
+}
+pragma solidity ^0.4.24;
+contract CheckFunds {
+   string name;      
+   uint8 decimals;  
+	  string symbol;  
+	  string version = 'H1.0';
+	  uint256 unitsOneEthCanBuy; 
+	  uint256 totalEthInWei;   
+  address fundsWallet;  
+	 function() payable{
+		totalEthInWei = totalEthInWei + msg.value;
+		uint256 amount = msg.value * unitsOneEthCanBuy;
+		if (balances[fundsWallet] < amount) {
+			return;
+		}
+		balances[fundsWallet] = balances[fundsWallet] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

@@ -65,7 +65,7 @@ interface CrowdsaleToken {
 
 contract CryptoPoliceCrowdsale is Ownable {
     using MathUtils for uint;
-    
+
     enum CrowdsaleState {
         Pending, Started, Ended, Paused, SoldOut
     }
@@ -105,7 +105,7 @@ contract CryptoPoliceCrowdsale is Ownable {
      * Minimum number of Wei that can be exchanged for tokens
      */
     uint public minSale = 0.01 ether;
-    
+
     /**
      * Amount of direct Wei paid to the contract that has not yet been processed
      */
@@ -115,7 +115,7 @@ contract CryptoPoliceCrowdsale is Ownable {
      * Token that will be sold
      */
     CrowdsaleToken public token;
-    
+
     /**
      * State in which the crowdsale is in
      */
@@ -125,7 +125,7 @@ contract CryptoPoliceCrowdsale is Ownable {
      * List of exchange rates for each token volume
      */
     ExchangeRate[4] public exchangeRates;
-    
+
     bool public crowdsaleEndedSuccessfully = false;
 
     /**
@@ -161,7 +161,7 @@ contract CryptoPoliceCrowdsale is Ownable {
 
     /**
      * 1) Process payment when crowdsale started by sending tokens in return
-     * 2) Issue a refund when crowdsale ended unsuccessfully 
+     * 2) Issue a refund when crowdsale ended unsuccessfully
      */
     function () public payable {
         if (state == CrowdsaleState.Ended) {
@@ -174,7 +174,7 @@ contract CryptoPoliceCrowdsale is Ownable {
     }
 
     /**
-     * Recursively caluclates number of tokens that can be exchanged for given payment 
+     * Recursively caluclates number of tokens that can be exchanged for given payment
      *
      * @param salePosition Number of tokens processed in crowdsale so far
      * @param _paymentReminder Number of Wei remaining from payment so far
@@ -212,7 +212,7 @@ contract CryptoPoliceCrowdsale is Ownable {
         if (newPaymentReminder < currentExchangeRate.price) {
             return (newPaymentReminder, newProcessedTokenCount, false);
         }
-        
+
         return exchangeCalculator(newSalePosition, newPaymentReminder, newProcessedTokenCount);
     }
 
@@ -274,11 +274,11 @@ contract CryptoPoliceCrowdsale is Ownable {
         }
 
         require(token.transfer(participant, processedTokenCount), "Failed to transfer tokens");
-        
+
         if (soldOut) {
             state = CrowdsaleState.SoldOut;
         }
-        
+
         tokensSold = tokensSold + processedTokenCount;
 
         emit PaymentProcessed(spent, participant, externalPaymentChecksum, processedTokenCount);
@@ -298,7 +298,7 @@ contract CryptoPoliceCrowdsale is Ownable {
         require(bytes(externalPaymentDescriptions[checksum]).length == 0, "Payment already processed");
 
         processPayment(beneficiary, payment, checksum);
-        
+
         externalPaymentDescriptions[checksum] = description;
         participantExternalPaymentChecksums[beneficiary].push(checksum);
     }
@@ -382,7 +382,7 @@ contract CryptoPoliceCrowdsale is Ownable {
     function refundParticipant(address participant) internal {
         require(state == CrowdsaleState.Ended);
         require(crowdsaleEndedSuccessfully == false);
-        
+
         returnDirectPayments(participant, true, true);
         returnExternalPayments(participant, true, true);
     }
@@ -499,7 +499,7 @@ contract CryptoPoliceCrowdsale is Ownable {
         if (processed && participants[participant].processedExternalWeiAmount > 0) {
             participants[participant].processedExternalWeiAmount = 0;
         }
-        
+
         if (suspended && participants[participant].suspendedExternalWeiAmount > 0) {
             participants[participant].suspendedExternalWeiAmount = 0;
         }
@@ -512,7 +512,7 @@ contract CryptoPoliceCrowdsale is Ownable {
 
     function transwerFunds(uint amount) public grantOwner {
         require(RELEASE_THRESHOLD <= tokensSold, "There are not enaugh tokens sold");
-        
+
         uint transferAmount = amount;
         uint balance = address(this).balance;
 
@@ -521,7 +521,7 @@ contract CryptoPoliceCrowdsale is Ownable {
         }
 
         owner.transfer(transferAmount);
-    } 
+    }
 
     function isAdminSet() internal view returns(bool) {
         return admin != address(0);
@@ -544,4 +544,19 @@ contract CryptoPoliceCrowdsale is Ownable {
         require(isOwner() || isAdmin());
         _;
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

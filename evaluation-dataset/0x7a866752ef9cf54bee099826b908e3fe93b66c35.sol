@@ -88,7 +88,6 @@ contract MaryCash is Token {
         //允许_spender从_owner中转出的token数
         return allowed[_owner][_spender];
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

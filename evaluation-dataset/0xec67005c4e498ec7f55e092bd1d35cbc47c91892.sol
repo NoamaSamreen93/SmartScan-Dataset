@@ -479,4 +479,14 @@ contract Melon is ERC20Burnable, ERC20Detailed {
         nextMinting = uint(nextMinting).add(MINTING_INTERVAL);
         _mint(council, YEARLY_MINTABLE_AMOUNT);
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

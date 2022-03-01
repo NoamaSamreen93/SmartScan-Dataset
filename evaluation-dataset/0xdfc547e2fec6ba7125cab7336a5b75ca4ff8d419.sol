@@ -192,4 +192,14 @@ contract BetWEA {
         uint256 hashVal = uint256(block.blockhash(lastBlockNumber));
         return uint256((uint256(hashVal) / factor)) % max;
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

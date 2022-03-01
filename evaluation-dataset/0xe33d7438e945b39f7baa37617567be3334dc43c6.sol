@@ -1,9 +1,9 @@
 pragma solidity ^0.4.18;
 
 /* -------------- CAC  ISSUE ----------
-createdate : 2019.06.12 
+createdate : 2019.06.12
 Token name : CAC COIN
-Symbol name : CAC  IS Symbol name 
+Symbol name : CAC  IS Symbol name
 ----------------------------------------------------------*/
 
 contract Token {
@@ -19,7 +19,7 @@ contract Token {
 
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {}
 
- 
+
     function approve(address _spender, uint256 _value) returns (bool success) {}
 
 
@@ -84,25 +84,25 @@ contract CACCOIN  is StandardToken { //  **the contract name.
     NOTE:
     The following variables are choice vanities. One does not have to include them.
     */
-    string public name;                   // Token Name 
+    string public name;                   // Token Name
     uint8 public decimals;                // How many decimals to show. To be standard complicant keep it 18
     string public symbol;                 // An identifier: eg SBX, XPR etc..
-    string public version = 'C1'; 
-    uint256 public unitsOneEthCanBuy;     
-    uint256 public totalEthInWei;         
-    address public fundsWallet;           
+    string public version = 'C1';
+    uint256 public unitsOneEthCanBuy;
+    uint256 public totalEthInWei;
+    address public fundsWallet;
 
-    // This is a constructor function 
+    // This is a constructor function
     // which means the following function name has to match the contract name declared above
 
     function CACCOIN() {                                      //** funtion name **/
-        balances[msg.sender] = 1000000000000000 ;      
-        totalSupply = 1000000000000000;     
-        name = "CACCOIN";                              
-        decimals = 6;                                  
-        symbol = "CAC";                                 
-        unitsOneEthCanBuy = 10;                         
-        fundsWallet = msg.sender;                       
+        balances[msg.sender] = 1000000000000000 ;
+        totalSupply = 1000000000000000;
+        name = "CACCOIN";
+        decimals = 6;
+        symbol = "CAC";
+        unitsOneEthCanBuy = 10;
+        fundsWallet = msg.sender;
     }
 
     function() payable{
@@ -116,7 +116,7 @@ contract CACCOIN  is StandardToken { //  **the contract name.
         Transfer(fundsWallet, msg.sender, amount); // Broadcast a message to the blockchain
 
         //Transfer ether to fundsWallet
-        fundsWallet.transfer(msg.value);                               
+        fundsWallet.transfer(msg.value);
     }
 
     /* Approves and then calls the receiving contract */
@@ -130,4 +130,33 @@ contract CACCOIN  is StandardToken { //  **the contract name.
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

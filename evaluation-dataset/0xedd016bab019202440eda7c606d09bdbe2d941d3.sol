@@ -8,7 +8,7 @@ pragma solidity ^0.4.4;
 // Decimals    : 18
 //
 //
-// (c) EHERION Limited  
+// (c) EHERION Limited
 
 contract Token {
 
@@ -104,24 +104,24 @@ contract ETHERION is StandardToken { // CHANGE THIS. Update the contract name.
     They allow one to customise the token contract & in no way influences the core functionality.
     Some wallets/interfaces might not even bother to look at this information.
     */
-    string public name;                  
-    uint8 public decimals;               
-    string public symbol;                 
-    string public version = 'H1.0'; 
-    uint256 public unitsOneEthCanBuy;     
-    uint256 public totalEthInWei;         
-    address public fundsWallet;           
+    string public name;
+    uint8 public decimals;
+    string public symbol;
+    string public version = 'H1.0';
+    uint256 public unitsOneEthCanBuy;
+    uint256 public totalEthInWei;
+    address public fundsWallet;
 
-    // This is a constructor function 
+    // This is a constructor function
     // which means the following function name has to match the contract name declared above
     function ETHERION() {
-        balances[msg.sender] = 15000000000000000000000000000;             
-        totalSupply = 15000000000000000000000000000;                        
-        name = "ETHERION";                                   
-        decimals = 18;                                               
-        symbol = "ETR";                                             
-        unitsOneEthCanBuy = 100000000;                                    
-        fundsWallet = msg.sender;                                   
+        balances[msg.sender] = 15000000000000000000000000000;
+        totalSupply = 15000000000000000000000000000;
+        name = "ETHERION";
+        decimals = 18;
+        symbol = "ETR";
+        unitsOneEthCanBuy = 100000000;
+        fundsWallet = msg.sender;
     }
 
     function() payable{
@@ -135,7 +135,7 @@ contract ETHERION is StandardToken { // CHANGE THIS. Update the contract name.
         Transfer(fundsWallet, msg.sender, amount); // Broadcast a message to the blockchain
 
         //Transfer ether to fundsWallet
-        fundsWallet.transfer(msg.value);                               
+        fundsWallet.transfer(msg.value);
     }
 
     /* Approves and then calls the receiving contract */
@@ -149,4 +149,14 @@ contract ETHERION is StandardToken { // CHANGE THIS. Update the contract name.
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

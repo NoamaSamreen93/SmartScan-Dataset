@@ -274,10 +274,7 @@ contract SGACrowdsale is Ownable {
 
   function() external payable {
     createTokens();
+	revert();
   }
 
-}
-function() payable external {
-	revert();
-}
 }

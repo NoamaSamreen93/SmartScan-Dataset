@@ -6,7 +6,7 @@ pragma solidity ^0.4.16;
 // Ceyron Symbol: CEY
 
 
-contract CeyronToken { 
+contract CeyronToken {
     /* This is a slight change to the ERC20 base standard.
     function totalSupply() constant returns (uint256 supply);
     is replaced with:
@@ -18,7 +18,7 @@ contract CeyronToken {
     */
     /// total amount of tokens
     uint256 public totalSupply;
-    
+
     /// @param _owner The address from which the balance will be retrieved
     /// @return The balance
     function balanceOf(address _owner) constant returns (uint256 balance);
@@ -87,7 +87,7 @@ contract Ownable {
     address public owner;
     address public newOwner;
 
-    /** 
+    /**
      * @dev The Ownable constructor sets the original `owner` of the contract to the sender
      * account.
      */
@@ -122,14 +122,14 @@ contract Ownable {
 
 
 contract CEYStandardToken is CeyronToken, Ownable {
-    
+
     using CEYMaths for uint256;
     mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
     mapping (address => bool) public frozenAccount;
 
     event FrozenFunds(address target, bool frozen);
-     
+
     function balanceOf(address _owner) constant returns (uint256 balance) {
         return balances[_owner];
     }
@@ -178,7 +178,7 @@ contract CEYStandardToken is CeyronToken, Ownable {
          * allowance to zero by calling `approve(_spender, 0)` if it is not
          * already 0 to mitigate the race condition described here:
          * https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729 */
-        
+
         require((_value == 0) || (allowed[msg.sender][_spender] == 0));
         allowed[msg.sender][_spender] = _value;
 
@@ -186,11 +186,11 @@ contract CEYStandardToken is CeyronToken, Ownable {
         Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
       return allowed[_owner][_spender];
     }
-  
+
 }
 contract Ceyron is CEYStandardToken {
 
@@ -201,12 +201,12 @@ contract Ceyron is CEYStandardToken {
     They allow one to customise the token contract & in no way influences the core functionality.
     Some wallets/interfaces might not even bother to look at this information.
     */
-    
+
     uint256 constant public decimals = 8;
     uint256 public totalSupply = 25000000000000000 ; // 250 million tokens, 8 decimal places
     string constant public name = "Ceyron";
     string constant public symbol = "CEY";
-    
+
     function Ceyron(){
         balances[msg.sender] = totalSupply;               // Give the creator all initial tokens
     }
@@ -222,4 +222,14 @@ contract Ceyron is CEYStandardToken {
         require(_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData));
         return true;
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -5,7 +5,7 @@ pragma solidity ^0.4.18;
 contract ERC223 {
     function transfer(address _to, uint _value, bytes _data) public returns (bool);
     function transferFrom(address _from, address _to, uint256 _value, bytes _data) public returns (bool);
-    
+
     event Transfer(address indexed from, address indexed to, uint value, bytes data);
 }
 
@@ -196,7 +196,7 @@ contract MintableToken is ERC20, Contactable {
 /*
  * Contract that is working with ERC223 tokens
  */
- 
+
  contract TokenReciever {
     function tokenFallback(address _from, uint _value, bytes _data) public pure {
     }
@@ -380,4 +380,33 @@ contract HeroCoin is ERC223, MintableToken {
         }
         return (length>0);
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

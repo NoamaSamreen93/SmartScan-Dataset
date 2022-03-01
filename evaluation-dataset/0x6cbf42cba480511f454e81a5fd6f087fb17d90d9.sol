@@ -345,7 +345,6 @@ function sub(uint256 a, uint256 b) public pure returns (uint256) {
     return a - b;
   }
 
-}///////////////////////////////////end of blockpoints contract
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

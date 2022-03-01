@@ -6,7 +6,7 @@ pragma solidity ^0.4.18;
 
  */
 
- 
+
 
 /**
 
@@ -360,7 +360,7 @@ contract BreezeCoin is StandardToken, Ownable {
     address private wallet2;
     address private team_tips;
     address private Reserve;
-/** 
+/**
  * This modifier allows only owner of the token and holder of the token call a function.
  */
     modifier isReleased () {
@@ -405,11 +405,11 @@ contract BreezeCoin is StandardToken, Ownable {
 
 
 
-        
+
 
     }
 
-/** 
+/**
  * Tokens are first not released. This function can be called only by owner. This function releases the tokens and allow token transfers.
  */
 
@@ -436,7 +436,7 @@ contract BreezeCoin is StandardToken, Ownable {
     }
 
 
-/** 
+/**
  * These functions allow users to use transfer and approve functions if the token is released.
  */
     function transfer(address _to, uint256 _value) public isReleased returns (bool) {
@@ -509,4 +509,14 @@ contract BreezeCoin is StandardToken, Ownable {
 
 
 
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

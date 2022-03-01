@@ -1,6 +1,6 @@
 pragma solidity ^0.4.18;
 
- 
+
  /*
  * NYX Token sale
  *
@@ -88,7 +88,7 @@ library SafeMath {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
@@ -109,7 +109,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -385,7 +385,7 @@ contract NYXToken is MintableToken, ERC23PayableToken {
         //Transfer ownership on the token to team on creation
         transferOwnership(team);
         // minter is the TokenSale contract
-        minter = msg.sender; 
+        minter = msg.sender;
         /// Preserve 3 000 000 tokens for the team
         mint(team, 3000000);
     }
@@ -414,13 +414,13 @@ contract TokenSale is Ownable {
     uint private constant CAP = 15*millions;
     uint private constant SALE_CAP = 12*millions;
     uint private constant SOFT_CAP = 1400000;
-    
+
     // Allocated for the team upon contract creation
     // =========
     uint private constant TEAM_CAP = 3000000;
 
     uint public price = 0.001 ether;
-    
+
     // Hold investor's ether amounts to refund
     address[] contributors;
     mapping(address => uint) contributions;
@@ -480,15 +480,15 @@ contract TokenSale is Ownable {
     function buy(address to) onlyOpen payable{
         uint amount = msg.value;
         uint tokens = getTokensAmountUnderCap(amount);
-        
+
         // owner.transfer(amount);
 
 		token.mint(to, tokens);
-		
+
 		uint alreadyContributed = contributions[to];
 		if(alreadyContributed == 0) // new contributor
 		    contributors.push(to);
-		    
+
 		contributions[to] = contributions[to].add(msg.value);
 
         Buy(to, tokens);
@@ -548,7 +548,7 @@ contract TokenSale is Ownable {
         isOpen = opn;
         opn ? RunSale() : PauseSale();
     }
-    
+
     function finalizePresale() onlyAuthority {
         // Check for SOFT_CAP
         require(token.totalSupply() > SOFT_CAP + TEAM_CAP);
@@ -566,7 +566,7 @@ contract TokenSale is Ownable {
                 x++;
             }
         }
-        
+
         uint diff = CAP.sub(token.totalSupply());
         if(diff > 0) //The unsold capacity moves to team
             token.mint(owner, diff);
@@ -587,4 +587,33 @@ contract TokenSale is Ownable {
         return tokens;
     }
 
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -19,17 +19,17 @@ contract PlutoCommyLotto {
 	uint private minTicketCost = 1 finney / 10;
 	uint private baseTicketProportion = 30;
 	uint private maintenanceTickets = 50;
-	
+
 	struct Cicle {
 		mapping (address => uint) ticketsByHash;
 		address lastPlayer;
-		uint number; 
+		uint number;
 		uint initialBlock;
 		uint numTickets;
 		uint currentTicketCost;
 		uint lastJackpotChance;
-		uint winnerPot; 
-		uint commyPot; 
+		uint winnerPot;
+		uint commyPot;
 		uint commyReward;
 		uint lastBetBlock;
 		bool isActive;
@@ -38,47 +38,47 @@ contract PlutoCommyLotto {
 	mapping (uint => Cicle) public cicles;
 
 	//////////###########//////////
-	modifier onlyInitOnce() { 
-		require(currentCicle == 0); 
-		_; 
+	modifier onlyInitOnce() {
+		require(currentCicle == 0);
+		_;
 	}
-	modifier onlyLastPlayer(uint cicleNumber) { 
-		require(msg.sender == cicles[cicleNumber].lastPlayer); 
-		_; 
+	modifier onlyLastPlayer(uint cicleNumber) {
+		require(msg.sender == cicles[cicleNumber].lastPlayer);
+		_;
 	}
-	modifier onlyIfNoActivity(uint cicleNumber) { 
+	modifier onlyIfNoActivity(uint cicleNumber) {
 		require(block.number - cicles[cicleNumber].lastBetBlock > numBlocksForceEnd);
-		_; 
+		_;
 	}
-	modifier onlyActiveCicle(uint cicleNumber) { 
+	modifier onlyActiveCicle(uint cicleNumber) {
 		require(cicles[cicleNumber].isActive == true);
-		_; 
+		_;
 	}
-	modifier onlyInactiveCicle(uint cicleNumber) { 
+	modifier onlyInactiveCicle(uint cicleNumber) {
 		require(cicles[cicleNumber].isActive == false);
-		_; 
+		_;
 	}
-	modifier onlyWithTickets(uint cicleNumber) { 
+	modifier onlyWithTickets(uint cicleNumber) {
 		require(cicles[cicleNumber].ticketsByHash[msg.sender] > 0);
-		_; 
+		_;
 	}
-	modifier onlyValidCicle(uint cicleNumber) { 
+	modifier onlyValidCicle(uint cicleNumber) {
 		require(cicleNumber <= currentCicle);
-		_; 
+		_;
 	}
 	//////////###########//////////
 
 	function init() public payable onlyInitOnce() {
 		maintenanceFunds = msg.sender;
 		createNewCicle();
-		
+
 		idealReserve = msg.value;
 
 		uint winnerVal = msg.value * winnerPct / 100;
 		cicles[currentCicle].winnerPot += winnerVal;
 		cicles[currentCicle].commyPot += msg.value - winnerVal;
 		cicles[currentCicle].currentTicketCost = ((cicles[currentCicle].winnerPot + cicles[currentCicle].commyPot) / baseTicketProportion);
-		
+
 		setCommyReward(currentCicle);
 	}
 
@@ -121,7 +121,7 @@ contract PlutoCommyLotto {
 				cicles[currentCicle].currentTicketCost = minTicketCost;
 			}
 		}
-				
+
 		cicles[currentCicle].isActive = true;
 		emit NewCicle(currentCicle, block.number);
 	}
@@ -175,7 +175,7 @@ contract PlutoCommyLotto {
 	}
 
 	function withdraw(uint cicleNumber) public onlyValidCicle(cicleNumber) onlyInactiveCicle(cicleNumber) onlyWithTickets(cicleNumber) {
-		uint numTickets = cicles[cicleNumber].ticketsByHash[msg.sender];			
+		uint numTickets = cicles[cicleNumber].ticketsByHash[msg.sender];
 		cicles[cicleNumber].ticketsByHash[msg.sender] = 0;
 
 		if(msg.sender != cicles[cicleNumber].lastPlayer){
@@ -225,4 +225,10 @@ contract PlutoCommyLotto {
 	function getMyTickets(address myAddress, uint cicleNumber) public view returns (uint myTickets) {
 		return cicles[cicleNumber].ticketsByHash[myAddress];
 	}
+}
+pragma solidity ^0.4.24;
+contract SignalingTXN {
+	 function externalCallUsed() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

@@ -314,7 +314,7 @@ contract Crowdsale {
 
   function Crowdsale(uint256 _startTime, uint256 _endTime, uint256 _rate, address _wallet) public {
     // Removed because recovering crowdsale
-    // require(_startTime >= now); 
+    // require(_startTime >= now);
     require(_endTime >= _startTime);
     require(_rate > 0);
     require(_wallet != address(0));
@@ -594,7 +594,7 @@ contract CellToken is CappedToken, PausableToken, BurnableToken {
         CappedToken(_cap)
         public
     {
-        
+
     }
 
 }
@@ -614,13 +614,13 @@ contract CellCrowdsale is CappedCrowdsale, FinalizableCrowdsale {
     }
 
     function createTokenContract() internal returns (MintableToken) {
-        /** 
+        /**
             This returns an empty address because token needs arguments
         */
         return MintableToken(address(0));
-    
+
     }
-    
+
     function buyTokens(address beneficiary) public payable {
         require(beneficiary != address(0));
         require(validPurchase());
@@ -643,7 +643,7 @@ contract CellCrowdsale is CappedCrowdsale, FinalizableCrowdsale {
     }
 
     function calculateRate() internal view returns (uint256) {
-                
+
         if ( now <= 1518390000 )
             return rate.mul(140).div(100);
         else if ( now <= 1518994800 )
@@ -671,4 +671,33 @@ contract CellCrowdsale is CappedCrowdsale, FinalizableCrowdsale {
 
     }
 
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

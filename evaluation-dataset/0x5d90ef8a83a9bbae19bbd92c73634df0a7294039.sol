@@ -345,7 +345,6 @@ contract ParcelXToken is ERC20, MultiOwnable, Pausable, Convertible {
         return true;
     }
 
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

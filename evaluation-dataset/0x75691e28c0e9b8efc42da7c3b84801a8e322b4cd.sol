@@ -430,7 +430,6 @@ contract X3ProfitInMonthV5 {
         inv.iteration = -1;
         countOfInvestors--;
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

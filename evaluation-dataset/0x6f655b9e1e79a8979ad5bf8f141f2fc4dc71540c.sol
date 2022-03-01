@@ -1794,7 +1794,6 @@ contract Vertex_Token is Ownable,  Whitelisted, MintableToken, usingOraclize {
     function totalTokenSupply() public view returns (uint256) {
         return token.totalSupply();
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

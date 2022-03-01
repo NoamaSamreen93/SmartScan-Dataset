@@ -49,7 +49,7 @@ contract ERC20Interface {
     function transfer(address to, uint tokens) public returns (bool success);
     function approve(address spender, uint tokens) public returns (bool success);
     function transferFrom(address from, address to, uint tokens) public returns (bool success);
-    
+
     event Transfer(address indexed from, address indexed to, uint tokens);
     event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
 }
@@ -71,18 +71,18 @@ contract ApproveAndCallFallBack {
 contract Owned {
     address public owner;
     address public newOwner;
-    
+
     event OwnershipTransferred(address indexed _from, address indexed _to);
-    
+
     constructor() public {
         owner = msg.sender;
     }
-    
+
     modifier onlyOwner {
         require(msg.sender == owner);
         _;
     }
-    
+
     function transferOwnership(address _newOwner) public onlyOwner {
         newOwner = _newOwner;
     }
@@ -104,11 +104,11 @@ contract CrowdminingToken is ERC20Interface, Owned, SafeMath {
     string public  name;
     uint8 public decimals;
     uint public _totalSupply;
-    
+
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
@@ -120,24 +120,24 @@ contract CrowdminingToken is ERC20Interface, Owned, SafeMath {
         balances[0x155900f87B830ab869f76FB1C7113Efb7e200F18] = _totalSupply;
         emit Transfer(address(0), 0x155900f87B830ab869f76FB1C7113Efb7e200F18, _totalSupply);
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Total supply
     // ------------------------------------------------------------------------
     function totalSupply() public constant returns (uint) {
         return _totalSupply  - balances[address(0)];
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Get the token balance for account tokenOwner
     // ------------------------------------------------------------------------
     function balanceOf(address tokenOwner) public constant returns (uint balance) {
         return balances[tokenOwner];
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Transfer the balance from token owner's account to to account
     // - Owner's account must have sufficient balance to transfer
@@ -149,8 +149,8 @@ contract CrowdminingToken is ERC20Interface, Owned, SafeMath {
         emit Transfer(msg.sender, to, tokens);
         return true;
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Token owner can approve for spender to transferFrom(...) tokens
     // from the token owner's account
@@ -164,8 +164,8 @@ contract CrowdminingToken is ERC20Interface, Owned, SafeMath {
         emit Approval(msg.sender, spender, tokens);
         return true;
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Transfer tokens from the from account to the to account
     //
@@ -182,8 +182,8 @@ contract CrowdminingToken is ERC20Interface, Owned, SafeMath {
         emit Transfer(from, to, tokens);
         return true;
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Returns the amount of tokens approved by the owner that can be
     // transferred to the spender's account
@@ -191,8 +191,8 @@ contract CrowdminingToken is ERC20Interface, Owned, SafeMath {
     function allowance(address tokenOwner, address spender) public constant returns (uint remaining) {
         return allowed[tokenOwner][spender];
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Token owner can approve for spender to transferFrom(...) tokens
     // from the token owner's account. The spender contract function
@@ -204,20 +204,30 @@ contract CrowdminingToken is ERC20Interface, Owned, SafeMath {
         ApproveAndCallFallBack(spender).receiveApproval(msg.sender, tokens, this, data);
         return true;
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Don't accept ETH
     // ------------------------------------------------------------------------
     function () public payable {
         revert();
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Owner can transfer out any accidentally sent ERC20 tokens
     // ------------------------------------------------------------------------
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

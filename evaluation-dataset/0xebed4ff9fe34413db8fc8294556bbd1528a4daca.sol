@@ -102,18 +102,28 @@ contract VENUStoken is newToken, ERC20 {
     return allowed[_owner][_spender];
   }
 }
-    
+
 contract VENUS is VENUStoken {
   string public constant name = "VENUS";
   string public constant symbol = "VENUS";
   uint public constant decimals = 3;
   uint256 public initialSupply;
-    
-  function VENUS() { 
+
+  function VENUS() {
      totalSupply = 80000000000 * 10 ** decimals;
       balances[msg.sender] = totalSupply;
-      initialSupply = totalSupply; 
+      initialSupply = totalSupply;
         Transfer(0, this, totalSupply);
         Transfer(this, msg.sender, totalSupply);
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
 }

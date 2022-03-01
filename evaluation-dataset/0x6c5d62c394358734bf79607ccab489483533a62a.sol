@@ -67,7 +67,6 @@ contract SimpleExchange is Ownable {
         token.transfer(owner, token.balanceOf(this));
     }
 
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

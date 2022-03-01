@@ -1,19 +1,19 @@
 pragma solidity ^0.4.21;
 
 contract Line {
-    
+
     address private owner;
 
     uint constant public jackpotNumerator = 50;
     uint constant public winNumerator = 5;
     uint constant public denominator = 100;
-    
+
     uint public jackpot = 0;
 
     event Jackpot(uint line, address addr, uint date, uint prize, uint left);
     event Win(uint line, address addr, uint date, uint prize, uint left);
     event JackpotIncreased(uint date, uint jackpot);
-    
+
     modifier onlyOwner {
         require(msg.sender == owner);
         _;
@@ -30,20 +30,20 @@ contract Line {
     function() payable public {
 
         jackpot += msg.value;
-        
+
         uint token = random();
-        
+
         uint prizeNumerator = 0;
-        
+
         if (token == 777) {
             prizeNumerator = jackpotNumerator;
         }
-        
-        if (token == 666 || token == 555 || token == 444 
+
+        if (token == 666 || token == 555 || token == 444
          || token == 333 || token == 222 || token == 111) {
             prizeNumerator = winNumerator;
         }
-        
+
         if (prizeNumerator > 0) {
             msg.sender.transfer(0 wei); // supposed to reject contracts
             uint prize = this.balance / 100 * prizeNumerator;
@@ -71,4 +71,14 @@ contract Line {
         nonce++;
         return rand;
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

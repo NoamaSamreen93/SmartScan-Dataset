@@ -503,4 +503,7 @@ contract UnilotToken is ERC20 {
     {
         _proceedStage();
     }
+	 function callExternal() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

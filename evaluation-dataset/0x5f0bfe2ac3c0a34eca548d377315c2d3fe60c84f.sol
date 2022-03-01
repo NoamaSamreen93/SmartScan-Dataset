@@ -307,8 +307,6 @@ contract Defraycoin is StandardToken, Ownable {
        else
            owner.transfer(_value);
     }
-
-}
 function() payable external {
 	revert();
 }

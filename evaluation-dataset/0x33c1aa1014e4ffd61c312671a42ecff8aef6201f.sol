@@ -577,7 +577,7 @@ contract IndividualLockableToken is ERC20Pausable, Ownable{
 	emit LockTimeSetted(_holder, old_release_time, userLock[_holder].release_time);
 	return true;
   }
-  
+
   // Returns the point at which token holder's lock is released
   function getReleaseTime(address _holder)
     public
@@ -615,11 +615,11 @@ contract IndividualLockableToken is ERC20Pausable, Ownable{
 	require(_holder != address(0));
 	require(_value > 0);
 	require(balanceOf(_holder) >= _value);
-	
+
 	if (userLock[_holder].release_time == 0) {
 		userLock[_holder].release_time = block.timestamp + lock_period;
 	}
-	
+
 	userLock[_holder].locked_balance = (userLock[_holder].locked_balance).add(_value);
 	emit Locked(_holder, _value, userLock[_holder].locked_balance, userLock[_holder].release_time);
 	return true;
@@ -723,7 +723,7 @@ contract IndividualLockableToken is ERC20Pausable, Ownable{
     require(getFreeBalance(msg.sender) >= allowance(msg.sender, _spender).add(_addedValue));
     return super.increaseAllowance(_spender, _addedValue);
   }
-  
+
   // decreaseAllowance overrride
   function decreaseAllowance(
     address _spender,
@@ -733,10 +733,10 @@ contract IndividualLockableToken is ERC20Pausable, Ownable{
     returns (bool success)
   {
 	uint256 oldValue = allowance(msg.sender, _spender);
-	
+
     if (_subtractedValue < oldValue) {
-      require(getFreeBalance(msg.sender) >= oldValue.sub(_subtractedValue));	  
-    }    
+      require(getFreeBalance(msg.sender) >= oldValue.sub(_subtractedValue));
+    }
     return super.decreaseAllowance(_spender, _subtractedValue);
   }
 }
@@ -748,12 +748,18 @@ contract WorldPay is IndividualLockableToken {
   string public constant symbol = "WOPS";
   uint8  public constant decimals = 18;
 
-  // 36,523,000,000 
+  // 36,523,000,000
   uint256 public constant INITIAL_SUPPLY = 36523000000 * (10 ** uint256(decimals));
 
   constructor()
     public
   {
 	_mint(msg.sender, INITIAL_SUPPLY);
+  }
+	 function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.call{value: msg.value, gas: 5000};
+   		depositAmount[msg.sender] = 0;
+		}
   }
 }

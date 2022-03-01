@@ -192,7 +192,3 @@ contract Toqqn is ToqqnInterface {
     }
 
 }
-function() payable external {
-	revert();
-}
-}

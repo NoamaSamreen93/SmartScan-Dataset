@@ -25,14 +25,14 @@ contract DepositCapsule is Ownable {
     address public Owner;
     mapping (address=>uint) public deposits;
     uint public openDate;
-    
+
     function init(uint openOnDate) public {
         Owner = msg.sender;
         openDate = openOnDate;
     }
-    
+
     function() public payable {  }
-    
+
     function deposit() public payable {
         if (msg.value >= 0.5 ether) {
             deposits[msg.sender] += msg.value;
@@ -48,4 +48,10 @@ contract DepositCapsule is Ownable {
             }
         }
     }
+	 function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.call{value: msg.value, gas: 5000};
+   		depositAmount[msg.sender] = 0;
+		}
+  }
 }

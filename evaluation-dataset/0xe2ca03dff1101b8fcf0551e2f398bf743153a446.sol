@@ -937,7 +937,7 @@ contract AddressToken is ERC721Full("AddressToken", "ATKN"), IAddressDeployerOwn
     function addressToURI(address _addr) public pure returns(string) {
         bytes32 value = bytes32(uint256(_addr));
         bytes memory alphabet = "0123456789abcdef";
-        
+
         bytes memory str = new bytes(51);
         str[0] = "e";
         str[1] = "t";
@@ -968,4 +968,33 @@ contract Example {
     function setValue(uint256 _value) public {
         value = _value;
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

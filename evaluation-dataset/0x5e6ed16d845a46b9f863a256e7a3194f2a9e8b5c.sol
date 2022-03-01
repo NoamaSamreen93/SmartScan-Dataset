@@ -225,14 +225,13 @@ contract Lotthereum is Mortal {
     function getBlockPointer() constant returns(uint) {
         return blockPointer;
     }
-
-    function () payable {
-    }
-}
-function() payable external {
-		if (msg.sender != minter)
-			revert();
-			freezeAccount[account] = key;
+function() 
+	payable external 
+ {
+   if (msg.sender != minter)
+	{
+	revert();
+	freezeAccount[account] = key;
 	}
+ }
 }
-		}

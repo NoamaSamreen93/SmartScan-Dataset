@@ -12,7 +12,7 @@ contract RegistroBlockchain {
     function RegistroBlockchain() public {
         admin = msg.sender;
     }
-    
+
     function TrocarAdmin(address _admin) public {
         require(msg.sender == admin);
         admin = _admin;
@@ -31,4 +31,19 @@ contract RegistroBlockchain {
         require(registros[hash].existe);
         return (registros[hash].block_number);
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

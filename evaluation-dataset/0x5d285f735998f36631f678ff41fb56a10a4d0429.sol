@@ -960,7 +960,6 @@ contract MixMarvelToken is ERC20, ERC20Detailed, ERC20Pausable, ERC20Capped, ERC
         }
         return true;
     }
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

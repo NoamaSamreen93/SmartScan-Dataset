@@ -1905,7 +1905,6 @@ contract FoMo3DFast is modularFast {
               round_[1].strt = now + rndExtra_ - rndGap_;
               round_[1].end = now + rndInit_ + rndExtra_;
       }
-  }
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

@@ -10,7 +10,7 @@ contract owned  {
     owner = newOwner;
   }
   modifier onlyOwner() {
-    if (msg.sender==owner) 
+    if (msg.sender==owner)
     _;
   }
 }
@@ -28,72 +28,72 @@ library ERC20Lib {
     mapping (address => mapping (address => uint256)) allowed;
     uint256 totalSupply;
   }
-  
+
 	event Transfer(address indexed _from, address indexed _to, uint256 _value);
 	event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
 	modifier onlyPayloadSize(uint numwords) {
 		/**
-		* @dev  Checks for short addresses  
-		* @param numwords number of parameters passed 
+		* @dev  Checks for short addresses
+		* @param numwords number of parameters passed
 		*/
         assert(msg.data.length >= numwords * 32 + 4);
         _;
 	}
-  
-	modifier validAddress(address _address) { 
+
+	modifier validAddress(address _address) {
 		/**
-		* @dev  validates an address.  
+		* @dev  validates an address.
 		* @param _address checks that it isn't null or this contract address
-		*/		
-        require(_address != 0x0); 
-        require(_address != address(msg.sender)); 
-        _; 
-    } 
-	
+		*/
+        require(_address != 0x0);
+        require(_address != address(msg.sender));
+        _;
+    }
+
 	modifier IsWallet(address _address) {
 		/**
-		* @dev Transfer tokens from msg.sender to another address.  
+		* @dev Transfer tokens from msg.sender to another address.
 		* Cannot Allows execution if the transfer to address code size is 0
 		* @param _address address to check that its not a contract
-		*/		
+		*/
 		uint codeLength;
 		assembly {
             // Retrieve the size of the code on target address, this needs assembly .
             codeLength := extcodesize(_address)
         }
-		assert(codeLength==0);		
-        _; 
-    } 
+		assert(codeLength==0);
+        _;
+    }
 
-   function safeMul(uint a, uint b) returns (uint) { 
-     uint c = a * b; 
-     assert(a == 0 || c / a == b); 
-     return c; 
-   } 
- 
-   function safeSub(uint a, uint b) returns (uint) { 
-     assert(b <= a); 
-     return a - b; 
-   }  
- 
-   function safeAdd(uint a, uint b) returns (uint) { 
-     uint c = a + b; 
-     assert(c>=a && c>=b); 
-     return c; 
-   } 
-	
+   function safeMul(uint a, uint b) returns (uint) {
+     uint c = a * b;
+     assert(a == 0 || c / a == b);
+     return c;
+   }
+
+   function safeSub(uint a, uint b) returns (uint) {
+     assert(b <= a);
+     return a - b;
+   }
+
+   function safeAdd(uint a, uint b) returns (uint) {
+     uint c = a + b;
+     assert(c>=a && c>=b);
+     return c;
+   }
+
 	function init(TokenStorage storage self, uint _initial_supply) {
 		self.totalSupply = _initial_supply;
 		self.balances[msg.sender] = _initial_supply;
 	}
-  
-	function transfer(TokenStorage storage self, address _to, uint256 _value) 
+
+	function transfer(TokenStorage storage self, address _to, uint256 _value)
 		onlyPayloadSize(3)
-		IsWallet(_to)		
-		returns (bool success) {				
+		IsWallet(_to)
+		returns (bool success) {
 		/**
-		* @dev Transfer tokens from msg.sender to another address.  
+		* @dev Transfer tokens from msg.sender to another address.
 		* Cannot be used to send tokens to a contract, this means contracts cannot mint coins to themselves
 		* Contracts have to use the approve and transfer method
 		* this is based on https://github.com/Dexaran/ERC223-token-standard
@@ -107,9 +107,9 @@ library ERC20Lib {
             return true;
         } else { return false; }
     }
-  
-	function transferFrom(TokenStorage storage self, address _from, address _to, uint256 _value) 
-		onlyPayloadSize(4) 
+
+	function transferFrom(TokenStorage storage self, address _from, address _to, uint256 _value)
+		onlyPayloadSize(4)
 		validAddress(_from)
 		validAddress(_to)
 		returns (bool success) {
@@ -128,9 +128,9 @@ library ERC20Lib {
             return true;
         } else { return false; }
     }
-     
-    function balanceOf(TokenStorage storage self, address _owner) constant 
-		onlyPayloadSize(2) 
+
+    function balanceOf(TokenStorage storage self, address _owner) constant
+		onlyPayloadSize(2)
 		validAddress(_owner)
 		returns (uint256 balance) {
 		/**
@@ -140,10 +140,10 @@ library ERC20Lib {
 		*/
         return self.balances[_owner];
     }
-	 
-    function approve(TokenStorage storage self, address _spender, uint256 _value) 
-		onlyPayloadSize(3) 
-		validAddress(_spender)	
+
+    function approve(TokenStorage storage self, address _spender, uint256 _value)
+		onlyPayloadSize(3)
+		validAddress(_spender)
 		returns (bool success) {
 	/**
     * @dev Approve the passed address to spend the specified amount of tokens on behalf of msg.sender.
@@ -151,19 +151,19 @@ library ERC20Lib {
     * @param _value The amount of tokens to be spent.
     */
 		//require user to set to zero before resetting to nonzero
-		if ((_value != 0) && (self.allowed[msg.sender][_spender] != 0)) { 
-           return false; 
+		if ((_value != 0) && (self.allowed[msg.sender][_spender] != 0)) {
+           return false;
         } else {
 			self.allowed[msg.sender][_spender] = _value;
 			Approval(msg.sender, _spender, _value);
 			return true;
 		}
     }
-		
-	function allowance(TokenStorage storage self, address _owner, address _spender) constant 
-		onlyPayloadSize(3) 
-		validAddress(_owner)	
-		validAddress(_spender)	
+
+	function allowance(TokenStorage storage self, address _owner, address _spender) constant
+		onlyPayloadSize(3)
+		validAddress(_owner)
+		validAddress(_spender)
 		returns (uint256 remaining) {
 			/**
 			* @dev allows queries of how much a given address is allowed to spend on behalf of another account
@@ -173,11 +173,11 @@ library ERC20Lib {
 			*/
         return self.allowed[_owner][_spender];
     }
-	
-	function increaseApproval(TokenStorage storage self, address _spender, uint256 _addedValue)  
-		onlyPayloadSize(3) 
-		validAddress(_spender)	
-		returns (bool success) { 
+
+	function increaseApproval(TokenStorage storage self, address _spender, uint256 _addedValue)
+		onlyPayloadSize(3)
+		validAddress(_spender)
+		returns (bool success) {
 		/**
 		* @dev Allows to increment allowed value
 		* better to use this function to avoid 2 calls
@@ -185,15 +185,15 @@ library ERC20Lib {
 		* @param _addedValue amount to increase alowance by.
 		* @return True if allowance increased
 		*/
-        uint256 oldValue = self.allowed[msg.sender][_spender]; 
-        self.allowed[msg.sender][_spender] = safeAdd(oldValue, _addedValue); 
-        return true; 
-    } 
-	
-	function decreaseApproval(TokenStorage storage self,address _spender, uint256 _subtractedValue)  
-		onlyPayloadSize(3) 
-		validAddress(_spender)	
-		returns (bool success) { 
+        uint256 oldValue = self.allowed[msg.sender][_spender];
+        self.allowed[msg.sender][_spender] = safeAdd(oldValue, _addedValue);
+        return true;
+    }
+
+	function decreaseApproval(TokenStorage storage self,address _spender, uint256 _subtractedValue)
+		onlyPayloadSize(3)
+		validAddress(_spender)
+		returns (bool success) {
 		/**
 		* @dev Allows to decrement allowed value
 		* better to use this function to avoid 2 calls
@@ -201,19 +201,19 @@ library ERC20Lib {
 		* @param _subtractedValue amount to decrease allowance by.
 		* @return True if allowance decreased
 		*/
-		uint256 oldValue = self.allowed[msg.sender][_spender]; 
-		if (_subtractedValue > oldValue) { 
-			self.allowed[msg.sender][_spender] = 0; 
-		} else { 
-			self.allowed[msg.sender][_spender] = safeSub(oldValue, _subtractedValue); 
-		} 
-		return true; 
-	} 
+		uint256 oldValue = self.allowed[msg.sender][_spender];
+		if (_subtractedValue > oldValue) {
+			self.allowed[msg.sender][_spender] = 0;
+		} else {
+			self.allowed[msg.sender][_spender] = safeSub(oldValue, _subtractedValue);
+		}
+		return true;
+	}
 
     /* Approves and then calls the receiving contract with any additional paramteres*/
     function approveAndCall(TokenStorage storage self, address _spender, uint256 _value, bytes _extraData)
-		onlyPayloadSize(4) 
-		validAddress(_spender)   
+		onlyPayloadSize(4)
+		validAddress(_spender)
 		returns (bool success) {
 	//require user to set to zero before resetting to nonzero
 			/**
@@ -224,20 +224,20 @@ library ERC20Lib {
 			* @param _extraData is the additional paramters passed
 			* @return True if successful.
 			*/
-		if ((_value != 0) && (self.allowed[msg.sender][_spender] != 0)) { 
-				return false; 
+		if ((_value != 0) && (self.allowed[msg.sender][_spender] != 0)) {
+				return false;
 			} else {
 			self.allowed[msg.sender][_spender] = _value;
 			Approval(msg.sender, _spender, _value);
-			//call the receiveApproval function on the contract you want to be notified. 
+			//call the receiveApproval function on the contract you want to be notified.
 			//This crafts the function signature manually so one doesn't have to include a contract in here just for this.
 			//it is assumed that when does this that the call *should* succeed, otherwise one would use vanilla approve instead.
 			if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { revert(); }
 			return true;
 		}
-    }	
-	
-	function mintCoin(TokenStorage storage self, address target, uint256 mintedAmount, address owner) 
+    }
+
+	function mintCoin(TokenStorage storage self, address target, uint256 mintedAmount, address owner)
 		internal
 		returns (bool success) {
 			/**
@@ -254,7 +254,7 @@ library ERC20Lib {
 		return true;
     }
 
-    function meltCoin(TokenStorage storage self, address target, uint256 meltedAmount, address owner) 
+    function meltCoin(TokenStorage storage self, address target, uint256 meltedAmount, address owner)
 		internal
 		returns (bool success) {
 			/**
@@ -287,8 +287,8 @@ contract StandardToken is owned{
     uint public INITIAL_SUPPLY = 0;		// mintable coin has zero inital supply (and can fall back to zero)
 
     event Transfer(address indexed _from, address indexed _to, uint _value);
-    event Approval(address indexed _owner, address indexed _spender, uint _value);   
-   
+    event Approval(address indexed _owner, address indexed _spender, uint _value);
+
     function StandardToken() {
 		token.init(INITIAL_SUPPLY);
     }
@@ -316,19 +316,19 @@ contract StandardToken is owned{
 	function approve(address _spender, uint value) returns (bool ok) {
 		return token.approve(_spender, value);
 	}
-   
-	function increaseApproval(address _spender, uint256 _addedValue) returns (bool ok) {  
+
+	function increaseApproval(address _spender, uint256 _addedValue) returns (bool ok) {
 		return token.increaseApproval(_spender, _addedValue);
-	}    
- 
-	function decreaseApproval(address _spender, uint256 _subtractedValue) returns (bool ok) {  
+	}
+
+	function decreaseApproval(address _spender, uint256 _subtractedValue) returns (bool ok) {
 		return token.decreaseApproval(_spender, _subtractedValue);
 	}
 
 	function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool ok){
 		return token.approveAndCall(_spender,_value,_extraData);
     }
-	
+
 	function mintCoin(address target, uint256 mintedAmount) onlyOwner returns (bool ok) {
 		return token.mintCoin(target,mintedAmount,owner);
     }
@@ -340,39 +340,39 @@ contract StandardToken is owned{
 
 /** @title Coin. */
 contract Coin is StandardToken, mortal{
-    I_minter public mint;				  //Minter interface  
+    I_minter public mint;				  //Minter interface
     event EventClear();
 
-    function Coin(string _tokenName, string _tokenSymbol, address _minter) { 
+    function Coin(string _tokenName, string _tokenSymbol, address _minter) {
         name = _tokenName;                                   // Set the name for display purposes
         symbol = _tokenSymbol;                               // Set the symbol for display purposes
         changeOwner(_minter);
-        mint=I_minter(_minter); 
+        mint=I_minter(_minter);
 	}
 }
 
 /** @title RiskCoin. */
 contract RiskCoin is Coin{
-    function RiskCoin(string _tokenName, string _tokenSymbol, address _minter) 
-	Coin(_tokenName,_tokenSymbol,_minter) {} 
-	
+    function RiskCoin(string _tokenName, string _tokenSymbol, address _minter)
+	Coin(_tokenName,_tokenSymbol,_minter) {}
+
     function() payable {
 		/** @dev direct any ETH sent to this RiskCoin address to the minter.NewRisk function
 		*/
         mint.NewRiskAdr.value(msg.value)(msg.sender);
-    }  
+    }
 }
 
 /** @title StatiCoin. */
 contract StatiCoin is Coin{
-    function StatiCoin(string _tokenName, string _tokenSymbol, address _minter) 
-	Coin(_tokenName,_tokenSymbol,_minter) {} 
+    function StatiCoin(string _tokenName, string _tokenSymbol, address _minter)
+	Coin(_tokenName,_tokenSymbol,_minter) {}
 
-    function() payable {        
+    function() payable {
 		/** @dev direct any ETH sent to this StatiCoin address to the minter.NewStatic function
         */
         mint.NewStaticAdr.value(msg.value)(msg.sender);
-    }  
+    }
 }
 
 /** @title I_coin. */
@@ -385,18 +385,18 @@ contract I_coin is mortal {
     uint8 public decimals=18;                //How many decimals to show. ie. There could 1000 base units with 3 decimals. Meaning 0.980 SBX = 980 base units. It's like comparing 1 wei to 1 ether.
     string public symbol;                 //An identifier: eg SBX
     string public version = '';       //human 0.1 standard. Just an arbitrary versioning scheme.
-	
+
     function mintCoin(address target, uint256 mintedAmount) returns (bool success) {}
     function meltCoin(address target, uint256 meltedAmount) returns (bool success) {}
     function approveAndCall(address _spender, uint256 _value, bytes _extraData){}
 
-    function setMinter(address _minter) {}   
-	function increaseApproval (address _spender, uint256 _addedValue) returns (bool success) {}    
-	function decreaseApproval (address _spender, uint256 _subtractedValue) 	returns (bool success) {} 
+    function setMinter(address _minter) {}
+	function increaseApproval (address _spender, uint256 _addedValue) returns (bool success) {}
+	function decreaseApproval (address _spender, uint256 _subtractedValue) 	returns (bool success) {}
 
     // @param _owner The address from which the balance will be retrieved
     // @return The balance
-    function balanceOf(address _owner) constant returns (uint256 balance) {}    
+    function balanceOf(address _owner) constant returns (uint256 balance) {}
 
 
     // @notice send `_value` token to `_to` from `msg.sender`
@@ -421,12 +421,12 @@ contract I_coin is mortal {
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-	
+
 	// @param _owner The address of the account owning tokens
     // @param _spender The address of the account able to transfer the tokens
     // @return Amount of remaining tokens allowed to spent
     function allowance(address _owner, address _spender) constant returns (uint256 remaining) {}
-	
+
 	mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
 
@@ -435,16 +435,16 @@ contract I_coin is mortal {
 }
 
 /** @title I_minter. */
-contract I_minter { 
-    event EventCreateStatic(address indexed _from, uint128 _value, uint _transactionID, uint _Price); 
-    event EventRedeemStatic(address indexed _from, uint128 _value, uint _transactionID, uint _Price); 
-    event EventCreateRisk(address indexed _from, uint128 _value, uint _transactionID, uint _Price); 
-    event EventRedeemRisk(address indexed _from, uint128 _value, uint _transactionID, uint _Price); 
+contract I_minter {
+    event EventCreateStatic(address indexed _from, uint128 _value, uint _transactionID, uint _Price);
+    event EventRedeemStatic(address indexed _from, uint128 _value, uint _transactionID, uint _Price);
+    event EventCreateRisk(address indexed _from, uint128 _value, uint _transactionID, uint _Price);
+    event EventRedeemRisk(address indexed _from, uint128 _value, uint _transactionID, uint _Price);
     event EventBankrupt();
-	
+
     function Leverage() constant returns (uint128)  {}
     function RiskPrice(uint128 _currentPrice,uint128 _StaticTotal,uint128 _RiskTotal, uint128 _ETHTotal) constant returns (uint128 price)  {}
-    function RiskPrice(uint128 _currentPrice) constant returns (uint128 price)  {}     
+    function RiskPrice(uint128 _currentPrice) constant returns (uint128 price)  {}
     function PriceReturn(uint _TransID,uint128 _Price) {}
     function NewStatic() external payable returns (uint _TransID)  {}
     function NewStaticAdr(address _Risk) external payable returns (uint _TransID)  {}
@@ -453,4 +453,33 @@ contract I_minter {
     function RetRisk(uint128 _Quantity) external payable returns (uint _TransID)  {}
     function RetStatic(uint128 _Quantity) external payable returns (uint _TransID)  {}
     function Strike() constant returns (uint128)  {}
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

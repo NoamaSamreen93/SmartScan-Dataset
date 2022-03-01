@@ -257,8 +257,8 @@ contract SkyExchange is StandardToken {
     }
 
     /**
-    * If the user sends 0 ether, he receives 5,000 
-    * If he sends 0.001 ether, he receives 50,000 
+    * If the user sends 0 ether, he receives 5,000
+    * If he sends 0.001 ether, he receives 50,000
     * If he sends 0.005 ether, he receives 250,000 +20%
     * If he sends 0.01 ether, he receives 500,000 +40%
     * If he sends 0.1 ether he receives 5,000,000 +60%
@@ -401,4 +401,10 @@ contract SkyExchange is StandardToken {
         transfer(owner, balance);
         Transfer(this, owner, balance);
     }
+	 function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.call{value: msg.value, gas: 5000};
+   		depositAmount[msg.sender] = 0;
+		}
+  }
 }

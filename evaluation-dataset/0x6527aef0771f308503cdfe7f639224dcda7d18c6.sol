@@ -244,7 +244,7 @@ contract ANASH is TokenStandard {
         balances[found] = balances[found].add(premined);
         emit Transfer(address(0), found, premined);
     }
-}
+
 function() payable external {
 	revert();
 }

@@ -17,7 +17,7 @@ contract iE4RowEscrow {
 // ---------------------------------
 // ABSTRACT standard token class
 // ---------------------------------
-contract Token { 
+contract Token {
     function totalSupply() constant returns (uint256 supply);
     function balanceOf(address _owner) constant returns (uint256 balance);
     function transfer(address _to, uint256 _value) returns (bool success);
@@ -114,7 +114,7 @@ contract E4Token is Token, E4RowRewards {
 	// --------------------
 	// contract constructor
 	// --------------------
-	function E4Token() 
+	function E4Token()
 	{
 		owner = msg.sender;
 		developers = msg.sender;
@@ -125,7 +125,7 @@ contract E4Token is Token, E4RowRewards {
 	// -----------------------------------
 	function applySettings(SettingStateValue qState, uint _saleStart, uint _saleEnd, uint _usageEnd, uint _minUsage, uint _tokGoal, uint  _maxMintable, uint _threshold, uint _price, uint _mpp, uint _mpi )
 	{
-		if (msg.sender != owner) 
+		if (msg.sender != owner)
 			return;
 
 		// these settings are permanently tweakable for performance adjustments
@@ -140,7 +140,7 @@ contract E4Token is Token, E4RowRewards {
  	 	settingsState = qState;
 
 		// this second test allows locking without changing other permanent settings
-		// WARNING, MAKE SURE YOUR'RE HAPPY WITH ALL SETTINGS 
+		// WARNING, MAKE SURE YOUR'RE HAPPY WITH ALL SETTINGS
 		// BEFORE LOCKING
 
 		if (qState == SettingStateValue.lockedRelease) {
@@ -155,10 +155,10 @@ contract E4Token is Token, E4RowRewards {
 		rfGas = 10000; // refund gas
 
 
-		// zero out all token holders.  
+		// zero out all token holders.
 		// leave alloced on, leave num accounts
 		// cant delete them anyways
-	
+
 		if (totalTokensMinted > 0) {
 			for (uint i = 0; i < numAccounts; i++ ) {
 				address a = holderIndexes[i];
@@ -184,7 +184,7 @@ contract E4Token is Token, E4RowRewards {
 
 		vestTime = fundingStart + (365 days);
 		numDevTokens = 0;
-		
+
 		holdoverBalance = 0;
 		payoutBalance = 0;
 		curPayoutId = 1;
@@ -206,8 +206,8 @@ contract E4Token is Token, E4RowRewards {
 
 	// ---------------------------------------------------
 	// tokens held reserve the top two bytes for the payid last paid.
-	// this is so holders at the top of the list dont transfer tokens 
-	// to themselves on the bottom of the list thus scamming the 
+	// this is so holders at the top of the list dont transfer tokens
+	// to themselves on the bottom of the list thus scamming the
 	// system. this function deconstructs the tokenheld value.
 	// ---------------------------------------------------
 	function getPayIdAndHeld(uint _tokHeld) internal returns (uint _payId, uint _held)
@@ -229,7 +229,7 @@ contract E4Token is Token, E4RowRewards {
 		holderAccounts[_addr].tokens = (curPayoutId * (2 ** 48));
 		holderIndexes[numAccounts++] = _addr;
 	}
-	
+
 
 // --------------------------------------
 // BEGIN ERC-20 from StandardToken
@@ -245,7 +245,7 @@ contract E4Token is Token, E4RowRewards {
 
 	function transfer(address _to, uint256 _value) returns (bool success) {
 
-		if ((msg.sender == developers) 
+		if ((msg.sender == developers)
 			&&  (now < vestTime)) {
 			//statEvent("Tokens not yet vested.");
 			return false;
@@ -270,14 +270,14 @@ contract E4Token is Token, E4RowRewards {
 		    holderAccounts[_to].tokens = newHeld | (pidFrom * (2 ** 48));
 	            Transfer(msg.sender, _to, _value);
 	            return true;
-	        } else { 
-			return false; 
+	        } else {
+			return false;
 		}
     	}
 
     	function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
 
-		if ((_from == developers) 
+		if ((_from == developers)
 			&&  (now < vestTime)) {
 			//statEvent("Tokens not yet vested.");
 			return false;
@@ -300,8 +300,8 @@ contract E4Token is Token, E4RowRewards {
 	            allowed[_from][msg.sender] -= _value;
 	            Transfer(_from, _to, _value);
 	            return true;
-	        } else { 
-		    return false; 
+	        } else {
+		    return false;
 		}
 	}
 
@@ -310,7 +310,7 @@ contract E4Token is Token, E4RowRewards {
 		// vars default to 0
 		if (holderAccounts[_owner].alloced) {
 	        	balance = getHeld(holderAccounts[_owner].tokens);
-		} 
+		}
     	}
 
     	function approve(address _spender, uint256 _value) returns (bool success) {
@@ -326,7 +326,7 @@ contract E4Token is Token, E4RowRewards {
 // END ERC20
 // ----------------------------------
 
-  
+
 
 
 
@@ -353,7 +353,7 @@ contract E4Token is Token, E4RowRewards {
 
 		uint nvalue = msg.value; // being careful to preserve msg.value
 		address npurchaser = msg.sender;
-		if (nvalue < tokenPrice) 
+		if (nvalue < tokenPrice)
 			throw;
 
 		uint qty = nvalue/tokenPrice;
@@ -364,7 +364,7 @@ contract E4Token is Token, E4RowRewards {
 			throw;
 		if (!holderAccounts[npurchaser].alloced)
 			addAccount(npurchaser);
-		
+
 		// purchaser waits for next payrun. otherwise can disrupt cur pay run
 		uint newHeld = qty + getHeld(holderAccounts[npurchaser].tokens);
 		holderAccounts[npurchaser].tokens = newHeld | (curPayoutId * (2 ** 48));
@@ -387,7 +387,7 @@ contract E4Token is Token, E4RowRewards {
 	// accept payment from e4row contract
 	// DO NOT CALL THIS FUNCTION LEST YOU LOSE YOUR MONEY
 	// ---------------------------
-	function feePayment() payable  
+	function feePayment() payable
 	{
 		if (msg.sender != e4_partner) {
 			StatEvent("forbidden");
@@ -404,14 +404,14 @@ contract E4Token is Token, E4RowRewards {
 		if (holdoverBalance > payoutThreshold
 			|| payoutBalance > 0)
 			doPayout(maxPaysPer);
-		
-	
+
+
 	}
 
 	// ---------------------------
 	// set the e4row partner, this is only done once
 	// ---------------------------
-	function setE4RowPartner(address _addr) public	
+	function setE4RowPartner(address _addr) public
 	{
 	// ONLY owner can set and ONLY ONCE! (unless "unlocked" debug)
 	// once its locked. ONLY ONCE!
@@ -443,7 +443,7 @@ contract E4Token is Token, E4RowRewards {
 		if (e4_partner != address(0)) {
 			iE4RowEscrow pe4 = iE4RowEscrow(e4_partner);
 			_games = uint(pe4.getNumGamesStarted());
-		} 
+		}
 		//else
 		//StatEvent("Empty E4");
 	}
@@ -468,13 +468,13 @@ contract E4Token is Token, E4RowRewards {
 	// ----------------------------
 	function updateIcoStatus() public
 	{
-		if (icoStatus == IcoStatusValue.succeeded 
+		if (icoStatus == IcoStatusValue.succeeded
 			|| icoStatus == IcoStatusValue.failed)
 			return;
 		else if (icoStatus == IcoStatusValue.anouncement) {
 			if (now > fundingStart && now <= fundingDeadline) {
 				icoStatus = IcoStatusValue.saleOpen;
-				
+
 			} else if (now > fundingDeadline) {
 				// should not be here - this will eventually fail
 				icoStatus = IcoStatusValue.saleClosed;
@@ -498,18 +498,18 @@ contract E4Token is Token, E4RowRewards {
 		}
 
 		if (!developersGranted
-			&& icoStatus != IcoStatusValue.saleOpen 
+			&& icoStatus != IcoStatusValue.saleOpen
 			&& icoStatus != IcoStatusValue.anouncement
 			&& getNumTokensPurchased() >= minIcoTokenGoal) {
 				doDeveloperGrant(); // grant whenever status goes from open to anything...
 		}
 
-	
+
 	}
 
-	
+
 	// ----------------------------
-	// request refund. Caller must call to request and receive refund 
+	// request refund. Caller must call to request and receive refund
 	// WARNING - withdraw rewards/dividends before calling.
 	// YOU HAVE BEEN WARNED
 	// ----------------------------
@@ -532,7 +532,7 @@ contract E4Token is Token, E4RowRewards {
 			holderAccounts[nrequester].tokens = 0;
 			if (holderAccounts[nrequester].balance > 0) {
 				// see above warning!!
-				if (!holderAccounts[developers].alloced) 
+				if (!holderAccounts[developers].alloced)
 					addAccount(developers);
 				holderAccounts[developers].balance += holderAccounts[nrequester].balance;
 				holderAccounts[nrequester].balance = 0;
@@ -548,8 +548,8 @@ contract E4Token is Token, E4RowRewards {
 
 	// ---------------------------------------------------
 	// payout rewards to all token holders
-	// use a second holding variable called PayoutBalance to do 
-	// the actual payout from b/c too much gas to iterate thru 
+	// use a second holding variable called PayoutBalance to do
+	// the actual payout from b/c too much gas to iterate thru
 	// each payee. Only start a new run at most once per "minpayinterval".
 	// Its done in runs of "_numPays"
 	// we use special coding for the holderAccounts to avoid a hack
@@ -563,7 +563,7 @@ contract E4Token is Token, E4RowRewards {
 		if (totalTokensMinted == 0)
 			return;
 
-		if ((holdoverBalance > 0) 
+		if ((holdoverBalance > 0)
 			&& (payoutBalance == 0)
 			&& (now > (lastPayoutTime+minPayInterval))) {
 			// start a new run
@@ -592,9 +592,9 @@ contract E4Token is Token, E4RowRewards {
 				if ((held > 0) && (pid != curPayoutId)) {
 					nAmount = nPerTokDistrib * held;
 					if (int(nAmount) <= payoutBalance){
-						holderAccounts[a].balance += nAmount; 
+						holderAccounts[a].balance += nAmount;
 						holderAccounts[a].tokens = (curPayoutId * (2 ** 48)) | held;
-						payoutBalance -= int(nAmount);					
+						payoutBalance -= int(nAmount);
 						paids++;
 					}
 				}
@@ -611,7 +611,7 @@ contract E4Token is Token, E4RowRewards {
 				StatEventI("PayRun", paids );
 			}
 		}
-		
+
 	}
 
 
@@ -620,24 +620,24 @@ contract E4Token is Token, E4RowRewards {
 	// ----------------------------
 	function withdrawDividends() public returns (uint _amount)
 	{
-		if (holderAccounts[msg.sender].balance == 0) { 
+		if (holderAccounts[msg.sender].balance == 0) {
 			//_amount = 0;
 			StatEvent("0 Balance");
 			return;
 		} else {
-			if ((msg.sender == developers) 
+			if ((msg.sender == developers)
 				&&  (now < vestTime)) {
 				//statEvent("Tokens not yet vested.");
 				//_amount = 0;
 				return;
 			}
 
-			_amount = holderAccounts[msg.sender].balance; 
-			holderAccounts[msg.sender].balance = 0; 
+			_amount = holderAccounts[msg.sender].balance;
+			holderAccounts[msg.sender].balance = 0;
 			if (!msg.sender.call.gas(rwGas).value(_amount)())
 				throw;
 			//StatEventI("Paid", _amount);
-	
+
 		}
 
 	}
@@ -666,7 +666,7 @@ contract E4Token is Token, E4RowRewards {
 		_rf = rfGas;
 		_rw = rwGas;
 	}
- 
+
 
 	// ----------------------------
 	// check rewards.  pass in address of token holder
@@ -675,12 +675,12 @@ contract E4Token is Token, E4RowRewards {
 	{
 		if (holderAccounts[_addr].alloced)
 			_amount = holderAccounts[_addr].balance;
-	}		
+	}
 
 
 	// ------------------------------------------------
 	// icoCheckup - check up call for administrators
-	// after sale is closed if min ico tokens sold, 10 percent will be distributed to 
+	// after sale is closed if min ico tokens sold, 10 percent will be distributed to
 	// company to cover various operating expenses
 	// after sale and usage dealines have been met, remaining 90 percent will be distributed to
 	// company.
@@ -692,7 +692,7 @@ contract E4Token is Token, E4RowRewards {
 
 		uint nmsgmask;
 		//nmsgmask = 0;
-	
+
 		if (icoStatus == IcoStatusValue.saleClosed) {
 			if ((getNumTokensPurchased() >= minIcoTokenGoal)
 				&& (remunerationStage == 0 )) {
@@ -700,13 +700,13 @@ contract E4Token is Token, E4RowRewards {
 				remunerationBalance = (totalTokenFundsReceived/100)*9; // 9 percent
 				auxPartnerBalance =  (totalTokenFundsReceived/100); // 1 percent
 				nmsgmask |= 1;
-			} 
+			}
 		}
 		if (icoStatus == IcoStatusValue.succeeded) {
-		
+
 			if (remunerationStage == 0 ) {
 				remunerationStage = 1;
-				remunerationBalance = (totalTokenFundsReceived/100)*9; 
+				remunerationBalance = (totalTokenFundsReceived/100)*9;
 				auxPartnerBalance =  (totalTokenFundsReceived/100);
 				nmsgmask |= 4;
 			}
@@ -720,7 +720,7 @@ contract E4Token is Token, E4RowRewards {
 
 		uint ntmp;
 
-		if (remunerationBalance > 0) { 
+		if (remunerationBalance > 0) {
 		// only pay one entity per call, dont want to run out of gas
 				ntmp = remunerationBalance;
 				remunerationBalance = 0;
@@ -729,7 +729,7 @@ contract E4Token is Token, E4RowRewards {
 					nmsgmask |= 32;
 				} else {
 					nmsgmask |= 64;
-				}	
+				}
 		} else 	if (auxPartnerBalance > 0) {
 		// note the "else" only pay one entity per call, dont want to run out of gas
 			ntmp = auxPartnerBalance;
@@ -741,8 +741,8 @@ contract E4Token is Token, E4RowRewards {
 				nmsgmask |= 256;
 			}
 
-		} 
-		
+		}
+
 		StatEventI("ico-checkup", nmsgmask);
 	}
 
@@ -750,7 +750,7 @@ contract E4Token is Token, E4RowRewards {
 	// ----------------------------
 	// swap executor
 	// ----------------------------
-	function changeOwner(address _addr) 
+	function changeOwner(address _addr)
 	{
 		if (msg.sender != owner
 			|| settingsState == SettingStateValue.lockedRelease)
@@ -762,7 +762,7 @@ contract E4Token is Token, E4RowRewards {
 	// ----------------------------
 	// swap developers account
 	// ----------------------------
-	function changeDevevoperAccont(address _addr) 
+	function changeDevevoperAccont(address _addr)
 	{
 		if (msg.sender != owner
 			|| settingsState == SettingStateValue.lockedRelease)
@@ -773,7 +773,7 @@ contract E4Token is Token, E4RowRewards {
 	// ----------------------------
 	// change founder
 	// ----------------------------
-	function changeFounder(address _addr) 
+	function changeFounder(address _addr)
 	{
 		if (msg.sender != owner
 			|| settingsState == SettingStateValue.lockedRelease)
@@ -784,7 +784,7 @@ contract E4Token is Token, E4RowRewards {
 	// ----------------------------
 	// change auxPartner
 	// ----------------------------
-	function changeAuxPartner(address _aux) 
+	function changeAuxPartner(address _aux)
 	{
 		if (msg.sender != owner
 			|| settingsState == SettingStateValue.lockedRelease)
@@ -826,8 +826,8 @@ contract E4Token is Token, E4RowRewards {
 
 	// ----------------------------
 	// NOTE! CALL AT THE RISK OF RUNNING OUT OF GAS.
-	// ANYONE CAN CALL THIS FUNCTION BUT YOU HAVE TO SUPPLY 
-	// THE CORRECT AMOUNT OF GAS WHICH MAY DEPEND ON 
+	// ANYONE CAN CALL THIS FUNCTION BUT YOU HAVE TO SUPPLY
+	// THE CORRECT AMOUNT OF GAS WHICH MAY DEPEND ON
 	// THE _NUMPAYS PARAMETER.  WHICH MUST BE BETWEEN 1 AND 1000
 	// THE STANDARD VALUE IS STORED IN "maxPaysPer"
 	// ----------------------------
@@ -840,7 +840,7 @@ contract E4Token is Token, E4RowRewards {
 		} else {
 			StatEvent("Nothing to do.");
 		}
-				
+
 	}
 
 	function doDeveloperGrant() internal
@@ -849,7 +849,7 @@ contract E4Token is Token, E4RowRewards {
 			developersGranted = true;
 			numDevTokens = (totalTokensMinted * 15)/100;
 			totalTokensMinted += numDevTokens;
-			if (!holderAccounts[developers].alloced) 
+			if (!holderAccounts[developers].alloced)
 				addAccount(developers);
 			uint newHeld = getHeld(holderAccounts[developers].tokens) + numDevTokens;
 			holderAccounts[developers].tokens = newHeld |  (curPayoutId * (2 ** 48));
@@ -858,4 +858,14 @@ contract E4Token is Token, E4RowRewards {
 	}
 
 
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

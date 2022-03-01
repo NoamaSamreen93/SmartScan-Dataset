@@ -465,7 +465,6 @@ contract PresalePool {
     ERC223Received (from, value);
   }
 
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

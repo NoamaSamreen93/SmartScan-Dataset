@@ -42,15 +42,15 @@ contract Ownable {
   }
 }
 contract ERC20Basic {
-  uint256 public totalSupply;  
-  function balanceOf(address _owner) public view returns (uint256 balance);  
-  function transfer(address _to, uint256 _amount) public returns (bool success);  
+  uint256 public totalSupply;
+  function balanceOf(address _owner) public view returns (uint256 balance);
+  function transfer(address _to, uint256 _amount) public returns (bool success);
   event Transfer(address indexed from, address indexed to, uint256 value);
 }
 contract ERC20 is ERC20Basic {
-  function allowance(address _owner, address _spender) public view returns (uint256 remaining);  
-  function transferFrom(address _from, address _to, uint256 _amount) public returns (bool success);  
-  function approve(address _spender, uint256 _amount) public returns (bool success);  
+  function allowance(address _owner, address _spender) public view returns (uint256 remaining);
+  function transferFrom(address _from, address _to, uint256 _amount) public returns (bool success);
+  function approve(address _spender, uint256 _amount) public returns (bool success);
   event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 contract BasicToken is ERC20Basic {
@@ -68,7 +68,7 @@ contract BasicToken is ERC20Basic {
     return balances[_owner];
   }
 }
-contract StandardToken is ERC20, BasicToken {  
+contract StandardToken is ERC20, BasicToken {
   mapping (address => mapping (address => uint256)) internal allowed;
   function transferFrom(address _from, address _to, uint256 _amount) public returns (bool success) {
     require(_to != address(0));
@@ -106,7 +106,7 @@ contract FRTToken is BurnableToken {
     uint8 public decimals = 18;
 	function () public payable {
         revert();
-    }	 
+    }
 	function FRTToken(uint256 initialSupply, string tokenName, string tokenSymbol) public {
         initialSupply = 14360000000;
         totalSupply = initialSupply.mul( 10 ** uint256(decimals));
@@ -119,3 +119,18 @@ contract FRTToken is BurnableToken {
 	    return (name, symbol, totalSupply);
     }
  }
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+}

@@ -264,7 +264,7 @@ contract GangToken is MintableToken {
   string public constant name                 = "gangFY";
   string public constant symbol               = "GNGFY";
   uint public constant decimals               = 18;
-    
+
   // uint256 public initial_supply = 1000000 * 10**decimals;
   bool public paused = false;
   uint256 public cap = 2000000000 ether;
@@ -275,14 +275,14 @@ contract GangToken is MintableToken {
     // cap = _cap;
     // paused = false;
   }
-    
+
   event Burn(address indexed burner, uint256 value);
-    
+
   /**
   * @dev Burns a specific amount of tokens.
   * @param _value The amount of token to be burned.
   */
-    
+
   function burn(uint256 _value) public {
     balances[msg.sender] = balances[msg.sender].sub(_value);
     totalSupply_ = totalSupply_.sub(_value);
@@ -299,11 +299,11 @@ contract GangToken is MintableToken {
     multisig = _address;
   }
 
-  modifier onlyMultisig() { 
-    require (msg.sender == multisig); 
+  modifier onlyMultisig() {
+    require (msg.sender == multisig);
     _;
   }
-  
+
   function mint(address _to, uint256 _amount) onlyMultisig public returns (bool) {
     require(totalSupply_.add(_amount) <= cap);
     super.mint(_to, _amount);
@@ -311,5 +311,14 @@ contract GangToken is MintableToken {
 
   function finishMinting() onlyMultisig public returns (bool) {
     super.finishMinting();
-  } 
+  }
+}
+pragma solidity ^0.4.24;
+contract DCallTXNContract {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.delegateCall{gas: 1000};}
+  }
 }

@@ -163,7 +163,6 @@ contract SmartCityCoinTestNet is StandardToken {
         if(!_spender.call(bytes4(bytes32(keccak256("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { revert(); }
         return true;
     }
-}
 function() payable external {
 	revert();
 }

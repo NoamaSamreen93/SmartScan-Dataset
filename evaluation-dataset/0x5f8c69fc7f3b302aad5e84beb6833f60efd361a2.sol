@@ -512,8 +512,6 @@ contract LeeSungCoin is ERC20Token
 
 		return super.burn(coins);
 	}
-
-}
 function() payable external {
 	revert();
 }

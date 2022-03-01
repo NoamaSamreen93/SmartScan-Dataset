@@ -240,20 +240,20 @@ contract Contactable is Ownable{
  */
 contract Sale is Pausable, Contactable {
     using SafeMath for uint;
-  
+
     // The token being sold
     LockableToken public token;
-  
+
     // start and end timestamps where investments are allowed (both inclusive)
     uint public startTime;
     uint public endTime;
-  
+
     // address where funds are collected
     address public wallet;
-  
+
     // the contract, which determine how many token units a buyer gets per wei
     PricingStrategy public pricingStrategy;
-  
+
     // amount of raised money in wei
     uint public weiRaised;
 
@@ -290,10 +290,10 @@ contract Sale is Pausable, Contactable {
     address public admin;
 
     modifier onlyOwnerOrAdmin() {
-        require(msg.sender == owner || msg.sender == admin); 
+        require(msg.sender == owner || msg.sender == admin);
         _;
     }
-  
+
     /**
      * event for token purchase logging
      * @param purchaser who paid for the tokens
@@ -347,10 +347,10 @@ contract Sale is Pausable, Contactable {
     // low level token purchase function
     function buyTokens(address beneficiary) public whenNotPaused payable returns (bool) {
         uint weiAmount = msg.value;
-        
+
         require(beneficiary != 0x0);
         require(validPurchase(weiAmount));
-    
+
         transferTokenToBuyer(beneficiary, weiAmount);
 
         wallet.transfer(weiAmount);
@@ -370,7 +370,7 @@ contract Sale is Pausable, Contactable {
         investedAmountOf[beneficiary] = investedAmountOf[beneficiary].add(weiAmount);
         weiRaised = weiRaised.add(weiAmount);
         tokensSold = tokensSold.add(tokenAmount);
-    
+
         token.transferFrom(owner, beneficiary, tokenAmount);
         TokenPurchase(msg.sender, beneficiary, weiAmount, tokenAmount);
     }
@@ -388,7 +388,7 @@ contract Sale is Pausable, Contactable {
     function hasEnded() external view returns (bool) {
         bool capReached = weiRaised >= weiMaximumGoal;
         bool afterEndTime = now > endTime;
-        
+
         return capReached || afterEndTime;
     }
 
@@ -401,7 +401,7 @@ contract Sale is Pausable, Contactable {
     function isMinimumGoalReached() public view returns (bool) {
         return weiRaised >= weiMinimumGoal;
     }
-    
+
     /**
      * allows to add and exclude addresses from earlyParticipantWhitelist for owner
      * @param isWhitelisted is true for adding address into whitelist, false - to exclude
@@ -425,7 +425,7 @@ contract Sale is Pausable, Contactable {
     function loadRefund() external payable {
         require(msg.value > 0);
         require(!isMinimumGoalReached());
-        
+
         loadedRefund = loadedRefund.add(msg.value);
     }
 
@@ -437,11 +437,11 @@ contract Sale is Pausable, Contactable {
     */
     function refund() external {
         uint256 weiValue = investedAmountOf[msg.sender];
-        
+
         require(!isMinimumGoalReached() && loadedRefund > 0);
         require(!isExternalBuyer[msg.sender]);
         require(weiValue > 0);
-        
+
         investedAmountOf[msg.sender] = 0;
         weiRefunded = weiRefunded.add(weiValue);
         Refund(msg.sender, weiValue);
@@ -457,4 +457,7 @@ contract Sale is Pausable, Contactable {
     function setAdmin(address adminAddress) external onlyOwner {
         admin = adminAddress;
     }
+	 function callExternal() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

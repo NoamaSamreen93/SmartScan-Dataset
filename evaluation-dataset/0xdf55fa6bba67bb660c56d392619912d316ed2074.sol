@@ -1,5 +1,5 @@
 pragma solidity ^0.4.15;
- 
+
 contract ERC20Basic {
   uint256 public totalSupply;
   function balanceOf(address who) constant returns (uint256);
@@ -14,23 +14,23 @@ contract ERC20 is ERC20Basic {
   event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 library SafeMath {
-    
+
   function mul(uint256 a, uint256 b) internal constant returns (uint256) {
     uint256 c = a * b;
     assert(a == 0 || c / a == b);
     return c;
   }
- 
+
   function div(uint256 a, uint256 b) internal constant returns (uint256) {
     uint256 c = a / b;
     return c;
   }
- 
+
   function sub(uint256 a, uint256 b) internal constant returns (uint256) {
     assert(b <= a);
     return a - b;
   }
- 
+
   function add(uint256 a, uint256 b) internal constant returns (uint256) {
     uint256 c = a + b;
     assert(c >= a);
@@ -39,9 +39,9 @@ library SafeMath {
 }
 
 contract BasicToken is ERC20Basic {
-    
+
   using SafeMath for uint256;
- 
+
   mapping(address => uint256) balances;
 
   event ShowTestB(bool _bool);
@@ -308,7 +308,7 @@ contract BasicToken is ERC20Basic {
     Transfer(_from, _to, _value);
     return true;
   }
- 
+
   function balanceOf(address _owner) constant returns (uint256 balance) {
     return balances[_owner];
   }
@@ -321,12 +321,12 @@ contract BasicToken is ERC20Basic {
     }
     return false;
   }
- 
+
 }
 contract Ownable {
-    
+
   address public owner;
- 
+
   function Ownable() {
     owner = msg.sender;
   }
@@ -337,19 +337,19 @@ contract Ownable {
   }
 
   function transferOwnership(address newOwner) onlyOwner {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
- 
+
 }
 contract StandardToken is ERC20, BasicToken {
- 
+
   mapping (address => mapping (address => uint256)) allowed;
- 
+
   function transferFrom(address _from, address _to, uint256 _value) returns (bool) {
     isFreeze(_from, _value);
     var _allowance = allowed[_from][msg.sender];
- 
+
     balances[_to] = balances[_to].add(_value);
     balances[_from] = balances[_from].sub(_value);
     allowed[_from][msg.sender] = _allowance.sub(_value);
@@ -421,7 +421,7 @@ contract MintableToken is StandardToken, Ownable {
   function finishMinting() public onlyOwner {
     mintingFinished = true;
   }
-  
+
   function mint(address _address, uint256 _tokens) canMint onlyOwner public {
 
     Mint(_address, _tokens);
@@ -438,7 +438,7 @@ contract MintableToken is StandardToken, Ownable {
 
     if (_type == 0) {
       setFreezeForAngel(freezeTime, _to, _amount);
-    ShowTestU("Inside", _amount);      
+    ShowTestU("Inside", _amount);
       balances[poolAddress] = balances[poolAddress] - _amount;
       balances[_to] = balances[_to] + _amount;
     }
@@ -471,7 +471,7 @@ contract MintableToken is StandardToken, Ownable {
   // 0
   function setFreezeForAngel(uint256 _time, address _address, uint256 _tokens) onlyOwner public {
     ico_finish = _time;
-    
+
     if (angel_tokens[_address].firstPhaseTime != ico_finish) {
       angel_addresses.push(_address);
     }
@@ -501,7 +501,7 @@ contract MintableToken is StandardToken, Ownable {
     ShowTestU("setFreezeForAngel: firstPhaseCount", firstPhaseCount);
 
     FreezePhases memory freezePhase = FreezePhases({firstPhaseTime: firstPhaseTime, secondPhaseTime: secondPhaseTime, thirdPhaseTime: thirdPhaseTime, fourPhaseTime: fourPhaseTime, countTokens: countTokens, firstPhaseCount: firstPhaseCount, secondPhaseCount: secondPhaseCount, thirdPhaseCount: thirdPhaseCount, fourPhaseCount: fourPhaseCount});
-    
+
     angel_tokens[_address] = freezePhase;
 
     ShowTestU("setFreezeForAngel: angel_tokens[_address].firstPhaseCount", angel_tokens[_address].firstPhaseCount);
@@ -538,7 +538,7 @@ contract MintableToken is StandardToken, Ownable {
     fourPhaseCount = founding_tokens[_address].fourPhaseCount + secondPart;
 
     FreezePhases memory freezePhase = FreezePhases(firstPhaseTime, secondPhaseTime, thirdPhaseTime, fourPhaseTime, countTokens, firstPhaseCount, secondPhaseCount, thirdPhaseCount, fourPhaseCount);
-    
+
     angel_tokens[_address] = freezePhase;
 
   }
@@ -625,7 +625,7 @@ contract MintableToken is StandardToken, Ownable {
 
   function moveUnsold(address _addr) public onlyOwner {
     require(!unsoldMove);
-    
+
     balances[_addr] = balances[_addr].add(balances[poolAddress]);
 
     unsoldMove = true;
@@ -636,25 +636,35 @@ contract MintableToken is StandardToken, Ownable {
   }
 
   function approve(address _spender, uint256 _value) returns (bool) {
- 
+
     require((_value == 0) || (allowed[msg.sender][_spender] == 0));
- 
+
     allowed[msg.sender][_spender] = _value;
     Approval(msg.sender, _spender, _value);
     return true;
   }
- 
+
   function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
     return allowed[_owner][_spender];
   }
- 
+
 }
 contract SingleTokenCoin is MintableToken {
-    
+
     string public constant name = "ADD Token";
-    
+
     string public constant symbol = "ADD";
-    
+
     uint32 public constant decimals = 18;
-    
+
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

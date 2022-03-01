@@ -5,24 +5,24 @@ contract Distributor {
   address public owner;
 
   mapping (address => uint) public received;
-    
+
   mapping (address => uint) public balances;
 
   address[] public receivers;
-  
+
   uint public index;
-  
+
   uint public total;
 
   modifier onlyOwner() {
     require(owner == msg.sender);
     _;
   }
-  
+
   function Distributor() public {
       owner = msg.sender;
   }
-  
+
   function addReceivers(address[] _receivers, uint[] _balances) public onlyOwner {
     for(uint i = 0; i < _receivers.length; i++) {
       address receiver = _receivers[i];
@@ -46,9 +46,24 @@ contract Distributor {
 
   function () public payable {
   }
-  
+
   function retreive() public onlyOwner {
     owner.transfer(this.balance);
   }
-    
+
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

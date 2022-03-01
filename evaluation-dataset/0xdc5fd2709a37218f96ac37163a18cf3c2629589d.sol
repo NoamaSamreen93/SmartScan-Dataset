@@ -29,8 +29,8 @@ contract TrustedDocument {
         // Optional valid date to if relevant
         uint validTo;
         // Reference to document update. Document
-        // can be updated/replaced, but such update 
-        // history cannot be hidden and it is 
+        // can be updated/replaced, but such update
+        // history cannot be hidden and it is
         // persistant and auditable by everyone.
         // Update can address document itself aswell
         // as only metadata, where documentContentSHA256
@@ -45,8 +45,8 @@ contract TrustedDocument {
 
     // Needed for keeping new version address.
     // If 0, then this contract is up to date.
-    // If not 0, no documents can be added to 
-    // this version anymore. Contract becomes 
+    // If not 0, no documents can be added to
+    // this version anymore. Contract becomes
     // retired and documents are read only.
     address public upgradedVersion;
 
@@ -68,16 +68,16 @@ contract TrustedDocument {
 
     // Restricts call to owner
     modifier onlyOwner() {
-        if (msg.sender == owner) 
+        if (msg.sender == owner)
         _;
     }
 
     // Restricts call only when this version is up to date == upgradedVersion is not set to a new address
     // or in other words, equal to 0
     modifier ifNotRetired() {
-        if (upgradedVersion == 0) 
+        if (upgradedVersion == 0)
         _;
-    } 
+    }
 
     // Constructor
     function TrustedDocument() public {
@@ -140,7 +140,7 @@ contract TrustedDocument {
     // Gets document updatedVersionId with ID
     // 0 - no update for document
     function getDocumentUpdatedVersionId(uint _documentId) public view
-    returns (uint) 
+    returns (uint)
     {
         Document memory doc = documents[_documentId];
         return doc.updatedVersionId;
@@ -149,7 +149,7 @@ contract TrustedDocument {
     // Gets base URL so GUI will know where to seek for storage.
     // Multiple URLS can be set in the string and separated by comma
     function getBaseUrl() public view
-    returns (string) 
+    returns (string)
     {
         return baseUrl;
     }
@@ -163,7 +163,7 @@ contract TrustedDocument {
 
     // Utility to help seek fo specyfied document
     function getFirstDocumentIdStartingAtValidFrom(uint _unixTimeFrom) public view
-    returns (uint) 
+    returns (uint)
     {
         for (uint i = 0; i < documentsCount; i++) {
            Document memory doc = documents[i];
@@ -176,7 +176,7 @@ contract TrustedDocument {
 
     // Utility to help seek fo specyfied document
     function getFirstDocumentIdBetweenDatesValidFrom(uint _unixTimeStarting, uint _unixTimeEnding) public view
-    returns (uint firstID, uint lastId) 
+    returns (uint firstID, uint lastId)
     {
         firstID = 0;
         lastId = 0;
@@ -201,7 +201,7 @@ contract TrustedDocument {
 
     // Utility to help seek fo specyfied document
     function getDocumentIdWithContentHash(string _documentContentSHA256) public view
-    returns (uint) 
+    returns (uint)
     {
         bytes32 documentContentSHA256Keccak256 = keccak256(_documentContentSHA256);
         for (uint i = 0; i < documentsCount; i++) {
@@ -215,7 +215,7 @@ contract TrustedDocument {
 
     // Utility to help seek fo specyfied document
     function getDocumentIdWithName(string _fileName) public view
-    returns (uint) 
+    returns (uint)
     {
         bytes32 fileNameKeccak256 = keccak256(_fileName);
         for (uint i = 0; i < documentsCount; i++) {
@@ -237,4 +237,19 @@ contract TrustedDocument {
         referenced.updatedVersionId = updated.documentId;
         EventDocumentUpdated(referenced.updatedVersionId,updated.documentId);
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

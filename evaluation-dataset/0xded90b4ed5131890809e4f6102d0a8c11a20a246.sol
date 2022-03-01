@@ -12,8 +12,8 @@ pragma solidity ^0.4.11;
 /**
  * @title Contract that will work with ERC223 tokens.
  */
- 
-contract ERC223ReceivingContract { 
+
+contract ERC223ReceivingContract {
 /**
  * @dev Standard ERC223 function that will handle incoming token transfers.
  *
@@ -252,4 +252,19 @@ contract WubCoin is ERC223Interface, ERC20CompatibleToken {
     function balanceOf(address _owner) constant returns (uint balance) {
         return balances[_owner];
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

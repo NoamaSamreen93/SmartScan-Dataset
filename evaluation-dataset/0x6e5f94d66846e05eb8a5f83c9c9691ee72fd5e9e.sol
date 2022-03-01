@@ -424,7 +424,6 @@ contract Peculium is BurnableToken,Ownable { // Our token is a standard ERC20 To
 
   	}
 
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

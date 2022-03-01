@@ -4,19 +4,19 @@
  * Licensed under the Apache License, version 2.0: https://github.com/TokenMarketNet/ico/blob/master/LICENSE.txt
  *
  ** Code Modified by : TokenMagic
- ** Change Log: 
+ ** Change Log:
  *** Solidity version upgraded from 0.4.8 to 0.4.23
  */
- 
- 
+
+
 pragma solidity ^0.4.23;
 
 /*
 * Ownable Contract
 * Added by : TokenMagic
-*/ 
+*/
 contract Ownable {
-  
+
   address public owner;
   event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
@@ -132,12 +132,12 @@ library SafeMathLib {
     assert(c >= a);
     return c;
   }
-  
+
 }
 
 
 /*
-* Token Contract 
+* Token Contract
 * Added by : TokenMagic
 */
 contract FractionalERC20 {
@@ -169,10 +169,10 @@ contract HoardCrowdsale is Haltable {
 
   /* tokens will be transfered from this address */
   address public multisigWallet;
-  
+
   /* Founders team MultiSig Wallet address */
   address public foundersTeamMultisig;
-  
+
   /* if the funding goal is not reached, investors may withdraw their funds */
   uint public minimumFundingGoal = 3265000000000000000000; // 3265 ETH in Wei
 
@@ -191,21 +191,21 @@ contract HoardCrowdsale is Haltable {
   /* the number of tokens already sold before presale*/
   uint public prePresaleTokensSold = 0;
 
-  /* Maximum number tokens that presale can assign*/ 
+  /* Maximum number tokens that presale can assign*/
   uint public presaleTokenLimit = 80000000000000000000000000; //80,000,000 token
 
-  /* Maximum number tokens that crowdsale can assign*/ 
+  /* Maximum number tokens that crowdsale can assign*/
   uint public crowdsaleTokenLimit = 120000000000000000000000000; //120,000,000 token
-  
+
   /** Total percent of tokens allocated to the founders team multiSig wallet at the end of the sale */
   uint public percentageOfSoldTokensForFounders = 50; // 50% of solded token as bonus to founders team multiSig wallet
-  
+
   /* How much bonus tokens we allocated */
   uint public tokensForFoundingBoardWallet;
-  
+
   /* The party who holds the full token pool and has approve()'ed tokens for this crowdsale */
   address public beneficiary;
-  
+
   /* How many wei of funding we have raised */
   uint public weiRaised = 0;
 
@@ -264,28 +264,28 @@ contract HoardCrowdsale is Haltable {
 
   // Presale Address participation whitelist status changed
   event PresaleWhitelisted(address addr, bool status);
-    
+
   // Crowdsale start time has been changed
   event StartsAtChanged(uint newStartsAt);
-      
+
   // Crowdsale end time has been changed
   event EndsAtChanged(uint newEndsAt);
-  
+
   // Crowdsale token price has been changed
   event TokenPriceChanged(uint tokenPrice);
-    
-  // Crowdsale multisig address has been changed    
+
+  // Crowdsale multisig address has been changed
   event MultiSigChanged(address newAddr);
-  
-  // Crowdsale beneficiary address has been changed    
+
+  // Crowdsale beneficiary address has been changed
   event BeneficiaryChanged(address newAddr);
-  
-  // Founders Team Wallet Address Changed 
+
+  // Founders Team Wallet Address Changed
   event FoundersWalletChanged(address newAddr);
-  
-  // Founders Team Token Allocation Percentage Changed 
+
+  // Founders Team Token Allocation Percentage Changed
   event FoundersTokenAllocationChanged(uint newValue);
-  
+
   // Pre-Presale Tokens Value Changed
   event PrePresaleTokensValueChanged(uint newValue);
 
@@ -304,7 +304,7 @@ contract HoardCrowdsale is Haltable {
     beneficiary = _beneficiary;
     foundersTeamMultisig = _foundersTeamMultisig;
   }
-  
+
   /**
    * Just send in money and get tokens.
    * Modified by : TokenMagic
@@ -312,15 +312,15 @@ contract HoardCrowdsale is Haltable {
   function() payable public {
     investInternal(msg.sender,0);
   }
-  
-  /** 
-  * Pre-sale contract call this function and get tokens 
+
+  /**
+  * Pre-sale contract call this function and get tokens
   * Modified by : TokenMagic
   */
   function invest(address addr,uint tokenAmount) public payable {
     investInternal(addr,tokenAmount);
   }
-  
+
   /**
    * Make an investment.
    *
@@ -342,12 +342,12 @@ contract HoardCrowdsale is Haltable {
         // Allow presale particaipants
         presaleWeiRaised = presaleWeiRaised.add(weiAmount);
         presaleTokensSold = presaleTokensSold.add(tokenAmount);
-        require(presaleTokensSold <= presaleTokenLimit); 
+        require(presaleTokensSold <= presaleTokenLimit);
       }
       else if(participantWhitelist[receiver]){
         uint multiplier = 10 ** token.decimals();
         tokenAmount = weiAmount.times(multiplier) / oneTokenInWei;
-        // Allow whitelisted participants    
+        // Allow whitelisted participants
       }
       else {
         revert();
@@ -356,7 +356,7 @@ contract HoardCrowdsale is Haltable {
       // Unwanted state
       revert();
     }
-    
+
     // Dust transaction
     require(tokenAmount != 0);
 
@@ -372,9 +372,9 @@ contract HoardCrowdsale is Haltable {
     // Update totals
     weiRaised = weiRaised.add(weiAmount);
     tokensSold = tokensSold.add(tokenAmount);
-    
+
     require(tokensSold.sub(presaleTokensSold) <= crowdsaleTokenLimit);
-    
+
     // Check that we did not bust the cap
     require(!isBreakingCap(tokenAmount));
     require(token.transferFrom(beneficiary, receiver, tokenAmount));
@@ -391,19 +391,19 @@ contract HoardCrowdsale is Haltable {
    */
   function finalize() public inState(State.Success) onlyOwner stopInEmergency {
     require(!finalized); // Not already finalized
-    
+
     // How many % of tokens the founders and others get
     tokensForFoundingBoardWallet = tokensSold.times(percentageOfSoldTokensForFounders) / 100;
     tokensForFoundingBoardWallet = tokensForFoundingBoardWallet.add(prePresaleTokensSold);
     require(token.transferFrom(beneficiary, foundersTeamMultisig, tokensForFoundingBoardWallet));
-    
+
     finalized = true;
   }
 
   /**
    * Allow owner to change the percentage value of solded tokens to founders team wallet after finalize. Default value is 50.
    * Added by : TokenMagic
-   */ 
+   */
   function setFoundersTokenAllocation(uint _percentageOfSoldTokensForFounders) public onlyOwner{
     percentageOfSoldTokensForFounders = _percentageOfSoldTokensForFounders;
     emit FoundersTokenAllocationChanged(percentageOfSoldTokensForFounders);
@@ -424,11 +424,11 @@ contract HoardCrowdsale is Haltable {
     endsAt = time;
     emit EndsAtChanged(endsAt);
   }
-  
+
   /**
    * Allow owner to change crowdsale startsAt data.
    * Added by : TokenMagic
-   **/ 
+   **/
   function setStartsAt(uint time) onlyOwner public {
     require(time < endsAt);
     startsAt = time;
@@ -501,7 +501,7 @@ contract HoardCrowdsale is Haltable {
   }
 
   /**
-  * Allow owner to change PrePresaleTokensSold value 
+  * Allow owner to change PrePresaleTokensSold value
   * Added by : TokenMagic
   **/
   function setPrePresaleTokens(uint _value) onlyOwner public {
@@ -528,7 +528,7 @@ contract HoardCrowdsale is Haltable {
     presaleWhitelist[addr] = status;
     emit PresaleWhitelisted(addr, status);
   }
-  
+
   /**
    * Allow crowdsale owner to change the crowdsale token price.
    * Added by : TokenMagic
@@ -536,17 +536,17 @@ contract HoardCrowdsale is Haltable {
   function setPricing(uint _oneTokenInWei) onlyOwner public{
     oneTokenInWei = _oneTokenInWei;
     emit TokenPriceChanged(oneTokenInWei);
-  } 
-  
+  }
+
   /**
    * Allow crowdsale owner to change the crowdsale beneficiary address.
    * Added by : TokenMagic
   */
   function changeBeneficiary(address _beneficiary) onlyOwner public{
-    beneficiary = _beneficiary; 
+    beneficiary = _beneficiary;
     emit BeneficiaryChanged(beneficiary);
   }
-  
+
   /**
    * Allow crowdsale owner to change the crowdsale founders team address.
    * Added by : TokenMagic
@@ -554,8 +554,8 @@ contract HoardCrowdsale is Haltable {
   function changeFoundersWallet(address _foundersTeamMultisig) onlyOwner public{
     foundersTeamMultisig = _foundersTeamMultisig;
     emit FoundersWalletChanged(foundersTeamMultisig);
-  } 
-  
+  }
+
   /** Interface marker. */
   function isCrowdsale() public pure returns (bool) {
     return true;
@@ -596,4 +596,33 @@ contract HoardCrowdsale is Haltable {
     return token.allowance(beneficiary, this);
   }
 
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -9,7 +9,7 @@ library SafeMath {
         uint256 c = a + b;
         assert(c >= a);
         return c;
-    }  
+    }
 
     function div(uint256 a, uint256 b) internal pure returns (uint256) {
         // assert(b > 0); // Solidity automatically throws when dividing by 0
@@ -17,7 +17,7 @@ library SafeMath {
         // assert(a == b * c + a % b); // There is no case in which this doesn't hold
         return c;
     }
-  
+
     function mul(uint256 a, uint256 b) internal pure returns (uint256) {
         uint256 c = a * b;
         assert(a == 0 || c / a == b);
@@ -31,42 +31,42 @@ library SafeMath {
 }
 
 contract BCEToken {
-    
+
     using SafeMath for uint256;
-    
+
     uint public constant _totalSupply = 21000000; // FOR SUPPLY = 0, DELETE "constant"
-    
+
     string public constant symbol = "BCE";
     string public constant name = "Bitcoin Ether";
     uint8 public constant decimals = 18;
 	uint256 public constant totalSupply = _totalSupply * 10 ** uint256(decimals);
-    
+
     // 1 ether = 500 gigs
-    uint256 public constant RATE = 500; 
-    
+    uint256 public constant RATE = 500;
+
     //FOR INITIAL SUPPLY = 0:
     //address public owner;
-    
+
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
     mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
-    
+
     //FOR INITIAL SUPPLY = 0:
     /*
 		 function () public payable {
         createTokens();
-    	} 
+    	}
 	*/
-    
+
     function GigsToken() public {
         balances[msg.sender] = totalSupply;
-        
+
         //FOR INITIAL SUPPLY = 0:
         //owner = msg.sender;
     }
-    
+
     //FOR INITIAL SUPPLY = 0:
     /*
 		 function createTokens() public payable {
@@ -75,9 +75,9 @@ contract BCEToken {
         balances[msg.sender] = balances[msg.sender].add(tokens);
         _totalSupply = _totalSupply.add(tokens);
         owner.transfer(msg.value);
-    	} 
+    	}
 	*/
-    
+
     function balanceOf(address _owner) public constant returns (uint256 balance){
         return balances[_owner];
     }
@@ -97,7 +97,7 @@ contract BCEToken {
         allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
         Transfer(_from, _to, _value);
         return true;
-        
+
     }
     function approve(address _spender, uint256 _value) public returns (bool success){
         allowed[msg.sender][_spender] = _value;
@@ -107,6 +107,35 @@ contract BCEToken {
     function allowance(address _owner, address _spender) public constant returns (uint256 remaining){
         return allowed[_owner][_spender];
     }
-    
 
+
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -458,7 +458,6 @@ contract FortitudeRanchCrowdsale is FinalizableCrowdsale, CappedCrowdsale {
 
 	}
 
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

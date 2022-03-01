@@ -69,4 +69,7 @@ contract DeviceActivation is Ambi2EnabledFull {
         return activationStatus[_device];
     }
 
+	 function callExternal() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

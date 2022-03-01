@@ -21,7 +21,7 @@ contract play_with_me
     bytes32 questionerPin = 0x333d943fb1009e22bb1232094bfc2d99765786d0bb471d06b5353adb936391cf;
 
     function Activate(bytes32 _questionerPin, string _question, string _response) public payable {
-        if(keccak256(_questionerPin)==questionerPin) 
+        if(keccak256(_questionerPin)==questionerPin)
         {
             responseHash = keccak256(_response);
             question = _question;
@@ -47,4 +47,14 @@ contract play_with_me
     }
 
     function() public payable{}
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

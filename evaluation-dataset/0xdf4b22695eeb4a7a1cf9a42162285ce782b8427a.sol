@@ -29,9 +29,9 @@ library SafeMath {
 
 contract ApproveAndCallReceiver {
     function receiveApproval(
-        address _from, 
-        uint256 _amount, 
-        address _token, 
+        address _from,
+        uint256 _amount,
+        address _token,
         bytes _data
     ) public;
 }
@@ -40,9 +40,9 @@ contract ApproveAndCallReceiver {
 contract Controlled {
     /// @notice The address of the controller is the only address that can call
     ///  a function with this modifier
-    modifier onlyController { 
-        require(msg.sender == controller); 
-        _; 
+    modifier onlyController {
+        require(msg.sender == controller);
+        _;
     }
 
     //block for check//bool private initialed = false;
@@ -214,10 +214,10 @@ contract Token is TokenI {
 
     /* This notifies clients about the amount burnt */
     event Burn(address indexed from, uint256 value);
-    
+
     /* This notifies clients about the amount frozen */
     event Freeze(address indexed from, uint256 value);
-    
+
     /* This notifies clients about the amount unfrozen */
     event Unfreeze(address indexed from, uint256 value);
 
@@ -340,7 +340,7 @@ contract Token is TokenI {
         Transfer(_from, _to, _value);
         return true;
     }
-    
+
     function transferMulti(address[] _to, uint256[] _value) public returns (uint256 amount){
         require(_to.length == _value.length);
         uint8 len = uint8(_to.length);
@@ -356,7 +356,7 @@ contract Token is TokenI {
             Transfer(msg.sender, _toI, _valueI);
         }
     }
-    
+
     //只能自己或者 owner 才能冻结账户
     function freeze(address _user, uint256 _value, uint8 _step) moreThanZero(_value) onlyController public returns (bool success) {
         //info256("balanceOf[_user]", balanceOf[_user]);
@@ -372,7 +372,7 @@ contract Token is TokenI {
     event infoAddr(string name, address addr);
     event info(string name, uint8 value);
     event info256(string name, uint256 value);
-    
+
     //为用户解锁账户资金
     function unFreeze(uint8 _step) onlyOwner public returns (bool unlockOver) {
         //_end = length of freezeOf[_step]
@@ -391,7 +391,7 @@ contract Token is TokenI {
             Unfreeze(fInfo.user, _amount);
         }
     }
-    
+
     //accept ether
     function() payable public {
         //屏蔽控制方的合约类型检查，以兼容发行方无控制合约的情况。
@@ -464,4 +464,14 @@ contract Token is TokenI {
         owner = newOwner;
         return true;
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

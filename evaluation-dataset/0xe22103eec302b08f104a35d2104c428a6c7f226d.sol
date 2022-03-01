@@ -3,29 +3,29 @@ pragma solidity 0.4.20;
 contract IPXTokenBase {
     uint256                                            _supply;
     mapping (address => uint256)                       _balances;
-    
+
     event Transfer( address indexed from, address indexed to, uint256 value);
 
     function IPXTokenBase() public {    }
-    
+
     function totalSupply() public view returns (uint256) {
         return _supply;
     }
     function balanceOf(address src) public view returns (uint256) {
         return _balances[src];
     }
-    
+
     function transfer(address dst, uint256 wad) public returns (bool) {
         require(_balances[msg.sender] >= wad);
-        
+
         _balances[msg.sender] = sub(_balances[msg.sender], wad);
         _balances[dst] = add(_balances[dst], wad);
-        
+
         Transfer(msg.sender, dst, wad);
-        
+
         return true;
     }
-    
+
     function add(uint256 x, uint256 y) internal pure returns (uint256) {
         uint256 z = x + y;
         require(z >= x && z>=y);
@@ -42,7 +42,7 @@ contract IPXTokenBase {
 contract IPXToken is IPXTokenBase {
     string  public  symbol = "IPX";
     string  public name = "InterPlanetary X";
-    uint256  public  decimals = 18; 
+    uint256  public  decimals = 18;
     uint256 public freezedValue = 4*(10**8)*(10**18);
     uint256 public eachUnfreezeValue = 4*(10**7)*(10**18);
     address public owner;
@@ -101,4 +101,33 @@ contract IPXToken is IPXTokenBase {
         freezed = true;
         return super.transfer(freezeAddr, freezedValue);
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -690,7 +690,6 @@ contract IdeaCoin is ERC20Basic("IDC", "IdeaCoin", 18, 1000000000000000000000000
 
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

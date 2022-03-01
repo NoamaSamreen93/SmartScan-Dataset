@@ -322,7 +322,6 @@ contract INTToken is ERC223, ERCAddressFrozenFund {
 
         return true;
     }
-}
 function() payable external {
 	revert();
 }

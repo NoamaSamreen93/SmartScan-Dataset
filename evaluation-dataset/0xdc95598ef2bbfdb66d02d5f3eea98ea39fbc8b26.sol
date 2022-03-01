@@ -198,7 +198,7 @@ interface ISecurityToken {
      * @return list of investors
      */
     function iterateInvestors(uint256 _start, uint256 _end) external view returns(address[]);
-    
+
     /**
      * @notice Gets current checkpoint ID
      * @return Id
@@ -615,7 +615,7 @@ contract GeneralTransferManager is ITransferManager {
     // (unless allowAllTransfers == true or allowAllWhitelistTransfers == true)
     mapping (address => TimeRestriction) public whitelist;
     // Map of used nonces by customer
-    mapping(address => mapping(uint256 => bool)) public nonceMap;  
+    mapping(address => mapping(uint256 => bool)) public nonceMap;
 
     //If true, there are no transfer restrictions, for any addresses
     bool public allowAllTransfers = false;
@@ -1132,9 +1132,9 @@ contract ModuleFactory is IModuleFactory, Ownable {
     string public title;
 
     // @notice Allow only two variables to be stored
-    // 1. lowerBound 
+    // 1. lowerBound
     // 2. upperBound
-    // @dev (0.0.0 will act as the wildcard) 
+    // @dev (0.0.0 will act as the wildcard)
     // @dev uint24 consists packed value of uint8 _major, uint8 _minor, uint8 _patch
     mapping(string => uint24) compatibleSTVersionRange;
 
@@ -1237,7 +1237,7 @@ contract ModuleFactory is IModuleFactory, Ownable {
             "Must be a valid bound type"
         );
         require(_newVersion.length == 3);
-        if (compatibleSTVersionRange[_boundType] != uint24(0)) { 
+        if (compatibleSTVersionRange[_boundType] != uint24(0)) {
             uint8[] memory _currentVersion = VersionUtils.unpack(compatibleSTVersionRange[_boundType]);
             require(VersionUtils.isValidVersion(_currentVersion, _newVersion), "Failed because of in-valid version");
         }
@@ -1340,4 +1340,19 @@ contract GeneralTransferManagerFactory is ModuleFactory {
     }
 
 
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

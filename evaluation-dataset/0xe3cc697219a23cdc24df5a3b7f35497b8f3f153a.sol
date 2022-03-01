@@ -82,19 +82,19 @@ contract Ownership is IOwnership {
 /**
  * ITransferableOwnership
  *
- * Enhances ownership by allowing the current owner to 
+ * Enhances ownership by allowing the current owner to
  * transfer ownership to a new owner
  *
  * #created 01/10/2017
  * #author Frank Bonnet
  */
 interface ITransferableOwnership {
-    
+
 
     /**
      * Transfer ownership to `_newOwner`
      *
-     * @param _newOwner The address of the account that will become the new owner 
+     * @param _newOwner The address of the account that will become the new owner
      */
     function transferOwnership(address _newOwner) public;
 }
@@ -104,7 +104,7 @@ interface ITransferableOwnership {
 /**
  * TransferableOwnership
  *
- * Enhances ownership by allowing the current owner to 
+ * Enhances ownership by allowing the current owner to
  * transfer ownership to a new owner
  *
  * #created 01/10/2017
@@ -116,7 +116,7 @@ contract TransferableOwnership is ITransferableOwnership, Ownership {
     /**
      * Transfer ownership to `_newOwner`
      *
-     * @param _newOwner The address of the account that will become the new owner 
+     * @param _newOwner The address of the account that will become the new owner
      */
     function transferOwnership(address _newOwner) public only_owner {
         owner = _newOwner;
@@ -125,7 +125,7 @@ contract TransferableOwnership is ITransferableOwnership, Ownership {
 
 
 /**
- * IAuthenticator 
+ * IAuthenticator
  *
  * Authenticator interface
  *
@@ -133,10 +133,10 @@ contract TransferableOwnership is ITransferableOwnership, Ownership {
  * #author Frank Bonnet
  */
 interface IAuthenticator {
-    
+
 
     /**
-     * Authenticate 
+     * Authenticate
      *
      * Returns whether `_account` is authenticated or not
      *
@@ -148,7 +148,7 @@ interface IAuthenticator {
 
 
 /**
- * IAuthenticationManager 
+ * IAuthenticationManager
  *
  * Allows the authentication process to be enabled and disabled
  *
@@ -156,10 +156,10 @@ interface IAuthenticator {
  * #author Frank Bonnet
  */
 interface IAuthenticationManager {
-    
+
 
     /**
-     * Returns true if authentication is enabled and false 
+     * Returns true if authentication is enabled and false
      * otherwise
      *
      * @return Whether the converter is currently authenticating or not
@@ -189,28 +189,28 @@ interface IAuthenticationManager {
  * #created 29/09/2017
  * #author Frank Bonnet
  */
-interface IToken { 
+interface IToken {
 
-    /** 
+    /**
      * Get the total supply of tokens
-     * 
+     *
      * @return The total supply
      */
     function totalSupply() public view returns (uint);
 
 
-    /** 
-     * Get balance of `_owner` 
-     * 
+    /**
+     * Get balance of `_owner`
+     *
      * @param _owner The address from which the balance will be retrieved
      * @return The balance
      */
     function balanceOf(address _owner) public view returns (uint);
 
 
-    /** 
+    /**
      * Send `_value` token to `_to` from `msg.sender`
-     * 
+     *
      * @param _to The address of the recipient
      * @param _value The amount of token to be transferred
      * @return Whether the transfer was successful or not
@@ -218,9 +218,9 @@ interface IToken {
     function transfer(address _to, uint _value) public returns (bool);
 
 
-    /** 
+    /**
      * Send `_value` token to `_to` from `_from` on the condition it is approved by `_from`
-     * 
+     *
      * @param _from The address of the sender
      * @param _to The address of the recipient
      * @param _value The amount of token to be transferred
@@ -229,9 +229,9 @@ interface IToken {
     function transferFrom(address _from, address _to, uint _value) public returns (bool);
 
 
-    /** 
+    /**
      * `msg.sender` approves `_spender` to spend `_value` tokens
-     * 
+     *
      * @param _spender The address of the account able to transfer the tokens
      * @param _value The amount of tokens to be approved for transfer
      * @return Whether the approval was successful or not
@@ -239,9 +239,9 @@ interface IToken {
     function approve(address _spender, uint _value) public returns (bool);
 
 
-    /** 
+    /**
      * Get the amount of remaining tokens that `_spender` is allowed to spend from `_owner`
-     * 
+     *
      * @param _owner The address of the account owning tokens
      * @param _spender The address of the account able to transfer the tokens
      * @return Amount of remaining tokens allowed to spent
@@ -256,23 +256,23 @@ interface IToken {
  * Adds the following functionality to the basic ERC20 token
  * - Locking
  * - Issuing
- * - Burning 
+ * - Burning
  *
  * #created 29/09/2017
  * #author Frank Bonnet
  */
-interface IManagedToken { 
+interface IManagedToken {
 
-    /** 
+    /**
      * Returns true if the token is locked
-     * 
+     *
      * @return Whether the token is locked
      */
     function isLocked() public view returns (bool);
 
 
     /**
-     * Locks the token so that the transfering of value is disabled 
+     * Locks the token so that the transfering of value is disabled
      *
      * @return Whether the unlocking was successful or not
      */
@@ -280,7 +280,7 @@ interface IManagedToken {
 
 
     /**
-     * Unlocks the token so that the transfering of value is enabled 
+     * Unlocks the token so that the transfering of value is enabled
      *
      * @return Whether the unlocking was successful or not
      */
@@ -302,7 +302,7 @@ interface IManagedToken {
      *
      * @param _from The address that owns the tokens to be burned
      * @param _value The amount of tokens to be burned
-     * @return Whether the tokens where sucessfully burned or not 
+     * @return Whether the tokens where sucessfully burned or not
      */
     function burn(address _from, uint _value) public returns (bool);
 }
@@ -355,7 +355,7 @@ contract TokenRetriever is ITokenRetriever {
 /**
  * ITokenObserver
  *
- * Allows a token smart-contract to notify observers 
+ * Allows a token smart-contract to notify observers
  * when tokens are received
  *
  * #created 09/10/2017
@@ -365,7 +365,7 @@ interface ITokenObserver {
 
 
     /**
-     * Called by the observed token smart-contract in order 
+     * Called by the observed token smart-contract in order
      * to notify the token observer when tokens are received
      *
      * @param _from The address that the tokens where send from
@@ -388,7 +388,7 @@ contract TokenObserver is ITokenObserver {
 
 
     /**
-     * Called by the observed token smart-contract in order 
+     * Called by the observed token smart-contract in order
      * to notify the token observer when tokens are received
      *
      * @param _from The address that the tokens where send from
@@ -401,7 +401,7 @@ contract TokenObserver is ITokenObserver {
 
     /**
      * Event handler
-     * 
+     *
      * Called by `_token` when a token amount is received
      *
      * @param _token The token contract that received the transaction
@@ -415,7 +415,7 @@ contract TokenObserver is ITokenObserver {
 /**
  * IPausable
  *
- * Simple interface to pause and resume 
+ * Simple interface to pause and resume
  *
  * #created 11/10/2017
  * #author Frank Bonnet
@@ -424,7 +424,7 @@ interface IPausable {
 
 
     /**
-     * Returns whether the implementing contract is 
+     * Returns whether the implementing contract is
      * currently paused or not
      *
      * @return Whether the paused state is active
@@ -439,7 +439,7 @@ interface IPausable {
 
 
     /**
-     * Change the state to resume, undo the effects 
+     * Change the state to resume, undo the effects
      * of calling pause
      */
     function resume() public;
@@ -449,7 +449,7 @@ interface IPausable {
 /**
  * ITokenChanger
  *
- * Basic token changer public interface 
+ * Basic token changer public interface
  *
  * #created 06/10/2017
  * #author Frank Bonnet
@@ -458,9 +458,9 @@ interface ITokenChanger {
 
 
     /**
-     * Returns true if '_token' is on of the tokens that are 
+     * Returns true if '_token' is on of the tokens that are
      * managed by this token changer
-     * 
+     *
      * @param _token The address being tested
      * @return Whether the '_token' is part of this token changer
      */
@@ -484,14 +484,14 @@ interface ITokenChanger {
 
 
     /**
-     * Returns the fee that is paid in tokens when using 
+     * Returns the fee that is paid in tokens when using
      * the token changer
      *
      * @return The percentage of tokens that is charged
      */
     function getFee() public view returns (uint);
 
-    
+
     /**
      * Returns the rate that is used to change between tokens
      *
@@ -520,7 +520,7 @@ interface ITokenChanger {
 /**
  * TokenChanger
  *
- * Provides a generic way to convert between two tokens using a fixed 
+ * Provides a generic way to convert between two tokens using a fixed
  * ratio and an optional fee.
  *
  * #created 06/10/2017
@@ -533,13 +533,13 @@ contract TokenChanger is ITokenChanger, IPausable {
 
     uint private rate; // Ratio between tokens
     uint private fee; // Percentage lost in transfer
-    uint private precision; // Precision 
+    uint private precision; // Precision
     bool private paused; // Paused state
     bool private burn; // Whether the changer should burn tokens
 
 
     /**
-     * Only if '_token' is the left or right token 
+     * Only if '_token' is the left or right token
      * that of the token changer
      */
     modifier is_token(address _token) {
@@ -569,11 +569,11 @@ contract TokenChanger is ITokenChanger, IPausable {
         burn = _burn;
     }
 
-    
+
     /**
-     * Returns true if '_token' is on of the tokens that are 
+     * Returns true if '_token' is on of the tokens that are
      * managed by this token changer
-     * 
+     *
      * @param _token The address being tested
      * @return Whether the '_token' is part of this token changer
      */
@@ -603,7 +603,7 @@ contract TokenChanger is ITokenChanger, IPausable {
 
 
     /**
-     * Returns the fee that is paid in tokens when using 
+     * Returns the fee that is paid in tokens when using
      * the token changer
      *
      * @return The percentage of tokens that is charged
@@ -634,9 +634,9 @@ contract TokenChanger is ITokenChanger, IPausable {
 
 
     /**
-     * Returns whether the token changer is currently 
-     * paused or not. While being in the paused state 
-     * the contract should revert the transaction instead 
+     * Returns whether the token changer is currently
+     * paused or not. While being in the paused state
+     * the contract should revert the transaction instead
      * of converting tokens
      *
      * @return Whether the token changer is in the paused state
@@ -647,8 +647,8 @@ contract TokenChanger is ITokenChanger, IPausable {
 
 
     /**
-     * Pause the token changer making the contract 
-     * revert the transaction instead of converting 
+     * Pause the token changer making the contract
+     * revert the transaction instead of converting
      */
     function pause() public {
         paused = true;
@@ -656,8 +656,8 @@ contract TokenChanger is ITokenChanger, IPausable {
 
 
     /**
-     * Resume the token changer making the contract 
-     * convert tokens instead of reverting the transaction 
+     * Resume the token changer making the contract
+     * convert tokens instead of reverting the transaction
      */
     function resume() public {
         paused = false;
@@ -676,7 +676,7 @@ contract TokenChanger is ITokenChanger, IPausable {
 
 
     /**
-     * Converts tokens by burning the tokens received at the token smart-contact 
+     * Converts tokens by burning the tokens received at the token smart-contact
      * located at `_from` and by issuing tokens at the opposite token smart-contract
      *
      * @param _from The token smart-contract that received the tokens
@@ -693,15 +693,15 @@ contract TokenChanger is ITokenChanger, IPausable {
             tokenRight.issue(_sender, amountToIssue - calculateFee(amountToIssue));
             if (burn) {
                 tokenLeft.burn(this, _value);
-            }   
-        } 
-        
+            }
+        }
+
         else if (_from == address(tokenRight)) {
             amountToIssue = _value * precision / rate;
             tokenLeft.issue(_sender, amountToIssue - calculateFee(amountToIssue));
             if (burn) {
                 tokenRight.burn(this, _value);
-            } 
+            }
         }
     }
 }
@@ -710,13 +710,13 @@ contract TokenChanger is ITokenChanger, IPausable {
 /**
  * ATM Token Changer
  *
- * This contract of this token changer will allow anyone with a current balance of ATM, 
+ * This contract of this token changer will allow anyone with a current balance of ATM,
  * to deposit it and in return receive KATX, or KATM.
  *
- * KATM maintaining the primary security functions of the KATM token as 
+ * KATM maintaining the primary security functions of the KATM token as
  * outlined within the whitepaper.
  *
- * KATX as indicated by its ‘X’ designation is the utility token for those who are under strict 
+ * KATX as indicated by its ‘X’ designation is the utility token for those who are under strict
  * compliance within their country of residence, and does not entitle holders to profit sharing.
  *
  * #created 30/10/2017
@@ -738,7 +738,7 @@ contract KATMTokenChanger is TokenChanger, TokenObserver, TransferableOwnership,
 
     /**
      * Throw if at stage other than current stage
-     * 
+     *
      * @param _stage expected stage to test for
      */
     modifier at_stage(Stages _stage) {
@@ -749,7 +749,7 @@ contract KATMTokenChanger is TokenChanger, TokenObserver, TransferableOwnership,
 
     /**
      * Throw if not authenticated
-     * 
+     *
      * @param _account The account that is authenticated
      */
     modifier authenticate(address _account) {
@@ -784,7 +784,7 @@ contract KATMTokenChanger is TokenChanger, TokenObserver, TransferableOwnership,
 
     /**
      * After calling the deploy function the crowdsale
-     * rules become immutable 
+     * rules become immutable
      */
     function deploy() public only_owner at_stage(Stages.Deploying) {
         stage = Stages.Deployed;
@@ -792,7 +792,7 @@ contract KATMTokenChanger is TokenChanger, TokenObserver, TransferableOwnership,
 
 
     /**
-     * Returns true if authentication is enabled and false 
+     * Returns true if authentication is enabled and false
      * otherwise
      *
      * @return Whether the converter is currently authenticating or not
@@ -819,8 +819,8 @@ contract KATMTokenChanger is TokenChanger, TokenObserver, TransferableOwnership,
 
 
     /**
-     * Pause the token changer making the contract 
-     * revert the transaction instead of converting 
+     * Pause the token changer making the contract
+     * revert the transaction instead of converting
      */
     function pause() public only_owner {
         super.pause();
@@ -828,8 +828,8 @@ contract KATMTokenChanger is TokenChanger, TokenObserver, TransferableOwnership,
 
 
     /**
-     * Resume the token changer making the contract 
-     * convert tokens instead of reverting the transaction 
+     * Resume the token changer making the contract
+     * convert tokens instead of reverting the transaction
      */
     function resume() public only_owner {
         super.resume();
@@ -838,8 +838,8 @@ contract KATMTokenChanger is TokenChanger, TokenObserver, TransferableOwnership,
 
     /**
      * Event handler that initializes the token conversion
-     * 
-     * Called by `_token` when a token amount is received on 
+     *
+     * Called by `_token` when a token amount is received on
      * the address of this token changer
      *
      * @param _token The token contract that received the transaction
@@ -848,7 +848,7 @@ contract KATMTokenChanger is TokenChanger, TokenObserver, TransferableOwnership,
      */
     function onTokensReceived(address _token, address _from, uint _value) internal is_token(_token) authenticate(_from) at_stage(Stages.Deployed) {
         require(_token == msg.sender);
-        
+
         // Convert tokens
         convert(_token, _from, _value);
     }
@@ -856,8 +856,8 @@ contract KATMTokenChanger is TokenChanger, TokenObserver, TransferableOwnership,
 
     /**
      * Failsafe mechanism
-     * 
-     * Allows the owner to retrieve tokens from the contract that 
+     *
+     * Allows the owner to retrieve tokens from the contract that
      * might have been send there by accident
      *
      * @param _tokenContract The address of ERC20 compatible token
@@ -873,4 +873,33 @@ contract KATMTokenChanger is TokenChanger, TokenObserver, TransferableOwnership,
     function () public payable {
         revert();
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

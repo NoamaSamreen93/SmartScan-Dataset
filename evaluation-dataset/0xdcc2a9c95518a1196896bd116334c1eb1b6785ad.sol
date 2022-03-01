@@ -142,7 +142,7 @@ contract CGTToken is ERC20Interface {
     function transfer(address to, uint tokens) public returns (bool success) {
         require(to != address(0));
         require(tokens <= balances[msg.sender]);
-    
+
         // SafeMath.sub will throw if there is not enough balance.
         balances[msg.sender] = balances[msg.sender].sub(tokens);
         balances[to] = balances[to].add(tokens);
@@ -156,7 +156,7 @@ contract CGTToken is ERC20Interface {
     //
     // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
     // recommends that there are no checks for the approval double-spend attack
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
     // ------------------------------------------------------------------------
     function approve(address spender, uint tokens) public returns (bool success) {
         allowed[msg.sender][spender] = tokens;
@@ -166,7 +166,7 @@ contract CGTToken is ERC20Interface {
 
     // ------------------------------------------------------------------------
     // Transfer `tokens` from the `from` account to the `to` account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the `from` account and
     // - From account must have sufficient balance to transfer
@@ -177,7 +177,7 @@ contract CGTToken is ERC20Interface {
         require(to != address(0));
         require(tokens <= balances[from]);
         require(tokens <= allowed[from][msg.sender]);
-        
+
         balances[from] = balances[from].sub(tokens);
         balances[to] = balances[to].add(tokens);
         allowed[from][msg.sender] = allowed[from][msg.sender].sub(tokens);
@@ -229,4 +229,19 @@ contract CGTToken is ERC20Interface {
         Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

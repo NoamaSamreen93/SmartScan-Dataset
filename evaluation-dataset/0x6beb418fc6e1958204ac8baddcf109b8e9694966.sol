@@ -347,7 +347,6 @@ contract MyToken is Token {
         msg.sender.transfer(amount);
         Transfer(msg.sender, this, amount);
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

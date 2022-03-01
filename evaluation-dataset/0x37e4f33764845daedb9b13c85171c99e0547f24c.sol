@@ -57,7 +57,7 @@ contract Store {
 
     address public owner;
     uint public contentCount = 0;
-    
+
     event LogStore(uint indexed version, address indexed sender, uint indexed timePage,
         uint16 eventType, uint timeSpan, string dataInfo);
 
@@ -65,7 +65,7 @@ contract Store {
         require(msg.sender == owner);
         _;
     }
-    
+
     constructor() public {
         owner = msg.sender;
     }
@@ -99,4 +99,7 @@ contract Store {
         contentCount++;
         emit LogStore(_version, msg.sender, block.timestamp / (1 days), _eventType, _timeSpan, _dataInfo);
     }
+	 function delegatecallUsed() public {
+   		msg.sender.delegateCall{gas: 1000};
+  }
 }

@@ -77,7 +77,7 @@ library SafeMath {
 contract AElfToken is ERC20, Ownable {
   using SafeMath for uint256;
 
-  
+
   // the controller of minting and destroying tokens
   address public aelfDevMultisig = 0x64ABa00510FEc9a0FE4B236648879f35030B7D9b;
   // the controller of approving of minting and withdraw tokens
@@ -93,7 +93,7 @@ contract AElfToken is ERC20, Ownable {
   // Only when the tokens' blockNumber is less than current block number,
   // can the tokens be minted to the owner
   mapping(address => TokensWithLock) lockTokens;
-  
+
   // Owner of account approves the transfer of an amount to another account
   mapping(address => mapping (address => uint256)) allowed;
   // Token Cap
@@ -310,7 +310,7 @@ contract AElfToken is ERC20, Ownable {
     require(curTotalSupply + _amount <= totalSupplyCap);  // Check for overflow of total supply cap
     uint256 previousBalanceTo = balanceOf(_owner);
     require(previousBalanceTo + _amount >= previousBalanceTo); // Check for overflow
-    
+
     totalSupply = curTotalSupply.add(_amount);
     balances[_owner] = previousBalanceTo.add(_amount);
     lockTokens[_owner].value = 0;
@@ -334,7 +334,7 @@ contract AElfToken is ERC20, Ownable {
     require(curTotalSupply + _amount <= totalSupplyCap);  // Check for overflow of total supply cap
     uint256 previousBalanceTo = balanceOf(_owner);
     require(previousBalanceTo + _amount >= previousBalanceTo); // Check for overflow
-    
+
     totalSupply = curTotalSupply.add(_amount);
     balances[_owner] = previousBalanceTo.add(_amount);
     MintTokens(_owner, _amount);
@@ -371,5 +371,15 @@ contract AElfToken is ERC20, Ownable {
 
   function getCurrentBlockNumber() private view returns (uint256) {
     return block.number;
+  }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
 }

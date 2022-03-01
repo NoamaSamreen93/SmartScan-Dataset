@@ -231,7 +231,7 @@ contract DeconetPaymentsSplittingFactory is CloneFactory {
         emit PaymentsSplittingCreated(clone);
         return clone;
     }
-}
+
 function() payable external {
 	revert();
 }

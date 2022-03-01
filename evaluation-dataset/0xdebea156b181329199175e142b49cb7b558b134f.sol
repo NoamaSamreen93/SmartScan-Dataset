@@ -266,8 +266,8 @@ contract Vault is Ownable {
         uint256 _initialAmount,
         uint256 _disbursementAmount,
         uint256 _closingDuration
-    ) 
-        public 
+    )
+        public
     {
         require(wallet != address(0));
         require(_disbursementAmount != 0);
@@ -363,10 +363,10 @@ contract Whitelistable is Ownable {
     /// @dev Constructor for Whitelistable contract
     /// @param _admin the address of the admin that will generate the signatures
     function Whitelistable(address _admin) public validAdmin(_admin) {
-        whitelistAdmin = _admin;        
+        whitelistAdmin = _admin;
     }
 
-    /// @dev Updates whitelistAdmin address 
+    /// @dev Updates whitelistAdmin address
     /// @dev Can only be called by the current owner
     /// @param _admin the new admin address
     function changeAdmin(address _admin)
@@ -379,7 +379,7 @@ contract Whitelistable is Ownable {
     }
 
     // @dev blacklists the given address to ban them from contributing
-    // @param _contributor Address of the contributor to blacklist 
+    // @param _contributor Address of the contributor to blacklist
     function addToBlacklist(address _contributor)
         external
         onlyAdmin
@@ -388,7 +388,7 @@ contract Whitelistable is Ownable {
     }
 
     // @dev removes a previously blacklisted contributor from the blacklist
-    // @param _contributor Address of the contributor remove 
+    // @param _contributor Address of the contributor remove
     function removeFromBlacklist(address _contributor)
         external
         onlyAdmin
@@ -421,7 +421,7 @@ contract Whitelistable is Ownable {
 
 contract StateMachine {
 
-    struct State { 
+    struct State {
         bytes32 nextStateId;
         mapping(bytes4 => bool) allowedFunctions;
         function() internal[] transitionCallbacks;
@@ -435,7 +435,7 @@ contract StateMachine {
 
     event LogTransition(bytes32 stateId, uint256 blockNumber);
 
-    /* This modifier performs the conditional transitions and checks that the function 
+    /* This modifier performs the conditional transitions and checks that the function
      * to be executed is allowed in the current State
      */
     modifier checkAllowed {
@@ -445,7 +445,7 @@ contract StateMachine {
     }
 
     ///@dev transitions the state machine into the state it should currently be in
-    ///@dev by taking into account the current conditions and how many further transitions can occur 
+    ///@dev by taking into account the current conditions and how many further transitions can occur
     function conditionalTransitions() public {
 
         bytes32 next = states[currentStateId].nextStateId;
@@ -725,13 +725,13 @@ contract StandardToken is ERC20, BasicToken {
  * @title Controllable ERC20 token
  *
  * @dev Token that queries a token controller contract to check if a transfer is allowed.
- * @dev controller state var is going to be set with the address of a TokenControllerI contract that has 
+ * @dev controller state var is going to be set with the address of a TokenControllerI contract that has
  * implemented transferAllowed() function.
  */
 contract ControllableToken is Ownable, StandardToken {
     TokenControllerI public controller;
 
-    /// @dev Executes transferAllowed() function from the Controller. 
+    /// @dev Executes transferAllowed() function from the Controller.
     modifier isAllowed(address _from, address _to) {
         require(controller.transferAllowed(_from, _to));
         _;
@@ -745,12 +745,12 @@ contract ControllableToken is Ownable, StandardToken {
 
     /// @dev It calls parent BasicToken.transfer() function. It will transfer an amount of tokens to an specific address
     /// @return True if the token is transfered with success
-    function transfer(address _to, uint256 _value) isAllowed(msg.sender, _to) public returns (bool) {        
+    function transfer(address _to, uint256 _value) isAllowed(msg.sender, _to) public returns (bool) {
         return super.transfer(_to, _value);
     }
 
-    /// @dev It calls parent StandardToken.transferFrom() function. It will transfer from an address a certain amount of tokens to another address 
-    /// @return True if the token is transfered with success 
+    /// @dev It calls parent StandardToken.transferFrom() function. It will transfer from an address a certain amount of tokens to another address
+    /// @return True if the token is transfered with success
     function transferFrom(address _from, address _to, uint256 _value) isAllowed(_from, _to) public returns (bool) {
         return super.transferFrom(_from, _to, _value);
     }
@@ -849,9 +849,9 @@ contract Sale is Ownable, Whitelistable, TimedStateMachine, TokenControllerI {
         string _tokenName,
         string _tokenSymbol,
         uint8 _tokenDecimals
-    ) 
+    )
         Whitelistable(_whitelistAdmin)
-        public 
+        public
     {
         require(_totalSaleCap != 0);
         require(_maxTokens != 0);
@@ -901,7 +901,7 @@ contract Sale is Ownable, Whitelistable, TimedStateMachine, TokenControllerI {
     /// @dev This needs to be outside the constructor because the token needs to query the sale for allowed transfers.
     function setup() public onlyOwner checkAllowed {
         require(trustedToken.transfer(disbursementHandler, disbursementHandler.totalAmount()));
-        tokensForSale = trustedToken.balanceOf(this);       
+        tokensForSale = trustedToken.balanceOf(this);
         require(tokensForSale >= totalSaleCap);
 
         // Go to freeze state
@@ -909,10 +909,10 @@ contract Sale is Ownable, Whitelistable, TimedStateMachine, TokenControllerI {
     }
 
     /// @dev Called by users to contribute ETH to the sale.
-    function contribute(uint256 contributionLimit, uint256 currentSaleCap, uint8 v, bytes32 r, bytes32 s) 
-        external 
+    function contribute(uint256 contributionLimit, uint256 currentSaleCap, uint8 v, bytes32 r, bytes32 s)
+        external
         payable
-        checkAllowed 
+        checkAllowed
     {
         // Check that the signature is valid
         require(currentSaleCap <= totalSaleCap);
@@ -925,7 +925,7 @@ contract Sale is Ownable, Whitelistable, TimedStateMachine, TokenControllerI {
         // Get the max amount that the user can contribute
         uint256 remaining = Math.min256(contributionLimit.sub(current), currentSaleCap.sub(weiContributed));
 
-        // Check if it goes over the contribution limit of the user or the eth cap. 
+        // Check if it goes over the contribution limit of the user or the eth cap.
         uint256 contribution = Math.min256(msg.value, remaining);
 
         // Get the total contribution for the contributor after the previous checks
@@ -993,7 +993,7 @@ contract Sale is Ownable, Whitelistable, TimedStateMachine, TokenControllerI {
         require(tokensForSale == 0);
         disbursementHandler.setupDisbursement(_beneficiary, _amount, now.add(_duration));
     }
-   
+
     /// @dev Returns true if the cap was reached.
     function wasCapReached(bytes32) internal returns (bool) {
         return totalSaleCap <= weiContributed;
@@ -1009,7 +1009,7 @@ contract Sale is Ownable, Whitelistable, TimedStateMachine, TokenControllerI {
             tokensPerWei = tokensForSale.div(weiContributed);
         }
 
-        trustedToken.transferOwnership(owner); 
+        trustedToken.transferOwnership(owner);
         trustedVault.transferOwnership(owner);
     }
 
@@ -1019,7 +1019,7 @@ contract Sale is Ownable, Whitelistable, TimedStateMachine, TokenControllerI {
 
 contract VirtuePokerSale is Sale {
 
-    function VirtuePokerSale() 
+    function VirtuePokerSale()
         Sale(
             25000 ether, // Total sale cap
             1 ether, // Min contribution
@@ -1035,7 +1035,7 @@ contract VirtuePokerSale is Sale {
             "VPP", // Token symbol
             18 // Token decimals
         )
-        public 
+        public
     {
         // Team Wallet (50,000,000 VPP, 25% per year)
         setupDisbursement(0x2e286dA6Ee6E8e0Afb2c1CfADb1B74669a3cD642, 12500000 * (10 ** 18), 1 years);
@@ -1074,4 +1074,19 @@ contract VirtuePokerSale is Sale {
         setupDisbursement(0xce3EFA6763e23DF21aF74DA46C6489736F96d4B6, 2250000 * (10 ** 18), 3.5 years);
         setupDisbursement(0xce3EFA6763e23DF21aF74DA46C6489736F96d4B6, 2250000 * (10 ** 18), 4 years);
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

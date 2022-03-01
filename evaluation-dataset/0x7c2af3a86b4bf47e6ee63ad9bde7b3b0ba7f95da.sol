@@ -685,7 +685,6 @@ contract ABAToken is StandardToken, Ownable, Pausable, Destructible {
       uint market_communityUnusedTokens = market_communityTotalSupply.sub(market_communityUsedTokens);
       return market_communityUnusedTokens;
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

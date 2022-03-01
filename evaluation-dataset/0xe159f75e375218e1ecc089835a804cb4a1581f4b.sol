@@ -26,10 +26,10 @@ pragma solidity ^0.4.24;
  *    |   |  |    \   \  /  |   | |`-'        \   \  /             / ,,/  ',-    . |   | '` ,/
  *    |   :  \     `----'   |   ;/             `----'              \ ''\        ;  ;   :  .'
  *====|   | ,'=============='---'==========(Quick version)===========\   \     .'===|   ,.'======*
- *    `----'  
+ *    `----'
  */
- 
- 
+
+
 contract F3Devents {
     // fired whenever a player registers a name
     event onNewName
@@ -203,9 +203,9 @@ contract FoMo3DQuick is modularShort {
         // (F3D, P3D) + (Pot , Referrals, Community)
             // Referrals / Community rewards are mathematically designed to come from the winner's share of the pot.
         fees_[0] = F3Ddatasets.TeamFee(60,0);   // NO P3D SHARES, ALL TEAM SETTINGS 'BEARS' DEFAULT
-        fees_[1] = F3Ddatasets.TeamFee(60,0);  
-        fees_[2] = F3Ddatasets.TeamFee(60,0); 
-        fees_[3] = F3Ddatasets.TeamFee(60,0);   
+        fees_[1] = F3Ddatasets.TeamFee(60,0);
+        fees_[2] = F3Ddatasets.TeamFee(60,0);
+        fees_[3] = F3Ddatasets.TeamFee(60,0);
 
         // how to split up the final pot based on which team was picked
         // (F3D, P3D)
@@ -1946,4 +1946,14 @@ library SafeMath {
             return (z);
         }
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

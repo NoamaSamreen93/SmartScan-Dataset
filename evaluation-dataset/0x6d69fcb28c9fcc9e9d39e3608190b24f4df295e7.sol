@@ -424,7 +424,6 @@ contract EtherShuffle is Operable {
   function getLowestGameWithoutQuorum () public constant returns (uint256) {
     return lowestGameWithoutQuorum;
   }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

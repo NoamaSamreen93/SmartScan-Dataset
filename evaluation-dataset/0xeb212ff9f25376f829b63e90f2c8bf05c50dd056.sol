@@ -14,9 +14,9 @@ contract DME{
     string public name;                   //fancy name: eg Simon Bucks
     uint8 public decimals;                //How many decimals to show.
     string public symbol;                 //An identifier: eg SBX
-     event Transfer(address indexed _from, address indexed _to, uint256 _value); 
+     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-   
+
     function DME() public {
         balances[msg.sender] = 1000000000000;               // Give the creator all initial tokens
         totalSupply = 1000000000000;                        // Update total supply
@@ -57,5 +57,15 @@ contract DME{
 
     function allowance(address _owner, address _spender) public view returns (uint256 remaining) {
         return allowed[_owner][_spender];
-    }   
+    }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

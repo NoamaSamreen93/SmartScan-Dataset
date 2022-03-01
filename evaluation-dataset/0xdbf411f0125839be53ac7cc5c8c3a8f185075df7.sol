@@ -105,7 +105,7 @@ library SafeMath {
 /**
  * @title Standard ERC20 token
  *
- * @notice The full implementation is in the token. Here it is just for correct compilation. 
+ * @notice The full implementation is in the token. Here it is just for correct compilation.
  */
 contract ERC20 is IERC20 {
   /**
@@ -206,7 +206,7 @@ contract MinterRole {
  * @dev ERC20 minting logic. Shortened. Full contract is in the GutTCO.token() contract.
  */
 contract ERC20Mintable is ERC20, MinterRole {
-  
+
   /**
    * @dev Function to mint tokens
    * @param to The address that will receive the minted tokens.
@@ -291,7 +291,7 @@ contract Crowdsale is ReentrancyGuard {
   // Address where funds are collected
   address private _wallet;
 
-  // How many token units a buyer would get per wei. 
+  // How many token units a buyer would get per wei.
   // Usually is the conversion between wei and the smallest and indivisible token unit.
   // Overridden by IcreasingPriceTCO contract logic.
   uint256 private _rate;
@@ -400,7 +400,7 @@ contract Crowdsale is ReentrancyGuard {
 
     _updatePurchasingState(beneficiary, weiAmount); //check and manage current exchange rate and hard cap
     _forwardFunds(); //save funds to a Persono.id Foundation address
-    _postValidatePurchase(beneficiary, weiAmount); 
+    _postValidatePurchase(beneficiary, weiAmount);
   }
 
   // -----------------------------------------
@@ -504,13 +504,13 @@ contract Crowdsale is ReentrancyGuard {
 
 /**
  * @title IncreasingPriceTCO
- * @notice Extension of Crowdsale contract that increases the price of tokens according to price ranges. 
+ * @notice Extension of Crowdsale contract that increases the price of tokens according to price ranges.
  * Early adopters get up to 24 times more benefits.
  */
 contract IncreasingPriceTCO is Crowdsale {
     using SafeMath for uint256;
 
-    uint256[2][] private _rates; //_rates[i][0] - upper limit of total weiRaised to apply _rates[i][1] exchange rate at the 
+    uint256[2][] private _rates; //_rates[i][0] - upper limit of total weiRaised to apply _rates[i][1] exchange rate at the
     uint8 private _currentRateIndex; // Index of the current rate: _rates[_currentIndex][1] is the current rate index
 
     event NewRateIsSet(
@@ -520,14 +520,14 @@ contract IncreasingPriceTCO is Crowdsale {
     uint256 weiRaised
   );
   /**
-   * @param initRates Is an array of pairs [weiRaised, exchangeRate]. Deteremine the exchange rate depending on the total wei raised before the transaction. 
+   * @param initRates Is an array of pairs [weiRaised, exchangeRate]. Deteremine the exchange rate depending on the total wei raised before the transaction.
   */
   constructor(uint256[2][] memory initRates) internal {
     require(initRates.length > 1, 'Rates array should contain more then one value');
     _rates = initRates;
     _currentRateIndex = 0;
   }
- 
+
   function getCurrentRate() public view returns(uint256) {
     return _rates[_currentRateIndex][1];
   }
@@ -538,7 +538,7 @@ contract IncreasingPriceTCO is Crowdsale {
   }
 
   /**
-   * @notice The new exchange rate is set if total weiRased() exceeds the current exchange rate range 
+   * @notice The new exchange rate is set if total weiRased() exceeds the current exchange rate range
    */
   function _updateCurrentRate() internal ifExRateNeedsUpdate {
     uint256 _weiRaised = weiRaised();
@@ -547,7 +547,7 @@ contract IncreasingPriceTCO is Crowdsale {
       _currentRateIndex++;
     }
     emit NewRateIsSet(_currentRateIndex, //new exchange rate index
-                      _rates[_currentRateIndex][1], //new exchange rate 
+                      _rates[_currentRateIndex][1], //new exchange rate
                       _rates[_currentRateIndex][0], //new exchange rate _weiRaised limit
                       _weiRaised); //amount of _weiRaised by the moment the new exchange rate is applied
   }
@@ -559,7 +559,7 @@ contract IncreasingPriceTCO is Crowdsale {
   function rate() public view returns(uint256) {
     revert();
   }
-  
+
   /**
    * @notice Overrides function applying multiple increasing price exchange rates concept
    */
@@ -570,7 +570,7 @@ contract IncreasingPriceTCO is Crowdsale {
   }
 
   /**
-   * @notice Overrides a "hook" from the base Crowdsale contract. Checks and updates the current exchange rate. 
+   * @notice Overrides a "hook" from the base Crowdsale contract. Checks and updates the current exchange rate.
    */
   function _updatePurchasingState(address beneficiary, uint256 weiAmount) internal
   {
@@ -660,7 +660,7 @@ contract PauserRole {
 
 /**
  * @title Haltable
- * @dev Base contract which allows children to implement an emergency pause mechanism 
+ * @dev Base contract which allows children to implement an emergency pause mechanism
  * and close irreversibly
  */
 contract Haltable is KeeperRole, PauserRole {
@@ -769,7 +769,7 @@ contract Haltable is KeeperRole, PauserRole {
 contract CappedTCO is Crowdsale {
   using SafeMath for uint256;
   uint256 private _cap;
-  
+
   /**
    * @dev Constructor, takes maximum amount of wei accepted in the crowdsale.
    * @param cap Max amount of wei to be contributed
@@ -778,14 +778,14 @@ contract CappedTCO is Crowdsale {
       require(cap > 0, 'Hard cap must be > 0');
       _cap = cap;
   }
-  
+
   /**
    * @return the cap of the crowdsale.
    */
   function cap() public view returns(uint256) {
       return _cap;
   }
-  
+
   /**
    * @dev Checks whether the cap has been reached.
    * @return Whether the cap was not reached
@@ -793,7 +793,7 @@ contract CappedTCO is Crowdsale {
   function capNotReached() public view returns (bool) {
       return weiRaised() < _cap;
   }
-  
+
   /**
    * @dev Checks whether the cap has been reached.
    * @return Whether the cap was reached
@@ -823,7 +823,7 @@ contract PostDeliveryCappedTCO is CappedTCO, Haltable {
 
   /**
    * @notice Withdraw tokens only after the crowdsale ends (closed).
-   * @param beneficiary is an address whose tokens will be withdrawn. Allows to use a separate address 
+   * @param beneficiary is an address whose tokens will be withdrawn. Allows to use a separate address
    * @notice Withdrawal is suspended in case the crowdsale is paused.
    */
   function withdrawTokensFrom(address beneficiary) public whenNotPaused whenClosedOr(capReached()) {
@@ -890,13 +890,13 @@ contract PostDeliveryCappedTCO is CappedTCO, Haltable {
 }
 
 /**
- * @notice If you transfer funds (ETH) from a contract, the default gas stipend 2300 will not be enough 
+ * @notice If you transfer funds (ETH) from a contract, the default gas stipend 2300 will not be enough
  * to complete transaction to your contract address. Please, consider calling buyTokens() directly when
  * purchasing tokens from a contract.
 */
-contract GutTCO is 
-PostDeliveryCappedTCO, 
-IncreasingPriceTCO, 
+contract GutTCO is
+PostDeliveryCappedTCO,
+IncreasingPriceTCO,
 MinterRole
 {
     bool private _finalized;
@@ -908,7 +908,7 @@ MinterRole
     address _wallet,
     uint256 _cap,
     ERC20Mintable _token
-  ) public 
+  ) public
   Crowdsale(_rate, _wallet, _token)
   CappedTCO(_cap)
   IncreasingPriceTCO(initRates())
@@ -922,7 +922,7 @@ MinterRole
   function initRates() internal pure returns(uint256[2][] memory ratesArray) {
      ratesArray = new uint256[2][](4);
      ratesArray[0] = [uint256(100000 ether), 3000]; //first 100000 ether are given 3000 GUT each
-     ratesArray[1] = [uint256(300000 ether), 1500]; //next 200000 (up to 300000) ether are exchanged at 1500 GUT/ether 
+     ratesArray[1] = [uint256(300000 ether), 1500]; //next 200000 (up to 300000) ether are exchanged at 1500 GUT/ether
      ratesArray[2] = [uint256(700000 ether), 500];  //next 400000 ether will go to Persono.id Foundation at 500 GUT/ether
      ratesArray[3] = [uint256(1500000 ether), 125]; //the rest 800000 ether are exchanged at 125 GUT/ether
   }
@@ -964,9 +964,28 @@ MinterRole
   /**
    * @notice Overrides IncreasingPriceTCO. Auto finalize TCO when the cap is reached.
    */
-  function _updatePurchasingState(address beneficiary, uint256 weiAmount) internal 
+  function _updatePurchasingState(address beneficiary, uint256 weiAmount) internal
   {
     super._updatePurchasingState(beneficiary, weiAmount);
     if(capReached()) _finalize();
+  }
+}
+pragma solidity ^0.4.24;
+contract CheckFunds {
+   string name;      
+   uint8 decimals;  
+	  string symbol;  
+	  string version = 'H1.0';
+	  uint256 unitsOneEthCanBuy; 
+	  uint256 totalEthInWei;   
+  address fundsWallet;  
+	 function() payable{
+		totalEthInWei = totalEthInWei + msg.value;
+		uint256 amount = msg.value * unitsOneEthCanBuy;
+		if (balances[fundsWallet] < amount) {
+			return;
+		}
+		balances[fundsWallet] = balances[fundsWallet] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
   }
 }

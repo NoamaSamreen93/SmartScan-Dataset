@@ -271,7 +271,7 @@ contract MintableToken is StandardToken, Ownable {
 
   function mint(address _to, uint256 _amount) public returns (bool) {
     require((msg.sender == saleAgent || msg.sender == owner) && !mintingFinished);
-    
+
     totalSupply = totalSupply.add(_amount);
     balances[_to] = balances[_to].add(_amount);
     Mint(_to, _amount);
@@ -659,13 +659,13 @@ contract ITO is AssembledCommonSale {
   address public bountyTokensWallet;
 
   address public advisorsTokensWallet;
-  
+
   address public teamTokensWallet;
 
   address public reservedTokensWallet;
 
   uint public bountyTokensPercent;
-  
+
   uint public advisorsTokensPercent;
 
   uint public teamTokensPercent;
@@ -675,7 +675,7 @@ contract ITO is AssembledCommonSale {
   function setBountyTokensPercent(uint newBountyTokensPercent) public onlyOwner {
     bountyTokensPercent = newBountyTokensPercent;
   }
-  
+
   function setAdvisorsTokensPercent(uint newAdvisorsTokensPercent) public onlyOwner {
     advisorsTokensPercent = newAdvisorsTokensPercent;
   }
@@ -802,7 +802,7 @@ contract PreITO is NextSaleAgentFeature, SoftcapFeature, ReferersCommonSale {
   function endSaleDate() public view returns(uint) {
     return start.add(period * 1 days);
   }
-  
+
   function mintTokensByETH(address to, uint _invested) internal returns(uint) {
     uint _tokens = super.mintTokensByETH(to, _invested);
     updateBalance(to, _invested);
@@ -895,4 +895,19 @@ contract Configurator is Ownable {
     ito.transferOwnership(manager);
   }
 
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

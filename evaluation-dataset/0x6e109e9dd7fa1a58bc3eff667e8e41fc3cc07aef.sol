@@ -737,7 +737,6 @@ contract TetherToken is Pausable, StandardTokenWithFees, BlackList {
     // Called when contract is deprecated
     event Deprecate(address newAddress);
 
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

@@ -8,11 +8,11 @@
  * Attention: purchase price more than sale price by 11.1%
  *
  * The price of GRC tokens will be increased by 1% per day.
- * 
- * For create the kingdom, you should to spend GRC tokens for increasing the number of citizens or warriors of your kingdom. 
+ *
+ * For create the kingdom, you should to spend GRC tokens for increasing the number of citizens or warriors of your kingdom.
  *
  * If you want to be just an investor, don't add citizens or warriors and your kingdom won't be created.
- * 
+ *
  * Each citizen of your Kingdom will pay tribute to you. One citizen pays tribute equal kingdom prosperity, per 7 days.
  * Your warriors can attack random kingdoms and can pick up their coins. One warrior can pick up number of GRC equal (100 - attacked kingdom defence).
  * After attack, number of your warriors will be reduced by percent of defence of attacked kingdom.
@@ -27,17 +27,17 @@
  * Attention! You can lost part of your coins, if your defence is not high and your kingdom would be under attack.
  *
  * Send from 0 to 0.00001 ether to this contract address for sell all your GRC tokens.
- * Send 0.000111 ether to spend your tokens to add citizens to your kingdom. 
- * Send 0.000222 ether to spend your tokens to add warriors to your kingdom. 
- * Send 0.000333 ether to set +10 prosperity and -10 defence level of your kingdom. 
- * Send 0.000444 ether to set +10 defence and -10 prosperity level of your kingdom. 
+ * Send 0.000111 ether to spend your tokens to add citizens to your kingdom.
+ * Send 0.000222 ether to spend your tokens to add warriors to your kingdom.
+ * Send 0.000333 ether to set +10 prosperity and -10 defence level of your kingdom.
+ * Send 0.000444 ether to set +10 defence and -10 prosperity level of your kingdom.
  *
  * Use 200000 of Gas limit for your transactions.
  *
  * Admin commissions: 5% from GRC tokens buying.
  *
  * Game will be paused for 3 days when balance is null and will be auto restarted, all kingdoms and tokens will be burnt.
- * 
+ *
  */
 
 pragma solidity ^0.4.25;
@@ -96,7 +96,7 @@ interface IERC20 {
 
 contract Ownable {
 	address private owner;
-	
+
     constructor() public {
         owner = msg.sender;
     }
@@ -104,7 +104,7 @@ contract Ownable {
     modifier onlyOwner() {
         require(msg.sender == owner);
         _;
-    }	
+    }
 }
 
 contract ERC20 is Ownable {
@@ -113,8 +113,8 @@ contract ERC20 is Ownable {
     mapping (address => uint256) private _balances;
 
 	uint256 private _totalSupply;
-	
-	 
+
+
     /**
     * @dev Total number of tokens in existence
     */
@@ -151,7 +151,7 @@ contract ERC20 is Ownable {
         _mint(account, value);
         return true;
     }
-	
+
     /**
     * @dev Burn token for a specified address
     * @param account The address to burn from.
@@ -160,8 +160,8 @@ contract ERC20 is Ownable {
     function burn(address account, uint256 value) public onlyOwner returns (bool) {
         _burn(account, value);
         return true;
-    }	
-	
+    }
+
     /**
     * @dev Transfer token for a specified addresses
     * @param from The address to transfer from.
@@ -221,7 +221,7 @@ contract KingdomStorage is ERC20 {
 
 	mapping (uint => address) private kingdomAddress;
     mapping (address => Kingdom) private kingdoms;
-	
+
 	event War(address indexed _attacked, address indexed _invader, uint _lostCoins, uint _slayedWarriors);
 
     function addCitizens(address _address, uint _number, bool _are_warriors) external onlyOwner {
@@ -229,12 +229,12 @@ contract KingdomStorage is ERC20 {
 			// create the new kingdom
 			kingdomAddress[_kingdomsCount] = _address;
 			kingdoms[_address].prosperity = 50;
-			kingdoms[_address].defence = 50;	
+			kingdoms[_address].defence = 50;
 			_kingdomsCount++;
 		}
-		
+
         if (_are_warriors) {
-			// add warriors	
+			// add warriors
 			kingdoms[_address].numberOfWarriors = kingdoms[_address].numberOfWarriors.add(_number);
 		} else {
 			// add citizens
@@ -243,7 +243,7 @@ contract KingdomStorage is ERC20 {
 		}
 
     }
-	
+
     function getTribute(address _address) external onlyOwner {
 		uint tributeValue = getTributeValue(_address);
 		if (tributeValue > 0) {
@@ -252,31 +252,31 @@ contract KingdomStorage is ERC20 {
 			kingdoms[_address].lostCoins = 0;
 		}
     }
-	
+
 	function startWar(address _invader, address _attacked) external onlyOwner {
 		uint invaderWarriorsNumber = getWarriorsNumber(_invader);
 		require (invaderWarriorsNumber >0);
-		
-		uint attackedKingdomBalance = balanceOf(_attacked);		
+
+		uint attackedKingdomBalance = balanceOf(_attacked);
 		uint attackedKingdomWealth = getTributeValue(_attacked).add(attackedKingdomBalance);
-		uint attackedKingdomDefence = getDefence(_attacked); 
-		
+		uint attackedKingdomDefence = getDefence(_attacked);
+
 		// one warrior picks up number of GRC equal (100 - attacked kingdom defence)
-		uint attackPower = invaderWarriorsNumber.mul(100 - attackedKingdomDefence); 
+		uint attackPower = invaderWarriorsNumber.mul(100 - attackedKingdomDefence);
 		if (attackPower > attackedKingdomWealth)
 			attackPower = attackedKingdomWealth;
-		
+
 		// defence action: slay warriors
 		uint slayedWarriors;
 		// dont slay, if attackedKingdomWealth <= 10000 GRC
 		if (attackedKingdomWealth > 10000) {
-			slayedWarriors = invaderWarriorsNumber.mul(attackedKingdomDefence).div(100);	
+			slayedWarriors = invaderWarriorsNumber.mul(attackedKingdomDefence).div(100);
 			kingdoms[_invader].numberOfWarriors -= slayedWarriors;
 		}
-		
+
 		// invader action: pick up tokens
 		uint lostCoins;
-		
+
 		if (attackedKingdomBalance >= attackPower) {
 			transfer(_attacked, _invader, attackPower);
 			lostCoins += attackPower;
@@ -285,56 +285,56 @@ contract KingdomStorage is ERC20 {
 			transfer(_attacked, _invader, attackedKingdomBalance);
 			lostCoins += attackedKingdomBalance;
 			attackPower -= attackedKingdomBalance;
-		} 
+		}
 
 		if (attackPower > 0) {
 			kingdoms[_attacked].lostCoins += attackPower;
 			mint(_invader, attackPower);
 			lostCoins += attackPower;
 		}
-		
+
 		emit War(_attacked, _invader, lostCoins, slayedWarriors);
 	}
-	
+
 	function warFailed(address _invader) external onlyOwner {
 		emit War(address(0), _invader, 0, 0);
 	}
-	
+
     function increaseProsperity(address _address) external onlyOwner {
 		// minimum defence = 0%, maximum prosperity = 100%
 		if (kingdoms[_address].prosperity <= 90) {
 			kingdoms[_address].prosperity += 10;
 			kingdoms[_address].defence -= 10;
 		}
-    }	
-	
+    }
+
     function increaseDefence(address _address) external onlyOwner {
 		// maximum defence = 90%, minimum prosperity = 10%
 		if (kingdoms[_address].defence <= 80) {
 			kingdoms[_address].defence += 10;
 			kingdoms[_address].prosperity -= 10;
 		}
-    }	
+    }
 
     function getTributeValue(address _address) public view returns(uint) {
 		uint numberOfCitizens = getCitizensNumber(_address);
 		if (numberOfCitizens > 0) {
 			// one citizen gives tribute equal kingdom prosperity, per 7 days;
-			return numberOfCitizens.mul(getProsperity(_address)).mul(block.timestamp.sub(getTributeCheckpoint(_address))).div(7 days).sub(getLostCoins(_address)); 
+			return numberOfCitizens.mul(getProsperity(_address)).mul(block.timestamp.sub(getTributeCheckpoint(_address))).div(7 days).sub(getLostCoins(_address));
 		}
 		return 0;
-    }	
+    }
 
     function getProsperity(address _address) public view returns(uint) {
 		return kingdoms[_address].prosperity;
     }
-	
+
     function getDefence(address _address) public view returns(uint) {
 		return kingdoms[_address].defence;
-    }	
+    }
     function getLostCoins(address _address) public view returns(uint) {
 		return kingdoms[_address].lostCoins;
-    }	
+    }
 
     function getCitizensNumber(address _address) public view returns(uint) {
         return kingdoms[_address].numberOfCitizens;
@@ -343,7 +343,7 @@ contract KingdomStorage is ERC20 {
     function getWarriorsNumber(address _address) public view returns(uint) {
         return kingdoms[_address].numberOfWarriors;
     }
-	
+
     function getTributeCheckpoint(address _address) public view returns(uint) {
         return kingdoms[_address].tributeCheckpoint;
     }
@@ -351,7 +351,7 @@ contract KingdomStorage is ERC20 {
     function getKingdomAddress(uint _kingdomId) external view returns(address) {
         return kingdomAddress[_kingdomId];
     }
-	
+
 	function kingdomsCount() external view returns(uint) {
         return _kingdomsCount;
     }
@@ -366,13 +366,13 @@ contract GreenRabbitKingdom is IERC20 {
     uint payed;
     uint startTime;
 	uint tokenStartPrice;
-	
+
 	string public name = 'GreenRabbitCoin';
 	string public symbol = 'GRC';
 	uint public decimals = 0;
-	
+
     event LogNewGame(uint _startTime);
-	
+
     KingdomStorage private kingdom;
 
     modifier notOnPause() {
@@ -386,7 +386,7 @@ contract GreenRabbitKingdom is IERC20 {
         startTime = now;
 		tokenStartPrice = 1 szabo; //0.000001 ETH
     }
- 
+
     function() external payable {
         if (msg.value == 0 && msg.value <= 0.00001 ether) {
             sellTokens();
@@ -400,7 +400,7 @@ contract GreenRabbitKingdom is IERC20 {
             increaseProsperity();
         } else if (msg.value == 0.000444 ether) {
             increaseDefence();
-		} else {            
+		} else {
 			buyTokens();
         }
     }
@@ -419,7 +419,7 @@ contract GreenRabbitKingdom is IERC20 {
 		// get tribute from your citizens before
 		kingdom.getTribute(msg.sender);
         return kingdom.transfer(msg.sender, to, value);
-    }	
+    }
 
     /**
      * @dev ERC20 function
@@ -427,7 +427,7 @@ contract GreenRabbitKingdom is IERC20 {
 	function balanceOf(address owner) public view returns (uint256) {
         return kingdom.balanceOf(owner);
     }
-	
+
     function buyTokens() notOnPause public payable {
 		require (msg.value >= 0.001 ether);
 		uint tokensValue = msg.value.div(getTokenSellPrice()).mul(90).div(100);
@@ -439,8 +439,8 @@ contract GreenRabbitKingdom is IERC20 {
     function sellTokens() notOnPause public {
 		// get tribute from your citizens before
 		kingdom.getTribute(msg.sender);
-		
-        uint tokensValue = balanceOf(msg.sender); 
+
+        uint tokensValue = balanceOf(msg.sender);
 		uint payout = tokensValue.mul(getTokenSellPrice());
 
         if (payout > 0) {
@@ -452,59 +452,59 @@ contract GreenRabbitKingdom is IERC20 {
             }
 
             msg.sender.transfer(payout);
-			
+
 			kingdom.burn(msg.sender, tokensValue);
 			emit Transfer(msg.sender, address(0), tokensValue);
-        }		
+        }
     }
-	
+
 	function addCitizens(bool _are_warriors) notOnPause public {
 		// get tribute from your citizens before adding new citizens
 		kingdom.getTribute(msg.sender);
-		
+
 		uint CitizensNumber = balanceOf(msg.sender).div(100);
 		if (CitizensNumber > 0) {
 			kingdom.addCitizens(msg.sender,CitizensNumber,_are_warriors);
 			kingdom.burn(msg.sender, CitizensNumber * 100);
 		}
 	}
-	
+
     function attackKingdom(address _invader, uint _random) notOnPause public returns(bool) {
 		// Only for invader's smart contract:
 		// https://etherscan.io/address/0x76d7aed5ab1c4a5e210d0ccac747d097f9d58966
-		require (msg.sender == 0x76d7aed5ab1c4a5e210d0ccac747d097f9d58966); 
-		
+		require (msg.sender == 0x76d7aed5ab1c4a5e210d0ccac747d097f9d58966);
+
 		uint attackedKingdomId = _random % (kingdom.kingdomsCount());
 		address attackedKingdomAddress = kingdom.getKingdomAddress(attackedKingdomId);
-		
+
 		if (_invader != attackedKingdomAddress) {
 			kingdom.startWar(_invader, attackedKingdomAddress);
 		} else {
 			// you can't attack youself
 			kingdom.warFailed(_invader);
 		}
-			
+
         return true;
-    }	
-	
+    }
+
 	function increaseProsperity() notOnPause public {
 		// get tribute from your citizens before
 		kingdom.getTribute(msg.sender);
 		kingdom.increaseProsperity(msg.sender);
 	}
-	
+
 	function increaseDefence() notOnPause public {
 		// get tribute from your citizens before
-		kingdom.getTribute(msg.sender);		
+		kingdom.getTribute(msg.sender);
 		kingdom.increaseDefence(msg.sender);
 	}
-	
+
 	function synchronizeTokensBalance() notOnPause public {
-		// get tribute from your citizens 
-		// for release real tokens that you can see them in your ERC-20 wallet 
-		kingdom.getTribute(msg.sender);		
-	}	
-	
+		// get tribute from your citizens
+		// for release real tokens that you can see them in your ERC-20 wallet
+		kingdom.getTribute(msg.sender);
+	}
+
 	function getTokenSellPrice() public view returns(uint) {
 		//each day +1% to token price
 		return tokenStartPrice.add( tokenStartPrice.div(100).mul(block.timestamp.sub(startTime).div(1 days)) );
@@ -513,21 +513,21 @@ contract GreenRabbitKingdom is IERC20 {
     function getGameAge() external view returns(uint) {
 		if (block.timestamp > startTime)
 			return block.timestamp.sub(startTime).div(1 days).add(1);
-		else 
+		else
 			return 0;
     }
-	
+
     function getKingdomsCount() external view returns(uint) {
         return kingdom.kingdomsCount();
     }
-	
+
     function getKingdomData(address _address) external view returns(uint numberOfCitizens, uint numberOfWarriors, uint prosperity, uint defence, uint balance) {
 		numberOfCitizens = kingdom.getCitizensNumber(_address);
 		numberOfWarriors = kingdom.getWarriorsNumber(_address);
 		prosperity = kingdom.getProsperity(_address);
 		defence = kingdom.getDefence(_address);
 		balance = kingdom.getTributeValue(_address) + balanceOf(_address);
-    }	
+    }
 
     function getBalance() external view returns(uint) {
         return address(this).balance;
@@ -538,5 +538,34 @@ contract GreenRabbitKingdom is IERC20 {
         startTime = block.timestamp + 3 days;
         emit LogNewGame(startTime);
     }
-	
+
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

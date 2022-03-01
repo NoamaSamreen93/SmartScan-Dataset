@@ -113,7 +113,6 @@ contract DividendDistributor is Ownable{
     function destroy() public onlyOwner {
         selfdestruct(msg.sender);
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

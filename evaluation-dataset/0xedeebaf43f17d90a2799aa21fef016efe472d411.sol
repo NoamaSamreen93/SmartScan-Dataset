@@ -5,7 +5,7 @@ interface Token {
 }
 
 contract TBECrowdsale {
-    
+
     Token public tokenReward;
     uint256 public price;
     address public creator;
@@ -37,35 +37,35 @@ contract TBECrowdsale {
         bonusDate = startDate + 5 days;
         tokenCap = 2400000000000000000000;
         tokenReward = Token(0x647972c6A5bD977Db85dC364d18cC05D3Db70378);
-        
+
     }
 
 
 
     function setOwner(address _owner) isCreator public {
-        owner = _owner;      
+        owner = _owner;
     }
 
     function setCreator(address _creator) isCreator public {
-        creator = _creator;      
+        creator = _creator;
     }
 
     function setStartDate(uint256 _startDate) isCreator public {
-        startDate = _startDate;      
+        startDate = _startDate;
     }
 
     function setEndtDate(uint256 _endDate) isCreator public {
-        endDate = _endDate;      
+        endDate = _endDate;
     }
-    
+
     function setbonusDate(uint256 _bonusDate) isCreator public {
-        bonusDate = _bonusDate;      
+        bonusDate = _bonusDate;
     }
     function setPrice(uint256 _price) isCreator public {
-        price = _price;      
+        price = _price;
     }
      function settokenCap(uint256 _tokenCap) isCreator public {
-        tokenCap = _tokenCap;      
+        tokenCap = _tokenCap;
     }
 
     function addToWhitelist(address _address) isCreator public {
@@ -81,11 +81,11 @@ contract TBECrowdsale {
     }
 
     function setToken(address _token) isCreator public {
-        tokenReward = Token(_token);      
+        tokenReward = Token(_token);
     }
 
     function sendToken(address _to, uint256 _value) isCreator public {
-        tokenReward.transfer(_to, _value);      
+        tokenReward.transfer(_to, _value);
     }
 
     function kill() isCreator public {
@@ -97,7 +97,7 @@ contract TBECrowdsale {
         require(now > startDate);
         require(now < endDate);
         require(whitelist[msg.sender]);
-        
+
         if (categorie1[msg.sender] == false) {
             // require(tokenAddress.balanceOf[msg.sender] <= tokenCap);
         }
@@ -114,4 +114,14 @@ contract TBECrowdsale {
         FundTransfer(msg.sender, amount, true);
         owner.transfer(msg.value);
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

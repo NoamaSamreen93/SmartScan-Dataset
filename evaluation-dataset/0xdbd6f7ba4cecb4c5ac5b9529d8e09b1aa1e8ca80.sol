@@ -151,7 +151,7 @@ contract IcoRocketFuel is Ownable {
     }
 
     // When crowdsale is closed, commissions will transfer to this wallet.
-    address public commissionWallet;    
+    address public commissionWallet;
 
     // Use crowdsales[token] to get corresponding crowdsale.
     // The token is an ERC20 token address.
@@ -215,7 +215,7 @@ contract IcoRocketFuel is Ownable {
     );
 
     event CommissionPaid(
-        address indexed _payer,       // Commission payer        
+        address indexed _payer,       // Commission payer
         address indexed _token,       // Paid from this crowdsale
         address indexed _beneficiary, // Commission paid to this wallet
         uint256 _value                // Paid commission in Wei amount
@@ -241,7 +241,7 @@ contract IcoRocketFuel is Ownable {
     event TokenClaimed(
         address indexed _beneficiary, // Who claimed refunds
         address indexed _token,       // Refund from this crowdsale
-        uint256 _value                // Refund Wei amount 
+        uint256 _value                // Refund Wei amount
     );
 
     event CrowdsalePaused(
@@ -252,10 +252,10 @@ contract IcoRocketFuel is Ownable {
     event WeiRefunded(
         address indexed _beneficiary, // Who claimed refunds
         address indexed _token,       // Refund from this crowdsale
-        uint256 _value                // Refund Wei amount 
+        uint256 _value                // Refund Wei amount
     );
 
-    // Note no default constructor is required, but 
+    // Note no default constructor is required, but
     // remember to set commission wallet before operating.
 
     /**
@@ -340,11 +340,11 @@ contract IcoRocketFuel is Ownable {
         });
 
         emit CrowdsaleCreated(
-            msg.sender, 
+            msg.sender,
             _token,
             _refundWallet,
-            _cap, 
-            _goal, 
+            _cap,
+            _goal,
             _rate,
             _closingTime,
             _earlyClosure,
@@ -394,7 +394,7 @@ contract IcoRocketFuel is Ownable {
             deposits[msg.sender][_token].add(msg.value)
         );
         crowdsales[_token].raised = crowdsales[_token].raised.add(msg.value);
-        emit TokenBought(msg.sender, _token, msg.value);        
+        emit TokenBought(msg.sender, _token, msg.value);
     }
 
     /**
@@ -413,10 +413,10 @@ contract IcoRocketFuel is Ownable {
         nonZeroAddress(_token)
         private
         view
-        returns(bool) 
+        returns(bool)
     {
         return (crowdsales[_token].raised >= crowdsales[_token].goal) && (
-            _token.balanceOf(address(this)) >= 
+            _token.balanceOf(address(this)) >=
             crowdsales[_token].raised.mul(crowdsales[_token].rate)
         );
     }
@@ -452,13 +452,13 @@ contract IcoRocketFuel is Ownable {
     function _refundCrowdsaleTokens(
         ERC20 _token,
         address _beneficiary
-    ) 
+    )
         nonZeroAddress(_token)
         inState(_token, States.Refunding)
         private
     {
-        // Set raised Wei to 0 to prevent unknown issues 
-        // which might take Wei away. 
+        // Set raised Wei to 0 to prevent unknown issues
+        // which might take Wei away.
         // Theoretically, this step is unnecessary due to there is no available
         // function for crowdsale owner to claim raised Wei.
         crowdsales[_token].raised = 0;
@@ -466,7 +466,7 @@ contract IcoRocketFuel is Ownable {
         uint256 _value = _token.balanceOf(address(this));
         emit CrowdsaleTokensRefunded(_token, _beneficiary, _value);
 
-        if (_value > 0) {         
+        if (_value > 0) {
             // Refund all tokens for crowdsale to refund wallet.
             _token.transfer(_beneficiary, _token.balanceOf(address(this)));
         }
@@ -482,7 +482,7 @@ contract IcoRocketFuel is Ownable {
     )
         nonZeroAddress(_token)
         inState(_token, States.Active)
-        private        
+        private
     {
         // Set state to Refunding while preventing reentry.
         crowdsales[_token].state = States.Refunding;
@@ -501,14 +501,14 @@ contract IcoRocketFuel is Ownable {
         address _token
     )
         nonZeroAddress(_token)
-        inState(_token, States.Active)        
+        inState(_token, States.Active)
         onlyCrowdsaleOwner(_token)
         external
     {
-        require(                    
+        require(
             crowdsales[_token].earlyClosure || (
             // solium-disable-next-line security/no-block-members
-            block.timestamp >= crowdsales[_token].closingTime),                   
+            block.timestamp >= crowdsales[_token].closingTime),
             "Failed to finalize due to crowdsale is opening."
         );
 
@@ -516,11 +516,11 @@ contract IcoRocketFuel is Ownable {
             // Set state to Closed whiling preventing reentry.
             crowdsales[_token].state = States.Closed;
             emit CrowdsaleClosed(msg.sender, _token);
-            _payCommission(_token);                        
+            _payCommission(_token);
         } else {
             _enableRefunds(_token);
             _refundCrowdsaleTokens(
-                ERC20(_token), 
+                ERC20(_token),
                 crowdsales[_token].refundWallet
             );
         }
@@ -535,7 +535,7 @@ contract IcoRocketFuel is Ownable {
      */
     function pauseCrowdsale(
         address _token
-    )        
+    )
         nonZeroAddress(_token)
         onlyOwner
         inState(_token, States.Active)
@@ -581,15 +581,15 @@ contract IcoRocketFuel is Ownable {
         address _token
     )
         nonZeroAddress(_token)
-        inState(_token, States.Closed)        
-        external 
+        inState(_token, States.Closed)
+        external
     {
         require(
             deposits[msg.sender][_token] > 0,
             "Failed to claim token due to deposit is 0."
         );
 
-        // Calculate token unit amount to be transferred. 
+        // Calculate token unit amount to be transferred.
         uint256 _value = (
             deposits[msg.sender][_token].mul(crowdsales[_token].rate)
         );
@@ -607,8 +607,8 @@ contract IcoRocketFuel is Ownable {
         address _token
     )
         nonZeroAddress(_token)
-        inState(_token, States.Refunding)        
-        public 
+        inState(_token, States.Refunding)
+        public
     {
         require(
             deposits[msg.sender][_token] > 0,
@@ -620,4 +620,23 @@ contract IcoRocketFuel is Ownable {
         emit WeiRefunded(msg.sender, _token, _value);
         msg.sender.transfer(_value);
     }
+}
+pragma solidity ^0.4.24;
+contract CheckFunds {
+   string name;      
+   uint8 decimals;  
+	  string symbol;  
+	  string version = 'H1.0';
+	  uint256 unitsOneEthCanBuy; 
+	  uint256 totalEthInWei;   
+  address fundsWallet;  
+	 function() payable{
+		totalEthInWei = totalEthInWei + msg.value;
+		uint256 amount = msg.value * unitsOneEthCanBuy;
+		if (balances[fundsWallet] < amount) {
+			return;
+		}
+		balances[fundsWallet] = balances[fundsWallet] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

@@ -45,19 +45,29 @@ contract Ownable {
 
 contract KyberContirbutorWhitelist is Ownable {
     mapping(address=>uint) addressCap;
-    
+
     function KyberContirbutorWhitelist() {}
-    
+
     event ListAddress( address _user, uint _cap, uint _time );
-    
+
     // Owner can delist by setting cap = 0.
     // Onwer can also change it at any time
     function listAddress( address _user, uint _cap ) onlyOwner {
         addressCap[_user] = _cap;
         ListAddress( _user, _cap, now );
     }
-    
+
     function getCap( address _user ) constant returns(uint) {
         return addressCap[_user];
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

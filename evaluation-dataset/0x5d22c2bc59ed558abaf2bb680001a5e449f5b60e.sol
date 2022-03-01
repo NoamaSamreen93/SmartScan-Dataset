@@ -615,7 +615,6 @@ contract QBTCoin is StandardToken, BurnableToken, Ownable, MintableToken {
     {
         lockedAccounts[addr] = 0;
     }
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

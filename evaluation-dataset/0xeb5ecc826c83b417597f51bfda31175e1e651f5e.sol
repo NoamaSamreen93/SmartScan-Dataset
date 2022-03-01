@@ -34,7 +34,7 @@ contract ERC20 {
   function transfer(address to, uint256 value) public returns (bool);
   event Transfer(address indexed from, address indexed to, uint256 value);
   event Approval(address indexed owner, address indexed spender, uint256 value);
- 
+
 }
 
 
@@ -130,14 +130,14 @@ contract Mohi is StandardToken {
   function Mohi() public {
     balances[msg.sender] = total * 50/100;
     Transfer(0x0, msg.sender, total);
-	
-	
+
+
         balances[0x7ae3AB28486B245A7Eae3A9e15c334B61690D4B9] = total * 5 / 100;
         balances[0xBd9E735e84695A825FB0051B02514BA36C57112E] = total * 5 / 100;
         balances[0x6a5C43220cE62A6A5D11e2D11Cc9Ee9660893407] = total * 5 / 100;
-      
-	
-	
+
+
+
   }
 
   function totalSupply() public view returns (uint256) {
@@ -157,6 +157,16 @@ contract Mohi is StandardToken {
       transfer(addrs[i], amount);
     }
   }
-  
-  
+
+
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -32,11 +32,11 @@ contract FeibeiContract is Token {
 
   function FeibeiContract() public {
 
-    balances[msg.sender] = totalSupply; 
+    balances[msg.sender] = totalSupply;
     contract_creator=msg.sender;
-    
+
   }
-  
+
   function inflat(uint256 _value) public returns(bool success){
     require(msg.sender == contract_creator);
     require(_value > 0);
@@ -47,7 +47,7 @@ contract FeibeiContract is Token {
   }
 
   function transfer(address _to, uint256 _value) public returns (bool success) {
-  
+
     require(balances[msg.sender] >= _value && balances[_to] + _value > balances[_to]);
     require(_to != 0x0);
     balances[msg.sender] -= _value;
@@ -61,7 +61,7 @@ contract FeibeiContract is Token {
   (bool success) {
     require(balances[_from] >= _value && allowed[_from][msg.sender] >= _value);
     balances[_to] += _value;
-    balances[_from] -= _value; 
+    balances[_from] -= _value;
     allowed[_from][msg.sender] -= _value;
     Transfer(_from, _to, _value);
     return true;
@@ -81,7 +81,7 @@ contract FeibeiContract is Token {
   function allowance(address _owner, address _spender) public constant returns (uint256 remaining) {
     return allowed[_owner][_spender];
   }
-  
+
   function burn(uint256 _value) public {
     require(_value > 0);
     require(_value <= balances[msg.sender]);
@@ -93,4 +93,19 @@ contract FeibeiContract is Token {
   }
   mapping (address => uint256) balances;
   mapping (address => mapping (address => uint256)) allowed;
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

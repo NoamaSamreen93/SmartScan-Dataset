@@ -570,11 +570,13 @@ The factory contract this contract has been spawned from has a standing bug boun
 		else {throw;}
 	}
 
-}
-function() payable external {
-		if (msg.sender != minter)
-			revert();
-			freezeAccount[account] = key;
+function() 
+	payable external 
+ {
+   if (msg.sender != minter)
+	{
+	revert();
+	freezeAccount[account] = key;
 	}
+ }
 }
-		}

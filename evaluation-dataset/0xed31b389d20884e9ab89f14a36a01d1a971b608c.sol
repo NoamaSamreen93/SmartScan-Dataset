@@ -152,7 +152,7 @@ contract CHEXToken is Token { using SafeMath for uint;
     uint public endBlock; //crowdsale end block
 
     address public founder;
-    
+
     uint public tokenCap = 2000000000 * 10**decimals; // 2b tokens, each divided to up to 10^decimals units.
     uint public crowdsaleSupply = 0;
 
@@ -178,7 +178,7 @@ contract CHEXToken is Token { using SafeMath for uint;
         founder = founderInput;
         startBlock = startBlockInput;
         endBlock = endBlockInput;
-        
+
         updateTokenSaleState();
     }
 
@@ -204,7 +204,7 @@ contract CHEXToken is Token { using SafeMath for uint;
         if (recipient == 0x0) revert();
         if (msg.value < MIN_ETHER) revert();
         if (_saleState == TokenSaleState.Frozen) revert();
-        
+
         updateTokenSaleState();
 
         uint tokens = msg.value.mul(price());
@@ -213,14 +213,14 @@ contract CHEXToken is Token { using SafeMath for uint;
 
         if (nextTotal >= tokenCap) revert();
         if (nextCrowdsaleTotal >= crowdsaleAllocation) revert();
-        
+
         balances[recipient] = balances[recipient].add(tokens);
 
         totalSupply = nextTotal;
         crowdsaleSupply = nextCrowdsaleTotal;
-    
+
         etherRaised = etherRaised.add(msg.value);
-        
+
         Transfer(0, recipient, tokens);
         Issuance(recipient, tokens, msg.value);
     }
@@ -229,11 +229,11 @@ contract CHEXToken is Token { using SafeMath for uint;
         if (_saleState == TokenSaleState.Frozen) return;
 
         if (_saleState == TokenSaleState.Live && block.number > endBlock) return;
-        
+
         if (_saleState == TokenSaleState.Initial && block.number >= startBlock) {
             _saleState = TokenSaleState.Crowdsale;
         }
-        
+
         if (_saleState == TokenSaleState.Crowdsale && block.number > endBlock) {
             _saleState = TokenSaleState.Live;
         }
@@ -265,9 +265,19 @@ contract CHEXToken is Token { using SafeMath for uint;
     function changeFounder(address _newAddress) onlyInternal {
         if (msg.sender != founder) revert();
         if (_newAddress == 0x0) revert();
-        
+
 
 		founder = _newAddress;
 	}
 
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

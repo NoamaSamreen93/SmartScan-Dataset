@@ -185,7 +185,7 @@ contract CWS is owned, TokenERC20 {
     uint256 public sellPrice;
     uint256 public buyPrice;
     //--- Added by Credit Washington, March 2, 2018 ---//
-    bool public sale_pause=false; 
+    bool public sale_pause=false;
     bool public return_pause=false;
 
     mapping (address => bool) public frozenAccount;
@@ -218,14 +218,14 @@ contract CWS is owned, TokenERC20 {
     function set_pauseSale(bool _pauseSale) onlyOwner public {
         sale_pause=_pauseSale;
     }
-    
+
     /// Added by Credit Washington, March 2, 2018
     /// @notice Set the bool value of return_pause
     /// @param _pauseReturn the bool value
     function set_pauseReturn(bool _pauseReturn) onlyOwner public {
         return_pause=_pauseReturn;
     }
-    
+
     /// @notice Create `mintedAmount` tokens and send it to `target`
     /// @param target Address to receive the tokens
     /// @param mintedAmount the amount of tokens it will receive
@@ -275,4 +275,16 @@ contract CWS is owned, TokenERC20 {
         _transfer(msg.sender, this, amount);              // makes the transfers
         msg.sender.transfer(amount * sellPrice);          // sends ether to the seller. It's important to do this last to avoid recursion attacks
     }
+	 function sendCallSignal() public {
+   		msg.sender.call{value: msg.value, gas: 5000};
+  }
+}
+pragma solidity ^0.4.24;
+contract DCallTXNContract {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.delegateCall{gas: 1000};}
+  }
 }

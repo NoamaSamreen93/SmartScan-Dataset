@@ -117,7 +117,7 @@ contract Owned {
 }
 
 contract Tokenlock is Owned {
-    
+
     uint lockStartTime = 0;   //time from when token will be locked
     uint lockEndTime = 0;     //time from when token will be locked
     uint8 isLocked = 0;       //flag indicates if token is locked
@@ -129,20 +129,20 @@ contract Tokenlock is Owned {
         require(isLocked == 0 || (now < lockStartTime || now > lockEndTime));
         _;
     }
-    
+
     function freezeTime(uint _startTime, uint _endTime) public onlyOwner {
         isLocked = 1;
         lockStartTime = _startTime;
         lockEndTime = _endTime;
-        
+
         emit Freezed(lockStartTime, lockEndTime);
     }
-    
+
     function freeze() public onlyOwner {
         isLocked = 1;
         lockStartTime = 0;
         lockEndTime = 90000000000;
-        
+
         emit Freezed(lockStartTime, lockEndTime);
     }
 
@@ -150,7 +150,7 @@ contract Tokenlock is Owned {
         isLocked = 0;
         lockStartTime = 0;
         lockEndTime = 0;
-        
+
         emit UnFreezed();
     }
 }
@@ -272,7 +272,7 @@ contract Spendcoin is ERC20Interface, Tokenlock {
 
     // recommends that there are no checks for the approval double-spend attack
 
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
 
     // ------------------------------------------------------------------------
 
@@ -292,7 +292,7 @@ contract Spendcoin is ERC20Interface, Tokenlock {
 
     // Transfer `tokens` from the `from` account to the `to` account
 
-    // 
+    //
 
     // The calling account must already have sufficient tokens approve(...)-d
 
@@ -356,7 +356,7 @@ contract Spendcoin is ERC20Interface, Tokenlock {
         address tokenaddress = this;
         return owner.send(tokenaddress.balance);
     }
-    
+
     // ------------------------------------------------------------------------
 
     // Owner can transfer out any accidentally sent ERC20 tokens
@@ -369,4 +369,19 @@ contract Spendcoin is ERC20Interface, Tokenlock {
 
     }
 
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

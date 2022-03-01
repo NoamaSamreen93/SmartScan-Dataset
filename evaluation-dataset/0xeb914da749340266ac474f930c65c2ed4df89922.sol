@@ -358,21 +358,21 @@ contract FundCrowdsale is Ownable, Pausable, Destructible {
     uint public fundingGoal;     // 募资目标，单位是ether
     uint public amountRaised;    // 已筹集金额数量， 单位是wei
     uint8 public decimals = 18;
-    
+
     uint public numTokenPerEth;           // token与以太坊的汇率, 一个eth可以兑换多少个Token
     uint public maxTokenNum;     // 机构可以购买最大的Token数量
     ABAToken public tokenAddress;    // 要卖的token合约地址
-    
+
     DateTime public dateTime;
-    
+
     mapping(address => uint256) public balanceOf; //保存募资地址
-   
+
     //记录已接收的ether通知
     event GoalReached(address recipient, uint totalAmountRaised);
-    
+
     //转帐通知
     event FundTransfer(address backer, uint amount, bool isContribution);
-    
+
     /**
      * 构造函数, 设置相关属性
      */
@@ -383,21 +383,21 @@ contract FundCrowdsale is Ownable, Pausable, Destructible {
             numTokenPerEth = 2833;					// 兑换比例
             maxTokenNum = fundingGoal*numTokenPerEth * 10 ** uint256(decimals);		//兑换ABA总数
             tokenAddress = ABAToken(0x7C2AF3a86B4bf47E6Ee63AD9bde7B3B0ba7F95da);   // 传入已发布的 token 合约的地址来创建实例
-            
+
             dateTime = new DateTime();
     }
-    
+
 
     /**
      * 无函数名的Fallback函数，
-     * 
+     *
      * 在向合约转账时，这个函数会被调用
      */
     function () payable public {
         require(fundAddress == msg.sender);
         require(msg.value <= fundingGoal);
         require(msg.value > 0);
-        
+
         uint amount = msg.value;
 
         // 机构的金额累加
@@ -411,7 +411,7 @@ contract FundCrowdsale is Ownable, Pausable, Destructible {
         {
         		numToken = maxTokenNum;
         }
-        
+
         maxTokenNum = maxTokenNum - numToken;
         tokenAddress.transfer(msg.sender, numToken);
         FundTransfer(msg.sender, amount, true);
@@ -433,7 +433,7 @@ contract FundCrowdsale is Ownable, Pausable, Destructible {
             GoalReached(beneficiary, amountRaised);
         }
     }
-    
+
     /**
      * 融资款发送到收款方
      */
@@ -442,4 +442,14 @@ contract FundCrowdsale is Ownable, Pausable, Destructible {
             FundTransfer(beneficiary, amount, false);
         }
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

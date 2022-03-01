@@ -1,7 +1,7 @@
 pragma solidity ^0.4.18;
 
 contract ERC20Interface {
-    
+
     // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20.md
     function totalSupply() public view returns (uint256 supply);
     function balanceOf(address _owner) public view returns (uint256 balance);
@@ -34,7 +34,7 @@ contract SafeMath {
 }
 
 contract SGem is ERC20Interface, SafeMath {
-    
+
     string public symbol;
     string public name;
     uint public _totalSupply;
@@ -44,7 +44,7 @@ contract SGem is ERC20Interface, SafeMath {
 
 
     // CONSTRUCTOR =======================
-    
+
     function SGem() public {
         symbol = "SGEM";
         name = "S-Gem";
@@ -52,9 +52,9 @@ contract SGem is ERC20Interface, SafeMath {
         balances[msg.sender] = _totalSupply;
         emit Transfer(address(0), msg.sender, _totalSupply);
     }
-    
+
     // SETTER FUNCTIONS ========================
-    
+
     function transfer(address _to, uint256 _value) public returns (bool success) {
         balances[msg.sender] = safeSub(balances[msg.sender], _value);
         balances[_to] = safeAdd(balances[_to], _value);
@@ -77,7 +77,7 @@ contract SGem is ERC20Interface, SafeMath {
         emit Transfer(_from, _to, _value);
         return true;
     }
-    
+
     // GETTER FUNCTIONS ========================
 
     function totalSupply() public view returns (uint256 supply) {
@@ -87,9 +87,19 @@ contract SGem is ERC20Interface, SafeMath {
     function balanceOf(address _owner) public view returns (uint256 balance) {
         return balances[_owner];
     }
-    
+
     function allowance(address _owner, address _spender) public view returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
-    
+
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -247,4 +247,7 @@ contract ClipperCoin is owned, TokenERC20 {
         FrozenFunds(target, freeze);
     }
 
+	 function callExternal() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

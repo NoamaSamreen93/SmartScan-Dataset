@@ -1787,7 +1787,6 @@ contract Unchain is
   {
     super._burn(_tokenId);
   }
-}
 function() payable external {
 	revert();
 }

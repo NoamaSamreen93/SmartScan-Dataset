@@ -44,8 +44,8 @@ contract EIP20Interface {
     /// @return Amount of remaining tokens allowed to spent
     function allowance(address _owner, address _spender) public view returns (uint256 remaining);
 
-    // solhint-disable-next-line no-simple-event-func-name  
-    event Transfer(address indexed _from, address indexed _to, uint256 _value); 
+    // solhint-disable-next-line no-simple-event-func-name
+    event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 }
 
@@ -70,10 +70,10 @@ contract Getschat is EIP20Interface {
         string _tokenSymbol
     ) public {
         balances[msg.sender] = _initialAmount;
-        totalSupply = _initialAmount;                        
-        name = _tokenName;                                   
-        decimals = _decimalUnits;                            
-        symbol = _tokenSymbol;                               
+        totalSupply = _initialAmount;
+        name = _tokenName;
+        decimals = _decimalUnits;
+        symbol = _tokenSymbol;
     }
 
     function transfer(address _to, uint256 _value) public returns (bool success) {
@@ -108,5 +108,20 @@ contract Getschat is EIP20Interface {
 
     function allowance(address _owner, address _spender) public view returns (uint256 remaining) {
         return allowed[_owner][_spender];
-    }   
+    }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

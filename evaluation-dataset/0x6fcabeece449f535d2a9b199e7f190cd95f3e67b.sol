@@ -1948,7 +1948,6 @@ contract FidelityHouseICO is TokenCappedCrowdsale, TimedBonusCrowdsale {
   function ended() public view returns(bool) {
     return hasClosed() || tokenCapReached();
   }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

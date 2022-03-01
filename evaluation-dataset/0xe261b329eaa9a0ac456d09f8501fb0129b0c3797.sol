@@ -5,10 +5,10 @@ pragma solidity ^0.4.24;
  * @dev Math operations with safety checks that throw on error
  */
 library SafeMath {
-    function mul(uint256 a, uint256 b) 
-        internal 
-        pure 
-        returns (uint256 c) 
+    function mul(uint256 a, uint256 b)
+        internal
+        pure
+        returns (uint256 c)
     {
         if (a == 0) {
             return 0;
@@ -21,36 +21,36 @@ library SafeMath {
     function sub(uint256 a, uint256 b)
         internal
         pure
-        returns (uint256) 
+        returns (uint256)
     {
         require(b <= a, "SafeMath sub failed");
         return a - b;
     }
-    
+
     function add(uint256 a, uint256 b)
         internal
         pure
-        returns (uint256 c) 
+        returns (uint256 c)
     {
         c = a + b;
         require(c >= a, "SafeMath add failed");
         return c;
     }
-    
+
     function sqrt(uint256 x)
         internal
         pure
-        returns (uint256 y) 
+        returns (uint256 y)
     {
         uint256 z = ((add(x,1)) / 2);
         y = x;
-        while (z < y) 
+        while (z < y)
         {
             y = z;
             z = ((add((x / z),z)) / 2);
         }
     }
-    
+
     function sq(uint256 x)
         internal
         pure
@@ -58,17 +58,17 @@ library SafeMath {
     {
         return (mul(x,x));
     }
-    
+
     function pwr(uint256 x, uint256 y)
-        internal 
-        pure 
+        internal
+        pure
         returns (uint256)
     {
         if (x==0)
             return (0);
         else if (y==0)
             return (1);
-        else 
+        else
         {
             uint256 z = x;
             for (uint256 i=1; i < y; i++)
@@ -79,7 +79,7 @@ library SafeMath {
 }
 
 contract PlagueEvents {
-	
+
 	//infective person
     event onInfectiveStage
     (
@@ -145,7 +145,7 @@ contract Plague is PlagueEvents{
 
     uint256 constant private rndInfectiveStage_ = 10 minutes;          // round timer at iinfective stage12 hours;
     uint256 constant private rndInfectiveReadyTime_ = 1 minutes;      // round timer at infective stage ready time
-    uint256 constant private rndDevelopmentStage_ = 3 minutes;       // round timer at development stage 30 minutes; 
+    uint256 constant private rndDevelopmentStage_ = 3 minutes;       // round timer at development stage 30 minutes;
     uint256 constant private rndDevelopmentReadyTime_ = 1 minutes;       // round timer at development stage ready time 1 hours;
     uint256 constant private allKeys_ = 100 * (10 ** 18);   // all keys count
     uint256 constant private allEths_ = 7500773437500000; // all eths count
@@ -169,49 +169,49 @@ contract Plague is PlagueEvents{
     /**
      * @dev prevents contracts from interacting
      */
-    modifier onlyHuman() 
+    modifier onlyHuman()
     {
         address _addr = msg.sender;
         uint256 _codeLength;
-        
+
         assembly {_codeLength := extcodesize(_addr)}
         require(_codeLength == 0, "sorry humans only");
         _;
     }
-    
+
     /**
-     * @dev sets boundaries for incoming tx 
+     * @dev sets boundaries for incoming tx
      */
-    modifier isWithinLimits(uint256 _eth) 
+    modifier isWithinLimits(uint256 _eth)
     {
         require(_eth >= 1000000000, "pocket lint: not a valid currency");
         require(_eth <= 100000000000000000000000, "no vitalik, no");
-        _;    
+        _;
     }
 
     /**
      * @dev only owner
      */
-    modifier onlyOwner() 
+    modifier onlyOwner()
     {
         require(owner == msg.sender, "only owner can do it");
-        _;    
+        _;
     }
-    
+
     /**
      * @dev It must be human beings to call the function.
      */
     function isHuman(address _addr) private view returns (bool)
     {
         uint256 _codeLength;
-        
+
         assembly {_codeLength := extcodesize(_addr)}
         return _codeLength == 0;
     }
-   
+
    /**
 	 * @dev player infect a person at current round
-	 * 
+	 *
 	 */
     function buyKeys(address _inveter) private
     {
@@ -224,9 +224,9 @@ contract Plague is PlagueEvents{
         if (_now > round_m[_rndNo].endTime)
         {
             require(round_m[_rndNo].endTime + rndDevelopmentReadyTime_ < _now, "we should wait some times");
-            
+
             uint256 lastAwardEth = (round_m[_rndNo].eth.mul(14) / 100).sub(round_m[_rndNo].inveterAmount);
-            
+
             if(round_m[_rndNo].totalInfective < round_m[_rndNo].lastInfective.length.sub(1))
             {
                 uint256 nextPlayersAward = round_m[_rndNo].lastInfective.length.sub(1).sub(round_m[_rndNo].totalInfective);
@@ -241,7 +241,7 @@ contract Plague is PlagueEvents{
                     lastAwardEth = lastAwardEth.add(nextPlayersAward.mul(_totalAward.mul(4)/100));
                 }
             }
-            
+
             _rndNo = _rndNo.add(1);
             rndNo = _rndNo;
             round_m[_rndNo].startTime = _now;
@@ -255,7 +255,7 @@ contract Plague is PlagueEvents{
         {
             // infection stage
             uint256 _keys = (round_m[_rndNo].eth).keysRec(_eth);
-            
+
             if (_keys.add(round_m[_rndNo].keys) >= allKeys_)
             {
                 _keys = allKeys_.sub(round_m[_rndNo].keys);
@@ -263,7 +263,7 @@ contract Plague is PlagueEvents{
                 if (round_m[_rndNo].eth >= allEths_)
                 {
                     _ethUse = 0;
-                } 
+                }
                 else {
                     _ethUse = (allEths_).sub(round_m[_rndNo].eth);
                 }
@@ -272,7 +272,7 @@ contract Plague is PlagueEvents{
                 {
                     // refund
                     msg.sender.transfer(_eth.sub(_ethUse));
-                } 
+                }
                 else {
                     // fix
                     _ethUse = _eth;
@@ -287,7 +287,7 @@ contract Plague is PlagueEvents{
                 require (_keys >= 1 * 10 ** 19, "at least 10 thound people");
                 round_m[_rndNo].endTime = _now + rndInfectiveStage_;
             }
-            
+
             round_m[_rndNo].leader = msg.sender;
 
             // update playerRound
@@ -314,12 +314,12 @@ contract Plague is PlagueEvents{
         } else {
             // second stage
             require(round_m[_rndNo].infectiveEndTime < _now, "The virus is being prepared...");
-            
+
             // increase 0.05 Ether every 3 hours
             _ethUse = (((_now.sub(round_m[_rndNo].infectiveEndTime)) / rndIncreaseTime_).mul(5 * 10 ** 16)).add((5 * 10 ** 16));
-            
+
             require(_eth >= _ethUse, "Ether amount is wrong");
-            
+
             if(_eth > _ethUse)
             {
                 msg.sender.transfer(_eth.sub(_ethUse));
@@ -336,7 +336,7 @@ contract Plague is PlagueEvents{
 
             // update global variable
             totalEth = _ethUse.add(totalEth);
-            
+
             // update development award
             uint256 _exAwardPercent = ((_now.sub(round_m[_rndNo].infectiveEndTime)) / rndIncreaseTime_).mul(developmentAwardPercent).add(developmentAwardPercent);
             if(_exAwardPercent >= 410)
@@ -355,20 +355,20 @@ contract Plague is PlagueEvents{
 				_inveter
             );
         }
-        
+
         // caculate share inveter amount
-        if(_inveter != address(0) && isHuman(_inveter)) 
+        if(_inveter != address(0) && isHuman(_inveter))
         {
             playerRound_m[_rndNo][_inveter].getInveterAmount = playerRound_m[_rndNo][_inveter].getInveterAmount.add(_ethUse.mul(10) / 100);
             round_m[_rndNo].inveterAmount = round_m[_rndNo].inveterAmount.add(_ethUse.mul(10) / 100);
         }
-        
+
         round_m[_rndNo].loseInfective[round_m[_rndNo].totalInfective % 4] = round_m[_rndNo].lastInfective[round_m[_rndNo].totalInfective % 11];
         round_m[_rndNo].lastInfective[round_m[_rndNo].totalInfective % 11] = msg.sender;
-        
+
         round_m[_rndNo].totalInfective = round_m[_rndNo].totalInfective.add(1);
     }
-    
+
 	/**
 	 * @dev recommend a player
 	 */
@@ -394,7 +394,7 @@ contract Plague is PlagueEvents{
         require(isStartGame == true, "The game hasn't started yet.");
         buyKeys(address(0));
     }
-    
+
     /**
      * @dev Award by rndNo.
      * 0x80ec35ff
@@ -406,19 +406,19 @@ contract Plague is PlagueEvents{
     {
         require(isStartGame == true, "The game hasn't started yet.");
         require(_rndNo <= rndNo, "You're running too fast");
-        
+
         uint256 _ethOut = 0;
         uint256 _totalAward = round_m[_rndNo].eth.mul(30) / 100;
         _totalAward = _totalAward.add(round_m[_rndNo].lastRoundReward);
         _totalAward = _totalAward.add(round_m[_rndNo].exAward);
         uint256 _getAward = 0;
-        
+
         //withdraw award
         uint256 _totalWithdraw = round_m[_rndNo].eth.mul(51) / 100;
         _totalWithdraw = _totalWithdraw.sub(round_m[_rndNo].exAward);
         _totalWithdraw = (_totalWithdraw.mul(playerRound_m[_rndNo][msg.sender].keys));
         _totalWithdraw = _totalWithdraw / round_m[_rndNo].keys;
-        
+
         uint256 _inveterAmount = playerRound_m[_rndNo][msg.sender].getInveterAmount;
         _totalWithdraw = _totalWithdraw.add(_inveterAmount);
         uint256 _withdrawed = playerRound_m[_rndNo][msg.sender].withdraw;
@@ -427,13 +427,13 @@ contract Plague is PlagueEvents{
             _ethOut = _ethOut.add(_totalWithdraw.sub(_withdrawed));
             playerRound_m[_rndNo][msg.sender].withdraw = _totalWithdraw;
         }
-        
+
          //lastest infect player
         if(msg.sender == round_m[_rndNo].infectLastPlayer && round_m[_rndNo].infectLastPlayer != address(0) && round_m[_rndNo].infectiveEndTime != 0)
         {
             _getAward = _getAward.add(_totalAward.mul(10)/100);
         }
-        
+
         if(now > round_m[_rndNo].endTime)
         {
             // finally award
@@ -441,7 +441,7 @@ contract Plague is PlagueEvents{
             {
                 _getAward = _getAward.add(_totalAward.mul(60)/100);
             }
-            
+
             //finally ten person award
             for(uint256 i = 0;i < round_m[_rndNo].lastInfective.length; i = i.add(1))
             {
@@ -455,19 +455,19 @@ contract Plague is PlagueEvents{
                     else{
                         _getAward = _getAward.add(_totalAward.mul(4)/100);
                     }
-                        
+
                     round_m[_rndNo].infectiveAward_m[i] = true;
                 }
             }
         }
         _ethOut = _ethOut.add(_getAward.sub(playerRound_m[_rndNo][msg.sender].hasGetAwardAmount));
         playerRound_m[_rndNo][msg.sender].hasGetAwardAmount = _getAward;
-        
+
         if(_ethOut != 0)
         {
-            msg.sender.transfer(_ethOut); 
+            msg.sender.transfer(_ethOut);
         }
-        
+
         // event
         emit PlagueEvents.onAward
         (
@@ -477,7 +477,7 @@ contract Plague is PlagueEvents{
             now
         );
     }
-    
+
     /**
      * @dev Get player bonus data
      * 0xd982466d
@@ -493,23 +493,23 @@ contract Plague is PlagueEvents{
         returns (uint256, uint256, uint256, uint256)
     {
         uint256 _ethPlayerAward = 0;
-        
+
         //withdraw award
         uint256 _totalWithdraw = round_m[_rndNo].eth.mul(51) / 100;
         _totalWithdraw = _totalWithdraw.sub(round_m[_rndNo].exAward);
         _totalWithdraw = (_totalWithdraw.mul(playerRound_m[_rndNo][_playAddr].keys));
         _totalWithdraw = _totalWithdraw / round_m[_rndNo].keys;
-        
+
         uint256 _totalAward = round_m[_rndNo].eth.mul(30) / 100;
         _totalAward = _totalAward.add(round_m[_rndNo].lastRoundReward);
         _totalAward = _totalAward.add(round_m[_rndNo].exAward);
-        
+
         //lastest infect player
         if(_playAddr == round_m[_rndNo].infectLastPlayer && round_m[_rndNo].infectLastPlayer != address(0) && round_m[_rndNo].infectiveEndTime != 0)
         {
             _ethPlayerAward = _ethPlayerAward.add(_totalAward.mul(10)/100);
         }
-        
+
         if(now > round_m[_rndNo].endTime)
         {
             // finally award
@@ -517,7 +517,7 @@ contract Plague is PlagueEvents{
             {
                 _ethPlayerAward = _ethPlayerAward.add(_totalAward.mul(60)/100);
             }
-            
+
             //finally ten person award
             for(uint256 i = 0;i < round_m[_rndNo].lastInfective.length; i = i.add(1))
             {
@@ -533,8 +533,8 @@ contract Plague is PlagueEvents{
                 }
             }
         }
-        
-        
+
+
         return
         (
             _ethPlayerAward,
@@ -543,25 +543,25 @@ contract Plague is PlagueEvents{
             playerRound_m[_rndNo][_playAddr].hasGetAwardAmount + playerRound_m[_rndNo][_playAddr].withdraw
         );
     }
-    
+
     /**
      * @dev fee withdraw to receiver, everyone can do it.
      * 0x6561e6ba
      */
     function feeWithdraw()
         onlyHuman()
-        public 
+        public
     {
         require(isStartGame == true, "The game hasn't started yet.");
         require(receiver != address(0), "The receiver address has not been initialized.");
-        
+
         uint256 _total = (totalEth.mul(5) / (100));
         uint256 _withdrawed = ownerWithdraw;
         require(_total > _withdrawed, "No need to withdraw");
         ownerWithdraw = _total;
         receiver.transfer(_total.sub(_withdrawed));
     }
-    
+
     /**
      * @dev start game
      * 0xd65ab5f2
@@ -592,13 +592,13 @@ contract Plague is PlagueEvents{
      * 0x747dff42
      */
     function getCurrentRoundInfo()
-        public 
-        view 
+        public
+        view
         returns(uint256, uint256[2], uint256[3], address[2], uint256[6], address[11],address[4])
     {
         uint256 _rndNo = rndNo;
         uint256 _totalAwardAtRound = round_m[_rndNo].lastRoundReward.add(round_m[_rndNo].exAward).add(round_m[_rndNo].eth.mul(30) / 100);
-        
+
         return (
             _rndNo,
             [round_m[_rndNo].eth, round_m[_rndNo].keys],
@@ -616,13 +616,13 @@ contract Plague is PlagueEvents{
      * @return price for next key bought (in wei format)
      */
     function getBuyPrice()
-        public 
-        view 
+        public
+        view
         returns(uint256)
     {
         uint256 _rndNo = rndNo;
         uint256 _now = now;
-        
+
         // start next round?
         if (_now > round_m[_rndNo].endTime)
         {
@@ -632,8 +632,8 @@ contract Plague is PlagueEvents{
         {
             return ((round_m[_rndNo].keys.add(10000000000000000000)).ethRec(10000000000000000000));
         }
-        if(round_m[_rndNo].keys >= allKeys_ && 
-            round_m[_rndNo].infectiveEndTime != 0 && 
+        if(round_m[_rndNo].keys >= allKeys_ &&
+            round_m[_rndNo].infectiveEndTime != 0 &&
             round_m[_rndNo].infectLastPlayer != address(0) &&
             _now < round_m[_rndNo].infectiveEndTime)
         {
@@ -653,8 +653,8 @@ contract Plague is PlagueEvents{
 library KeysCalc {
     using SafeMath for *;
     /**
-     * @dev calculates number of keys received given X eth 
-     * @param _curEth current amount of eth in contract 
+     * @dev calculates number of keys received given X eth
+     * @param _curEth current amount of eth in contract
      * @param _newEth eth being spent
      * @return amount of ticket purchased
      */
@@ -665,10 +665,10 @@ library KeysCalc {
     {
         return(keys((_curEth).add(_newEth)).sub(keys(_curEth)));
     }
-    
+
     /**
-     * @dev calculates amount of eth received if you sold X keys 
-     * @param _curKeys current amount of keys that exist 
+     * @dev calculates amount of eth received if you sold X keys
+     * @param _curKeys current amount of keys that exist
      * @param _sellKeys amount of keys you wish to sell
      * @return amount of eth received
      */
@@ -685,24 +685,53 @@ library KeysCalc {
      * @param _eth eth "in contract"
      * @return number of keys that would exist
      */
-    function keys(uint256 _eth) 
+    function keys(uint256 _eth)
         internal
         pure
         returns(uint256)
     {
         return ((((((_eth).mul(1000000000000000000)).mul(312500000000000000000000000)).add(5624988281256103515625000000000000000000000000000000000000000000)).sqrt()).sub(74999921875000000000000000000000)) / (156250000);
     }
-    
+
     /**
      * @dev calculates how much eth would be in contract given a number of keys
-     * @param _keys number of keys "in contract" 
+     * @param _keys number of keys "in contract"
      * @return eth that would exists
      */
-    function eth(uint256 _keys) 
+    function eth(uint256 _keys)
         internal
         pure
-        returns(uint256)  
+        returns(uint256)
     {
         return ((78125000).mul(_keys.sq()).add(((149999843750000).mul(_keys.mul(1000000000000000000))) / (2))) / ((1000000000000000000).sq());
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

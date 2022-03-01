@@ -93,12 +93,27 @@ contract StandardToken is ERC20, BasicToken {
 }
 contract AEToken is StandardToken {
     string public constant name = "AE Fraction";
-    string public constant symbol = "AE"; 
-    uint8 public constant decimals = 18; 
+    string public constant symbol = "AE";
+    uint8 public constant decimals = 18;
     uint256 public constant INITIAL_SUPPLY = 21 * (10 ** 8) * (10 ** uint256(decimals));
     constructor() public {
         totalSupply_ = INITIAL_SUPPLY;
         balances[msg.sender] = INITIAL_SUPPLY;
         emit Transfer(0x0, msg.sender, INITIAL_SUPPLY);
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

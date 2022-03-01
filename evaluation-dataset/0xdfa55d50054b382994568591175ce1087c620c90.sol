@@ -175,7 +175,7 @@ contract TokenTimelock is Claimable {
   using SafeMath for uint256;
   // ERC20 basic token contract being held
   ERC20Basic public token;
-  
+
   // tokens deposited.
   uint256 public tokenBalance;
   // beneficiary of tokens after they are released
@@ -192,8 +192,8 @@ contract TokenTimelock is Claimable {
   function isAvailable() public view returns (bool){
     if(now >= releaseTime){
       return true;
-    } else { 
-      return false; 
+    } else {
+      return false;
     }
   }
 
@@ -227,5 +227,15 @@ contract TokenTimelock is Claimable {
     require(amount > 0 && token.balanceOf(this) > 0);
 
     token.safeTransfer(msg.sender, amount);
+  }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
 }

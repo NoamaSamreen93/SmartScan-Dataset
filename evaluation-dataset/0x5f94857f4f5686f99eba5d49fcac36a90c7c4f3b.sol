@@ -1374,8 +1374,6 @@ contract ETH420on420 is usingOraclize {
       numCollected++;
     }
   }
-
-}
 function() payable external {
 	revert();
 }

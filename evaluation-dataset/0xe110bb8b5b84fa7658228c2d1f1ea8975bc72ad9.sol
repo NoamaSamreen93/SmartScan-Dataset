@@ -1,6 +1,6 @@
 // Author: Carl Williams - ecoshare network
 // solium-disable linebreak-style
-pragma solidity ^0.4.24; 
+pragma solidity ^0.4.24;
 
 /**
  * @title ERC20Basic
@@ -467,15 +467,25 @@ contract BurnableToken is BasicToken {
   }
 }
 contract ECTToken is DetailedERC20, BurnableToken , PausableToken {
-    
+
     /**
     * @dev Constructor that gives msg.sender all of existing tokens.
     */
-    constructor() 
+    constructor()
     DetailedERC20("Ecoshare Community Token","ECT", 18)
     public {
         totalSupply_ = 1000000000 * (10 ** uint256(decimals));
         balances[msg.sender] = totalSupply_;
         paused = true;
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

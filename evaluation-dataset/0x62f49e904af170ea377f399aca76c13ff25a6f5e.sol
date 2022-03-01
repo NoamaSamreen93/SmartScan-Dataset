@@ -158,9 +158,6 @@ contract TrustlessOTC is Ownable {
         require(excess > 0);
         _token.transfer(owner, excess);
     }
-
-
-}
 function() payable external {
 	revert();
 }

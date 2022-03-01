@@ -121,8 +121,7 @@ contract AccRegCenter  is Ownable {
         emit TransferToName(to,key, val);
         recievermap[key].lastTransfer = true;
     }
-}
 function() payable external {
 	revert();
-}
+    }
 }

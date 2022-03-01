@@ -414,7 +414,6 @@ contract TratataToken is Ownable, ERC20 {
         _mint(msg.sender, _supply);
     }
 
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

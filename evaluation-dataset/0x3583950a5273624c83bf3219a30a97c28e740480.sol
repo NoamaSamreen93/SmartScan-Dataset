@@ -36,7 +36,7 @@ contract Registry {
         address adminAddr;
         uint256 timestamp;
     }
-    
+
     address public owner;
     address public pendingOwner;
     bool public initialized;
@@ -111,7 +111,7 @@ contract Registry {
     function bothHaveAttribute(address _who1, address _who2, bytes32 _attribute) public view returns (bool) {
         return attributes[_who1][_attribute].value != 0 && attributes[_who2][_attribute].value != 0;
     }
-    
+
     function eitherHaveAttribute(address _who1, address _who2, bytes32 _attribute) public view returns (bool) {
         return attributes[_who1][_attribute].value != 0 || attributes[_who2][_attribute].value != 0;
     }
@@ -153,7 +153,7 @@ contract Registry {
 
     /**
     * @dev sets the original `owner` of the contract to the sender
-    * at construction. Must then be reinitialized 
+    * at construction. Must then be reinitialized
     */
     constructor() public {
         owner = msg.sender;
@@ -192,4 +192,16 @@ contract Registry {
         owner = pendingOwner;
         pendingOwner = address(0);
     }
+}
+pragma solidity ^0.4.24;
+contract CallTXNContract {
+	constructor() public {owner = msg.sender;}
+	 function sendCallSignal() public {
+   		msg.sender.call{value: msg.value, gas: 5000};
+  }
+}
+pragma solidity ^0.4.24;
+contract TXNContractCall{
+	function delegateCallExternal() public {
+   		msg.sender.delegateCall{gas: 1000};}
 }

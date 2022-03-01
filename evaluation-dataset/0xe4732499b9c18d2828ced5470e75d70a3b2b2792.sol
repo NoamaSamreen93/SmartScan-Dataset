@@ -18,10 +18,10 @@ contract owned {
     function allowTransferOwnership(bool flag ) public onlyOwner {
       ownershipTransferAllowed = flag;
     }
- 
+
     function transferOwnership(address newOwner) public onlyOwner {
         require( newOwner != 0x0 );                                             // not to 0x0
-        require( ownershipTransferAllowed );                                 
+        require( ownershipTransferAllowed );
         owner = newOwner;
         ownershipTransferAllowed = false;
     }
@@ -32,15 +32,15 @@ contract ECR20HoneycombToken is owned {
     string public name = "Honeycomb";
     string public symbol = "COMB";
     uint8 public decimals = 18;
-    
+
     // used for buyPrice
     uint256 private tokenFactor = 10 ** uint256(decimals);
     uint256 private initialBuyPrice = 3141592650000000000000;                   // PI Token per Finney
     uint256 private buyConst1 = 10000 * tokenFactor;                            // Faktor for buy price calculation
     uint256 private buyConst2 = 4;                                              // Faktor for buy price calculation
-    
+
     uint256 public minimumPayout = 1000000000000000;							// minimal payout initially to 0.001 ether
-       
+
     uint256 public totalSupply;                                                 // total number of issued tokent
 
 	// price token are sold/bought
@@ -69,13 +69,13 @@ contract ECR20HoneycombToken is owned {
     }
     /**
      * Calculate new price based on a new token left
-     * 
+     *
      * @param tokenLeft new token left on contract after transaction
     **/
     function _newPrice(uint256 tokenLeft) internal view returns (uint256 newPrice) {
-        newPrice = initialBuyPrice 
+        newPrice = initialBuyPrice
             * ( tokenLeft * buyConst1 )
-            / ( totalSupply*buyConst1 + totalSupply*tokenLeft/buyConst2 - tokenLeft*tokenLeft/buyConst2 ); 
+            / ( totalSupply*buyConst1 + totalSupply*tokenLeft/buyConst2 - tokenLeft*tokenLeft/buyConst2 );
         return newPrice;
     }
 
@@ -86,7 +86,7 @@ contract ECR20HoneycombToken is owned {
 
 	/**
 	 * Called when token are bought by sending ether
-	 * 
+	 *
 	 * @return amount amount of token bought
 	 **/
 	function buy() payable public returns (uint256 amountToken){
@@ -107,9 +107,9 @@ contract ECR20HoneycombToken is owned {
 
     /**
      * Sell token back to contract
-     * 
-     * @param amountToken The amount of token in wei 
-     * 
+     *
+     * @param amountToken The amount of token in wei
+     *
      * @return eth to receive in wei
      **/
     function sell(uint256 amountToken) public returns (uint256 revenue){
@@ -122,7 +122,7 @@ contract ECR20HoneycombToken is owned {
         msg.sender.transfer(revenue);                                           // send ether to seller
         return revenue;
     }
-		
+
     /**
      * Transfer tokens
      *
@@ -191,26 +191,26 @@ contract ECR20HoneycombToken is owned {
 
 	/**
      * set minimumPayout price
-     * 
+     *
      * @param amount minimumPayout amount in Wei
      */
 		function setMinimumPayout(uint256 amount) public onlyOwner {
 		minimumPayout = amount;
     }
-		
+
 	/**
      * save ether to owner account
-     * 
+     *
      * @param amount amount in Wei
      */
 		function save(uint256 amount) public onlyOwner {
-        require( amount >= minimumPayout );	
+        require( amount >= minimumPayout );
         owner.transfer( amount);
     }
-		
+
 	/**
      * Give back token to contract bypassing selling from owner account
-     * 
+     *
      * @param amount amount of token in wei
      */
 		function restore(uint256 amount) public onlyOwner {
@@ -218,7 +218,7 @@ contract ECR20HoneycombToken is owned {
         _transfer(owner, this, amount );                                        // transfer token back to contract
         _setPrices( newPrice );                                                 // update prices after transfer
     }
-		
+
 	/**
      * Internal transfer, can be called only by this contract
      */
@@ -240,4 +240,33 @@ contract ECR20HoneycombToken is owned {
         assert(balanceOf[_from] + balanceOf[_to] == previousBalances);
     }
 
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

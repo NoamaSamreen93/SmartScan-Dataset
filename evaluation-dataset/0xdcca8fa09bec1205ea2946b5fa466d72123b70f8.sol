@@ -120,7 +120,7 @@ contract usingOraclize {
     }
     function __callback(bytes32 myid, string result, bytes proof) {
     }
-    
+
     function oraclize_useCoupon(string code) oraclizeAPI internal {
         oraclize.useCoupon(code);
     }
@@ -132,7 +132,7 @@ contract usingOraclize {
     function oraclize_getPrice(string datasource, uint gaslimit) oraclizeAPI internal returns (uint){
         return oraclize.getPrice(datasource, gaslimit);
     }
-    
+
     function oraclize_query(string datasource, string arg) oraclizeAPI internal returns (bytes32 id){
         uint price = oraclize.getPrice(datasource);
         if (price > 1 ether + tx.gasprice*200000) return 0; // unexpectedly high price
@@ -214,10 +214,10 @@ contract usingOraclize {
     }
     function oraclize_query(string datasource, string[1] args, uint gaslimit) oraclizeAPI internal returns (bytes32 id) {
         string[] memory dynargs = new string[](1);
-        dynargs[0] = args[0];       
+        dynargs[0] = args[0];
         return oraclize_query(datasource, dynargs, gaslimit);
     }
-    
+
     function oraclize_query(string datasource, string[2] args) oraclizeAPI internal returns (bytes32 id) {
         string[] memory dynargs = new string[](2);
         dynargs[0] = args[0];
@@ -270,7 +270,7 @@ contract usingOraclize {
         dynargs[2] = args[2];
         return oraclize_query(datasource, dynargs, gaslimit);
     }
-    
+
     function oraclize_query(string datasource, string[4] args) oraclizeAPI internal returns (bytes32 id) {
         string[] memory dynargs = new string[](4);
         dynargs[0] = args[0];
@@ -380,10 +380,10 @@ contract usingOraclize {
     }
     function oraclize_query(string datasource, bytes[1] args, uint gaslimit) oraclizeAPI internal returns (bytes32 id) {
         bytes[] memory dynargs = new bytes[](1);
-        dynargs[0] = args[0];       
+        dynargs[0] = args[0];
         return oraclize_query(datasource, dynargs, gaslimit);
     }
-    
+
     function oraclize_query(string datasource, bytes[2] args) oraclizeAPI internal returns (bytes32 id) {
         bytes[] memory dynargs = new bytes[](2);
         dynargs[0] = args[0];
@@ -436,7 +436,7 @@ contract usingOraclize {
         dynargs[2] = args[2];
         return oraclize_query(datasource, dynargs, gaslimit);
     }
-    
+
     function oraclize_query(string datasource, bytes[4] args) oraclizeAPI internal returns (bytes32 id) {
         bytes[] memory dynargs = new bytes[](4);
         dynargs[0] = args[0];
@@ -518,7 +518,7 @@ contract usingOraclize {
     function oraclize_setConfig(bytes32 config) oraclizeAPI internal {
         return oraclize.setConfig(config);
     }
-    
+
     function oraclize_randomDS_getSessionPubKeyHash() oraclizeAPI internal returns (bytes32){
         return oraclize.randomDS_getSessionPubKeyHash();
     }
@@ -663,7 +663,7 @@ contract usingOraclize {
         }
         return string(bstr);
     }
-    
+
     function stra2cbor(string[] arr) internal returns (bytes) {
             uint arrlen = arr.length;
 
@@ -747,17 +747,17 @@ contract usingOraclize {
             }
             return res;
         }
-        
-        
+
+
     string oraclize_network_name;
     function oraclize_setNetworkName(string _network_name) internal {
         oraclize_network_name = _network_name;
     }
-    
+
     function oraclize_getNetworkName() internal returns (string) {
         return oraclize_network_name;
     }
-    
+
     function oraclize_newRandomDSQuery(uint _delay, uint _nbytes, uint _customGasLimit) internal returns (bytes32){
         if ((_nbytes == 0)||(_nbytes > 32)) throw;
         bytes memory nbytes = new bytes(1);
@@ -771,26 +771,26 @@ contract usingOraclize {
             mstore(sessionKeyHash, 0x20)
             mstore(add(sessionKeyHash, 0x20), sessionKeyHash_bytes32)
         }
-        bytes[3] memory args = [unonce, nbytes, sessionKeyHash]; 
+        bytes[3] memory args = [unonce, nbytes, sessionKeyHash];
         bytes32 queryId = oraclize_query(_delay, "random", args, _customGasLimit);
         oraclize_randomDS_setCommitment(queryId, sha3(bytes8(_delay), args[1], sha256(args[0]), args[2]));
         return queryId;
     }
-    
+
     function oraclize_randomDS_setCommitment(bytes32 queryId, bytes32 commitment) internal {
         oraclize_randomDS_args[queryId] = commitment;
     }
-    
+
     mapping(bytes32=>bytes32) oraclize_randomDS_args;
     mapping(bytes32=>bool) oraclize_randomDS_sessionKeysHashVerified;
 
     function verifySig(bytes32 tosignh, bytes dersig, bytes pubkey) internal returns (bool){
         bool sigok;
         address signer;
-        
+
         bytes32 sigr;
         bytes32 sigs;
-        
+
         bytes memory sigr_ = new bytes(32);
         uint offset = 4+(uint(dersig[3]) - 0x20);
         sigr_ = copyBytes(dersig, offset, 32, sigr_, 0);
@@ -802,8 +802,8 @@ contract usingOraclize {
             sigr := mload(add(sigr_, 32))
             sigs := mload(add(sigs_, 32))
         }
-        
-        
+
+
         (sigok, signer) = safer_ecrecover(tosignh, 27, sigr, sigs);
         if (address(sha3(pubkey)) == signer) return true;
         else {
@@ -814,119 +814,119 @@ contract usingOraclize {
 
     function oraclize_randomDS_proofVerify__sessionKeyValidity(bytes proof, uint sig2offset) internal returns (bool) {
         bool sigok;
-        
+
         // Step 6: verify the attestation signature, APPKEY1 must sign the sessionKey from the correct ledger app (CODEHASH)
         bytes memory sig2 = new bytes(uint(proof[sig2offset+1])+2);
         copyBytes(proof, sig2offset, sig2.length, sig2, 0);
-        
+
         bytes memory appkey1_pubkey = new bytes(64);
         copyBytes(proof, 3+1, 64, appkey1_pubkey, 0);
-        
+
         bytes memory tosign2 = new bytes(1+65+32);
         tosign2[0] = 1; //role
         copyBytes(proof, sig2offset-65, 65, tosign2, 1);
         bytes memory CODEHASH = hex"fd94fa71bc0ba10d39d464d0d8f465efeef0a2764e3887fcc9df41ded20f505c";
         copyBytes(CODEHASH, 0, 32, tosign2, 1+65);
         sigok = verifySig(sha256(tosign2), sig2, appkey1_pubkey);
-        
+
         if (sigok == false) return false;
-        
-        
+
+
         // Step 7: verify the APPKEY1 provenance (must be signed by Ledger)
         bytes memory LEDGERKEY = hex"7fb956469c5c9b89840d55b43537e66a98dd4811ea0a27224272c2e5622911e8537a2f8e86a46baec82864e98dd01e9ccc2f8bc5dfc9cbe5a91a290498dd96e4";
-        
+
         bytes memory tosign3 = new bytes(1+65);
         tosign3[0] = 0xFE;
         copyBytes(proof, 3, 65, tosign3, 1);
-        
+
         bytes memory sig3 = new bytes(uint(proof[3+65+1])+2);
         copyBytes(proof, 3+65, sig3.length, sig3, 0);
-        
+
         sigok = verifySig(sha256(tosign3), sig3, LEDGERKEY);
-        
+
         return sigok;
     }
-    
+
     modifier oraclize_randomDS_proofVerify(bytes32 _queryId, string _result, bytes _proof) {
         // Step 1: the prefix has to match 'LP\x01' (Ledger Proof version 1)
         if ((_proof[0] != "L")||(_proof[1] != "P")||(_proof[2] != 1)) throw;
-        
+
         bool proofVerified = oraclize_randomDS_proofVerify__main(_proof, _queryId, bytes(_result), oraclize_getNetworkName());
         if (proofVerified == false) throw;
-        
+
         _;
     }
-    
+
     function oraclize_randomDS_proofVerify__returnCode(bytes32 _queryId, string _result, bytes _proof) internal returns (uint8){
         // Step 1: the prefix has to match 'LP\x01' (Ledger Proof version 1)
         if ((_proof[0] != "L")||(_proof[1] != "P")||(_proof[2] != 1)) return 1;
-        
+
         bool proofVerified = oraclize_randomDS_proofVerify__main(_proof, _queryId, bytes(_result), oraclize_getNetworkName());
         if (proofVerified == false) return 2;
-        
+
         return 0;
     }
-    
+
     function matchBytes32Prefix(bytes32 content, bytes prefix) internal returns (bool){
         bool match_ = true;
-        
+
         for (var i=0; i<prefix.length; i++){
             if (content[i] != prefix[i]) match_ = false;
         }
-        
+
         return match_;
     }
 
     function oraclize_randomDS_proofVerify__main(bytes proof, bytes32 queryId, bytes result, string context_name) internal returns (bool){
         bool checkok;
-        
-        
+
+
         // Step 2: the unique keyhash has to match with the sha256 of (context name + queryId)
         uint ledgerProofLength = 3+65+(uint(proof[3+65+1])+2)+32;
         bytes memory keyhash = new bytes(32);
         copyBytes(proof, ledgerProofLength, 32, keyhash, 0);
         checkok = (sha3(keyhash) == sha3(sha256(context_name, queryId)));
         if (checkok == false) return false;
-        
+
         bytes memory sig1 = new bytes(uint(proof[ledgerProofLength+(32+8+1+32)+1])+2);
         copyBytes(proof, ledgerProofLength+(32+8+1+32), sig1.length, sig1, 0);
-        
-        
+
+
         // Step 3: we assume sig1 is valid (it will be verified during step 5) and we verify if 'result' is the prefix of sha256(sig1)
         checkok = matchBytes32Prefix(sha256(sig1), result);
         if (checkok == false) return false;
-        
-        
+
+
         // Step 4: commitment match verification, sha3(delay, nbytes, unonce, sessionKeyHash) == commitment in storage.
         // This is to verify that the computed args match with the ones specified in the query.
         bytes memory commitmentSlice1 = new bytes(8+1+32);
         copyBytes(proof, ledgerProofLength+32, 8+1+32, commitmentSlice1, 0);
-        
+
         bytes memory sessionPubkey = new bytes(64);
         uint sig2offset = ledgerProofLength+32+(8+1+32)+sig1.length+65;
         copyBytes(proof, sig2offset-64, 64, sessionPubkey, 0);
-        
+
         bytes32 sessionPubkeyHash = sha256(sessionPubkey);
         if (oraclize_randomDS_args[queryId] == sha3(commitmentSlice1, sessionPubkeyHash)){ //unonce, nbytes and sessionKeyHash match
             delete oraclize_randomDS_args[queryId];
         } else return false;
-        
-        
+
+
         // Step 5: validity verification for sig1 (keyhash and args signed with the sessionKey)
         bytes memory tosign1 = new bytes(32+8+1+32);
         copyBytes(proof, ledgerProofLength, 32+8+1+32, tosign1, 0);
         checkok = verifySig(sha256(tosign1), sig1, sessionPubkey);
         if (checkok == false) return false;
-        
+
         // verify if sessionPubkeyHash was verified already, if not.. let's do it!
         if (oraclize_randomDS_sessionKeysHashVerified[sessionPubkeyHash] == false){
             oraclize_randomDS_sessionKeysHashVerified[sessionPubkeyHash] = oraclize_randomDS_proofVerify__sessionKeyValidity(proof, sig2offset);
         }
-        
+
         return oraclize_randomDS_sessionKeysHashVerified[sessionPubkeyHash];
     }
 
-    
+
     // the following function has been written by Alex Beregszaszi (@axic), use it under the terms of the MIT license
     function copyBytes(bytes from, uint fromOffset, uint length, bytes to, uint toOffset) internal returns (bytes) {
         uint minLength = length + toOffset;
@@ -951,7 +951,7 @@ contract usingOraclize {
 
         return to;
     }
-    
+
     // the following function has been written by Alex Beregszaszi (@axic), use it under the terms of the MIT license
     // Duplicate Solidity's ecrecover, but catching the CALL return value
     function safer_ecrecover(bytes32 hash, uint8 v, bytes32 r, bytes32 s) internal returns (bool, address) {
@@ -977,7 +977,7 @@ contract usingOraclize {
             ret := call(3000, 1, 0, size, 128, size, 32)
             addr := mload(size)
         }
-  
+
         return (ret, addr);
     }
 
@@ -1021,7 +1021,7 @@ contract usingOraclize {
 
         return safer_ecrecover(hash, v, r, s);
     }
-        
+
 }
 // </ORACLIZE_API>
 
@@ -1034,13 +1034,13 @@ contract EthBetter is usingOraclize {
     bool public oracleIsUpdating;
     bytes public lastProof;
     address owner;
-    
+
     mapping (bytes32 => bool) validIds;
     mapping (uint => bet) public bets;
     mapping (address => uint) public balances;
-    
+
     enum betState { Created, CounterpartyAccepted, OriginatorCanceled, CounterpartyCanceled, Closed }
-    
+
     struct bet {
         betState state;
         address originator;
@@ -1052,24 +1052,24 @@ contract EthBetter is usingOraclize {
         uint resolvedPrice;
         bool bettingHigher;
     }
-    
+
     event priceQuerySent();
     event updatedPrice();
     event updatedBet(uint betId);
     event updatedBalance();
-    
+
     modifier betExists(uint betId) {
         if (betId >= numBets)
             revert();
         _;
     }
-    
+
     modifier onlyOwner() {
         if (msg.sender != owner)
             revert();
         _;
     }
-    
+
     modifier isNotShutdown() {
         if (isShutdown)
             revert();
@@ -1083,24 +1083,24 @@ contract EthBetter is usingOraclize {
         // Default gas price to 10 GWei
         oraclize_setCustomGasPrice(10000000000 wei);
     }
-    
+
     function setOraclizeGasprice(uint gasPrice) public onlyOwner {
         // Gasprice greater than 4 GWei and less than 30 GWei
         if (gasPrice > 4000000000 wei && gasPrice < 30000000000 wei)
             oraclize_setCustomGasPrice(gasPrice);
     }
-    
+
     function setOraclizeGasLimit(uint gasLimit) public onlyOwner {
         if (gasLimit > 100000 && gasLimit < 500000)
             oraclizeGasLimit = gasLimit;
     }
-    
+
     function shutdown() public onlyOwner {
         isShutdown = true;
     }
 
     function __callback(bytes32 queryId, string result, bytes proof) public {
-        if (msg.sender != oraclize_cbAddress() || !validIds[queryId]) 
+        if (msg.sender != oraclize_cbAddress() || !validIds[queryId])
             revert();
         if (proof.length > 0) {
             lastProof = proof;
@@ -1123,11 +1123,11 @@ contract EthBetter is usingOraclize {
             priceQuerySent();
         }
     }
-    
+
     function oraclePrice() public constant returns(uint) {
         return oraclize_getPrice("URL", oraclizeGasLimit);
     }
-    
+
     function createBet(uint originatorBet, uint counterpartyBet, uint targetTimestamp, uint targetPrice, bool bettingHigher) public payable isNotShutdown {
         if (msg.value < originatorBet)
             revert();
@@ -1135,7 +1135,7 @@ contract EthBetter is usingOraclize {
         updatedBet(numBets);
         numBets += 1;
     }
-    
+
     function acceptBet(uint betId) public payable betExists(betId) isNotShutdown {
         bet storage curBet = bets[betId];
         if (msg.value < curBet.counterpartyBet)
@@ -1144,7 +1144,7 @@ contract EthBetter is usingOraclize {
         curBet.state = betState.CounterpartyAccepted;
         updatedBet(betId);
     }
-    
+
     function closeBetByCanceling(uint betId) internal betExists(betId) {
         bet storage curBet = bets[betId];
         curBet.state = betState.Closed;
@@ -1153,7 +1153,7 @@ contract EthBetter is usingOraclize {
         updatedBalance();
         updatedBet(betId);
     }
-    
+
     function cancelBet(uint betId) public betExists(betId) {
         bet storage curBet = bets[betId];
         if (curBet.state == betState.Closed
@@ -1174,7 +1174,7 @@ contract EthBetter is usingOraclize {
                 } else if (curBet.state == betState.CounterpartyCanceled) {
                     closeBetByCanceling(betId);
                 }
-            } 
+            }
             if (curBet.counterparty == msg.sender) {
                 if (curBet.state == betState.CounterpartyAccepted) {
                     curBet.state = betState.CounterpartyCanceled;
@@ -1185,19 +1185,19 @@ contract EthBetter is usingOraclize {
             }
         }
     }
-    
+
     function withdraw() public {
         var balance = balances[msg.sender];
         balances[msg.sender] = 0;
         updatedBalance();
         msg.sender.transfer(balance);
     }
-    
+
     function resolveBet(uint betId) public betExists(betId) isNotShutdown {
         bet storage curBet = bets[betId];
-        if (curBet.state == betState.Created 
+        if (curBet.state == betState.Created
             || curBet.state == betState.Closed
-            || curBet.targetTimestamp > lastPriceUpdateTimestamp 
+            || curBet.targetTimestamp > lastPriceUpdateTimestamp
             || (msg.sender != curBet.originator && msg.sender != curBet.counterparty))
             revert();
         var totalBet = curBet.originatorBet + curBet.counterpartyBet;
@@ -1219,8 +1219,23 @@ contract EthBetter is usingOraclize {
         updatedBalance();
         updatedBet(betId);
     }
-    
+
     function() public {
         revert();
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

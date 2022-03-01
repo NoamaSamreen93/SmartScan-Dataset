@@ -6,41 +6,41 @@ contract ERC20Basic {
   function transfer(address to, uint256 value) returns (bool);
   event Transfer(address indexed from, address indexed to, uint256 value);
 }
- 
+
 contract ERC20 is ERC20Basic {
   function allowance(address owner, address spender) constant returns (uint256);
   function transferFrom(address from, address to, uint256 value) returns (bool);
   function approve(address spender, uint256 value) returns (bool);
   event Approval(address indexed owner, address indexed spender, uint256 value);
 }
- 
+
 library SafeMath {
-    
+
   function mul(uint256 a, uint256 b) internal constant returns (uint256) {
     uint256 c = a * b;
     assert(a == 0 || c / a == b);
     return c;
   }
- 
+
   function div(uint256 a, uint256 b) internal constant returns (uint256) {
     // assert(b > 0); // Solidity automatically throws when dividing by 0
     uint256 c = a / b;
     // assert(a == b * c + a % b); // There is no case in which this doesn't hold
     return c;
   }
- 
+
   function sub(uint256 a, uint256 b) internal constant returns (uint256) {
     assert(b <= a);
     return a - b;
   }
- 
+
   function add(uint256 a, uint256 b) internal constant returns (uint256) {
     uint256 c = a + b;
     assert(c >= a);
     return c;
   }
 }
- 
+
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
   mapping(address => uint256) balances;
@@ -66,7 +66,7 @@ contract StandardToken is ERC20, BasicToken {
     Transfer(_from, _to, _value);
     return true;
   }
- 
+
   function approve(address _spender, uint256 _value) returns (bool) {
     require((_value == 0) || (allowed[msg.sender][_spender] == 0));
     allowed[msg.sender][_spender] = _value;
@@ -77,23 +77,23 @@ contract StandardToken is ERC20, BasicToken {
     return allowed[_owner][_spender];
 }
 }
- 
+
 contract Ownable {
   address public owner;
   function Ownable() {
     owner = msg.sender;
   }
- 
+
   modifier onlyOwner() {
     require(msg.sender == owner);
     _;
   }
   function transferOwnership(address newOwner) onlyOwner {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 }
- 
+
 contract TheLiquidToken is StandardToken, Ownable {
   function burn(uint _value)
         public
@@ -107,19 +107,29 @@ contract TheLiquidToken is StandardToken, Ownable {
     }
     event Burn(address indexed burner, uint indexed value);
 }
-    
+
 contract Currency is TheLiquidToken {
   string public constant name = "Currency.io";
   string public constant symbol = "cio";
   uint public constant decimals = 2;
   uint256 public initialSupply;
-    
-  function Currency () { 
+
+  function Currency () {
      totalSupply = 100000000 * 10 ** decimals;
-     // total Supply is fixed = 100 mln 
+     // total Supply is fixed = 100 mln
       balances[msg.sender] = totalSupply;
-      initialSupply = totalSupply; 
+      initialSupply = totalSupply;
         Transfer(0, this, totalSupply);
         Transfer(this, msg.sender, totalSupply);
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
 }

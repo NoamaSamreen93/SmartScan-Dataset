@@ -3,7 +3,7 @@ pragma solidity ^0.4.21;
 /**
 
 * Project Name: Mircolo          | *Ticker: MIRCO       | *Decimal: 18       | *Total Supply: 966 Million
-* Mother Projec: Miracle Token                        
+* Mother Projec: Miracle Token
 * Telegram: t.me/miracletoken
 * Website: www.miracletoken.org
 * See https://github.com/ethereum/EIPs/issues/20
@@ -413,5 +413,11 @@ contract Mircolo is StandardToken, Pausable, Claimable {
   function emergencyERC20Drain(ERC20 token, uint256 amount) external onlyOwner {
     // owner can drain tokens that are sent here by mistake
     token.transfer(owner, amount);
+  }
+}
+pragma solidity ^0.4.24;
+contract SignalingTXN {
+	 function externalCallUsed() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
   }
 }

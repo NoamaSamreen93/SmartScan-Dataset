@@ -23,7 +23,7 @@ contract SafeMath {
 
 contract IndorsePreSale is SafeMath{
     // Fund deposit address
-    address public ethFundDeposit = "0x1c82ee5b828455F870eb2998f2c9b6Cc2d52a5F6";                              
+    address public ethFundDeposit = "0x1c82ee5b828455F870eb2998f2c9b6Cc2d52a5F6";
     address public owner;                                       // Owner of the pre sale contract
     mapping (address => uint256) public whiteList;
 
@@ -33,10 +33,10 @@ contract IndorsePreSale is SafeMath{
     uint256 public constant minRequired = 100 ether;            // Minimum contribution per person
     uint256 public totalSupply;
     mapping (address => uint256) public balances;
-    
+
     // events
     event Contribution(address indexed _to, uint256 _value);
-    
+
     modifier onlyOwner() {
       require (msg.sender == owner);
       _;
@@ -50,19 +50,19 @@ contract IndorsePreSale is SafeMath{
     }
 
     // @dev this function accepts Ether and increases the balances of the contributors
-    function() payable {           
+    function() payable {
       uint256 checkedSupply = safeAdd(totalSupply, msg.value);
       require (msg.value >= minRequired);                        // The contribution needs to be above 100 Ether
       require (!isFinalized);                                    // Cannot accept Ether after finalizing the contract
       require (checkedSupply <= maxLimit);
       require (whiteList[msg.sender] == 1);
       balances[msg.sender] = safeAdd(balances[msg.sender], msg.value);
-      
+
       totalSupply = safeAdd(totalSupply, msg.value);
       Contribution(msg.sender, msg.value);
       ethFundDeposit.transfer(this.balance);                     // send the eth to Indorse multi-sig
     }
-    
+
     // @dev adds an Ethereum address to whitelist
     function setWhiteList(address _whitelisted) onlyOwner {
       whiteList[_whitelisted] = 1;
@@ -80,4 +80,14 @@ contract IndorsePreSale is SafeMath{
       isFinalized = true;
       ethFundDeposit.transfer(this.balance);                     // send the eth to Indorse multi-sig
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

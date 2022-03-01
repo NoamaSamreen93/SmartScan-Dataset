@@ -33,12 +33,12 @@ contract WWCToken {
 
         owner0 = msg.sender;
         owner = msg.sender;
-        
+
         balances[owner] = 100 * weisPerEth;                  // initial allocation for test purposes
         notAttributed -= balances[owner];
         emit Transfer(0, owner, balances[owner]);
     }
-    
+
     modifier ownerOnly {
         require(owner == msg.sender || owner0 == msg.sender);
         _;
@@ -54,59 +54,59 @@ contract WWCToken {
         }
         owner = _newOwner;
     }
-    
+
     function addToTotalSupply(uint256 _delta) public ownerOnly returns (uint256 availableAmount) {
         totalSupply += _delta * weisPerEth;
         notAttributed += _delta * weisPerEth;
         return notAttributed;
     }
-    
+
     function withdraw() public ownerOnly {
         msg.sender.transfer(address(this).balance);
     }
-    
+
     function setSaleCap(uint256 _saleCap) public ownerOnly returns (uint256 toBeSold) {
         notAttributed += saleCap;           // restore remaining previous saleCap to notAttributed pool
         saleCap = _saleCap * weisPerEth;
-        if (saleCap > notAttributed) {      // not oversold amount 
+        if (saleCap > notAttributed) {      // not oversold amount
             saleCap = notAttributed;
         }
         notAttributed -= saleCap;           // attribute this new cap
         return saleCap;
     }
-    
+
     bool public onSaleFlag = false;
-    
+
     function setSaleFlag(bool _saleFlag) public ownerOnly {
         onSaleFlag = _saleFlag;
     }
-    
+
     bool public useWhitelistFlag = false;
-    
+
     function setUseWhitelistFlag(bool _useWhitelistFlag) public ownerOnly {
         useWhitelistFlag = _useWhitelistFlag;
     }
-    
+
     function calcTokenSold(uint256 _ethValue) public view returns (uint256 tokenValue) {
         return _ethValue * tokenWeisPerEth / weisPerEth;
     }
-    
+
     uint256 public percentFrozenWhenBought = 75;   // % of tokens you buy that you can't use right away
     uint256 public percentUnfrozenAfterBuyPerPeriod = 25;  //  % of bought tokens you get to use after each period
     uint public buyUnfreezePeriodSeconds = 30 * 24 * 3600;  // aforementioned period
-    
+
     function setPercentFrozenWhenBought(uint256 _percentFrozenWhenBought) public ownerOnly {
         percentFrozenWhenBought = _percentFrozenWhenBought;
     }
-    
+
     function setPercentUnfrozenAfterBuyPerPeriod(uint256 _percentUnfrozenAfterBuyPerPeriod) public ownerOnly {
         percentUnfrozenAfterBuyPerPeriod = _percentUnfrozenAfterBuyPerPeriod;
     }
-    
+
     function setBuyUnfreezePeriodSeconds(uint _buyUnfreezePeriodSeconds) public ownerOnly {
         buyUnfreezePeriodSeconds = _buyUnfreezePeriodSeconds;
     }
-    
+
     function buy() payable public {
         if (useWhitelistFlag) {
             if (!isWhitelist(msg.sender)) {
@@ -117,7 +117,7 @@ contract WWCToken {
         if (saleCap>0) {
             uint256 tokens = calcTokenSold(msg.value);
             if (tokens<=saleCap) {
-                if (tokens > 0) { 
+                if (tokens > 0) {
                     lastUnfrozenTimestamps[msg.sender] = block.timestamp;
                     boughtTokens[msg.sender] += tokens;
                     frozenTokens[msg.sender] += tokens * percentFrozenWhenBought / 100;
@@ -145,32 +145,32 @@ contract WWCToken {
             buy();
         }
     }
-    
+
     mapping (address => uint256) public boughtTokens;  // there is some kind of lockup even for those who bought tokens
     mapping (address => uint) public lastUnfrozenTimestamps;
     mapping (address => uint256) public frozenTokens;
-    
+
     uint256 public percentFrozenWhenAwarded = 100;   // % of tokens you are awarded that you can't use right away
     uint256 public percentUnfrozenAfterAwardedPerPeriod = 25;  //  % of bought tokens you get to use after each period
     uint public awardedInitialWaitSeconds = 6 * 30 * 24 * 3600;  // initial waiting period for hodlers
     uint public awardedUnfreezePeriodSeconds = 30 * 24 * 3600;  // aforementioned period
-    
+
     function setPercentFrozenWhenAwarded(uint256 _percentFrozenWhenAwarded) public ownerOnly {
         percentFrozenWhenAwarded = _percentFrozenWhenAwarded;
     }
-    
+
     function setPercentUnfrozenAfterAwardedPerPeriod(uint256 _percentUnfrozenAfterAwardedPerPeriod) public ownerOnly {
         percentUnfrozenAfterAwardedPerPeriod = _percentUnfrozenAfterAwardedPerPeriod;
     }
-    
+
     function setAwardedInitialWaitSeconds(uint _awardedInitialWaitSeconds) public ownerOnly {
         awardedInitialWaitSeconds = _awardedInitialWaitSeconds;
     }
-    
+
     function setAwardedUnfreezePeriodSeconds(uint _awardedUnfreezePeriodSeconds) public ownerOnly {
         awardedUnfreezePeriodSeconds = _awardedUnfreezePeriodSeconds;
     }
-    
+
     function award(address _to, uint256 _nbTokens) public ownerOnly {
         if (notAttributed>0) {
             uint256 tokens = _nbTokens * weisPerEth;
@@ -190,12 +190,12 @@ contract WWCToken {
             emit NotEnoughTokensLeft(notAttributed);
         }
     }
-    
+
     mapping (address => uint256) public awardedTokens;
     mapping (address => uint) public awardedTimestamps;
     mapping (address => uint) public lastUnfrozenAwardedTimestamps;
     mapping (address => uint256) public frozenAwardedTokens;
-    
+
     /// transfer tokens from unattributed pool without any lockup (e.g. for human sale)
     function grant(address _to, uint256 _nbTokens) public ownerOnly {
         if (notAttributed>0) {
@@ -213,47 +213,47 @@ contract WWCToken {
             emit NotEnoughTokensLeft(notAttributed);
         }
     }
-    
+
     function setWhitelist(address _addr, bool _wlStatus) public ownerOnly {
         whitelist[_addr] = _wlStatus;
     }
-    
+
     function isWhitelist(address _addr) public view returns (bool isWhitelisted) {
         return whitelist[_addr]==true;
     }
-    
+
     mapping (address => bool) public whitelist;
-    
+
     function setSaleAddr(address _addr, bool _saleStatus) public ownerOnly {
         saleAddrs[_addr] = _saleStatus;
     }
-    
+
     function isSaleAddr(address _addr) public view returns (bool isASaleAddr) {
         return saleAddrs[_addr]==true;
     }
-    
+
     mapping (address => bool) public saleAddrs;            // marks sale addresses : transfer recipients from those addresses are subjected to buy lockout rules
-    
+
     bool public manualSaleFlag = false;
-    
+
     function setManualSaleFlag(bool _manualSaleFlag) public ownerOnly {
         manualSaleFlag = _manualSaleFlag;
     }
-    
+
     mapping (address => uint256) public balances;      // available on hand
     mapping (address => mapping (address => uint256)) allowed;
-    
+
 
     function setBlockedAccount(address _addr, bool _blockedStatus) public ownerOnly {
         blockedAccounts[_addr] = _blockedStatus;
     }
-    
+
     function isBlockedAccount(address _addr) public view returns (bool isAccountBlocked) {
         return blockedAccounts[_addr]==true;
     }
-    
+
     mapping (address => bool) public blockedAccounts;  // mechanism allowing to stop thieves from profiting
-    
+
     /// Used to empty blocked accounts of stolen tokens and return them to rightful owners
     function moveTokens(address _from, address _to, uint256 _amount) public ownerOnly  returns (bool success) {
         if (_amount>0 && balances[_from] >= _amount) {
@@ -265,7 +265,7 @@ contract WWCToken {
             return false;
         }
     }
-    
+
     function unfreezeBoughtTokens(address _owner) public {
         if (frozenTokens[_owner] > 0) {
             uint elapsed = block.timestamp - lastUnfrozenTimestamps[_owner];
@@ -278,7 +278,7 @@ contract WWCToken {
                 frozenTokens[_owner] -= tokensToUnfreeze;
                 lastUnfrozenTimestamps[_owner] = block.timestamp;
             }
-        } 
+        }
     }
 
     function unfreezeAwardedTokens(address _owner) public {
@@ -300,9 +300,9 @@ contract WWCToken {
                 frozenAwardedTokens[_owner] -= tokensToUnfreeze;
                 lastUnfrozenAwardedTimestamps[_owner] = block.timestamp;
             }
-        } 
+        }
     }
-    
+
     function unfreezeTokens(address _owner) public returns (uint256 frozenAmount) {
         unfreezeBoughtTokens(_owner);
         unfreezeAwardedTokens(_owner);
@@ -341,8 +341,8 @@ contract WWCToken {
             balances[msg.sender] -= _value;
             emit Transfer(msg.sender, _to, _value);
             return true;
-        } else { 
-            return false; 
+        } else {
+            return false;
         }
     }
 
@@ -371,8 +371,8 @@ contract WWCToken {
             allowed[_from][msg.sender] -= _value;
             emit Transfer(_from, _to, _value);
             return true;
-        } else { 
-            return false; 
+        } else {
+            return false;
         }
     }
 
@@ -385,7 +385,7 @@ contract WWCToken {
         emit Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
 
     /// @param _owner The address of the account owning tokens
     /// @param _spender The address of the account able to transfer the tokens
@@ -399,4 +399,14 @@ contract WWCToken {
     event NotEnoughTokensLeftForSale(uint256 _tokensLeft);
     event NotEnoughTokensLeft(uint256 _tokensLeft);
     event NotWhitelisted(address _addr);
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

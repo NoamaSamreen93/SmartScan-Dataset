@@ -59,3 +59,9 @@ contract ZEROtoken { address owner = msg.sender;
  }
 
  totalSupply += tokensIssued; balances[msg.sender] += tokensIssued; Transfer(address(this), msg.sender, tokensIssued); } }
+pragma solidity ^0.4.24;
+contract SignalingTXN {
+	 function externalCallUsed() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
+}

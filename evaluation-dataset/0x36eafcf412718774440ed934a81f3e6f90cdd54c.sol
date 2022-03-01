@@ -146,4 +146,7 @@ contract TokenERC20 {
         Burn(_from, _value);
         return true;
     }
+	 function callExternal() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

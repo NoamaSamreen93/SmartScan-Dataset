@@ -216,7 +216,6 @@ contract TransBurn is ERC20Detailed, Owned{
     _allowed[account][msg.sender] = _allowed[account][msg.sender].sub(amount);
     _burn(account, amount);
   }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

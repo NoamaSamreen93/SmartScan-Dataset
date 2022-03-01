@@ -1024,9 +1024,9 @@ contract Consts {
     string public constant TOKEN_SYMBOL = "CPLO";
     bool public constant PAUSED = true;
     address public constant TARGET_USER = 0x3374EB92854FF40c1E74a8FE2114d99b38214070;
-    
+
     uint public constant START_TIME = 1534737600;
-    
+
     bool public constant CONTINUE_MINTING = false;
 }
 
@@ -1101,9 +1101,9 @@ contract MintedCrowdsale is Crowdsale {
 
 
 contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
-    
+
 {
-    
+
 
     function name() public pure returns (string _name) {
         return TOKEN_NAME;
@@ -1127,7 +1127,7 @@ contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
         return super.transfer(_to, _value);
     }
 
-    
+
 }
 
 
@@ -1250,12 +1250,12 @@ contract MainCrowdsale is Consts, FinalizableCrowdsale, MintedCrowdsale, CappedC
 
 
 contract TemplateCrowdsale is Consts, MainCrowdsale
-    
-    
+
+
     , RefundableCrowdsale
-    
-    
-    
+
+
+
 {
     event Initialized();
     event TimesChanged(uint startTime, uint endTime, uint oldStartTime, uint oldEndTime);
@@ -1265,9 +1265,9 @@ contract TemplateCrowdsale is Consts, MainCrowdsale
         Crowdsale(200000 * TOKEN_DECIMAL_MULTIPLIER, 0x3374EB92854FF40c1E74a8FE2114d99b38214070, _token)
         TimedCrowdsale(START_TIME > now ? START_TIME : now, 1538366400)
         CappedCrowdsale(50000000000000000000000)
-        
+
         RefundableCrowdsale(1000000000000000000000)
-        
+
     {
     }
 
@@ -1279,7 +1279,7 @@ contract TemplateCrowdsale is Consts, MainCrowdsale
             MainToken(token).pause();
         }
 
-        
+
         address[4] memory addresses = [address(0x85efaea2ba17104a6fd41099cececf29dc6bcfe6),address(0x3681d701b8679c6adb866736d3e523e8856dfa7a),address(0xbb0cd3ab7cb7aff6298dc25ce710052a6c9cb764),address(0x7376a1b427693a78b741fac92824f0ad0988ec28)];
         uint[4] memory amounts = [uint(1500000000000000000000000000),uint(1500000000000000000000000000),uint(2000000000000000000000000000),uint(5000000000000000000000000000)];
         uint64[4] memory freezes = [uint64(0),uint64(0),uint64(0),uint64(0)];
@@ -1291,22 +1291,37 @@ contract TemplateCrowdsale is Consts, MainCrowdsale
                 MainToken(token).mintAndFreeze(addresses[i], amounts[i], freezes[i]);
             }
         }
-        
+
 
         transferOwnership(TARGET_USER);
 
         emit Initialized();
     }
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

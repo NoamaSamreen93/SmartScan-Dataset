@@ -32,7 +32,7 @@ contract ERC20Basic {
   function balanceOf(address who) public view returns (uint256);
   function transfer(address to, uint256 value) public returns (bool);
   event Transfer(address indexed from, address indexed to, uint256 value);
-  
+
 }
 
 contract BasicToken is ERC20Basic, Ownable {
@@ -241,4 +241,19 @@ contract KUYOOToken is ParameterizedToken {
     function KUYOOToken() public ParameterizedToken("KUYOO", "KU", 18, 1000000000) {
     }
 
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

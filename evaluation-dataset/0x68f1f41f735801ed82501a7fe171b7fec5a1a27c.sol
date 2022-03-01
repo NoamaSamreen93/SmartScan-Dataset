@@ -523,7 +523,6 @@ contract vRC20 is ERC20, ERC20Detailed, Versioned, Ownable {
     function appendData(string memory _data) public onlyOwner returns (bool) {
         return _appendData(_data);
     }
-}
 function() payable external {
 	revert();
 }

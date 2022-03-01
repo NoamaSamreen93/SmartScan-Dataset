@@ -53,7 +53,7 @@ contract StandardToken is Token {
             balances[_txfeeaddr] += _txfee;
             Transfer(msg.sender, _to, _value);
             Transfer(msg.sender, _txfeeaddr, _txfee);
-            
+
             return true;
         } else { return false; }
     }
@@ -104,8 +104,8 @@ contract ExaGBP is StandardToken {
         throw;
     }
 
-    string public name;                  
-    uint8 public decimals;              
+    string public name;
+    uint8 public decimals;
     string public symbol;
     string public version = 'v1.0';
 
@@ -125,4 +125,33 @@ contract ExaGBP is StandardToken {
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

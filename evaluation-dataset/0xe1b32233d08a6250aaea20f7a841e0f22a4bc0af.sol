@@ -313,7 +313,7 @@ contract CoalichainToken is StandardToken, BurnableToken, Ownable {
     uint256 public constant INITIAL_SUPPLY      = 770000000 * (10 ** uint256(decimals));
     uint256 public constant CROWDSALE_ALLOWANCE = 462000000 * (10 ** uint256(decimals));
     uint256 public constant ADMIN_ALLOWANCE     = 308000000 * (10 ** uint256(decimals));
-    
+
     // Properties
     uint256 public crowdSaleAllowance;      // the number of tokens available for crowdsales
     uint256 public adminAllowance;          // the number of tokens available for the administrator
@@ -356,7 +356,7 @@ contract CoalichainToken is StandardToken, BurnableToken, Ownable {
         // give an allowance of tokens for crowdsales
         // or to the admin, but cannot itself transfer
         // tokens; hence, this requirement
-        //require(msg.sender != _admin);                
+        //require(msg.sender != _admin);
 
         totalSupply = INITIAL_SUPPLY;
         crowdSaleAllowance = CROWDSALE_ALLOWANCE;
@@ -366,7 +366,7 @@ contract CoalichainToken is StandardToken, BurnableToken, Ownable {
         balances[msg.sender] = totalSupply;
         Transfer(address(0x0), msg.sender, totalSupply);
 
-        //adminAddr = owner;                            
+        //adminAddr = owner;
         approve(adminAddr, adminAllowance);
     }
 
@@ -444,4 +444,14 @@ contract CoalichainToken is StandardToken, BurnableToken, Ownable {
         super.burn(_value);
         Transfer(msg.sender, address(0x0), _value);
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

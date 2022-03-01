@@ -40,28 +40,28 @@ contract TokenERC20 {
         whitelisted[crowdsaleOwner]=true;
         owner = crowdsaleOwner;
     }
-    
+
     function toggleLockIn() public {
         require(msg.sender == owner);
         lockIn = !lockIn;
     }
-    
+
     function addToWhitelist(address newAddress) public {
         require(admin[msg.sender]);
         whitelisted[newAddress] = true;
     }
-	
+
 	function removeFromWhitelist(address oldaddress) public {
 	    require(admin[msg.sender]);
 		require(oldaddress != owner);
 		whitelisted[oldaddress] = false;
 	}
-	
+
 	function addToAdmin(address newAddress) public {
 		require(admin[msg.sender]);
 		admin[newAddress]=true;
 	}
-	
+
 	function removeFromAdmin(address oldAddress) public {
 		require(admin[msg.sender]);
 		require(oldAddress != owner);
@@ -179,4 +179,19 @@ contract TokenERC20 {
         emit Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

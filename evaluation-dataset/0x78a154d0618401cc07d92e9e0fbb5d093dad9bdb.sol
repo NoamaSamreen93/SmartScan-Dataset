@@ -355,7 +355,6 @@ __/__|____(___ _/___(___ _(___/_/_/__/_(___ _____/______(___/__o_o_
             }
         }
 
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

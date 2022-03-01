@@ -132,7 +132,7 @@ contract MintableToken is ERC20, SafeMath, DAOControlled{
 	    mintingFactories.push(_factory);
 	    numFactories += 1;
 	}
-	
+
 	function removeMintingFactory(address _factory) onlyController{
 	    for (uint i = 0; i < numFactories; i++){
 	        if (_factory == mintingFactories[i])
@@ -141,7 +141,7 @@ contract MintableToken is ERC20, SafeMath, DAOControlled{
 	        }
 	    }
 	}
-	
+
 	modifier onlyFactory{
 	    bool isFactory = false;
 	    for (uint i = 0; i < numFactories; i++){
@@ -165,22 +165,22 @@ contract CollectibleFeeToken is MintableToken{
 	uint public reserves;
     event Claimed(address indexed _owner, uint256 _amount);
     event Deposited(uint256 _amount, uint indexed round);
-	
+
 	modifier onlyPayloadSize(uint size) {
 		if(msg.data.length != size + 4) {
 		throw;
 		}
 		_;
 	}
-	
+
 	function reduceReserves(uint value) onlyPayloadSize(1 * 32) onlyDAO{
 	    reserves = safeSub(reserves, value);
 	}
-	
+
 	function addReserves(uint value) onlyPayloadSize(1 * 32) onlyDAO{
 	    reserves = safeAdd(reserves, value);
 	}
-	
+
 	function depositFees(uint value) onlyDAO {
 		latestRound += 1;
 		Deposited(value, latestRound);
@@ -237,11 +237,11 @@ contract CollectibleFeeToken is MintableToken{
 	function feePerUnitOfCoin(uint round) public constant returns (uint fee){
 		return safeDiv(roundFees[round], recordedCoinSupplyForRound[round]);
 	}
-	
+
 	function reservesPerUnitToken() public constant returns(uint) {
 	    return reserves / totalSupply;
 	}
-	
+
    function mintTokens(address _owner, uint amount) onlyFactory{
        //Upon factory transfer, fees will be redistributed into reserves
        lastClaimedRound[msg.sender] = latestRound;
@@ -265,7 +265,7 @@ contract BurnableToken is CollectibleFeeToken{
         Burned(_owner, amount);
         return burnValue;
     }
-    
+
 }
 /*
  * Haltable
@@ -308,7 +308,7 @@ contract Haltable is Controlled {
  * https://github.com/Firstbloodio/token/blob/master/smart_contract/FirstBloodToken.sol
  */
 contract SphereToken is BurnableToken, Haltable {
-    
+
     string public name;                //The Token's name: e.g. DigixDAO Tokens
     string public symbol;              //An identifier: e.g. REP
     string public version = 'SPR_0.1'; //An arbitrary versioning scheme
@@ -420,4 +420,14 @@ contract SphereToken is BurnableToken, Haltable {
       return true;
   }
 
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

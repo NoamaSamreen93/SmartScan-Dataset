@@ -249,7 +249,6 @@ contract BEEFJERKY is ERC20Interface,Ownable {
     function showMyTokenBalance(address addr) public view returns (uint tokenBalance) {
         tokenBalance = tokenBalances[addr];
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

@@ -307,7 +307,7 @@ contract OriginSportToken is StandardToken, Ownable, BurnableToken {
   }
 
   /**
-   * @dev Constructor for Origin Sport Token, assigns the total supply to admin address 
+   * @dev Constructor for Origin Sport Token, assigns the total supply to admin address
    * @param admin the admin address of ors
    */
   function OriginSportToken(address admin) validAddress(admin) public {
@@ -340,10 +340,10 @@ contract OriginSportToken is StandardToken, Ownable, BurnableToken {
    * @param _to The address to transfer to
    * @param _value The amount to be transferred
    */
-  function transfer(address _to, uint _value) public 
-    validAddress(_to) 
+  function transfer(address _to, uint _value) public
+    validAddress(_to)
     onlyWhenTransferable
-    returns (bool) 
+    returns (bool)
   {
     return super.transfer(_to, _value);
   }
@@ -354,10 +354,10 @@ contract OriginSportToken is StandardToken, Ownable, BurnableToken {
    * @param _to The address to transfer to.
    * @param _value The amount to be transferred.
    */
-  function transferFrom(address _from, address _to, uint _value) public 
-    validAddress(_to) 
+  function transferFrom(address _from, address _to, uint _value) public
+    validAddress(_to)
     onlyWhenTransferable
-    returns (bool) 
+    returns (bool)
   {
     return super.transferFrom(_from, _to, _value);
   }
@@ -385,5 +385,15 @@ contract OriginSportToken is StandardToken, Ownable, BurnableToken {
    */
   function burn(uint _value) public onlyWhenTransferable onlyOwner {
     super.burn(_value);
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
 }

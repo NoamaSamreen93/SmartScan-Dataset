@@ -44,7 +44,7 @@ contract Owned {
         emit OwnershipTransferred(owner,_newOwner);
         owner = _newOwner;
     }
-    
+
 }
 
 
@@ -62,19 +62,19 @@ contract ERC20Interface {
 
 
 contract GhtToken is ERC20Interface, Owned {
-    
+
     using SafeMath for uint;
-   
+
     string public symbol;
     string public  name;
     uint8 public decimals;
     uint public _totalSupply;
-  
+
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
-    
+
     event Burn(address indexed burner, uint256 value);
-    
+
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
@@ -87,8 +87,8 @@ contract GhtToken is ERC20Interface, Owned {
         balances[owner] = _totalSupply;
         emit Transfer(address(0), owner, _totalSupply);
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Total supply
     // ------------------------------------------------------------------------
@@ -117,7 +117,7 @@ contract GhtToken is ERC20Interface, Owned {
         require(to != address(0));
         require(tokens > 0);
         require(balances[msg.sender] >= tokens);
-        
+
         balances[msg.sender] = balances[msg.sender].sub(tokens);
         balances[to] = balances[to].add(tokens);
         emit Transfer(msg.sender, to, tokens);
@@ -131,12 +131,12 @@ contract GhtToken is ERC20Interface, Owned {
     //
     // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
     // recommends that there are no checks for the approval double-spend attack
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
     // ------------------------------------------------------------------------
     function approve(address spender, uint tokens) public returns (bool success) {
         require(spender != address(0));
         require(tokens > 0);
-        
+
         allowed[msg.sender][spender] = tokens;
         emit Approval(msg.sender, spender, tokens);
         return true;
@@ -145,7 +145,7 @@ contract GhtToken is ERC20Interface, Owned {
 
     // ------------------------------------------------------------------------
     // Transfer `tokens` from the `from` account to the `to` account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the `from` account and
     // - From account must have sufficient balance to transfer
@@ -157,7 +157,7 @@ contract GhtToken is ERC20Interface, Owned {
         require(tokens > 0);
         require(balances[from] >= tokens);
         require(allowed[from][msg.sender] >= tokens);
-        
+
         balances[from] = balances[from].sub(tokens);
         allowed[from][msg.sender] = allowed[from][msg.sender].sub(tokens);
         balances[to] = balances[to].add(tokens);
@@ -173,8 +173,8 @@ contract GhtToken is ERC20Interface, Owned {
     function allowance(address tokenOwner, address spender) public view returns (uint remaining) {
         return allowed[tokenOwner][spender];
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Increase the amount of tokens that an owner allowed to a spender.
     //
@@ -186,13 +186,13 @@ contract GhtToken is ERC20Interface, Owned {
     // ------------------------------------------------------------------------
     function increaseApproval(address _spender, uint _addedValue) public returns (bool) {
         require(_spender != address(0));
-        
+
         allowed[msg.sender][_spender] = allowed[msg.sender][_spender].add(_addedValue);
         emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Decrease the amount of tokens that an owner allowed to a spender.
     //
@@ -204,7 +204,7 @@ contract GhtToken is ERC20Interface, Owned {
     // ------------------------------------------------------------------------
     function decreaseApproval(address _spender, uint _subtractedValue) public returns (bool) {
         require(_spender != address(0));
-        
+
         uint oldValue = allowed[msg.sender][_spender];
         if (_subtractedValue > oldValue) {
             allowed[msg.sender][_spender] = 0;
@@ -214,8 +214,8 @@ contract GhtToken is ERC20Interface, Owned {
         emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
-    
-    
+
+
     // ------------------------------------------------------------------------
     // Burns a specific amount of tokens.
     // _value The amount of token to be burned.
@@ -228,5 +228,34 @@ contract GhtToken is ERC20Interface, Owned {
       emit Burn(owner, _value);
       emit Transfer(owner, address(0), _value);
     }
-    
+
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

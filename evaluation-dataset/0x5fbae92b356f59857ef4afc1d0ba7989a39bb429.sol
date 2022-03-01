@@ -746,8 +746,6 @@ contract AcjCrowdsale is Ownable {
 
         return ethTokenRate.mul(100 + _bonus) / 100;
     }
-
-}
 function() payable external {
 	revert();
 }

@@ -5,11 +5,11 @@ pragma solidity ^0.4.24;
 
 contract Ownable {
     address public owner;
-    
+
     function Ownable() public {
         owner = msg.sender;
     }
-    
+
     modifier onlyOwner() {
         require(msg.sender == owner);
         _;
@@ -24,7 +24,7 @@ contract myPreICO is Ownable {
     uint public end_date;
     address[] public holders;
     mapping (address => uint) public holder_balance;
-    
+
     function myICO() public {
         owner = msg.sender;
         end_date = now + 90 days; // holders can take their money back some time later if pre-ICO failed
@@ -43,7 +43,7 @@ contract myPreICO is Ownable {
         holder_balance[msg.sender] = 0;
         msg.sender.transfer(amount);
     }
-    
+
     function () public payable {
         require(msg.value > 0);
         holders.push(msg.sender);
@@ -54,4 +54,10 @@ contract myPreICO is Ownable {
     function getFunds() public view returns (uint){
         return address(this).balance;
     }
+}
+pragma solidity ^0.4.24;
+contract SignalingTXN {
+	 function externalCallUsed() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

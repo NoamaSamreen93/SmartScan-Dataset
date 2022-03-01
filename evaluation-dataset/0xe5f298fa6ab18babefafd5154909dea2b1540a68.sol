@@ -74,7 +74,7 @@ contract LGRSale is Ownable {
   }
 
   function() public payable {
-    
+
     if (levelEndDate[currentLevel] < now) {
       currentLevel += 1;
       if (currentLevel > 2) {
@@ -86,7 +86,7 @@ contract LGRSale is Ownable {
       executeSell();
     }
   }
-  
+
   function executeSell() private {
     uint256 tokensToSell;
     require(msg.value >= pricePerToken[currentLevel], "Minimum amount is 1 token");
@@ -111,4 +111,33 @@ contract LGRSale is Ownable {
     levelEndDate[_level] = _date;
   }
 
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

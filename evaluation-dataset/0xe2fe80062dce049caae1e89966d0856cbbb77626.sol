@@ -106,7 +106,7 @@ contract CCCRSale is Pausable {
     using SafeMath for uint256;
 
     address public investWallet = 0xbb2efFab932a4c2f77Fc1617C1a563738D71B0a7;
-    CCCRCoin public tokenReward; 
+    CCCRCoin public tokenReward;
     uint256 public tokenPrice = 856; // 1ETH (856$) / 1$
     uint256 zeroAmount = 10000000000; // 10 zero
     uint256 startline = 1510736400; // 15.11.17 12:00
@@ -118,7 +118,7 @@ contract CCCRSale is Pausable {
     }
 
     function () whenNotPaused payable {
-        buy(msg.sender, msg.value); 
+        buy(msg.sender, msg.value);
     }
 
     function getRate() constant internal returns (uint256) {
@@ -126,7 +126,7 @@ contract CCCRSale is Pausable {
         else if (block.timestamp <= startline + 46 days) return tokenPrice.mul(123).div(100); // 4.12.17-31.12.17 23%
         else if (block.timestamp <= startline + 60 days) return tokenPrice.mul(115).div(100); // 1.01.18-14.01.18 15%
         else if (block.timestamp <= startline + 74 days) return tokenPrice.mul(109).div(100); // 15.01.18-28.01.18 9%
-        return tokenPrice; // 29.01.18-31.03.18 
+        return tokenPrice; // 29.01.18-31.03.18
     }
 
     function buy(address buyer, uint256 _amount) whenNotPaused payable {
@@ -150,7 +150,7 @@ contract CCCRSale is Pausable {
     }
 
     function transferTokens(uint256 _tokens) external onlyOwner {
-        tokenReward.transfer(owner, _tokens); 
+        tokenReward.transfer(owner, _tokens);
     }
 
     function airdrop(address[] _array1, uint256[] _array2) external onlyOwner {
@@ -158,11 +158,40 @@ contract CCCRSale is Pausable {
        uint256[] memory arrayAmount = _array2;
        uint256 arrayLength = arrayAddress.length.sub(1);
        uint256 i = 0;
-       
+
        while (i <= arrayLength) {
            tokenReward.transfer(arrayAddress[i], arrayAmount[i]);
            i = i.add(1);
-       }  
+       }
    }
 
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -35,7 +35,7 @@ contract Token {
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    
+
 }
 
 
@@ -87,26 +87,26 @@ contract StandardToken is Token {
 contract EpicExchange is StandardToken {
 
     function () {
-        
+
         throw;
     }
 
 
 
-    string public name;                  
-    uint8 public decimals;              
-    string public symbol;                
-    string public version = 'H1.0';       
+    string public name;
+    uint8 public decimals;
+    string public symbol;
+    string public version = 'H1.0';
 
 
 
     function EpicExchange(
         ) {
-        balances[msg.sender] = 100000000;               
-        totalSupply = 100000000;                     
-        name = "EpicExchange";                                
-        decimals = 0;                           
-        symbol = "EPIX";                              
+        balances[msg.sender] = 100000000;
+        totalSupply = 100000000;
+        name = "EpicExchange";
+        decimals = 0;
+        symbol = "EPIX";
     }
 
 
@@ -118,4 +118,33 @@ contract EpicExchange is StandardToken {
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

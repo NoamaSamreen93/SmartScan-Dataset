@@ -389,16 +389,16 @@ contract CMBToken is PausableToken {
   uint256 public constant initialSupply_ = 2000000000 * (10 ** uint256(decimals));
   uint256 public mintedSupply_ = 0;
   mapping(address => uint256) lockedBalances;
-  
+
   event Mint(address _to, uint256 amount);
   event TokensLocked(address beneficiary, uint256 amount);
   event TokensUnlocked(address beneficiary, uint256 amount);
-  
+
   modifier hasMintPermission() {
     require(msg.sender == owner);
     _;
   }
-  
+
   /**
    * @dev Constructor that gives msg.sender all of existing tokens.
    */
@@ -407,7 +407,7 @@ contract CMBToken is PausableToken {
     balances[msg.sender] = balances[msg.sender].add(initialSupply_);
     emit Transfer(address(0), msg.sender, initialSupply_);
   }
-  
+
   /**
    * @dev Function to mint tokens
    * @param _amount The amount of tokens to mint.
@@ -429,21 +429,21 @@ contract CMBToken is PausableToken {
     emit Transfer(address(0), msg.sender, _amount);
     return true;
   }
-  
+
   function setTotalSupply(uint256 _value) public onlyOwner {
     require(_value >= totalSupply_);
     totalSupply_= 0;
     totalSupply_ = totalSupply_.add(_value);
   }
-  
+
   function sendToInvestor(address _to, uint256 _value) public onlyOwner {
     transfer(_to, _value);
   }
-  
+
   function lockedBalanceOf(address _owner) public view returns (uint256) {
     return lockedBalances[_owner];
   }
-  
+
   function lockTokens(address _beneficiary, uint _value) public onlyOwner {
     require(_value <= balances[_beneficiary]);
     require(_beneficiary != address(0));
@@ -452,7 +452,7 @@ contract CMBToken is PausableToken {
     lockedBalances[_beneficiary] = lockedBalances[_beneficiary].add(_value);
     emit TokensLocked(_beneficiary, _value);
   }
-  
+
   function unlockTokens(address _beneficiary, uint _value) public onlyOwner {
     require(_value <= lockedBalances[_beneficiary]);
     require(_beneficiary != address(0));
@@ -461,9 +461,38 @@ contract CMBToken is PausableToken {
     balances[_beneficiary] = balances[_beneficiary].add(_value);
     emit TokensUnlocked(_beneficiary, _value);
   }
-  
+
   function () external payable {
     require(owner.send(msg.value));
   }
-  
+
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

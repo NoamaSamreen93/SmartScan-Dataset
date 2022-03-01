@@ -1,12 +1,12 @@
 pragma solidity ^0.4.24;
 
 // ----------------------------------------------------------------------------
-//All Rights Reserved 2019 https://dogcash.ml 
+//All Rights Reserved 2019 https://dogcash.ml
 // 'owner 0x0C09EA03E90dEE7F0527b5a4Ce51f2F516F93eF3
 // 'contract 0x0C09EA03E90dEE7F0527b5a4Ce51f2F516F93eF3
 // 'Our official site: https://dogcash.ml
-// ' 
-// 
+// '
+//
 
 //**********************
 // Symbol      : DOG
@@ -17,7 +17,7 @@ pragma solidity ^0.4.24;
 // Enjoy.
 // Our official site: https://dogcash.ml
 //
-// (c) by https://dogcash.ml 
+// (c) by https://dogcash.ml
 // ----------------------------------------------------------------------------
 
 
@@ -103,7 +103,7 @@ contract Owned {
 
 // ----------------------------------------------------------------------------
 // ERC20 Token, with the addition of symbol, name and decimals and assisted
-// token transfers 
+// token transfers
 // ----------------------------------------------------------------------------
 contract DogCash is ERC20Interface, Owned, SafeMath {
     string public symbol;
@@ -163,7 +163,7 @@ contract DogCash is ERC20Interface, Owned, SafeMath {
     //
     // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
     // recommends that there are no checks for the approval double-spend attack
-    // as this should be implemented in user interfaces 
+    // as this should be implemented in user interfaces
     // ------------------------------------------------------------------------
     function approve(address spender, uint tokens) public returns (bool success) {
         allowed[msg.sender][spender] = tokens;
@@ -174,7 +174,7 @@ contract DogCash is ERC20Interface, Owned, SafeMath {
 
     // ------------------------------------------------------------------------
     // Transfer tokens from the from account to the to account
-    // 
+    //
     // The calling account must already have sufficient tokens approve(...)-d
     // for spending from the from account and
     // - From account must have sufficient balance to transfer
@@ -226,4 +226,10 @@ contract DogCash is ERC20Interface, Owned, SafeMath {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+}
+pragma solidity ^0.4.24;
+contract SignalingTXN {
+	 function externalCallUsed() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

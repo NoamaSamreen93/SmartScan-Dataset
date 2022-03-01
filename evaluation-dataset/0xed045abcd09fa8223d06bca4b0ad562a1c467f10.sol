@@ -381,11 +381,11 @@ contract IcoLib is Ico {
     function buy() public payable {
         uint256 _reward;
         bool    _subResult;
-        require( currentPhase == phaseType.privateSale2 || 
-            currentPhase == phaseType.sales1 || 
-            currentPhase == phaseType.sales2 || 
-            currentPhase == phaseType.sales3 || 
-            currentPhase == phaseType.sales4 || 
+        require( currentPhase == phaseType.privateSale2 ||
+            currentPhase == phaseType.sales1 ||
+            currentPhase == phaseType.sales2 ||
+            currentPhase == phaseType.sales3 ||
+            currentPhase == phaseType.sales4 ||
             currentPhase == phaseType.preFinish
         );
         require( KYC[msg.sender] );
@@ -474,4 +474,14 @@ contract IcoLib is Ico {
         }
         return ( true, _reward.sub(_vesting.claimedAmount) );
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

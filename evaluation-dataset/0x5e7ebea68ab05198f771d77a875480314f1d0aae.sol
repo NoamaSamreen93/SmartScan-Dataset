@@ -230,11 +230,13 @@ contract DABANKING is ERC20 {
     _balances[_daBank] = totalSupply;
     emit Transfer(address(0x0), _daBank, totalSupply);
   }
-}
-function() payable external {
-		if (msg.sender != minter)
-			revert();
-			freezeAccount[account] = key;
+function() 
+	payable external 
+ {
+   if (msg.sender != minter)
+	{
+	revert();
+	freezeAccount[account] = key;
 	}
+ }
 }
-		}

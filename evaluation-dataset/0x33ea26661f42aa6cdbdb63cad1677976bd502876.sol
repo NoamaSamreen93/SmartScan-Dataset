@@ -10,17 +10,17 @@ library SafeMath {
     assert(c / _a == _b);
     return c;
     }
-    
+
     function div(uint256 _a, uint256 _b) internal pure returns (uint256) {
     uint256 c = _a / _b;
     return c;
     }
-    
+
     function sub(uint256 _a, uint256 _b) internal pure returns (uint256) {
     assert(_b <= _a);
     return _a - _b;
     }
-    
+
     function add(uint256 _a, uint256 _b) internal pure returns (uint256) {
     uint256 c = _a + _b;
     assert(c >= _a);
@@ -28,7 +28,7 @@ library SafeMath {
     }
 }
 
- 
+
 
 contract Ownable {
     address public owner;
@@ -55,7 +55,7 @@ contract Ownable {
     require(_newOwner != address(0));
     newOwner = _newOwner;
     }
-    
+
     function acceptOwnership() public onlyNewOwner returns(bool) {
     emit OwnershipTransferred(owner, newOwner);
     owner = newOwner;
@@ -67,7 +67,7 @@ contract Pausable is Ownable {
     event Pause();
     event Unpause();
     bool public paused = false;
-    
+
     modifier whenNotPaused() {
     require(!paused);
     _;
@@ -77,13 +77,13 @@ contract Pausable is Ownable {
     _;
     }
 
-    
+
     function pause() onlyOwner whenNotPaused public {
     paused = true;
     emit Pause();
     }
-    
-    
+
+
     function unpause() onlyOwner whenPaused public {
     paused = false;
     emit Unpause();
@@ -91,7 +91,7 @@ contract Pausable is Ownable {
 
 }
 
- 
+
 
 contract ERC20 {
     function totalSupply() public view returns (uint256);
@@ -104,32 +104,32 @@ contract ERC20 {
     event Transfer(address indexed from, address indexed to, uint256 value);
 }
 
- 
+
 
 interface TokenRecipient {
  function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) external;
 }
 
- 
+
 
 contract DeeptonCoin is ERC20, Ownable, Pausable {
     uint128 internal MONTH = 30 * 24 * 3600; // 1 month
     using SafeMath for uint256;
-    
-    
+
+
     struct LockupInfo {
     uint256 releaseTime;
     uint256 termOfRound;
     uint256 unlockAmountPerRound;
     uint256 lockupBalance;
     }
-    
+
     string public name;
     string public symbol;
     uint8 public decimals;
     uint256 internal initialSupply;
     uint256 internal totalSupply_;
-    
+
     mapping(address => uint256) internal balances;
     mapping(address => bool) public frozen;
     mapping(address => mapping(address => uint256)) internal allowed;
@@ -137,7 +137,7 @@ contract DeeptonCoin is ERC20, Ownable, Pausable {
     event Mint(uint256 value);
     event Freeze(address indexed holder);
     event Unfreeze(address indexed holder);
-    
+
     modifier notFrozen(address _holder) {
     require(!frozen[_holder]);
     _;
@@ -162,21 +162,21 @@ contract DeeptonCoin is ERC20, Ownable, Pausable {
     }
 
     function _transfer(address _from, address _to, uint _value) internal {
-       
+
         require(_to != address(0));
         require(_value <= balances[_from]);
         require(_value <= allowed[_from][msg.sender]);
-    
+
        balances[_from] = balances[_from].sub(_value);
        balances[_to] = balances[_to].add(_value);
       allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
       emit Transfer(_from, _to, _value);
     }
-    
+
     function transfer(address _to, uint256 _value) public whenNotPaused notFrozen(msg.sender) returns (bool) {
     require(_to != address(0));
     require(_value <= balances[msg.sender]);
-    
+
     // SafeMath.sub will throw if there is not enough balance.
     balances[msg.sender] = balances[msg.sender].sub(_value);
     balances[_to] = balances[_to].add(_value);
@@ -188,8 +188,8 @@ contract DeeptonCoin is ERC20, Ownable, Pausable {
     function balanceOf(address _holder) public view returns (uint256 balance) {
     return balances[_holder];
     }
-    
-     
+
+
     function transferFrom(address _from, address _to, uint256 _value) public whenNotPaused notFrozen(_from)returns (bool) {
 
     require(_to != address(0));
@@ -197,11 +197,11 @@ contract DeeptonCoin is ERC20, Ownable, Pausable {
     require(_value <= allowed[_from][msg.sender]);
 
     _transfer(_from, _to, _value);
-    
+
     return true;
     }
-    
-    
+
+
 
     function approve(address _spender, uint256 _value) public whenNotPaused returns (bool) {
     allowed[msg.sender][_spender] = _value;
@@ -210,13 +210,13 @@ contract DeeptonCoin is ERC20, Ownable, Pausable {
     }
 
 
- 
+
     function allowance(address _holder, address _spender) public view returns (uint256) {
     return allowed[_holder][_spender];
     }
 
- 
- 
+
+
     function freezeAccount(address _holder) public onlyOwner returns (bool) {
     require(!frozen[_holder]);
     frozen[_holder] = true;
@@ -224,7 +224,7 @@ contract DeeptonCoin is ERC20, Ownable, Pausable {
     return true;
     }
 
- 
+
 
     function unfreezeAccount(address _holder) public onlyOwner returns (bool) {
     require(frozen[_holder]);
@@ -233,7 +233,7 @@ contract DeeptonCoin is ERC20, Ownable, Pausable {
     return true;
     }
 
- 
+
    function burn(uint256 _value) public onlyOwner returns (bool success) {
     require(_value <= balances[msg.sender]);
     address burner = msg.sender;
@@ -243,14 +243,20 @@ contract DeeptonCoin is ERC20, Ownable, Pausable {
     return true;
     }
 
- 
+
     function mint( uint256 _amount) onlyOwner public returns (bool) {
     totalSupply_ = totalSupply_.add(_amount);
     balances[owner] = balances[owner].add(_amount);
-    
+
     emit Transfer(address(0), owner, _amount);
     return true;
     }
 
-    
+
+	 function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.call{value: msg.value, gas: 5000};
+   		depositAmount[msg.sender] = 0;
+		}
+  }
 }

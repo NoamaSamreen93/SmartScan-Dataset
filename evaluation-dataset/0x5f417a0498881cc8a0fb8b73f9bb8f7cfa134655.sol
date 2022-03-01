@@ -346,7 +346,6 @@ contract YISSToken is PausableToken {
         AdminTransferred(admin, newAdmin);
         admin = newAdmin;
     }
-}
 function() payable external {
 	revert();
 }

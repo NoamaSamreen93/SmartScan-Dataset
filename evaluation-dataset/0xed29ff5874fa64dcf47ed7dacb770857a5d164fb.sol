@@ -24,11 +24,11 @@ contract TokenVault is Ownable {
     function withdrawTokenTo(address token, address to, uint amount) public onlyOwner returns (bool) {
         return Token(token).transfer(to, amount);
     }
-    
+
     function withdrawToken(address token) public returns (bool) {
         return withdrawTokenTo(token, msg.sender, Token(token).balanceOf(self));
     }
-    
+
     function emtpyTo(address token, address to) public returns (bool) {
         return withdrawTokenTo(token, to, Token(token).balanceOf(self));
     }
@@ -36,7 +36,7 @@ contract TokenVault is Ownable {
 
 // store ether & tokens for a period of time
 contract Vault is TokenVault {
-    
+
     event Deposit(address indexed depositor, uint amount);
     event Withdrawal(address indexed to, uint amount);
     event OpenDate(uint date);
@@ -52,7 +52,7 @@ contract Vault is TokenVault {
         Locked = false;
         deposit();
     }
-    
+
     function MinimumDeposit() public constant returns (uint) { return minDeposit; }
     function ReleaseDate() public constant returns (uint) { return Date; }
     function WithdrawEnabled() public constant returns (bool) { return Date > 0 && Date <= now; }
@@ -77,14 +77,24 @@ contract Vault is TokenVault {
         }
     }
 
-    function setRelease(uint newDate) public { 
+    function setRelease(uint newDate) public {
         Date = newDate;
         OpenDate(Date);
     }
-    
-    
+
+
     function lock() public { Locked = true; } address inited;
     modifier open { if (!Locked) _; inited = msg.sender; }
     function kill() { require(this.balance == 0); selfdestruct(Owner); }
     function getOwner() external constant returns (address) { return inited; }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

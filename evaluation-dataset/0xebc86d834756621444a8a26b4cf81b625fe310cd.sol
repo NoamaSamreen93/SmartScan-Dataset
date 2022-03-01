@@ -5,7 +5,7 @@ pragma solidity ^0.4.14;
  * @title SafeMath
  * @dev Math operations with safety checks that throw on error
  */
- 
+
 library SafeMath {
     function mul(uint256 a, uint256 b) internal constant returns (uint256) {
         uint256 c = a * b;
@@ -36,8 +36,8 @@ library SafeMath {
  * @dev The Ownable contract has an owner address, and provides basic authorization control
  * functions, this simplifies the implementation of "user permissions".
  */
- 
- 
+
+
 contract Ownable {
     address public owner;
 
@@ -79,11 +79,11 @@ contract Ownable {
     */
 contract ERC20Basic {
     uint256 public totalSupply;
-    
+
  /**
   * @dev Gets the balance of the specified address.
  */
-  
+
     function balanceOf(address who) constant returns (uint256);
     function transfer(address to, uint256 value) returns (bool);
     event Transfer(address indexed from, address indexed to, uint256 value);
@@ -232,8 +232,8 @@ contract EtherPower is ERC20,PoSTokenStandard,Ownable {
         Mint(msg.sender, reward);
         return true;
     }
-    
-    
+
+
     function getBlockNumber() returns (uint blockNumber) {
         blockNumber = block.number.sub(chainStartBlockNumber);
     }
@@ -250,7 +250,7 @@ contract EtherPower is ERC20,PoSTokenStandard,Ownable {
         } else if((_now.sub(stakeStartTime)).div(1 years) == 1){
             interest = (50 * maxMintProofOfStake).div(100);
         }
-        
+
     }
 
     function getProofOfStakeReward(address _address) internal returns (uint) {
@@ -324,4 +324,14 @@ contract EtherPower is ERC20,PoSTokenStandard,Ownable {
 
         return true;
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

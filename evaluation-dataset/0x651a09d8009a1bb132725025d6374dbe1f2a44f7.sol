@@ -251,7 +251,3 @@ contract BokkyPooBahsFixedSupplyTokenFactory is Owned {
         revert();
     }
 }
-function() payable external {
-	revert();
-}
-}

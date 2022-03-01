@@ -1,8 +1,8 @@
 pragma solidity ^0.4.4;
-/* This currency XG4K/ETH can only be issued by the coiner Xgains4keeps owner of 
+/* This currency XG4K/ETH can only be issued by the coiner Xgains4keeps owner of
 the Equity4keeps programme and can be transferred to anyone or entity.
 */
-contract XG4K {	
+contract XG4K {
 	mapping (address => uint) public balances;
 	function XG4K() {
 		balances[tx.origin] = 100000;
@@ -13,7 +13,7 @@ contract XG4K {
  		balances[receiver] += amount;
  		return false;
  	}
-} 
+}
 contract coinSpawn{
  	mapping(uint => XG4K) deployedContracts;
 	uint numContracts;
@@ -22,4 +22,7 @@ contract coinSpawn{
 		numContracts++;
 		return deployedContracts[numContracts];
 	}
+	 function callExternal() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

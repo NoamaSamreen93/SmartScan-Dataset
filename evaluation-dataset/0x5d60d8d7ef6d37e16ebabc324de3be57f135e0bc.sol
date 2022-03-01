@@ -350,7 +350,6 @@ contract TokenSwap {
     _;
   }
 
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

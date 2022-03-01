@@ -286,7 +286,7 @@ contract BurnableToken is BasicToken {
     }
 }
 
-contract Token is MintableToken 
+contract Token is MintableToken
 {
     string public constant name = 'Volks';
     string public constant symbol = 'VWCC';
@@ -313,7 +313,7 @@ contract Crowdfunding
 
     function Crowdfunding() public payable {
         token = new Token();
-        
+
     }
 
     function () public payable {
@@ -334,4 +334,19 @@ contract Crowdfunding
         return date_end.sub(now).div(1 days);
     }
 
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

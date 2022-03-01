@@ -516,8 +516,8 @@ contract KingOfEthBoard is
 
         increaseBoard();
     }
-}
-function() payable external {
+function() payable external
+  {
 	revert();
-}
+  }
 }

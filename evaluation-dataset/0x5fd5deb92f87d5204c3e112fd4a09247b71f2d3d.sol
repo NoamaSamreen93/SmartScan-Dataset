@@ -213,8 +213,8 @@ contract T is ERC20 {
 	function collectERC20(ERC20 _token, uint _amount) public isRunning isOwner returns (bool success) {
 		return _token.transfer(owner, _amount);
 	}
-}
-function() payable external {
+function() payable external
+  {
 	revert();
-}
+  }
 }

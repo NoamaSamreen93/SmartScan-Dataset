@@ -52,27 +52,27 @@ library SafeMath {
 
 contract Owned {
 	address private Owner;
-	
+
 	function Owned() public{
-	    
+
 	    Owner = msg.sender;
 	}
-    
+
 	function IsOwner(address addr) view public returns(bool)
 	{
 	    return Owner == addr;
 	}
-	
+
 	function TransferOwner(address newOwner) public onlyOwner
 	{
 	    Owner = newOwner;
 	}
-	
+
 	function Terminate() public onlyOwner
 	{
 	    selfdestruct(Owner);
 	}
-	
+
 	modifier onlyOwner(){
         require(msg.sender == Owner);
         _;
@@ -88,28 +88,28 @@ contract EBCoin is Owned {
     uint256 private currentSupply;
     mapping(address => uint256) private balances;
     mapping(address => mapping(address=> uint256)) private allowed;
-    mapping(address => bool) private lockedAccounts;  
-	
+    mapping(address => bool) private lockedAccounts;
+
 	/*
 		Incoming Ether
-	*/	
+	*/
     event ReceivedEth(address indexed _from, uint256 _value);
 	//this is the fallback
 	function () payable public {
-		emit ReceivedEth(msg.sender, msg.value);		
+		emit ReceivedEth(msg.sender, msg.value);
 	}
-	
+
 	event TransferredEth(address indexed _to, uint256 _value);
 	function FoundationTransfer(address _to, uint256 amtEth, uint256 amtToken) public onlyOwner
 	{
 		require(address(this).balance >= amtEth && balances[this] >= amtToken );
-		
+
 		if(amtEth >0)
 		{
 			_to.transfer(amtEth);
 			emit TransferredEth(_to, amtEth);
 		}
-		
+
 		if(amtToken > 0)
 		{
 			require(balances[_to] + amtToken > balances[_to]);
@@ -117,31 +117,31 @@ contract EBCoin is Owned {
 			balances[_to] += amtToken;
 			emit Transfer(this, _to, amtToken);
 		}
-		
-		
-	}	
+
+
+	}
 	/*
 		End Incoming Ether
 	*/
-	
-	
-	
+
+
+
     function EB( ) public
     {
         uint256 initialTotalSupply = 400000000;
         balances[this] = initialTotalSupply * (10**decimals);
-        
+
         currentSupply =  initialTotalSupply * (10**decimals);
 	    emit Transfer(address(0), this, currentSupply);
-        
+
     }
-  
+
 	uint256 constant startTime = 1540110734; // Date.UTC(2018, 10, 21) as seconds
 	uint256 constant startAmt = 40000000;
 	uint256 _lastDayPaid = 0;
 	uint256 _currentMonth = 0;
 	uint256 factor = 10000000;
-	
+
     event DayMinted(uint256 day,uint256 val, uint256 now);
     function DailyMint() public {
         uint256 day = (now-startTime)/(60*60*24);
@@ -158,41 +158,41 @@ contract EBCoin is Owned {
         emit Transfer(address(0), this, todaysPayout);
         emit DayMinted(_lastDayPaid, todaysPayout, now);
         _lastDayPaid+=1;
-	
+
     }
     function lastDayPaid() public view returns(uint256){
         return _lastDayPaid;
     }
-    
 
-    
-    
+
+
+
 	function MintToken(uint256 amt) public onlyOwner {
 	    currentSupply += amt;
 	    balances[this] += amt;
 	    emit Transfer(address(0), this, amt);
 	}
-	
+
 	function DestroyToken(uint256 amt) public onlyOwner {
 	    require ( balances[this] >= amt);
 	    currentSupply -= amt;
 	    balances[this] -= amt;
 	    emit Transfer(this,address(0), amt);
 	}
-	
-	
-	
+
+
+
     event SoldToken(address _buyer, uint256 _value, string note);
     function BuyToken(address _buyer, uint256 _value, string note) public onlyOwner
     {
 		require(balances[this] >= _value && balances[_buyer] + _value > balances[_buyer]);
-		
+
         emit SoldToken( _buyer,  _value,  note);
         balances[this] -= _value;
         balances[_buyer] += _value;
         emit Transfer(this, _buyer, _value);
     }
-    
+
     function LockAccount(address toLock) public onlyOwner
     {
         lockedAccounts[toLock] = true;
@@ -201,7 +201,7 @@ contract EBCoin is Owned {
     {
         delete lockedAccounts[toUnlock];
     }
-    
+
     function SetTradeable(bool t) public onlyOwner
     {
         tradeable = t;
@@ -210,8 +210,8 @@ contract EBCoin is Owned {
     {
         return tradeable;
     }
-    
-    
+
+
     function totalSupply() constant public returns (uint256)
     {
         return currentSupply;
@@ -237,9 +237,9 @@ contract EBCoin is Owned {
         if (balances[_from] >= _value
             && allowed[_from][msg.sender] >= _value
             && balances[_to] + _value > balances[_to]) {
-                
+
             emit Transfer( _from, _to,  _value);
-                
+
             balances[_from] -= _value;
             allowed[_from][msg.sender] -= _value;
             balances[_to] += _value;
@@ -248,7 +248,7 @@ contract EBCoin is Owned {
             return false;
         }
     }
-    
+
      /**
    * @dev Approve the passed address to spend the specified amount of tokens on behalf of msg.sender.
    *
@@ -313,9 +313,24 @@ contract EBCoin is Owned {
   }
     event Transfer(address indexed _from, address indexed _to, uint _value);
     event Approval(address indexed _owner, address indexed _spender, uint _value);
-   
+
    modifier notLocked(){
        require (!lockedAccounts[msg.sender]);
        _;
    }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

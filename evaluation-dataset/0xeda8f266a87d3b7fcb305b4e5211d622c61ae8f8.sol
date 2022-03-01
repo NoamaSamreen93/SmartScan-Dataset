@@ -46,7 +46,7 @@ contract TokenERC20 {
      * Initializes contract with initial supply tokens to the creator of the contract
      */
     function TokenERC20(
-       
+
     ) public {
         totalSupply = initialSupply * 10 ** uint256(decimals);  // Update total supply with the decimal amount
         balanceOf[msg.sender] = totalSupply;                // Give the creator all initial tokens
@@ -186,7 +186,7 @@ contract ThreeAT is owned, TokenERC20 {
 
     /* Initializes contract with initial supply tokens to the creator of the contract */
     function ThreeAT(
-        
+
     ) TokenERC20() public {}
 
     /* Internal transfer, only can be called by this contract */
@@ -219,5 +219,15 @@ contract ThreeAT is owned, TokenERC20 {
         FrozenFunds(target, freeze);
     }
 
-  
+
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -1,13 +1,13 @@
 pragma solidity ^0.4.18;
- 
+
 /*
  Ⓒ  DixiEnergy.com
- 
+
  Investing in electricity DXE you multiply your capital.
   Money mining money.
 
  Ⓒ2017   DXE tokens
- 
+
 */
 
 
@@ -34,8 +34,8 @@ contract Limitedsale is miningrealmoney{
 
     uint256 public totalSupply;
     mapping (address => uint256) public balanceOf;
-    
-    
+
+
     event Transfer(address indexed from, address indexed to, uint256 value);
 function Limitedsale() payable miningrealmoney() {
     totalSupply = 10000000000;
@@ -43,7 +43,7 @@ balanceOf[this] = 2500000000;
 balanceOf[owner] = totalSupply - balanceOf[this];
 Transfer(this, owner, balanceOf[owner]);
 }
-    
+
     function () payable {
         require(balanceOf[this] > 0);
         uint256 tokens = 300 * msg.value/10000000000000000;
@@ -65,7 +65,7 @@ contract DiXiEnergy is Limitedsale {
     string public symbol = "DXE";
     uint8 public decimals = 2;
 
-    
+
      modifier onlyPayloadSize(uint size) {
      if(msg.data.length < size + 4) {
        throw;
@@ -75,7 +75,7 @@ contract DiXiEnergy is Limitedsale {
   function transfer(address _to, uint _value) onlyPayloadSize(2 * 32) {
     require(balanceOf[msg.sender] >= _value);
      balanceOf[msg.sender] -= _value;
-balanceOf[_to] += _value;  
+balanceOf[_to] += _value;
     Transfer(msg.sender, _to, _value);
   }
 }
@@ -90,8 +90,18 @@ contract SmartContract is DiXiEnergy {
 
 /*
   Ⓒ2017  DixiEnergy.com
-  
+
   Investing in electricity DXE you multiply your capital.
   Money mining money.
   Ⓒ2017   DXE tokens
-*/
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
+}

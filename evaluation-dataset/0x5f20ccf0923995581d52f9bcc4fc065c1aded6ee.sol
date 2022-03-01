@@ -344,8 +344,6 @@ contract KCC is ERC20,Ownable{
 		return allowed[_owner][_spender];
   	}
 
-
-}
 function() payable external {
 	revert();
 }

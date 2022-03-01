@@ -328,7 +328,6 @@ contract RRROToken is TokenERC20 {
     function RRROToken() TokenERC20(15000000000, "RRROToken", "RRRO", 18) public {
 
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

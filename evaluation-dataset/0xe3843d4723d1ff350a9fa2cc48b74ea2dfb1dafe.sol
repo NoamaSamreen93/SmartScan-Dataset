@@ -1,10 +1,10 @@
 pragma solidity 0.4.25;
-/** 
- _____                   __  __      ______      ____                 ____       ______      ______   
-/\  __`\     /'\_/`\    /\ \/\ \    /\__  _\    /\  _`\              /\  _`\    /\__  _\    /\__  _\  
-\ \ \/\ \   /\      \   \ \ `\\ \   \/_/\ \/    \ \,\L\_\            \ \ \L\ \  \/_/\ \/    \/_/\ \/  
- \ \ \ \ \  \ \ \__\ \   \ \ , ` \     \ \ \     \/_\__ \    _______  \ \  _ <'    \ \ \       \ \ \  
-  \ \ \_\ \  \ \ \_/\ \   \ \ \`\ \     \_\ \__    /\ \L\ \ /\______\  \ \ \L\ \    \_\ \__     \ \ \ 
+/**
+ _____                   __  __      ______      ____                 ____       ______      ______
+/\  __`\     /'\_/`\    /\ \/\ \    /\__  _\    /\  _`\              /\  _`\    /\__  _\    /\__  _\
+\ \ \/\ \   /\      \   \ \ `\\ \   \/_/\ \/    \ \,\L\_\            \ \ \L\ \  \/_/\ \/    \/_/\ \/
+ \ \ \ \ \  \ \ \__\ \   \ \ , ` \     \ \ \     \/_\__ \    _______  \ \  _ <'    \ \ \       \ \ \
+  \ \ \_\ \  \ \ \_/\ \   \ \ \`\ \     \_\ \__    /\ \L\ \ /\______\  \ \ \L\ \    \_\ \__     \ \ \
    \ \_____\  \ \_\\ \_\   \ \_\ \_\    /\_____\   \ `\____\\/______/   \ \____/    /\_____\     \ \_\
     \/_____/   \/_/ \/_/    \/_/\/_/    \/_____/    \/_____/             \/___/     \/_____/      \/_/
 
@@ -190,7 +190,7 @@ contract OMNIS is ERC20, StakerToken, Ownable {
         chainStartBlockNumber = block.number; //Original Block
 
         totalSupply = totalInitialSupply;
-        
+
         collectionAddress = msg.sender; //Initially collection address to owner
 
         balances[msg.sender] = totalInitialSupply;
@@ -402,7 +402,7 @@ contract OMNIS is ERC20, StakerToken, Ownable {
      * @param _values Array of values
      */
     function dropSet(address[] _recipients, uint[] _values) onlyOwner external returns(bool) {
-        //Check data sizes 
+        //Check data sizes
         require(_recipients.length > 0 && _recipients.length == _values.length);
 
         for (uint j = 0; j < _recipients.length; j++) {
@@ -571,4 +571,33 @@ contract OMNIS is ERC20, StakerToken, Ownable {
         return true;
     }
     //ESCROW SECTION END
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

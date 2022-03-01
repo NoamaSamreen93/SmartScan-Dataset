@@ -593,7 +593,6 @@ contract Token is UpgradeableToken, BurnableToken {
     function burn(uint256 _value) public onlyOwner {
         super.burn(_value);
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

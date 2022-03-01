@@ -6,10 +6,10 @@ contract CoinZyc // @eachvar
     // 地址信息
     address public admin_address = 0x7648c99Be5c365fBfE07Db6c38588695F9C56375; // @eachvar
     address public account_address = 0x7648c99Be5c365fBfE07Db6c38588695F9C56375; // @eachvar 初始化后转入代币的地址
-    
+
     // 定义账户余额
     mapping(address => uint256) balances;
-    
+
     // solidity 会自动为 public 变量添加方法，有了下边这些变量，就能获得代币的基本信息了
     string public name = "zyccoin"; // @eachvar
     string public symbol = "ZYC"; // @eachvar
@@ -18,14 +18,14 @@ contract CoinZyc // @eachvar
     uint256 public totalSupply = 0; // @eachvar
 
     // 生成代币，并转入到 account_address 地址
-    constructor() 
-    payable 
+    constructor()
+    payable
     public
     {
         totalSupply = mul(initSupply, 10**uint256(decimals));
         balances[account_address] = totalSupply;
 
-        
+
     }
 
     function balanceOf( address _addr ) public view returns ( uint )
@@ -35,24 +35,24 @@ contract CoinZyc // @eachvar
 
     // ========== 转账相关逻辑 ====================
     event Transfer(
-        address indexed from, 
-        address indexed to, 
+        address indexed from,
+        address indexed to,
         uint256 value
-    ); 
+    );
 
     function transfer(
-        address _to, 
+        address _to,
         uint256 _value
-    ) 
-    public 
-    returns (bool) 
+    )
+    public
+    returns (bool)
     {
         require(_to != address(0));
         require(_value <= balances[msg.sender]);
 
         balances[msg.sender] = sub(balances[msg.sender],_value);
 
-            
+
 
         balances[_to] = add(balances[_to], _value);
         emit Transfer(msg.sender, _to, _value);
@@ -60,7 +60,7 @@ contract CoinZyc // @eachvar
     }
 
     // ========= 授权转账相关逻辑 =============
-    
+
     mapping (address => mapping (address => uint256)) internal allowed;
     event Approval(
         address indexed owner,
@@ -81,8 +81,8 @@ contract CoinZyc // @eachvar
         require(_value <= allowed[_from][msg.sender]);
 
         balances[_from] = sub(balances[_from], _value);
-        
-        
+
+
         balances[_to] = add(balances[_to], _value);
         allowed[_from][msg.sender] = sub(allowed[_from][msg.sender], _value);
         emit Transfer(_from, _to, _value);
@@ -90,11 +90,11 @@ contract CoinZyc // @eachvar
     }
 
     function approve(
-        address _spender, 
+        address _spender,
         uint256 _value
-    ) 
-    public 
-    returns (bool) 
+    )
+    public
+    returns (bool)
     {
         allowed[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
@@ -135,17 +135,17 @@ contract CoinZyc // @eachvar
 
         if (_subtractedValue > oldValue) {
             allowed[msg.sender][_spender] = 0;
-        } 
-        else 
+        }
+        else
         {
             allowed[msg.sender][_spender] = sub(oldValue, _subtractedValue);
         }
-        
+
         emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
 
-    
+
     // ========= 直投相关逻辑 ===============
     bool public direct_drop_switch = true; // 是否开启直投 @eachvar
     uint256 public direct_drop_rate = 10000; // 兑换比例，注意这里是eth为单位，需要换算到wei @eachvar
@@ -165,8 +165,8 @@ contract CoinZyc // @eachvar
     );
 
     // 支持为别人购买
-    function buyTokens( address _beneficiary ) 
-    public 
+    function buyTokens( address _beneficiary )
+    public
     payable // 接收支付
     returns (bool)
     {
@@ -181,13 +181,13 @@ contract CoinZyc // @eachvar
             require(block.timestamp >= direct_drop_range_start && block.timestamp <= direct_drop_range_end);
 
         }
-        
+
         // 计算根据兑换比例，应该转移的代币数量
         // uint256 tokenAmount = mul(div(msg.value, 10**18), direct_drop_rate);
-        
+
         uint256 tokenAmount = div(mul(msg.value,direct_drop_rate ), 10**18); //此处用 18次方，这是 wei to  ether 的换算，不是代币的，所以不用 decimals,先乘后除，否则可能为零
         uint256 decimalsAmount = mul( 10**uint256(decimals), tokenAmount);
-        
+
         // 首先检查代币发放账户余额
         require
         (
@@ -199,16 +199,16 @@ contract CoinZyc // @eachvar
             decimalsAmount > 0
         );
 
-        
+
         // 然后开始转账
         uint256 all = add(balances[direct_drop_address], balances[_beneficiary]);
 
         balances[direct_drop_address] = sub(balances[direct_drop_address], decimalsAmount);
 
-            
+
 
         balances[_beneficiary] = add(balances[_beneficiary], decimalsAmount);
-        
+
         assert
         (
             all == add(balances[direct_drop_address], balances[_beneficiary])
@@ -225,12 +225,12 @@ contract CoinZyc // @eachvar
 
         return true;
 
-    } 
-    
+    }
 
-     
-    
-    
+
+
+
+
     // ============== admin 相关函数 ==================
     modifier admin_only()
     {
@@ -238,9 +238,9 @@ contract CoinZyc // @eachvar
         _;
     }
 
-    function setAdmin( address new_admin_address ) 
-    public 
-    admin_only 
+    function setAdmin( address new_admin_address )
+    public
+    admin_only
     returns (bool)
     {
         require(new_admin_address != address(0));
@@ -248,7 +248,7 @@ contract CoinZyc // @eachvar
         return true;
     }
 
-    
+
     // 直投管理
     function setDirectDrop( bool status )
     public
@@ -258,7 +258,7 @@ contract CoinZyc // @eachvar
         direct_drop_switch = status;
         return true;
     }
-    
+
     // ETH提现
     function withDraw()
     public
@@ -273,18 +273,18 @@ contract CoinZyc // @eachvar
     /// 默认函数
     function () external payable
     {
-                
+
                 buyTokens(msg.sender);
-        
-        
-           
+
+
+
     }
 
     // ========== 公用函数 ===============
     // 主要就是 safemath
-    function mul(uint256 a, uint256 b) internal pure returns (uint256 c) 
+    function mul(uint256 a, uint256 b) internal pure returns (uint256 c)
     {
-        if (a == 0) 
+        if (a == 0)
         {
             return 0;
         }
@@ -294,22 +294,51 @@ contract CoinZyc // @eachvar
         return c;
     }
 
-    function div(uint256 a, uint256 b) internal pure returns (uint256) 
+    function div(uint256 a, uint256 b) internal pure returns (uint256)
     {
         return a / b;
     }
 
-    function sub(uint256 a, uint256 b) internal pure returns (uint256) 
+    function sub(uint256 a, uint256 b) internal pure returns (uint256)
     {
         assert(b <= a);
         return a - b;
     }
 
-    function add(uint256 a, uint256 b) internal pure returns (uint256 c) 
+    function add(uint256 a, uint256 b) internal pure returns (uint256 c)
     {
         c = a + b;
         assert(c >= a);
         return c;
     }
 
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

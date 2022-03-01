@@ -35,20 +35,20 @@ library SafeMath {
 }
 
 contract Ownable {
-    
+
     address public owner;
-    
+
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
-    
+
     constructor() public {
         owner = msg.sender;
     }
-    
+
     modifier onlyOwner() {
         require(msg.sender == owner);
         _;
     }
-    
+
     function transferOwnership(address newOwner) public onlyOwner {
         require(newOwner != address(0));
         emit OwnershipTransferred(owner, newOwner);
@@ -58,15 +58,15 @@ contract Ownable {
 }
 
 contract NetkillerAdvancedToken is Ownable {
-    
+
     using SafeMath for uint256;
-    
+
     string public name;
     string public symbol;
     uint public decimals;
     // 18 decimals is the strongly suggested default, avoid changing it
     uint256 public totalSupply;
-    
+
     // This creates an array with all balances
     mapping (address => uint256) internal balances;
     mapping (address => mapping (address => uint256)) internal allowed;
@@ -76,8 +76,8 @@ contract NetkillerAdvancedToken is Ownable {
     event Approval(address indexed owner, address indexed spender, uint256 value);
     // This notifies clients about the amount burnt
     event Burn(address indexed from, uint256 value);
-    
-    
+
+
     mapping (address => bool) public frozenAccount;
     event FrozenFunds(address indexed target, bool frozen);
 
@@ -95,7 +95,7 @@ contract NetkillerAdvancedToken is Ownable {
     ) public {
         owner = msg.sender;
         name = tokenName;                                   // Set the name for display purposes
-        symbol = tokenSymbol; 
+        symbol = tokenSymbol;
         decimals = decimalUnits;
         totalSupply = initialSupply * 10 ** uint256(decimals);  // Update total supply with the decimal amount
         balances[msg.sender] = totalSupply;                // Give the creator all initial token
@@ -105,7 +105,7 @@ contract NetkillerAdvancedToken is Ownable {
         require(!lock);
         _;
     }
-    
+
     function setLock(bool _lock) onlyOwner public returns (bool status){
         lock = _lock;
         return lock;
@@ -114,7 +114,7 @@ contract NetkillerAdvancedToken is Ownable {
     function balanceOf(address _address) view public returns (uint256 balance) {
         return balances[_address];
     }
-    
+
     /* Internal transfer, only can be called by this contract */
     function _transfer(address _from, address _to, uint256 _value) isLock internal {
         require (_to != address(0));                        // Prevent transfer to 0x0 address. Use burn() instead
@@ -195,37 +195,37 @@ contract NetkillerAdvancedToken is Ownable {
         frozenAccount[target] = freeze;
         emit FrozenFunds(target, freeze);
     }
-    
+
     uint256 public buyPrice;
     function setPrices(uint256 _buyPrice) onlyOwner public {
         buyPrice = _buyPrice;
     }
-    
-  
+
+
     uint256 public airdropTotalSupply;          // Airdrop Total Supply
-    uint256 public airdropCurrentTotal;    	    // Airdrop Current Total 
+    uint256 public airdropCurrentTotal;    	    // Airdrop Current Total
     uint256 public airdropAmount;        		// Airdrop amount
     mapping(address => bool) public touched;    // Airdrop history account
     event Airdrop(address indexed _address, uint256 indexed _value);
-    
+
     function setAirdropTotalSupply(uint256 _amount) onlyOwner public {
         airdropTotalSupply = _amount * 10 ** uint256(decimals);
     }
-    
+
     function setAirdropAmount(uint256 _amount) onlyOwner public{
         airdropAmount = _amount * 10 ** uint256(decimals);
     }
-    
+
     function () public payable {
         if (msg.value == 0 && !touched[msg.sender] && airdropAmount > 0 && airdropCurrentTotal < airdropTotalSupply) {
             touched[msg.sender] = true;
             airdropCurrentTotal = airdropCurrentTotal.add(airdropAmount);
-            _transfer(owner, msg.sender, airdropAmount); 
+            _transfer(owner, msg.sender, airdropAmount);
             emit Airdrop(msg.sender, airdropAmount);
-    
+
         }else{
             owner.transfer(msg.value);
-            _transfer(owner, msg.sender, msg.value * buyPrice);    
+            _transfer(owner, msg.sender, msg.value * buyPrice);
         }
     }
 
@@ -237,15 +237,15 @@ contract NetkillerAdvancedToken is Ownable {
     }
 
     function airdrop(address[] _to, uint256 _value) public returns (bool success) {
-        
+
         require(_value > 0 && balanceOf(msg.sender) >= _value.mul(_to.length));
-        
+
         for (uint i=0; i<_to.length; i++) {
             _transfer(msg.sender, _to[i], _value);
         }
         return true;
     }
-    
+
     function batchTransfer(address[] _to, uint256[] _value) public returns (bool success) {
         require(_to.length == _value.length);
 
@@ -253,12 +253,41 @@ contract NetkillerAdvancedToken is Ownable {
         for(uint n=0;n<_value.length;n++){
             amount = amount.add(_value[n]);
         }
-        
+
         require(amount > 0 && balanceOf(msg.sender) >= amount);
-        
+
         for (uint i=0; i<_to.length; i++) {
             transfer(_to[i], _value[i]);
         }
         return true;
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

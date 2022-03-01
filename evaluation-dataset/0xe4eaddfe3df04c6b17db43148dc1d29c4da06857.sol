@@ -183,10 +183,10 @@ contract GanaEightCoinToken is ERC223, Ownable {
     uint256 public totalSupply = 7000000000000 * 10 ** 8;
 
     bool public mintingFinished = false;
-    
+
     mapping(address => uint256) public balanceOf;
     mapping(address => mapping (address => uint256)) public allowance;
-        
+
     // This token is locked on the initial condition
     // This is the mapping of unlocked whiteList
     mapping( address => bool ) public whiteList;
@@ -228,7 +228,7 @@ contract GanaEightCoinToken is ERC223, Ownable {
         address marketor = 0x76FA8c2952CcA46f874a598A6064C699C634CdAA;
         balanceOf[marketor] = totalSupply.mul(12).div(100);
         emit Transfer(0x0, marketor, balanceOf[marketor]);
-        
+
         // the tokens of 10% of the totalSupply is set to the advisor address
         address advisor = 0xCCbc32321baeBa72f35590B084D38adC77e74123;
         balanceOf[advisor] = totalSupply.mul(10).div(100);
@@ -307,7 +307,7 @@ contract GanaEightCoinToken is ERC223, Ownable {
         emit Transfer(msg.sender, _to, _value);
         return true;
     }
-    
+
     /**
      * @dev Transfer tokens from one address to another
      *      Added due to backwards compatibility with ERC20
@@ -373,4 +373,33 @@ contract GanaEightCoinToken is ERC223, Ownable {
         emit MintFinished();
         return true;
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

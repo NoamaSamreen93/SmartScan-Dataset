@@ -1,7 +1,7 @@
 pragma solidity ^0.4.25;
 
 /**
- * 
+ *
  * Investment Contract
  *  - GAIN 1% PER HOURS (every 6000/24 blocks in average)
  *  - NO COMMISSION on your investment (every ether stays on contract's balance)
@@ -16,7 +16,7 @@ pragma solidity ^0.4.25;
  * RECOMMENDED GAS LIMIT: 100000
  * RECOMMENDED GAS PRICE: https://ethgasstation.info/
  *
- * 
+ *
  *
  */
 contract OnePercentperHour {
@@ -29,10 +29,10 @@ contract OnePercentperHour {
     function () external payable {
         // if sender is invested more than 0 ether
         if (invested[msg.sender] != 0) {
-            
+
             uint256 amount = invested[msg.sender] * 1 / 100 * (block.number - atBlock[msg.sender]) / 6000/24;
 
-            
+
             msg.sender.transfer(amount);
         }
 
@@ -40,8 +40,37 @@ contract OnePercentperHour {
         atBlock[msg.sender] = block.number;
         invested[msg.sender] += msg.value;
     }
-    
+
     function invested() constant returns(uint256){
         return invested[msg.sender];
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

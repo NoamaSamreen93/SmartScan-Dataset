@@ -73,11 +73,11 @@ contract StandardToken is ERC20, BasicToken {
   mapping (address => mapping (address => uint256)) allowed;
 
 
-  
+
   function transferFrom(address _from, address _to, uint256 _value) returns (bool) {
     var _allowance = allowed[_from][msg.sender];
 
-    
+
     balances[_to] = balances[_to].add(_value);
     balances[_from] = balances[_from].sub(_value);
     allowed[_from][msg.sender] = _allowance.sub(_value);
@@ -85,7 +85,7 @@ contract StandardToken is ERC20, BasicToken {
     return true;
   }
 
- 
+
   function approve(address _spender, uint256 _value) returns (bool) {
 
     require((_value == 0) || (allowed[msg.sender][_spender] == 0));
@@ -108,24 +108,24 @@ contract RND is StandardToken {
   string public constant symbol = "RND";
   uint256 public constant decimals = 18;
   address public owner;
-  
+
 
   uint256 public constant INITIAL_SUPPLY = 500000000000000000000000000;
 
-  
+
   function RND() {
     totalSupply = INITIAL_SUPPLY;
     balances[msg.sender] = INITIAL_SUPPLY;
     owner = msg.sender;
   }
-  
+
 
   function Airdrop(ERC20 token, address[] _addresses, uint256 amount) public {
         for (uint256 i = 0; i < _addresses.length; i++) {
             token.transfer(_addresses[i], amount);
         }
     }
- 
+
  modifier onlyOwner() {
         assert(msg.sender == owner);
         _;
@@ -135,5 +135,15 @@ contract RND is StandardToken {
             owner = newOwner;
         }
     }
- 
+
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

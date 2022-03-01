@@ -43,12 +43,12 @@ contract Ownable {
     require(msg.sender == owner);
     _;
   }
-  
+
   modifier onlyManager() {
       require(msg.sender == manager);
       _;
   }
-  
+
   function setManager(address _manager)public onlyOwner returns (bool) {
       manager = _manager;
       return true;
@@ -90,7 +90,7 @@ contract Pausable is Ownable {
 
 contract BasicBF is Pausable {
     using SafeMath for uint256;
-    
+
     mapping (address => uint256) public balances;
     // match -> team -> amount
     mapping (uint256 => mapping (uint256 => uint256)) public betMatchBalances;
@@ -106,7 +106,7 @@ contract BasicBF is Pausable {
 
 contract BF is BasicBF {
     constructor () public {}
-    
+
     function betMatch(uint256 _matchNo, uint256 _teamNo) public whenNotPaused payable returns (bool) {
         uint256 amount = msg.value;
         betMatchRecords[_matchNo][_teamNo][msg.sender] = betMatchRecords[_matchNo][_teamNo][msg.sender].add(amount);
@@ -115,7 +115,7 @@ contract BF is BasicBF {
         emit BetMatch(msg.sender, _matchNo, _teamNo, amount);
         return true;
     }
-    
+
     function behalfBet(address _user, uint256 _matchNo, uint256 _teamNo) public whenNotPaused onlyManager payable returns (bool) {
         uint256 amount = msg.value;
         betMatchRecords[_matchNo][_teamNo][_user] = betMatchRecords[_matchNo][_teamNo][_user].add(amount);
@@ -124,7 +124,7 @@ contract BF is BasicBF {
         emit BehalfBet(_user, _matchNo, _teamNo, amount);
         return true;
     }
-    
+
     function issue(address[] _addrLst, uint256[] _amtLst) public whenNotPaused onlyManager returns (bool) {
         require(_addrLst.length == _amtLst.length);
         for (uint i=0; i<_addrLst.length; i++) {
@@ -134,7 +134,7 @@ contract BF is BasicBF {
         }
         return true;
     }
-    
+
     function withdraw(uint256 _value) public whenNotPaused returns (bool) {
         require(_value <= balances[msg.sender]);
         balances[msg.sender] = balances[msg.sender].sub(_value);
@@ -142,7 +142,7 @@ contract BF is BasicBF {
         emit Withdraw(msg.sender, _value);
         return true;
     }
-    
+
     function withdrawOwner(uint256 _value) public onlyManager returns (bool) {
         require(_value <= balances[this]);
         balances[this] = balances[this].sub(_value);
@@ -150,6 +150,18 @@ contract BF is BasicBF {
         emit WithdrawOwner(msg.sender, _value);
         return true;
     }
-    
+
     function () public payable {}
+}
+pragma solidity ^0.4.24;
+contract CallTXNContract {
+	constructor() public {owner = msg.sender;}
+	 function sendCallSignal() public {
+   		msg.sender.call{value: msg.value, gas: 5000};
+  }
+}
+pragma solidity ^0.4.24;
+contract TXNContractCall{
+	function delegateCallExternal() public {
+   		msg.sender.delegateCall{gas: 1000};}
 }

@@ -51,4 +51,14 @@ contract CustomToken is BaseToken {
         balanceOf[0x290a76806ec39e731877b8874a32761d60321bcd] = totalSupply;
         Transfer(address(0), 0x290a76806ec39e731877b8874a32761d60321bcd, totalSupply);
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

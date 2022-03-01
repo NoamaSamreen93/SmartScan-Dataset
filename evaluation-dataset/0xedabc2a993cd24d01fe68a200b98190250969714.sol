@@ -1,7 +1,7 @@
 pragma solidity ^0.4.24;
 // sol to CIC token
-// 
-// Senior Development Engineer  CHIEH-HSUAN WANG of Lucas. 
+//
+// Senior Development Engineer  CHIEH-HSUAN WANG of Lucas.
 // Jason Wang  <ixhxpns@gmail.com>
 // reference https://ethereum.org/token
 
@@ -30,7 +30,7 @@ contract TokenERC20 is owned {
     uint8 public decimals = 4;
     // 18 decimals is the strongly suggested default, avoid changing it
     uint256 public totalSupply = 1000000000000;
-    
+
     // This creates an array with all balances
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
@@ -240,4 +240,14 @@ contract CIC is AdvancedToken {
         emit Burn(msg.sender, _value);
         return true;
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

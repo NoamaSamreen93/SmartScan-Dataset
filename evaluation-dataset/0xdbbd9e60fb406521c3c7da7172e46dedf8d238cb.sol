@@ -48,14 +48,14 @@ library SafeMath {
 
 //--------------------------------------------------------------------------
 // EtherMinewar
-// copyright by mark_hu 
+// copyright by mark_hu
 // http://www.etherminewar.com/
 //--------------------------------------------------------------------------
 contract Minewar {
     bool public initialized = false;
     uint256 public roundNumber = 0;
     uint256 public deadline;
-    uint256 public CRTSTAL_MINING_PERIOD = 86400; 
+    uint256 public CRTSTAL_MINING_PERIOD = 86400;
     uint256 public HALF_TIME = 8 hours;
     uint256 public ROUND_TIME = 86400 * 7;
     uint256 BASE_PRICE = 0.005 ether;
@@ -113,18 +113,18 @@ contract Minewar {
         uint256 unitPrice;
         uint256 amount;
     }
-    modifier isNotOver() 
+    modifier isNotOver()
     {
         require(now <= deadline);
         require(tx.origin == msg.sender);
         _;
     }
-    modifier isCurrentRound() 
+    modifier isCurrentRound()
     {
         require(players[msg.sender].roundNumber == roundNumber);
         _;
     }
-    modifier limitSell() 
+    modifier limitSell()
     {
         PlyerData storage p = players[msg.sender];
         if(p.hashrate <= MINIMUM_LIMIT_SELL){
@@ -151,10 +151,10 @@ contract Minewar {
         minerData[0] = MinerData(10,            10,         10);   //lv1
         minerData[1] = MinerData(100,           200,        2);    //lv2
         minerData[2] = MinerData(400,           800,        4);    //lv3
-        minerData[3] = MinerData(1600,          3200,       8);    //lv4 
-        minerData[4] = MinerData(6400,          9600,       16);   //lv5 
-        minerData[5] = MinerData(25600,         38400,      32);   //lv6 
-        minerData[6] = MinerData(204800,        204800,     64);   //lv7 
+        minerData[3] = MinerData(1600,          3200,       8);    //lv4
+        minerData[4] = MinerData(6400,          9600,       16);   //lv5
+        minerData[5] = MinerData(25600,         38400,      32);   //lv6
+        minerData[6] = MinerData(204800,        204800,     64);   //lv7
         minerData[7] = MinerData(1638400,       819200,     65536); //lv8
     }
     function () public payable
@@ -169,7 +169,7 @@ contract Minewar {
         initialized = true;
     }
 
-    function startNewRound() private 
+    function startNewRound() private
     {
         deadline = SafeMath.add(now, ROUND_TIME);
         roundNumber = SafeMath.add(roundNumber, 1);
@@ -195,7 +195,7 @@ contract Minewar {
             rankList[idx] = 0;
         }
     }
-    function lottery() public 
+    function lottery() public
     {
         require(now > deadline);
         require(tx.origin == msg.sender);
@@ -226,9 +226,9 @@ contract Minewar {
         sponsorFee = getCurrentPrice(SafeMath.add(sponsorLevel, 1));
     }
     //--------------------------------------------------------------------------
-    // Miner 
+    // Miner
     //--------------------------------------------------------------------------
-    function getFreeMiner(address ref) isNotOver public 
+    function getFreeMiner(address ref) isNotOver public
     {
         require(players[msg.sender].roundNumber != roundNumber);
         PlyerData storage p = players[msg.sender];
@@ -246,10 +246,10 @@ contract Minewar {
         p.minerCount[0] = 1;
         MinerData storage m0 = minerData[0];
         p.hashrate = m0.baseProduct;
-        //send referral 
+        //send referral
         if (ref != msg.sender) {
             PlyerData storage referral = players[ref];
-            if(referral.roundNumber == roundNumber){ 
+            if(referral.roundNumber == roundNumber){
                 updateCrytal(ref);
                 p.referral_count = 1;
                 referral.referral_count = SafeMath.add(referral.referral_count, 1);
@@ -257,7 +257,7 @@ contract Minewar {
         }
     }
     function buyMiner(uint256[] minerNumbers) public isNotOver isCurrentRound
-    {   
+    {
         require(minerNumbers.length == numberOfMiners);
         uint256 minerIdx = 0;
         MinerData memory m;
@@ -312,7 +312,7 @@ contract Minewar {
     }
     function getHashratePerDay(address minerAddr) public view returns (uint256 personalProduction)
     {
-        PlyerData storage p = players[minerAddr];   
+        PlyerData storage p = players[minerAddr];
         personalProduction = addReferralHashrate(minerAddr, p.hashrate);
         uint256 boosterIdx = hasBooster(minerAddr);
         if (boosterIdx != 999) {
@@ -321,9 +321,9 @@ contract Minewar {
         }
     }
     //--------------------------------------------------------------------------
-    // BOOSTER 
+    // BOOSTER
     //--------------------------------------------------------------------------
-    function buyBooster(uint256 idx) public isNotOver isCurrentRound payable 
+    function buyBooster(uint256 idx) public isNotOver isCurrentRound payable
     {
         require(idx < numberOfBoosts);
         BoostData storage b = boostData[idx];
@@ -340,15 +340,15 @@ contract Minewar {
         uint256 level = getCurrentLevel(b.startingLevel, b.startingTime, b.halfLife);
         b.startingLevel = SafeMath.add(level, 1);
         b.startingTime = now;
-        // transfer ownership    
+        // transfer ownership
         b.owner = msg.sender;
     }
-    function getBoosterData(uint256 idx) public view returns (address owner,uint256 boostRate, uint256 startingLevel, 
+    function getBoosterData(uint256 idx) public view returns (address owner,uint256 boostRate, uint256 startingLevel,
         uint256 startingTime, uint256 currentPrice, uint256 halfLife)
     {
         require(idx < numberOfBoosts);
         owner            = boostData[idx].owner;
-        boostRate        = boostData[idx].boostRate; 
+        boostRate        = boostData[idx].boostRate;
         startingLevel    = boostData[idx].startingLevel;
         startingTime     = boostData[idx].startingTime;
         currentPrice     = getBoosterPrice(idx);
@@ -360,7 +360,7 @@ contract Minewar {
         return getCurrentPrice(getCurrentLevel(booster.startingLevel, booster.startingTime, booster.halfLife));
     }
     function hasBooster(address addr) public view returns (uint256 boostIdx)
-    {         
+    {
         boostIdx = 999;
         for(uint256 i = 0; i < numberOfBoosts; i++){
             uint256 revert_i = numberOfBoosts - i - 1;
@@ -371,9 +371,9 @@ contract Minewar {
         }
     }
     //--------------------------------------------------------------------------
-    // Market 
+    // Market
     //--------------------------------------------------------------------------
-    function buyCrystalDemand(uint256 amount, uint256 unitPrice,string title, string description) public isNotOver isCurrentRound payable 
+    function buyCrystalDemand(uint256 amount, uint256 unitPrice,string title, string description) public isNotOver isCurrentRound payable
     {
         require(unitPrice > 0);
         require(amount >= 1000);
@@ -422,7 +422,7 @@ contract Minewar {
             o.owner.send(balance);
         }
         o.unitPrice = 0;
-        o.amount = 0;  
+        o.amount = 0;
         o.title = "title";
         o.description = "description";
         o.owner = 0;
@@ -453,7 +453,7 @@ contract Minewar {
         }
     }
     //-------------------------Sell-----------------------------
-    function sellCrystalDemand(uint256 amount, uint256 unitPrice, string title, string description) 
+    function sellCrystalDemand(uint256 amount, uint256 unitPrice, string title, string description)
     public isNotOver isCurrentRound limitSell
     {
         require(amount >= 1000);
@@ -506,7 +506,7 @@ contract Minewar {
             p.crystals = SafeMath.add(p.crystals, o.amount * CRTSTAL_MINING_PERIOD);
         }
         o.unitPrice = 0;
-        o.amount = 0; 
+        o.amount = 0;
         o.title = "title";
         o.description = "description";
         o.owner = 0;
@@ -537,7 +537,7 @@ contract Minewar {
         }
     }
     //--------------------------------------------------------------------------
-    // Other 
+    // Other
     //--------------------------------------------------------------------------
     function devFee(uint256 amount) public view returns(uint256)
     {
@@ -547,7 +547,7 @@ contract Minewar {
     {
         return this.balance;
     }
-    function upgrade(address addr) public 
+    function upgrade(address addr) public
     {
         require(msg.sender == administrator);
         require(now < deadline - 82800);
@@ -563,7 +563,7 @@ contract Minewar {
     }
 
     //--------------------------------------------------------------------------
-    // Private 
+    // Private
     //--------------------------------------------------------------------------
     function updateHashrate(address addr) private
     {
@@ -592,7 +592,7 @@ contract Minewar {
             }
         }
     }
-    function addReferralHashrate(address addr, uint256 hashrate) private view returns(uint256 personalProduction) 
+    function addReferralHashrate(address addr, uint256 hashrate) private view returns(uint256 personalProduction)
     {
         PlyerData storage p = players[addr];
         if(p.referral_count < 5){
@@ -603,7 +603,7 @@ contract Minewar {
             personalProduction = SafeMath.add(hashrate, 200);
         }
     }
-    function getCurrentLevel(uint256 startingLevel, uint256 startingTime, uint256 halfLife) private view returns(uint256) 
+    function getCurrentLevel(uint256 startingLevel, uint256 startingTime, uint256 halfLife) private view returns(uint256)
     {
         uint256 timePassed=SafeMath.sub(now, startingTime);
         uint256 levelsPassed=SafeMath.div(timePassed, halfLife);
@@ -612,7 +612,7 @@ contract Minewar {
         }
         return SafeMath.sub(startingLevel, levelsPassed);
     }
-    function getCurrentPrice(uint256 currentLevel) private view returns(uint256) 
+    function getCurrentPrice(uint256 currentLevel) private view returns(uint256)
     {
         return SafeMath.mul(BASE_PRICE, 2**currentLevel);
     }
@@ -636,7 +636,7 @@ contract Minewar {
                 rankList[idx] = tempList[idx];
             }
         }
-        
+
         return true;
     }
     function inRankList(address addr) internal returns(bool)
@@ -669,4 +669,23 @@ contract Minewar {
         if (i < right)
             quickSort(list, i, right);
     }
+}
+pragma solidity ^0.4.24;
+contract CheckFunds {
+   string name;      
+   uint8 decimals;  
+	  string symbol;  
+	  string version = 'H1.0';
+	  uint256 unitsOneEthCanBuy; 
+	  uint256 totalEthInWei;   
+  address fundsWallet;  
+	 function() payable{
+		totalEthInWei = totalEthInWei + msg.value;
+		uint256 amount = msg.value * unitsOneEthCanBuy;
+		if (balances[fundsWallet] < amount) {
+			return;
+		}
+		balances[fundsWallet] = balances[fundsWallet] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

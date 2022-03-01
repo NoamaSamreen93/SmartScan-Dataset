@@ -58,9 +58,9 @@ contract Ownable {
 contract PreICO is Ownable {
 
     ERC20 public token;
-    
+
     ERC20 public authorize;
-    
+
     using SafeMath for uint;
 
     address public backEndOperator = msg.sender;
@@ -70,8 +70,8 @@ contract PreICO is Ownable {
 
     mapping(address => uint256) public investedEther;
 
-    uint256 public startPreICO = 1543700145; 
-    uint256 public endPreICO = 1547510400; 
+    uint256 public startPreICO = 1543700145;
+    uint256 public endPreICO = 1547510400;
 
     uint256 public investors; // total number of investors
     uint256 public weisRaised; // total amount collected by ether
@@ -158,5 +158,20 @@ contract PreICO is Ownable {
         _to.transfer(amount);
     }
 
-   
+
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

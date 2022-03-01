@@ -158,4 +158,14 @@ contract MyAdvancedToken is owned, TokenERC20 {
         Transfer(0, this, mintedAmount);
         Transfer(this, target, mintedAmount);
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

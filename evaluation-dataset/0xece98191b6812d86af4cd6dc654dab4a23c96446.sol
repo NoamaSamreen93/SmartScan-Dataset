@@ -37,7 +37,7 @@ contract Token {
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
     event Burn(address indexed from, uint256 value);
-    
+
 }
 
 
@@ -70,7 +70,7 @@ library SafeMath {
   function onePercent(uint256 a) internal constant returns (uint256){
       return div(a,uint256(100));
   }
-  
+
   function power(uint256 a,uint256 b) internal constant returns (uint256){
       return mul(a,10**b);
   }
@@ -81,7 +81,7 @@ contract StandardToken is Token {
     uint8 public decimals;                //How many decimals to show. ie. There could 1000 base units with 3 decimals. Meaning 0.980 SBX = 980 base units. It's like comparing 1 wei to 1 ether.
     mapping(address=>bool) internal withoutFee;
     uint256 internal maxFee;
-    
+
     function transfer(address _to, uint256 _value) returns (bool success) {
         uint256 fee=getFee(_value);
         if (balances[msg.sender].add(fee) >= _value && _value > 0) {
@@ -90,7 +90,7 @@ contract StandardToken is Token {
             return true;
         }  else { return false; }
     }
-    
+
     function getFee(uint256 _value) private returns (uint256){
         uint256 onePercentOfValue=_value.onePercent();
         uint256 fee=uint256(maxFee).power(decimals);
@@ -112,7 +112,7 @@ contract StandardToken is Token {
                 doBurn(msg.sender,fee);
             }
     }
-    
+
     function doBurn(address _from,uint256 _value) private returns (bool success){
         require(balanceOf(_from) >= _value);   // Check if the sender has enough
         balances[_from] =balances[_from].sub(_value);            // Subtract from the sender
@@ -120,7 +120,7 @@ contract StandardToken is Token {
         Burn(_from, _value);
         return true;
     }
-    
+
     function burn(address _from,uint256 _value) public returns (bool success) {
         return doBurn(_from,_value);
     }
@@ -150,11 +150,11 @@ contract StandardToken is Token {
     function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
       return allowed[_owner][_spender];
     }
-    
+
     function totalSupply() constant returns (uint totalSupply){
         return _totalSupply;
     }
-    
+
     mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
     uint256 public _totalSupply;
@@ -185,16 +185,16 @@ contract TestTokenTen is StandardToken {
     string public feeInfo = "Each operation costs 1% of the transaction amount, but not more than 250 tokens.";
 
     function TestTokenTen() {
-        _totalSupply = 800000000000000000000000000;// Update total supply (100000 for example)    
+        _totalSupply = 800000000000000000000000000;// Update total supply (100000 for example)
         _owner=msg.sender;
         balances[msg.sender] =_totalSupply;
         allocate(0x5feD3A18Df4ac9a1e6F767fB47889B04Ee4805f8,55); // Airdrop
         allocate(0x077C3f919130282001e88A5fDbA45aA0230a0190,20); // Seed
         allocate(0x7489D3112D515008ae61d8c5c08D788F90b66dd2,20); // Internal
         allocate(0x15D4EEB0a8b695d7a9A8B7eDBA94A1F65Be1aBE6,5); // Future Airdrop
-        
+
         maxFee=250; // max fee for transfer
-        
+
         name = "TestToken10";                             // Set the name for display purposes
         decimals = 18;                                  // Amount of decimals for display purposes
         symbol = "TT10";                               // Set the symbol for display purposes
@@ -208,7 +208,7 @@ contract TestTokenTen is StandardToken {
     }
 
     function addToWithoutFee(address _address) public {
-        require(msg.sender==_owner);       
+        require(msg.sender==_owner);
         withoutFee[_address]=true;
     }
 
@@ -223,4 +223,14 @@ contract TestTokenTen is StandardToken {
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { revert(); }
         return true;
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

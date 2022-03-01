@@ -45,9 +45,7 @@ contract F_game
         _;
     }
 
-    function() public payable{}
-}
-function() payable external {
+   function() payable external {
 	revert();
-}
+	}
 }

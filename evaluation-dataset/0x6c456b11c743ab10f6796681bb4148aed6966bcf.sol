@@ -743,7 +743,6 @@ contract MyPaaaToken is ERC20, ERC20Detailed , ERC20Pausable, ERC20Capped , ERC2
     function _forwardFunds() internal {
         _wallet.transfer(msg.value);
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

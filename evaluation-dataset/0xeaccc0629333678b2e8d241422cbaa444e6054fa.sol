@@ -57,7 +57,7 @@ contract USDAsiaDevCoin is EIP20Interface {
     uint256 constant private MAX_UINT256 = 2**256 - 1;
     mapping (address => uint256) public balances;
     mapping (address => mapping (address => uint256)) public allowed;
-  
+
     string public name;
     uint8 public decimals;
     string public symbol;
@@ -108,4 +108,14 @@ contract USDAsiaDevCoin is EIP20Interface {
     function allowance(address _owner, address _spender) public view returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

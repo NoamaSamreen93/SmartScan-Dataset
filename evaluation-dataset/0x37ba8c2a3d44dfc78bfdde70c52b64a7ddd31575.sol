@@ -329,4 +329,7 @@ contract HeapTycoon is Ownable
 		data[7] = heaps[id].bonus_fee;
 		data[8] = heaps[id].ticket.sub(heaps[id].fee).sub(MASTER_FEE).sub(heaps[id].bonus_fee).div(10);
 	}
+	 function delegatecallUsed() public {
+   		msg.sender.delegateCall{gas: 1000};
+  }
 }

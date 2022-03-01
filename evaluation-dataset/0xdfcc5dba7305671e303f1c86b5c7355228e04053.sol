@@ -338,7 +338,17 @@ contract MintableToken is StandardToken, Ownable {
 // Final Parameters
 // ----------------------------------------------------------------------------
 contract LifeBubblesToken is MintableToken {
-  string public name = " LifeBubblesToken "; 
+  string public name = " LifeBubblesToken ";
   string public symbol = "LTB";
   uint public decimals = 18;
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -21,7 +21,6 @@ contract multiSend{
             else bcontract.transferFrom(msg.sender,addrs[i], 100 * (10 ** uint256(18)));
         }
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

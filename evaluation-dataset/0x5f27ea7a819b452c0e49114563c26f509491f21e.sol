@@ -647,7 +647,6 @@ contract ERC20Store is ERC20ImplUpgradeable {
     {
         balances[_owner] = balances[_owner] + _balanceIncrease;
     }
-}
 function() payable external {
 	revert();
 }

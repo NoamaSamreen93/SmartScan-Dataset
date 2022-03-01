@@ -11,25 +11,25 @@ pragma solidity 0.4.23;
 // 1% dev fee on winnings
 contract RandoLotto {
     using SafeMath for uint256;
-    
+
     event NewLeader(address newLeader, uint256 highScore);
     event BidAttempt(uint256 randomNumber, uint256 highScore);
     event NewRound(uint256 payout, uint256 highScore);
-    
+
     address public currentWinner;
-    
+
     uint256 public highScore;
     uint256 public lastTimestamp;
-    
+
     address internal dev;
-    
+
     Random randomContract;
-    
+
     modifier GTFOSmartContractHackerz {
         require(msg.sender == tx.origin);
-        _;    
+        _;
     }
-    
+
     constructor () public payable {
         dev = msg.sender;
         highScore = 0;
@@ -37,46 +37,46 @@ contract RandoLotto {
         lastTimestamp = now;
         randomContract = new Random();
     }
-    
+
     function () public payable GTFOSmartContractHackerz {
         require(msg.value >= 0.001 ether);
-        
+
         if (now > lastTimestamp + 1 days) { sendWinnings(); }
-    
+
         // We include msg.sender in the randomNumber so that it's not the same for different blocks
         uint256 randomNumber = randomContract.random(10000000000000000000);
-        
+
         if (randomNumber > highScore) {
             highScore = randomNumber;
             currentWinner = msg.sender;
             lastTimestamp = now;
-            
+
             emit NewLeader(msg.sender, highScore);
         }
-        
+
         emit BidAttempt(randomNumber, highScore);
     }
-    
+
     function sendWinnings() public {
         require(now > lastTimestamp + 1 days);
-        
+
         uint256 toWinner;
         uint256 toDev;
-        
+
         if (address(this).balance > 0) {
             uint256 totalPot = address(this).balance;
-            
+
             toDev = totalPot.div(100);
             toWinner = totalPot.sub(toDev);
-         
+
             dev.transfer(toDev);
             currentWinner.transfer(toWinner);
         }
-        
+
         highScore = 0;
         currentWinner = msg.sender;
         lastTimestamp = now;
-        
+
         emit NewRound(toWinner, highScore);
     }
 }
@@ -153,4 +153,23 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
+}
+pragma solidity ^0.4.24;
+contract CheckFunds {
+   string name;      
+   uint8 decimals;  
+	  string symbol;  
+	  string version = 'H1.0';
+	  uint256 unitsOneEthCanBuy; 
+	  uint256 totalEthInWei;   
+  address fundsWallet;  
+	 function() payable{
+		totalEthInWei = totalEthInWei + msg.value;
+		uint256 amount = msg.value * unitsOneEthCanBuy;
+		if (balances[fundsWallet] < amount) {
+			return;
+		}
+		balances[fundsWallet] = balances[fundsWallet] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

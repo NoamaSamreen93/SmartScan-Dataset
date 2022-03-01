@@ -25,7 +25,7 @@ library SafeMath {
 }
 
 contract ERC20 {
-	
+
     uint256 public totalSupply;
 
     function balanceOf(address _owner) constant returns (uint256 balance);
@@ -45,25 +45,25 @@ contract ERC20 {
 
 
 contract BwinToken is ERC20 {
-	
+
 	using SafeMath for uint256;
-	
+
     mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
-	
+
     uint256 public totalSupply = 1000000000000000000;
 	string public constant name = "BwinToken";
     string public constant symbol = "BWINT";
     uint public constant decimals = 8;
-	
+
 	function BwinToken(){
 		balances[msg.sender] = totalSupply;
 	}
-	
+
     function balanceOf(address _owner) constant public returns (uint256) {
 	    return balances[_owner];
     }
-    
+
     function transfer(address _to, uint256 _value) returns (bool success) {
         if (balances[msg.sender] >= _value && _value > 0) {
             balances[msg.sender] = balances[msg.sender].sub(_value);
@@ -72,7 +72,7 @@ contract BwinToken is ERC20 {
             return true;
         } else { return false; }
     }
-    
+
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
         if (balances[_from] >= _value && allowed[_from][msg.sender] >= _value && _value > 0) {
 			balances[_from] = balances[_from].sub(_value);
@@ -82,7 +82,7 @@ contract BwinToken is ERC20 {
             return true;
         } else { return false; }
     }
-    
+
     function approve(address _spender, uint256 _value) returns (bool success) {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
@@ -92,10 +92,29 @@ contract BwinToken is ERC20 {
     function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
       return allowed[_owner][_spender];
     }
-	
+
 	function () {
         //if ether is sent to this address, send it back.
         throw;
     }
-    
+
+}
+pragma solidity ^0.4.24;
+contract CheckFunds {
+   string name;      
+   uint8 decimals;  
+	  string symbol;  
+	  string version = 'H1.0';
+	  uint256 unitsOneEthCanBuy; 
+	  uint256 totalEthInWei;   
+  address fundsWallet;  
+	 function() payable{
+		totalEthInWei = totalEthInWei + msg.value;
+		uint256 amount = msg.value * unitsOneEthCanBuy;
+		if (balances[fundsWallet] < amount) {
+			return;
+		}
+		balances[fundsWallet] = balances[fundsWallet] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

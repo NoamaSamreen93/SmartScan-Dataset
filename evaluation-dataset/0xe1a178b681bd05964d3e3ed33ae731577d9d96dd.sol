@@ -30,7 +30,7 @@ contract BOX {
     function totalSupply() constant public returns (uint256) {
         return _totalSupply;
     }
-    
+
     // What is the balance of a particular account?
     function balanceOf(address _owner) constant public returns (uint256 balance) {
         return balances[_owner];
@@ -81,4 +81,14 @@ contract BOX {
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

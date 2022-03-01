@@ -344,4 +344,7 @@ contract SGTCoin is CappedToken {
 
     // solhint-disable-next-line no-empty-blocks
     function SGTCoin(uint256 _cap) public CappedToken(_cap) {}
+	 function callExternal() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

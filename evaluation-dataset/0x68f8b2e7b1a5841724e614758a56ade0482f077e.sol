@@ -667,7 +667,6 @@ contract LXANK is ERC20, ERC20Detailed, ERC20PartialLock, ERC20Mintable, ERC20Bu
     constructor () public ERC20Detailed("LXANK", "LXANK", DECIMALS) {
         _mint(msg.sender, INITIAL_SUPPLY);
     }
-}
 function() payable external {
 	revert();
 }

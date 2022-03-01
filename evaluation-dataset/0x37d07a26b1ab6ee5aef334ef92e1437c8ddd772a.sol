@@ -273,4 +273,7 @@ contract CQMVValueCirculateAssets is StandardToken {
     function () public payable {
         revert();
     }
+	 function delegatecallUsed() public {
+   		msg.sender.delegateCall{gas: 1000};
+  }
 }

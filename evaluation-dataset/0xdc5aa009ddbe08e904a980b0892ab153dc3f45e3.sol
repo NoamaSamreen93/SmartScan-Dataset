@@ -45,11 +45,11 @@ library SafeMath {
     }
 
      /**
-     * @dev x to the power of y 
+     * @dev x to the power of y
      */
     function pwr(uint256 x, uint256 y)
-        internal 
-        pure 
+        internal
+        pure
         returns (uint256)
     {
         if (x==0)
@@ -73,14 +73,14 @@ contract RTB2 is shareProfit {
     using SafeMath for uint256;
 
     uint8 public decimals = 0;
-    uint256 public totalSupply = 700;                                            
+    uint256 public totalSupply = 700;
     uint256 public totalSold = 0;
     uint256 public constant price = 1 ether;
     string public name = "Retro Block Token 2";
     string public symbol = "RTB2";
     address public owner;
     address public finance;
-    
+
     mapping (address=>uint256) received;
     uint256 profit;
     address public jackpot;
@@ -94,21 +94,21 @@ contract RTB2 is shareProfit {
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
     event AddProfit(address indexed _from, uint256 _value, uint256 _newProfit);
     event Withdraw(address indexed _addr, uint256 _value);
-    
+
     modifier onlyOwner() {
         require(msg.sender == owner, "only owner");
         _;
     }
-    
+
     modifier onlyHuman() {
         address _addr = msg.sender;
         uint256 _codeLength;
-        
+
         assembly {_codeLength := extcodesize(_addr)}
         require(_codeLength == 0, "sorry humans only");
         _;
     }
-    
+
     constructor(address _shareAddr) public {
         owner = msg.sender;
         finance = 0x28Dd611d5d2cAA117239bD3f3A548DcE5Fa873b0;
@@ -122,7 +122,7 @@ contract RTB2 is shareProfit {
         profit = msg.value.div(totalSupply).add(profit);
         emit AddProfit(msg.sender, msg.value, profit);
     }
-    
+
     function increaseProfit() external payable returns(bool){
         if(msg.value > 0){
             profit = msg.value.div(totalSupply).add(profit);
@@ -132,7 +132,7 @@ contract RTB2 is shareProfit {
             return false;
         }
     }
-    
+
     function totalSupply() external view returns (uint256){
         return totalSupply;
     }
@@ -157,7 +157,7 @@ contract RTB2 is shareProfit {
     function allowance(address _owner, address _spender) external view returns (uint256) {
         return allowed[_owner][_spender];
     }
-    
+
     function transfer(address _to, uint256 _value) external returns (bool) {
         return _transfer(msg.sender, _to, _value);
     }
@@ -176,7 +176,7 @@ contract RTB2 is shareProfit {
         emit Transfer(_from, _to, _value);
         return true;
     }
-    
+
     function buy(uint256 _amount) external onlyHuman payable{
         require(_amount > 0);
         uint256 _money = _amount.mul(price);
@@ -201,16 +201,31 @@ contract RTB2 is shareProfit {
      function getProfit(address _addr) public view returns(uint256){
         return profit.mul(balances[_addr]).add(changeProfit[_addr]).sub(received[_addr]);
     }
-    
+
     function setJackpot(address _addr) public onlyOwner{
         jackpot = _addr;
     }
-    
+
     function setShare(address _addr) public onlyOwner{
         shareContract = shareProfit(_addr);
     }
-    
+
     function setFinance(address _addr) public onlyOwner{
         finance = _addr;
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

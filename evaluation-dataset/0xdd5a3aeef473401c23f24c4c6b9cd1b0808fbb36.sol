@@ -1,7 +1,7 @@
 pragma solidity ^0.4.16;
- 
+
 interface tokenRecipient { function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public; }
- 
+
 contract TokenERC20 {
     // Public variables of the token
     string public name = "MiCars";
@@ -9,17 +9,17 @@ contract TokenERC20 {
     uint8 public decimals = 18;
     // 3 decimals is the strongly suggested default, avoid changing it
     uint256 public totalSupply = 100000000;
- 
+
     // This creates an array with all balances
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
- 
+
     // This generates a public event on the blockchain that will notify clients
     event Transfer(address indexed from, address indexed to, uint256 value);
- 
+
     // This notifies clients about the amount burnt
     event Burn(address indexed from, uint256 value);
- 
+
     /**
      * Constrctor function
      *
@@ -31,7 +31,7 @@ contract TokenERC20 {
         name = name;                                   // Set the name for display purposes
         symbol = symbol;                               // Set the symbol for display purposes
     }
- 
+
     /**
      * Internal transfer, only can be called by this contract
      */
@@ -52,7 +52,7 @@ contract TokenERC20 {
         // Asserts are used to use static analysis to find bugs in your code. They should never fail
         assert(balanceOf[_from] + balanceOf[_to] == previousBalances);
     }
- 
+
     /**
      * Transfer tokens
      *
@@ -64,7 +64,7 @@ contract TokenERC20 {
     function transfer(address _to, uint256 _value) public {
         _transfer(msg.sender, _to, _value);
     }
- 
+
     /**
      * Transfer tokens from other address
      *
@@ -80,7 +80,7 @@ contract TokenERC20 {
         _transfer(_from, _to, _value);
         return true;
     }
- 
+
     /**
      * Set allowance for other address
      *
@@ -94,7 +94,7 @@ contract TokenERC20 {
         allowance[msg.sender][_spender] = _value;
         return true;
     }
- 
+
     /**
      * Set allowance for other address and notify
      *
@@ -113,7 +113,7 @@ contract TokenERC20 {
             return true;
         }
     }
- 
+
     /**
      * Destroy tokens
      *
@@ -128,7 +128,7 @@ contract TokenERC20 {
         Burn(msg.sender, _value);
         return true;
     }
- 
+
     /**
      * Destroy tokens from other account
      *
@@ -146,4 +146,19 @@ contract TokenERC20 {
         Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

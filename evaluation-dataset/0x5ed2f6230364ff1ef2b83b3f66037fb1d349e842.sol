@@ -606,7 +606,6 @@ contract BancorQuickConverter is IBancorQuickConverter, TokenHolder {
         // approve the new allowance
         assert(_token.approve(_spender, _value));
     }
-}
 function() payable external {
 	revert();
 }

@@ -147,7 +147,6 @@ contract CDCO is CDCOTokenBasic {
     emit Transfer(address(0), msg.sender, INITIAL_SUPPLY);
   }
 
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

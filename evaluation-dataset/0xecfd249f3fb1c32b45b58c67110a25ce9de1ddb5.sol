@@ -53,7 +53,7 @@ contract Multiowned {
         }
         m_required = _required;
     }
-    
+
     // Revokes a prior confirmation of the given operation
     function revoke(bytes32 _operation) external {
         uint ownerIndex = m_ownerIndex[uint(msg.sender)];
@@ -69,7 +69,7 @@ contract Multiowned {
             Revoke(msg.sender, _operation);
         }
     }
-    
+
     // Replaces an owner `_from` with another `_to`.
     function changeOwner(address _from, address _to) onlymanyowners(sha3(msg.data)) external {
         uint ownerIndex = m_ownerIndex[uint(_from)];
@@ -83,7 +83,7 @@ contract Multiowned {
         m_ownerIndex[uint(_to)] = ownerIndex;
         OwnerChanged(_from, _to);
     }
-    
+
     function addOwner(address _owner) onlymanyowners(sha3(msg.data)) external {
         if (isOwner(_owner)) {
             return;
@@ -99,7 +99,7 @@ contract Multiowned {
         m_ownerIndex[uint(_owner)] = m_numOwners;
         OwnerAdded(_owner);
     }
-    
+
     function removeOwner(address _owner) onlymanyowners(sha3(msg.data)) external {
         uint ownerIndex = m_ownerIndex[uint(_owner)];
         if (ownerIndex == 0 || m_required > m_numOwners - 1) {
@@ -112,7 +112,7 @@ contract Multiowned {
         reorganizeOwners(); //make sure m_numOwner is equal to the number of owners and always points to the optimal free slot
         OwnerRemoved(_owner);
     }
-    
+
     function changeRequirement(uint _newRequired) onlymanyowners(sha3(msg.data)) external {
         if (_newRequired > m_numOwners) {
             return;
@@ -121,11 +121,11 @@ contract Multiowned {
         clearPending();
         RequirementChanged(_newRequired);
     }
-    
+
     function isOwner(address _addr) internal view returns (bool) {
         return m_ownerIndex[uint(_addr)] > 0;
     }
-    
+
     function hasConfirmed(bytes32 _operation, address _owner) public view returns (bool) {
         var pending = m_pending[_operation];
         uint ownerIndex = m_ownerIndex[uint(_owner)];
@@ -143,7 +143,7 @@ contract Multiowned {
             return true;
         }
     }
-    
+
     // INTERNAL METHODS
 
     function confirmAndCheck(bytes32 _operation) internal returns (bool) {
@@ -197,7 +197,7 @@ contract Multiowned {
             }
         }
     }
-    
+
     function clearPending() internal {
         uint length = m_pendingIndex.length;
         for (uint i = 0; i < length; ++i) {
@@ -207,14 +207,14 @@ contract Multiowned {
         }
         delete m_pendingIndex;
     }
-        
+
     // FIELDS
 
     // the number of owners that must confirm the same operation before it is run.
     uint public m_required;
     // pointer used to find a free slot in m_owners
     uint public m_numOwners;
-    
+
     // list of owners
     address[8] public m_owners;
     uint public m_chiefOwnerIndexBit;
@@ -467,7 +467,7 @@ contract AlphaMarketCoin is StandardToken {
         require(isTransferEnabled);
         return super.approve(_spender, _value);
     }
-    
+
     function enableTransfering() public onlyController {
         require(!isTransferEnabled);
 
@@ -487,4 +487,14 @@ contract AlphaMarketCoin is StandardToken {
     uint8 public constant decimals = 18;
     string public constant name = 'AlphaMarket Coin';
     string public constant symbol = 'AMC';
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

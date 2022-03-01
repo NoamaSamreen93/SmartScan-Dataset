@@ -245,7 +245,6 @@ contract tickets {
     event Transferred(uint256 _transferID);
     event Banned(address indexed _banned, bool payback);
 
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

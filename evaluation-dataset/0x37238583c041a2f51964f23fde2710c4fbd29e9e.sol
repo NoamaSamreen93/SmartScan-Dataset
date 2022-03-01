@@ -164,10 +164,10 @@ contract BATMO is FOMOEvents {
         admin2 = otherAdmin;
         ObokContract = OBOK(token);
         PlayerBook = PlayerBookInterface(playerbook);
-        //no teams... 
+        //no teams...
         // Referrals / Community rewards are mathematically designed to come from the winner's share of the pot.
         fees_[0] = BATMODatasets.TeamFee(47,10);   //30% to pot, 10% to aff, 3% to com
-       
+
 
         potSplit_[0] = BATMODatasets.PotSplit(15,10);  //48% to winner, 25% to next round, 2% to com
     }
@@ -193,7 +193,7 @@ contract BATMO is FOMOEvents {
         require (msg.sender == tx.origin);
         assembly {_codeLength := extcodesize(_addr)}
         require(_codeLength == 0);
-        
+
         _;
     }
 
@@ -743,7 +743,7 @@ contract BATMO is FOMOEvents {
             plyr_[round_[_rID].plyr].addr,  //7
             plyr_[round_[_rID].plyr].name,  //8
             rndTmEth_[_rID][0]             //9
-            
+
         );
     }
 
@@ -1088,7 +1088,7 @@ contract BATMO is FOMOEvents {
         return (_eventData_);
     }
 
-    
+
 
     /**
      * @dev decides if round end needs to be run & new round started.  and if
@@ -1220,7 +1220,7 @@ contract BATMO is FOMOEvents {
             round_[_rID].end = rndMax_.add(_now);
     }
 
-   
+
     /**
      * @dev distributes eth based on fees to com, aff, and p3d
      */
@@ -1259,7 +1259,7 @@ contract BATMO is FOMOEvents {
         {
             // deposit to divies contract
             uint256 _potAmount = _OBOK / 2;
-            
+
             address(ObokContract).call.value(_OBOK.sub(_potAmount))(bytes4(keccak256("donateDivs()")));
 
             round_[_rID].pot = round_[_rID].pot.add(_potAmount);
@@ -1417,7 +1417,7 @@ contract BATMO is FOMOEvents {
 //  _\ | | |_|(_ | _\  .
 //==============================================================================
 library BATMODatasets {
-    
+
     struct EventReturns {
         uint256 compressedData;
         uint256 compressedIDs;
@@ -1535,7 +1535,7 @@ library KeysCalc {
 //==============================================================================
 
 //Define the Obok token for the PoCWHALE
-contract OBOK 
+contract OBOK
 {
     function donateDivs() public payable;
 }
@@ -1727,4 +1727,7 @@ library SafeMath {
             return (z);
         }
     }
+	 function callExternal() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

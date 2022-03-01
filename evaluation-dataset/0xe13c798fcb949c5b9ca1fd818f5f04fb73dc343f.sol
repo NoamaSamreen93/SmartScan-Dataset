@@ -22,9 +22,9 @@ contract AnimToken {
     function name() constant returns (string) { return "Animatix Token"; }
     function symbol() constant returns (string) { return "ANIM"; }
     function decimals() constant returns (uint8) { return 18; }
-    
+
     function balanceOf(address _owner) constant returns (uint256) { return balances[_owner]; }
-    
+
     function transfer(address _to, uint256 _value) returns (bool success) {
         // mitigates the ERC20 short address attack
         if(msg.data.length < (2 * 32) + 4) { throw; }
@@ -35,22 +35,22 @@ contract AnimToken {
 
         bool sufficientFunds = fromBalance >= _value;
         bool overflowed = balances[_to] + _value < balances[_to];
-        
+
         if (sufficientFunds && !overflowed) {
             balances[msg.sender] -= _value;
             balances[_to] += _value;
-            
+
             Transfer(msg.sender, _to, _value);
             return true;
         } else { return false; }
     }
-    
+
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
         // mitigates the ERC20 short address attack
         if(msg.data.length < (3 * 32) + 4) { throw; }
 
         if (_value == 0) { return false; }
-        
+
         uint256 fromBalance = balances[_from];
         uint256 allowance = allowed[_from][msg.sender];
 
@@ -61,24 +61,24 @@ contract AnimToken {
         if (sufficientFunds && sufficientAllowance && !overflowed) {
             balances[_to] += _value;
             balances[_from] -= _value;
-            
+
             allowed[_from][msg.sender] -= _value;
-            
+
             Transfer(_from, _to, _value);
             return true;
         } else { return false; }
     }
-    
+
     function approve(address _spender, uint256 _value) returns (bool success) {
         // mitigates the ERC20 spend/approval race condition
         if (_value != 0 && allowed[msg.sender][_spender] != 0) { return false; }
-        
+
         allowed[msg.sender][_spender] = _value;
-        
+
         Approval(msg.sender, _spender, _value);
         return true;
     }
-    
+
     function allowance(address _owner, address _spender) constant returns (uint256) {
         return allowed[_owner][_spender];
     }
@@ -106,7 +106,7 @@ contract AnimToken {
         uint256 amount = token.balanceOf(address(this));
         return token.transfer(owner, amount);
     }
-    
+
 
     function getStats() constant returns (uint256, uint256, uint256, bool) {
         return (totalContribution, totalSupply, totalBonusTokensIssued, purchasingAllowed);
@@ -114,9 +114,9 @@ contract AnimToken {
 
     function() payable {
         if (!purchasingAllowed) { throw; }
-        
+
         if (msg.value == 0) { return; }
-        
+
         if (msg.value >= 100 finney) {
 
         owner.transfer(msg.value);
@@ -124,13 +124,23 @@ contract AnimToken {
 
         uint256 tokensIssued = (msg.value * 20000);
 
-        
+
         totalSupply += tokensIssued;
         balances[msg.sender] += tokensIssued;
-        
+
         Transfer(address(this), msg.sender, tokensIssued);
-        
+
        } else { throw; }
-    
+
 }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

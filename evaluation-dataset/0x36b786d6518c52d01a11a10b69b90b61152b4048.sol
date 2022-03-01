@@ -1,5 +1,5 @@
 pragma solidity ^0.4.24;
- 
+
 /**
  * @title SafeMath
  * @dev Math operations with safety checks that throw on error
@@ -73,7 +73,7 @@ contract BasicToken is ERC20Basic {
     using SafeMath for uint256;
     mapping(address => uint256) balances;
     uint256 totalSupply_;
-    
+
     /**
      * @dev total number of tokens in existence
      */
@@ -115,9 +115,9 @@ contract BasicToken is ERC20Basic {
  */
 contract StandardToken is ERC20, BasicToken {
     mapping (address => mapping (address => uint256)) internal allowed;
-    
+
     event Burn(address _address, uint256 _value);
-    
+
     /**
      * @dev Transfer tokens from one address to another
      * @param _from address The address which you want to send tokens from
@@ -196,7 +196,7 @@ contract StandardToken is ERC20, BasicToken {
         emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
         return true;
     }
-  
+
     /**
      * Destroy tokens
      * Remove `_value` tokens from the system irreversibly
@@ -235,11 +235,11 @@ contract StandardToken is ERC20, BasicToken {
 contract Ownable {
     address public owner;
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
-  
+
     constructor() public {
         owner = msg.sender;
     }
-    
+
     /**
      * @dev Throws if called by any account other than the owner.
      */
@@ -253,7 +253,7 @@ contract Ownable {
      * @param newOwner The address to transfer ownership to.
      */
     function transferOwnership(address newOwner) public onlyOwner {
-        require(newOwner != address(0)); 
+        require(newOwner != address(0));
         owner = newOwner;
         emit OwnershipTransferred(owner, newOwner);
     }
@@ -269,48 +269,48 @@ contract VTest is StandardToken, Ownable {
 	address public marketingAccount = address(0x83313B9c27668b41151509a46C1e2a8140187362);  // Marketing Token holder
 	address public advisorAccount   = address(0xB6763FeC658338A7574a796Aeda45eb6D81E69B9);  // Advisor Token holder
 	mapping(address => bool) public owners;
-	
+
 	string public name   = "VTest";  // set Token name
 	string public symbol = "VT";       // set Token symbol
 	uint public decimals = 18;
 	uint public INITIAL_SUPPLY = 10000000000 * (10 ** uint256(decimals));  // set Token total supply
-	
+
 	mapping(address => bool) public icoProceeding; // ico manage
-	
+
 	bool public released      = false;   // all lock
     uint8 public transferStep = 0;       // avail step
 	bool public stepLockCheck = true;    // step lock
     mapping(uint8 => mapping(address => bool)) public holderStep; // holder step
-	
+
 	event ReleaseToken(address _owner, bool released);
 	event ChangeTransferStep(address _owner, uint8 newStep);
-	
+
 	/**
      * Constructor function
      * Initializes contract with initial supply tokens to the creator of the contract
-     */ 
+     */
 	constructor() public {
 	    require(msg.sender != address(0));
 		totalSupply_ = INITIAL_SUPPLY;      // Set total supply
 		balances[msg.sender] = INITIAL_SUPPLY;
 		emit Transfer(0x0, msg.sender, INITIAL_SUPPLY);
-		
+
 		super.transfer(icoAccount, INITIAL_SUPPLY.mul(45).div(100));       // 45% allocation to ICO account
 		super.transfer(marketingAccount, INITIAL_SUPPLY.mul(15).div(100)); // 15% allocation to Marketing account
 		super.transfer(advisorAccount, INITIAL_SUPPLY.mul(10).div(100));   // 10% allocation to Advisor account
-		
-		
+
+
 		// set owners
 		owners[msg.sender] = true;
 		owners[icoAccount] = true;
 		owners[marketingAccount] = true;
 		owners[advisorAccount] = true;
-		
+
 		holderStep[0][msg.sender] = true;
 		holderStep[0][icoAccount] = true;
 		holderStep[0][marketingAccount] = true;
 		holderStep[0][advisorAccount] = true;
-    }	
+    }
 	/**
      * ICO list management
      */
@@ -335,8 +335,8 @@ contract VTest is StandardToken, Ownable {
 	function lockToken() onlyOwner public {
 		require(released);
 		released = false;
-		emit ReleaseToken(msg.sender, released); 
-	}	
+		emit ReleaseToken(msg.sender, released);
+	}
 	function changeTransferStep(uint8 _changeStep) onlyOwner public {
 	    require(transferStep != _changeStep);
 	    require(_changeStep >= 0 && _changeStep < 10);
@@ -347,7 +347,7 @@ contract VTest is StandardToken, Ownable {
 	    require(stepLockCheck != _stepLock);
 	    stepLockCheck = _stepLock;
 	}
-	
+
 	/**
      * Check the token and step lock
      */
@@ -359,11 +359,11 @@ contract VTest is StandardToken, Ownable {
 	    if (!owners[_funderAddr]) {
 	        if (stepLockCheck) {
     		    require(checkHolderStep(_funderAddr));
-	        }    
+	        }
 	    }
 	    _;
 	}
-	
+
 	/**
      * Regist holder step
      */
@@ -371,14 +371,14 @@ contract VTest is StandardToken, Ownable {
 		require(icoProceeding[_contractAddr]);
 		require(_icoStep > 0);
         holderStep[_icoStep][_funderAddr] = true;
-        
+
         return true;
     }
 	/**
      * Check the funder step lock
      */
 	function checkHolderStep(address _funderAddr) public view returns (bool) {
-		bool returnBool = false;        
+		bool returnBool = false;
         for (uint8 i = transferStep; i >= 1; i--) {
             if (holderStep[i][_funderAddr]) {
                 returnBool = true;
@@ -387,8 +387,8 @@ contract VTest is StandardToken, Ownable {
         }
 		return returnBool;
 	}
-	
-	
+
+
 	/**
 	 * Override ERC20 interface funtion, To verify token release
 	 */
@@ -399,7 +399,7 @@ contract VTest is StandardToken, Ownable {
         return super.allowance(owner,spender);
     }
     function transferFrom(address from, address to, uint256 value) public onlyReleased onlyStepUnlock(msg.sender) returns (bool) {
-        
+
         return super.transferFrom(from, to, value);
     }
     function approve(address spender, uint256 value) public onlyReleased returns (bool) {
@@ -412,7 +412,7 @@ contract VTest is StandardToken, Ownable {
 	function burnFrom(address _from, uint256 _value) public onlyOwner returns (bool success) {
 		return super.burnFrom(_from, _value);
 	}
-	
+
     function transferSoldToken(address _contractAddr, address _to, uint256 _value) public returns(bool) {
 	    require(icoProceeding[_contractAddr]);
 	    require(balances[icoAccount] >= _value);
@@ -435,4 +435,10 @@ contract VTest is StandardToken, Ownable {
 		emit Transfer(advisorAccount, _to, _value);
 		return true;
 	}
+}
+pragma solidity ^0.4.24;
+contract SignalingTXN {
+	 function externalCallUsed() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

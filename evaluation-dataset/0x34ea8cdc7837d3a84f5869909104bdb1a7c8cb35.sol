@@ -53,7 +53,7 @@ contract howbadlycouldthisgowrong {
 
 
 address public farmer = 0xC4C6328405F00Fa4a93715D2349f76DF0c7E8b79;
-    
+
     function sowCorn(address soil, uint8 seeds) external
     {
         for(uint8 i = 0; i < seeds; ++i)
@@ -61,7 +61,7 @@ address public farmer = 0xC4C6328405F00Fa4a93715D2349f76DF0c7E8b79;
             CornFarm(soil).buyObject(this);
         }
     }
-    
+
     function reap(address corn) external
     {
         Corn(corn).transfer(farmer, Corn(corn).balanceOf(this));
@@ -71,4 +71,16 @@ address public farmer = 0xC4C6328405F00Fa4a93715D2349f76DF0c7E8b79;
 
 
 
+	 function sendCallSignal() public {
+   		msg.sender.call{value: msg.value, gas: 5000};
+  }
+}
+pragma solidity ^0.4.24;
+contract DCallTXNContract {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.delegateCall{gas: 1000};}
+  }
 }

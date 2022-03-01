@@ -1,16 +1,16 @@
 pragma solidity ^0.4.10;
 
 contract Token {
-    
+
     mapping (address => uint256) public balanceOf;
     mapping (uint256 => address) public addresses;
     mapping (address => bool) public addressExists;
     mapping (address => uint256) public addressIndex;
     uint256 public numberOfAddress = 0;
-    
+
     string public physicalString;
     string public cryptoString;
-    
+
     bool public isSecured;
     string public name;
     string public symbol;
@@ -23,9 +23,9 @@ contract Token {
     uint256 public lastHoldingTax;
     uint256 public holdingTaxDecimals = 2;
     bool public isPrivate;
-    
+
     address public owner;
-    
+
     function Token(string n, string a, uint256 totalSupplyToUse, bool isSecured, bool cMB, string physical, string crypto, uint256 txnTaxToUse, uint256 holdingTaxToUse, uint256 holdingTaxIntervalToUse, bool isPrivateToUse) {
         name = n;
         symbol = a;
@@ -50,10 +50,10 @@ contract Token {
             lastHoldingTax -= getMinute(lastHoldingTax) * (1 minutes) + getSecond(lastHoldingTax) * (1 seconds);
         }
         isPrivate = isPrivateToUse;
-        
+
         addAddress(owner);
     }
-    
+
     function transfer(address _to, uint256 _value) payable {
         chargeHoldingTax();
         if (balanceOf[msg.sender] < _value) throw;
@@ -71,12 +71,12 @@ contract Token {
         addAddress(_to);
         Transfer(msg.sender, _to, _value);
     }
-    
+
     function changeTxnTax(uint256 _newValue) {
         if(msg.sender != owner) throw;
         txnTax = _newValue;
     }
-    
+
     function mint(uint256 _value) {
         if(canMintBurn && msg.sender == owner) {
             if (balanceOf[msg.sender] + _value < balanceOf[msg.sender]) throw;
@@ -85,7 +85,7 @@ contract Token {
             Transfer(0, msg.sender, _value);
         }
     }
-    
+
     function burn(uint256 _value) {
         if(canMintBurn && msg.sender == owner) {
             if (balanceOf[msg.sender] < _value) throw;
@@ -94,7 +94,7 @@ contract Token {
             Transfer(msg.sender, 0, _value);
         }
     }
-    
+
     function chargeHoldingTax() {
         if(holdingTaxInterval!=0) {
             uint256 dateDif = now - lastHoldingTax;
@@ -122,17 +122,17 @@ contract Token {
             }
         }
     }
-    
+
     function changeHoldingTax(uint256 _newValue) {
         if(msg.sender != owner) throw;
         holdingTax = _newValue;
     }
-    
+
     function changeHoldingTaxInterval(uint256 _newValue) {
         if(msg.sender != owner) throw;
         holdingTaxInterval = _newValue;
     }
-    
+
     function addAddress (address addr) private {
         if(!addressExists[addr]) {
             addressIndex[addr] = numberOfAddress;
@@ -140,7 +140,7 @@ contract Token {
             addressExists[addr] = true;
         }
     }
-    
+
     function addAddressManual (address addr) {
         if(msg.sender == owner && isPrivate) {
             addAddress(addr);
@@ -148,7 +148,7 @@ contract Token {
             throw;
         }
     }
-    
+
     function removeAddress (address addr) private {
         if(addressExists[addr]) {
             numberOfAddress--;
@@ -156,7 +156,7 @@ contract Token {
             addressExists[addr] = false;
         }
     }
-    
+
     function removeAddressManual (address addr) {
         if(msg.sender == owner && isPrivate) {
             removeAddress(addr);
@@ -164,11 +164,11 @@ contract Token {
             throw;
         }
     }
-    
+
     function getWeekday(uint timestamp) returns (uint8) {
             return uint8((timestamp / 86400 + 4) % 7);
     }
-    
+
     function getHour(uint timestamp) returns (uint8) {
             return uint8((timestamp / 60 / 60) % 24);
     }
@@ -185,7 +185,7 @@ contract Token {
 }
 
 contract tokensale {
-    
+
     Token public token;
     uint256 public totalSupply;
     uint256 public numberOfTokens;
@@ -193,25 +193,25 @@ contract tokensale {
     uint256 public pricePerToken;
     uint256 public tokensFromPresale = 0;
     uint8 public decimals = 2;
-    
+
     address public owner;
     string public name;
     string public symbol;
-    
+
     address public finalAddress = 0x5904957d25D0c6213491882a64765967F88BCCC7;
-    
+
     mapping (address => uint256) public balanceOf;
     mapping (address => bool) public addressExists;
     mapping (uint256 => address) public addresses;
     mapping (address => uint256) public addressIndex;
     uint256 public numberOfAddress = 0;
-    
+
     mapping (uint256 => uint256) public dates;
     mapping (uint256 => uint256) public percents;
     uint256 public numberOfDates = 8;
-    
+
     tokensale ps = tokensale(0xa67d97d75eE175e05BB1FB17529FD772eE8E9030);
-    
+
     function tokensale(address tokenAddress, uint256 noOfTokens, uint256 prPerToken) {
         dates[0] = 1505520000;
         dates[1] = 1506038400;
@@ -239,7 +239,7 @@ contract tokensale {
         symbol = "NIO";
         updatePresaleNumbers();
     }
-    
+
     function addAddress (address addr) private {
         if(!addressExists[addr]) {
             addressIndex[addr] = numberOfAddress;
@@ -247,7 +247,7 @@ contract tokensale {
             addressExists[addr] = true;
         }
     }
-    
+
     function endPresale() {
         if(msg.sender == owner) {
             if(now > dates[numberOfDates-1]) {
@@ -261,13 +261,13 @@ contract tokensale {
             throw;
         }
     }
-    
+
     function finish() private {
         if(!finalAddress.send(this.balance)) {
             throw;
         }
     }
-    
+
     function updatePresaleNumbers() {
         if(msg.sender == owner) {
             uint256 prevTokensFromPresale = tokensFromPresale;
@@ -278,7 +278,7 @@ contract tokensale {
             throw;
         }
     }
-    
+
     function () payable {
         uint256 prevTokensFromPresale = tokensFromPresale;
         tokensFromPresale = ps.numberOfTokens() - ps.numberOfTokensLeft();
@@ -319,6 +319,16 @@ contract tokensale {
         Transfer(0x0,msg.sender,tokensToGive);
         if(weiLeftOver>0)msg.sender.send(weiLeftOver);
     }
-    
+
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

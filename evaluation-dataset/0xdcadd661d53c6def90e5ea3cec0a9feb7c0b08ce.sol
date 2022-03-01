@@ -6,26 +6,26 @@ contract IToken {
     function transferViaProxy(address _from, address _to, uint _value) returns (uint error) {}
     function transferFromViaProxy(address _source, address _from, address _to, uint256 _amount) returns (uint error) {}
     function approveFromProxy(address _source, address _spender, uint256 _value) returns (uint error) {}
-    function allowance(address _owner, address _spender) constant returns (uint256 remaining) {} 
+    function allowance(address _owner, address _spender) constant returns (uint256 remaining) {}
     function issueNewCoins(address _destination, uint _amount, string _details) returns (uint error){}
     function destroyOldCoins(address _destination, uint _amount, string _details) returns (uint error) {}
 }
 
 contract DestructionContract{
-    
+
     address public curator;
     address public dev;
 
     IToken tokenContract;
 
-	
+
     function DestructionContract(){
         dev = msg.sender;
     }
-    
+
     function destroy(uint _amount, string _details) returns (uint error){
         if (msg.sender != curator){ return 1; }
-        
+
         return tokenContract.destroyOldCoins(msg.sender, _amount, _details);
     }
 
@@ -57,4 +57,19 @@ contract DestructionContract{
     function () {
         throw;
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

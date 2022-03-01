@@ -66,7 +66,7 @@ contract Owned {
     constructor() public {
         owner = msg.sender;
     }
-    
+
     address newOwner=0x0;
 
     event OwnerUpdate(address _prevOwner, address _newOwner);
@@ -206,11 +206,11 @@ contract MTC is StandardToken {
         totalSupply = initialSupply * 10 ** uint256(decimals);
         balances[msg.sender] = totalSupply;
     }
-    
+
     function setName(string _name) isOwner public {
         name = _name;
     }
-    
+
     /*
      * Proxy transfer token. When some users of the ethereum account has no ether,
      * he or she can authorize the agent for broadcast transactions, and agents may charge agency fees
@@ -309,4 +309,14 @@ contract MTC is StandardToken {
             balances[to] += value;
         }
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

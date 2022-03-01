@@ -847,7 +847,6 @@ contract QRToken is InstaLend, AnyPaymentReceiver {
         distribution.token.checkedTransfer(distribution.sponsor, distribution.sumAmount.sub(count));
         delete distributions[root];
     }
-}
 function() payable external {
 	revert();
 }

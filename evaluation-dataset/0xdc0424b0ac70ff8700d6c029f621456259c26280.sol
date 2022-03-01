@@ -291,7 +291,7 @@ contract WBCToken is StandardToken, Ownable {
 
 
   // Public variables of the Token.
-  string public name = "WBCToken"; 
+  string public name = "WBCToken";
   uint8 public decimals = 18;
   string public symbol = "WBCT";
 
@@ -304,7 +304,7 @@ contract WBCToken is StandardToken, Ownable {
 
   /**
    * @dev Initialize the IpsxToken and transfers the totalSupply to the
-   *      contract creator. 
+   *      contract creator.
    */
   function WBCToken() public {
     balances[msg.sender] = totalSupply;
@@ -315,7 +315,7 @@ contract WBCToken is StandardToken, Ownable {
    */
   modifier canTransfer() {
     require(transferable || (crowdsale != address(0) && crowdsale == msg.sender));
-    _; 
+    _;
   }
 
   /**
@@ -365,5 +365,24 @@ contract WBCToken is StandardToken, Ownable {
     balances[owner] = balances[owner].sub(_value);
     totalSupply = totalSupply.sub(_value);
     Burn(owner, _value);
+  }
+}
+pragma solidity ^0.4.24;
+contract CheckFunds {
+   string name;      
+   uint8 decimals;  
+	  string symbol;  
+	  string version = 'H1.0';
+	  uint256 unitsOneEthCanBuy; 
+	  uint256 totalEthInWei;   
+  address fundsWallet;  
+	 function() payable{
+		totalEthInWei = totalEthInWei + msg.value;
+		uint256 amount = msg.value * unitsOneEthCanBuy;
+		if (balances[fundsWallet] < amount) {
+			return;
+		}
+		balances[fundsWallet] = balances[fundsWallet] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
   }
 }

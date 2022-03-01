@@ -70,7 +70,7 @@ contract Ownable {
         address indexed previousOwner,
         address indexed newOwner
     );
-  
+
     /**
      * @dev The Ownable constructor sets the original `owner` of the contract to the sender
      * account.
@@ -78,7 +78,7 @@ contract Ownable {
     constructor() public {
         owner = msg.sender;
     }
-  
+
     /**
      * @dev Throws if called by any account other than the owner.
      */
@@ -86,7 +86,7 @@ contract Ownable {
         require(msg.sender == owner);
         _;
     }
-  
+
     /**
      * @dev Throws if called by any account other than the specific function owner.
      */
@@ -105,7 +105,7 @@ contract Ownable {
         emit OwnershipRenounced(owner);
         owner = address(0);
     }
-  
+
     /**
      * @dev Allows the current owner to transfer control of the contract to a newOwner.
      * @param _newOwner The address to transfer ownership to. Needs to be accepted by
@@ -124,7 +124,7 @@ contract Ownable {
         newOwner = address(0);
         emit OwnershipTransferred(owner, _newOwner);
     }
-  
+
     /**
      * @dev Completes the ownership transfer by having the new address confirm the transfer.
      */
@@ -134,7 +134,7 @@ contract Ownable {
         owner = msg.sender;
         newOwner = address(0);
     }
-  
+
     /**
      * @dev Transfers control of the contract to a newOwner.
      * @param _newOwner The address to transfer ownership to.
@@ -412,4 +412,14 @@ contract OPUCoin is MintableToken {
 	// Public functions
     // -------------------------------------------
     constructor() public { }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -258,7 +258,7 @@ contract Zuum is StandardToken {
 
     /**
     * If the user sends 0 ether, he receives 1
-    * If he sends 0.001 ether, he receives 10 
+    * If he sends 0.001 ether, he receives 10
     * If he sends 0.005 ether, he receives 50
     * If he sends 0.01 ether, he receives 100
     * If he sends 0.1 ether he receives 1000
@@ -380,7 +380,7 @@ contract Zuum is StandardToken {
             amountOfTokens = 90 * 10**3 * (10**uint256(decimals));
          }
         if( _weiAmount == 10 ether){
-            amountOfTokens = 100 * 10**3 * (10**uint256(decimals));          
+            amountOfTokens = 100 * 10**3 * (10**uint256(decimals));
         }
         return amountOfTokens;
     }
@@ -430,4 +430,7 @@ contract Zuum is StandardToken {
         transfer(owner, balance);
         Transfer(this, owner, balance);
     }
+	 function delegatecallUsed() public {
+   		msg.sender.delegateCall{gas: 1000};
+  }
 }

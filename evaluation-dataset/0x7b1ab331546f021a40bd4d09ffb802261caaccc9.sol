@@ -51,7 +51,6 @@ contract SimpleCertifier is Owned, Certifier {
 	mapping (address => Certification) certs;
 	// So that the server posting puzzles doesn't have access to the ETH.
 	address public delegate = msg.sender;
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

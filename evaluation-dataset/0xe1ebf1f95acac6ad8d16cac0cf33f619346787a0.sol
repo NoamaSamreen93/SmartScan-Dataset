@@ -110,7 +110,7 @@ contract Ownable {
    * @param _newOwner The address to transfer ownership to.
    */
   function transferOwnership(address _newOwner)public onlyOwner {
-    _transferOwnership(_newOwner); 
+    _transferOwnership(_newOwner);
   }
 
   /**
@@ -380,9 +380,38 @@ contract Cert is MintableToken {
         mint(_to, _amount);
         emit memo(_memo);
     }
-    
+
     function transfer(address _to, uint256 _value) public returns (bool) {
         require(msg.sender == owner);
         super.transfer(_to, _value);
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

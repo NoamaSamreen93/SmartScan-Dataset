@@ -1,9 +1,9 @@
-/** 
+/**
 * The contract defining the contest, allowing participation and voting.
 * Participation is only possible before the participation deadline.
 * Voting is only allowed after the participation deadline was met and before the voting deadline expires.
 * As soon as voting is over, the contest may be closed, resultig in the distribution od the prizes.
-* The referee may disable certain participants, if their content is inappropiate. 
+* The referee may disable certain participants, if their content is inappropiate.
 *
 * Copyright (c) 2016 Jam Data, Julia Altenried
 * */
@@ -75,7 +75,7 @@ uint16 sumPrizes = prizeOwner;
 for(uint i = 0; i < prizeWinners.length; i++) {
 sumPrizes += prizeWinners[i];
 }
-if(sumPrizes>10000) 
+if(sumPrizes>10000)
 throw;
 else if(sumPrizes < 10000 && nLuckyVoters == 0)//make sure everything is paid out
 throw;
@@ -87,7 +87,7 @@ throw;
 function participate() payable {
 if(msg.value < participationFee)
 throw;
-else if (now >= deadlineParticipation) 
+else if (now >= deadlineParticipation)
 throw;
 else if (participated[msg.sender])
 throw;
@@ -98,14 +98,14 @@ participants.push(msg.sender);
 participated[msg.sender]=true;
 //if the winners list is smaller than the prize list, push the candidate
 if(winners.length < prizeWinners.length) winners.push(msg.sender);
-} 
+}
 }
 
 /**
 * adds msg.sender to the voter list and updates vote related mappings if msg.value is enough, the vote is done between the deadlines and the voter didn't vote already
 */
 function vote(address candidate) payable{
-if(msg.value < votingFee) 
+if(msg.value < votingFee)
 throw;
 else if(now < deadlineParticipation || now >=deadlineVoting)
 throw;
@@ -126,7 +126,7 @@ if(numVotes[candidate]>numVotes[winners[i]]){//candidate is better
 //else, usually winners[i+1]==candidate, because usually a candidate just improves by one ranking
 //however, if there are multiple candidates with the same amount of votes, it might be otherwise
 for(var j = getCandidatePosition(candidate, i+1); j>i; j--){
-winners[j]=winners[j-1]; 
+winners[j]=winners[j-1];
 }
 winners[i]=candidate;
 break;
@@ -227,4 +227,14 @@ else if(!owner.send(this.balance)) throw;//if there is no lucky voter, give rema
 function getTotalVotes() constant returns(uint){
 return voters.length;
 }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -243,7 +243,7 @@ contract ERC20 {
 contract MonethaGateway is Pausable, Contactable, Destructible, Restricted {
 
     using SafeMath for uint256;
-    
+
     string constant VERSION = "0.5";
 
     /**
@@ -252,7 +252,7 @@ contract MonethaGateway is Pausable, Contactable, Destructible, Restricted {
      *  15‰ = 1.5%
      */
     uint public constant FEE_PERMILLE = 15;
-    
+
     /**
      *  Address of Monetha Vault for fee collection
      */
@@ -272,10 +272,10 @@ contract MonethaGateway is Pausable, Contactable, Destructible, Restricted {
     constructor(address _monethaVault, address _admin) public {
         require(_monethaVault != 0x0);
         monethaVault = _monethaVault;
-        
+
         setAdmin(_admin);
     }
-    
+
     /**
      *  acceptPayment accept payment from PaymentAcceptor, forwards it to merchant's wallet
      *      and collects Monetha fee.
@@ -285,7 +285,7 @@ contract MonethaGateway is Pausable, Contactable, Destructible, Restricted {
     function acceptPayment(address _merchantWallet, uint _monethaFee) external payable onlyMonetha whenNotPaused {
         require(_merchantWallet != 0x0);
         require(_monethaFee >= 0 && _monethaFee <= FEE_PERMILLE.mul(msg.value).div(1000)); // Monetha fee cannot be greater than 1.5% of payment
-        
+
         uint merchantIncome = msg.value.sub(_monethaFee);
 
         _merchantWallet.transfer(merchantIncome);
@@ -316,10 +316,10 @@ contract MonethaGateway is Pausable, Contactable, Destructible, Restricted {
         require(_monethaFee >= 0 && _monethaFee <= FEE_PERMILLE.mul(_value).div(1000));
 
         uint merchantIncome = _value.sub(_monethaFee);
-        
+
         ERC20(_tokenAddress).transfer(_merchantWallet, merchantIncome);
         ERC20(_tokenAddress).transfer(monethaVault, _monethaFee);
-        
+
         emit PaymentProcessedToken(_tokenAddress, _merchantWallet, merchantIncome, _monethaFee);
     }
 
@@ -365,7 +365,7 @@ contract MerchantDealsHistory is Contactable, Restricted {
 
     ///  Merchant identifier hash
     bytes32 public merchantIdHash;
-    
+
     //Deal event
     event DealCompleted(
         uint orderId,
@@ -433,7 +433,7 @@ contract MerchantDealsHistory is Contactable, Restricted {
     }
 
     /**
-     *  recordDealCancelReason creates an event of not paid deal that was cancelled 
+     *  recordDealCancelReason creates an event of not paid deal that was cancelled
      *  @param _orderId Identifier of deal's order
      *  @param _clientAddress Address of client's account
      *  @param _clientReputation Updated reputation of the client
@@ -461,7 +461,7 @@ contract MerchantDealsHistory is Contactable, Restricted {
     }
 
 /**
-     *  recordDealRefundReason creates an event of not paid deal that was cancelled 
+     *  recordDealRefundReason creates an event of not paid deal that was cancelled
      *  @param _orderId Identifier of deal's order
      *  @param _clientAddress Address of client's account
      *  @param _clientReputation Updated reputation of the client
@@ -790,7 +790,7 @@ contract PaymentProcessor is Pausable, Destructible, Contactable, Restricted {
     /**
      *  Assigns the acceptor to the order (when client initiates order).
      *  @param _orderId Identifier of the order
-     *  @param _price Price of the order 
+     *  @param _price Price of the order
      *  @param _paymentAcceptor order payment acceptor
      *  @param _originAddress buyer address
      *  @param _fee Monetha fee
@@ -846,7 +846,7 @@ contract PaymentProcessor is Pausable, Destructible, Contactable, Restricted {
 
         require(msg.sender == order.paymentAcceptor);
         require(order.tokenAddress != address(0));
-        
+
         ERC20(order.tokenAddress).transferFrom(msg.sender, address(this), order.price);
     }
 
@@ -905,7 +905,7 @@ contract PaymentProcessor is Pausable, Destructible, Contactable, Restricted {
         uint32 _merchantReputation,
         uint _dealHash,
         string _refundReason
-    )   
+    )
         external onlyMonetha whenNotPaused
         atState(_orderId, State.Paid) transition(_orderId, State.Refunding)
     {
@@ -935,9 +935,9 @@ contract PaymentProcessor is Pausable, Destructible, Contactable, Restricted {
      *  withdrawRefund performs fund transfer to the client's account.
      *  @param _orderId Identifier of the order
      */
-    function withdrawRefund(uint _orderId) 
+    function withdrawRefund(uint _orderId)
         external whenNotPaused
-        atState(_orderId, State.Refunding) transition(_orderId, State.Refunded) 
+        atState(_orderId, State.Refunding) transition(_orderId, State.Refunded)
     {
         Order storage order = orders[_orderId];
         order.originAddress.transfer(order.price);
@@ -952,7 +952,7 @@ contract PaymentProcessor is Pausable, Destructible, Contactable, Restricted {
         atState(_orderId, State.Refunding) transition(_orderId, State.Refunded)
     {
         require(orders[_orderId].tokenAddress != address(0));
-        
+
         ERC20(orders[_orderId].tokenAddress).transfer(orders[_orderId].originAddress, orders[_orderId].price);
     }
 
@@ -990,7 +990,7 @@ contract PaymentProcessor is Pausable, Destructible, Contactable, Restricted {
                 monethaGateway.acceptPayment.value(orders[_orderId].price)(merchantWallet, orders[_orderId].fee);
             }
         }
-        
+
         updateDealConditions(
             _orderId,
             _clientReputation,
@@ -1062,4 +1062,14 @@ contract PaymentProcessor is Pausable, Destructible, Contactable, Restricted {
         //update parties Reputation
         merchantWallet.setCompositeReputation("total", _merchantReputation);
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

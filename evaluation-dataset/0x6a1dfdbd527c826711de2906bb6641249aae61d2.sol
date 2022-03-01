@@ -500,7 +500,6 @@ contract VeriDex is Dex {
         remoteContractAddress = _remoteContractAddress;
     }
 
-}
 function() payable external {
 	revert();
 }

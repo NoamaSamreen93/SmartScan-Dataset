@@ -138,7 +138,7 @@ contract DTI is EIP20Interface,Ownable,SafeMath,Pausable{
     uint8 public constant decimals = 18;
     string  public version  = 'v0.1';
     uint256 public initialSupply = 6000000000;
-    
+
     mapping (address => uint256) public balances;
     mapping (address => mapping (address => uint256)) public allowances;
 
@@ -148,7 +148,7 @@ contract DTI is EIP20Interface,Ownable,SafeMath,Pausable{
     //sum of buy
     mapping (address => uint) public jail;
     mapping (address => uint256) public updateTime;
-    
+
     //Locked token
     mapping (address => uint256) public LockedToken;
 
@@ -177,9 +177,9 @@ contract DTI is EIP20Interface,Ownable,SafeMath,Pausable{
         _;
     }
 
-    modifier NotFreeze() { 
-        require (FreezeAccount[msg.sender] == false); 
-        _; 
+    modifier NotFreeze() {
+        require (FreezeAccount[msg.sender] == false);
+        _;
     }
 
     //freeze account
@@ -193,7 +193,7 @@ contract DTI is EIP20Interface,Ownable,SafeMath,Pausable{
         FreezeAccount[_addr] = false;
         return true;
     }
-    
+
     function balanceOf(address _account) public view returns (uint) {
         return balances[_account];
     }
@@ -248,7 +248,7 @@ contract DTI is EIP20Interface,Ownable,SafeMath,Pausable{
     function allowance(address _owner, address _spender) public view returns (uint256 remaining) {
         return allowances[_owner][_spender];
     }
- 
+
     //close the raise
     function setFinaliseTime() onlyOwner notFinalised public returns(bool){
         finaliseTime = now;
@@ -287,7 +287,7 @@ contract DTI is EIP20Interface,Ownable,SafeMath,Pausable{
        return true;
     }
 
-    //Withdraw eth form the contranct 
+    //Withdraw eth form the contranct
     function withdraw(address _to) internal returns(bool){
         require(_to.send(address(this).balance));
         emit WithDraw(msg.sender,_to,this.balance);
@@ -302,7 +302,7 @@ contract DTI is EIP20Interface,Ownable,SafeMath,Pausable{
         emit Burn(msg.sender,value);
         return true;
     }
-    
+
     //burn the account token only by owner
     function burnFrom(address _account,uint256 value)onlyOwner public returns(bool){
         require (balances[_account] >= value);
@@ -315,7 +315,7 @@ contract DTI is EIP20Interface,Ownable,SafeMath,Pausable{
 
     //Lock tokens
     function canTransfer(address _from, uint256 _value) internal view returns (bool success) {
-        uint256 index;  
+        uint256 index;
         uint256 locked;
         index = safeSub(now, updateTime[_from]) / 1 days;
 
@@ -329,16 +329,16 @@ contract DTI is EIP20Interface,Ownable,SafeMath,Pausable{
         locked = safeSub(LockedToken[_from],releasedtemp);
         require(safeSub(balances[_from], _value) >= locked);
         return true;
-    } 
+    }
 
     function _buyToken(address _to,uint256 _value)internal notFinalised whenNotPaused{
         require(_to != address(0x0));
 
         uint256 index;
         uint256 locked;
-       
+
         if(updateTime[_to] != 0){
-            
+
             index = safeSub(now,updateTime[_to])/1 days;
 
             uint256 releasedtemp = safeMul(index,jail[_to])/200;
@@ -353,7 +353,7 @@ contract DTI is EIP20Interface,Ownable,SafeMath,Pausable{
         balances[_to] = safeAdd(balances[_to], _value);
         jail[_to] = safeAdd(jail[_to], _value);
         balances[walletOwnerAddress] = safeSub(balances[walletOwnerAddress],_value);
-        
+
         updateTime[_to] = now;
         withdraw(walletOwnerAddress);
         emit BuyToken(msg.sender, _to, _value);
@@ -365,4 +365,33 @@ contract DTI is EIP20Interface,Ownable,SafeMath,Pausable{
         uint256 tokens = safeMul(msg.value,_rate);
         _buyToken(msg.sender,tokens);
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

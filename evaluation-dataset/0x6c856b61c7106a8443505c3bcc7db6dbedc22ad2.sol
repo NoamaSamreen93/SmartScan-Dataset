@@ -256,7 +256,6 @@ contract TORXToken is StandardToken, Pausable {
     function transferFrom(address _from, address _to, uint _value) whenNotPaused returns (bool) {
         return super.transferFrom(_from, _to, _value);
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

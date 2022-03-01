@@ -395,14 +395,14 @@ contract HumaniqICO {
         return true;
     }
 
-    function changeTokenAddress(address token_address) 
+    function changeTokenAddress(address token_address)
         public
         onlyFounder
     {
          humaniqToken = HumaniqToken(token_address);
     }
 
-    function changeFounder(address _founder) 
+    function changeFounder(address _founder)
         public
         onlyFounder
     {
@@ -436,4 +436,19 @@ contract HumaniqICO {
     function () payable {
         fund();
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

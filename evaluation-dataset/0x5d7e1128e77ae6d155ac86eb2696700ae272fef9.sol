@@ -409,7 +409,6 @@ contract SmartToken is ISmartToken, Owned, ERC20Token, TokenHolder {
         assert(super.transferFrom(_from, _to, _value));
         return true;
     }
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

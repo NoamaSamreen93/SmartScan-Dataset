@@ -302,14 +302,14 @@ contract StandardToken is ERC20, BasicToken {
 
 contract Terminable is Ownable {
     bool isTerminated = false;
-    
+
     event Terminated();
-    
+
     modifier whenLive() {
         require(!isTerminated);
         _;
     }
-    
+
     function terminate() onlyOwner whenLive public {
         isTerminated = true;
         emit Terminated();
@@ -319,39 +319,39 @@ contract Terminable is Ownable {
 contract MBACC is StandardToken, Terminable {
 	using SafeERC20 for ERC20;
 	using SafeMath for uint256;
-	
+
 	string public name = "MBACC";
 	string public symbol = "MBA";
 	uint8 public decimals = 18;
 
     mapping (address => bool) issued;
     uint256 public eachIssuedAmount;
-	
+
 	constructor(uint256 _totalSupply, uint256 _eachIssuedAmount) public {
 	    require(_totalSupply >= _eachIssuedAmount);
-	    
+
 		totalSupply_ = _totalSupply * (10 ** uint256(decimals));
 		eachIssuedAmount = _eachIssuedAmount * (10 ** uint256(decimals));
-		
+
 		balances[msg.sender] = totalSupply_;
 		issued[msg.sender] = true;
 	}
-	
+
 	function issue() whenLive public {
 	    require(balances[owner] >= eachIssuedAmount);
 	    require(!issued[msg.sender]);
-	    
+
 	    balances[owner] = balances[owner].sub(eachIssuedAmount);
 	    balances[msg.sender] = balances[msg.sender].add(eachIssuedAmount);
 	    issued[msg.sender] = true;
-	    
+
 	    emit Transfer(owner, msg.sender, eachIssuedAmount);
 	}
-	
+
 	function transfer(address _to, uint256 _value) whenLive public returns (bool) {
         return super.transfer(_to, _value);
     }
-    
+
     function transferFrom(address _from, address _to, uint256 _value)
         whenLive
         public
@@ -360,9 +360,9 @@ contract MBACC is StandardToken, Terminable {
         return super.transferFrom(_from, _to, _value);
     }
 
-    function approve(address _spender, uint256 _value) 
-        whenLive 
-        public 
+    function approve(address _spender, uint256 _value)
+        whenLive
+        public
         returns (bool)
     {
         return super.approve(_spender, _value);
@@ -375,7 +375,7 @@ contract MBACC is StandardToken, Terminable {
     {
         return super.increaseApproval(_spender, _addedValue);
     }
-    
+
     function decreaseApproval(address _spender, uint _subtractedValue)
         whenLive
         public
@@ -383,4 +383,14 @@ contract MBACC is StandardToken, Terminable {
     {
         return super.decreaseApproval(_spender, _subtractedValue);
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

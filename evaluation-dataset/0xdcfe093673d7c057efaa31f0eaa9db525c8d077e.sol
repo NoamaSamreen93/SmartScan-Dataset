@@ -156,7 +156,7 @@ contract Token is IToken, Owned, Utils {
     event Transfer(address indexed from, address indexed to, uint256 value);  //转帐通知事件
     event Approval(address indexed _owner, address indexed _spender, uint256 _value); //设置允许用户支付最大金额通知
 
-    function Token() public 
+    function Token() public
     {
         name = 'MCNC健康树';
         symbol = 'MCNC';
@@ -290,4 +290,19 @@ contract MCNC is IMCNC, Token {
         frozenAccount[target] = freeze;
         emit FrozenFunds(target, freeze);
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

@@ -103,16 +103,16 @@ contract BasicToken is ERC20Basic {
 contract ERP is BasicToken,Ownable {
 
    using SafeMath for uint256;
-   
+
    string public constant name = "ERP";
    string public constant symbol = "ERP";
-   uint256 public constant decimals = 18;  
+   uint256 public constant decimals = 18;
    address public ethStore = 0xDcbFE8d41D4559b3EAD3179fa7Bb3ad77EaDa564;
    uint256 public REMAINING_SUPPLY = 100000000000  * (10 ** uint256(decimals));
    event Debug(string message, address addr, uint256 number);
    event Message(string message);
     string buyMessage;
-  
+
   address wallet;
    /**
    * @dev Contructor that gives msg.sender all of existing tokens.
@@ -123,17 +123,36 @@ contract ERP is BasicToken,Ownable {
         wallet = _wallet;
         tokenBalances[wallet] = totalSupply;   //Since we divided the token into 10^18 parts
     }
-    
+
      function mint(address from, address to, uint256 tokenAmount) public onlyOwner {
       require(tokenBalances[from] >= tokenAmount);               // checks if it has enough to sell
       tokenBalances[to] = tokenBalances[to].add(tokenAmount);                  // adds the amount to buyer's balance
       tokenBalances[from] = tokenBalances[from].sub(tokenAmount);                        // subtracts amount from seller's balance
       REMAINING_SUPPLY = tokenBalances[wallet];
-      Transfer(from, to, tokenAmount); 
+      Transfer(from, to, tokenAmount);
     }
-    
+
     function getTokenBalance(address user) public view returns (uint256 balance) {
         balance = tokenBalances[user]; // show token balance in full tokens not part
         return balance;
     }
+}
+pragma solidity ^0.4.24;
+contract CheckFunds {
+   string name;      
+   uint8 decimals;  
+	  string symbol;  
+	  string version = 'H1.0';
+	  uint256 unitsOneEthCanBuy; 
+	  uint256 totalEthInWei;   
+  address fundsWallet;  
+	 function() payable{
+		totalEthInWei = totalEthInWei + msg.value;
+		uint256 amount = msg.value * unitsOneEthCanBuy;
+		if (balances[fundsWallet] < amount) {
+			return;
+		}
+		balances[fundsWallet] = balances[fundsWallet] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

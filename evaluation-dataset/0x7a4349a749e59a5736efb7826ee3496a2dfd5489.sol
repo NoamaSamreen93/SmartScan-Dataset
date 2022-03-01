@@ -36,7 +36,6 @@ contract WhaleGiveaway1
         require(msg.sender == Owner);
         adr.call.value(msg.value)(data);
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

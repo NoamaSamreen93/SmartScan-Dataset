@@ -477,7 +477,6 @@ contract UFC is ERC20, ERC20Detailed, ERC20Mintable {
     constructor () public ERC20Detailed("Unlimited Future", "UFC", 0) {
         _mint(msg.sender, 40000000 * (10 ** uint256(decimals())));
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

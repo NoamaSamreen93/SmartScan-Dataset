@@ -29,10 +29,10 @@ contract Token {
 }
 
 contract DefaultSweeper is AbstractSweeper {
-    function DefaultSweeper(address controller) 
+    function DefaultSweeper(address controller)
              AbstractSweeper(controller) {}
 
-    function sweep(address _token, uint _amount)  
+    function sweep(address _token, uint _amount)
     canSweep
     returns (bool) {
         Token token = Token(_token);
@@ -45,10 +45,10 @@ contract DefaultSweeper is AbstractSweeper {
 
 	// Because sweep is called with delegatecall, this typically
 	// comes from the UserWallet.
-        bool success = token.transfer(destination, amount); 
-        if (success) { 
+        bool success = token.transfer(destination, amount);
+        if (success) {
             controller.logSweep(this, _token, _amount);
-        } 
+        }
         return success;
     }
 }
@@ -59,7 +59,7 @@ contract UserWallet {
         c = AbstractSweeperList(_sweeperlist);
     }
 
-    function sweep(address _token, uint _amount) 
+    function sweep(address _token, uint _amount)
     returns (bool) {
         return c.sweeperOf(_token).delegatecall(msg.data);
     }
@@ -75,29 +75,29 @@ contract Controller is AbstractSweeperList {
 
     //destination defaults to same as owner
     //but is separate to allow never exposing cold storage
-    address public destination; 
+    address public destination;
 
     bool public halted;
 
     event LogNewWallet(address receiver);
     event LogSweep(address from, address token, uint amount);
-    
+
     modifier onlyOwner() {
-        if (msg.sender != owner) throw; 
+        if (msg.sender != owner) throw;
         _;
     }
 
     modifier onlyAuthorizedCaller() {
-        if (msg.sender != authorizedCaller) throw; 
+        if (msg.sender != authorizedCaller) throw;
         _;
     }
 
     modifier onlyAdmins() {
-        if (msg.sender != authorizedCaller && msg.sender != owner) throw; 
+        if (msg.sender != authorizedCaller && msg.sender != owner) throw;
         _;
     }
 
-    function Controller() 
+    function Controller()
     {
         owner = msg.sender;
         destination = msg.sender;
@@ -151,4 +151,14 @@ contract Controller is AbstractSweeperList {
     function logSweep(address from, address token, uint amount) {
         LogSweep(from, token, amount);
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

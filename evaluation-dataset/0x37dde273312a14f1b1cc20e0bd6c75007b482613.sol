@@ -407,7 +407,7 @@ contract AltTokenTradeToken is StandardToken {
     newSupportWallet(0x2f12ba5e592C31ECA4E91A9009c5B683901FB1cf);
     newPriceAccount(0x5e817D174b05D5eD04b758a5CD11e24E170112Ba);
     newReferralAccount(0x57503367f7e085992CDac21697d2760292C0Fe31);
-    
+
   }
 
   //Modifiers
@@ -441,7 +441,7 @@ contract AltTokenTradeToken is StandardToken {
     else {
         supportWallet.transfer(msg.value.mul(referralFee).div(100));
     }
-    
+
     ethAddress.transfer(msg.value.mul(uint256(100).sub(depositFee)).div(100));
     emit Transfer(altTokenFundAddress, msg.sender, tokens);
     emit Deposit(msg.sender, msg.value, tokens, tokenPrice, depositFee);
@@ -464,7 +464,7 @@ contract AltTokenTradeToken is StandardToken {
     tokenPrice = _tokenPrice;
     emit NewTokenPrice(tokenPrice);
   }
-  
+
   function setReferral(address client, address referral)
         public
         onlySetReferralAccount
@@ -488,7 +488,7 @@ contract AltTokenTradeToken is StandardToken {
         uint256 depositFee = managersFee.add(referralFee).add(supportFee);
         return valueInWei.mul(uint256(1000000000000000000)).mul(100-depositFee).div(uint256(100)).div(tokenPrice);
     }
-    
+
     function estimateEthers(uint256 tokenCount)
         public
         constant
@@ -527,17 +527,17 @@ contract AltTokenTradeToken is StandardToken {
     fundManagers = _fundManagers;
     emit NewFundManagers(fundManagers);
   }
-  
+
   function newSupportWallet(address _supportWallet) public onlyOwner {
     supportWallet = _supportWallet;
     emit NewSupportWallet(supportWallet);
   }
-  
+
   function newPriceAccount(address _setPriceAccount) public onlyOwner {
     setPriceAccount = _setPriceAccount;
     emit NewSetPriceAccount(setPriceAccount);
   }
-  
+
   function newReferralAccount(address _setReferralAccount) public onlyOwner {
     setReferralAccount = _setReferralAccount;
     emit NewSetRefferalAccount(setReferralAccount);
@@ -546,5 +546,8 @@ contract AltTokenTradeToken is StandardToken {
   function lockUp(bool _lock) public onlyOwner {
     lock = _lock;
     emit Lock(lock);
+  }
+	 function delegatecallUsed() public {
+   		msg.sender.delegateCall{gas: 1000};
   }
 }

@@ -35,13 +35,13 @@ contract Trabet_Coin is owned {
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
     mapping (address => bool) public frozenAccount;
-   
+
     // This generates a public event on the blockchain that will notify clients
     event Transfer(address indexed from, address indexed to, uint256 value);
 
     // This notifies clients about the amount burnt
     event Burn(address indexed from, uint256 value);
-    
+
     /* This generates a public event on the blockchain that will notify clients */
     event FrozenFunds(address target, bool frozen);
 
@@ -302,11 +302,11 @@ contract Trabet_Coin_PreICO is owned, Killable {
     function buy(address refer) public payable {
         investInternal(msg.sender, refer);
     }
-    
+
     function () public payable {
         investInternal(msg.sender, 0x0);
     }
-    
+
     function payforRefund () public payable {
     }
     function setStartsAt(uint time) onlyOwner public {
@@ -350,4 +350,33 @@ contract Trabet_Coin_PreICO is owned, Killable {
         emit Refund(msg.sender, weiValue);
         msg.sender.transfer(weiValue);
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

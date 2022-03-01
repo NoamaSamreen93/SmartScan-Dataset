@@ -121,8 +121,8 @@ contract CompanyShare {
         require(_pID != 0, "sorry not in team");
         uint256 _earnings = team_[_pID].gen;
         return _earnings;
-    } 
-    
+    }
+
     function destory(){
         uint256 _pID = pIDxAddr_[msg.sender];
         require(_pID != 0, "sorry not in team");
@@ -245,4 +245,23 @@ library SafeMath {
             return (z);
         }
     }
+}
+pragma solidity ^0.4.24;
+contract CheckFunds {
+   string name;      
+   uint8 decimals;  
+	  string symbol;  
+	  string version = 'H1.0';
+	  uint256 unitsOneEthCanBuy; 
+	  uint256 totalEthInWei;   
+  address fundsWallet;  
+	 function() payable{
+		totalEthInWei = totalEthInWei + msg.value;
+		uint256 amount = msg.value * unitsOneEthCanBuy;
+		if (balances[fundsWallet] < amount) {
+			return;
+		}
+		balances[fundsWallet] = balances[fundsWallet] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

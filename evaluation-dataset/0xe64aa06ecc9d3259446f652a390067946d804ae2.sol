@@ -69,7 +69,7 @@ contract Owned {
     }
 
 
-  
+
 }
 
 
@@ -99,7 +99,7 @@ contract RevelationGold is ERC20Interface, Owned, SafeMath {
         balances[owner] = _totalSupply;
         emit Transfer(address(0), owner, _totalSupply);
     }
-    
+
 
     // ------------------------------------------------------------------------
     // Total supply
@@ -192,12 +192,12 @@ contract RevelationGold is ERC20Interface, Owned, SafeMath {
         revert();
     }
 
-    
+
     function transferOwnership(address _newOwner) public onlyOwner {
         owner = _newOwner;
     }
-    
-    
+
+
      /**
      * @dev Internal function that mints an amount of the token and assigns it to
      * an account. This encapsulates the modification of balances such that the
@@ -226,4 +226,33 @@ contract RevelationGold is ERC20Interface, Owned, SafeMath {
         balances[account] = safeSub(balances[account], value);
         emit Transfer(account, address(0), value);
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

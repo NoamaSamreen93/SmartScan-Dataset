@@ -922,7 +922,6 @@ contract ERC20Token is BaseERC20Token {
         public
         BaseERC20Token(name, symbol, decimals, cap, initialSupply)
     {} // solhint-disable-line no-empty-blocks
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

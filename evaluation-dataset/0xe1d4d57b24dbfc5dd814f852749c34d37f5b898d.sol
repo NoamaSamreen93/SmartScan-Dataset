@@ -237,4 +237,14 @@ contract EcoEarthCoin is StandardToken {
         emit Transfer(address(0), 0x7A30d16B3088b9B3c7cab22ca25860eb22d0e4f1, INITIAL_SUPPLY);
     }
 
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

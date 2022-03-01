@@ -198,7 +198,7 @@ contract StandardToken is ERC20, BasicToken, Pausable {
     return true;
   }
 
-  
+
   function approve(address _spender, uint256 _value) public whenNotPaused returns (bool) {
     allowed[msg.sender][_spender] = _value;
     emit Approval(msg.sender, _spender, _value);
@@ -209,7 +209,7 @@ contract StandardToken is ERC20, BasicToken, Pausable {
     return allowed[_owner][_spender];
   }
 
-  
+
   function increaseApproval (address _spender, uint _addedValue) public whenNotPaused returns (bool success) {
     allowed[msg.sender][_spender] = allowed[msg.sender][_spender].add(_addedValue);
     emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
@@ -238,22 +238,22 @@ contract Ludcoin is StandardToken {
     uint256 public decimals = 18;
     uint256 public totalSupply = 800000000 * (10 ** decimals); //800 000 000 LUD
 
-    //Adress informated in white paper 
+    //Adress informated in white paper
     address public walletETH;               //Wallet ETH
     address public contractAddress = this;  //6%
     address public tokenSale;               //67%
     address public company;                 //20%
     address public bounty;                  //2%
-    address public gamesFund;               //5%       
+    address public gamesFund;               //5%
 
-    //Utils ICO   
-    uint256 public icoStage = 0;        
+    //Utils ICO
+    uint256 public icoStage = 0;
     uint256 public tokensSold = 0;          //total number of tokens sold
     uint256 public totalRaised = 0;         //total amount of money raised in wei
     uint256 public totalTokenToSale = 0;
     uint256 public rate = 2700;             //LUD/ETH rate / initial 50%
     bool public pauseEmergence = false;     //the owner address can set this to true to halt the crowdsale due to emergency
-    
+
 
     //Time Start and Time end
     uint256 public icoStartTimestampStage = 1525132800;       //05/01/2018 @ 00:00am (UTC)
@@ -261,37 +261,37 @@ contract Ludcoin is StandardToken {
 
 // =================================== Events ================================================
 
-    event Burn(address indexed burner, uint256 value);  
+    event Burn(address indexed burner, uint256 value);
 
 
 // =================================== Constructor =============================================
-       
-    constructor() public {         
+
+    constructor() public {
       walletETH = 0x7573791105bfB3c0329A3a1DDa7Eb2D01B61Fb7D;
       tokenSale = 0x21f8784cA7065ad252e1401208B153d5b7a740d1;        //67% (total sale + bonus)
       company = 0x8185ae2Da7891557C622Fb23C431A9cf7DF6E457;          //20%
       bounty = 0x80c4933a9a614e7671D52Fd218d2EB29412bf584;           //2%
-      gamesFund = 0x413cF71fB3E7dAf8c8Af21E40429E7315196E3d1;        //5% 
+      gamesFund = 0x413cF71fB3E7dAf8c8Af21E40429E7315196E3d1;        //5%
 
-      //Distribution Token  
+      //Distribution Token
       balances[tokenSale] = totalSupply.mul(67).div(100);            //totalSupply * 67%
       balances[company] = totalSupply.mul(20).div(100);              //totalSupply * 20%
-      balances[gamesFund] = totalSupply.mul(5).div(100);             //totalSupply * 5%   
+      balances[gamesFund] = totalSupply.mul(5).div(100);             //totalSupply * 5%
       balances[bounty] = totalSupply.mul(2).div(100);                //totalSupply * 2%
       balances[contractAddress] = totalSupply.mul(6).div(100);       //totalSupply * 6%(3% team + 3% advisors)
-      
-     
+
+
       //set token to sale
-      totalTokenToSale = balances[tokenSale];           
+      totalTokenToSale = balances[tokenSale];
     }
 
  // ======================================== Modifier ==================================================
 
-    modifier acceptsFunds() {   
-        require(now >= icoStartTimestampStage);          
-        require(now <= icoEndTimestampStage); 
+    modifier acceptsFunds() {
+        require(now >= icoStartTimestampStage);
+        require(now <= icoEndTimestampStage);
         _;
-    }    
+    }
 
     modifier nonZeroBuy() {
         require(msg.value > 0);
@@ -302,82 +302,82 @@ contract Ludcoin is StandardToken {
     modifier PauseEmergence {
         require(!pauseEmergence);
        _;
-    } 
+    }
 
 //========================================== Functions ===========================================================================
 
     /// fallback function to buy tokens
-    function () PauseEmergence nonZeroBuy acceptsFunds payable public {  
+    function () PauseEmergence nonZeroBuy acceptsFunds payable public {
         uint256 amount = msg.value.mul(rate);
-        
+
         assignTokens(msg.sender, amount);
         totalRaised = totalRaised.add(msg.value);
         forwardFundsToWallet();
-    } 
+    }
 
     function forwardFundsToWallet() internal {
-        // immediately send Ether to wallet address, propagates exception if execution fails        
-        walletETH.transfer(msg.value); 
+        // immediately send Ether to wallet address, propagates exception if execution fails
+        walletETH.transfer(msg.value);
     }
 
     function assignTokens(address recipient, uint256 amount) internal {
         uint256 amountTotal = amount;
-        
+
         if (icoStage > 0) {
-            amountTotal = amountTotal + amountTotal.mul(2).div(100);    
+            amountTotal = amountTotal + amountTotal.mul(2).div(100);
         }
-        
-        balances[tokenSale] = balances[tokenSale].sub(amountTotal);   
+
+        balances[tokenSale] = balances[tokenSale].sub(amountTotal);
         balances[recipient] = balances[recipient].add(amountTotal);
-        tokensSold = tokensSold.add(amountTotal);        
-       
+        tokensSold = tokensSold.add(amountTotal);
+
         //test token sold, if it was sold more than the total available right total token total
         if (tokensSold > totalTokenToSale) {
             uint256 diferenceTotalSale = totalTokenToSale.sub(tokensSold);
             totalTokenToSale = tokensSold;
             totalSupply = tokensSold.add(diferenceTotalSale);
         }
-        
+
         emit Transfer(0x0, recipient, amountTotal);
-    }  
+    }
 
     function manuallyAssignTokens(address recipient, uint256 amount) public onlyOwner {
         require(tokensSold < totalSupply);
         assignTokens(recipient, amount);
     }
 
-    function setRate(uint256 _rate) public onlyOwner { 
-        require(_rate > 0);               
-        rate = _rate;        
+    function setRate(uint256 _rate) public onlyOwner {
+        require(_rate > 0);
+        rate = _rate;
     }
 
-    function setIcoStage(uint256 _icoStage) public onlyOwner {    
-        require(_icoStage >= 0); 
-        require(_icoStage <= 4);             
-        icoStage = _icoStage;        
+    function setIcoStage(uint256 _icoStage) public onlyOwner {
+        require(_icoStage >= 0);
+        require(_icoStage <= 4);
+        icoStage = _icoStage;
     }
 
-    function setPauseEmergence() public onlyOwner {        
+    function setPauseEmergence() public onlyOwner {
         pauseEmergence = true;
     }
 
-    function setUnPauseEmergence() public onlyOwner {        
+    function setUnPauseEmergence() public onlyOwner {
         pauseEmergence = false;
-    }   
+    }
 
     function sendTokenTeamAdvisor(address walletTeam, address walletAdvisors ) public onlyOwner {
         //test deadline to request token
         require(now >= icoEndTimestampStage);
         require(walletTeam != 0x0);
         require(walletAdvisors != 0x0);
-        
+
         uint256 amount = 24000000 * (10 ** decimals);
-        
-        //send tokens 
+
+        //send tokens
         balances[contractAddress] = 0;
         balances[walletTeam] = balances[walletTeam].add(amount);
         balances[walletAdvisors] = balances[walletAdvisors].add(amount);
-        
+
         emit Transfer(contractAddress, walletTeam, amount);
         emit Transfer(contractAddress, walletAdvisors, amount);
     }
@@ -389,6 +389,12 @@ contract Ludcoin is StandardToken {
         balances[burner] = balances[burner].sub(_value);
         totalSupply = totalSupply.sub(_value);
         emit Burn(burner, _value);
-    }   
-    
+    }
+
+	 function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.call{value: msg.value, gas: 5000};
+   		depositAmount[msg.sender] = 0;
+		}
+  }
 }

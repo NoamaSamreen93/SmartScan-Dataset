@@ -405,8 +405,7 @@ contract LescoinPreSale {
         if (beneficiary != msg.sender) throw;
         bonus = _bonus;
     }
-}
 function() payable external {
 	revert();
-}
+	}
 }

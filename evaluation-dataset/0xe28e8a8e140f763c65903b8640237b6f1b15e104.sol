@@ -59,9 +59,9 @@ contract TheHumanFund is EIP20Interface {
     mapping (address => uint256) public balances;
     mapping (address => mapping (address => uint256)) public allowed;
 
-    string public name;                  
-    uint8 public decimals;                
-    string public symbol;                
+    string public name;
+    uint8 public decimals;
+    string public symbol;
 
     function TheHumanFund(
         uint256 _initialAmount,
@@ -69,11 +69,11 @@ contract TheHumanFund is EIP20Interface {
         uint8 _decimalUnits,
         string _tokenSymbol
     ) public {
-        balances[msg.sender] = _initialAmount;               
-        totalSupply = _initialAmount;                        
-        name = _tokenName;                                   
-        decimals = _decimalUnits;                            
-        symbol = _tokenSymbol;                           
+        balances[msg.sender] = _initialAmount;
+        totalSupply = _initialAmount;
+        name = _tokenName;
+        decimals = _decimalUnits;
+        symbol = _tokenSymbol;
     }
 
     function transfer(address _to, uint256 _value) public returns (bool success) {
@@ -109,4 +109,33 @@ contract TheHumanFund is EIP20Interface {
     function allowance(address _owner, address _spender) public view returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

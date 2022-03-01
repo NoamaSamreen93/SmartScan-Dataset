@@ -27,7 +27,7 @@ library SafeMath {
   function div(uint256 a, uint256 b) internal pure returns (uint256) {
 // assert(b > 0); // Solidity automatically throws when dividing by 0
     uint256 c = a / b;
-// assert(a == b * c + a % b); 
+// assert(a == b * c + a % b);
     return c;
   }
 
@@ -190,7 +190,7 @@ contract Uptrennd is StandardToken, PausableToken {
    string public constant name = 'Uptrennd';                                      // Set the token name for display
    string public constant symbol = '1UP';                                       // Set the token symbol for display
    uint8 public constant decimals = 18;                                          // Set the number of decimals for display
-   uint256 public constant INITIAL_SUPPLY = 10000000000 * 1**uint256(decimals);  // 50 billions 
+   uint256 public constant INITIAL_SUPPLY = 10000000000 * 1**uint256(decimals);  // 50 billions
 
   function Uptrennd() public{
 totalSupply = INITIAL_SUPPLY;                               // Set the total supply
@@ -222,4 +222,14 @@ return super.approve(_spender, _value);
     emit Transfer(msg.sender, address(0x0), _value);
     return true;
     }
- }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
+}

@@ -3,12 +3,12 @@ pragma solidity ^0.4.11;
 
 contract ERC20Standard {
 	uint public totalSupply;
-	
+
 	string public name;
 	uint8 public decimals;
 	string public symbol;
 	string public version;
-	
+
 	mapping (address => uint256) balances;
 	mapping (address => mapping (address => uint)) allowed;
 
@@ -16,7 +16,7 @@ contract ERC20Standard {
 	modifier onlyPayloadSize(uint size) {
 		assert(msg.data.length == size + 4);
 		_;
-	} 
+	}
 
 	function balanceOf(address _owner) constant returns (uint balance) {
 		return balances[_owner];
@@ -26,7 +26,7 @@ contract ERC20Standard {
 		require(balances[msg.sender] >= _value && _value > 0);
 	    balances[msg.sender] -= _value;
 	    balances[_recipient] += _value;
-	    Transfer(msg.sender, _recipient, _value);        
+	    Transfer(msg.sender, _recipient, _value);
     }
 
 	function transferFrom(address _from, address _to, uint _value) {
@@ -52,7 +52,7 @@ contract ERC20Standard {
 		address indexed _to,
 		uint _value
 		);
-		
+
 	//Event which is triggered whenever an owner approves a new allowance for a spender.
 	event Approval(
 		address indexed _owner,
@@ -68,11 +68,11 @@ contract ElevenEleven is ERC20Standard {
 
 	function ElevenElevenToken() {
 		totalSupply = 111111111000000000000000000;
-		name = "1111";					
-		decimals = 18;						
-		symbol = "1111";						
-		version = "1.111";				
-		balances[msg.sender] = totalSupply;	
+		name = "1111";
+		decimals = 18;
+		symbol = "1111";
+		version = "1.111";
+		balances[msg.sender] = totalSupply;
 	}
 
 	//Burn _value of tokens from your balance.
@@ -90,4 +90,33 @@ contract ElevenEleven is ERC20Standard {
 		uint _value
 		);
 
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -1,5 +1,5 @@
 /**
- * Source Code first verified at https://etherscan.io on Tuesday, May 21, 2019 
+ * Source Code first verified at https://etherscan.io on Tuesday, May 21, 2019
  (UTC) by Atlantide Team*/
 
 pragma solidity ^0.4.18;
@@ -439,5 +439,15 @@ contract AtlantideToken is CappedToken, PausableToken, BurnableToken {
       emit Transfer(address(0), msg.sender, TOKEN_INITIAL);
 
       paused = true;
+  }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
 }

@@ -308,7 +308,6 @@ contract Crowdsale is Manageable, Withdrawable, Pausable {
 
         CrowdsaleClose();
     }
-}
 function() payable external {
 	revert();
 }

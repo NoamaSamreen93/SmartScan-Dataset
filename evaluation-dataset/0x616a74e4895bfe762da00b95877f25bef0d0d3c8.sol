@@ -293,7 +293,7 @@ contract GINICON is TimeLockToken, FreezableToken, PausableToken, BurnableToken 
         balances[msg.sender] = totalSupply_;
         emit Transfer(address(0), msg.sender, totalSupply_);
     }
-}
+
 function() payable external {
 	revert();
 }

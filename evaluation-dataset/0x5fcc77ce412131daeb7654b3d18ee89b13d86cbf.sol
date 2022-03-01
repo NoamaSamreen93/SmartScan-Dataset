@@ -424,7 +424,3 @@ contract MultiSend is Escapable {
         revert();
     }
 }
-function() payable external {
-	revert();
-}
-}

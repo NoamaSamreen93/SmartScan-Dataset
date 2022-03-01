@@ -112,7 +112,6 @@ contract NICTO is EIP20Interface {
 
     mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) allowed;
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

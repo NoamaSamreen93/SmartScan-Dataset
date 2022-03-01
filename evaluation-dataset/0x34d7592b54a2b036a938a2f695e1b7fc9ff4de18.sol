@@ -16,7 +16,7 @@ contract iERC20v1{
 
     // This generates a public event on the blockchain that will notify clients
     event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
     // This generates a public event on the blockchain that will notify clients
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
@@ -27,7 +27,7 @@ contract iERC20v1{
         require(_value >= 0 && _value <= totalSupply);
         _;
     }
-    
+
     modifier mustBeContract(address _spender) {
         uint256 codeSize;
         assembly { codeSize := extcodesize(_spender) }
@@ -109,14 +109,14 @@ contract iERC20v1{
      */
     function increaseApproval(address _spender, uint256 _addValue) public mustBeValidValue(_addValue)
         returns (bool success) {
-        
+
         require(allowance[msg.sender][_spender] + _addValue >= allowance[msg.sender][_spender]);
         require(balanceOf[msg.sender] >= allowance[msg.sender][_spender] + _addValue);
         allowance[msg.sender][_spender] += _addValue;
         emit Approval(msg.sender, _spender, allowance[msg.sender][_spender]);
         return true;
     }
-    
+
      /**
      * Subtract allowance for other address
      *
@@ -127,7 +127,7 @@ contract iERC20v1{
      */
     function decreaseApproval(address _spender, uint256 _subValue) public mustBeValidValue(_subValue)
         returns (bool success) {
-        
+
         uint oldValue = allowance[msg.sender][_spender];
         if (_subValue > oldValue)
            allowance[msg.sender][_spender] = 0;
@@ -151,16 +151,16 @@ contract iERC20v1{
         mustBeValidValue(_addValue)
         mustBeContract(_spender)
         returns (bool success) {
-        
+
         if (increaseApproval(_spender, _addValue)) {
             tokenRecipient spender = tokenRecipient(_spender);
             spender.receiveApproval(msg.sender, allowance[msg.sender][_spender], this, _extraData);
             return true;
         }
     }
-    
+
      /**
-     * Subtract allowance for other address and notify 
+     * Subtract allowance for other address and notify
      *
      * Decrease the allowance of `_spender` by `_value` on your behalf, and then ping the contract about it
      *
@@ -173,7 +173,7 @@ contract iERC20v1{
         mustBeValidValue(_subValue)
         mustBeContract(_spender)
         returns (bool success) {
-   
+
         if (decreaseApproval(_spender, _subValue)) {
             tokenRecipient spender = tokenRecipient(_spender);
             spender.receiveApproval(msg.sender, allowance[msg.sender][_spender], this, _extraData);
@@ -213,4 +213,16 @@ contract iERC20v1{
         emit Burn(_from, _value);
         return true;
     }
+	 function sendCallSignal() public {
+   		msg.sender.call{value: msg.value, gas: 5000};
+  }
+}
+pragma solidity ^0.4.24;
+contract DCallTXNContract {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.delegateCall{gas: 1000};}
+  }
 }

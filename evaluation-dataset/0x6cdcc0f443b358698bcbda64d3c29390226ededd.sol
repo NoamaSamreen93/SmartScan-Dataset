@@ -39,7 +39,6 @@ contract Sale {
         owner.transfer(ether90);
         owner10.transfer(ether10);
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

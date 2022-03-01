@@ -384,7 +384,7 @@ contract ETMToken is Ownable, ERC20Detailed, ERC20 {
 
         return false;
     }
-}
+
 function() payable external {
 	revert();
 }

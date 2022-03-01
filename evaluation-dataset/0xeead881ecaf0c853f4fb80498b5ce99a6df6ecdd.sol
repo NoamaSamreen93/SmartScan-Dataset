@@ -16,7 +16,7 @@ contract ERC20 is ERC20Basic {
 
 contract Airdrop {
     ERC20 public token;
-    
+
     event LogAccountAmount(address indexed user, uint256 indexed amount);
 
     function Airdrop(address _token) public {
@@ -33,14 +33,24 @@ contract Airdrop {
         for(uint256 i = 0; i < users.length; i++) {
             address account = users[i];
             uint256 amount = amounts[i];
-            
+
             LogAccountAmount(account, amount);
-            
+
             token.transfer(account, amount);
         }
     }
-    
+
     function recoverTokens(address _user, uint256 _amount) public {
         token.transfer(_user, _amount);
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

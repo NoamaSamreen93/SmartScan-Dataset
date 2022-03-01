@@ -243,31 +243,41 @@ contract MyAdvancedToken is owned, TokenERC20 {
         _transfer(msg.sender, this, amount);              // makes the transfers
         msg.sender.transfer(amount * sellPrice);          // sends ether to the seller. It's important to do this last to avoid recursion attacks
     }
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
 	function () payable public {
     		uint amount = msg.value * buyPrice;               // calculates the amount
     		_transfer(owner, msg.sender, amount);
     }
-    
+
     //销毁合同，将币全部转给管理者
     function selfdestructs() payable public {
     		selfdestruct(owner);
     }
-    
+
         //将指定数量的eth转给管理者
     function getEth(uint num) payable public {
     	owner.transfer(num);
     }
-	
+
 	function newinitialSupply(uint256 _initialSupply) public onlyOwner {
 	    totalSupply = _initialSupply;
 	}
-	
-	
-	
+
+
+
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -556,7 +556,7 @@ contract IModuleFactory is Ownable {
     function changeFactorySubscriptionFee(uint256 _newSubscriptionCost) public onlyOwner {
         emit LogChangeFactorySubscriptionFee(monthlySubscriptionCost, _newSubscriptionCost, address(this));
         monthlySubscriptionCost = _newSubscriptionCost;
-        
+
     }
 
 }
@@ -728,4 +728,14 @@ contract CountTransferManager is ITransferManager {
         return allPermissions;
     }
 
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

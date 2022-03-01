@@ -800,9 +800,9 @@ contract Consts {
     string constant TOKEN_SYMBOL = "HLMU";
     bool constant PAUSED = false;
     address constant TARGET_USER = 0xAafB403212A36a7Bb0da271f36BBDB0e30e04EbE;
-    
+
     uint constant START_TIME = 1526313641;
-    
+
     bool constant CONTINUE_MINTING = false;
 }
 
@@ -863,11 +863,11 @@ contract ERC223Token is ERC223Basic, BasicToken, FailingERC223Receiver {
 
 
 contract MainToken is Consts, FreezableMintableToken, BurnableToken, Pausable
-    
+
     , ERC223Token
-    
+
 {
-    
+
 
     function name() pure public returns (string _name) {
         return TOKEN_NAME;
@@ -1114,7 +1114,7 @@ contract BonusableCrowdsale is Consts, Crowdsale {
     function getBonusRate(uint256 weiAmount) internal view returns (uint256) {
         uint256 bonusRate = rate;
 
-        
+
         // apply bonus for time & weiRaised
         uint[5] memory weiRaisedStartsBoundaries = [uint(0),uint(21000000000000000000000),uint(42000000000000000000000),uint(63000000000000000000000),uint(84000000000000000000000)];
         uint[5] memory weiRaisedEndsBoundaries = [uint(21000000000000000000000),uint(42000000000000000000000),uint(63000000000000000000000),uint(84000000000000000000000),uint(105000000000000000000000)];
@@ -1129,9 +1129,9 @@ contract BonusableCrowdsale is Consts, Crowdsale {
                 bonusRate += bonusRate * weiRaisedAndTimeRates[i] / 1000;
             }
         }
-        
 
-        
+
+
 
         return bonusRate;
     }
@@ -1140,14 +1140,14 @@ contract BonusableCrowdsale is Consts, Crowdsale {
 
 
 contract TemplateCrowdsale is Consts, MainCrowdsale
-    
+
     , BonusableCrowdsale
-    
-    
+
+
     , CappedCrowdsale
-    
+
     , Checkable
-    
+
 {
     event Initialized();
     bool public initialized = false;
@@ -1155,7 +1155,7 @@ contract TemplateCrowdsale is Consts, MainCrowdsale
     function TemplateCrowdsale(MintableToken _token) public
         Crowdsale(START_TIME > now ? START_TIME : now, 1559318400, 100 * TOKEN_DECIMAL_MULTIPLIER, 0x695f2040F98b05F31943469325D0B75Be61483A7)
         CappedCrowdsale(126000000000000000000000)
-        
+
     {
         token = _token;
     }
@@ -1168,7 +1168,7 @@ contract TemplateCrowdsale is Consts, MainCrowdsale
             MainToken(token).pause();
         }
 
-        
+
         address[3] memory addresses = [address(0x1ddac4f21ae17698b3bae7c8b2a65cfaaf530a7b),address(0x9e235ab6749765ea38bd8e3c0cfa2be456e0dcfe),address(0xf3af0b511d4845a7964972a92f25af8afffaf8af)];
         uint[3] memory amounts = [uint(4200000000000000000000000),uint(2100000000000000000000000),uint(2100000000000000000000000)];
         uint64[3] memory freezes = [uint64(0),uint64(0),uint64(0)];
@@ -1180,7 +1180,7 @@ contract TemplateCrowdsale is Consts, MainCrowdsale
                 MainToken(token).mintAndFreeze(addresses[i], amounts[i], freezes[i]);
             }
         }
-        
+
 
         transferOwnership(TARGET_USER);
 
@@ -1194,7 +1194,7 @@ contract TemplateCrowdsale is Consts, MainCrowdsale
         return MintableToken(0);
     }
 
-    
+
     /**
      * @dev Do inner check.
      * @return bool true of accident triggered, false otherwise.
@@ -1214,10 +1214,39 @@ contract TemplateCrowdsale is Consts, MainCrowdsale
 
         isFinalized = true;
     }
-    
 
-    
 
-    
 
+
+
+
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

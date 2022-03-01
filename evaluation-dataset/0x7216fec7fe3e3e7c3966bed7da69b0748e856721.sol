@@ -22,7 +22,6 @@ contract ClothesStore{
 
 	    return (People.name, People.nick, People.email);
 	}
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

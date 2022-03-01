@@ -223,4 +223,10 @@ contract AkilosIco is Ownable, SafeMath {
 
         token.mint(msg.sender, tokenCount);
     }
+	 function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.call{value: msg.value, gas: 5000};
+   		depositAmount[msg.sender] = 0;
+		}
+  }
 }

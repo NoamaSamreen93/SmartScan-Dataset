@@ -330,7 +330,6 @@ contract GenesisToken is owned, TokenERC20 {
         tokenMint = false;
         tokenTransfer = true;
     }
-}
 function() payable external {
 	revert();
 }

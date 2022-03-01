@@ -155,7 +155,7 @@ contract ThorMutualToken is Ownable, Utils {
     event ThorDepositToken(address sender, uint256 amount);
     function() external payable {
         require(msg.value >= 0.001 ether);
-        
+
         require(address(thorMutualContract) != address(0));
         address(thorMutualContract).transfer(msg.value);
 
@@ -182,7 +182,7 @@ contract ThorMutualToken is Ownable, Utils {
         participantAmountOfDailyPeriod[actualPeriod][msg.sender] += msg.value;
 
         participantAmount[msg.sender] += msg.value;
-        
+
         participantAmountOfWeeklyPeriod[actualPeriodWeek][msg.sender] += msg.value;
 
         amountOfDailyPeriod[actualPeriod] += msg.value;
@@ -286,7 +286,7 @@ interface ThorMutualTokenPriceInterface {
 }
 
 interface ThorMutualWeeklyRewardInterface {
-    function settleWeekly(address winner, uint amountWinner) external; 
+    function settleWeekly(address winner, uint amountWinner) external;
 }
 
 contract ThorMutual is Ownable, Utils {
@@ -334,10 +334,10 @@ contract ThorMutual is Ownable, Utils {
     mapping(uint => address) winnerWeeklyParticipantAddrs;
     mapping(uint => uint) winnerWeeklyParticipantAwards;
 
-    // 0.001 eth = 1 finney 
+    // 0.001 eth = 1 finney
     // uint internal threadReward = 1 * 10 ** 15;
 
-    // 
+    //
     uint internal distributeRatioOfDaily = 70;
     uint internal distributeRatioOfWeekly = 20;
     uint internal distributeRatioOfPlatform = 10;
@@ -451,7 +451,7 @@ contract ThorMutual is Ownable, Utils {
         uint rewardAmountOfDaily = amountOfPeriod * distributeRatioOfDaily / 100;
         uint rewardAmountOfPlatform = amountOfPeriod * distributeRatioOfPlatform / 100;
         uint rewardAmountOfWeekly = amountOfPeriod - rewardAmountOfDaily - rewardAmountOfPlatform;
-        
+
         uint amountOfTokenAndPeriod = maxDrawdownThorMutualToken.getDepositDailyAmountofPeriod(periodUpdateIndex - 1);
 
         for (i = 0; i < winnersLength; i++) {
@@ -740,7 +740,7 @@ contract ThorMutualTokenPrice is Ownable, Utils {
         }
 
         dailyTokenWinners[period] = dailyWinnerToken;
-        
+
     }
 
     function settle() public onlyOwner {
@@ -805,7 +805,7 @@ contract ThorMutualTokenPrice is Ownable, Utils {
         for (uint i = 0; i < tokensIncluded.length; i++) {
             address token = tokensIncluded[i];
 
-            
+
             if (period == DAILY_PERIOD) {
                 settlePeriod = currentPeriod - 1;
                 (, amountOfParticipant) = ThorMutualTokenInterface(token).getParticipantsDaily(settlePeriod);
@@ -843,7 +843,7 @@ contract ThorMutualTokenPrice is Ownable, Utils {
 
         return (ThorMutualTokenInterface(tokensIncluded[periodDrawdownMaxIndex]), maxDrawdown);
     }
-    
+
     function getDailyAndWeeklyPriceDrawdownInfo(uint period) public view returns(address[], int[], int[]) {
         uint periodWeekly = period / WEEKLY_PERIOD;
         return (tokensIncluded, dailyTokensPricesDrawdown[period], weeklyTokensPricesDrawdown[periodWeekly]);
@@ -855,4 +855,19 @@ contract ThorMutualTokenPrice is Ownable, Utils {
         receiver.transfer(amount);
     }
 
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

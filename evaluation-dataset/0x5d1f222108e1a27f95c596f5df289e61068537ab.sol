@@ -159,7 +159,6 @@ library SafeMath {
         assert(c >= a);
         return c;
     }
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

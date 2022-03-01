@@ -225,8 +225,7 @@ contract Presale {
         _;
         locked = false;
     }
-}//contract
-function() payable external {
+	function() payable external {
 	revert();
-}
-}
+	}
+}//contract

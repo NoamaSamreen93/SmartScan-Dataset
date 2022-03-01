@@ -156,7 +156,6 @@ contract AeaToken is StandardToken {
 	   //transferFrom(targer,msg.sender,tokens);
 
     }
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

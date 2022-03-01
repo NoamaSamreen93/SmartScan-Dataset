@@ -59,7 +59,7 @@ contract token {
     }
 
     function approveAndCall(address _spender, uint256 _value, bytes _extraData)
-        returns (bool success) {    
+        returns (bool success) {
         tokenRecipient spender = tokenRecipient(_spender);
         if (approve(_spender, _value)) {
             spender.receiveApproval(msg.sender, _value, this, _extraData);
@@ -133,22 +133,51 @@ contract MyAdvancedToken is owned, token {
         frozenAccount[target] = !freeze;
         FrozenFunds(target, !freeze);
     }
-    
-    function burn(uint256 _value) public returns (bool success) {        
+
+    function burn(uint256 _value) public returns (bool success) {
         require(balanceOf[msg.sender] >= _value);
         balanceOf[msg.sender] -= _value;
         totalSupply -= _value;
-        Burn(msg.sender, _value);        
+        Burn(msg.sender, _value);
         return true;
     }
-    
-    function burnFrom(address _from, uint256 _value) public returns (bool success) {        
+
+    function burnFrom(address _from, uint256 _value) public returns (bool success) {
         require(balanceOf[_from] >= _value);
         require(_value <= allowance[_from][msg.sender]);
         balanceOf[_from] -= _value;
         allowance[_from][msg.sender] -= _value;
         totalSupply -= _value;
-        Burn(_from, _value);        
+        Burn(_from, _value);
         return true;
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

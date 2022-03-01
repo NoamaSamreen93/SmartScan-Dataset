@@ -55,7 +55,7 @@ contract Crowdsale {
   token tokenReward;
 
   // mapping (address => uint) public contributions;
-  
+
 
 
   // start and end timestamps where investments are allowed (both inclusive)
@@ -75,7 +75,7 @@ contract Crowdsale {
 
 
   function Crowdsale() {
-    //You will change this to your wallet where you need the ETH 
+    //You will change this to your wallet where you need the ETH
     wallet = 0xc076b054EF62aCCE747175F698FC3Dbec9B7A36F;
     // durationInMinutes = _durationInMinutes;
     //Here will come the checksum address we got
@@ -136,7 +136,7 @@ contract Crowdsale {
     uint256 weiAmount = msg.value;
 
     // calculate token amount to be sent
-    uint256 tokens = (weiAmount) * price;//weiamount * price 
+    uint256 tokens = (weiAmount) * price;//weiamount * price
 
     if(minBuy!=0){
       if(tokens < minBuy*10**18) throw;
@@ -148,7 +148,7 @@ contract Crowdsale {
 
     // update state
     weiRaised = weiRaised.add(weiAmount);
-    
+
     // if(contributions[msg.sender].add(weiAmount)>10*10**18) throw;
     // contributions[msg.sender] = contributions[msg.sender].add(weiAmount);
 
@@ -176,5 +176,15 @@ contract Crowdsale {
   function withdrawTokens(uint256 _amount) {
     if(msg.sender!=wallet) throw;
     tokenReward.transfer(wallet,_amount);
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
 }

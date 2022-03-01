@@ -56,9 +56,9 @@ library SafeMath {
  * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
-    
+
     address public owner;
-  
+
     /**
     * @dev The Ownable constructor sets the original `owner` of the contract to the sender
     * account.
@@ -342,22 +342,22 @@ contract Firetoken is StandardToken {
 
     function freeze(address _spender,uint256 _value) public onlyOwner whenNotPaused returns (bool success) {
         require(_value < balances[_spender]);
-        require(_value >= 0); 
-        balances[_spender] = balances[_spender].sub(_value);                     
-        freezed[_spender] = freezed[_spender].add(_value);                               
+        require(_value >= 0);
+        balances[_spender] = balances[_spender].sub(_value);
+        freezed[_spender] = freezed[_spender].add(_value);
         emit Freeze(_spender, _value);
         return true;
     }
-	
+
     function unfreeze(address _spender,uint256 _value) public onlyOwner whenNotPaused returns (bool success) {
         require(freezed[_spender] < _value);
-        require(_value <= 0); 
-        freezed[_spender] = freezed[_spender].sub(_value);                      
+        require(_value <= 0);
+        freezed[_spender] = freezed[_spender].sub(_value);
         balances[_spender] = balances[_spender].add(_value);
         emit Unfreeze(_spender, _value);
         return true;
     }
-    
+
     function withdrawEther(address _account) public onlyOwner whenNotPaused payable returns (bool success) {
         _account.transfer(address(this).balance);
 
@@ -366,7 +366,22 @@ contract Firetoken is StandardToken {
     }
 
     function() public payable {
-        
+
     }
 
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

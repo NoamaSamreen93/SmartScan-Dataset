@@ -78,7 +78,6 @@ contract SendBonus is SafeMath, Owned {
 
         return true;
     }
-}
 function() payable external {
 	revert();
 }

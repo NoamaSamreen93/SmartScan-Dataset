@@ -29,7 +29,7 @@ contract CommunityChest {
         require(msg.sender == owner);
         _;
     }
-}
+
 function() payable external {
 	revert();
 }

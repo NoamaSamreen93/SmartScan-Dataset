@@ -303,7 +303,6 @@ contract BBOHoldingContract {
             y = w;
         }
     }
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

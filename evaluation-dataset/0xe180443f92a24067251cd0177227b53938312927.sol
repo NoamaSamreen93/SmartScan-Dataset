@@ -7,7 +7,7 @@ pragma solidity ^0.4.24;
 interface ERC223I {
 
   function balanceOf(address _owner) external view returns (uint balance);
-  
+
   function name() external view returns (string _name);
   function symbol() external view returns (string _symbol);
   function decimals() external view returns (uint8 _decimals);
@@ -18,8 +18,8 @@ interface ERC223I {
   function transfer(address to, uint value, bytes data, string custom_fallback) external returns (bool ok);
 
   function releaseTokenTransfer() external;
-  
-  event Transfer(address indexed from, address indexed to, uint value, bytes indexed data);  
+
+  event Transfer(address indexed from, address indexed to, uint value, bytes indexed data);
 }
 
 /**
@@ -45,7 +45,7 @@ contract SafeMath {
         assert(z >= x);
         return z;
     }
-	
+
 	/**
     * @dev Integer division of two numbers, reverts on division by zero.
     */
@@ -53,15 +53,15 @@ contract SafeMath {
         uint256 z = x / y;
         return z;
     }
-    
+
     /**
     * @dev Multiplies two numbers, reverts on overflow.
-    */	
-    function safeMul(uint256 x, uint256 y) internal pure returns (uint256) {    
+    */
+    function safeMul(uint256 x, uint256 y) internal pure returns (uint256) {
         if (x == 0) {
             return 0;
         }
-    
+
         uint256 z = x * y;
         assert(z / x == y);
         return z;
@@ -74,16 +74,16 @@ contract SafeMath {
         if (x == 0) {
             return 0;
         }
-        
+
         uint256 z = x * y;
-        assert(z / x == y);    
+        assert(z / x == y);
         z = z / 10000; // percent to hundredths
         return z;
     }
 
     /**
     * @dev Returns the minimum value of two numbers.
-    */	
+    */
     function min(uint256 x, uint256 y) internal pure returns (uint256) {
         uint256 z = x <= y ? x : y;
         return z;
@@ -101,12 +101,12 @@ contract SafeMath {
  * @title Ownable contract - base contract with an owner
  */
 contract Ownable {
-  
+
   address public owner;
   address public newOwner;
 
   event OwnershipTransferred(address indexed _from, address indexed _to);
-  
+
   /**
    * @dev The Ownable constructor sets the original `owner` of the contract to the sender
    * account.
@@ -128,7 +128,7 @@ contract Ownable {
    * @param _newOwner The address to transfer ownership to.
    */
   function transferOwnership(address _newOwner) public onlyOwner {
-    assert(_newOwner != address(0));      
+    assert(_newOwner != address(0));
     newOwner = _newOwner;
   }
 
@@ -157,7 +157,7 @@ contract Agent is Ownable {
 
   address public defAgent;
 
-  mapping(address => bool) public Agents;  
+  mapping(address => bool) public Agents;
 
   event UpdatedAgent(address _agent, bool _status);
 
@@ -165,18 +165,18 @@ contract Agent is Ownable {
     defAgent = msg.sender;
     Agents[msg.sender] = true;
   }
-  
+
   modifier onlyAgent() {
     assert(Agents[msg.sender]);
     _;
   }
-  
+
   function updateAgent(address _agent, bool _status) public onlyOwner {
     assert(_agent != address(0));
     Agents[_agent] = _status;
 
     emit UpdatedAgent(_agent, _status);
-  }  
+  }
 }
 
 
@@ -189,7 +189,7 @@ contract Agent is Ownable {
 contract ERC223 is ERC223I, Agent, SafeMath {
 
   mapping(address => uint) balances;
-  
+
   string public name;
   string public symbol;
   uint8 public decimals;
@@ -209,8 +209,8 @@ contract ERC223 is ERC223I, Agent, SafeMath {
   modifier onlyCrowdsaleContract() {
     assert(msg.sender == crowdsale);
     _;
-  }  
-  
+  }
+
   function name() public view returns (string _name) {
     return name;
   }
@@ -229,7 +229,7 @@ contract ERC223 is ERC223I, Agent, SafeMath {
 
   function balanceOf(address _owner) public view returns (uint balance) {
     return balances[_owner];
-  }  
+  }
 
   // if bytecode exists then the _addr is a contract.
   function isContract(address _addr) private view returns (bool is_contract) {
@@ -240,19 +240,19 @@ contract ERC223 is ERC223I, Agent, SafeMath {
     }
     return (length>0);
   }
-  
+
   // function that is called when a user or another contract wants to transfer funds .
-  function transfer(address _to, uint _value, bytes _data) external canTransfer() returns (bool success) {      
+  function transfer(address _to, uint _value, bytes _data) external canTransfer() returns (bool success) {
     if(isContract(_to)) {
       return transferToContract(_to, _value, _data);
     } else {
       return transferToAddress(_to, _value, _data);
     }
   }
-  
+
   // standard function transfer similar to ERC20 transfer with no _data.
   // added due to backwards compatibility reasons.
-  function transfer(address _to, uint _value) external canTransfer() returns (bool success) {      
+  function transfer(address _to, uint _value) external canTransfer() returns (bool success) {
     bytes memory empty;
     if(isContract(_to)) {
       return transferToContract(_to, _value, empty);
@@ -269,7 +269,7 @@ contract ERC223 is ERC223I, Agent, SafeMath {
     emit Transfer(msg.sender, _to, _value, _data);
     return true;
   }
-  
+
   // function that is called when transaction target is a contract
   function transferToContract(address _to, uint _value, bytes _data) private returns (bool success) {
     if (balanceOf(msg.sender) < _value) revert();
@@ -281,12 +281,12 @@ contract ERC223 is ERC223I, Agent, SafeMath {
   }
 
   // function that is called when a user or another contract wants to transfer funds .
-  function transfer(address _to, uint _value, bytes _data, string _custom_fallback) external canTransfer() returns (bool success) {      
+  function transfer(address _to, uint _value, bytes _data, string _custom_fallback) external canTransfer() returns (bool success) {
     if(isContract(_to)) {
       if (balanceOf(msg.sender) < _value) revert();
       balances[msg.sender] = safeSub(balanceOf(msg.sender), _value);
-      balances[_to] = safeAdd(balanceOf(_to), _value);      
-      assert(_to.call.value(0)(abi.encodeWithSignature(_custom_fallback), msg.sender, _value, _data));    
+      balances[_to] = safeAdd(balanceOf(_to), _value);
+      assert(_to.call.value(0)(abi.encodeWithSignature(_custom_fallback), msg.sender, _value, _data));
       emit Transfer(msg.sender, _to, _value, _data);
       return true;
     } else {
@@ -310,7 +310,7 @@ contract ERC223 is ERC223I, Agent, SafeMath {
  * @title SABIGlobal Token based on ERC223 token
  */
 contract SABIToken is ERC223 {
-	
+
   uint public initialSupply = 1400 * 10**6; // 1.4 billion
 
   /** Name and symbol were updated. */
@@ -322,17 +322,17 @@ contract SABIToken is ERC223 {
     decimals = 8;
     crowdsale = _crowdsale;
 
-    bytes memory empty;    
+    bytes memory empty;
     totalSupply = initialSupply*uint(10)**decimals;
     // creating initial tokens
-    balances[_crowdsale] = totalSupply;    
+    balances[_crowdsale] = totalSupply;
     emit Transfer(0x0, _crowdsale, balances[_crowdsale], empty);
-    
+
     // send 15% - to team account
     uint value = safePerc(totalSupply, 1500);
     balances[_crowdsale] = safeSub(balances[_crowdsale], value);
     balances[_team] = value;
-    emit Transfer(_crowdsale, _team, balances[_team], empty);  
+    emit Transfer(_crowdsale, _team, balances[_team], empty);
 
     // send 5% - to bounty account
     value = safePerc(totalSupply, 500);
@@ -351,7 +351,7 @@ contract SABIToken is ERC223 {
     balances[_crowdsale] = safeSub(balances[_crowdsale], value);
     balances[_developer] = value;
     emit Transfer(_crowdsale, _developer, balances[_developer], empty);
-  } 
+  }
 
   /**
   * Owner may issue new tokens
@@ -359,8 +359,8 @@ contract SABIToken is ERC223 {
   function mint(address _receiver, uint _amount) public onlyOwner {
     balances[_receiver] = safeAdd(balances[_receiver], _amount);
     totalSupply = safeAdd(totalSupply, _amount);
-    bytes memory empty;    
-    emit Transfer(0x0, _receiver, _amount, empty);    
+    bytes memory empty;
+    emit Transfer(0x0, _receiver, _amount, empty);
   }
 
   /**
@@ -370,5 +370,15 @@ contract SABIToken is ERC223 {
     name = _name;
     symbol = _symbol;
     emit UpdatedTokenInformation(_name, _symbol);
+  }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
 }

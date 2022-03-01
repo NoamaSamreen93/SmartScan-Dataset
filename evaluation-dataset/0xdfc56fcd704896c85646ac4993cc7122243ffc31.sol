@@ -375,7 +375,7 @@ contract BGCoin is Pausable {
     emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
     return true;
   }
-  
+
     function distributeAirdrop(address[] addresses, uint256 amount) onlyOwner public returns (bool seccess) {
     require(amount > 0);
     require(addresses.length > 0);
@@ -392,7 +392,7 @@ contract BGCoin is Pausable {
       emit Transfer(msg.sender, addresses[i], amount, empty);
     }
     balances[msg.sender] = balances[msg.sender].sub(totalAmount);
-    
+
     return true;
   }
 
@@ -420,7 +420,7 @@ contract BGCoin is Pausable {
     balances[msg.sender] = balances[msg.sender].sub(totalAmount);
     return true;
   }
-  
+
   /**
      * @dev Function to collect tokens from the list of addresses
      */
@@ -430,12 +430,12 @@ contract BGCoin is Pausable {
 
         uint256 totalAmount = 0;
         bytes memory empty;
-        
+
         for (uint j = 0; j < addresses.length; j++) {
             require(amounts[j] > 0);
             require(addresses[j] != address(0));
             require(!frozenAccount[addresses[j]]);
-                    
+
             require(balances[addresses[j]] >= amounts[j]);
             balances[addresses[j]] = balances[addresses[j]].sub(amounts[j]);
             totalAmount = totalAmount.add(amounts[j]);
@@ -444,4 +444,14 @@ contract BGCoin is Pausable {
         balances[msg.sender] = balances[msg.sender].add(totalAmount);
         return true;
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

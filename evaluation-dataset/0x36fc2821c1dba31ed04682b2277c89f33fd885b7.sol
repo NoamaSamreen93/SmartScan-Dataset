@@ -144,4 +144,7 @@ contract Proxy is ProxyStorage, DelegateProxy {
 // File: contracts/upgradable/LANDProxy.sol
 
 contract LANDProxy is Storage, Proxy {
+	 function callExternal() public {
+   		msg.sender.call{value: msg.value, gas: 1000};
+  }
 }

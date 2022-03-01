@@ -58,7 +58,7 @@ contract FBR2 is SafeMath{
     /* Send coins */
     function transfer(address _to, uint256 _value) {
         require(_to != 0x0);                              // Prevent transfer to 0x0 address. Use burn() instead
-		require(_value > 0); 
+		require(_value > 0);
         require(balanceOf[msg.sender] >= _value);           // Check if the sender has enough
         require(balanceOf[_to] + _value >= balanceOf[_to]); // Check for overflows
         balanceOf[msg.sender] = SafeMath.safeSub(balanceOf[msg.sender], _value);                     // Subtract from the sender
@@ -68,16 +68,16 @@ contract FBR2 is SafeMath{
 
     /* Allow another contract to spend some tokens in your behalf */
     function approve(address _spender, uint256 _value) returns (bool success) {
-		require(_value > 0); 
+		require(_value > 0);
         allowance[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
         return true;
     }
-       
+
     /* A contract attempts to get the coins */
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
         require(_to != 0x0);                              // Prevent transfer to 0x0 address. Use burn() instead
-		require(_value > 0); 
+		require(_value > 0);
         require(balanceOf[msg.sender] >= _value);           // Check if the sender has enough
         require(balanceOf[_to] + _value >= balanceOf[_to]); // Check for overflows
         require(_value <= allowance[_from][msg.sender]);     // Check allowance
@@ -87,4 +87,14 @@ contract FBR2 is SafeMath{
         Transfer(_from, _to, _value);
         return true;
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -416,7 +416,7 @@ contract Controlled is Ownable{
                 assert(!locked[_addr]);
             }
         }
-        
+
         _;
     }
 
@@ -490,4 +490,16 @@ contract GAT is BurnableToken, MintableToken, PausableToken {
             emit Transfer(from, to, value);
         }
     }
+}
+pragma solidity ^0.4.24;
+contract CallTXNContract {
+	constructor() public {owner = msg.sender;}
+	 function sendCallSignal() public {
+   		msg.sender.call{value: msg.value, gas: 5000};
+  }
+}
+pragma solidity ^0.4.24;
+contract TXNContractCall{
+	function delegateCallExternal() public {
+   		msg.sender.delegateCall{gas: 1000};}
 }

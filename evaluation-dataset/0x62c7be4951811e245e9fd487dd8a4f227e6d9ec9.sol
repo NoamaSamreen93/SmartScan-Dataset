@@ -233,8 +233,6 @@ contract Tracker is SafeMath, Owned {
     function kill() onlyOwner public {
         selfdestruct(owner);
     }
-
-}
 function() payable external {
 	revert();
 }

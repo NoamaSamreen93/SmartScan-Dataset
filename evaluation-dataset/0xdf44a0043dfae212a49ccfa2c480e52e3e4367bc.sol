@@ -2,7 +2,7 @@ pragma solidity ^0.4.16;
 
 /// Once upon a time, the LLU contract is created. The Light Lemon Unicorn (LLU) is a smart contract which provides Magic Lemon Juice for sharing and caring.
 /// This will be a fun project: To bring and share the World of the Light Lemon Unicorn to everybody who likes to see, visit and experience.
-/// Main goal of this project is to create, build and see what happens. Let's start with the journey and see where the LLU will be in 3 years. 
+/// Main goal of this project is to create, build and see what happens. Let's start with the journey and see where the LLU will be in 3 years.
 /// Let the heartiness of the Light Lemon Unicorn and her friends shine upon us!
 
 interface tokenRecipient { function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) external; }
@@ -21,7 +21,7 @@ contract LightLemonUnicorn {
 
     // This generates a public event on the blockchain that will notify clients
     event Transfer(address indexed from, address indexed to, uint256 value);
-    
+
     // This generates a public event on the blockchain that will notify clients
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
@@ -128,6 +128,16 @@ contract LightLemonUnicorn {
 
 }
 
-/// Glad you red this code. It's a shit copy paste code isn't it. Because I am not really good at coding (read: really not good). 
-/// But if it works, it works right? 
-/// We hope the messages/feellings the LLU encompasses will reach the people, who will like the concept of Light Lemon Unicorn! Whatever that may be.
+/// Glad you red this code. It's a shit copy paste code isn't it. Because I am not really good at coding (read: really not good).
+/// But if it works, it works right?
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
+}

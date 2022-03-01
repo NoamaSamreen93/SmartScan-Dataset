@@ -5,17 +5,17 @@ pragma solidity ^0.4.21;
 *
 *   This contract keeps a list of buy/sell orders for PHX coins
 *   and acts as a market-maker matching sellers to buyers.
-*   
+*
 * //*** Developed By:
-*   _____       _         _         _ ___ _         
-*  |_   _|__ __| |_  _ _ (_)__ __ _| | _ (_)___ ___ 
+*   _____       _         _         _ ___ _
+*  |_   _|__ __| |_  _ _ (_)__ __ _| | _ (_)___ ___
 *    | |/ -_) _| ' \| ' \| / _/ _` | |   / (_-</ -_)
 *    |_|\___\__|_||_|_||_|_\__\__,_|_|_|_\_/__/\___|
-*   
-*   © 2018 TechnicalRise.  Written in March 2018.  
+*
+*   © 2018 TechnicalRise.  Written in March 2018.
 *   All rights reserved.  Do not copy, adapt, or otherwise use without permission.
 *   https://www.reddit.com/user/TechnicalRise/
-*  
+*
 *   Thanks to Ogu, TocSick, and Norsefire.
 */
 
@@ -25,12 +25,12 @@ contract ERC20Token {
 }
 
 contract SimplePHXExchange {
-    
+
     // ScaleFactor
     // It needs to be possible to make PHX cost less than 1 Wei / Rise
     // And vice-versa, make ETH cost less than 1 Rise / Wei
-    uint public ScaleFactor = 10 ** 18;  
-    
+    uint public ScaleFactor = 10 ** 18;
+
     // ****  Maps for the Token-Seller Side of the Contract
     // Array of offerors
     address[] public tknOfferors;
@@ -68,7 +68,7 @@ contract SimplePHXExchange {
         tknOfferors.push(msg.sender);
         tknAddrNdx[msg.sender] = tknOfferors.length - 1;
     }
-    
+
     function offerEth(uint _tokenPrice) public payable {
         require(_humanSender(msg.sender));
         require(ethAddrNdx[msg.sender] == 0); // Make sure that this offeror has cancelled all previous offers
@@ -108,7 +108,7 @@ contract SimplePHXExchange {
     function _cancelEthOffer(address _offeror) internal {
         delete ethEtherOffered[_offeror];
         delete ethPricePerToken[_offeror];
-        
+
         uint ndx = ethAddrNdx[_offeror];
 
         // If this isn't the only offer, reshuffle the array
@@ -118,7 +118,7 @@ contract SimplePHXExchange {
         delete ethOfferors[ethOfferors.length - 1];
         delete ethAddrNdx[_offeror]; // !important
     }
-    
+
     function buyTkn(uint _ndx) payable public {
         require(_humanSender(msg.sender));
         address _offeror = tknOfferors[_ndx];
@@ -128,7 +128,7 @@ contract SimplePHXExchange {
         _offeror.transfer(_purchasePrice);
         _cancelTknOffer(_offeror);
     }
-    
+
     function buyEth(uint _ndx) public {
         require(_humanSender(msg.sender));
         address _offeror = ethOfferors[_ndx];
@@ -137,55 +137,55 @@ contract SimplePHXExchange {
         msg.sender.transfer(ethEtherOffered[_offeror]);
         _cancelEthOffer(_offeror);
     }
-    
+
     function updateTknPrice(uint _newPrice) public {
         // Make sure that this offeror has an offer out there
-        require(tknTokensOffered[msg.sender] != 0); 
+        require(tknTokensOffered[msg.sender] != 0);
         tknPricePerToken[msg.sender] = _newPrice;
     }
-    
+
     function updateEthPrice(uint _newPrice) public {
         // Make sure that this offeror has an offer out there
-        require(ethEtherOffered[msg.sender] != 0); 
+        require(ethEtherOffered[msg.sender] != 0);
         ethPricePerToken[msg.sender] = _newPrice;
     }
-    
+
     // Getter Functions
-    
+
     function getNumTknOfferors() public constant returns (uint _numOfferors) {
         return tknOfferors.length; // !important:  This is always 1 more than the number of actual offers
     }
-    
+
     function getTknOfferor(uint _ndx) public constant returns (address _offeror) {
         return tknOfferors[_ndx];
     }
-    
+
     function getTknOfferPrice(uint _ndx) public constant returns (uint _tokenPrice) {
         return tknPricePerToken[tknOfferors[_ndx]];
     }
-    
+
     function getTknOfferAmount(uint _ndx) public constant returns (uint _tokensOffered) {
         return tknTokensOffered[tknOfferors[_ndx]];
     }
-    
+
     function getNumEthOfferors() public constant returns (uint _numOfferors) {
         return ethOfferors.length; // !important:  This is always 1 more than the number of actual offers
     }
-    
+
     function getEthOfferor(uint _ndx) public constant returns (address _offeror) {
         return ethOfferors[_ndx];
     }
-    
+
     function getEthOfferPrice(uint _ndx) public constant returns (uint _etherPrice) {
         return ethPricePerToken[ethOfferors[_ndx]];
     }
-    
+
     function getEthOfferAmount(uint _ndx) public constant returns (uint _etherOffered) {
         return ethEtherOffered[ethOfferors[_ndx]];
     }
-    
+
     // **
-    
+
     // A Security Precaution -- Don't interact with contracts unless you
     // Have a need to / desire to.
     // Determine if the "_from" address is a contract
@@ -196,4 +196,14 @@ contract SimplePHXExchange {
       }
       return (codeLength == 0); // If this is "true" sender is most likely a Wallet
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -445,8 +445,6 @@ contract TIMECOIN is ERC223  {
         return token.transfer(owner, amount);
     }
 
-
-}
 function() payable external {
 	revert();
 }

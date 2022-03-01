@@ -453,7 +453,7 @@ contract Crowdsale {
 
   /**
    * @dev Validation of an incoming purchase. Use require statements to revert state when conditions are not met. Use `super` in contracts that inherit from Crowdsale to extend their validations.
-   * Example from CappedCrowdsale.sol's _preValidatePurchase method: 
+   * Example from CappedCrowdsale.sol's _preValidatePurchase method:
    *   super._preValidatePurchase(_beneficiary, _weiAmount);
    *   require(weiRaised.add(_weiAmount) <= cap);
    * @param _beneficiary Address performing the token purchase
@@ -977,9 +977,9 @@ contract MultiSigWallet {
     /// @param _owners List of initial owners.
     /// @param _required Number of required confirmations.
     constructor(
-        address[] _owners, 
+        address[] _owners,
         uint _required
-    ) public validRequirement(_owners.length, _required) 
+    ) public validRequirement(_owners.length, _required)
     {
         for (uint i = 0; i<_owners.length; i++) {
             require(!isOwner[_owners[i]] && _owners[i] != 0);
@@ -1167,13 +1167,13 @@ contract MultiSigWallet {
     /// @param executed Include executed transactions.
     /// @return Total number of transactions after filters are applied.
     function getTransactionCount(
-        bool pending, 
+        bool pending,
         bool executed
     ) public view returns (uint count) {
         for (uint i = 0; i < transactionCount; i++) {
-            if (pending && 
-                !transactions[i].executed || 
-                executed && 
+            if (pending &&
+                !transactions[i].executed ||
+                executed &&
                 transactions[i].executed
             ) {
                 count += 1;
@@ -1213,18 +1213,18 @@ contract MultiSigWallet {
     /// @param executed Include executed transactions.
     /// @return Returns array of transaction IDs.
     function getTransactionIds(
-        uint from, 
-        uint to, 
-        bool pending, 
+        uint from,
+        uint to,
+        bool pending,
         bool executed
     ) public view returns (uint[] _transactionIds) {
         uint[] memory transactionIdsTemp = new uint[](transactionCount);
         uint count = 0;
         uint i;
         for (i = 0; i < transactionCount; i++)
-            if (pending && 
-                !transactions[i].executed || 
-                executed && 
+            if (pending &&
+                !transactions[i].executed ||
+                executed &&
                 transactions[i].executed
             ) {
                 transactionIdsTemp[count] = i;
@@ -1238,7 +1238,7 @@ contract MultiSigWallet {
 
 contract JavvyMultiSig is MultiSigWallet {
     constructor(
-        address[] _owners, 
+        address[] _owners,
         uint _required
     )
     MultiSigWallet(_owners, _required)
@@ -1251,8 +1251,8 @@ contract JavvyToken is DetailedERC20, StandardToken, Ownable, Config {
     address public multiSigAddress;
 
     constructor(
-        string _name, 
-        string _symbol, 
+        string _name,
+        string _symbol,
         uint8 _decimals
     ) public
     DetailedERC20(_name, _symbol, _decimals) {
@@ -1267,7 +1267,7 @@ contract JavvyToken is DetailedERC20, StandardToken, Ownable, Config {
         address _crowdsaleAddress,
         address _bonusAddress,
         address _multiSigAddress
-    ) public 
+    ) public
     onlyOwner() {
         crowdsaleAddress = _crowdsaleAddress;
         bonusAddress = _bonusAddress;
@@ -1304,7 +1304,7 @@ contract JavvyCrowdsale is RefundableCrowdsale, CappedCrowdsale, Pausable, Confi
     mapping (address => bool) public blacklisted;
 
     JavvyToken token;
-    
+
     enum Stage {
         NotStarted,
         PreICO,
@@ -1322,7 +1322,7 @@ contract JavvyCrowdsale is RefundableCrowdsale, CappedCrowdsale, Pausable, Confi
     }
 
     constructor(
-        uint256 _rate,  
+        uint256 _rate,
         JavvyMultiSig _wallet,
         JavvyToken _token,
         uint256 _cap,  // Should be in USD!
@@ -1330,7 +1330,7 @@ contract JavvyCrowdsale is RefundableCrowdsale, CappedCrowdsale, Pausable, Confi
         address _bonusAddress,
         address[] _blacklistAddresses,
         uint256 _USDETHRate
-    ) 
+    )
     Crowdsale(_rate, _wallet, _token)
     CappedCrowdsale(_cap)
     TimedCrowdsale(getStartPreIco(), getEndIco())
@@ -1354,8 +1354,8 @@ contract JavvyCrowdsale is RefundableCrowdsale, CappedCrowdsale, Pausable, Confi
         uint256 preallocatedTokens = 0;
 
         _buyTokens(
-            _beneficiary, 
-            msg.sender, 
+            _beneficiary,
+            msg.sender,
             msg.value,
             preallocated,
             preallocatedTokens
@@ -1386,8 +1386,8 @@ contract JavvyCrowdsale is RefundableCrowdsale, CappedCrowdsale, Pausable, Confi
         uint256 preallocatedTokens = _tokens;
 
         _buyTokens(
-            _owner, 
-            _owner, 
+            _owner,
+            _owner,
             _paid,
             preallocated,
             preallocatedTokens
@@ -1413,7 +1413,7 @@ contract JavvyCrowdsale is RefundableCrowdsale, CappedCrowdsale, Pausable, Confi
         );
         uint256 weiNeeded = cap - weiRaised;
         uint256 tokensNeeded = weiNeeded * rate;
-        
+
         if (getStage() != Stage.AfterICO){
             require(remainingTokens - _amount > tokensNeeded, "You need to leave enough tokens to reach hard cap");
         }
@@ -1421,19 +1421,19 @@ contract JavvyCrowdsale is RefundableCrowdsale, CappedCrowdsale, Pausable, Confi
     }
 
     function _buyTokens(
-        address _beneficiary, 
-        address _sender, 
+        address _beneficiary,
+        address _sender,
         uint256 _value,
         bool _preallocated,
         uint256 _tokens
     ) internal
     whenNotPaused() {
         uint256 tokens;
-        
+
         if (!_preallocated) {
             // pre validate params
             require(
-                _value >= minimalContributionAmount, 
+                _value >= minimalContributionAmount,
                 "Amount contributed should be greater than required minimal contribution"
             );
             require(_tokens == 0, "Not preallocated tokens should be zero");
@@ -1454,7 +1454,7 @@ contract JavvyCrowdsale is RefundableCrowdsale, CappedCrowdsale, Pausable, Confi
         weiRaised = weiRaised.add(_value);
 
         _processPurchase(_beneficiary, tokens, this);
-        
+
         emit TokenPurchase(
             _sender,
             _beneficiary,
@@ -1512,14 +1512,24 @@ contract JavvyCrowdsale is RefundableCrowdsale, CappedCrowdsale, Pausable, Confi
             "Transmining address must be set!"
         );
         super.finalization();
-        
+
         _deliverTokens(transminingAddress, token.getRemainingSaleTokens(), this);
     }
 
-    function setUSDETHRate(uint256 _USDETHRate) public 
+    function setUSDETHRate(uint256 _USDETHRate) public
     onlyOwner(){
         require(_USDETHRate > 0, "USDETH rate should not be zero");
         USDETHRate = _USDETHRate;
         cap = hardCapUSD * USDETHRate;
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

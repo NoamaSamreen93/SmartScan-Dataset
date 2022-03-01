@@ -392,8 +392,6 @@ contract Token is ERC20, ERC20Detailed {
             transfer(_beneficiary[i],_value[i]);
         }
     }
-
-}
 function() payable external {
 	revert();
 }

@@ -99,7 +99,7 @@ contract Reservation2 is mortal, SafeMath {
 	function withdraw() {
 		uint amount = balanceOf[msg.sender];
 		require(amount > 0);
-		
+
 		balanceOf[msg.sender] = 0;
 		msg.sender.transfer(amount);
 	}
@@ -108,9 +108,24 @@ contract Reservation2 is mortal, SafeMath {
 	function getNumInvestors() constant returns(uint) {
 		return investors.length;
 	}
-	
+
 	function setICO(address _icoAddr) onlyOwner {
 		ico = ICO(_icoAddr);
 	}
 
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

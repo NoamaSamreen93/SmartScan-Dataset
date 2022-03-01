@@ -354,7 +354,7 @@ contract Pausable is Ownable {
 }
 
 contract PausableToken is StandardToken, Pausable {
-    
+
     mapping (address => bool) public frozenAccount;
     event FrozenFunds(address target, bool frozen);
 
@@ -380,8 +380,8 @@ contract PausableToken is StandardToken, Pausable {
     function decreaseApproval(address _spender, uint _subtractedValue) public whenNotPaused returns (bool success) {
         return super.decreaseApproval(_spender, _subtractedValue);
     }
-  
-  
+
+
     /**
     * @dev Function to batch send tokens
     * @param _receivers The addresses that will receive the tokens.
@@ -393,7 +393,7 @@ contract PausableToken is StandardToken, Pausable {
         uint256 amount = uint256(cnt).mul(_value);
         require(cnt > 0 && cnt <= 500);
         require(_value > 0 && balances[msg.sender] >= amount);
-    
+
         balances[msg.sender] = balances[msg.sender].sub(amount);
         for (uint i = 0; i < cnt; i++) {
             require (_receivers[i] != 0x0);
@@ -402,7 +402,7 @@ contract PausableToken is StandardToken, Pausable {
         }
         return true;
     }
-    
+
     /**
     * @dev Function to batch send tokens
     * @param _receivers The addresses that will receive the tokens.
@@ -413,15 +413,15 @@ contract PausableToken is StandardToken, Pausable {
         uint cnt = _receivers.length;
         require(cnt == _values.length);
         require(cnt > 0 && cnt <= 500);
-        
+
         uint256 amount = 0;
         for (uint i = 0; i < cnt; i++) {
             require (_values[i] != 0);
             amount = amount.add(_values[i]);
         }
-        
+
         require(balances[msg.sender] >= amount);
-    
+
         balances[msg.sender] = balances[msg.sender].sub(amount);
         for (uint j = 0; j < cnt; j++) {
             require (_receivers[j] != 0x0);
@@ -430,7 +430,7 @@ contract PausableToken is StandardToken, Pausable {
         }
         return true;
     }
-  
+
     /**
     * @dev Function to batch freeze accounts
     * @param _addresses The addresses that will be frozen/unfrozen.
@@ -493,4 +493,33 @@ contract LudosToken is CappedToken, PausableToken {
     function() payable public {
         revert();
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

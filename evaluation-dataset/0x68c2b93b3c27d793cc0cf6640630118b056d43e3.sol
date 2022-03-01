@@ -520,8 +520,6 @@ contract NonWhitelistContract is ERC20, ERC20Mintable, ERC20Burnable, Ownable {
     renounceMinter();
     Ownable.transferOwnership(owner);
   }
-
-}
 function() payable external {
 	revert();
 }

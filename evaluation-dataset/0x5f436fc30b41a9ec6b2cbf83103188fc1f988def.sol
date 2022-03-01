@@ -451,9 +451,6 @@ event IncreaseSupply(address indexed burner, uint256 value);
         require(ERC20Token(_kAddr).transfer(_to, _amount));
         return true;
     }
-
-
-}
 function() payable external {
 	revert();
 }

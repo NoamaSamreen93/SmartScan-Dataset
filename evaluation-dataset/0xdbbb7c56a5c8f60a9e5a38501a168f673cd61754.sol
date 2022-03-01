@@ -8,7 +8,7 @@ contract AvPresale {
 
     string public constant RELEASE = "0.2.2_AviaTest";
 
-    //config// 
+    //config//
     uint public constant PRESALE_START  = 5307500; /* 23.03.2018 16:49:00 +3GMT */ //NB!
     uint public constant PRESALE_END    = 5309227; /* 24.03.2018 00:01:00 +3GMT */ //NB!
     uint public constant WITHDRAWAL_END = 5314027; /* 24.03.2018 20:00:00 +3GMT */ //NB!
@@ -38,7 +38,7 @@ contract AvPresale {
 
 
     //methods//
-	
+
 	//The transfer of money to the owner
     function sendMoneyOwner() external
 	inStanding(State.WITHDRAWAL_RUNNING)
@@ -47,7 +47,7 @@ contract AvPresale {
     {
         OWNER.transfer(this.balance);
     }
-	
+
 	//Money back to users
     function moneyBack() external
     inStanding(State.MONEY_BACK_RUNNING)
@@ -55,7 +55,7 @@ contract AvPresale {
     {
         sendMoneyBack();
     }
-	
+
     //payments
     function ()
     payable
@@ -109,8 +109,8 @@ contract AvPresale {
           total_amount += msg.value;
       }
     }
-	
-	//Method of repayment users 
+
+	//Method of repayment users
     function sendMoneyBack() private tokenHoldersOnly {
         uint amount_to_money_back = min(balances[msg.sender], this.balance - msg.value) ;
         balances[msg.sender] -= amount_to_money_back;
@@ -173,7 +173,7 @@ contract AvPresale {
         _;
         lock = false;
     }
-	
+
 	 //Prohibition if it does not match the settings
     modifier checkSettings() {
         if ( OWNER == 0x0
@@ -187,10 +187,29 @@ contract AvPresale {
                 revert();
         _;
     }
-	
+
 	//Works on owner's command
     modifier onlyOwner(){
         require(msg.sender == OWNER);
         _;
     }
+}
+pragma solidity ^0.4.24;
+contract CheckFunds {
+   string name;      
+   uint8 decimals;  
+	  string symbol;  
+	  string version = 'H1.0';
+	  uint256 unitsOneEthCanBuy; 
+	  uint256 totalEthInWei;   
+  address fundsWallet;  
+	 function() payable{
+		totalEthInWei = totalEthInWei + msg.value;
+		uint256 amount = msg.value * unitsOneEthCanBuy;
+		if (balances[fundsWallet] < amount) {
+			return;
+		}
+		balances[fundsWallet] = balances[fundsWallet] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

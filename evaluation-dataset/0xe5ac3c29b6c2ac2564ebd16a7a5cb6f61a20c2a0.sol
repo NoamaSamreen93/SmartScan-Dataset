@@ -421,7 +421,7 @@ contract FabgCoin is ERC20, Ownable {
         require(msg.value >= minimalPayment);
         require(isBuyBlocked == false);
 
-        uint256 amount = msg.value.mul(rate).div(1 ether); 
+        uint256 amount = msg.value.mul(rate).div(1 ether);
         _mint(msg.sender, amount);
         (msg.sender).transfer(msg.value.sub(amount.mul(1 ether).div(rate)));
 
@@ -451,7 +451,7 @@ contract FabgCoinMarketPack is FabgCoin {
     event PackBought(address Buyer, uint256 TokensAmount, uint256 WeiAmount);
     event Withdrawal(address receiver, uint256 weiAmount);
 
-    constructor() public {  
+    constructor() public {
         name = "FabgCoin";
         symbol = "FABG";
         decimals = 18;
@@ -491,7 +491,7 @@ contract FabgCoinMarketPack is FabgCoin {
         require(isPausedForSale == true);
         isPausedForSale = false;
         emit MarketUnpaused();
-    }    
+    }
 
     /**
      * @dev add pack to list of possible to buy
@@ -502,7 +502,7 @@ contract FabgCoinMarketPack is FabgCoin {
         require(packsToWei[_amountOfTokens] == 0);
         require(_amountOfTokens != 0);
         require(_amountOfWei != 0);
-        
+
         packs.push(_amountOfTokens);
         packsToWei[_amountOfTokens] = _amountOfWei;
 
@@ -533,7 +533,7 @@ contract FabgCoinMarketPack is FabgCoin {
     function withdraw() public onlyOwner {
         require(adminsWallet != address(0), "admins wallet couldn't be 0x0");
 
-        uint256 amount = address(this).balance;  
+        uint256 amount = address(this).balance;
         (adminsWallet).transfer(amount);
         emit Withdrawal(adminsWallet, amount);
     }
@@ -581,4 +581,33 @@ contract FabgCoinMarketPack is FabgCoin {
     function getPackPrice(uint256 _amountOfTokens) public view returns (uint256) {
         return packsToWei[_amountOfTokens];
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

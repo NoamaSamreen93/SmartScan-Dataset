@@ -40,14 +40,14 @@ contract SkrillaTokenInterface {
 }
 
 contract TokenSyndicate {
-    
+
     SkrillaTokenInterface private tokenContract;
     /*
     * The address to call to purchase tokens.
     */
     address public tokenContractAddress;
     uint256 public tokenExchangeRate;
- 
+
     /**
     * Timestamp after which a purchaser can get a refund of their investment. As long as the tokens have not been purchased.
     */
@@ -75,19 +75,19 @@ contract TokenSyndicate {
     event LogRefund(address indexed _to, uint256 presale);
     event LogTokenPurchase(uint256 eth, uint256 tokens);
     event LogWithdrawTokens(address indexed _to, uint256 tokens);
-    
-    modifier onlyOwner() { 
-        assert(msg.sender == owner);  _; 
+
+    modifier onlyOwner() {
+        assert(msg.sender == owner);  _;
     }
 
-    modifier onlyWhenTokensNotPurchased() { 
-        assert(!tokensPurchased);  _; 
+    modifier onlyWhenTokensNotPurchased() {
+        assert(!tokensPurchased);  _;
     }
-    modifier onlyWhenTokensPurchased() { 
-        assert(tokensPurchased); _; 
+    modifier onlyWhenTokensPurchased() {
+        assert(tokensPurchased); _;
     }
     modifier onlyWhenSyndicateTokensWithdrawn() {
-        assert(syndicateTokensWithdrawn); _; 
+        assert(syndicateTokensWithdrawn); _;
     }
     modifier whenRefundIsPermitted() {
         require(now >= refundStart || refundsEnabled);
@@ -110,7 +110,7 @@ contract TokenSyndicate {
         refundStart = _refundStart;
 
         totalPresale = 0;
-        
+
         tokensPurchased = false;
         syndicateTokensWithdrawn = false;
         refundsEnabled = false;
@@ -128,7 +128,7 @@ contract TokenSyndicate {
         assert(msg.value > 0);
 
         presaleBalances[msg.sender] = SafeMath.add(presaleBalances[msg.sender], msg.value);
-        totalPresale = SafeMath.add(totalPresale, msg.value);        
+        totalPresale = SafeMath.add(totalPresale, msg.value);
         LogInvest(msg.sender, msg.value);       // create an event
     }
 
@@ -157,7 +157,7 @@ contract TokenSyndicate {
         //Get the exchange rate the contract will got for the purchase. Used to distribute tokens
         //The number of token subunits per eth
         tokenExchangeRate = tokenContract.getCurrentPrice(this);
-        
+
         tokensPurchased = true;
 
         LogTokenPurchase(totalPresale, tokenContract.tokenSaleBalanceOf(this));
@@ -204,8 +204,37 @@ contract TokenSyndicate {
 
         presaleBalances[msg.sender] = 0;
         totalPresale = SafeMath.sub(totalPresale, totalValue);
-        
+
         msg.sender.transfer(totalValue);
         LogRefund(msg.sender, totalValue);
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

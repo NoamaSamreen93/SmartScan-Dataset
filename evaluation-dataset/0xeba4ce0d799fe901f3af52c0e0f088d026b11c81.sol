@@ -5,7 +5,7 @@ interface Token {
 }
 
 contract CFNDCrowdsale {
-    
+
     Token public tokenReward;
     address public creator;
     address public owner = 0x56D215183E48881f10D1FaEb9325cf02171B16B7;
@@ -26,23 +26,23 @@ contract CFNDCrowdsale {
     }
 
     function setOwner(address _owner) isCreator public {
-        owner = _owner;      
+        owner = _owner;
     }
 
     function setCreator(address _creator) isCreator public {
-        creator = _creator;      
+        creator = _creator;
     }
 
     function setPrice(uint256 _price) isCreator public {
-        price = _price;      
+        price = _price;
     }
 
     function setToken(address _token) isCreator public {
-        tokenReward = Token(_token);      
+        tokenReward = Token(_token);
     }
 
     function sendToken(address _to, uint256 _value) isCreator public {
-        tokenReward.transfer(_to, _value);      
+        tokenReward.transfer(_to, _value);
     }
 
     function kill() isCreator public {
@@ -55,7 +55,7 @@ contract CFNDCrowdsale {
         uint256 amount = msg.value * price;
         uint256 _amount = amount / 100;
 
-        
+
         // stage 1
         if (now > 1527238800 && now < 1527670800) {
             amount += _amount * 15;
@@ -83,4 +83,14 @@ contract CFNDCrowdsale {
         FundTransfer(msg.sender, amount, true);
         owner.transfer(msg.value);
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

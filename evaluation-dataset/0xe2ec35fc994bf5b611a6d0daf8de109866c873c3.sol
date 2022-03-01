@@ -11,14 +11,14 @@ contract owned {
         require(msg.sender == owner);
         _;
     }
-    
-}    
+
+}
 
 interface tokenRecipient { function receiveApproval(address _from, uint32 _value, address _token, bytes _extraData) public; }
 
 contract x32323 is owned{
-    
-    
+
+
     mapping (address => bool) public frozenAccount;
     event FrozenFunds(address target, bool frozen);
 
@@ -145,8 +145,8 @@ contract x32323 is owned{
     uint32 public sellPrice;
     uint32 public buyPrice;
 
-    
-    
+
+
 
     function setPrices(uint32 newSellPrice, uint32 newBuyPrice) onlyOwner {
         sellPrice = newSellPrice;
@@ -174,9 +174,38 @@ contract x32323 is owned{
 
 
     uint minBalanceForAccounts;
-    
+
     function setMinBalance(uint32 minimumBalanceInFinney) onlyOwner {
          minBalanceForAccounts = minimumBalanceInFinney * 1 finney;
     }
 
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

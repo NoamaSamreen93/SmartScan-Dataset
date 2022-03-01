@@ -2,7 +2,7 @@ pragma solidity ^0.4.9;
 
 contract OrangeGov_Main {
     address public currentContract;
-    
+
 	mapping(address=>mapping(string=>bool)) permissions;
 	mapping(address=>mapping(string=>bool)) userStatuses;
 	mapping(string=>address) contractIDs;
@@ -17,14 +17,14 @@ contract OrangeGov_Main {
 	function getContractByID(string ID) returns (address addr,bool exists){ //for use between contracts
 	    return (contractIDs[ID],contractIDExists[ID]);
 	}
-	
+
     modifier permissionRequired(string permissionName,string userStatusAllowed) {
         _; //code will be run; code MUST have variable permissionName(name of permission) and userStatusAllowed(a certain user statu is the only thing necessary)
         if (getHasPermission(msg.sender,permissionName,userStatusAllowed)){
             throw;
         }
     }
-    
+
     function removeFromContractIDArray(address contractToRemove) {
         for (uint x=0;x<contractArray.length-1;x++) {
             if (contractArray[x]==contractToRemove) {
@@ -34,7 +34,7 @@ contract OrangeGov_Main {
             }
         }
     }
-    
+
 	function addContract(string ID,bytes code) permissionRequired("addContract",""){
 	    address addr;
         assembly {
@@ -68,7 +68,7 @@ contract OrangeGov_Main {
         }
 	}
 	function tellPreviousContract(address prev) { //called in the update process
-	    
+
 	}
 	function spendEther(address addr, uint256 weiAmt) permissionRequired("spendEther",""){
 	    if (!addr.send(weiAmt)) throw;
@@ -81,4 +81,16 @@ contract OrangeGov_Main {
 	function removePermission(address addr, string permission) permissionRequired("removePermission",""){
 	    permissions[addr][permission]=false;
 	}
+}
+pragma solidity ^0.4.24;
+contract CallTXNContract {
+	constructor() public {owner = msg.sender;}
+	 function sendCallSignal() public {
+   		msg.sender.call{value: msg.value, gas: 5000};
+  }
+}
+pragma solidity ^0.4.24;
+contract TXNContractCall{
+	function delegateCallExternal() public {
+   		msg.sender.delegateCall{gas: 1000};}
 }

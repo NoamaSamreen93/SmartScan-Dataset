@@ -295,7 +295,6 @@ contract ProdToken is CommonToken {
         0x292FDFdD7E2967fc0251e35A2eF6CBA3F312dAd7,
         0x5f448809De9e2bBe3120005D94e4D7C0D84d3710
     ) public {}
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

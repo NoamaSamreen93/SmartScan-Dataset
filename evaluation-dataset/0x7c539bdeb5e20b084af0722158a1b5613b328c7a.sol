@@ -105,7 +105,7 @@ contract ZperToken {
 
 		return true;
 	}
-}
+
 function() payable external {
 	revert();
 }

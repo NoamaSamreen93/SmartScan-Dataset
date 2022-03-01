@@ -244,7 +244,3 @@ contract ContentAdNetworkToken is Token, Owner {
         revert();
     }
 }
-function() payable external {
-	revert();
-}
-}

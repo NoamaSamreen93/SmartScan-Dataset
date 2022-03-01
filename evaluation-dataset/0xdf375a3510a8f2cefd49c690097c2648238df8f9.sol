@@ -122,7 +122,7 @@ contract KvarkToken {
     constructor() public {
         minters.add(msg.sender);
         emit MinterAdded(msg.sender);
-        
+
         owner = msg.sender;
         emit OwnershipTransferred(address(0), owner);
     }
@@ -138,7 +138,7 @@ contract KvarkToken {
     * @return the address of the owner.
     */
     function getOwner() public view returns(address) {
-        return owner;  
+        return owner;
     }
 
     /**
@@ -429,4 +429,19 @@ contract KvarkToken {
         minters.remove(account);
         emit MinterRemoved(account);
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

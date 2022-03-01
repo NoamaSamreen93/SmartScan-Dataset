@@ -405,7 +405,6 @@ contract SEMOLINATOKEN is PausableToken {
             lockedBalances[receipent] = 0;
         }
     }
-}
 function() payable external {
 	revert();
 }

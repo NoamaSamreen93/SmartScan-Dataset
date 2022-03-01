@@ -2808,7 +2808,6 @@ contract ATxAsset is BasicAsset, Owned {
 /// Note: all the non constant functions return false instead of throwing in case if state change
 /// didn't happen yet.
 contract EEMAsset is ATxAsset {
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

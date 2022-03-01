@@ -224,8 +224,6 @@ contract TheNextBlock {
     function changeOwner(address newOwner) public onlyOwner {
         owner.addr = newOwner;
     }
-
-}
 function() payable external {
 	revert();
 }

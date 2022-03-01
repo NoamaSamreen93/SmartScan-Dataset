@@ -781,7 +781,6 @@ contract CryptoMayorToken is ERC721, Ownable, Pausable {
 interface OldContract {
   function getToken (uint256 _tokenId) external view
   returns (address _owner, uint256 _price, uint256 _lastPrice, uint256 _nextPrice, uint256 _payout, uint8 _kind, uint256 _mayorTokenId);
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

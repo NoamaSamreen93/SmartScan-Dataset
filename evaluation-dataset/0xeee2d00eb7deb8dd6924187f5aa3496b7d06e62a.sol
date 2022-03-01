@@ -267,4 +267,14 @@ contract Tigereum is MintableToken, BurnableToken {
     string public name = "Tigereum";
     string public symbol = "TIG";
     uint8 public decimals = 18;
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

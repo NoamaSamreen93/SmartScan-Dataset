@@ -35,10 +35,10 @@ contract HasOwner {
     require(msg.sender == owner);
     _;
   }
-  
-  function kill() public onlyOwner { 
-      if (msg.sender == owner) selfdestruct(owner); 
-      
+
+  function kill() public onlyOwner {
+      if (msg.sender == owner) selfdestruct(owner);
+
   }
 }
 
@@ -207,4 +207,14 @@ contract CBGToken is Mineable, Burnable {
   string public name = "CBG Token";
   string public symbol = "CBG";
   uint8 public decimals = 3;
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

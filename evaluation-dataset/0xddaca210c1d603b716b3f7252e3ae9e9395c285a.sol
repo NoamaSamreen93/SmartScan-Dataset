@@ -787,3 +787,18 @@ contract ChallengeToken is ERC721Token, Ownable {
     event ChallengeAccepted(address _person, uint256 _index);
     event BoughtToken(address indexed buyer, uint256 tokenId);
 }
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+}

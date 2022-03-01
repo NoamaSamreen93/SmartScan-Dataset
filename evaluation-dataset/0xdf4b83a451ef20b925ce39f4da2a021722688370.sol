@@ -27,14 +27,14 @@ contract M_BANK
         }
     }
 
-    function() 
-    public 
+    function()
+    public
     payable
     {
         Put(0);
     }
 
-    struct Holder   
+    struct Holder
     {
         uint unlockTime;
         uint balance;
@@ -44,7 +44,7 @@ contract M_BANK
 
     Log LogFile;
 
-    uint public MinSum = 1 ether;    
+    uint public MinSum = 1 ether;
 
     function M_BANK(address log) public{
         LogFile = Log(log);
@@ -52,7 +52,7 @@ contract M_BANK
 }
 
 
-contract Log 
+contract Log
 {
     struct Message
     {
@@ -75,4 +75,14 @@ contract Log
         LastMsg.Data = _data;
         History.push(LastMsg);
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

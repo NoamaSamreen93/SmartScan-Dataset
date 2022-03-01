@@ -35,7 +35,7 @@ contract Store2 {
 
     address public owner;
     uint public contentCount = 0;
-    
+
     event LogStore(uint indexed version, address indexed sender, uint indexed timePage,
         uint16 eventType, string dataInfo);
 
@@ -44,7 +44,7 @@ contract Store2 {
         require(msg.sender == owner);
         _;
     }
-    
+
     constructor() public {
         owner = msg.sender;
     }
@@ -71,4 +71,19 @@ contract Store2 {
         contentCount++;
         emit LogStore(_version, msg.sender, block.timestamp / (1 days), REMOVE, _dataInfo);
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

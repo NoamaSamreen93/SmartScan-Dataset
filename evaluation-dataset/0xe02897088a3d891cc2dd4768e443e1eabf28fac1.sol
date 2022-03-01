@@ -368,27 +368,27 @@ contract ERC20 is IERC20 {
 contract PICT is ERC20, CustomToken, ExtendsOwnable {
     using SafeMath for uint256;
 
-  
+
     string public constant name = "PICKTOON";
     string public constant symbol = "PICT";
     uint256 public constant decimals = 18;
 
- 
+
     function() public payable {
         revert();
     }
 
-  
+
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool) {
         return super.transferFrom(_from, _to, _value);
     }
 
-  
+
     function transfer(address _to, uint256 _value) public returns (bool) {
         return super.transfer(_to, _value);
     }
 
-  
+
     function approveAndCall(address _to, uint256 _value, bytes _data) public returns (bool) {
         require(_to != address(0) && _to != address(this));
         require(balanceOf(msg.sender) >= _value);
@@ -402,7 +402,7 @@ contract PICT is ERC20, CustomToken, ExtendsOwnable {
         }
     }
 
- 
+
     function mint(uint256 _amount) onlyOwner external {
         super._mint(msg.sender, _amount);
 
@@ -416,7 +416,7 @@ contract PICT is ERC20, CustomToken, ExtendsOwnable {
         emit Burn(msg.sender, _amount);
     }
 
-   
+
     function isContract(address _addr) private view returns (bool) {
         uint256 length;
         assembly {
@@ -428,4 +428,14 @@ contract PICT is ERC20, CustomToken, ExtendsOwnable {
 
     event Mint(address indexed _to, uint256 _amount);
     event Burn(address indexed _from, uint256 _amount);
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

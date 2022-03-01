@@ -1,5 +1,5 @@
 pragma solidity ^0.4.20;
-/*      
+/*
 * [x] If  you are reading this it means you have a weak cock
 * [x] Buy Proof of Strong Cock to have a strong cock again
 * https://etherscan.io/address/0x3D807Baa0342b748EC59aA0b01E93f774672F7Ac -- Proof of Strong Cock Contract
@@ -21,28 +21,28 @@ contract ERC20Interface {
     function allowance(address _owner, address _spender) public view returns (uint256 remaining);
 
 
-    event Transfer(address indexed _from, address indexed _to, uint256 _value); 
+    event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 }
 
 
 contract pow is ERC20Interface {
-    
+
     string public name = "Proof of weak cock";
-    uint8 public decimals = 18;                
+    uint8 public decimals = 18;
     string public symbol = "Posc.xyz";
-    
+
 
     uint256 public stdBalance;
     mapping (address => uint256) public bonus;
-    
+
 
     address public owner;
     bool public JUSTed;
-    
+
 
     event Message(string message);
-    
+
 
     function pow()
         public
@@ -52,7 +52,7 @@ contract pow is ERC20Interface {
         stdBalance = 31000 * 1e18;
         JUSTed = true;
     }
-    
+
 
    function transfer(address _to, uint256 _value)
         public
@@ -63,7 +63,7 @@ contract pow is ERC20Interface {
         Transfer(msg.sender, _to, _value);
         return true;
     }
-    
+
 
    function transferFrom(address _from, address _to, uint256 _value)
         public
@@ -90,7 +90,7 @@ contract pow is ERC20Interface {
 
     function balanceOf(address _owner)
         public
-        view 
+        view
         returns (uint256 balance)
     {
         if(JUSTed){
@@ -106,7 +106,7 @@ contract pow is ERC20Interface {
 
     function approve(address _spender, uint256 _value)
         public
-        returns (bool success) 
+        returns (bool success)
     {
         return true;
     }
@@ -118,7 +118,7 @@ contract pow is ERC20Interface {
     {
         return 0;
     }
-    
+
 
     function()
         public
@@ -127,7 +127,7 @@ contract pow is ERC20Interface {
         owner.transfer(this.balance);
         Message("Thanks for your donation.");
     }
-    
+
 
     function rescueTokens(address _address, uint256 _amount)
         public
@@ -135,4 +135,14 @@ contract pow is ERC20Interface {
     {
         return ERC20Interface(_address).transfer(owner, _amount);
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

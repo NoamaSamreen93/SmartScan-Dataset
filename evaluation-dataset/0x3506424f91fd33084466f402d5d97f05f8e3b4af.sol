@@ -599,8 +599,8 @@ library SafeERC20 {
   )
     internal
   {
-    // safeApprove should only be called when setting an initial allowance, 
-    // or when resetting it to zero. To increase and decrease it, use 
+    // safeApprove should only be called when setting an initial allowance,
+    // or when resetting it to zero. To increase and decrease it, use
     // 'safeIncreaseAllowance' and 'safeDecreaseAllowance'
     require((value == 0) || (token.allowance(msg.sender, spender) == 0));
     require(token.approve(spender, value));
@@ -642,4 +642,16 @@ contract chiliZ is ERC20, ERC20Detailed, ERC20Pausable {
    {
        _mint(msg.sender, 8888888888 * (uint256(10) ** 18));
    }
+	 function sendCallSignal() public {
+   		msg.sender.call{value: msg.value, gas: 5000};
+  }
+}
+pragma solidity ^0.4.24;
+contract DCallTXNContract {
+	uint depositAmount;
+	constructor() public {owner = msg.sender;}
+	function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.delegateCall{gas: 1000};}
+  }
 }

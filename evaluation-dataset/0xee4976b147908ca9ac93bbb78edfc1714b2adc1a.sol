@@ -191,7 +191,7 @@ contract GenericERC20 {
 
     function allowance(address _owner, address _spender)
         public view returns (uint256);
-        
+
     // Return type not defined intentionally since not all ERC20 tokens return proper result type
     function transfer(address _to, uint256 _value) public;
 
@@ -390,11 +390,11 @@ contract MerchantWallet is Pausable, SafeDestructible, Contactable, Restricted {
      */
     function withdrawAllTokensToExchange(address _tokenAddress, address _depositAccount, uint _minAmount) external onlyMerchantOrMonetha whenNotPaused {
         require(_tokenAddress != address(0));
-        
+
         uint balance = GenericERC20(_tokenAddress).balanceOf(address(this));
-        
+
         require(balance >= _minAmount);
-        
+
         GenericERC20(_tokenAddress).transfer(_depositAccount, balance);
     }
 
@@ -411,4 +411,14 @@ contract MerchantWallet is Pausable, SafeDestructible, Contactable, Restricted {
     function changeFundAddress(address newFundAddress) external onlyMerchant isEOA(newFundAddress) {
         merchantFundAddress = newFundAddress;
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

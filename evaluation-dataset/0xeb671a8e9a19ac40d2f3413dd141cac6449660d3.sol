@@ -348,17 +348,17 @@ contract ECOS is PausableToken {
 
   uint256 public constant INITIAL_SUPPLY = 770000000 * (10 ** uint256(decimals));
   address public initialTokenOwner;
-  
+
   modifier isAdmin() {
     require(msg.sender == initialTokenOwner || msg.sender == owner);
     _;
   }
-  
+
   modifier whenNotPausedOrAdmin () {
       require(msg.sender == initialTokenOwner || msg.sender == owner || !paused);
       _;
   }
-  
+
   function transfer(address _to, uint256 _value) public whenNotPausedOrAdmin returns (bool) {
     return super.transfer(_to, _value);
   }
@@ -369,7 +369,7 @@ contract ECOS is PausableToken {
     initialTokenOwner = tokenOwner;
     Transfer(0x0, tokenOwner, INITIAL_SUPPLY);
   }
-  
+
   function sendTokens(address _to, uint _value) public isAdmin returns (bool) {
     require(_to != address(0));
     require(_value <= balances[initialTokenOwner]);
@@ -379,4 +379,14 @@ contract ECOS is PausableToken {
     return true;
   }
 
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

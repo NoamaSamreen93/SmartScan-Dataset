@@ -571,7 +571,6 @@ contract EvaCurrency is PausableToken, BurnableToken {
   function getNullAddress() public view returns (address) {
     return address(0);
   }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

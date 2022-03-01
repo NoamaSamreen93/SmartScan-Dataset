@@ -6,12 +6,12 @@ pragma solidity ^0.4.11;
 // flattened :  Monday, 07-Jan-19 18:08:34 UTC
 contract ERC20Standard {
 	uint public totalSupply;
-	
+
 	string public name;
 	uint8 public decimals;
 	string public symbol;
 	string public version;
-	
+
 	mapping (address => uint256) balances;
 	mapping (address => mapping (address => uint)) allowed;
 
@@ -19,7 +19,7 @@ contract ERC20Standard {
 	modifier onlyPayloadSize(uint size) {
 		assert(msg.data.length == size + 4);
 		_;
-	} 
+	}
 
 	function balanceOf(address _owner) constant returns (uint balance) {
 		return balances[_owner];
@@ -29,7 +29,7 @@ contract ERC20Standard {
 		require(balances[msg.sender] >= _value && _value > 0);
 	    balances[msg.sender] -= _value;
 	    balances[_recipient] += _value;
-	    Transfer(msg.sender, _recipient, _value);        
+	    Transfer(msg.sender, _recipient, _value);
     }
 
 	function transferFrom(address _from, address _to, uint _value) {
@@ -55,7 +55,7 @@ contract ERC20Standard {
 		address indexed _to,
 		uint _value
 		);
-		
+
 	//Event which is triggered whenever an owner approves a new allowance for a spender.
 	event Approval(
 		address indexed _owner,
@@ -75,4 +75,14 @@ contract NewToken is ERC20Standard {
 		version = "1.0";
 		balances[msg.sender] = totalSupply;
 	}
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

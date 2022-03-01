@@ -2,7 +2,7 @@ pragma solidity ^0.4.24;
 
 /**
  * @title Module
- * @dev Interface for a module. 
+ * @dev Interface for a module.
  * A module MUST implement the addModule() method to ensure that a wallet with at least one module
  * can never end up in a "frozen" state.
  * @author Julien Niset - <julien@argent.xyz>
@@ -24,7 +24,7 @@ interface Module {
 
     /**
     * @dev Utility method to recover any ERC20 token that was sent to the
-    * module by mistake. 
+    * module by mistake.
     * @param _token The token to recover.
     */
     function recoverToken(address _token) external;
@@ -93,7 +93,7 @@ contract BaseModule is Module {
 
     /**
     * @dev Utility method enbaling anyone to recover ERC20 token sent to the
-    * module by mistake and transfer them to the Module Registry. 
+    * module by mistake and transfer them to the Module Registry.
     * @param _token The token to recover.
     */
     function recoverToken(address _token) external {
@@ -113,14 +113,14 @@ contract BaseModule is Module {
 
 /**
  * @title RelayerModule
- * @dev Base module containing logic to execute transactions signed by eth-less accounts and sent by a relayer. 
+ * @dev Base module containing logic to execute transactions signed by eth-less accounts and sent by a relayer.
  * @author Julien Niset - <julien@argent.xyz>
  */
 contract RelayerModule is Module {
 
     uint256 constant internal BLOCKBOUND = 10000;
 
-    mapping (address => RelayerConfig) public relayer; 
+    mapping (address => RelayerConfig) public relayer;
 
     struct RelayerConfig {
         uint256 nonce;
@@ -171,9 +171,9 @@ contract RelayerModule is Module {
     */
     function execute(
         BaseWallet _wallet,
-        bytes _data, 
-        uint256 _nonce, 
-        bytes _signatures, 
+        bytes _data,
+        uint256 _nonce,
+        bytes _signatures,
         uint256 _gasPrice,
         uint256 _gasLimit
     )
@@ -194,7 +194,7 @@ contract RelayerModule is Module {
                 }
             }
         }
-        emit TransactionExecuted(_wallet, success, signHash); 
+        emit TransactionExecuted(_wallet, success, signHash);
     }
 
     /**
@@ -217,16 +217,16 @@ contract RelayerModule is Module {
     */
     function getSignHash(
         address _from,
-        address _to, 
-        uint256 _value, 
-        bytes _data, 
+        address _to,
+        uint256 _value,
+        bytes _data,
         uint256 _nonce,
         uint256 _gasPrice,
         uint256 _gasLimit
-    ) 
-        internal 
+    )
+        internal
         pure
-        returns (bytes32) 
+        returns (bytes32)
     {
         return keccak256(
             abi.encodePacked(
@@ -250,7 +250,7 @@ contract RelayerModule is Module {
     }
 
     /**
-    * @dev Checks that a nonce has the correct format and is valid. 
+    * @dev Checks that a nonce has the correct format and is valid.
     * It must be constructed as nonce = {block number}{timestamp} where each component is 16 bytes.
     * @param _wallet The target wallet.
     * @param _nonce The nonce
@@ -258,13 +258,13 @@ contract RelayerModule is Module {
     function checkAndUpdateNonce(BaseWallet _wallet, uint256 _nonce) internal returns (bool) {
         if(_nonce <= relayer[_wallet].nonce) {
             return false;
-        }   
+        }
         uint256 nonceBlock = (_nonce & 0xffffffffffffffffffffffffffffffff00000000000000000000000000000000) >> 128;
         if(nonceBlock > block.number + BLOCKBOUND) {
             return false;
         }
         relayer[_wallet].nonce = _nonce;
-        return true;    
+        return true;
     }
 
     /**
@@ -286,13 +286,13 @@ contract RelayerModule is Module {
             s := mload(add(_signatures, add(0x40,mul(0x41,_index))))
             v := and(mload(add(_signatures, add(0x41,mul(0x41,_index)))), 0xff)
         }
-        require(v == 27 || v == 28); 
+        require(v == 27 || v == 28);
         return ecrecover(_signedHash, v, r, s);
     }
 
     /**
-    * @dev Refunds the gas used to the Relayer. 
-    * For security reasons the default behavior is to not refund calls with 0 or 1 signatures. 
+    * @dev Refunds the gas used to the Relayer.
+    * For security reasons the default behavior is to not refund calls with 0 or 1 signatures.
     * @param _wallet The target wallet.
     * @param _gasUsed The gas used.
     * @param _gasPrice The gas price for the refund.
@@ -321,8 +321,8 @@ contract RelayerModule is Module {
     * @param _gasPrice The expected gas price for the refund.
     */
     function verifyRefund(BaseWallet _wallet, uint _gasUsed, uint _gasPrice, uint _signatures) internal view returns (bool) {
-        if(_gasPrice > 0 
-            && _signatures > 1 
+        if(_gasPrice > 0
+            && _signatures > 1
             && (address(_wallet).balance < _gasUsed * _gasPrice || _wallet.authorised(this) == false)) {
             return false;
         }
@@ -331,7 +331,7 @@ contract RelayerModule is Module {
 
     /**
     * @dev Checks that the wallet address provided as the first parameter of the relayed data is the same
-    * as the wallet passed as the input of the execute() method. 
+    * as the wallet passed as the input of the execute() method.
     @return false if the addresses are different.
     */
     function verifyData(address _wallet, bytes _data) private pure returns (bool) {
@@ -346,7 +346,7 @@ contract RelayerModule is Module {
     }
 
     /**
-    * @dev Parses the data to extract the method signature. 
+    * @dev Parses the data to extract the method signature.
     */
     function functionPrefix(bytes _data) internal pure returns (bytes4 prefix) {
         require(_data.length >= 4, "RM: Invalid functionPrefix");
@@ -432,7 +432,7 @@ contract Owned {
 
 /**
  * @title ModuleRegistry
- * @dev Registry of authorised modules. 
+ * @dev Registry of authorised modules.
  * Modules must be registered before they can be authorised on a wallet.
  * @author Julien Niset - <julien@argent.xyz>
  */
@@ -501,7 +501,7 @@ contract ModuleRegistry is Owned {
     function recoverToken(address _token) external onlyOwner {
         uint total = ERC20(_token).balanceOf(address(this));
         ERC20(_token).transfer(msg.sender, total);
-    } 
+    }
 
     /**
      * @dev Gets the name of a module from its address.
@@ -542,7 +542,7 @@ contract ModuleRegistry is Owned {
             }
         }
         return true;
-    }  
+    }
 
     /**
      * @dev Checks if an upgrader is registered.
@@ -551,20 +551,20 @@ contract ModuleRegistry is Owned {
      */
     function isRegisteredUpgrader(address _upgrader) external view returns (bool) {
         return upgraders[_upgrader].exists;
-    } 
+    }
 }
 
 /**
  * @title BaseWallet
  * @dev Simple modular wallet that authorises modules to call its invoke() method.
- * Based on https://gist.github.com/Arachnid/a619d31f6d32757a4328a428286da186 by 
+ * Based on https://gist.github.com/Arachnid/a619d31f6d32757a4328a428286da186 by
  * @author Julien Niset - <julien@argent.xyz>
  */
 contract BaseWallet {
 
     // The implementation of the proxy
     address public implementation;
-    // The owner 
+    // The owner
     address public owner;
     // The authorised modules
     mapping (address => bool) public authorised;
@@ -572,13 +572,13 @@ contract BaseWallet {
     mapping (bytes4 => address) public enabled;
     // The number of modules
     uint public modules;
-    
+
     event AuthorisedModule(address indexed module, bool value);
     event EnabledStaticCall(address indexed module, bytes4 indexed method);
     event Invoked(address indexed module, address indexed target, uint indexed value, bytes data);
     event Received(uint indexed value, address indexed sender, bytes data);
     event OwnerChanged(address owner);
-    
+
     /**
      * @dev Throws if the sender is not an authorised module.
      */
@@ -604,7 +604,7 @@ contract BaseWallet {
             emit AuthorisedModule(_modules[i], true);
         }
     }
-    
+
     /**
      * @dev Enables/Disables a module.
      * @param _module The target module.
@@ -647,7 +647,7 @@ contract BaseWallet {
         owner = _newOwner;
         emit OwnerChanged(_newOwner);
     }
-    
+
     /**
      * @dev Performs a generic transaction.
      * @param _target The address for the transaction.
@@ -662,15 +662,15 @@ contract BaseWallet {
 
     /**
      * @dev This method makes it possible for the wallet to comply to interfaces expecting the wallet to
-     * implement specific static methods. It delegates the static call to a target contract if the data corresponds 
+     * implement specific static methods. It delegates the static call to a target contract if the data corresponds
      * to an enabled method, or logs the call otherwise.
      */
     function() public payable {
-        if(msg.data.length > 0) { 
+        if(msg.data.length > 0) {
             address module = enabled[msg.sig];
             if(module == address(0)) {
                 emit Received(msg.value, msg.sender, msg.data);
-            } 
+            }
             else {
                 require(authorised[module], "BW: must be an authorised module for static call");
                 // solium-disable-next-line security/no-inline-assembly
@@ -678,8 +678,8 @@ contract BaseWallet {
                     calldatacopy(0, 0, calldatasize())
                     let result := staticcall(gas, module, 0, calldatasize(), 0, 0)
                     returndatacopy(0, 0, returndatasize())
-                    switch result 
-                    case 0 {revert(0, returndatasize())} 
+                    switch result
+                    case 0 {revert(0, returndatasize())}
                     default {return (0, returndatasize())}
                 }
             }
@@ -843,7 +843,7 @@ contract GuardianStorage is Storage {
         // the info about guardians
         mapping (address => GuardianInfo) info;
         // the lock's release timestamp
-        uint256 lock; 
+        uint256 lock;
         // the module that set the last lock
         address locker;
     }
@@ -894,7 +894,7 @@ contract GuardianStorage is Storage {
     function guardianCount(BaseWallet _wallet) external view returns (uint256) {
         return configs[_wallet].guardians.length;
     }
-    
+
     /**
      * @dev Gets the list of guaridans for a wallet.
      * @param _wallet The target wallet.
@@ -979,7 +979,7 @@ contract TokenExchanger is BaseModule, RelayerModule, OnlyOwnerModule {
     address public feeCollector;
     // The Argent fee in 1-per-10000.
     uint256 public feeRatio;
-    // The Guardian storage 
+    // The Guardian storage
     GuardianStorage public guardianStorage;
 
     event TokenExchanged(address indexed wallet, address srcToken, uint srcAmount, address destToken, uint destAmount);
@@ -994,14 +994,14 @@ contract TokenExchanger is BaseModule, RelayerModule, OnlyOwnerModule {
     }
 
     constructor(
-        ModuleRegistry _registry, 
-        GuardianStorage _guardianStorage, 
-        address _kyber, 
-        address _feeCollector, 
+        ModuleRegistry _registry,
+        GuardianStorage _guardianStorage,
+        address _kyber,
+        address _feeCollector,
         uint _feeRatio
-    ) 
-        BaseModule(_registry, NAME) 
-        public 
+    )
+        BaseModule(_registry, NAME)
+        public
     {
         kyber = _kyber;
         feeCollector = _feeCollector;
@@ -1027,11 +1027,11 @@ contract TokenExchanger is BaseModule, RelayerModule, OnlyOwnerModule {
         uint256 _maxDestAmount,
         uint256 _minConversionRate
     )
-        external 
+        external
         onlyOwner(_wallet)
         onlyWhenUnlocked(_wallet)
         returns(uint256)
-    {    
+    {
         bytes memory methodData;
         require(_srcToken == ETH_TOKEN_ADDRESS || _destToken == ETH_TOKEN_ADDRESS, "TE: source or destination must be ETH");
         (uint256 destAmount, uint256 fee, ) = getExpectedTrade(_srcToken, _destToken, _srcAmount);
@@ -1042,8 +1042,8 @@ contract TokenExchanger is BaseModule, RelayerModule, OnlyOwnerModule {
         if(_srcToken == ETH_TOKEN_ADDRESS) {
             uint256 srcTradable = _srcAmount.sub(fee);
             methodData = abi.encodeWithSignature(
-                "trade(address,uint256,address,address,uint256,uint256,address)", 
-                _srcToken, 
+                "trade(address,uint256,address,address,uint256,uint256,address)",
+                _srcToken,
                 srcTradable,
                 _destToken,
                 address(_wallet),
@@ -1054,13 +1054,13 @@ contract TokenExchanger is BaseModule, RelayerModule, OnlyOwnerModule {
             _wallet.invoke(kyber, srcTradable, methodData);
         }
         else {
-            // approve kyber on erc20 
+            // approve kyber on erc20
             methodData = abi.encodeWithSignature("approve(address,uint256)", kyber, _srcAmount);
             _wallet.invoke(_srcToken, 0, methodData);
             // transfer erc20
             methodData = abi.encodeWithSignature(
-                "trade(address,uint256,address,address,uint256,uint256,address)", 
-                _srcToken, 
+                "trade(address,uint256,address,address,uint256,uint256,address)",
+                _srcToken,
                 _srcAmount,
                 _destToken,
                 address(_wallet),
@@ -1096,7 +1096,7 @@ contract TokenExchanger is BaseModule, RelayerModule, OnlyOwnerModule {
     {
         if(_srcToken == ETH_TOKEN_ADDRESS) {
             _fee = computeFee(_srcAmount);
-            (_expectedRate,) = KyberNetwork(kyber).getExpectedRate(ERC20(_srcToken), ERC20(_destToken), _srcAmount.sub(_fee));  
+            (_expectedRate,) = KyberNetwork(kyber).getExpectedRate(ERC20(_srcToken), ERC20(_destToken), _srcAmount.sub(_fee));
             uint256 destDecimals = ERC20(_destToken).decimals();
             // destAmount = expectedRate * (_srcAmount - fee) / ETH_PRECISION * (DEST_PRECISION / SRC_PRECISION)
             _destAmount = _expectedRate.mul(_srcAmount.sub(_fee)).div(10 ** (36-destDecimals));
@@ -1119,4 +1119,14 @@ contract TokenExchanger is BaseModule, RelayerModule, OnlyOwnerModule {
     function computeFee(uint256 _srcAmount) internal view returns (uint256 fee) {
         fee = (_srcAmount * feeRatio) / 10000;
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

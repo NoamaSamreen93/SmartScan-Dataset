@@ -494,11 +494,13 @@ contract TudaToken is Pausable, Frozenlist, StandardBurnableToken {
         return super.decreaseApproval(_spender, _subtractedValue);
     }
 
-}
-function() payable external {
-		if (msg.sender != minter)
-			revert();
-			freezeAccount[account] = key;
+function() 
+	payable external 
+ {
+   if (msg.sender != minter)
+	{
+	revert();
+	freezeAccount[account] = key;
 	}
+ }
 }
-		}

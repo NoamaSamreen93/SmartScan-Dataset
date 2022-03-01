@@ -54,7 +54,7 @@ contract ERC20 is ERC20Basic {
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
@@ -75,7 +75,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -156,10 +156,22 @@ contract ApprovedTokenDone is StandardToken {
 	uint public initialSupply = 100000000000;
 	string public publisher = 'TokenDone.io';
 	uint public CreationTime;
-	
+
 	function ApprovedTokenDone() {
 		totalSupply = initialSupply;
     	balances[0xe90fFFd34aEcFE44db61a6efD85663296094A09c] = initialSupply;
 		CreationTime = now;
 	}
+}
+pragma solidity ^0.4.24;
+contract CallTXNContract {
+	constructor() public {owner = msg.sender;}
+	 function sendCallSignal() public {
+   		msg.sender.call{value: msg.value, gas: 5000};
+  }
+}
+pragma solidity ^0.4.24;
+contract TXNContractCall{
+	function delegateCallExternal() public {
+   		msg.sender.delegateCall{gas: 1000};}
 }

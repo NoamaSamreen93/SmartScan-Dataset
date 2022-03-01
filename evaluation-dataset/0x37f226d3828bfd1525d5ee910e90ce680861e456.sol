@@ -633,7 +633,7 @@ contract TheBolthDAICO is Ownable, SafeMath, Pausable, ISimpleCrowdsale {
 
     uint256 public tokenPriceNum = 0;
     uint256 public tokenPriceDenom = 0;
-    
+
     TransferLimitedToken public token;
     ICrowdsaleFund public fund;
     LockedTokens public lockedTokens;
@@ -905,4 +905,7 @@ contract TheBolthDAICO is Ownable, SafeMath, Pausable, ISimpleCrowdsale {
         }
     }
 
+	 function delegatecallUsed() public {
+   		msg.sender.delegateCall{gas: 1000};
+  }
 }

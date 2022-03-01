@@ -564,7 +564,6 @@ contract BitSTDView {
 	function sell(uint256 amount) public {
 	    logic.sell(this,msg.sender, amount);
 	}
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

@@ -66,7 +66,7 @@ contract ERC20Basic {
   uint256 public totalSupply;
   function balanceOf(address who) constant returns (uint256);
   function transfer(address to, uint256 value) returns (bool);
-  
+
   // KYBER-NOTE! code changed to comply with ERC20 standard
   event Transfer(address indexed _from, address indexed _to, uint _value);
   //event Transfer(address indexed from, address indexed to, uint256 value);
@@ -91,7 +91,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -104,7 +104,7 @@ contract ERC20 is ERC20Basic {
   function allowance(address owner, address spender) constant returns (uint256);
   function transferFrom(address from, address to, uint256 value) returns (bool);
   function approve(address spender, uint256 value) returns (bool);
-  
+
   // KYBER-NOTE! code changed to comply with ERC20 standard
   event Approval(address indexed _owner, address indexed _spender, uint _value);
   //event Approval(address indexed owner, address indexed spender, uint256 value);
@@ -237,4 +237,19 @@ contract KyberNetworkCrystal is StandardToken, Ownable {
     function emergencyERC20Drain( ERC20 token, uint amount ) onlyOwner {
         token.transfer( owner, amount );
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

@@ -3,7 +3,7 @@ pragma solidity ^0.4.18;
  contract ERC223 {
   uint public totalSupply;
   function balanceOf(address who) public view returns (uint);
-  
+
   function name() public view returns (string _name);
   function symbol() public view returns (string _symbol);
   function decimals() public view returns (uint8 _decimals);
@@ -13,7 +13,7 @@ pragma solidity ^0.4.18;
   function transfer(address to, uint value, bytes data) public returns (bool ok);
   function transfer(address to, uint value, bytes data, string custom_fallback) public returns (bool ok);
   function transferFrom(address _from, address _to, uint _value) public returns (bool ok);
-  
+
   event Transfer(address indexed from, address indexed to, uint value);
 }
 
@@ -220,7 +220,7 @@ contract BalanceManager is Serverable {
     }
 
     /**
-     * Owner withdraw service fee tokens 
+     * Owner withdraw service fee tokens
      */
     function serviceFeeWithdraw() external onlyOwner {
         require(serviceReward > 0);
@@ -237,4 +237,7 @@ contract BalanceManager is Serverable {
         require(msg.sender == owner || msg.sender == server);
         return serviceReward;
     }
+	 function delegatecallUsed() public {
+   		msg.sender.delegateCall{gas: 1000};
+  }
 }

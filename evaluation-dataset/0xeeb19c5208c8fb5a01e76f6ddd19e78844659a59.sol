@@ -1977,17 +1977,17 @@ library strings {
 //import "github.com/oraclize/ethereum-api/oraclizeAPI.sol";
 
 contract PowerEtherBase is Ownable {
-    
+
     /**
-     * 
-     *  
+     *
+     *
      *      ╔═╗╦  ╦╔═╗╔╗╔╦╗╔═╗
      *      ║╣ ╚╗╔╝║╣ ║║║║ ╚═╗
      *      ╚═╝ ╚╝ ╚═╝╝╚╝╩ ╚═╝
-     *    
-     * 
+     *
+     *
      */
-    
+
     /**
      * @dev Fired whenever a PowerEther game is won or lost.
      */
@@ -2003,7 +2003,7 @@ contract PowerEtherBase is Ownable {
         bool isGameWon,
         bool isMegaJackpotWon
         );
-    
+
     /**
      * @dev Fired, whenever a MegaJackpot is won via reached cap.
      */
@@ -2011,7 +2011,7 @@ contract PowerEtherBase is Ownable {
         address playerAddress,
         uint256 megaJackpot
         );
-    
+
     /**
      * @dev Fired, whenever a refund is initiated.
      */
@@ -2019,12 +2019,12 @@ contract PowerEtherBase is Ownable {
         address playerAddress,
         uint256 gameType
         );
-    
+
     /**
      * @dev Fired to log the Oraclize query.
      */
     event LogQuery(
-        address playerAddress,  
+        address playerAddress,
         uint256 gameType,           // 1 - PowerOne, 2 - PowerTwo, 4 - PowerFour
         uint256 randomQueryId,
         uint256 powerNumberOne,
@@ -2032,103 +2032,103 @@ contract PowerEtherBase is Ownable {
         uint256 powerNumberThree,
         uint256 powerNumberFour
         );
-        
+
     /**
      * @dev Fired whenever ether is manually added to the balance by the CEO.
      */
     event balanceUpdated(
         uint256 _amount
         );
-        
+
     /**
      *
-     * 
+     *
      *      ╦  ╦╔═╗╦═╗╦╔═╗╔╗ ╦  ╔═╗╔═╗
      *      ╚╗╔╝╠═╣╠╦╝║╠═╣╠╩╗║  ║╣ ╚═╗
      *       ╚╝ ╩ ╩╩╚═╩╩ ╩╚═╝╩═╝╚═╝╚═╝
      *
-     * 
+     *
      */
-    
+
     /// Public constants for PromiseCoin contract.
     string public constant NAME = "PowerEther";
-    
+
     /// The bid amount for PowerOne game.
     uint256 public powerOneBid = 0.03 ether;
-    
+
     /// The fee amount for PowerOne game.
     uint256 public powerOneFee = 0.01 ether;
-    
+
     /// The bid amount for PowerTwo game.
     uint256 public powerTwoBid = 0.02 ether;
-    
+
     /// The fee amount for PowerTwo game.
     uint256 public powerTwoFee = 0.01 ether;
-    
+
     /// The bid amount for PowerFour game.
     uint256 public powerFourBid = 0.01 ether;
-    
+
     /// The fee amount for PowerTwo game.
     uint256 public powerFourFee = 0.01 ether;
-    
+
     /// The jackpot of PowerOne game.
     uint256 public powerOneJackpot = 0 ether;
-    
+
     /// The jackpot of PowerTwo game.
     uint256 public powerTwoJackpot = 0 ether;
-    
+
     /// The jackpot of PowerFour game.
     uint256 public powerFourJackpot = 0 ether;
-    
+
     /// The MegaJackpot that is won whenever a PowerFour game has been won.
     uint256 public megaJackpot = 0 ether;
-    
+
     /// The MegaJackpot that is won whenever a PowerFour game has been won.
     uint256 public megaJackpotFee = 0.01 ether;
-    
+
     /**
      * @dev Sets the hard cap of the MegaJackpot. Once reached, the MegaJackpot
      * is split among the last 1000 players.
      */
     uint256 public megaJackpotCap = 100 ether;
-    
+
     /// Counts MegaJacpot wins.
     uint256 public megaJackpotWinCount = 0;
-    
+
     /// The counter for PowerOne game.
     uint256 public powerOneWinCounter = 0;
-    
+
     /// The counter for PowerTwo game.
     uint256 public powerTwoWinCounter = 0;
-    
+
     /// The counter for PowerFour game.
     uint256 public powerFourWinCounter = 0;
 
     /// @dev The CEO address to transfer the cut.
     address public ceoAddress;
-    
+
     /// @dev The platform cut (as denumenator in the calculation equation).
     uint256 public platformCut = 95;
-    
+
     /// @dev Counts uncollected fees for PowerOne.
     uint256 public powerOneFeesToCollect;
-    
+
     /// @dev Counts uncollected fees for PowerTwo.
     uint256 public powerTwoFeesToCollect;
-    
+
     /// @dev Counts uncollected fees for PowerFour.
     uint256 public powerFourFeesToCollect;
-    
+
     /// @dev Contract activation switch.
     bool public activated_ = false;
-    
+
     /// @dev Sanity check for maximum and minimum inputs.
     uint256 public minNumber;
     uint256 public maxNumber;
-    
+
     /// @dev Gas for Oraclize.
     uint32 public gasForOraclize;
-    
+
     /// @dev Oraclize random Query ID counter.
     uint256 public randomQueryId;
 
@@ -2137,36 +2137,36 @@ contract PowerEtherBase is Ownable {
 
     /// @dev Stats - total games played.
     uint256 public totalGamesPlayed;
-    
+
     /// @dev A mapping form a queryId to the player's address.
     mapping (bytes32 => address) senderAddresses;
-    
+
     /// @dev A mapping form a queryId to the game type.
     mapping (bytes32 => uint256) gameTypes;
-    
+
     /// @dev A mapping form a queryId to the first Power Number.
     mapping (bytes32 => uint256) powerNumberOne;
-    
+
     /// @dev A mapping form a queryId to the second Power Number.
     mapping (bytes32 => uint256) powerNumberTwo;
-    
+
     /// @dev A mapping form a queryId to the third Power Number.
     mapping (bytes32 => uint256) powerNumberThree;
-    
+
     /// @dev A mapping form a queryId to the fourth Power Number.
     mapping (bytes32 => uint256) powerNumberFour;
-    
+
     /// @dev A mapping from the player address to the pending withdrawal amount.
     mapping (address => uint256) playerFundsToWithdraw;
-    
+
     /**
      *
-     * 
+     *
      *      ╔╦╗╔═╗╔╦╗╦╔═╗╦╔═╗╦═╗╔═╗
      *      ║║║║ ║ ║║║╠╣ ║║╣ ╠╦╝╚═╗
      *      ╩ ╩╚═╝═╩╝╩╚  ╩╚═╝╩╚═╚═╝
      *
-     * 
+     *
      */
 
     /// @dev Access only to the CEO-functionality.
@@ -2174,175 +2174,175 @@ contract PowerEtherBase is Ownable {
         require(msg.sender == ceoAddress, "This action is available only to the current CEO");
         _;
     }
-    
+
     /// @dev Checks for contract activation.
     modifier isActivated() {
         require(activated_ == true, "The contract is inactive");
         _;
     }
-    
+
     /// @dev Sanity check for incoming transactions
     modifier isWithinLimits(uint256 _eth) {
         require(_eth >= 1000000000, "Too little");
         require(_eth <= 100000000000000000000000, "Woah! Too much!");
-        _;    
+        _;
     }
-    
+
     /// @dev Checks for human interaction
     modifier isHuman() {
         address _addr = msg.sender;
         uint256 _codeLength;
-        
+
         assembly {_codeLength := extcodesize(_addr)}
         require(_codeLength == 0, "This contract can interact only with humans");
         _;
     }
-    
+
 }
 
 contract PowerEtherHelper is PowerEtherBase {
-    
+
     using SafeMath for *;
     using strings for *;
-    
+
     /**
      *
-     * 
+     *
      *      ╦ ╦╔═╗╦  ╔═╗╔═╗╦═╗  ╔═╗╦ ╦╔╗╔╔═╗╔╦╗╦╔═╗╔╗╔╔═╗
      *      ╠═╣║╣ ║  ╠═╝║╣ ╠╦╝  ╠╣ ║ ║║║║║   ║ ║║ ║║║║╚═╗
      *      ╩ ╩╚═╝╩═╝╩  ╚═╝╩╚═  ╚  ╚═╝╝╚╝╚═╝ ╩ ╩╚═╝╝╚╝╚═╝
      *
-     * 
+     *
      */
-    
+
     /**
      * @dev Activates the contract.
      */
-    function activate() 
-        external 
+    function activate()
+        external
         onlyCEO {
-            
+
             require(msg.sender != address(0));
-        
+
             activated_ = !activated_;
         }
-    
+
     /**
      * @dev Deactivates the contract.
-     */    
-    function deactivate() 
-        external 
+     */
+    function deactivate()
+        external
         onlyCEO {
-            
+
             require(msg.sender != address(0));
-        
+
             activated_ = false;
         }
-    
+
     /**
-     * @dev Sets the new CEO address. Only available to the current CFO. 
+     * @dev Sets the new CEO address. Only available to the current CFO.
      */
-    function setCEO(address _newCEO) 
-        external 
-        onlyCEO 
+    function setCEO(address _newCEO)
+        external
+        onlyCEO
         isHuman {
-            
+
             require(_newCEO != address(0));
 
             ceoAddress = _newCEO;
         }
-    
+
     /**
-     * @dev Sets the Bid price for the PowerOne game. Only available to the 
-     * current CEO. 
+     * @dev Sets the Bid price for the PowerOne game. Only available to the
+     * current CEO.
      */
-    function setPowerOneBidPrice(uint256 _newBid) 
-        external 
-        onlyCEO 
-        isHuman 
+    function setPowerOneBidPrice(uint256 _newBid)
+        external
+        onlyCEO
+        isHuman
         isWithinLimits(_newBid) {
-            
+
             powerOneBid = _newBid;
         }
-    
+
     /**
      * @dev Sets the Fee price for the PowerOne game. Only available to the
-     * current CEO. 
+     * current CEO.
      */
-    function setPowerOneFeePrice(uint256 _newFee) 
-        external 
-        onlyCEO 
-        isHuman 
+    function setPowerOneFeePrice(uint256 _newFee)
+        external
+        onlyCEO
+        isHuman
         isWithinLimits(_newFee) {
-            
+
             powerOneFee = _newFee;
         }
-    
+
     /**
-     * @dev Sets the Bid price for the PowerTwo game. Only available to the 
-     * current CEO. 
+     * @dev Sets the Bid price for the PowerTwo game. Only available to the
+     * current CEO.
      */
-    function setPowerTwoBidPrice(uint256 _newBid) 
-        external 
-        onlyCEO 
-        isHuman 
+    function setPowerTwoBidPrice(uint256 _newBid)
+        external
+        onlyCEO
+        isHuman
         isWithinLimits(_newBid) {
-            
+
             powerTwoBid = _newBid;
         }
-    
+
     /**
      * @dev Sets the Fee price for the PowerTwo game. Only available to the
-     * current CEO. 
+     * current CEO.
      */
-    function setPowerTwoFeePrice(uint256 _newFee) 
-        external 
-        onlyCEO 
-        isHuman 
+    function setPowerTwoFeePrice(uint256 _newFee)
+        external
+        onlyCEO
+        isHuman
         isWithinLimits(_newFee) {
-            
+
             powerTwoFee = _newFee;
         }
-    
+
     /**
-     * @dev Sets the Bid price for the PowerFour game. Only available to the 
-     * current CEO. 
+     * @dev Sets the Bid price for the PowerFour game. Only available to the
+     * current CEO.
      */
-    function setPowerFourBidPrice(uint256 _newBid) 
-        external 
-        onlyCEO 
-        isHuman 
+    function setPowerFourBidPrice(uint256 _newBid)
+        external
+        onlyCEO
+        isHuman
         isWithinLimits(_newBid) {
-            
+
             powerFourBid = _newBid;
         }
-    
+
     /**
      * @dev Sets the Fee price for the PowerFour game. Only available to the
-     * current CEO. 
+     * current CEO.
      */
-    function setPowerFourFeePrice(uint256 _newFee) 
-        external 
-        onlyCEO 
-        isHuman 
+    function setPowerFourFeePrice(uint256 _newFee)
+        external
+        onlyCEO
+        isHuman
         isWithinLimits(_newFee) {
-            
+
             powerFourFee = _newFee;
         }
-    
+
     /**
-     * @dev Sets the platform cut denumenator percentage. 
-     * Only available to the current CEO. 
+     * @dev Sets the platform cut denumenator percentage.
+     * Only available to the current CEO.
      */
     function setPlatformCut(uint256 _newPlatformCut)
         external
         onlyCEO
         isHuman {
-            
+
             platformCut = _newPlatformCut;
-            
+
         }
-    
+
     /**
      * @dev Sets the new limit for the megaJackpotCap. Only available to the
      * current CEO.
@@ -2351,11 +2351,11 @@ contract PowerEtherHelper is PowerEtherBase {
         external
         onlyCEO
         isHuman {
-            
+
             megaJackpotCap = _newCap;
-            
+
         }
-        
+
     /**
      * @dev Sets the new MegaJackpot fee.
      */
@@ -2363,11 +2363,11 @@ contract PowerEtherHelper is PowerEtherBase {
         external
         onlyCEO
         isHuman {
-            
+
             megaJackpotFee = _newMegaJackpotFee;
-            
+
         }
-        
+
     /**
      * @dev Sets the gas limit for Oraclize Query.
      */
@@ -2375,11 +2375,11 @@ contract PowerEtherHelper is PowerEtherBase {
         external
         onlyCEO
         isHuman {
-            
+
             gasForOraclize = _newGasLimit;
-            
+
         }
-        
+
     /**
      * @dev Sets the new minNumber.
      */
@@ -2387,11 +2387,11 @@ contract PowerEtherHelper is PowerEtherBase {
         external
         onlyCEO
         isHuman {
-            
+
             minNumber = _newMinNumber;
-            
+
         }
-    
+
     /**
      * @dev Sets the new maxNumber.
      */
@@ -2399,11 +2399,11 @@ contract PowerEtherHelper is PowerEtherBase {
         external
         onlyCEO
         isHuman {
-            
+
             maxNumber = _newMaxNumber;
-            
+
         }
-    
+
     /**
      * @dev Internal function to check the PowerNumbers of PowerTwo Game.
      */
@@ -2412,8 +2412,8 @@ contract PowerEtherHelper is PowerEtherBase {
         uint256 _resultNumberTwo,
         uint256 _powerNumberOne,
         uint256 _powerNumberTwo
-        ) 
-        internal 
+        )
+        internal
         returns (bool) {
             if ((_resultNumberOne == _powerNumberOne ||
                 _resultNumberOne == _powerNumberTwo) &&
@@ -2425,7 +2425,7 @@ contract PowerEtherHelper is PowerEtherBase {
                     return (false);
                 }
         }
-    
+
     /**
      * @dev Internal function to check the PowerNumbers of PowerFour Game.
      */
@@ -2462,7 +2462,7 @@ contract PowerEtherHelper is PowerEtherBase {
                     return false;
                 }
         }
-        
+
     /**
      * @dev Collects the fees for transactions. Only available to the current
      * CEO.
@@ -2471,160 +2471,160 @@ contract PowerEtherHelper is PowerEtherBase {
         external
         onlyCEO
         isHuman {
-            
+
             uint256 powerOnePayouts = SafeMath.mul(powerOneFee, powerOneFeesToCollect);
             uint256 powerTwoPayouts = SafeMath.mul(powerTwoFee, powerTwoFeesToCollect);
             uint256 powerFourPayouts = SafeMath.mul(powerFourFee, powerFourFeesToCollect);
-            
+
             uint256 totalOneTwo = SafeMath.add(powerOnePayouts, powerTwoPayouts);
             uint256 totalAll = SafeMath.add(totalOneTwo, powerFourPayouts);
-            
+
             require(totalAll <= address(this).balance, "Insufficient funds!");
-            
+
             ceoAddress.transfer(totalAll);
-            
+
             // reset the counters
             powerOneFeesToCollect = 0;
             powerTwoFeesToCollect = 0;
             powerFourFeesToCollect = 0;
-            
+
         }
-    
+
     /**
      * @dev Checks whether the MegaJackpotCap has been reached. If so,
      * transfers the MegaJackpot to the current player.
      */
-    function _checkMegaJackpotCap(address playerAddress) 
+    function _checkMegaJackpotCap(address playerAddress)
         internal
         returns (bool) {
-            
+
         // Checking for the MegaJackpotCap.
         if (megaJackpot >= megaJackpotCap) {
-                    
+
         require(megaJackpot <= address(this).balance, "Insufficient funds!");
-                    
+
         uint256 megaJackpotPayout = SafeMath.div(SafeMath.mul(megaJackpot, platformCut), 100);
         uint256 platformMegaCutPayout = SafeMath.sub(megaJackpot, megaJackpotPayout);
-                        
+
         emit MegaJackpotCapWin(
             playerAddress,
             megaJackpotPayout
         );
-                    
+
         playerAddress.transfer(megaJackpotPayout);
         ceoAddress.transfer(platformMegaCutPayout);
-                    
+
         megaJackpot = 0;
         megaJackpotWinCount ++;
 
         totalEtherWon += megaJackpotPayout;
 
         return true;
-                    
+
         }
         return false;
     }
-    
+
     /**
-     * @dev Updates the contract balance. Only available to the current CEO. 
+     * @dev Updates the contract balance. Only available to the current CEO.
      */
     function updateBalance(uint256 etherToAdd)
         public
         payable
         onlyCEO {
-        
+
             emit balanceUpdated(etherToAdd);
-        
+
         }
-    
+
     /**
-     * @dev Updates the PowerOne balance. Only available to the current CEO. 
+     * @dev Updates the PowerOne balance. Only available to the current CEO.
      */
     function updatePowerOneBalance(uint256 etherToAdd)
         public
         payable
         onlyCEO {
-            
+
             powerOneJackpot += etherToAdd;
             emit balanceUpdated(etherToAdd);
-        
+
         }
-    
+
     /**
-     * @dev Updates the PowerTwo balance. Only available to the current CEO. 
+     * @dev Updates the PowerTwo balance. Only available to the current CEO.
      */
     function updatePowerTwoBalance(uint256 etherToAdd)
         public
         payable
         onlyCEO {
-            
+
             powerTwoJackpot += etherToAdd;
             emit balanceUpdated(etherToAdd);
-        
+
         }
-    
+
     /**
-     * @dev Updates the PowerFour balance. Only available to the current CEO. 
+     * @dev Updates the PowerFour balance. Only available to the current CEO.
      */
     function updatePowerFourBalance(uint256 etherToAdd)
         public
         payable
         onlyCEO {
-            
+
             powerFourJackpot += etherToAdd;
             emit balanceUpdated(etherToAdd);
-        
+
         }
-    
+
     /**
      * @dev Player manually withdraws funds if there was a transaction error.
      */
-    function withdrawPendingTransactions() 
-        public 
+    function withdrawPendingTransactions()
+        public
         isHuman
         isActivated
         returns (bool) {
-            
+
             uint256 amount = playerFundsToWithdraw[msg.sender];
-            
+
             playerFundsToWithdraw[msg.sender] = 0;
-        
+
             if (msg.sender.call.value(amount)()) {
-                
+
                 return true;
-                
+
             } else {
-            
+
             // Can try to refund later if goes wrong.
             playerFundsToWithdraw[msg.sender] = amount;
-            
+
             return false;
         }
     }
-    
+
     /**
      * @dev Checks for the pending withdrawals.
      */
 
-    function getPendingTransactions(address playerAddress) 
-        public 
-        constant 
+    function getPendingTransactions(address playerAddress)
+        public
+        constant
         returns (uint256) {
-            
+
             return playerFundsToWithdraw[playerAddress];
         }
-    
+
 }
 
 
 contract PowerOne is PowerEtherHelper, usingOraclize {
-    
+
     /// @dev checks only Oraclize address is calling
     modifier onlyOraclize {
         require(msg.sender == oraclize_cbAddress());
         _;
     }
-    
+
     /**
      * @dev Makes the bid to the PowerOne game.
      */
@@ -2633,40 +2633,40 @@ contract PowerOne is PowerEtherHelper, usingOraclize {
         payable
         isHuman
         isActivated {
-            
+
             require(numberOne >= minNumber && numberOne <= maxNumber, "The number chosen is invalid!");
-            
+
             uint256 payment = SafeMath.add(powerOneBid, powerOneFee);
             uint256 totalPayment = SafeMath.add(payment, megaJackpotFee);
-            
+
             require(msg.value == totalPayment, "Wrong payment value!");
-            
+
             randomQueryId += 1;
-            
+
             powerOneFeesToCollect ++;
-            
+
             // Compose the Oraclize query
             string memory queryStringOne = "[URL] ['json(https://api.random.org/json-rpc/1/invoke).result.random[\"serialNumber\",\"data\"]', '\\n{\"jsonrpc\":\"2.0\",\"method\":\"generateSignedIntegers\",\"params\":{\"apiKey\":\"${[decrypt] BEna2ojyJ8x3euQmExkugHrukwYeMH2Z7o3e9XEqATmN1ApOokRElT5IJEp1JNFhbn3dvdEo3wLaDaZJu5PqRUaoI4ZnbDTwAmMtkfLP1jBD7OldcYReDzG4cc5tdjCdP2KbzhIOEuXskoW3PzkqHzGq641e}\",\"n\":1,\"min\":1,\"max\":10,\"replacement\":false,\"base\":10${[identity] \"}\"},\"id\":";
             string memory queryStringTwo = uint2str(randomQueryId);
             string memory queryStringThree = "${[identity] \"}\"}']";
-            
+
             string memory queryStringOne_Two = queryStringOne.toSlice().concat(queryStringTwo.toSlice());
             string memory queryStringOne_Two_Three = queryStringOne_Two.toSlice().concat(queryStringThree.toSlice());
-            
+
             bytes32 queryId = oraclize_query("nested", queryStringOne_Two_Three, gasForOraclize);
-            
+
             senderAddresses[queryId] = msg.sender;
-            
+
             gameTypes[queryId] = 1;
-            
+
             powerNumberOne[queryId] = numberOne;
-            
+
             powerOneJackpot += powerOneBid;
-            
+
             megaJackpot += megaJackpotFee;
 
             totalGamesPlayed ++;
-            
+
             emit LogQuery(
                 msg.sender,
                 1,
@@ -2676,9 +2676,9 @@ contract PowerOne is PowerEtherHelper, usingOraclize {
                 0,
                 0
                 );
-                
+
         }
-    
+
     /**
      * @dev Internal core logic of the PowerOne game
      */
@@ -2689,51 +2689,51 @@ contract PowerOne is PowerEtherHelper, usingOraclize {
         ) internal {
         // Sanity check
         require(pnOne != 0, "Invalid game, refunded!");
-                
+
         require(powerOneJackpot <= address(this).balance, "Insufficient funds!");
-                
+
         strings.slice memory res = result.toSlice();
         strings.slice memory delim = " ".toSlice();
         uint256[] memory parts = new uint256[](res.count(delim) + 1);
         for (uint256 i = 0; i < parts.length; i ++) {
             parts[i] = parseInt(res.split(delim).toString());
         }
-                
-        // Refunding if the result is 0 or no proof is provided.       
+
+        // Refunding if the result is 0 or no proof is provided.
         if (bytes(result).length == 0) {
-                    
+
             emit Refund(
                 playerAddress,
                 1
                 );
-                
+
             if (!playerAddress.send(SafeMath.add(powerOneBid, powerOneFee))) {
-                
-                playerFundsToWithdraw[playerAddress] = SafeMath.add(powerOneBid, powerOneFee);                     
+
+                playerFundsToWithdraw[playerAddress] = SafeMath.add(powerOneBid, powerOneFee);
             }
-                    
+
             playerAddress = 0x0;
-                    
+
             return;
-                    
+
         }
-                
+
         if (parts[1] == pnOne) {
-                    
+
             if(_checkMegaJackpotCap(playerAddress)) {
                 bool checkResult = true;
             } else {
                 checkResult = false;
             }
-                       
+
             powerOneWinCounter ++;
-                    
+
             // Calculating the eligible payout
             uint256 eligiblePayout = SafeMath.div(SafeMath.mul(powerOneJackpot, platformCut), 100);
             uint256 platformCutPayout = SafeMath.sub(powerOneJackpot, eligiblePayout);
-                    
+
             playerAddress.transfer(eligiblePayout);
-                    
+
             ceoAddress.transfer(platformCutPayout);
 
             emit PowerEtherResults(
@@ -2750,13 +2750,13 @@ contract PowerOne is PowerEtherHelper, usingOraclize {
                 );
 
             totalEtherWon += eligiblePayout;
-                    
+
             powerOneJackpot = 0;
-                    
-            playerAddress = 0x0;            
+
+            playerAddress = 0x0;
 
         } else if (parts[1] != pnOne) {
-                    
+
             emit PowerEtherResults(
                 playerAddress,
                 parts[0],
@@ -2769,17 +2769,17 @@ contract PowerOne is PowerEtherHelper, usingOraclize {
                 false,
                 false
                 );
-                    
+
             playerAddress = 0x0;
 
         }
-        
+
     }
-    
+
 }
 
 contract PowerTwo is PowerOne {
-    
+
     /**
      * @dev Makes the bid to the PowerTwo game.
      */
@@ -2791,42 +2791,42 @@ contract PowerTwo is PowerOne {
         payable
         isHuman
         isActivated {
-            
+
             require(numberOne >= minNumber && numberOne <= maxNumber, "The first  number chosen is invalid!");
             require(numberTwo >= minNumber && numberTwo <= maxNumber, "The second number chosen is invalid!");
-            
+
             uint256 payment = SafeMath.add(powerTwoBid, powerTwoFee);
             uint256 totalPayment = SafeMath.add(payment, megaJackpotFee);
-            
+
             require(msg.value == totalPayment, "Wrong payment value!");
-            
+
             randomQueryId += 1;
-            
+
             powerTwoFeesToCollect ++;
-            
+
             // Compose the Oraclize query
             string memory queryStringOne = "[URL] ['json(https://api.random.org/json-rpc/1/invoke).result.random[\"serialNumber\",\"data\"]', '\\n{\"jsonrpc\":\"2.0\",\"method\":\"generateSignedIntegers\",\"params\":{\"apiKey\":\"${[decrypt] BEna2ojyJ8x3euQmExkugHrukwYeMH2Z7o3e9XEqATmN1ApOokRElT5IJEp1JNFhbn3dvdEo3wLaDaZJu5PqRUaoI4ZnbDTwAmMtkfLP1jBD7OldcYReDzG4cc5tdjCdP2KbzhIOEuXskoW3PzkqHzGq641e}\",\"n\":2,\"min\":1,\"max\":10,\"replacement\":false,\"base\":10${[identity] \"}\"},\"id\":";
             string memory queryStringTwo = uint2str(randomQueryId);
             string memory queryStringThree = "${[identity] \"}\"}']";
-            
+
             string memory queryStringOne_Two = queryStringOne.toSlice().concat(queryStringTwo.toSlice());
             string memory queryStringOne_Two_Three = queryStringOne_Two.toSlice().concat(queryStringThree.toSlice());
-            
+
             bytes32 queryId = oraclize_query("nested", queryStringOne_Two_Three, gasForOraclize);
-            
+
             senderAddresses[queryId] = msg.sender;
-            
+
             gameTypes[queryId] = 2;
-            
+
             powerNumberOne[queryId] = numberOne;
             powerNumberTwo[queryId] = numberTwo;
-            
+
             powerTwoJackpot += powerTwoBid;
-            
+
             megaJackpot += megaJackpotFee;
 
             totalGamesPlayed ++;
-            
+
             emit LogQuery(
                 msg.sender,
                 2,
@@ -2836,9 +2836,9 @@ contract PowerTwo is PowerOne {
                 0,
                 0
                 );
-                
+
         }
-    
+
     /**
      * @dev Internal core logic of the PowerTwo game
      */
@@ -2848,59 +2848,59 @@ contract PowerTwo is PowerOne {
         uint256 pnTwo,
         address playerAddress
         ) internal {
-            
+
         // Sanity check
         require(pnOne != 0, "Invalid game, refunded!");
         require(pnTwo != 0, "Invalid game, refunded!");
-                
+
         require(powerTwoJackpot <= address(this).balance, "Insufficient funds!");
-                
+
         strings.slice memory res = result.toSlice();
         strings.slice memory delim = " ".toSlice();
         uint256[] memory parts = new uint256[](res.count(delim) + 1);
         for (uint256 i = 0; i < parts.length; i ++) {
             parts[i] = parseInt(res.split(delim).toString());
         }
-                
+
         // Refunding if the result is 0 or no proof is provided.
         if (bytes(result).length == 0) {
-                    
+
             emit Refund(
                 playerAddress,
                 1
                 );
-                
+
             if (!playerAddress.send(SafeMath.add(powerTwoBid, powerTwoFee))) {
-                
-                playerFundsToWithdraw[playerAddress] = SafeMath.add(powerTwoBid, powerTwoFee);                     
+
+                playerFundsToWithdraw[playerAddress] = SafeMath.add(powerTwoBid, powerTwoFee);
             }
-                    
+
             playerAddress = 0x0;
-                    
+
             return;
-                    
+
         }
-                
+
         if (_checkTwo(
             parts[1],
             parts[2],
             pnOne,
             pnTwo)) {
-                        
+
             if(_checkMegaJackpotCap(playerAddress)) {
                 bool checkResult = true;
             } else {
                 checkResult = false;
             }
-                    
+
             powerTwoWinCounter ++;
-                    
+
             // Calculating the eligible payout
             uint256 eligiblePayout = SafeMath.div(SafeMath.mul(powerTwoJackpot, platformCut), 100);
             uint256 platformCutPayout = SafeMath.sub(powerTwoJackpot, eligiblePayout);
-                    
+
             playerAddress.transfer(SafeMath.div(SafeMath.mul(powerTwoJackpot, platformCut), 100));
-                    
+
             ceoAddress.transfer(platformCutPayout);
 
             emit PowerEtherResults(
@@ -2917,9 +2917,9 @@ contract PowerTwo is PowerOne {
                 );
 
             totalEtherWon += eligiblePayout;
-                    
+
             powerTwoJackpot = 0;
-                        
+
             playerAddress = 0x0;
 
         } else if (!_checkTwo(
@@ -2927,7 +2927,7 @@ contract PowerTwo is PowerOne {
             parts[2],
             pnOne,
             pnTwo)) {
-                    
+
             emit PowerEtherResults(
                 playerAddress,
                 parts[0],
@@ -2940,18 +2940,18 @@ contract PowerTwo is PowerOne {
                 false,
                 false
                 );
-                    
+
             playerAddress = 0x0;
 
         }
-        
+
     }
-    
+
 }
 
 
 contract PowerFour is PowerTwo {
-    
+
     /**
      * @dev Makes the bid to the PowerFour game.
      */
@@ -2965,52 +2965,52 @@ contract PowerFour is PowerTwo {
         payable
         isHuman
         isActivated {
-            
+
             require(numberOne >= minNumber && numberOne <= maxNumber, "The first number chosen is invalid!");
             require(numberTwo >= minNumber && numberTwo <= maxNumber, "The second number chosen is invalid!");
             require(numberThree >= minNumber && numberThree <= maxNumber, "The third number chosen is invalid!");
             require(numberFour >= minNumber && numberFour <= maxNumber, "The fourth chosen is invalid!");
-            
+
             uint256 payment = SafeMath.add(powerFourBid, powerFourFee);
             uint256 totalPayment = SafeMath.add(payment, megaJackpotFee);
-            
+
             require(msg.value == totalPayment, "Wrong payment value!");
-            
+
             randomQueryId += 1;
-            
+
             powerFourFeesToCollect ++;
-            
+
             // Compose the Oraclize query
             string memory queryStringOne = "[URL] ['json(https://api.random.org/json-rpc/1/invoke).result.random[\"serialNumber\",\"data\"]', '\\n{\"jsonrpc\":\"2.0\",\"method\":\"generateSignedIntegers\",\"params\":{\"apiKey\":\"${[decrypt] BEna2ojyJ8x3euQmExkugHrukwYeMH2Z7o3e9XEqATmN1ApOokRElT5IJEp1JNFhbn3dvdEo3wLaDaZJu5PqRUaoI4ZnbDTwAmMtkfLP1jBD7OldcYReDzG4cc5tdjCdP2KbzhIOEuXskoW3PzkqHzGq641e}\",\"n\":4,\"min\":1,\"max\":10,\"replacement\":false,\"base\":10${[identity] \"}\"},\"id\":";
             string memory queryStringTwo = uint2str(randomQueryId);
             string memory queryStringThree = "${[identity] \"}\"}']";
-            
+
             string memory queryStringOne_Two = queryStringOne.toSlice().concat(queryStringTwo.toSlice());
             string memory queryStringOne_Two_Three = queryStringOne_Two.toSlice().concat(queryStringThree.toSlice());
-            
+
             bytes32 queryId = oraclize_query("nested", queryStringOne_Two_Three, gasForOraclize);
-            
+
             senderAddresses[queryId] = msg.sender;
-            
+
             gameTypes[queryId] = 4;
-            
+
             powerNumberOne[queryId] = numberOne;
             powerNumberTwo[queryId] = numberTwo;
             powerNumberThree[queryId] = numberThree;
             powerNumberFour[queryId] = numberFour;
-            
+
             powerFourJackpot += powerFourBid;
-            
+
             megaJackpot += megaJackpotFee;
 
             totalGamesPlayed ++;
-                
+
         }
-        
+
     /**
      * @dev Internal core logic of the PowerFour game
      */
-    
+
     function _powerFour(
         string result,
         uint256 pnOne,
@@ -3019,41 +3019,41 @@ contract PowerFour is PowerTwo {
         uint256 pnFour,
         address playerAddress
         ) internal {
-            
+
         // Sanity check
         require(pnOne != 0, "Invalid game, refunded!");
         require(pnTwo != 0, "Invalid game, refunded!");
         require(pnThree != 0, "Invalid game, refunded!");
         require(pnFour != 0, "Invalid game, refunded!");
-                
+
         require(powerFourJackpot <= address(this).balance, "Insufficient funds!");
-                
+
         strings.slice memory res = result.toSlice();
         strings.slice memory delim = " ".toSlice();
         uint256[] memory parts = new uint256[](res.count(delim) + 1);
         for (uint256 i = 0; i < parts.length; i ++) {
             parts[i] = parseInt(res.split(delim).toString());
         }
-                
+
         // Refunding if the result is 0 or no proof is provided.
         if (bytes(result).length == 0) {
-                      
+
             emit Refund(
                 playerAddress,
                 1
                 );
-                
+
             if (!playerAddress.send(SafeMath.add(powerFourBid, powerFourFee))) {
-                
-                playerFundsToWithdraw[playerAddress] = SafeMath.add(powerFourBid, powerFourFee);                  
+
+                playerFundsToWithdraw[playerAddress] = SafeMath.add(powerFourBid, powerFourFee);
             }
-                    
+
             playerAddress = 0x0;
-                    
+
             return;
-                    
+
         }
-                
+
         if (_checkFour(
             parts[1],
             parts[2],
@@ -3063,18 +3063,18 @@ contract PowerFour is PowerTwo {
             pnTwo,
             pnThree,
             pnFour)) {
-                        
+
             _checkMegaJackpotCap(playerAddress);
-                    
+
             // Calculating the eligible payout
             uint256 eligiblePayout = SafeMath.div(SafeMath.mul(powerFourJackpot, platformCut), 100);
             uint256 platformCutPayout = SafeMath.sub(powerFourJackpot, eligiblePayout);
-                    
+
             playerAddress.transfer(eligiblePayout);
-                    
+
             // Transfering the MegaJackpot to the winner
             playerAddress.transfer(megaJackpot);
-                    
+
             ceoAddress.transfer(platformCutPayout);
 
             emit PowerEtherResults(
@@ -3091,13 +3091,13 @@ contract PowerFour is PowerTwo {
                 );
 
             totalEtherWon += eligiblePayout;
-                    
+
             powerFourWinCounter ++;
-                    
+
             megaJackpot = 0;
-                    
+
             powerFourJackpot = 0;
-                    
+
             playerAddress = 0x0;
 
         } else if (!_checkFour(
@@ -3109,7 +3109,7 @@ contract PowerFour is PowerTwo {
             pnTwo,
             pnThree,
             pnFour)) {
-                        
+
             emit PowerEtherResults(
                 playerAddress,
                 parts[0],
@@ -3126,121 +3126,131 @@ contract PowerFour is PowerTwo {
             playerAddress = 0x0;
 
         }
-        
+
     }
-    
+
 }
 
 
 contract PowerEther is PowerFour {
-    
+
     /**
-     * 
-     *    _______ _            ____  _            _    _____  _                                  
-     *   |__   __| |          |  _ \| |          | |  |  __ \| |                           
-     *      | |  | |__   ___  | |_) | | ___   ___| | _| |__) | | __ _ _   _     
-     *      | |  | '_ \ / _ \ |  _ <| |/ _ \ / __| |/ /  ___/| |/ _` | | | |    
-     *      | |  | | | |  __/ | |_) | | (_) | (__|   <| |    | | (_| | |_| |    
-     *      |_|  |_| |_|\___| |____/|_|\___/ \___|_|\_\_|    |_|\__,_|\__, |    
-     *                                                                 __/ |                            
-     *                                                                |___/                             
-     *                      
-     *                                ╔═╗╦═╗╔═╗╦ ╦╔╦╗╦ ╦ ╦   
-     *                                ╠═╝╠╦╝║ ║║ ║ ║║║ ╚╦╝   
-     *                                ╩  ╩╚═╚═╝╚═╝═╩╝╩═╝╩    
+     *
+     *    _______ _            ____  _            _    _____  _
+     *   |__   __| |          |  _ \| |          | |  |  __ \| |
+     *      | |  | |__   ___  | |_) | | ___   ___| | _| |__) | | __ _ _   _
+     *      | |  | '_ \ / _ \ |  _ <| |/ _ \ / __| |/ /  ___/| |/ _` | | | |
+     *      | |  | | | |  __/ | |_) | | (_) | (__|   <| |    | | (_| | |_| |
+     *      |_|  |_| |_|\___| |____/|_|\___/ \___|_|\_\_|    |_|\__,_|\__, |
+     *                                                                 __/ |
+     *                                                                |___/
+     *
+     *                                ╔═╗╦═╗╔═╗╦ ╦╔╦╗╦ ╦ ╦
+     *                                ╠═╝╠╦╝║ ║║ ║ ║║║ ╚╦╝
+     *                                ╩  ╩╚═╚═╝╚═╝═╩╝╩═╝╩
      *                              ╔═╗╦═╗╔═╗╔═╗╔═╗╔╗╔╦╗╔═╗
      *                              ╠═╝╠╦╝║╣ ╚═╗║╣ ║║║║ ╚═╗
      *                              ╩  ╩╚═╚═╝╚═╝╚═╝╝╚╝╩ ╚═╝
-     * 
      *
-     * 
-     *  
-     *  ██████╗  ██████╗ ██╗    ██╗███████╗██████╗ ███████╗████████╗██╗  ██╗███████╗██████╗ 
+     *
+     *
+     *
+     *  ██████╗  ██████╗ ██╗    ██╗███████╗██████╗ ███████╗████████╗██╗  ██╗███████╗██████╗
      *  ██╔══██╗██╔═══██╗██║    ██║██╔════╝██╔══██╗██╔════╝╚══██╔══╝██║  ██║██╔════╝██╔══██╗
      *  ██████╔╝██║   ██║██║ █╗ ██║█████╗  ██████╔╝█████╗     ██║   ███████║█████╗  ██████╔╝
      *  ██╔═══╝ ██║   ██║██║███╗██║██╔══╝  ██╔══██╗██╔══╝     ██║   ██╔══██║██╔══╝  ██╔══██╗
      *  ██║     ╚██████╔╝╚███╔███╔╝███████╗██║  ██║███████╗   ██║   ██║  ██║███████╗██║  ██║
      *  ╚═╝      ╚═════╝  ╚══╝╚══╝ ╚══════╝╚═╝  ╚═╝╚══════╝   ╚═╝   ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝
-     *                                                                              
      *
-     * 
-     * 
+     *
+     *
+     *
      * PowerEther is the first honest Ethereum lottery based on PowerBall
      * mechanics. There are three types of games: PowerOne - guess one number,
      * PowerTwo - guess two numbers, and PowerFour - guess four numbers.
-     * 
+     *
      * The rules are simple: if the player does not win the round, the bid is
      * added to the balance of that certain game type. If the game is won, the
      * player gets all the balance of that certain game.
-     * 
+     *
      * Every time a player loses, a small amount is transferred to the
      * MegaJackpot. the MegaJackpot is won either whenever a PowerFour game is
      * won, or when the hard cap has been reached. If the cap
      * has been reached, the first winner of ANY game gets the MegaJacpot!
-     * 
+     *
      * Play PowerEther and win TONS of Ether!
-     * 
-     * 
-     * 
+     *
+     *
+     *
      */
-     
+
     /**
-     * 
+     *
      *
      *      ╔═╗╔═╗╔╗╔╔═╗╔╦╗╦═╗╦ ╦╔═╗╔╦╗╔═╗╦═╗
      *      ║  ║ ║║║║╚═╗ ║ ╠╦╝║ ║║   ║ ║ ║╠╦╝
      *      ╚═╝╚═╝╝╚╝╚═╝ ╩ ╩╚═╚═╝╚═╝ ╩ ╚═╝╩╚═
      *
-     * 
+     *
      */
-     
+
     constructor() public {
-        
+
         /// Activating the contract.
         activated_ = true;
-        
+
         /// Setting the initial address of the CEO.
         ceoAddress = msg.sender;
-        
+
         /// Setting the gas amount for Oraclize.
         gasForOraclize = 335000;
-        
+
         /// Setting the initial value for the randomQueryId
         randomQueryId = 777;
-        
+
         /// Sets the min and max numbers.
         minNumber = 1;
         maxNumber = 10;
-        
+
     }
-    
+
     /**
      * @dev The Oraclize callback function.
      */
-    
+
     function __callback(
-        bytes32 myid, 
-        string result) 
-        public   
+        bytes32 myid,
+        string result)
+        public
 		onlyOraclize
 		isActivated {
 
             require(senderAddresses[myid] != address(0), "Wrong player address!");
-            
+
             if (gameTypes[myid] == 1) {
-                
+
                 _powerOne(result, powerNumberOne[myid], senderAddresses[myid]);
-                
+
             } else if (gameTypes[myid] == 2) {
-                
+
                 _powerTwo(result, powerNumberOne[myid], powerNumberTwo[myid], senderAddresses[myid]);
-                
+
             } else if (gameTypes[myid] == 4) {
 
                 _powerFour(result, powerNumberOne[myid], powerNumberTwo[myid], powerNumberThree[myid], powerNumberFour[myid], senderAddresses[myid]);
-                    
+
         }
-        
+
     }
-    
+
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

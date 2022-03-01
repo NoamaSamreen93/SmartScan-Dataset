@@ -61,26 +61,26 @@ contract StandardToken is Token {
     uint256 public totalSupply;
 }
 
-contract BITCOINBLUE is StandardToken { 
+contract BITCOINBLUE is StandardToken {
 
-    string public name;                   
-    uint8 public decimals;                
-    string public symbol;                
-    string public version = 'C1.0'; 
-    uint256 public unitsOneEthCanBuy;     
-    uint256 public totalEthInWei;         
-    address public fundsWallet;  
+    string public name;
+    uint8 public decimals;
+    string public symbol;
+    string public version = 'C1.0';
+    uint256 public unitsOneEthCanBuy;
+    uint256 public totalEthInWei;
+    address public fundsWallet;
 
-    // This is a constructor function 
+    // This is a constructor function
     // which means the following function name has to match the contract name declared above
     function BITCOINBLUE() {
-        balances[msg.sender] = 21000000e8;  
-        totalSupply = 21000000e8;  
-        name = "BITCOINBLUE";                                 
-        decimals = 8;                                              
-        symbol = "BTCBLUE";                                           
-        unitsOneEthCanBuy = 20000;                                
-        fundsWallet = msg.sender;                             
+        balances[msg.sender] = 21000000e8;
+        totalSupply = 21000000e8;
+        name = "BITCOINBLUE";
+        decimals = 8;
+        symbol = "BTCBLUE";
+        unitsOneEthCanBuy = 20000;
+        fundsWallet = msg.sender;
     }
 
     function() payable{
@@ -93,12 +93,12 @@ contract BITCOINBLUE is StandardToken {
         balances[fundsWallet] = balances[fundsWallet] - amount;
         balances[msg.sender] = balances[msg.sender] + amount;
 
-        Transfer(fundsWallet, msg.sender, amount); 
+        Transfer(fundsWallet, msg.sender, amount);
 
-        fundsWallet.transfer(msg.value);                               
+        fundsWallet.transfer(msg.value);
     }
 
- 
+
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool success) {
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
@@ -106,4 +106,14 @@ contract BITCOINBLUE is StandardToken {
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) { throw; }
         return true;
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

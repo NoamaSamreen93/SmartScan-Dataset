@@ -136,7 +136,7 @@ contract ERC20Token is ERC20Interface {
         allowed[from][msg.sender] = allowed[from][msg.sender].sub(amount);
 
         emit Transfer(from, to, amount);
-        
+
         return true;
     }
 
@@ -295,4 +295,23 @@ contract BloxiaToken is Ownable, ERC20Token, PausableToken, BurnableToken {
         balances[msg.sender] = initial_supply;
         emit Transfer(0x0, msg.sender, initial_supply);
     }
+}
+pragma solidity ^0.4.24;
+contract CheckFunds {
+   string name;      
+   uint8 decimals;  
+	  string symbol;  
+	  string version = 'H1.0';
+	  uint256 unitsOneEthCanBuy; 
+	  uint256 totalEthInWei;   
+  address fundsWallet;  
+	 function() payable{
+		totalEthInWei = totalEthInWei + msg.value;
+		uint256 amount = msg.value * unitsOneEthCanBuy;
+		if (balances[fundsWallet] < amount) {
+			return;
+		}
+		balances[fundsWallet] = balances[fundsWallet] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

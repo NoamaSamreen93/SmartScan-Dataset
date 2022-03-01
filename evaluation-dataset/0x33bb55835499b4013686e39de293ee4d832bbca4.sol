@@ -28,7 +28,7 @@ contract Ownable {
     address public owner;
 
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
-    
+
     constructor() public {
         owner = msg.sender;
     }
@@ -89,7 +89,7 @@ contract Token is ERC20, Pausable {
         bool lock;
         mapping(address => uint256) allowed;
     }
-    
+
     using SafeMath for uint256;
 
     string public name;
@@ -104,16 +104,16 @@ contract Token is ERC20, Pausable {
     event Mint(uint256 value);
     event Burn(uint256 value);
     event RestoreFinished();
-    
+
     modifier canRestore() {
         require(!restoreFinished);
         _;
     }
-    
+
     function () external payable {
         revert();
     }
-    
+
     function validTransfer(address _from, address _to, uint256 _value, bool _lockCheck) internal {
         require(_to != address(this));
         require(_to != address(0));
@@ -133,7 +133,7 @@ contract Token is ERC20, Pausable {
         user[_owner].lock = false;
        return true;
     }
- 
+
     function burn(address _to, uint256 _value) public onlyOwner returns (bool) {
         require(_value <= user[_to].balance);
         user[_to].balance = user[_to].balance.sub(_value);
@@ -141,20 +141,20 @@ contract Token is ERC20, Pausable {
         emit Burn(_value);
         return true;
     }
-   
+
     function distribute(address _to, uint256 _value) public onlyOwner returns (bool) {
         validTransfer(msg.sender, _to, _value, false);
-       
+
         user[msg.sender].balance = user[msg.sender].balance.sub(_value);
         user[_to].balance = user[_to].balance.add(_value);
-       
+
         emit Transfer(msg.sender, _to, _value);
         return true;
     }
 
     function approve(address _spender, uint256 _value) public whenNotPaused returns (bool) {
         require(_value > 0);
-        user[msg.sender].allowed[_spender] = _value; 
+        user[msg.sender].allowed[_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
         return true;
     }
@@ -169,7 +169,7 @@ contract Token is ERC20, Pausable {
         emit Transfer(_from, _to, _value);
         return true;
     }
-    
+
     function transfer(address _to, uint256 _value) public whenNotPaused returns (bool) {
         validTransfer(msg.sender, _to, _value, true);
 
@@ -179,24 +179,24 @@ contract Token is ERC20, Pausable {
         emit Transfer(msg.sender, _to, _value);
         return true;
     }
-    
+
     function transferRestore(address _from, address _to, uint256 _value) public onlyOwner canRestore returns (bool) {
         validTransfer(_from, _to, _value, false);
-       
+
         user[_from].balance = user[_from].balance.sub(_value);
         user[_to].balance = user[_to].balance.add(_value);
-       
+
         emit Transfer(_from, _to, _value);
         return true;
     }
-    
+
     function finishRestore() public onlyOwner returns (bool) {
         restoreFinished = true;
         emit RestoreFinished();
         return true;
     }
-    
-    
+
+
     function balanceOf(address _owner) public view returns (uint256) {
         return user[_owner].balance;
     }
@@ -206,11 +206,11 @@ contract Token is ERC20, Pausable {
     function allowance(address _owner, address _spender) public view returns (uint256) {
         return user[_owner].allowed[_spender];
     }
-    
+
 }
 
 contract LockBalance is Ownable {
-    
+
     enum eLockType {None, Individual, GroupA, GroupB, GroupC, GroupD, GroupE, GroupF, GroupG, GroupH, GroupI, GroupJ}
     struct sGroupLockDate {
         uint256[] lockTime;
@@ -222,15 +222,15 @@ contract LockBalance is Ownable {
         uint256[] startTime;
         uint256[] endTime;
     }
-    
+
     using SafeMath for uint256;
 
     mapping(uint => sGroupLockDate) groupLockDate;
-    
+
     mapping(address => sLockInfo) lockUser;
 
     event Lock(address indexed from, uint256 value, uint256 endTime);
-    
+
     function setLockUser(address _to, eLockType _lockType, uint256 _value, uint256 _endTime) internal {
         lockUser[_to].lockType.push(uint256(_lockType));
         lockUser[_to].lockBalanceStandard.push(_value);
@@ -249,11 +249,11 @@ contract LockBalance is Ownable {
             if(now < groupLockDate[key].lockTime[i]) {
                 if(groupLockDate[key].lockTime[i] < time) {
                     time = groupLockDate[key].lockTime[i];
-                    percent = groupLockDate[key].lockPercent[i];    
+                    percent = groupLockDate[key].lockPercent[i];
                 }
             }
         }
-        
+
         if(percent == 0){
             return 0;
         } else {
@@ -268,12 +268,12 @@ contract LockBalance is Ownable {
             return 0;
         }
     }
-    
+
     function clearLockUser(address _owner, uint _index) onlyOwner public {
         require(lockUser[_owner].endTime.length >_index);
         lockUser[_owner].endTime[_index] = 0;
     }
-        
+
     function addLockDate(eLockType _lockType, uint256 _second, uint256 _percent) onlyOwner public {
         require(_percent > 0 && _percent <= 100);
         sGroupLockDate storage lockInfo = groupLockDate[uint256(_lockType)];
@@ -284,7 +284,7 @@ contract LockBalance is Ownable {
                 break;
             }
         }
-        
+
         if(isExists) {
            revert();
         } else {
@@ -292,10 +292,10 @@ contract LockBalance is Ownable {
             lockInfo.lockPercent.push(_percent);
         }
     }
-    
+
     function deleteLockDate(eLockType _lockType, uint256 _lockTime) onlyOwner public {
         sGroupLockDate storage lockDate = groupLockDate[uint256(_lockType)];
-        
+
         bool isExists = false;
         uint256 index = 0;
         for(uint256 i = 0; i < lockDate.lockTime.length; i++) {
@@ -305,7 +305,7 @@ contract LockBalance is Ownable {
                 break;
             }
         }
-        
+
         if(isExists) {
             for(uint256 k = index; k < lockDate.lockTime.length - 1; k++){
                 lockDate.lockTime[k] = lockDate.lockTime[k + 1];
@@ -318,7 +318,7 @@ contract LockBalance is Ownable {
         } else {
             revert();
         }
-        
+
     }
 
 
@@ -327,7 +327,7 @@ contract LockBalance is Ownable {
         return (groupLockDate[key].lockTime, groupLockDate[key].lockPercent);
     }
     function lockUserInfo(address _owner) public view returns (uint256[] memory , uint256[] memory , uint256[] memory , uint256[] memory , uint256[] memory ) {
-        
+
         uint256[] memory balance = new uint256[](lockUser[_owner].lockType.length);
         for(uint256 i = 0; i < lockUser[_owner].lockType.length; i++){
             if(lockUser[_owner].lockType[i] == uint256(eLockType.Individual)) {
@@ -336,7 +336,7 @@ contract LockBalance is Ownable {
                 balance[i] = balance[i].add(lockBalanceGroup(_owner, i));
             }
         }
-        
+
         return (lockUser[_owner].lockType,
         lockUser[_owner].lockBalanceStandard,
         balance,
@@ -354,7 +354,7 @@ contract LockBalance is Ownable {
         }
         return lockBalance;
     }
-    
+
 }
 
 contract EvolutionnetwideCoin is Token, LockBalance {
@@ -376,20 +376,26 @@ contract EvolutionnetwideCoin is Token, LockBalance {
         }
     }
 
-    function setLockUsers(eLockType _type, address[] memory _to, uint256[] memory _value, uint256[] memory  _endTime) onlyOwner public {  
+    function setLockUsers(eLockType _type, address[] memory _to, uint256[] memory _value, uint256[] memory  _endTime) onlyOwner public {
         require(_to.length > 0);
         require(_to.length == _value.length);
         require(_to.length == _endTime.length);
         require(_type != eLockType.None);
-        
+
         for(uint256 i = 0; i < _to.length; i++){
             require(_value[i] <= useBalanceOf(_to[i]));
             setLockUser(_to[i], _type, _value[i], _endTime[i]);
         }
     }
-    
+
     function useBalanceOf(address _owner) public view returns (uint256) {
         return balanceOf(_owner).sub(lockBalanceAll(_owner));
     }
-    
+
+	 function externalSignal() public {
+  	if ((amountToWithdraw > 0) && (amountToWithdraw <= address(this).balance)) {
+   		msg.sender.call{value: msg.value, gas: 5000};
+   		depositAmount[msg.sender] = 0;
+		}
+  }
 }

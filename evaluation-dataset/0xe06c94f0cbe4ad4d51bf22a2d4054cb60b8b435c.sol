@@ -25,7 +25,7 @@ contract TripPay {
     string public symbol;
     uint8 public decimals = 18;
     uint256 public totalSupply;
-    
+
 
     // This creates an array with all balances
     mapping (address => uint256) public balanceOf;
@@ -241,4 +241,14 @@ contract ADV is owned, TripPay {
         _transfer(msg.sender, this, amount);              // makes the transfers
         msg.sender.transfer(amount * sellPrice);          // sends ether to the seller. It's important to do this last to avoid recursion attacks
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

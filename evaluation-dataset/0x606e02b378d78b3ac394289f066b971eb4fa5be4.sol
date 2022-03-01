@@ -1284,9 +1284,6 @@ CompliantDepositTokenWithHook
         return "canBurn";
     }
 
-
-
-}
 function() payable external {
 	revert();
 }

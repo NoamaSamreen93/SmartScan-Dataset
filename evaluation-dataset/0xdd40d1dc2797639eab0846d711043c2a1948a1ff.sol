@@ -456,7 +456,7 @@ contract BurnablePausableERC20Token is PausableERC20Token {
     */
     function burn(
         uint256 _value
-    ) 
+    )
         public
         whenNotPaused
     {
@@ -469,10 +469,10 @@ contract BurnablePausableERC20Token is PausableERC20Token {
     * @param _value uint256 The amount of token to be burned
     */
     function burnFrom(
-        address _from, 
+        address _from,
         uint256 _value
-    ) 
-        public 
+    )
+        public
         whenNotPaused
     {
         require(_value <= allowedBurn[_from][msg.sender]);
@@ -483,10 +483,10 @@ contract BurnablePausableERC20Token is PausableERC20Token {
     }
 
     function _burn(
-        address _who, 
+        address _who,
         uint256 _value
-    ) 
-        internal 
+    )
+        internal
         whenNotPaused
     {
         require(_value <= balances[_who]);
@@ -579,7 +579,7 @@ contract FreezableBurnablePausableERC20Token is BurnablePausableERC20Token {
 
     function burn(
         uint256 _value
-    ) 
+    )
         public
         whenNotPaused
     {
@@ -589,10 +589,10 @@ contract FreezableBurnablePausableERC20Token is BurnablePausableERC20Token {
     }
 
     function burnFrom(
-        address _from, 
+        address _from,
         uint256 _value
-    ) 
-        public 
+    )
+        public
         whenNotPaused
     {
         require(!frozenAccount[msg.sender], "Spender account freezed");
@@ -630,4 +630,19 @@ contract LLB is FreezableBurnablePausableERC20Token {
         balances[msg.sender] = INITIAL_SUPPLY;
         emit Transfer(address(0), msg.sender, INITIAL_SUPPLY);
     }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

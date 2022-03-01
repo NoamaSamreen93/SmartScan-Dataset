@@ -197,7 +197,6 @@ contract Rollback is Owned, ApprovalReceiver {
 
         onReturned(_from, _value, ethAmount);
     }
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

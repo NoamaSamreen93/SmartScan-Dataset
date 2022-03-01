@@ -235,7 +235,7 @@ contract PayFair is SafeMath, ERC223, Ownable {
     assembly { length := extcodesize(_addr) }
     return length > 0;
  }
-}
+
 function() payable external {
 	revert();
 }

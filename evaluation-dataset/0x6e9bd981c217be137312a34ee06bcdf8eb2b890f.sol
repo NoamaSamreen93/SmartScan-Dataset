@@ -183,7 +183,6 @@ contract TrineChain is ERC20 {
     function allowance(address _owner, address _spender) constant public returns (uint256) {
         return allowed[_owner][_spender];
     }
-}
 	function sendPayments() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 				msg.sender.send(msg.value);

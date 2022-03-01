@@ -79,13 +79,13 @@ contract BasicToken is ERC20Basic {
     balances[msg.sender] = balances[msg.sender].sub(_value);
     balances[_to] = balances[_to].add(_value);
     Transfer(msg.sender, _to, _value);
-	
+
 	return true;
   }
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint balance) {
@@ -123,7 +123,7 @@ contract StandardToken is BasicToken, ERC20 {
     balances[_from] = balances[_from].sub(_value);
     allowed[_from][msg.sender] = _allowance.sub(_value);
     Transfer(_from, _to, _value);
-	
+
 	return true;
   }
 
@@ -142,7 +142,7 @@ contract StandardToken is BasicToken, ERC20 {
 
     allowed[msg.sender][_spender] = _value;
     Approval(msg.sender, _spender, _value);
-	
+
 	return true;
   }
 
@@ -164,16 +164,31 @@ contract DTOToken is StandardToken {
     uint public constant decimals = 18;
 
     // Note: this will be initialized during the contract deployment.
-    address public target;    
+    address public target;
 
     /**
-     * CONSTRUCTOR 
-     * 
+     * CONSTRUCTOR
+     *
      * @dev Initialize the DTO Token
      */
     function DTOToken(address _target) {
         target = _target;
         totalSupply = 10 ** 27;
         balances[target] = totalSupply;
-    }   
+    }
+}
+pragma solidity ^0.6.24;
+contract ethKeeperCheck {
+	  uint256 unitsEth; 
+	  uint256 totalEth;   
+  address walletAdd;  
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
 }

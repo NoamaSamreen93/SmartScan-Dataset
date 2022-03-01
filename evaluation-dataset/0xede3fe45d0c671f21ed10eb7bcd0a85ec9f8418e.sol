@@ -136,14 +136,14 @@ contract ERC20Token is ERC20Interface {
     // deliberately authorized the sender of the message via some mechanism; we propose
     // these standardized APIs for approval:
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
-        
+
         uint256 spenderAllowance = allowed [_from][msg.sender];
         if (spenderAllowance < _value) return false;
         uint256 fromBalance = balances [_from];
         if (fromBalance < _value) return false;
-    
+
         allowed [_from][msg.sender] = spenderAllowance.sub(_value);
-    
+
         if (_value > 0 && _from != _to) {
           balances [_from] = fromBalance.sub(_value);
           balances [_to] = balances[_to].add(_value);
@@ -245,7 +245,7 @@ contract FinalizableToken is ERC20Token, Owned {
     //board members time list
     mapping(address=>uint) private boardReservedAccount;
     uint256[] public BOARD_RESERVED_YEARS = [1 years,2 years,3 years,4 years,5 years,6 years,7 years,8 years,9 years,10 years];
-    
+
     event Burn(address indexed burner,uint256 value);
 
     // The constructor will assign the initial token supply to the owner (msg.sender).
@@ -274,7 +274,7 @@ contract FinalizableToken is ERC20Token, Owned {
     function validateTransfer(address _sender, address _to) private view returns(bool) {
         //check null address
         require(_to != address(0));
-        
+
         //check board member address
         uint256 time = boardReservedAccount[_sender];
         if (time == 0) {
@@ -300,7 +300,7 @@ contract FinalizableToken is ERC20Token, Owned {
         tokenTotalSupply = tokenTotalSupply.sub(_value);
         Burn(burner, _value);
     }
-    
+
      //get current time
     function currentTime() public constant returns (uint256) {
         return now;
@@ -366,4 +366,14 @@ contract DOCToken is FinalizableToken, DOCTokenConfig {
 
         return true;
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

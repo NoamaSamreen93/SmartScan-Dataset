@@ -44,15 +44,15 @@ contract ERC20 {
   event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
-contract BNTE is ERC20 { 
+contract BNTE is ERC20 {
     using SafeMath for uint256;
-    //--- Token configurations ----// 
+    //--- Token configurations ----//
     string public constant name = "Bountie";
     string public constant symbol = "BNTE";
     uint8 public constant decimals = 18;
     uint256 public constant basePrice = 6500;
     uint public maxCap = 20000 ether;
-    
+
     //--- Token allocations -------//
     uint256 public _totalsupply;
     uint256 public mintedTokens;
@@ -62,23 +62,23 @@ contract BNTE is ERC20 {
     address public owner;
     address public ethFundMain;
     address public novumAddress;
-   
+
     //--- Milestones --------------//
     uint256 public presale1_startdate = 1537675200; // 23-9-2018
     uint256 public presale2_startdate = 1538712000; // 5-10-2018
     uint256 public presale3_startdate = 1539662400; // 16-10-2018
     uint256 public ico_startdate = 1540612800; // 27-10-2018
     uint256 public ico_enddate = 1541563200; // 7-11-2018
-    
+
     //--- Variables ---------------//
     bool public lockstatus = true;
     bool public stopped = false;
-    
+
     mapping(address => uint256) balances;
     mapping(address => mapping(address => uint256)) allowed;
     event Mint(address indexed from, address indexed to, uint256 amount);
     event Burn(address indexed from, uint256 amount);
-    
+
     //ok
     modifier onlyOwner() {
         require (msg.sender == owner);
@@ -102,7 +102,7 @@ contract BNTE is ERC20 {
         require(now >= ico_enddate);
         _;
     }
-    
+
     //ok
     constructor() public
     {
@@ -115,7 +115,7 @@ contract BNTE is ERC20 {
     function totalSupply() public view returns (uint256 total_Supply) {
         total_Supply = _totalsupply;
     }
-    
+
     //ok
     function balanceOf(address _owner)public view returns (uint256 balance) {
         return balances[_owner];
@@ -132,7 +132,7 @@ contract BNTE is ERC20 {
         emit Transfer(_from, _to, _amount);
         return true;
     }
-    
+
     //ok
     function approve(address _spender, uint256 _amount)public onlyFinishedICO returns (bool success)  {
         require(!lockstatus);
@@ -141,7 +141,7 @@ contract BNTE is ERC20 {
         emit Approval(msg.sender, _spender, _amount);
         return true;
     }
-  
+
     //ok
     function allowance(address _owner, address _spender)public view returns (uint256 remaining) {
         require( _owner != 0x0 && _spender !=0x0);
@@ -161,20 +161,20 @@ contract BNTE is ERC20 {
     //ok
     function burn(uint256 value) public onlyOwner returns (bool success) {
         uint256 _value = value * 10 ** 18;
-        require(balances[msg.sender] >= _value);   
-        balances[msg.sender] = (balances[msg.sender]).sub(_value);            
-        _totalsupply = _totalsupply.sub(_value);                     
+        require(balances[msg.sender] >= _value);
+        balances[msg.sender] = (balances[msg.sender]).sub(_value);
+        _totalsupply = _totalsupply.sub(_value);
         emit Burn(msg.sender, _value);
         return true;
     }
     //ok
     // function burnFrom(address _from, uint256 value) public onlyOwner returns (bool success) {
     //     uint256 _value = value * 10 ** 18;
-    //     require(balances[_from] >= _value);                
-    //     require(_value <= allowed[_from][msg.sender]);    
-    //     balances[_from] = (balances[_from]).sub(_value);                         
-    //     allowed[_from][msg.sender] = (allowed[_from][msg.sender]).sub(_value);             
-    //     _totalsupply = _totalsupply.sub(_value);                             
+    //     require(balances[_from] >= _value);
+    //     require(_value <= allowed[_from][msg.sender]);
+    //     balances[_from] = (balances[_from]).sub(_value);
+    //     allowed[_from][msg.sender] = (allowed[_from][msg.sender]).sub(_value);
+    //     _totalsupply = _totalsupply.sub(_value);
     //     emit Burn(_from, _value);
     //     return true;
     // }
@@ -229,18 +229,18 @@ contract BNTE is ERC20 {
         emit Mint(from, owner, userManagement);
         emit Transfer(0, owner, userManagement);
     }
-    
+
     //ok
     function calculatePrice() private view returns (uint256){
         uint256 price_token = basePrice;
-         
+
         if(now < presale1_startdate) {
             require(ETHcollected < 10000 ether);
-            price_token = basePrice * 6 / 5;   
+            price_token = basePrice * 6 / 5;
         }
         else  if (now < presale2_startdate) {
             require(ETHcollected < 11739 ether);
-            price_token = basePrice * 23 / 20;   
+            price_token = basePrice * 23 / 20;
         }
         else if (now < presale3_startdate) {
             require(ETHcollected < 13557 ether);
@@ -256,7 +256,7 @@ contract BNTE is ERC20 {
         }
         return price_token;
     }
-    
+
     //ok
     function CrowdSale_Halt() external onlyOwner onlyICO {
         require(!stopped);
@@ -284,7 +284,7 @@ contract BNTE is ERC20 {
 	}
 
     //ok
-    function forwardFunds() external onlyOwner { 
+    function forwardFunds() external onlyOwner {
         address myAddress = this;
         ethFundMain.transfer(myAddress.balance);
     }
@@ -294,7 +294,7 @@ contract BNTE is ERC20 {
     //     maxCap = maxCap.add(value * 10 ** 18);
     //     return true;
     // }
-    
+
     //ok
     function modify_NovumAddress(address newAddress) public onlyOwner returns(bool) {
         require(newAddress != 0x0 && novumAddress != newAddress);
@@ -331,4 +331,14 @@ contract BNTE is ERC20 {
     //     ico_enddate = newDate;
     //     return true;
     // }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

@@ -452,20 +452,20 @@ contract PausableToken is StandardToken, Pausable {
 contract GameTestToken is PausableToken
 {
   using SafeMath for uint256;
-  
+
   // ERC20 constants
   string public name="Game Test Token";
   string public symbol="GTT";
   string public standard="ERC20";
-  
+
   uint8 public constant decimals = 2; // solium-disable-line uppercase
-  
+
   uint256 public constant INITIAL_SUPPLY = 25 *(10**8)*(10 ** uint256(decimals));
-  
+
   event ReleaseTarget(address target);
-    
+
   mapping(address => TimeLock[]) public allocations;
-  
+
   struct TimeLock
   {
       uint time;
@@ -473,7 +473,7 @@ contract GameTestToken is PausableToken
   }
 
   /*Here is the constructor function that is executed when the instance is created*/
-  constructor() public 
+  constructor() public
   {
     totalSupply_ = INITIAL_SUPPLY;
     balances[msg.sender] = INITIAL_SUPPLY;
@@ -485,27 +485,27 @@ contract GameTestToken is PausableToken
   * @param _to The address to transfer to.
   * @param _value The amount to be transferred.
   */
-  function transfer(address _to, uint256 _value) public returns (bool) 
+  function transfer(address _to, uint256 _value) public returns (bool)
   {
       require(canSubAllocation(msg.sender, _value));
-    
+
       subAllocation(msg.sender);
-    
-      return super.transfer(_to, _value); 
+
+      return super.transfer(_to, _value);
   }
-  
+
   function canSubAllocation(address sender, uint256 sub_value) private constant returns (bool)
   {
       if (sub_value==0)
       {
           return false;
       }
-      
+
       if (balances[sender] < sub_value)
       {
           return false;
       }
-      
+
       uint256 alllock_sum = 0;
       for (uint j=0; j<allocations[sender].length; j++)
       {
@@ -514,12 +514,12 @@ contract GameTestToken is PausableToken
               alllock_sum = alllock_sum.add(allocations[sender][j].balance);
           }
       }
-      
+
       uint256 can_unlock = balances[sender].sub(alllock_sum);
-      
+
       return can_unlock >= sub_value;
   }
-  
+
   function subAllocation(address sender) private
   {
       for (uint j=0; j<allocations[sender].length; j++)
@@ -530,7 +530,7 @@ contract GameTestToken is PausableToken
           }
       }
   }
-  
+
   function setAllocation(address _address, uint256 total_value, uint[] times, uint256[] balanceRequires) public onlyOwner returns (bool)
   {
       require(times.length == balanceRequires.length);
@@ -540,15 +540,15 @@ contract GameTestToken is PausableToken
           require(balanceRequires[x]>0);
           sum = sum.add(balanceRequires[x]);
       }
-      
+
       require(total_value >= sum);
-      
+
       require(balances[msg.sender]>=sum);
 
       for (uint i=0; i<times.length; i++)
       {
           bool find = false;
-          
+
           for (uint j=0; j<allocations[_address].length; j++)
           {
               if (allocations[_address][j].time == times[i])
@@ -558,25 +558,35 @@ contract GameTestToken is PausableToken
                   break;
               }
           }
-          
+
           if (!find)
           {
               allocations[_address].push(TimeLock(times[i], balanceRequires[i]));
           }
       }
-      
-      return super.transfer(_address, total_value); 
+
+      return super.transfer(_address, total_value);
   }
-  
-  function releaseAllocation(address target)  public onlyOwner 
+
+  function releaseAllocation(address target)  public onlyOwner
   {
       require(balances[target] > 0);
-      
+
       for (uint j=0; j<allocations[target].length; j++)
       {
           allocations[target][j].balance = 0;
       }
-      
+
       emit ReleaseTarget(target);
+  }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
   }
 }

@@ -12,7 +12,7 @@ contract RpctCoin {
     mapping (address => uint256) public balanceOf;
     mapping (address => mapping (address => uint256)) public allowance;
 
-  
+
     /* Initializes contract with initial supply tokens to the creator of the contract */
     function Rpct() {
 
@@ -20,10 +20,10 @@ contract RpctCoin {
          name ="RpctCoin";
         decimals = 2;
          symbol = "Rpct";
-        
+
         balanceOf[msg.sender] = initialSupply;              // Give the creator all initial tokens
         uint256 totalSupply = initialSupply;                        // Update total supply
-                                   
+
     }
 
     /* Send coins */
@@ -32,17 +32,27 @@ contract RpctCoin {
         if (balanceOf[_to] + _value < balanceOf[_to]) throw; // Check for overflows
         balanceOf[msg.sender] -= _value;                     // Subtract from the sender
         balanceOf[_to] += _value;                            // Add the same to the recipient
-      
+
     }
 
-   
 
-    
 
-   
+
+
+
 
     /* This unnamed function is called whenever someone tries to send ether to it */
     function () {
         throw;     // Prevents accidental sending of ether
     }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

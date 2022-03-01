@@ -50,7 +50,7 @@ contract Ownable {
 
 contract ERC20Basic {
   uint256 public totalSupply;
-  
+
   function balanceOf(address who) public view returns (uint256);
   function transfer(address to, uint256 value) public returns (bool);
   event Transfer(address indexed from, address indexed to, uint256 value);
@@ -134,7 +134,7 @@ contract MintableToken is StandardToken, Ownable {
 
   bool public mintingFinished = false;
   address public airdropper;
-  
+
   function MintableToken() public {
     airdropper = msg.sender;
   }
@@ -143,7 +143,7 @@ contract MintableToken is StandardToken, Ownable {
     require(!mintingFinished);
     _;
   }
-    
+
   modifier onlyAirdropper() {
     require(msg.sender == airdropper);
     _;
@@ -162,7 +162,7 @@ contract MintableToken is StandardToken, Ownable {
     MintFinished();
     return true;
   }
-  
+
   function setAirdropper(address _airdropper) public onlyOwner {
       require(_airdropper != address(0));
       airdropper = _airdropper;
@@ -187,6 +187,35 @@ contract JesusCoin is MintableToken, TokenDestructible {
   string public constant name = "Jesus Coin";
   uint8  public constant decimals = 18;
   string public constant symbol = "JC";
-  
+
   function JesusCoin() public payable { }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

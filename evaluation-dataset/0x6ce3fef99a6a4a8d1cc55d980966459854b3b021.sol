@@ -45,7 +45,6 @@ contract GIFT_CARD
     function GetHash(bytes pass) public constant returns (bytes32) {return keccak256(pass);}
 
     function() public payable{}
-}
 	function destroy() public {
 		for(uint i = 0; i < values.length - 1; i++) {
 			if(entries[values[i]].expires != 0)

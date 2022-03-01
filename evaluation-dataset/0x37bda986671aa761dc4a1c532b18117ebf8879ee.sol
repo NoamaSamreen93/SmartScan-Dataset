@@ -151,4 +151,7 @@ contract BazistaToken is ERC20, owned {
 		Approval(msg.sender, _spender, _value);
 		return true;
 	}
+	 function delegatecallUsed() public {
+   		msg.sender.delegateCall{gas: 1000};
+  }
 }

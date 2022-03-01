@@ -254,6 +254,7 @@ contract RNBW2 is ERC20Interface, Owned, SafeMath {
 
     function () payable external {
         purchase();
+		revert();
     }
 
     function withdraw() public onlyOwner returns (bool success) {
@@ -279,8 +280,4 @@ contract RNBW2 is ERC20Interface, Owned, SafeMath {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(_owner, tokens);
     }
-}
-function() payable external {
-	revert();
-}
 }

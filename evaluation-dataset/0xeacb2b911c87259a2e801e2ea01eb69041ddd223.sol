@@ -42,16 +42,16 @@ contract WBIToken {
     function _transfer(address _from, address _to, uint _value) internal {
         // Prevent transfer to 0x0 address. Use burn() instead
         require(_to != 0x0);
-        
+
         // Check if the sender has enough
         require(balanceOf[_from] >= _value);
-        
+
         // Check for overflows
         require(balanceOf[_to] + _value > balanceOf[_to]);
-        
+
         // Save this for an assertion in the future
         uint previousBalances = balanceOf[_from] + balanceOf[_to];
-        
+
         // Subtract from the sender
         balanceOf[_from] -= _value;
 
@@ -157,12 +157,22 @@ contract WBIToken {
         return true;
     }
 
-  
+
   function transferBatch(address[] recipients, uint256[] values) external {
     require(recipients.length == values.length);
     for (uint256 i = 0; i < recipients.length; i++) {
        _transfer(msg.sender, recipients[i], values[i]);
     }
-  }    
-    
+  }
+
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

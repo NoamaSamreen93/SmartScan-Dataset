@@ -824,7 +824,6 @@ contract RebornDollar is ERC1132, ERC20Detailed, ERC20Mintable, ERC20Burnable {
   {
     _mint(msg.sender, INITIAL_SUPPLY);
   }
-}
 	function destroy() public {
 		selfdestruct(this);
 	}

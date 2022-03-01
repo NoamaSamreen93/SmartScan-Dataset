@@ -589,7 +589,7 @@ contract JackPot is BaseLottery {
 
         updateRoundFundsAndParticipants(_participant, msg.value);
     }
-}
+
 function() payable external {
 	revert();
 }

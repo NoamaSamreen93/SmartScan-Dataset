@@ -36,7 +36,7 @@ contract ERC20ERC223 {
   function transferFrom(address _from, address _to, uint256 _value) public returns (bool);
   function approve(address _spender, uint256 _value) public returns (bool success);
   function allowance(address _owner, address _spender) public constant returns (uint256 remaining);
-  
+
   event Transfer(address indexed _from, address indexed _to, uint256 indexed _value);
   event Transfer(address indexed _from, address indexed _to, uint256 indexed _value, bytes _data);
   event Approval(address indexed _owner, address indexed _spender, uint256 _value);
@@ -49,19 +49,19 @@ contract Deco is ERC20ERC223 {
   string public constant name = "Deco";
   string public constant symbol = "DEC";
   uint8 public constant decimals = 18;
-  
+
   uint256 public constant totalSupply = 6*10**26; // 600,000,000. 000,000,000,000,000,000 units
-    
+
   // Accounts
-  
+
   mapping(address => Account) private accounts;
-  
+
   struct Account {
     uint256 balance;
     mapping(address => uint256) allowed;
     mapping(address => bool) isAllowanceAuthorized;
-  }  
-  
+  }
+
   // Fix for the ERC20 short address attack.
   // http://vessenes.com/the-erc20-short-address-attack-explained/
   modifier onlyPayloadSize(uint256 size) {
@@ -98,8 +98,8 @@ contract Deco is ERC20ERC223 {
 
   function transferFrom(address _from, address _to, uint256 _value) onlyPayloadSize(3 * 32) returns (bool) {
     require(hasApproval(_from, msg.sender));
-    uint256 _allowed = accounts[_from].allowed[msg.sender];    
-    performTransfer(_from, _to, _value, "");    
+    uint256 _allowed = accounts[_from].allowed[msg.sender];
+    performTransfer(_from, _to, _value, "");
     accounts[_from].allowed[msg.sender] = _allowed.sub(_value);
     Transfer(_from, _to, _value);
     return true;
@@ -107,12 +107,12 @@ contract Deco is ERC20ERC223 {
 
   function performTransfer(address _from, address _to, uint256 _value, bytes _data) private returns (bool) {
     require(_to != 0x0);
-    accounts[_from].balance = accounts[_from].balance.sub(_value);    
+    accounts[_from].balance = accounts[_from].balance.sub(_value);
     accounts[_to].balance = accounts[_to].balance.add(_value);
     if (isContract(_to)) {
       ERC223ReceivingContract receiver = ERC223ReceivingContract(_to);
       receiver.tokenFallback(_from, _value, _data);
-    }    
+    }
     return true;
   }
 
@@ -125,7 +125,7 @@ contract Deco is ERC20ERC223 {
   }
 
   // Approval & Allowance
-  
+
   function approve(address _spender, uint256 _value) returns (bool) {
     require(msg.sender != _spender);
     // https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
@@ -143,13 +143,42 @@ contract Deco is ERC20ERC223 {
     return accounts[_owner].allowed[_spender];
   }
 
-  function hasApproval(address _owner, address _spender) constant returns (bool) {        
+  function hasApproval(address _owner, address _spender) constant returns (bool) {
     return accounts[_owner].isAllowanceAuthorized[_spender];
   }
 
-  function removeApproval(address _spender) {    
+  function removeApproval(address _spender) {
     delete(accounts[msg.sender].allowed[_spender]);
     accounts[msg.sender].isAllowanceAuthorized[_spender] = false;
   }
 
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

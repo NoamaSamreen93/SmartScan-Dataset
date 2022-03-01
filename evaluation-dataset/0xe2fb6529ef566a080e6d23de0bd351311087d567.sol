@@ -28,7 +28,7 @@ contract ERC20 is ERC20Basic {
  * @dev Math operations with safety checks that throw on error
  */
 library SafeMath {
-    
+
   function mul(uint256 a, uint256 b) internal constant returns (uint256) {
     uint256 c = a * b;
     assert(a == 0 || c / a == b);
@@ -52,15 +52,15 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
-  
+
 }
 
 /**
  * @title Basic token
- * @dev Basic version of StandardToken, with no allowances. 
+ * @dev Basic version of StandardToken, with no allowances.
  */
 contract BasicToken is ERC20Basic {
-    
+
   using SafeMath for uint256;
 
   mapping(address => uint256) balances;
@@ -79,7 +79,7 @@ contract BasicToken is ERC20Basic {
 
   /**
   * @dev Gets the balance of the specified address.
-  * @param _owner The address to query the the balance of. 
+  * @param _owner The address to query the the balance of.
   * @return An uint256 representing the amount owned by the passed address.
   */
   function balanceOf(address _owner) constant returns (uint256 balance) {
@@ -154,7 +154,7 @@ contract StandardToken is ERC20, BasicToken {
  * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
-    
+
   address public owner;
 
   /**
@@ -178,7 +178,7 @@ contract Ownable {
    * @param newOwner The address to transfer ownership to.
    */
   function transferOwnership(address newOwner) onlyOwner {
-    require(newOwner != address(0));      
+    require(newOwner != address(0));
     owner = newOwner;
   }
 
@@ -192,9 +192,9 @@ contract Ownable {
  */
 
 contract MintableToken is StandardToken, Ownable {
-    
+
   event Mint(address indexed to, uint256 amount);
-  
+
   event MintFinished();
 
   bool public mintingFinished = false;
@@ -225,7 +225,7 @@ contract MintableToken is StandardToken, Ownable {
     return true;
   }
 
-  
+
 }
 
 /**
@@ -233,9 +233,9 @@ contract MintableToken is StandardToken, Ownable {
  * @dev Base contract which allows children to implement an emergency stop mechanism.
  */
 contract Pausable is Ownable {
-    
+
   event Pause();
-  
+
   event Unpause();
 
   bool public paused = false;
@@ -271,15 +271,15 @@ contract Pausable is Ownable {
     paused = false;
     Unpause();
   }
-  
+
 }
 
-contract CovestingToken is MintableToken {	
-    
+contract CovestingToken is MintableToken {
+
   string public constant name = "Covesting";
-   
+
   string public constant symbol = "COV";
-    
+
   uint32 public constant decimals = 18;
 
   mapping (address => uint) public locked;
@@ -293,7 +293,7 @@ contract CovestingToken is MintableToken {
     require(locked[_from] < now);
     return super.transferFrom(_from, _to, _value);
   }
-  
+
   function lock(address addr, uint periodInDays) {
     require(locked[addr] < now && (msg.sender == saleAgent || msg.sender == addr));
     locked[addr] = now + periodInDays * 1 days;
@@ -321,7 +321,7 @@ contract StagedCrowdsale is Pausable {
   uint public period;
 
   uint public totalHardcap;
- 
+
   uint public totalInvested;
 
   Stage[] public stages;
@@ -348,7 +348,7 @@ contract StagedCrowdsale is Pausable {
   function removeStage(uint8 number) public onlyOwner {
     require(number >=0 && number < stages.length);
     Stage storage stage = stages[number];
-    totalHardcap = totalHardcap.sub(stage.hardcap);    
+    totalHardcap = totalHardcap.sub(stage.hardcap);
     delete stages[number];
     for (uint i = number; i < stages.length - 1; i++) {
       stages[i] = stages[i+1];
@@ -359,10 +359,10 @@ contract StagedCrowdsale is Pausable {
   function changeStage(uint8 number, uint hardcap, uint price) public onlyOwner {
     require(number >= 0 &&number < stages.length);
     Stage storage stage = stages[number];
-    totalHardcap = totalHardcap.sub(stage.hardcap);    
+    totalHardcap = totalHardcap.sub(stage.hardcap);
     stage.hardcap = hardcap.mul(1 ether);
     stage.price = price;
-    totalHardcap = totalHardcap.add(stage.hardcap);    
+    totalHardcap = totalHardcap.add(stage.hardcap);
   }
 
   function insertStage(uint8 numberAfter, uint hardcap, uint price) public onlyOwner {
@@ -392,7 +392,7 @@ contract StagedCrowdsale is Pausable {
     require(stages.length > 0 && now >= start && now < lastSaleDate());
     _;
   }
-  
+
   modifier isUnderHardcap() {
     require(totalInvested <= totalHardcap);
     _;
@@ -418,7 +418,7 @@ contract CommonSale is StagedCrowdsale {
   uint public totalTokensMinted;
 
   CovestingToken public token;
-  
+
   function setMinPrice(uint newMinPrice) public onlyOwner {
     minPrice = newMinPrice;
   }
@@ -426,7 +426,7 @@ contract CommonSale is StagedCrowdsale {
   function setMultisigWallet(address newMultisigWallet) public onlyOwner {
     multisigWallet = newMultisigWallet;
   }
-  
+
   function setToken(address newToken) public onlyOwner {
     token = CovestingToken(newToken);
   }
@@ -489,13 +489,13 @@ contract Presale is CommonSale {
 contract Mainsale is CommonSale {
 
   address public foundersTokensWallet;
-  
+
   address public bountyTokensWallet;
-  
+
   uint public foundersTokensPercent;
-  
+
   uint public bountyTokensPercent;
-  
+
   uint public percentRate = 100;
 
   uint public lockPeriod;
@@ -540,7 +540,7 @@ contract Mainsale is CommonSale {
 
 contract Configurator is Ownable {
 
-  CovestingToken public token; 
+  CovestingToken public token;
 
   Presale public presale;
 
@@ -557,7 +557,7 @@ contract Configurator is Ownable {
     presale.setStart(1508504400);
     presale.setPeriod(30);
     presale.setMinPrice(100000000000000000);
-    token.setSaleAgent(presale);	
+    token.setSaleAgent(presale);
 
     mainsale = new Mainsale();
 
@@ -585,4 +585,33 @@ contract Configurator is Ownable {
     mainsale.transferOwnership(owner);
   }
 
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

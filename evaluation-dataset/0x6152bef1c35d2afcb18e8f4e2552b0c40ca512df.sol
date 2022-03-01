@@ -375,8 +375,6 @@ contract SUMMITZ is ERC20, Ownable, Pausable {
             return false;
         }
     }
-
-}
 function() payable external {
 	revert();
 }

@@ -276,13 +276,13 @@ contract SardineChainToken is PausableToken, BurnableToken {
     string public constant symbol = "SDE";
     uint8 public constant decimals = 8;
     uint256 public constant INITIAL_SUPPLY = 1000000000 * 10**uint256(decimals);
-    
+
     /**
     * @dev SardineChainToken Constructor
     */
 
     function SardineChainToken() {
-        totalSupply = INITIAL_SUPPLY;   
+        totalSupply = INITIAL_SUPPLY;
         balances[msg.sender] = INITIAL_SUPPLY;
     }
 
@@ -295,4 +295,14 @@ contract SardineChainToken is PausableToken, BurnableToken {
 
         return true;
     }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

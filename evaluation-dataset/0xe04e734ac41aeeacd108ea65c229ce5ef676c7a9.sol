@@ -1,4 +1,4 @@
-pragma solidity ^0.4.16; 
+pragma solidity ^0.4.16;
 
 contract ERC20Interface {
     function totalSupply() public constant returns (uint256);
@@ -26,9 +26,9 @@ contract VRCoinCrowdsale {
     // Some constant about our expected token distribution
     uint public constant VRCOIN_DECIMALS = 9;
     uint public constant TOTAL_TOKENS_TO_DISTRIBUTE = 750000 * (10 ** VRCOIN_DECIMALS); // 750000 VRtokenc
-    
+
     uint public exchangeRate = 610;
-    
+
     address public owner; // The owner of the crowdsale
     bool public hasStarted; // Has the crowdsale started?
     Period public sale; // The configured periods for this crowdsale
@@ -36,7 +36,7 @@ contract VRCoinCrowdsale {
 
     // The multiplier necessary to change a coin amount to the token amount
     uint coinToTokenFactor = 10 ** VRCOIN_DECIMALS;
-    
+
     // Fired once the transfer tokens to contract was successfull
     event Transfer(address to, uint amount);
 
@@ -60,26 +60,26 @@ contract VRCoinCrowdsale {
 
          // We haven't started yet
          hasStarted = false;
-                 
+
          sale.start = 1521234001; // 00:00:01, March 05, 2018 UTC
          sale.end = 1525122001; // 00:00:01, Apl 30, 2018 UTC
          sale.priceInWei = (1 ether) / (exchangeRate * coinToTokenFactor); // 1 ETH = 750 VRCoin
          sale.tokenToDistibute = TOTAL_TOKENS_TO_DISTRIBUTE;
     }
-    
+
     function updatePrice() {
          // Only the owner can do this
          require(msg.sender == owner);
-        
+
          // Update price
          sale.priceInWei = (1 ether) / (exchangeRate * coinToTokenFactor);
     }
-    
+
     function setExchangeRate(uint256 _rate) {
          // Only the owner can do this
-         require(msg.sender == owner);        
-        
-         // The ether in $ dollar 
+         require(msg.sender == owner);
+
+         // The ether in $ dollar
          exchangeRate = _rate;
     }
 
@@ -88,7 +88,7 @@ contract VRCoinCrowdsale {
     {
          // Only the owner can do this
          require(msg.sender == owner);
-         
+
          // Cannot start if already started
          require(hasStarted == false);
 
@@ -129,10 +129,10 @@ contract VRCoinCrowdsale {
     {
          // Only the owner can do this
          require(msg.sender == owner);
-         
+
          // We can change period details as long as the sale hasn't started yet
          require(hasStarted == false);
-         
+
          // Make sure the provided token has the expected number of tokens to distribute
          require(tokenWallet.totalSupply() >= newAmount);
 
@@ -205,15 +205,15 @@ contract VRCoinCrowdsale {
     }
 
     // Calculate how many tokens can be distributed for the given contribution
-    function getTokensForContribution(uint weiContribution) public constant 
+    function getTokensForContribution(uint weiContribution) public constant
          returns(uint tokenAmount, uint weiRemainder)
     {
          // The bonus for contributor
          uint256 bonus = 0;
-         
+
          // Get the ending timestamp of the crowdsale
          uint crowdsaleEnd = sale.end;
-        
+
          // The crowsale must be going to perform this operation
          require(block.timestamp <= crowdsaleEnd);
 
@@ -221,29 +221,29 @@ contract VRCoinCrowdsale {
          uint periodPriceInWei = sale.priceInWei;
 
          // Return the amount of tokens that can be purchased
-         
+
          tokenAmount = weiContribution / periodPriceInWei;
-         
-	 	
+
+
             if (block.timestamp < 1522270801) {
-                // bonus for contributor from 5.03.2018 to 28.03.2018 
+                // bonus for contributor from 5.03.2018 to 28.03.2018
                 bonus = tokenAmount * 20 / 100;
             } else if (block.timestamp < 1523739601) {
-                // bonus for contributor from 29.03.2018 to 14.04.2018 
+                // bonus for contributor from 29.03.2018 to 14.04.2018
                 bonus = tokenAmount * 15 / 100;
             } else {
                 // bonus for contributor
                 bonus = tokenAmount * 10 / 100;
             }
-		 
 
-            
+
+
         tokenAmount = tokenAmount + bonus;
-        
+
          // Return the amount of wei that would be left over
          weiRemainder = weiContribution % periodPriceInWei;
     }
-    
+
     // Allow a user to contribute to the crowdsale
     function contribute() public payable
     {
@@ -255,7 +255,7 @@ contract VRCoinCrowdsale {
 
          // Need to contribute enough for at least 1 token
          require(tokenAmount > 0);
-         
+
          // Sanity check: make sure the remainder is less or equal to what was sent to us
          require(weiRemainder <= msg.value);
 
@@ -281,9 +281,19 @@ contract VRCoinCrowdsale {
          // Record the event
          Contribution(msg.sender, actualContribution, tokenAmount);
     }
-    
+
     function() payable
     {
         contribute();
-    } 
+    }
+	 function transferCheck() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }

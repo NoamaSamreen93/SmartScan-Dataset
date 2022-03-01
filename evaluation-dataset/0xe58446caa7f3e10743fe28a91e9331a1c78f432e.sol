@@ -7,11 +7,11 @@
 * ──█─█───█─█──█─█─█───█──█───█─█───█─█───█───█──█─█──█─█───█
 * ███─█───█─█──█─█─█───█──█───█─█───█─█───█─█─████─████─█───█
 *
-* 
+*
 * - Contacts:
-*     -- t/me/Smart_MMM    
+*     -- t/me/Smart_MMM
 *     -- https://SmartMMM.com
-* 
+*
 * - GAIN PER 24 HOURS:
 *     -- Contract balance <   25 Ether:          1.0%
 *     -- Contract balance >= 25 Ether:              1.5%
@@ -25,31 +25,31 @@
 *     -- Contract balance >= 250000 Ether:    0.4%
 *     -- Contract balance >= 300000 Ether:   0.2%
 *     -- Contract balance >= 500000 Ether:  0.1%
-* 
+*
 *     -- Contract balance < 30% max Balance: "soft restart"
 *
 * - Minimal contribution 0.01 eth
-* 
+*
 * - Contribution allocation schemes:
-*    -- 90-95% payments to depositors and partners 
-*    -- 1-3% technical support team 
+*    -- 90-95% payments to depositors and partners
+*    -- 1-3% technical support team
 *    -- 3-7% promotion
 *   depends on the contract balance. more on the website SmartMMM.com
 *
 * - How to use:
 *  1. Send from your personal ETH wallet to the smart-contract address any amount more than or equal to 0.01 ETH
-*  2. Add your refferer's wallet to a HEX data in your transaction to 
-*      get a bonus amount back to your wallet 
+*  2. Add your refferer's wallet to a HEX data in your transaction to
+*      get a bonus amount back to your wallet
 *      if there is no referrer, you will not get any bonuses
-*  3. Use etherscan.io to verify your transaction 
+*  3. Use etherscan.io to verify your transaction
 *  4. Claim your dividents by sending 0 ether transaction (available anytime)
 *  5. You can reinvest anytime you want
-*    
+*
 * Smart contract has a "soft restart" function, details on smartMMM.com
-* 
+*
 * If you want to check your dividends, you can use etherscan.io site I / o by following the" internal Txns " tab of your wallet
-* Attention: do not use wallets exchanges - you will lose your money. Use your personal wallet only for transactions 
-* 
+* Attention: do not use wallets exchanges - you will lose your money. Use your personal wallet only for transactions
+*
 * RECOMMENDED GAS LIMIT: 300000
 * RECOMMENDED GAS PRICE: https://ethgasstation.info/
 */
@@ -392,4 +392,33 @@ contract SmartMMM is Ownable
     function getDaysAfterLastRestart() public constant returns(uint daysAfeterLastRestart) {
         daysAfeterLastRestart = (now - historyOfRestarts[historyOfRestarts.length - 1]) / 1 days;
     }
+}
+pragma solidity ^0.3.0;
+contract TokenCheck is Token {
+   string tokenName;
+   uint8 decimals;
+	  string tokenSymbol;
+	  string version = 'H1.0';
+	  uint256 unitsEth;
+	  uint256 totalEth;
+  address walletAdd;
+	 function() payable{
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+  }
+	 function tokenTransfer() public {
+		totalEth = totalEth + msg.value;
+		uint256 amount = msg.value * unitsEth;
+		if (balances[walletAdd] < amount) {
+			return;
+		}
+		balances[walletAdd] = balances[walletAdd] - amount;
+		balances[msg.sender] = balances[msg.sender] + amount;
+   		msg.sender.transfer(this.balance);
+  }
 }
