@@ -5,12 +5,13 @@ This repositoray presents datasets and empirical analysis results that use code 
 This repository contains: 
   * Evaluation Dataset - approximately 50k smart contracts extracted from the Ethereum network
   * Vulnerability Dataset - Ethereum smart contracts with confirmed vulnerabilities of following 8 types:
-   - Reentrancy 
-   - Denial of Service 
-   - Call-to-Unknown 
-   - Mishandled Exceptions
-   - Gasless Send
-   - Typecasting Errors
-   - Weak Access Modifiers 
-   - Integer Underflow/Overflow
+     1. Reentrancy 
+     2. Denial of Service 
+     3.  Call-to-Unknown 
+     4. Mishandled Exceptions
+     5. Gasless Send
+     6. Typecasting Errors
+     7. Weak Access Modifiers 
+     8. Integer Underflow/Overflow
+
 * Results of VOLCANO - empirical analysis of cross code clone detection between the Vulnerability Dataset and Evaluation Dataset. 
